@@ -264,10 +264,15 @@ end
 
 gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
 
-function gens(S::UniversalPolyRing{T}, v::Vector{<:VarName}) where {T <: RingElement}
-   idx = _ensure_variables(S, v)
-   return tuple((UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx)...)
-end
+#function gens(S::UniversalPolyRing{T}, v::Vector{<:VarName}) where {T <: RingElement}
+#   idx = _ensure_variables(S, v)
+#   return tuple((UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx)...)
+#end
+
+# @varnames_interface expects the 
+gens(S::UniversalPolyRing, varnames...) = _gens(S, varnames...)[2:end]
+_gens(S::UniversalPolyRing, v::Vector{Symbol}) = nothing, [gen(S, s) for s in v]
+@varnames_interface _gens(S::UniversalPolyRing, s)
 
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
