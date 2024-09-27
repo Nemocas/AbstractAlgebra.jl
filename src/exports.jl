@@ -189,6 +189,7 @@ export div_left!
 export div_right
 export div_right!
 export divexact
+export divexact!
 export divexact_left
 export divexact_low
 export divexact_right
@@ -349,6 +350,7 @@ export laurent_series
 export laurent_series_field
 export laurent_series_ring
 export lcm
+export lcm!
 export leading_coefficient
 export leading_exponent_vector
 export leading_exponent_word
@@ -530,6 +532,7 @@ export strictly_upper_triangular_matrix
 export sturm_sequence
 export sub
 export sub!
+export submul!
 export subst
 export summands
 export supermodule

@@ -167,22 +167,49 @@ right, respectively, of `a`.
 
 ## Unsafe ring operators
 
-To speed up polynomial arithmetic, various unsafe operators are provided, which may
-mutate the output rather than create a new object.
+To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values
+in place rather than replace them with a newly created object every time they are
+modified.
 
-```julia
-zero!(a::NCRingElement)
-mul!(a::T, b::T, c::T) where T <: NCRingElement
-add!(a::T, b::T, c::T) where T <: NCRingElement
-addmul!(a::T, b::T, c::T, t::T) where T <: NCRingElement
+For this purpose, certain mutating operators are required. In order to support immutable
+types (struct in Julia) and systems that don't have in-place operators, all unsafe
+operators must return the (ostensibly) mutated value. Only the returned value is used
+in computations, so this lifts the requirement that the unsafe operators actually
+mutate the value.
+
+Note the exclamation point is a convention, which indicates that the object may be
+mutated in-place.
+
+To make use of these functions, one must be certain that no other references are held
+to the object being mutated, otherwise those values will also be changed!
+
+The results of `deepcopy` and all arithmetic operations, including powering and division
+can be assumed to be new objects without other references being held, as can objects
+returned from constructors.
+
+!!! note
+
+    It is important to recognise that `R(a)` where `R` is the ring `a` belongs
+    to, does not create a new value. For this case, use `deepcopy(a)`.
+
+```@docs
+zero!
+one!
+add!
+sub!
+mul!
+neg!
+inv!
+addmul!
+submul!
+divexact!
+div!
+rem!
+mod!
+gcd!
+lcm!
 ```
 
-In each case the mutated object is the leftmost parameter.
-
-The `add!(a, b)` operation does the same thing as `add!(a, a, b)`. The
-optional `addmul!(a, b, c, t)` operation does the same thing as
-`mul!(t, b, c); add!(a, t)` where `t` is a temporary which can be mutated so
-that an addition allocation is not needed.
 
 ## Random generation
 
