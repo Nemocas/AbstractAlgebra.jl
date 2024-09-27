@@ -302,177 +302,96 @@ const VarName = Union{Symbol, AbstractString, Char}
 @doc raw"""
     zero!(a)
 
-Return the zero of `parent(a)`, possibly modifying the object `a` in the process.
+Return the `zero(parent(a))`, possibly modifying the object `a` in the process.
 """
-function zero!(a)
-  return zero(parent(a))
-end
+zero!(a) = zero(parent(a))
 
 @doc raw"""
-    add!(a, b, c)
+    one!(a)
 
-Return `b + c`, possibly modifying the object `a` in the process.
+Return the `one(parent(a))`, possibly modifying the object `a` in the process.
 """
-function add!(a, b, c)
-  return b + c
-end
+one!(a) = one(parent(a))
 
 @doc raw"""
-    add!(a, b)
-
-Return `a + b`, possibly modifying the object `a` in the process.
-This is a shorthand for `add!(a, a, b)`.
-"""
-add!(a, b) = add!(a, a, b)
-
-@doc raw"""
-    sub!(a, b, c)
-
-Return `b - c`, possibly modifying the object `a` in the process.
-"""
-function sub!(a, b, c)
-  return b - c
-end
-
-@doc raw"""
-    sub!(a, b)
-
-Return `a - b`, possibly modifying the object `a` in the process.
-This is a shorthand for `sub!(a, a, b)`.
-"""
-sub!(a, b) = sub!(a, a, b)
-
-@doc raw"""
-    neg!(a, b)
-
-Return `-b`, possibly modifying the object `a` in the process.
-"""
-function neg!(a, b)
-  return -b
-end
-
-@doc raw"""
+    neg!(z, a)
     neg!(a)
 
-Return `-a`, possibly modifying the object `a` in the process.
-This is a shorthand for `neg!(a, a)`.
+Return `-a`, possibly modifying the object `z` in the process.
+Aliasing is permitted.
+The unary version is a shorthand for `neg!(a, a)`.
 """
+neg!(z, a) = -a
 neg!(a) = neg!(a, a)
 
 @doc raw"""
-    mul!(a, b, c)
-
-Return `b * c`, possibly modifying the object `a` in the process.
-"""
-function mul!(a, b, c)
-  return b * c
-end
-
-@doc raw"""
-    mul!(a, b)
-
-Return `a * b`, possibly modifying the object `a` in the process.
-This is a shorthand for `mul!(a, a, b)`.
-"""
-mul!(a, b) = mul!(a, a, b)
-
-@doc raw"""
-    addmul!(a, b, c, t)
-
-Return `a + b * c`, possibly modifying the objects `a` and `t` in the process.
-"""
-function addmul!(a, b, c, t)
-   t = mul!(t, b, c)
-   return add!(a, t)
-end
-
-@doc raw"""
-    addmul!(a, b, c)
-
-Return `a + b * c`, possibly modifying the object `a` in the process.
-
-This is usually a shorthand for `addmul!(a, b, c, parent(a)())`, but
-in some cases may be more efficient. For multiple operations in a row
-that use temporary storage, it is still best to use the four argument
-version.
-"""
-addmul!(a, b, c) = addmul!(a, b, c, parent(a)())
-
-@doc raw"""
-    div!(a, b, c)
-
-Return `div(b, c)`, possibly modifying the object `a` in the process.
-"""
-function div!(a, b, c)
-  return div(b, c)
-end
-
-@doc raw"""
-    div!(a, b)
-
-Return `div(a, b)`, possibly modifying the object `a` in the process.
-This is a shorthand for `div!(a, a, b)`.
-"""
-div!(a, b) = div!(a, a, b)
-
-@doc raw"""
-    rem!(a, b, c)
-
-Return `rem(b, c)`, possibly modifying the object `a` in the process.
-"""
-function rem!(a, b, c)
-  return rem(b, c)
-end
-
-@doc raw"""
-    rem!(a, b)
-
-Return `rem(a, b)`, possibly modifying the object `a` in the process.
-This is a shorthand for `rem!(a, a, b)`.
-"""
-rem!(a, b) = rem!(a, a, b)
-
-@doc raw"""
-    mod!(a, b, c)
-
-Return `mod(b, c)`, possibly modifying the object `a` in the process.
-"""
-function mod!(a, b, c)
-  return mod(b, c)
-end
-
-@doc raw"""
-    mod!(a, b)
-
-Return `mod(a, b)`, possibly modifying the object `a` in the process.
-This is a shorthand for `mod!(a, a, b)`.
-"""
-mod!(a, b) = mod!(a, a, b)
-
-@doc raw"""
-    inv!(a, b)
-
-Return `inv(b)`, possibly modifying the object `a` in the process.
-"""
-function inv!(a, b)
-  return inv(b)
-end
-
-@doc raw"""
+    inv!(z, a)
     inv!(a)
 
-Return `inv(a)`, possibly modifying the object `a` in the process.
-This is a shorthand for `inv!(a, a)`.
+Return `inv(a)`, possibly modifying the object `z` in the process.
+Aliasing is permitted.
+The unary version is a shorthand for `inv!(a, a)`.
 """
+inv!(z, a) = inv(a)
 inv!(a) = inv!(a, a)
 
-@doc raw"""
-    gcd!(a, b, c)
+for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
+  @eval begin
+    @doc """
+        $($name)(z, a, b)
+        $($name)(a, b)
 
-Return `gcd(b, c)`, possibly modifying the object `a` in the process.
+    Return `a $($op) b`, possibly modifying the object `z` in the process.
+    Aliasing is permitted.
+    The two argument version is a shorthand for `$($name)(a, a, b)`.
+    """
+    $name(z, a, b) = $op(a, b)
+    $name(a, b) = $name(a, a, b)
+  end
+end
+
+@doc raw"""
+    addmul!(z, a, b, t)
+    addmul!(z, a, b)
+
+Return `z + a * b`, possibly modifying the objects `z` and `t` in the process.
+
+The second version is usually a shorthand for `addmul!(z, a, b, parent(z)())`,
+but in some cases may be more efficient. For multiple operations in a row that
+use temporary storage, it is still best to use the four argument version.
 """
-function gcd!(a, b, c)
-  return gcd(b, c)
+addmul!(z, a, b, t) = add!(z, mul!(t, a, b))
+addmul!(z, a, b) = addmul!(z, a, b, parent(z)())
+
+@doc raw"""
+    submul!(z, a, b, t)
+    submul!(z, a, b)
+
+Return `z - a * b`, possibly modifying the objects `z` and `t` in the process.
+
+The second version is usually a shorthand for `submul!(z, a, b, parent(z)())`,
+but in some cases may be more efficient. For multiple operations in a row that
+use temporary storage, it is still best to use the four argument version.
+"""
+submul!(z, a, b, t) = sub!(z, mul!(t, a, b))
+submul!(z, a, b) = submul!(z, a, b, parent(z)())
+
+function divexact end
+
+for name in (:divexact, :div, :rem, :mod, :gcd, :lcm)
+  name_bang = Symbol(name, "!")
+  @eval begin
+    @doc """
+        $($name_bang)(z, a, b)
+        $($name_bang)(a, b)
+
+    Return `$($name)(a, b)`, possibly modifying the object `z` in the process.
+    Aliasing is permitted.
+    The two argument version is a shorthand for `$($name)(a, a, b)`.
+    """
+    $name_bang(z, a, b) = $name(a, b)
+    $name_bang(a, b) = $name_bang(a, a, b)
+  end
 end
 
 @doc raw"""

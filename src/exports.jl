@@ -189,6 +189,7 @@ export div_left!
 export div_right
 export div_right!
 export divexact
+export divexact!
 export divexact_left
 export divexact_low
 export divexact_right
@@ -349,6 +350,7 @@ export laurent_series
 export laurent_series_field
 export laurent_series_ring
 export lcm
+export lcm!
 export leading_coefficient
 export leading_exponent_vector
 export leading_exponent_word
@@ -566,6 +568,7 @@ export weights
 export with_unicode
 export zero
 export zero!
+export submul!
 export zero_matrix
 export zeros
 export zz

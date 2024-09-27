@@ -517,51 +517,6 @@ point division. Here we mean exact division in the ring.
 A fallback for this function is provided in terms of `divexact` so an implementation
 can be omitted if preferred.
 
-### Unsafe operators
-
-To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values
-in place rather than replace them with a newly created object every time they are
-modified.
-
-For this purpose, certain mutating operators are required. In order to support immutable
-types (struct in Julia) and systems that don't have in-place operators, all unsafe
-operators must return the (ostensibly) mutated value. Only the returned value is used
-in computations, so this lifts the requirement that the unsafe operators actually
-mutate the value.
-
-Note the exclamation point is a convention, which indicates that the object may be
-mutated in-place.
-
-To make use of these functions, one must be certain that no other references are held
-to the object being mutated, otherwise those values will also be changed!
-
-The results of `deepcopy` and all arithmetic operations, including powering and division
-can be assumed to be new objects without other references being held, as can objects
-returned from constructors.
-
-!!! note
-
-    It is important to recognise that `R(a)` where `R` is the ring `a` belongs
-    to, does not create a new value. For this case, use `deepcopy(a)`.
-
-```julia
-zero!(f::MyElem)
-```
-
-Set the value $f$ to zero in place. Return the mutated value.
-
-```julia
-mul!(c::MyElem, a::MyElem, b::MyElem)
-```
-
-Set $c$ to the value $ab$ in place. Return the mutated value. Aliasing is permitted.
-
-```julia
-add!(c::MyElem, a::MyElem, b::MyElem)
-```
-
-Set $c$ to the value $a + b$ in place. Return the mutated value. Aliasing is permitted.
-
 ### Random generation
 
 The random functions are only used for test code to generate test data. They therefore
@@ -678,6 +633,15 @@ It may be that no algorithm, or no efficient algorithm is known to implement the
 functions. As these functions are optional, they do not need to exist. Julia will
 already inform the user that the function has not been implemented if it is called but
 doesn't exist.
+
+### Optional unsafe operators
+
+The various operators described in [Unsafe ring operators](@ref) such as
+`add!` and `mul!` have default implementations which are not faster than their
+regular safe counterparts. Implementors may wish to implement some or all of
+them for their rings. Note that in general only the variants with the most
+arguments needs to be implemented. E.g. for `add!` only `add(z,a,b)` has to be
+implemented for any new ring type, as `add!(a,b)` delegates to `add!(a,a,b)`.
 
 ### Optional basic manipulation functionality
 
