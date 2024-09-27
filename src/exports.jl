@@ -532,6 +532,7 @@ export strictly_upper_triangular_matrix
 export sturm_sequence
 export sub
 export sub!
+export submul!
 export subst
 export summands
 export supermodule
@@ -568,7 +569,6 @@ export weights
 export with_unicode
 export zero
 export zero!
-export submul!
 export zero_matrix
 export zeros
 export zz

@@ -302,14 +302,14 @@ const VarName = Union{Symbol, AbstractString, Char}
 @doc raw"""
     zero!(a)
 
-Return the `zero(parent(a))`, possibly modifying the object `a` in the process.
+Return `zero(parent(a))`, possibly modifying the object `a` in the process.
 """
 zero!(a) = zero(parent(a))
 
 @doc raw"""
     one!(a)
 
-Return the `one(parent(a))`, possibly modifying the object `a` in the process.
+Return `one(parent(a))`, possibly modifying the object `a` in the process.
 """
 one!(a) = one(parent(a))
 
