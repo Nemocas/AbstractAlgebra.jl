@@ -1,4 +1,4 @@
-###############################################################################
+##############################################################################
 #
 #   SparsePoly.jl : Generic sparse univariate polynomials over rings
 #
@@ -478,13 +478,13 @@ function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElement, T <: RingElem
    if a.length == 0
       return base_ring(a)()
    end
-   r = a.coeffs[a.length]
+   r = deepcopy(a.coeffs[a.length])
    for i = 1:a.length - 1
-      r *= b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
-      r += a.coeffs[a.length - i]
+      r = mul!(r, r, b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
+      r = add!(r, r, a.coeffs[a.length - i])
    end
    if a.exps[1] != 0
-      r *= b^(reinterpret(Int, a.exps[1]))
+       r = mul!(r, r, b^(reinterpret(Int, a.exps[1])))
    end
    return r
 end
@@ -493,13 +493,13 @@ function evaluate(a::SparsePoly{T}, b::Rational{S}) where {S <: Integer, T <: Ri
    if a.length == 0
       return base_ring(a)()
    end
-   r = a.coeffs[a.length]
+   r = deepcopy(a.coeffs[a.length])
    for i = 1:a.length - 1
-      r *= b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
-      r += a.coeffs[a.length - i]
+      r = mul!(r, r, b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
+      r = add!(r, r, a.coeffs[a.length - i])
    end
    if a.exps[1] != 0
-      r *= b^(reinterpret(Int, a.exps[1]))
+      r = mul!(r, r,  b^(reinterpret(Int, a.exps[1])))
    end
    return r
 end
@@ -509,13 +509,13 @@ function evaluate(a::SparsePoly{T}, b::Integer) where {T <: RingElement}
       return base_ring(a)()
    end
    R = base_ring(a)
-   r = a.coeffs[a.length]
+   r = deepcopy(a.coeffs[a.length])
    for i = 1:a.length - 1
-      r *= R(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
-      r += a.coeffs[a.length - i]
+      r = mul!(r, r, R(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
+      r = add!(r, r, a.coeffs[a.length - i])
    end
    if a.exps[1] != 0
-      r *= R(b)^(reinterpret(Int, a.exps[1]))
+      r = mul!(r, r, R(b)^(reinterpret(Int, a.exps[1])))
    end
    return r
 end
