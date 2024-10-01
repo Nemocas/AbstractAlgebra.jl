@@ -344,12 +344,16 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R)
 
       @testset "Basic functionality for commutative rings only" begin
+        @test isone(AbstractAlgebra.inv(one(R)))
+        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R), one(R))
+        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R), -one(R))
+        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R), one(R))
+        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R), -one(R))
          for i in 1:reps
             a = test_elem(R)::T
             b = test_elem(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
-            @test isone(AbstractAlgebra.inv(one(R)))
             @test a*b == b*a
             # documentation is not clear on divexact
             if is_domain_type(T)
@@ -359,6 +363,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
                if T isa RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
+               iszero(a) || iszero(b) || test_mutating_op_like_divexact(divexact, divexact!, b*a, b*a, b)
             else
                try
                   t = divexact(b*a, b)
@@ -407,7 +412,17 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
       for i in 1:reps
          a = test_elem(R)::T
+         b = test_elem(R)::T
+         A = deepcopy(a)
+         B = deepcopy(b)
          @test is_unit(a) == !iszero(a)
+         if !is_zero(a)
+            @test is_one(a * inv(a))
+            @test is_one(inv(a) * a)
+            test_mutating_op_like_neg(inv, inv!, b, a)
+         end
+         @test A == a
+         @test B == b
       end
    end
 
@@ -495,6 +510,14 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test d == gcd(f, g)
          @test d == s*f + t*g
          @test gcdinv(f, g) == (d, s)
+
+         if !is_zero(f) && !is_zero(g) && !is_zero(m)
+            test_mutating_op_like_add(AbstractAlgebra.div, div!, f, g, m)
+            test_mutating_op_like_add(rem, rem!, f, g, m)
+            test_mutating_op_like_add(mod, mod!, f, g, m)
+         end
+         test_mutating_op_like_add(gcd, gcd!, f, g, m)
+         test_mutating_op_like_add(lcm, lcm!, f, g, m)
       end
 
    end
