@@ -348,9 +348,8 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          (a, b) = divides(f*m + g, m)
          @test !a || b*m == f*m + g
 
-         #TODO: enable once https://github.com/Nemocas/Nemo.jl/issues/1174
-         #@test_throws Exception remove(f, zero(R))
-         #@test_throws Exception valuation(f, zero(R))
+         @test_throws Exception remove(f, zero(R))
+         @test_throws Exception valuation(f, zero(R))
 
          if !is_unit(m) && !iszero(f)
             n = rand(0:3)
