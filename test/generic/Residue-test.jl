@@ -1,11 +1,3 @@
-function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing{BigInt})
-   return rand(R, 0:characteristic(R))
-end
-
-function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing{AbstractAlgebra.Generic.Poly{T}}) where T
-   return rand(R, 0:100, -100:100)
-end
-
 @testset "EuclideanRingResidueRingElem.conformance_tests" begin
    test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
    test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])

@@ -1,11 +1,3 @@
-function test_elem(R::AbstractAlgebra.Floats{Float64})
-   return rand(Float64)*rand(-100:100)
-end
-
-function test_elem(R::AbstractAlgebra.Floats{BigFloat})
-   return rand(BigFloat)*rand(-100:100)
-end
-
 @testset "Julia.Floats.conformance_tests" begin
    test_Ring_interface(RDF)
    test_Ring_interface(RealField)

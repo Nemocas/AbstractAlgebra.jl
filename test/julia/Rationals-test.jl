@@ -1,8 +1,3 @@
-function test_elem(R::AbstractAlgebra.Rationals{BigInt})
-   n = big(2)^rand(1:100)
-   return rand(QQ, -n:n)
-end
-
 @testset "Julia.Rationals.conformance_tests" begin
    test_Field_interface_recursive(QQ)
 end

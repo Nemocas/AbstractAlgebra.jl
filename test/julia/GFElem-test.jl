@@ -1,7 +1,3 @@
-function test_elem(R::AbstractAlgebra.GFField)
-   return rand(R)
-end
-
 @testset "Julia.GFElem.conformance_tests" begin
    test_Field_interface_recursive(GF(3))
    test_Field_interface_recursive(GF(13))

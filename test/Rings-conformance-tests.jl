@@ -13,6 +13,67 @@
 # - test_MatSpace_interface(R)
 # - test_MatAlgebra_interface(R)
 
+#
+# add methods for test_elem on ring elements here
+#
+
+function test_elem(R::AbstractAlgebra.Integers)
+   n = big(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+   return rand(R, -n:n)
+end
+
+function test_elem(R::AbstractAlgebra.Rationals)
+   B = base_ring(R)
+   n = test_elem(B)
+   d = test_elem(B)
+   return is_zero(d) ? R(n) : R(n, d)
+end
+
+function test_elem(R::AbstractAlgebra.FinField)
+   return rand(R)
+end
+
+function test_elem(R::AbstractAlgebra.Floats{T}) where T
+   return rand(T)*rand(-100:100)
+end
+
+function test_elem(Rx::AbstractAlgebra.PolyRing)
+   R = base_ring(Rx)
+   return Rx(elem_type(R)[test_elem(R) for i in 1:rand(0:6)])
+end
+
+function test_elem(S::Union{AbstractAlgebra.MatSpace,
+                            AbstractAlgebra.MatRing})
+   R = base_ring(S)
+   return S(elem_type(R)[test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
+
+function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing)
+   return R(test_elem(base_ring(R)))
+end
+
+function test_elem(Rx::AbstractAlgebra.SeriesRing)
+   R = base_ring(Rx)
+   prec = rand(3:10)
+   len = rand(0:prec-1)
+   val = rand(0:prec-len)
+   # FIXME: constructors don't seem to catch use of negative val
+   @assert val >= 0
+   A = elem_type(R)[test_elem(R) for i in 1:len]
+   if len > 0 && is_zero(A[1])
+     A[1] = one(R)
+   end
+   if elem_type(Rx) <: RelPowerSeriesRingElem
+     @assert prec >= len + val
+     return Rx(A, len, prec, val)
+   else
+     @assert prec >= len
+     return Rx(A, len, prec)
+   end
+end
+
+
+# helper
 function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    if is_exact_type(T)
       return a == b
@@ -484,11 +545,6 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 end
 
 
-function test_elem(Rx::AbstractAlgebra.PolyRing)
-   R = base_ring(Rx)
-   return Rx(elem_type(R)[test_elem(R) for i in 1:rand(0:6)])
-end
-
 function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
    T = elem_type(Rx)
@@ -568,12 +624,6 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
    end
 
    return nothing
-end
-
-function test_elem(S::Union{AbstractAlgebra.MatSpace,
-                            AbstractAlgebra.MatRing})
-   R = base_ring(S)
-   return S(elem_type(R)[test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
 end
 
 
