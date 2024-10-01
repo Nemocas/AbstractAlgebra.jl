@@ -21,111 +21,101 @@ function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    end
 end
 
-function test_mutating_op_like_zero(f::Function, f!::Function, a)
-  A = deepcopy(a)
+function test_mutating_op_like_zero(f::Function, f!::Function, A)
+  a = deepcopy(A)
   a = f!(a)
   @test equality(a, f(A))
-  a = deepcopy(A)
 end
 
-function test_mutating_op_like_neg(f::Function, f!::Function, a, b)
-  A = deepcopy(a)
-  B = deepcopy(b)
+function test_mutating_op_like_neg(f::Function, f!::Function, A, B)
+  a = deepcopy(A)
+  b = deepcopy(B)
   a = f!(a, b)
   @test equality(a, f(B))
   @test b == B
-  a = deepcopy(A)
-  b = deepcopy(B)
 
+  a = deepcopy(A)
   a = f!(a)
   @test equality(a, f(A))
-  a = deepcopy(A)
 end
 
-function test_mutating_op_like_add(f::Function, f!::Function, a, b, c)
-  A = deepcopy(a)
-  B = deepcopy(b)
-  C = deepcopy(c)
-
+function test_mutating_op_like_add(f::Function, f!::Function, A, B, C)
+  a = deepcopy(A)
+  b = deepcopy(B)
+  c = deepcopy(C)
   a = f!(a, b, c)
   @test equality(a, f(B, C))
   @test b == B
   @test c == C
+  
   a = deepcopy(A)
   b = deepcopy(B)
-  c = deepcopy(C)
-
   a = f!(a, a, b)
   @test equality(a, f(A, B))
   @test b == B
+  
   a = deepcopy(A)
   b = deepcopy(B)
-
   a = f!(a, b, a)
   @test equality(a, f(B, A))
   @test b == B
+  
   a = deepcopy(A)
   b = deepcopy(B)
-
   a = f!(a, b, b)
   @test equality(a, f(B, B))
   @test b == B
+  
   a = deepcopy(A)
-  b = deepcopy(B)
-
   a = f!(a, a, a)
   @test equality(a, f(A, A))
+  
   a = deepcopy(A)
-
+  b = deepcopy(B)
   a = f!(a, b)
   @test equality(a, f(A, B))
   @test b == B
+  
   a = deepcopy(A)
-  b = deepcopy(B)
-
   a = f!(a, a)
   @test equality(a, f(A, A))
   a = deepcopy(A)
 end
 
-function test_mutating_op_like_addmul(f::Function, f!_::Function, a, b, c)
-  A = deepcopy(a)
-  B = deepcopy(b)
-  C = deepcopy(c)
-
+function test_mutating_op_like_addmul(f::Function, f!_::Function, A, B, C)
   f!(a, b, c, ::Nothing) = f!_(a, b, c)
   f!(a, b, c, t) = f!_(a, b, c, t)
 
-  for t in [nothing, zero(parent(a)), deepcopy(a)]
+  for t in [nothing, zero(parent(A)), deepcopy(A)]
+    a = deepcopy(A)
+    b = deepcopy(B)
+    c = deepcopy(C)
     a = f!(a, b, c, t)
     @test equality(a, f(A, B, C))
     @test b == B
     @test c == C
+    
     a = deepcopy(A)
     b = deepcopy(B)
-    c = deepcopy(C)
-
     a = f!(a, a, b, t)
     @test equality(a, f(A, A, B))
     @test b == B
+    
     a = deepcopy(A)
     b = deepcopy(B)
-
     a = f!(a, b, a, t)
     @test equality(a, f(A, B, A))
     @test b == B
+    
     a = deepcopy(A)
     b = deepcopy(B)
-
     a = f!(a, b, b, t)
     @test equality(a, f(A, B, B))
     @test b == B
+    
     a = deepcopy(A)
-    b = deepcopy(B)
-
     a = f!(a, a, a, t)
     @test equality(a, f(A, A, A))
-    a = deepcopy(A)
   end
 end
 
