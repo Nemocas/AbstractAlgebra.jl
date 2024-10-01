@@ -39,6 +39,51 @@ function test_mutating_op_like_neg(f::Function, f!::Function, A, B)
   @test equality(a, f(A))
 end
 
+function test_mutating_op_like_divexact(f::Function, f!::Function, A, B, C)
+  a = deepcopy(A)
+  b = deepcopy(B)
+  c = deepcopy(C)
+  a = f!(a, b, c)
+  @test equality(a, f(B, C))
+  @test b == B
+  @test c == C
+
+  a = deepcopy(A)
+  b = deepcopy(B)
+  a = f!(a, a, b)
+  @test equality(a, f(A, B))
+  @test b == B
+
+  if typeof(A) == typeof(B)
+    a = deepcopy(A)
+    b = deepcopy(B)
+    a = f!(a, b, a)
+    @test equality(a, f(B, A))
+    @test b == B
+  end
+
+  a = deepcopy(A)
+  b = deepcopy(B)
+  a = f!(a, b, b)
+  @test equality(a, f(B, B))
+  @test b == B
+
+  a = deepcopy(A)
+  a = f!(a, a, a)
+  @test equality(a, f(A, A))
+
+  a = deepcopy(A)
+  b = deepcopy(B)
+  a = f!(a, b)
+  @test equality(a, f(A, B))
+  @test b == B
+
+  a = deepcopy(A)
+  a = f!(a, a)
+  @test equality(a, f(A, A))
+  a = deepcopy(A)
+end
+
 function test_mutating_op_like_add(f::Function, f!::Function, A, B, C)
   a = deepcopy(A)
   b = deepcopy(B)
@@ -47,19 +92,19 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, C)
   @test equality(a, f(B, C))
   @test b == B
   @test c == C
-  
+
   a = deepcopy(A)
   b = deepcopy(B)
   a = f!(a, a, b)
   @test equality(a, f(A, B))
   @test b == B
-  
+
   a = deepcopy(A)
   b = deepcopy(B)
   a = f!(a, b, a)
   @test equality(a, f(B, A))
   @test b == B
-  
+
   a = deepcopy(A)
   b = deepcopy(B)
   a = f!(a, b, b)
@@ -69,13 +114,13 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, C)
   a = deepcopy(A)
   a = f!(a, a, a)
   @test equality(a, f(A, A))
-  
+
   a = deepcopy(A)
   b = deepcopy(B)
   a = f!(a, b)
   @test equality(a, f(A, B))
   @test b == B
-  
+
   a = deepcopy(A)
   a = f!(a, a)
   @test equality(a, f(A, A))
