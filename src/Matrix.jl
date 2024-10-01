@@ -2494,16 +2494,35 @@ julia> minors(A, 2)
 
 ```
 """
-function minors(A::MatElem, k::Int)
-   row_indices = combinations(nrows(A), k)
-   col_indices = combinations(ncols(A), k)
-   mins = Vector{elem_type(base_ring(A))}(undef, 0)
-   for ri in row_indices
-      for ci in col_indices
-         push!(mins, det(A[ri, ci]))
-      end
-   end
-   return(mins)
+minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
+
+@doc raw"""
+    minors_iterator(A::MatElem, k::Int)
+
+Return an iterator that computes the `k`-minors of `A`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> first(minors_iterator(A, 2))
+-3
+
+julia> collect(minors_iterator(A, 2))
+3-element Vector{BigInt}:
+ -3
+ -6
+ -3
+
+```
+"""
+function minors_iterator(M::MatElem, k::Int)
+  row_indices = combinations(nrows(M), k)
+  col_indices = combinations(ncols(M), k)
+  return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
