@@ -263,10 +263,6 @@ function Base.divrem(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRing
   end
 end
 
-function Base.div(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T}) where {T}
-  return divrem(a, b)[1]
-end
-
 function rem(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T}) where {T}
   return divrem(a, b)[2]
 end

@@ -106,7 +106,7 @@ function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
 end
 
-function inv(a::LaurentMPolyWrap)
+function Base.inv(a::LaurentMPolyWrap)
     (ap, ad) = _normalize(a)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
@@ -204,7 +204,7 @@ function gcd(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     return LaurentMPolyWrap(parent(a), gcd(ap, bp), zero!(ad))
 end
 
-function divrem(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+function Base.divrem(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     check_parent(a, b)
     error("divrem not implemented for LaurentMPoly")
 end
