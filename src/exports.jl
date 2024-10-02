@@ -220,6 +220,7 @@ export finish
 export fit!
 export fraction_field
 export free_associative_algebra
+export free_associative_algebra_type
 export free_module
 export function_field
 export gcd
