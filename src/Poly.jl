@@ -400,20 +400,10 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
    end
 end
  
-Base.IteratorEltype(M::PolyRingElem) = Base.HasEltype()
+Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
-Base.eltype(M::PolyRingElem{T}) where {T} = T
-
-Base.eltype(M::PolyCoeffs) = Base.eltype(M.f)
+Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
  
-Base.eltype(M::Iterators.Reverse{<:PolyCoeffs}) = Base.eltype(M.itr.f)
-
-Base.eltype(M::Iterators.Take{<:PolyCoeffs}) = Base.eltype(M.xs.f)
-
-Base.eltype(M::Iterators.Take{<:Iterators.Reverse{<:PolyCoeffs}}) = Base.eltype(M.xs.itr.f)
-
-Base.IteratorSize(M::PolyCoeffs{<:PolyRingElem}) = Base.HasLength()
-
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
  
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})

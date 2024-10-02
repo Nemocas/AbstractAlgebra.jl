@@ -628,8 +628,6 @@ julia> unique(A)
 """
 elements!(G::SymmetricGroup)= (p for p in AllPerms(G.n))
 
-Base.IteratorSize(::Type{<:SymmetricGroup}) = Base.HasLength()
-
 @inline function Base.iterate(G::SymmetricGroup)
    A = AllPerms(G.n)
    a, b = iterate(A)
