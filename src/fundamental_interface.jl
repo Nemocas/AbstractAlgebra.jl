@@ -328,11 +328,16 @@ neg!(a) = neg!(a, a)
     inv!(z, a)
     inv!(a)
 
-Return `inv(a)`, possibly modifying the object `z` in the process.
+Return `AbstractAlgebra.inv(a)`, possibly modifying the object `z` in the process.
 Aliasing is permitted.
 The unary version is a shorthand for `inv!(a, a)`.
+
+!!! note
+    `AbstractAlgebra.inv` and `Base.inv` differ only in their behavior on julia
+    types like `Integer` and `Rational{Int}`. The former makes it adhere to the
+    Ring interface.
 """
-inv!(z, a) = inv(a)
+inv!(z, a) = AbstractAlgebra.inv(a)
 inv!(a) = inv!(a, a)
 
 for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
@@ -378,7 +383,7 @@ submul!(z, a, b) = submul!(z, a, b, parent(z)())
 
 function divexact end
 
-for name in (:divexact, :div, :rem, :mod, :gcd, :lcm)
+for name in (:divexact, :rem, :mod, :gcd, :lcm)
   name_bang = Symbol(name, "!")
   @eval begin
     @doc """
@@ -393,6 +398,22 @@ for name in (:divexact, :div, :rem, :mod, :gcd, :lcm)
     $name_bang(a, b) = $name_bang(a, a, b)
   end
 end
+
+@doc """
+    div!(z, a, b)
+    div!(a, b)
+
+Return `div(a, b)`, possibly modifying the object `z` in the process.
+Aliasing is permitted.
+The two argument version is a shorthand for `div(a, a, b)`.
+
+!!! note
+    `AbstractAlgebra.div` and `Base.div` differ only in their behavior on julia
+    types like `Integer` and `Rational{Int}`. The former makes it adhere to the
+    Ring interface.
+"""
+div!(z, a, b) = AbstractAlgebra.div(a, b)
+div!(a, b) = div!(a, a, b)
 
 @doc raw"""
     canonical_injection(D, i)
