@@ -234,7 +234,7 @@ function Base.length(
 end
 
 function Base.eltype(
-    x::FreeAssAlgExponentWords{T},
+    ::Type{FreeAssAlgExponentWords{T}},
 ) where {S <: RingElement, T <: FreeAssociativeAlgebraElem{S}}
     return Vector{Int}
 end

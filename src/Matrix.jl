@@ -506,7 +506,6 @@ function Base.iterate(a::MatrixElem{T}, ij=(0, 1)) where T <: NCRingElement
 end
 
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
-Base.IteratorEltype(::Type{<:MatrixElem}) = Base.HasEltype() # default
 
 Base.pairs(M::MatElem) = Base.pairs(IndexCartesian(), M)
 Base.pairs(::IndexCartesian, M::MatElem) = Base.Iterators.Pairs(M, CartesianIndices(axes(M)))

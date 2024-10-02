@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-Base.eltype(M::FPModule{T}) where T <: FinFieldElem = elem_type(M)
+Base.eltype(T::Type{<:FPModule{<:FinFieldElem}}) = elem_type(T)
 
 function zero(M::FPModule{T}) where T <: RingElement
    R = base_ring(M)

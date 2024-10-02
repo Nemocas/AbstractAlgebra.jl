@@ -466,19 +466,19 @@ function Base.length(x::Union{UnivPolyCoeffs, UnivPolyExponentVectors, UnivPolyT
    return length(x.poly)
 end
 
-function Base.eltype(x::UnivPolyCoeffs{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyCoeffs{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return S
 end
 
-function Base.eltype(x::UnivPolyExponentVectors{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyExponentVectors{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return Vector{Int}
 end
 
-function Base.eltype(x::UnivPolyMonomials{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyMonomials{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return T
 end
 
-function Base.eltype(x::UnivPolyTerms{T}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyTerms{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
    return T
 end
 
