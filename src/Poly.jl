@@ -1479,11 +1479,6 @@ function Base.divrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElem
    return q, f
 end
 
-function Base.div(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
-   q, r = divrem(f, g)
-   return q
-end
-
 ##############################################################################
 #
 #  Ad hoc Euclidean division

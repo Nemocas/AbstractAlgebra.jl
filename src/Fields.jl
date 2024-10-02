@@ -16,7 +16,7 @@ is_zero_divisor(a::T) where T <: FieldElem = is_zero(a)
 
 Base.divrem(a::T, b::T) where {T <: FieldElem} = divexact(a, b), zero(parent(a))
 
-div(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
+Base.div(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
 
 function gcd(x::T, y::T) where {T <: FieldElem}
    check_parent(x, y)
