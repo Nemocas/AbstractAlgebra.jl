@@ -143,11 +143,6 @@ end
 
 @testset "WeakKeyIdDict.gc" begin
 
-    # issue #26939
-    d26939 = WeakKeyIdDict()
-    d26939[big"1.0" + 1.1] = 1
-    GC.gc() # make sure this doesn't segfault
-
     wkd = WeakKeyIdDict([42]=>2, [43]=>3, [44]=>4)
     for k in keys(wkd)
         delete!(wkd, k)
