@@ -22,146 +22,102 @@ function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
 end
 
 function test_mutating_op_like_zero(f::Function, f!::Function, A)
-  a = deepcopy(A)
-  a = f!(a)
-  @test equality(a, f(A))
+   a = deepcopy(A)
+   a = f!(a)
+   @test equality(a, f(A))
 end
 
-function test_mutating_op_like_neg(f::Function, f!::Function, A, B)
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b)
-  @test equality(a, f(B))
-  @test b == B
+function test_mutating_op_like_neg(f::Function, f!::Function, A)
+   for z in [zero(A), deepcopy(A)]
+      a = deepcopy(A)
+      z = f!(z, a)
+      @test equality(z, f(A))
+      @test a == A
+   end
 
-  a = deepcopy(A)
-  a = f!(a)
-  @test equality(a, f(A))
+   a = deepcopy(A)
+   a = f!(a)
+   @test equality(a, f(A))
 end
 
-function test_mutating_op_like_divexact(f::Function, f!::Function, A, B, C)
-  a = deepcopy(A)
-  b = deepcopy(B)
-  c = deepcopy(C)
-  a = f!(a, b, c)
-  @test equality(a, f(B, C))
-  @test b == B
-  @test c == C
+function test_mutating_op_like_add(f::Function, f!::Function, A, B)
+   for z in [zero(A), deepcopy(A), deepcopy(B)]
+      a = deepcopy(A)
+      b = deepcopy(B)
+      z = f!(z, a, b)
+      @test equality(z, f(A, B))
+      @test a == A
+      @test b == B
+   end
 
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, a, b)
-  @test equality(a, f(A, B))
-  @test b == B
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, a, b)
+   @test equality(a, f(A, B))
+   @test b == B
 
-  if typeof(A) == typeof(B)
-    a = deepcopy(A)
-    b = deepcopy(B)
-    a = f!(a, b, a)
-    @test equality(a, f(B, A))
-    @test b == B
-  end
+   a = deepcopy(A)
+   b = deepcopy(B)
+   b = f!(b, a, b)
+   @test equality(b, f(A, B))
+   @test a == A
 
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b, b)
-  @test equality(a, f(B, B))
-  @test b == B
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, b, b)
+   @test equality(a, f(B, B))
+   @test b == B
+   
+   b = deepcopy(B)
+   b = f!(b, b, b)
+   @test equality(b, f(B, B))
 
-  a = deepcopy(A)
-  a = f!(a, a, a)
-  @test equality(a, f(A, A))
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, b)
+   @test equality(a, f(A, B))
+   @test b == B
 
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b)
-  @test equality(a, f(A, B))
-  @test b == B
-
-  a = deepcopy(A)
-  a = f!(a, a)
-  @test equality(a, f(A, A))
-  a = deepcopy(A)
+   b = deepcopy(B)
+   b = f!(b, b)
+   @test equality(b, f(B, B))
 end
 
-function test_mutating_op_like_add(f::Function, f!::Function, A, B, C)
-  a = deepcopy(A)
-  b = deepcopy(B)
-  c = deepcopy(C)
-  a = f!(a, b, c)
-  @test equality(a, f(B, C))
-  @test b == B
-  @test c == C
+function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B)
+   f!(z, a, b, ::Nothing) = f!_(z, a, b)
+   f!(z, a, b, t) = f!_(z, a, b, t)
 
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, a, b)
-  @test equality(a, f(A, B))
-  @test b == B
-
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b, a)
-  @test equality(a, f(B, A))
-  @test b == B
-
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b, b)
-  @test equality(a, f(B, B))
-  @test b == B
-  
-  a = deepcopy(A)
-  a = f!(a, a, a)
-  @test equality(a, f(A, A))
-
-  a = deepcopy(A)
-  b = deepcopy(B)
-  a = f!(a, b)
-  @test equality(a, f(A, B))
-  @test b == B
-
-  a = deepcopy(A)
-  a = f!(a, a)
-  @test equality(a, f(A, A))
-  a = deepcopy(A)
-end
-
-function test_mutating_op_like_addmul(f::Function, f!_::Function, A, B, C)
-  f!(a, b, c, ::Nothing) = f!_(a, b, c)
-  f!(a, b, c, t) = f!_(a, b, c, t)
-
-  for t in [nothing, zero(parent(A)), deepcopy(A)]
-    a = deepcopy(A)
-    b = deepcopy(B)
-    c = deepcopy(C)
-    a = f!(a, b, c, t)
-    @test equality(a, f(A, B, C))
-    @test b == B
-    @test c == C
-    
-    a = deepcopy(A)
-    b = deepcopy(B)
-    a = f!(a, a, b, t)
-    @test equality(a, f(A, A, B))
-    @test b == B
-    
-    a = deepcopy(A)
-    b = deepcopy(B)
-    a = f!(a, b, a, t)
-    @test equality(a, f(A, B, A))
-    @test b == B
-    
-    a = deepcopy(A)
-    b = deepcopy(B)
-    a = f!(a, b, b, t)
-    @test equality(a, f(A, B, B))
-    @test b == B
-    
-    a = deepcopy(A)
-    a = f!(a, a, a, t)
-    @test equality(a, f(A, A, A))
-  end
+   for t in [nothing, zero(A), deepcopy(A)]
+      z = deepcopy(Z)
+      a = deepcopy(A)
+      b = deepcopy(B)
+      z = f!(z, a, b, t)
+      @test equality(z, f(Z, A, B))
+      @test a == A
+      @test b == B
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      a = f!(a, a, b, t)
+      @test equality(a, f(A, A, B))
+      @test b == B
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      b = f!(b, a, b, t)
+      @test equality(b, f(B, A, B))
+      @test a == A
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      a = f!(a, b, b, t)
+      @test equality(a, f(A, B, B))
+      @test b == B
+      
+      b = deepcopy(B)
+      b = f!(b, b, b, t)
+      @test equality(b, f(B, B, B))
+   end
 end
 
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
@@ -321,11 +277,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             test_mutating_op_like_zero(zero, zero!, a)
             test_mutating_op_like_zero(one, one!, a)
 
-            test_mutating_op_like_neg(-, neg!, a, b)
+            test_mutating_op_like_neg(-, neg!, a)
 
-            test_mutating_op_like_add(+, add!, a, b, c)
-            test_mutating_op_like_add(-, sub!, a, b, c)
-            test_mutating_op_like_add(*, mul!, a, b, c)
+            test_mutating_op_like_add(+, add!, a, b)
+            test_mutating_op_like_add(-, sub!, a, b)
+            test_mutating_op_like_add(*, mul!, a, b)
 
             test_mutating_op_like_addmul((a, b, c) -> a + b*c, addmul!, a, b, c)
             test_mutating_op_like_addmul((a, b, c) -> a - b*c, submul!, a, b, c)
@@ -348,11 +304,9 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R)
 
       @testset "Basic functionality for commutative rings only" begin
-        @test isone(AbstractAlgebra.inv(one(R)))
-        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R), one(R))
-        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R), -one(R))
-        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R), one(R))
-        test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R), -one(R))
+         @test isone(AbstractAlgebra.inv(one(R)))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
             a = test_elem(R)::T
             b = test_elem(R)::T
@@ -367,7 +321,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
                if T isa RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
-               iszero(a) || iszero(b) || test_mutating_op_like_divexact(divexact, divexact!, b*a, b*a, b)
+               iszero(b) || test_mutating_op_like_add(divexact, divexact!, b*a, b)
             else
                try
                   t = divexact(b*a, b)
@@ -416,17 +370,14 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
       for i in 1:reps
          a = test_elem(R)::T
-         b = test_elem(R)::T
          A = deepcopy(a)
-         B = deepcopy(b)
          @test is_unit(a) == !iszero(a)
          if !is_zero(a)
             @test is_one(a * inv(a))
             @test is_one(inv(a) * a)
-            test_mutating_op_like_neg(inv, inv!, b, a)
+            test_mutating_op_like_neg(inv, inv!, a)
          end
          @test A == a
-         @test B == b
       end
    end
 
@@ -515,13 +466,11 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test d == s*f + t*g
          @test gcdinv(f, g) == (d, s)
 
-         if !is_zero(f) && !is_zero(g) && !is_zero(m)
-            test_mutating_op_like_add(AbstractAlgebra.div, div!, f, g, m)
-            test_mutating_op_like_add(rem, rem!, f, g, m)
-            test_mutating_op_like_add(mod, mod!, f, g, m)
-         end
-         test_mutating_op_like_add(gcd, gcd!, f, g, m)
-         test_mutating_op_like_add(lcm, lcm!, f, g, m)
+         test_mutating_op_like_add(AbstractAlgebra.div, div!, f, m)
+         test_mutating_op_like_add(rem, rem!, f, m)
+         test_mutating_op_like_add(mod, mod!, f, m)
+         test_mutating_op_like_add(gcd, gcd!, f, m)
+         test_mutating_op_like_add(lcm, lcm!, f, m)
       end
 
    end
