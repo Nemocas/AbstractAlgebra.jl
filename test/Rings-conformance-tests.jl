@@ -21,6 +21,8 @@ function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    end
 end
 
+# The following functions should not expect that their input is a `NCRingElem` or similar.
+# They should be usable in more general types, that don't even have a `parent/elem` correspondence
 function test_mutating_op_like_zero(f::Function, f!::Function, A)
    a = deepcopy(A)
    a = f!(a)
