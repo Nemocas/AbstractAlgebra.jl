@@ -224,7 +224,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          for i in 1:reps
             a = test_elem(R)::T
             @test hash(a) isa UInt
-            @test hash(a) == hash(deepcopy(a))
+            A = deepcopy(a)
+            @test !ismutable(a) || a !== A
+            @test equality(a, A)
+            @test hash(a) == hash(A)
+            @test parent(a) === parent(A)
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
