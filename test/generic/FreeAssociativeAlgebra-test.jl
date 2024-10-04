@@ -1,10 +1,14 @@
 @testset "Generic.FreeAssociativeAlgebra.constructors" begin
    R, x = ZZ["y"]
+   @test free_associative_algebra_type(R) == free_associative_algebra_type(typeof(R))
+   @test free_associative_algebra_type(R) == free_associative_algebra_type(elem_type(R))
+   @test isconcretetype(free_associative_algebra_type(R))
 
    for num_vars = 1:5
       var_names = ["x$j" for j in 1:num_vars]
 
       S, varlist = free_associative_algebra(R, var_names)
+      @test S isa free_associative_algebra_type(R)
 
       @test free_associative_algebra(R, var_names, cached = true)[1] === free_associative_algebra(R, var_names, cached = true)[1]
       @test free_associative_algebra(R, var_names, cached = false)[1] !== free_associative_algebra(R, var_names, cached = true)[1]

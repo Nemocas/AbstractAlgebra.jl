@@ -475,7 +475,7 @@ macro varnames_interface(e::Expr, options::Expr...)
     end
 end
 
-@varnames_interface Generic.free_associative_algebra(R::Ring, s)
+@varnames_interface free_associative_algebra(R::Ring, s)
 @varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
 @varnames_interface Generic.rational_function_field(K::Field, s)
 

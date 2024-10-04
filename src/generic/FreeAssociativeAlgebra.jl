@@ -696,19 +696,3 @@ function _map(g::S, a::FreeAssociativeAlgebraElem{T}, Rx) where {S, T <: RingEle
 
     return finish(M)
 end
-
-
-###############################################################################
-#
-#   free_associative_algebra constructor
-#
-###############################################################################
-
-function free_associative_algebra(
-    R::AbstractAlgebra.Ring,
-    s::Vector{Symbol};
-    cached::Bool = true,
-)
-    parent_obj = FreeAssociativeAlgebra{elem_type(R)}(R, s, cached)
-    return (parent_obj, gens(parent_obj))
-end
