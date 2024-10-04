@@ -177,6 +177,7 @@ function divexact(a::Integer, b::Integer; check::Bool=true)
 end
 
 function divexact(a::BigInt, b::BigInt; check::Bool=true)
+   iszero(b) && throw(DivideError())
    q = BigInt()
    if check
       r = BigInt()
@@ -191,6 +192,7 @@ function divexact(a::BigInt, b::BigInt; check::Bool=true)
 end
 
 function divexact(a::BigInt, b::Int; check::Bool=true)
+   iszero(b) && throw(DivideError())
    q = BigInt()
    sgn = b < 0
    if check
@@ -206,6 +208,7 @@ function divexact(a::BigInt, b::Int; check::Bool=true)
 end
 
 function divexact(a::BigInt, b::UInt; check::Bool=true)
+   iszero(b) && throw(DivideError())
    q = BigInt()
    if check
       r = BigInt()
