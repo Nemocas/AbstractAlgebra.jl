@@ -21,6 +21,110 @@ function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
    end
 end
 
+# The following functions should not expect that their input is a `NCRingElem` or similar.
+# They should be usable in more general types, that don't even have a `parent/elem` correspondence
+function test_mutating_op_like_zero(f::Function, f!::Function, A)
+   a = deepcopy(A)
+   a = f!(a)
+   @test equality(a, f(A))
+end
+
+function test_mutating_op_like_neg(f::Function, f!::Function, A)
+   # initialize storage var with different values to check that its value is not used
+   for z in [zero(A), deepcopy(A)]
+      a = deepcopy(A)
+      z = f!(z, a)
+      @test equality(z, f(A))
+      @test a == A
+   end
+
+   a = deepcopy(A)
+   a = f!(a)
+   @test equality(a, f(A))
+end
+
+function test_mutating_op_like_add(f::Function, f!::Function, A, B)
+   # initialize storage var with different values to check that its value is not used
+   for z in [zero(A), deepcopy(A), deepcopy(B)]
+      a = deepcopy(A)
+      b = deepcopy(B)
+      z = f!(z, a, b)
+      @test equality(z, f(A, B))
+      @test a == A
+      @test b == B
+   end
+
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, a, b)
+   @test equality(a, f(A, B))
+   @test b == B
+
+   a = deepcopy(A)
+   b = deepcopy(B)
+   b = f!(b, a, b)
+   @test equality(b, f(A, B))
+   @test a == A
+
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, b, b)
+   @test equality(a, f(B, B))
+   @test b == B
+   
+   b = deepcopy(B)
+   b = f!(b, b, b)
+   @test equality(b, f(B, B))
+
+   a = deepcopy(A)
+   b = deepcopy(B)
+   a = f!(a, b)
+   @test equality(a, f(A, B))
+   @test b == B
+
+   b = deepcopy(B)
+   b = f!(b, b)
+   @test equality(b, f(B, B))
+end
+
+function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B)
+   f!(z, a, b, ::Nothing) = f!_(z, a, b)
+   f!(z, a, b, t) = f!_(z, a, b, t)
+
+   # initialize storage var with different values to check that its value is not used
+   # and `nothing` for the three-arg dispatch
+   for t in [nothing, zero(A), deepcopy(A)]
+      z = deepcopy(Z)
+      a = deepcopy(A)
+      b = deepcopy(B)
+      z = f!(z, a, b, t)
+      @test equality(z, f(Z, A, B))
+      @test a == A
+      @test b == B
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      a = f!(a, a, b, t)
+      @test equality(a, f(A, A, B))
+      @test b == B
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      b = f!(b, a, b, t)
+      @test equality(b, f(B, A, B))
+      @test a == A
+      
+      a = deepcopy(A)
+      b = deepcopy(B)
+      a = f!(a, b, b, t)
+      @test equality(a, f(A, B, B))
+      @test b == B
+      
+      b = deepcopy(B)
+      b = f!(b, b, b, t)
+      @test equality(b, f(B, B, B))
+   end
+end
 
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
@@ -82,7 +186,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          for i in 1:reps
             a = test_elem(R)::T
             @test hash(a) isa UInt
-            @test hash(a) == hash(deepcopy(a))
+            A = deepcopy(a)
+            @test !ismutable(a) || a !== A
+            @test equality(a, A)
+            @test hash(a) == hash(A)
+            @test parent(a) === parent(A)
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
@@ -171,50 +279,18 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             a = test_elem(R)::T
             b = test_elem(R)::T
             c = test_elem(R)::T
-            A = deepcopy(a)
-            B = deepcopy(b)
-            C = deepcopy(c)
+            
+            test_mutating_op_like_zero(zero, zero!, a)
+            test_mutating_op_like_zero(one, one!, a)
 
-            x = deepcopy(a)
-            @test iszero(zero!(x))
+            test_mutating_op_like_neg(-, neg!, a)
 
-            ab = a*b
-            x = R()
-            @test mul!(x, a, b) == ab
-            x = deepcopy(b)
-            @test mul!(x, a, b) == ab
-            x = deepcopy(a)
-            @test mul!(x, x, b) == ab
-            x = deepcopy(b)
-            @test mul!(x, a, x) == ab
+            test_mutating_op_like_add(+, add!, a, b)
+            test_mutating_op_like_add(-, sub!, a, b)
+            test_mutating_op_like_add(*, mul!, a, b)
 
-            ab = a+b
-            x = R()
-            @test add!(x, a, b) == ab
-            x = deepcopy(b)
-            @test add!(x, a, b) == ab
-            x = deepcopy(a)
-            @test add!(x, x, b) == ab
-            x = deepcopy(b)
-            @test add!(x, a, x) == ab
-            x = deepcopy(a)
-            @test add!(x, b) == ab
-
-            # isapprox as BigFloat may fuse
-            # matrices don't implement addmul!
-            #t = R()
-            #x = deepcopy(a)
-            #@test equality(addmul!(x, b, c, t), a+b*c)
-            #x = deepcopy(a)
-            #@test equality(addmul!(x, x, c, t), a+a*c)
-            #x = deepcopy(a)
-            #@test equality(addmul!(x, b, x, t), a+b*a)
-            #x = deepcopy(a)
-            #@test equality(addmul!(x, x, x, t), a+a*a)
-
-            @test A == a
-            @test B == b
-            @test C == c
+            test_mutating_op_like_addmul((a, b, c) -> a + b*c, addmul!, a, b, c)
+            test_mutating_op_like_addmul((a, b, c) -> a - b*c, submul!, a, b, c)
          end
       end
    end
@@ -234,12 +310,14 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R)
 
       @testset "Basic functionality for commutative rings only" begin
+         @test isone(AbstractAlgebra.inv(one(R)))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
             a = test_elem(R)::T
             b = test_elem(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
-            @test isone(AbstractAlgebra.inv(one(R)))
             @test a*b == b*a
             # documentation is not clear on divexact
             if is_domain_type(T)
@@ -249,6 +327,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
                if T isa RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
+               iszero(b) || test_mutating_op_like_add(divexact, divexact!, b*a, b)
             else
                try
                   t = divexact(b*a, b)
@@ -297,7 +376,14 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
       for i in 1:reps
          a = test_elem(R)::T
+         A = deepcopy(a)
          @test is_unit(a) == !iszero(a)
+         if !is_zero(a)
+            @test is_one(a * inv(a))
+            @test is_one(inv(a) * a)
+            test_mutating_op_like_neg(inv, inv!, a)
+         end
+         @test A == a
       end
    end
 
@@ -385,6 +471,11 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test d == gcd(f, g)
          @test d == s*f + t*g
          @test gcdinv(f, g) == (d, s)
+
+         test_mutating_op_like_add(AbstractAlgebra.div, div!, f, m)
+         test_mutating_op_like_add(mod, mod!, f, m)
+         test_mutating_op_like_add(gcd, gcd!, f, m)
+         test_mutating_op_like_add(lcm, lcm!, f, m)
       end
 
    end
