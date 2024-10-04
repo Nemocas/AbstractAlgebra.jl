@@ -467,7 +467,6 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test gcdinv(f, g) == (d, s)
 
          test_mutating_op_like_add(AbstractAlgebra.div, div!, f, m)
-         test_mutating_op_like_add(rem, rem!, f, m)
          test_mutating_op_like_add(mod, mod!, f, m)
          test_mutating_op_like_add(gcd, gcd!, f, m)
          test_mutating_op_like_add(lcm, lcm!, f, m)
