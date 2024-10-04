@@ -185,6 +185,7 @@ const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 ###############################################################################
 
 include("fundamental_interface.jl")
+include("misc/VarNames.jl")
 
 ################################################################################
 #
@@ -344,7 +345,6 @@ end
 
 include("misc/ProductIterator.jl")
 include("misc/Evaluate.jl")
-include("misc/VarNames.jl")
 
 ###############################################################################
 #

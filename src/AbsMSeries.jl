@@ -215,3 +215,7 @@ when it was created.
 function rand(S::MSeriesRing, term_range, v...)
    rand(GLOBAL_RNG, S, term_range, v...)
 end
+
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
+@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
+@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`    

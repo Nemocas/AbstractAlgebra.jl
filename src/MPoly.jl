@@ -1428,6 +1428,8 @@ function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
    (S, gens(S))
 end
 
+@varnames_interface polynomial_ring(R::Ring, s)
+
 """
     polynomial_ring(R::Ring, varnames...; cached=true, internal_ordering=:lex)
     polynomial_ring(R::Ring, varnames::Tuple; cached=true, internal_ordering=:lex)

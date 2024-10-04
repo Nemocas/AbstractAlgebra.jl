@@ -254,3 +254,5 @@ end
 function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
    rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
 end
+
+@varnames_interface Generic.free_associative_algebra(R::Ring, s)

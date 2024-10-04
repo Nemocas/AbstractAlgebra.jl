@@ -158,3 +158,5 @@ For information about the many ways to specify `varnames...` refer to [`polynomi
 specification in [`AbstractAlgebra.@varnames_interface`](@ref).
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
+
+@varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)

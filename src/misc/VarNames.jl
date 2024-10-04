@@ -474,13 +474,3 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros], opts[:n], opts[:range]))
     end
 end
-
-@varnames_interface Generic.free_associative_algebra(R::Ring, s)
-@varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
-@varnames_interface Generic.rational_function_field(K::Field, s)
-
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
-
-@varnames_interface polynomial_ring(R::Ring, s)
