@@ -66,6 +66,13 @@ end
    @test_throws ArgumentError divexact(big(10), big(4))
    @test_throws ArgumentError divexact(big(10), 4)
 
+   @test_throws DivideError divexact(big(10), big(0))
+   @test_throws DivideError divexact(big(10), big(0), check = false)
+   @test_throws DivideError divexact(big(10), 0)
+   @test_throws DivideError divexact(big(10), 0, check = false)
+   @test_throws DivideError divexact(big(10), UInt(0))
+   @test_throws DivideError divexact(big(10), UInt(0), check = false)
+
    for iter = 1:1000
       a1 = rand(R, -100:100)
       a2 = rand(R, -100:100)
