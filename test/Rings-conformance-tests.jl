@@ -30,6 +30,7 @@ function test_mutating_op_like_zero(f::Function, f!::Function, A)
 end
 
 function test_mutating_op_like_neg(f::Function, f!::Function, A)
+   # initialize storage var with different values to check that its value is not used
    for z in [zero(A), deepcopy(A)]
       a = deepcopy(A)
       z = f!(z, a)
@@ -43,6 +44,7 @@ function test_mutating_op_like_neg(f::Function, f!::Function, A)
 end
 
 function test_mutating_op_like_add(f::Function, f!::Function, A, B)
+   # initialize storage var with different values to check that its value is not used
    for z in [zero(A), deepcopy(A), deepcopy(B)]
       a = deepcopy(A)
       b = deepcopy(B)
@@ -89,6 +91,8 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B)
    f!(z, a, b, ::Nothing) = f!_(z, a, b)
    f!(z, a, b, t) = f!_(z, a, b, t)
 
+   # initialize storage var with different values to check that its value is not used
+   # and `nothing` for the three-arg dispatch
    for t in [nothing, zero(A), deepcopy(A)]
       z = deepcopy(Z)
       a = deepcopy(A)
