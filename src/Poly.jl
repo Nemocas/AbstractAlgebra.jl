@@ -1369,7 +1369,9 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
          f = set_length!(f, normalise(f, lenf - 1))
       end
    end
-   check && length(f) != 0 && throw(ArgumentError("not an exact division"))
+   if check
+      @req length(f) == 0 "not an exact division"
+   end
    q = parent(f)(d)
    q = set_length!(q, lenq)
    return q

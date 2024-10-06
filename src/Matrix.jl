@@ -6822,9 +6822,9 @@ julia> lower_triangular_matrix([1, 2, 3])
 """
 function lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   @req l > 0 "Input vector must be nonempty"
    (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
+   @req flag "Input vector of invalid length"
    n = div(m-1, 2)
    R = parent(L[1])
    M = zero_matrix(R, n, n)
@@ -6861,9 +6861,9 @@ julia> upper_triangular_matrix([1, 2, 3])
 """
 function upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   @req l > 0 "Input vector must be nonempty"
    (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
+   @req flag "Input vector of invalid length"
    n = div(m-1, 2)
    R = parent(L[1])
    M = zero_matrix(R, n, n)
@@ -6901,9 +6901,9 @@ julia> strictly_lower_triangular_matrix([1, 2, 3])
 """
 function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   @req l > 0 "Input vector must be nonempty"
    (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
+   @req flag "Input vector of invalid length"
    n = div(m+1, 2)
    R = parent(L[1])
    M = zero_matrix(R, n, n)
@@ -6941,9 +6941,9 @@ julia> strictly_upper_triangular_matrix([1, 2, 3])
 """
 function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
    l = length(L)
-   l == 0 && throw(ArgumentError("Input vector must be nonempty"))
+   @req l > 0 "Input vector must be nonempty"
    (flag, m) = is_square_with_sqrt(8*l+1)
-   flag || throw(ArgumentError("Input vector of invalid length"))
+   @req flag "Input vector of invalid length"
    n = div(m+1, 2)
    R = parent(L[1])
    M = zero_matrix(R, n, n)

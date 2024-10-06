@@ -565,7 +565,7 @@ end
 
 function solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   fl, x = can_solve_with_solution(NF, A, b, side = side)
-  fl || throw(ArgumentError("Unable to solve linear system"))
+  @req fl "Unable to solve linear system"
   return x
 end
 

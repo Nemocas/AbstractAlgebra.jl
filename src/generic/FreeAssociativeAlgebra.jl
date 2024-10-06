@@ -202,23 +202,17 @@ function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
 end
 
 function leading_monomial(a::FreeAssociativeAlgebraElem{T}) where T
-    if length(a) < 1
-        throw(ArgumentError("Zero polynomial does not have a leading monomial"))
-    end
+    @req !is_zero(a) "Zero polynomial does not have a leading monomial"
     return monomial(a, 1)
 end
 
 function leading_term(a::FreeAssociativeAlgebraElem{T}) where T
-    if length(a) < 1
-        throw(ArgumentError("Zero polynomial does not have a leading term"))
-    end
+    @req !is_zero(a) "Zero polynomial does not have a leading term"
     return term(a, 1)
 end
 
 function leading_exponent_word(a::FreeAssociativeAlgebraElem{T}) where T
-    if length(a) < 1
-        throw(ArgumentError("Zero polynomial does not have a leading exponent word"))
-    end
+    @req !is_zero(a) "Zero polynomial does not have a leading exponent word"
     return exponent_word(a, 1)
 end
 
