@@ -4058,6 +4058,20 @@ end
    end
 end
 
+@testset "Generic.Mat.slices" begin
+  A = ZZ[1 2 3; 4 5 6]
+  @test length(eachrow(A)) == nrows(A)
+  @test length(eachcol(A)) == ncols(A)
+
+  @test first(eachrow(A)) == [ZZ(1), ZZ(2), ZZ(3)]
+  @test first(eachcol(A)) == [ZZ(1), ZZ(4)]
+
+  A = zero_matrix(ZZ, 2, 0)
+  @test length(eachrow(A)) == nrows(A)
+  @test length(eachcol(A)) == ncols(A)
+  @test first(eachrow(A)) == elem_type(ZZ)[]
+end
+
 @testset "Generic.Mat.change_base_ring" begin
    for (P, Q, T) in ((matrix_space(ZZ, 2, 3), matrix_space(ZZ, 3, 2), MatElem),
                      (matrix_ring(ZZ, 3), matrix_ring(ZZ, 3), MatRingElem))
