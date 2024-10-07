@@ -616,6 +616,20 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 
 ###############################################################################
 #
+#   eachrow / eachcol
+#
+###############################################################################
+
+@static if VERSION < v"1.9"
+  Base.eachrow(a::MatrixElem) = (view(a, i, :) for i in 1:nrows(a))
+  Base.eachcol(a::MatrixElem) = (view(a, :, i) for i in 1:ncols(a))
+else
+  Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
+  Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
+end
+
+###############################################################################
+#
 #   Matrix spaces iteration
 #
 ###############################################################################
