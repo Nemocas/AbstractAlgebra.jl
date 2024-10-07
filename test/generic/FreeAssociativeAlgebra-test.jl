@@ -140,10 +140,6 @@ end
    @test !occursin("\n", sprint(show, R))
 end
 
-function test_elem(R::Generic.FreeAssociativeAlgebra{elem_type(ZZ)})
-   return rand(R, 0:4, 0:5, -10:10)
-end
-
 @testset "Generic.FreeAssociativeAlgebra.change_base_ring" begin
    F5, = residue_ring(ZZ, 5)
    R, varsR = polynomial_ring(F5, ["x"])
@@ -221,6 +217,11 @@ end
 end
 
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
-   test_NCRing_interface(free_associative_algebra(ZZ, 3)[1])
+   S, = free_associative_algebra(ZZ, 3)
+   test_NCRing_interface(S)
+
+   R, x = QQ[:x]
+   S, = free_associative_algebra(R, 3)
+   test_NCRing_interface(S)
 end
 

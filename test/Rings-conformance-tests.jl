@@ -72,6 +72,19 @@ function test_elem(Rx::AbstractAlgebra.SeriesRing)
    end
 end
 
+function test_elem(S::AbstractAlgebra.FreeAssociativeAlgebra)
+   f = S()
+   g = gens(S)
+   R = base_ring(S)
+   isempty(g) && return S(test_elem(R))
+   len_bound = 8
+   exp_bound = 6
+   for i in 1:rand(0:len_bound)
+      f += test_elem(R) * prod(rand(g) for _ in 1:rand(0:exp_bound); init = S(1))
+   end
+   return f
+end
+
 
 # helper
 function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
