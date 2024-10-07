@@ -397,17 +397,13 @@ end
 
 function zero!(c::TotFrac)
    c.num = zero!(c.num)
-   if !isone(c.den)
-      c.den = one!(c.den)
-   end
+   c.den = one!(c.den)
    return c
 end
 
 function one!(c::TotFrac)
    c.num = one!(c.num)
-   if !isone(c.den)
-      c.den = one!(c.den)
-   end
+   c.den = one!(c.den)
    return c
 end
 
