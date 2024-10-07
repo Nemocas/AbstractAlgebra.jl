@@ -48,13 +48,34 @@ function _check_bases(a, b)
   return nothing
 end
 
-function (s::MatSpace{T})(a::M) where {T, M <: MatrixElem{T}}
+# create a zero matrix
+function (s::MatSpace{T})() where {T <: NCRingElement}
+  return zero_matrix(base_ring(s), nrows(s), ncols(s))::eltype(s)
+end
+
+function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(s), ncols(s), a)
   _check_bases(s, a)
   a isa eltype(s) && return a
-  b = eltype(s)(a)
-  b.base_ring = base_ring(s)
-  return b
+  M = s()  # zero matrix
+  R = base_ring(s)
+  for i = 1:nrows(s)
+    for j = 1:ncols(s)
+      M[i, j] = R(a[i, j])
+    end
+  end
+  return M
+end
+
+# create a matrix with b on the diagonal
+function (s::MatSpace)(b::NCRingElement)
+  M = s()  # zero matrix
+  R = base_ring(s)
+  rb = R(b)
+  for i in 1:min(nrows(s), ncols(s))
+    M[i, i] = rb
+  end
+  return M
 end
 
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
@@ -6559,10 +6580,18 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
 end
 
 function matrix(R::NCRing, arr::MatElem)
-    return map_entries(R, arr)
+   return map_entries(R, arr)
 end
 
-function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
+function matrix(R::NCRing, arr::MatRingElem)
+   return matrix_space(R, nrows(arr), ncols(arr))(arr)
+end
+
+function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
+   return matrix(base_ring(mat), mat)
+end
+
+function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
@@ -6570,11 +6599,11 @@ function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElem}
    return matrix(R, arr)
 end
 
-function matrix(arr::AbstractVector{T}) where {T<:NCRingElem}
+function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
    return matrix(reshape(arr, length(arr), 1))
 end
 
-function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElem}
+function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
     return matrix(permutedims(reduce(hcat, arr), (2, 1)))
 end
 

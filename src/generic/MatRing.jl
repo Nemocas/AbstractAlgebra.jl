@@ -151,6 +151,19 @@ function (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
    return b
 end
 
+function (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+   R = base_ring(a)
+   _check_dim(nrows(a), ncols(a), b)
+   entries = Matrix{T}(undef, nrows(a), ncols(a))
+   for i = 1:nrows(a)
+      for j = 1:ncols(a)
+         entries[i, j] = R(b[i, j])
+      end
+   end
+   z = MatRingElem{T}(R, entries)
+   return z
+end
+
 function (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(a.n, a.n, b)
