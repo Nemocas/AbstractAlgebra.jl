@@ -1134,7 +1134,6 @@ julia> y, z = gens(S, [:y, :z])
 julia> x*y - z
 x*y - z
 ```
-
 """
 function universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering::Symbol=:lex)
    T = elem_type(R)
