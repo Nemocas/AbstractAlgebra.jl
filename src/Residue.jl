@@ -406,27 +406,6 @@ _div_for_howell_form(a::T, b::T) where {T <: RingElement} = div(a, b)
 
 ###############################################################################
 #
-#   Unsafe functions
-#
-###############################################################################
-
-function zero!(a::ResElem{T}) where {T <: RingElement}
-   a.data = zero!(a.data)
-   return a
-end
-
-function mul!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(a)*data(b), modulus(a))
-   return c
-end
-
-function add!(c::ResElem{T}, a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   c.data = mod(data(a) + data(b), modulus(a))
-   return c
-end
-
-###############################################################################
-#
 #   Random functions
 #
 ###############################################################################
