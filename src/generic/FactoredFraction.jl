@@ -465,8 +465,7 @@ end
 
 ###############################################################################
 #
-#   Unsafe operators and functions: These are defined generically on FracElem
-#   in terms of the numerator/denominator interface, so we need some overrides.
+#   Unsafe functions
 #
 ###############################################################################
 
@@ -474,16 +473,6 @@ function zero!(c::FactoredFracFieldElem)
     c.unit = zero!(c.unit)
     empty!(c.terms)
     return c
-end
-
-# needed as add!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) is incompatible
-function add!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-  return a + b
-end
-
-# needed as mul!(c::FracElem{T}, a::FracElem{T}, b::FracElem{T}) is incompatible
-function mul!(c::FactoredFracFieldElem{T}, a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T <: RingElement
-  return a*b
 end
 
 ###############################################################################

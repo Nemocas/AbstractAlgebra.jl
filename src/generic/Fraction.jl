@@ -176,6 +176,109 @@ end
 
 ###############################################################################
 #
+#   Unsafe functions
+#
+###############################################################################
+
+function zero!(c::FracFieldElem)
+   c.num = zero!(c.num)
+   if !isone(c.den)
+      c.den = one(base_ring(c))
+   end
+   return c
+end
+
+function mul!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) where {T <: RingElem}
+   n1 = numerator(a, false)
+   d2 = denominator(b, false)
+   n2 = numerator(b, false)
+   d1 = denominator(a, false)
+   if d1 == d2
+      c.num = n1*n2
+      c.den = d1*d2
+   elseif isone(d1)
+      gd = gcd(n1, d2)
+      if isone(gd)
+         c.num = n1*n2
+         c.den = deepcopy(d2)
+      else
+         c.num = divexact(n1, gd)*n2
+         c.den = divexact(d2, gd)
+      end
+   elseif isone(d2)
+      gd = gcd(n2, d1)
+      if isone(gd)
+         c.num = n2*n1
+         c.den = deepcopy(d1)
+      else
+         c.num = divexact(n2, gd)*n1
+         c.den = divexact(d1, gd)
+      end
+   else
+      g1 = gcd(n1, d2)
+      g2 = gcd(n2, d1)
+      if !isone(g1)
+         n1 = divexact(n1, g1)
+         d2 = divexact(d2, g1)
+      end
+      if !isone(g2)
+         n2 = divexact(n2, g2)
+         d1 = divexact(d1, g2)
+      end
+      c.num = n1*n2
+      c.den = d1*d2
+   end
+   return c
+end
+
+function add!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) where {T <: RingElem}
+   d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
+   if d1 == d2
+      c.num = n1 + n2
+      if isone(d1)
+         c.den = deepcopy(d1)
+      else
+         gd = gcd(c.num, d1)
+         if isone(gd)
+            c.den = deepcopy(d1)
+         else
+            c.num = divexact(c.num, gd)
+            c.den = divexact(d1, gd)
+         end
+      end
+   elseif isone(d1)
+      c.num = n1*d2 + n2
+      c.den = deepcopy(d2)
+   elseif isone(d2)
+      c.num = n1 + n2*d1
+      c.den = deepcopy(d1)
+   else
+      gd = gcd(d1, d2)
+      if isone(gd)
+         c.num = n1*d2 + n2*d1
+         c.den = d1*d2
+      else
+         q1 = divexact(d1, gd)
+         q2 = divexact(d2, gd)
+         c.num = q1*n2 + q2*n1
+         t = gcd(c.num, gd)
+         if isone(t)
+            c.den = q2*d1
+         else
+            gd = divexact(d1, t)
+            c.num = divexact(c.num, t)
+            c.den = gd*q2
+         end
+      end
+   end
+   return c
+end
+
+###############################################################################
+#
 #   fraction_field constructor
 #
 ###############################################################################
