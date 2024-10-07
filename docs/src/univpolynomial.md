@@ -41,18 +41,8 @@ construct the universal polynomial ring itself. This is unique given a base ring
 The universal polynomial ring over a given base ring `R` is constructed with
 one of the following constructor functions.
 
-```julia
-universal_polynomial_ring(R::Ring; cached::Bool = true, internal_ordering::Symbol=:lex)
-```
-
-Given a base ring `R` and an array `S` of strings, return an object representing
-the universal polynomial ring $S = R[\ldots]$ with no variables in it initially.
-
-**Examples**
-
-```jldoctest
-julia> S = universal_polynomial_ring(ZZ)
-Universal Polynomial Ring over Integers
+```@docs
+universal_polynomial_ring
 ```
 
 ## Adding variables

@@ -1113,7 +1113,30 @@ end
 #
 ###############################################################################
 
-function universal_polynomial_ring(R::Ring; internal_ordering=:lex, cached::Bool=true)
+@doc raw"""
+    universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering::Symbol=:lex)
+
+Given a base ring `R`, return an object representing
+the universal polynomial ring $S = R[\ldots]$ with no variables in it initially.
+
+# Examples
+
+```jldoctest
+julia> S = universal_polynomial_ring(ZZ)
+Universal Polynomial Ring over Integers
+
+julia> x = gen(S, :x)
+x
+
+julia> y, z = gens(S, [:y, :z])
+(y, z)
+
+julia> x*y - z
+x*y - z
+```
+
+"""
+function universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering::Symbol=:lex)
    T = elem_type(R)
    U = mpoly_type(R)
 
