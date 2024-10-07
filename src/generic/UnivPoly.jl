@@ -1121,7 +1121,7 @@ the universal polynomial ring $S = R[\ldots]$ with no variables in it initially.
 
 # Examples
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> S = universal_polynomial_ring(ZZ)
 Universal Polynomial Ring over Integers
 
