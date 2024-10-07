@@ -179,14 +179,6 @@ zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement = zero(x
 zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
 zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero(x, base_ring(x), r, c)
 
-function zero!(x::MatrixElem{T}) where T <: NCRingElement
-   R = base_ring(x)
-   for i = 1:nrows(x), j = 1:ncols(x)
-      x[i, j] = zero(R)
-   end
-   x
-end
-
 @doc raw"""
     one(a::MatSpace)
 
@@ -791,6 +783,20 @@ function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
       end
    end
    return A
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function zero!(x::MatrixElem{T}) where T <: NCRingElement
+   R = base_ring(x)
+   for i = 1:nrows(x), j = 1:ncols(x)
+      x[i, j] = zero(R)
+   end
+   x
 end
 
 function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
