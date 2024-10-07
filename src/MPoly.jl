@@ -333,9 +333,7 @@ Return the leading monomial of $p$.
 This function throws an `ArgumentError` if $p$ is zero.
 """
 function leading_monomial(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      throw(ArgumentError("Zero polynomial does not have a leading monomial"))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
    return first(monomials(p))
 end
 
@@ -347,9 +345,7 @@ Return the exponent vector of the leading term of $p$. The return is a Julia
 This function throws an `ArgumentError` if $p$ is zero.
 """
 function leading_exponent_vector(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      throw(ArgumentError("Zero polynomial does not have a leading exponent vector"))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading exponent vector"
    return first(exponent_vectors(p))
 end
 
@@ -360,9 +356,7 @@ Return the leading term of the polynomial p.
 This function throws an `ArgumentError` if $p$ is zero.
 """
 function leading_term(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      throw(ArgumentError("Zero polynomial does not have a leading term"))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading term"
    return first(terms(p))
 end
 

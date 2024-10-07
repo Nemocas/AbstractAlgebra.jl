@@ -34,7 +34,7 @@ function ideal(x::NCRingElement; kw...)
 end
 
 function ideal(xs::AbstractVector{T}; kw...) where T<:NCRingElement
-  !is_empty(xs) || throw(ArgumentError("Empty collection, cannot determine parent ring. Try ideal(ring, xs) instead of ideal(xs)"))
+  @req !is_empty(xs) "Empty collection, cannot determine parent ring. Try ideal(ring, xs) instead of ideal(xs)"
   return ideal(parent(xs[1]), xs; kw...)
 end
 

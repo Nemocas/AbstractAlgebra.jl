@@ -169,7 +169,7 @@ end
 function divexact(a::Integer, b::Integer; check::Bool=true)
    if check
       q, r = divrem(a, b)
-      iszero(r) || throw(ArgumentError("Not an exact division"))
+      @req is_zero(r) "Not an exact division"
    else
       q = div(a, b)
    end
@@ -183,7 +183,7 @@ function divexact(a::BigInt, b::BigInt; check::Bool=true)
       r = BigInt()
       ccall((:__gmpz_tdiv_qr, :libgmp), Nothing,
               (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, r, a, b)
-      r != 0 && throw(ArgumentError("Not an exact division"))
+      @req is_zero(r) "Not an exact division"
    else
       ccall((:__gmpz_divexact, :libgmp), Nothing,
                               (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, a, b)
@@ -199,7 +199,7 @@ function divexact(a::BigInt, b::Int; check::Bool=true)
       r = BigInt()
       ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
            (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, sgn ? -b : b)
-      r != 0 && throw(ArgumentError("Not an exact division"))
+      @req is_zero(r) "Not an exact division"
    else
       ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
                            (Ref{BigInt}, Ref{BigInt}, Int), q, a, sgn ? -b : b)
@@ -214,7 +214,7 @@ function divexact(a::BigInt, b::UInt; check::Bool=true)
       r = BigInt()
       ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
                      (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, UInt), q, r, a, b)
-      r != 0 && throw(ArgumentError("Not an exact division"))
+      @req is_zero(r) "Not an exact division"
    else
       ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
                                      (Ref{BigInt}, Ref{BigInt}, UInt), q, a, b)
