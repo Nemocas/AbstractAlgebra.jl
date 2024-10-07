@@ -29,8 +29,6 @@ number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
 
 number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
 
-characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
-
 ###############################################################################
 #
 #   Basic manipulation

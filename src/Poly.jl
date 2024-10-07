@@ -49,6 +49,8 @@ number_of_variables(a::PolyRing) = 1
 
 characteristic(a::PolyRing) = characteristic(base_ring(a))
 
+is_finite(a::PolyRing) = is_trivial(a)
+
 Base.copy(a::PolyRingElem) = deepcopy(a)
 
 ###############################################################################
