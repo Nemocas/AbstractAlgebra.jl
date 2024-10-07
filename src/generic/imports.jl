@@ -173,6 +173,7 @@ import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mul_classical
 import ..AbstractAlgebra: mul_karatsuba
 import ..AbstractAlgebra: mullow
+import ..AbstractAlgebra: neg!
 import ..AbstractAlgebra: number_of_columns
 import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: number_of_rows

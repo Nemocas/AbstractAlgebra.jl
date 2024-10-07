@@ -71,7 +71,7 @@ function isone(a::FreeAssociativeAlgebraElem{T}) where T
     if length(a) < 1
         return isone(zero(base_ring(a)))
     else
-        return a.length == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
+        return length(a) == 1 && isone(a.coeffs[1]) && isempty(a.exps[1])
     end
 end
 
@@ -644,6 +644,50 @@ function divexact(
     b = base_ring(R)(b)
     zcoeffs = T[divexact(a.coeffs[i], b, check = check) for i in 1:n]
     return combine_like_terms!(FreeAssociativeAlgebraElem{T}(R, zcoeffs, copy(a.exps), n))
+end
+
+###############################################################################
+#
+# Unsafe arithmetic functions
+#
+###############################################################################
+
+function zero!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    a.length = 0
+    return a
+end
+
+function one!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    a.length = 1
+    fit!(a, 1)
+    a.coeffs[1] = one(base_ring(parent(a)))
+    a.exps[1] = Int[]
+    return a
+end
+
+function neg!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    for i in 1:length(a)
+        a.coeffs[i] = neg!(a.coeffs[i])
+    end
+    return a
+end
+
+function neg!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    if z === a
+        return neg!(a)
+    end
+    z.length = length(a)
+    fit!(z, length(a))
+    for i in 1:length(a)
+        if isassigned(z.coeffs, i)
+            z.coeffs[i] = neg!(z.coeffs[i], a.coeffs[i])
+        else
+            z.coeffs[i] = -a.coeffs[i]
+        end
+        # mutating z.exps[i] is not allowed since it could be aliased
+        z.exps[i] = a.exps[i]
+    end
+    return z
 end
 
 
