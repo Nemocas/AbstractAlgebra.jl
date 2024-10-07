@@ -146,6 +146,24 @@ function (a::MatRing{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    return z
 end
 
+# to resolve ambiguity for MatRing{MatRing{...}}
+function (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
+   R = base_ring(a)
+   entries = Matrix{T}(undef, a.n, a.n)
+   rb = R(b)
+   for i = 1:a.n
+      for j = 1:a.n
+         if i != j
+            entries[i, j] = zero(R)
+         else
+            entries[i, j] = rb
+         end
+      end
+   end
+   z = MatRingElem{T}(R, entries)
+   return z
+end
+
 function (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
    parent(b) != a && error("Unable to coerce matrix")
    return b
