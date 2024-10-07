@@ -125,3 +125,24 @@ function rand(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}
    end
    return r
 end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function zero!(a::T) where {T <: EuclideanRingResidueRingElem}
+   a.data = zero!(a.data)
+   return a
+end
+
+function mul!(c::T, a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+   c.data = mod(data(a)*data(b), modulus(a))
+   return c
+end
+
+function add!(c::T, a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+   c.data = mod(data(a) + data(b), modulus(a))
+   return c
+end
