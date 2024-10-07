@@ -1517,6 +1517,5 @@ polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, ca
 ###############################################################################
 
 function ==(x::MPolyRingElem, y::MPolyRingElem)
-   check_parent(x, y, true)
-   error("Polynomial comparison not implemented")
+   return is_zero(x - y)
 end
