@@ -112,6 +112,26 @@ end
     @test T == matrix(QQ, [42 0 0; 0 42 0; 0 0 42])
 end
 
+@testset "Matrix.conversion" begin
+  U, t = polynomial_ring(QQ, "t")
+
+  R = matrix_ring(U, 2)
+  S = matrix_space(U, 2, 2)
+  a = U.([1 2; t^2 (t-1)]) # Matrix
+  Ra = R(a) # MatRingElem
+  Sa = S(a) # MatElem
+  @test Ra == R(Ra)
+  @test Ra == R(Sa)
+  @test Sa == S(Sa)
+  @test Sa == S(Ra)
+  @test matrix(Ra) == Sa
+  @test matrix(U, Ra) == Ra
+  @test matrix(Sa) == Sa
+  @test matrix(U, Sa) == Sa
+  @test Matrix(Ra) == a
+  @test Matrix(Sa) == a
+end
+
 @testset "Strassen" begin
    S = matrix(QQ, rand(-10:10, 100, 100))
    T = S*S
