@@ -153,6 +153,9 @@ end
    @test_throws DomainError polcoeff(a, -1)
    @test_throws DomainError coeff(a, -rand(2:100))
    @test_throws DomainError polcoeff(a, -rand(2:100))
+
+   @test coefficients(a) == (cs = fill(0, 30); cs[2] = 2; cs[4] = 1; cs)
+   @test coefficients(b) == fill(0, 4)
    
    @test characteristic(R) == 0
 

@@ -57,6 +57,10 @@ end
 
 is_unit(a::AbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
+function coefficients(a::AbsPowerSeriesRingElem)
+   return [coeff(a, i) for i = 0:precision(a)-1]
+end
+
 @doc raw"""
     valuation(a::AbsPowerSeriesRingElem)
 
