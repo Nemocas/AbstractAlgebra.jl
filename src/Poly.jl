@@ -1873,8 +1873,8 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
          end
       end
       b = divexact(b, content(b))
+      b = c*b
    end
-   b = c*b
    return divexact(b, canonical_unit(leading_coefficient(b)))
 end
 
