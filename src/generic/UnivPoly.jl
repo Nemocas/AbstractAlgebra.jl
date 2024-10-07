@@ -1028,24 +1028,24 @@ function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
    return a
 end
 
-function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::Integer) where {T <: RingElement}
+function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
    a.p = add!(a.p, b.p, c)
    return a
 end
 
-add!(a::UnivPoly{T}, b::Integer, c::UnivPoly{T}) where {T <: RingElement} = add!(a, c, b)
+add!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = add!(a, c, b)
 
 function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
    a.p = sub!(a.p, b.p, c.p)
    return a
 end
 
-function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::Integer) where {T <: RingElement}
+function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
    a.p = sub!(a.p, b.p, c)
    return a
 end
 
-function sub!(a::UnivPoly{T}, b::Integer, c::UnivPoly{T}) where {T <: RingElement}
+function sub!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement}
    a.p = sub!(a.p, b, c.p)
    return a
 end
@@ -1055,12 +1055,12 @@ function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
    return a
 end
 
-function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::Integer) where {T <: RingElement}
+function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
    a.p = mul!(a.p, b.p, c)
    return a
 end
 
-mul!(a::UnivPoly{T}, b::Integer, c::UnivPoly{T}) where {T <: RingElement} = mul!(a, c, b)
+mul!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = mul!(a, c, b)
 
 ###############################################################################
 #
