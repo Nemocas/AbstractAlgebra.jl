@@ -8,6 +8,8 @@ is_domain_type(::Type{T}) where {T <: FieldElem} = true
 
 is_zero_divisor(a::T) where T <: FieldElem = is_zero(a)
 
+is_unit(a::FieldElem) = !iszero(a)
+
 //(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
 
 //(x::T, y::Union{Integer, Rational}) where {T <: RingElem} = x//parent(x)(y)

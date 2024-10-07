@@ -681,8 +681,6 @@ iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
 
 isone(a::FunctionFieldElem) = numerator(a, false) == denominator(a, false)
 
-is_unit(a::FunctionFieldElem) = !iszero(a)
-
 @doc raw"""
     is_gen(a::FunctionFieldElem)
 

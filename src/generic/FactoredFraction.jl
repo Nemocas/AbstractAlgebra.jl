@@ -122,10 +122,6 @@ function zero(F::FactoredFracField{T}) where T
     FactoredFracFieldElem{T}(zero(base_ring(F)), FactoredFracTerm{T}[], F)
 end
 
-function is_unit(a::FactoredFracFieldElem{T}) where T
-    return !iszero(a)
-end
-
 function iszero(a::FactoredFracFieldElem{T}) where T
     return iszero(a.unit)
 end
