@@ -23,10 +23,11 @@ function is_loaded_directly()
       # of _require_search_from_serialized and the call to _include_from_serialized.
       # For `using OtherPackage`, the difference is 61, while for `using Package`, the difference is 75 or 78
       # (on all 1.11 pre-releases up to 1.11.0-rc1 and 1.12.0-DEV.896, which are the newest at the time of writing this).
+      # for 1.12.0-DEV.1322 the differences are 72 and 88
       bt = Base.process_backtrace(Base.backtrace())
       Base.filter!(sf -> contains(string(sf[1].func), "_require_search_from_serialized"), bt)
       bt_entry = only(bt)[1]
-      return bt_entry.line - bt_entry.linfo.def.line >= 70
+      return bt_entry.line - bt_entry.linfo.def.line >= 73
     end
   catch e
     @debug "Error while checking if loaded directly" exception=(e, Base.catch_backtrace())
