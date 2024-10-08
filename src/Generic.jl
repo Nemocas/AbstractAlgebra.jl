@@ -118,4 +118,7 @@ Base.@deprecate_binding ResidueRingElem EuclideanRingResidueRingElem
 @deprecate hom(M::DirectSumModule{T}, N::DirectSumModule{T}, mp::Vector{ModuleHomomorphism{T}}) where T hom_direct_sum(M, N, mp)
 @deprecate hom(A::DirectSumModule{T}, B::DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T} hom_direct_sum(A, B, M)
 
+# Deprecated for 0.44
+#Base.@deprecate_binding MatSpace AbstractAlgebra.MatSpace false
+
 end # generic
