@@ -148,21 +148,7 @@ end
 #
 ###############################################################################
 
-# create a zero matrix
-function (a::Generic.MatSpace{T})() where {T <: NCRingElement}
-   return zero_matrix(base_ring(a), nrows(a), ncols(a))::dense_matrix_type(T)
-end
 
-# create a matrix with b on the diagonal
-function (a::Generic.MatSpace)(b::NCRingElement)
-   M = a()  # zero matrix
-   R = base_ring(a)
-   rb = R(b)
-   for i in 1:min(nrows(a), ncols(a))
-      M[i, i] = rb
-   end
-   return M
-end
 
 # convert a Julia matrix
 function (a::Generic.MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
