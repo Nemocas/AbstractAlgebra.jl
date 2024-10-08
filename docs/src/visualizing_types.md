@@ -44,4 +44,4 @@ are defined over.
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
   - `Generic.ResidueRingElem{T}` (`Generic.ResidueRing{T}`)
   - `Generic.FracFieldElem{T}` (`Generic.FracField{T}`)
-  - `Generic.Mat{T}` (`Generic.MatSpace{T}`)
+  - `Generic.Mat{T}` (`MatSpace{T}`)

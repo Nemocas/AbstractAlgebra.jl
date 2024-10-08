@@ -88,6 +88,7 @@ import ..AbstractAlgebra: LowercaseOff
 import ..AbstractAlgebra: Map
 import ..AbstractAlgebra: NCRing
 import ..AbstractAlgebra: NCRingElem
+import ..AbstractAlgebra: NCRingElement
 import ..AbstractAlgebra: O
 import ..AbstractAlgebra: Perm
 import ..AbstractAlgebra: Ring
