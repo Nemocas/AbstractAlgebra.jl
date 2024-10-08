@@ -114,8 +114,6 @@ iszero(a::RationalFunctionFieldElem) = iszero(data(a))
 
 isone(a::RationalFunctionFieldElem) = isone(data(a))
 
-is_unit(a::RationalFunctionFieldElem) = is_unit(data(a))
-
 gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
 
 gen(R::RationalFunctionField, i::Int) = R(gen(base_ring(R.fraction_field), i))

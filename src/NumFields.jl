@@ -17,8 +17,6 @@ end
 
 number_of_generators(L::SimpleNumField{T}) where {T} = 1
 
-is_unit(a::NumFieldElem) = !iszero(a)
-
 canonical_unit(a::NumFieldElem) = a
 
 characteristic(F::NumField) = 0
