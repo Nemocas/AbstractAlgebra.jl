@@ -172,6 +172,21 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    is_trivial(R::NCRing)
+
+Test whether the ring $R$ is trivial. A ring is trivial if it consists
+of a single element, or equivalently if its characteristic is 1. Such
+rings are also called zero rings.
+"""
+is_trivial(F::NCRing) = characteristic(F) == 1
+is_trivial(F::Field) = false
+
+@doc raw"""
+    is_perfect(F::Field)
+
+Test whether the field $F$ is perfect.
+"""
 is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
                                                  throw(NotImplementedError(:is_perfect, F))
 
