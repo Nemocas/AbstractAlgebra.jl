@@ -59,9 +59,17 @@ function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   a isa eltype(s) && return a
   M = s()  # zero matrix
   R = base_ring(s)
-  for i = 1:nrows(s)
-    for j = 1:ncols(s)
-      M[i, j] = R(a[i, j])
+  if R == base_ring(a)
+    for i = 1:nrows(s)
+      for j = 1:ncols(s)
+        M[i, j] = a[i, j]
+      end
+    end
+  else
+    for i = 1:nrows(s)
+      for j = 1:ncols(s)
+        M[i, j] = R(a[i, j])
+      end
     end
   end
   return M
