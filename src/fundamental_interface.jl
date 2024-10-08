@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-# TODO: Move more generic functions to this file.
-
 ###############################################################################
 #
 #   Parents, elements and data type methods
@@ -34,7 +32,6 @@ true
 """
 function parent end
 
-# TODO: Give example
 @doc raw"""
     elem_type(parent)
     elem_type(parent_type)
