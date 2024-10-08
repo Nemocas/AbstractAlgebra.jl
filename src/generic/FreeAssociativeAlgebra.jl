@@ -690,6 +690,102 @@ function neg!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     return z
 end
 
+function add!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(b) && return a
+    return add!(zero(a), a, b)
+end
+
+function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    if z === a
+        return add!(z, b)
+    elseif z === b
+        return add!(z, a)
+    end
+    z.coeffs = empty!(z.coeffs)
+    z.exps = empty!(z.exps)
+    i = j = 1
+    while i <= a.length && j <= b.length
+        c = word_cmp(a.exps[i], b.exps[j])
+        if c < 0
+            push!(z.coeffs, b.coeffs[j])
+            push!(z.exps, b.exps[j])
+            j += 1
+        elseif c > 0
+            push!(z.coeffs, a.coeffs[i])
+            push!(z.exps, a.exps[i])
+            i += 1
+        else
+            s = a.coeffs[i] + b.coeffs[j]
+            if !iszero(s)
+                push!(z.coeffs, s)
+                push!(z.exps, a.exps[i])
+            end
+            i += 1
+            j += 1
+        end
+    end
+    while i <= a.length
+        push!(z.coeffs, a.coeffs[i])
+        push!(z.exps, a.exps[i])
+        i += 1
+    end
+    while j <= b.length
+        push!(z.coeffs, b.coeffs[j])
+        push!(z.exps, b.exps[j])
+        j += 1
+    end
+    z.length = length(z.coeffs)
+    return z
+end
+
+function sub!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(b) && return a
+    return sub!(zero(a), a, b)
+end
+
+function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    if z === a
+        return sub!(z, b)
+    elseif z === b
+        return sub!(zero(a), a, b)
+    end
+    z.coeffs = empty!(z.coeffs)
+    z.exps = empty!(z.exps)
+    i = j = 1
+    while i <= a.length && j <= b.length
+        c = word_cmp(a.exps[i], b.exps[j])
+        if c < 0
+            push!(z.coeffs, -b.coeffs[j])
+            push!(z.exps, b.exps[j])
+            j += 1
+        elseif c > 0
+            push!(z.coeffs, a.coeffs[i])
+            push!(z.exps, a.exps[i])
+            i += 1
+        else
+            s = a.coeffs[i] - b.coeffs[j]
+            if !iszero(s)
+                push!(z.coeffs, s)
+                push!(z.exps, a.exps[i])
+            end
+            i += 1
+            j += 1
+        end
+    end
+    while i <= a.length
+        push!(z.coeffs, a.coeffs[i])
+        push!(z.exps, a.exps[i])
+        i += 1
+    end
+    while j <= b.length
+        push!(z.coeffs, -b.coeffs[j])
+        push!(z.exps, b.exps[j])
+        j += 1
+    end
+    z.length = length(z.coeffs)
+    return z
+end
+
 
 ################################################################################
 #
