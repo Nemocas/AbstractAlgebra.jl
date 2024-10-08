@@ -488,7 +488,7 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(p::UnivPoly{T}; check=true) where {T}
+function Base.sqrt(p::UnivPoly{T}; check::Bool=true) where {T}
    S = parent(p)
    s = sqrt(data(p); check=check)
    return UnivPoly{T}(s, S)

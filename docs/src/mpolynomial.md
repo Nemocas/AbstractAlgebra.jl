@@ -504,7 +504,7 @@ Over rings for which an exact square root is available, it is possible to take
 the square root of a polynomial or test whether it is a square.
 
 ```julia
-sqrt(f::MPolyRingElem, check::bool=true)
+sqrt(f::MPolyRingElem, check::Bool=true)
 is_square(::MPolyRingElem)
 ```
 
