@@ -220,8 +220,8 @@ end
    S, = free_associative_algebra(ZZ, 3)
    test_NCRing_interface(S)
 
-   R, x = QQ[:x]
-   S, = free_associative_algebra(R, 3)
+   R, = QQ[:x, :y]
+   S, = free_associative_algebra(R, :z => 1:3)
    test_NCRing_interface(S)
 end
 

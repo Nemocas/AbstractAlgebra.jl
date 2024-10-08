@@ -42,6 +42,18 @@ function test_elem(Rx::AbstractAlgebra.PolyRing)
    return Rx(elem_type(R)[test_elem(R) for i in 1:rand(0:6)])
 end
 
+function test_elem(Rx::AbstractAlgebra.MPolyRing)
+   R = base_ring(Rx)
+   num_gens = ngens(Rx)
+   iszero(num_gens) && return Rx(test_elem(R))
+   len_bound = 8
+   exp_bound = rand(1:5)
+   len = rand(0:len_bound)
+   coeffs = [test_elem(R) for _ in 1:len]
+   exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
+   return Rx(coeffs, exps)
+end
+
 function test_elem(S::Union{AbstractAlgebra.MatSpace,
                             AbstractAlgebra.MatRing})
    R = base_ring(S)
