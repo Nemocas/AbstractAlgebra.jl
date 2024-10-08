@@ -300,7 +300,9 @@ function varnames_method(d::Dict{Symbol})
         $f($(args...), s1::VarNames, s::VarNames...; kv...) where {$(wheres...)} =
             $f($(argnames...), (s1, s...); kv...)
         function $f($(args...), s::Tuple{Vararg{VarNames}}; kv...) where {$(wheres...)}
-            X, gens = $f($(argnames...), variable_names(s...); kv...)
+            varnames = variable_names(s...)
+            @req allunique(varnames) "Variable names must be unique"
+            X, gens = $f($(argnames...), varnames; kv...)
             return X, reshape_to_varnames(gens, s...)...
         end
     end
@@ -449,6 +451,14 @@ julia> @f("hello", "x#" => (1:1, 1:2), "y#" => (1:2), [:z])
 
 julia> (x11, x12, y1, y2, z)
 ("x11", "x12", "y1", "y2", "z")
+
+julia> f("something", VarName["x", "y", "z", :x])
+ERROR: ArgumentError: Variable names must be unique
+[...]
+
+julia> f("something else", :x=>1:2, :x=>1:3)
+ERROR: ArgumentError: Variable names must be unique
+[...]
 
 julia> g(a, s::Vector{Symbol}; kv...) = (a, kv...), String.(s)
 g (generic function with 1 method)
