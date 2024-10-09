@@ -366,9 +366,7 @@ power series. Only if the power series are precisely the same, to the same
 precision, are they declared equal by this function.
 """
 function isequal(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
-   if parent(x) != parent(y)
-      return false
-   end
+   parent(x) == parent(y) || return false
    if length(x) != length(y)
       return false
    end

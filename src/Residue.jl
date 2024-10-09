@@ -270,8 +270,7 @@ Only if the power series are precisely the same, to the same precision, are
 they declared equal by this function.
 """
 function isequal(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
+   parent(a) == parent(b) || return false
    return isequal(data(a), data(b))
 end
 

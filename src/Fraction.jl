@@ -431,9 +431,7 @@ inexact, e.g. power series. Only if the power series are precisely the same,
 to the same precision, are they declared equal by this function.
 """
 function isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   if parent(x) != parent(y)
-      return false
-   end
+   parent(x) == parent(y) || return false
    return isequal(numerator(x, false)*denominator(y, false),
                   denominator(x, false)*numerator(y, false))
 end

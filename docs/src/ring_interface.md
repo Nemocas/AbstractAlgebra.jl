@@ -918,7 +918,7 @@ function ==(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
 end
 
 function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   check_parent(f, g)
+   parent(f) == parent(g) || return false
    return isequal(f.c, g.c)
 end
 

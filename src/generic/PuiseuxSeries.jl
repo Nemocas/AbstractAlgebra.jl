@@ -571,6 +571,7 @@ function ==(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingEle
 end
 
 function isequal(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+   parent(a) == parent(b) || return false
    return a.scale == b.scale && isequal(a.data, b.data)
 end
 
