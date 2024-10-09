@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function isequal(a::RingElem, b::RingElem)
-   return parent(a) == parent(b) && a == b
-end
-
 """
     divexact(x, y; check::Bool=true)
 

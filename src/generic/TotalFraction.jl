@@ -306,17 +306,12 @@ end
 ###############################################################################
 
 function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
-   b  = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    return (denominator(x, false) == denominator(y, false) &&
            numerator(x, false) == numerator(y, false)) ||
           (numerator(x, false)*denominator(y, false) ==
            denominator(x, false)*numerator(y, false))
-end
-
-function isequal(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
-   return x == y
 end
 
 ###############################################################################
