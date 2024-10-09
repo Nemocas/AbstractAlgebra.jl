@@ -211,6 +211,7 @@ end
 function matrix_ring(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
    # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
    # (and perhaps future compatibility, in case we need it again)
+   @req n >= 0 "n must be a non-negative integer"
    T = elem_type(R)
    return MatRing{T}(R, n)
 end

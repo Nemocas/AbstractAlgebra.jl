@@ -1,5 +1,7 @@
 @testset "Generic.MatAlg.constructors" begin
    R, t = polynomial_ring(QQ, "t")
+   @test_throws ArgumentError matrix_ring(R, -1)
+
    S = matrix_ring(R, 3)
 
    @test S === matrix_ring(R, 3)
