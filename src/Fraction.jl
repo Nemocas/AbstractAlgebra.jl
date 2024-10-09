@@ -412,8 +412,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   b  = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    return (denominator(x, false) == denominator(y, false) &&
            numerator(x, false) == numerator(y, false)) ||

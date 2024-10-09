@@ -257,8 +257,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
+   check_parent(a, b)
    return data(a) == data(b)
 end
 

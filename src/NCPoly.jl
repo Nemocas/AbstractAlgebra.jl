@@ -345,15 +345,13 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
    if length(x) != length(y)
       return false
-   else
-      for i = 1:length(x)
-         if coeff(x, i - 1) != coeff(y, i - 1)
-            return false
-         end
+   end
+   for i = 1:length(x)
+      if coeff(x, i - 1) != coeff(y, i - 1)
+         return false
       end
    end
    return true

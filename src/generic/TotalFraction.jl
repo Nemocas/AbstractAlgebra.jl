@@ -305,8 +305,7 @@ end
 ###############################################################################
 
 function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
-   b  = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    return (denominator(x, false) == denominator(y, false) &&
            numerator(x, false) == numerator(y, false)) ||

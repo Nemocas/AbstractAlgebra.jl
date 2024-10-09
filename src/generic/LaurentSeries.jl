@@ -1044,8 +1044,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
    xval = valuation(x)
    xprec = precision(x)
    yval = valuation(y)
