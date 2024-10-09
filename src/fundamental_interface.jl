@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-# TODO: Move more generic functions to this file.
-
 function Base.:(==)(::AbstractAlgebra.SetElem, ::AbstractAlgebra.SetElem)
   error("== is not implemented for the given types")
 end
@@ -38,7 +36,6 @@ true
 """
 function parent end
 
-# TODO: Give example
 @doc raw"""
     elem_type(parent)
     elem_type(parent_type)
