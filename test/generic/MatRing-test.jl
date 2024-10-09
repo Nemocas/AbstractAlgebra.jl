@@ -1,5 +1,7 @@
 @testset "Generic.MatAlg.constructors" begin
    R, t = polynomial_ring(QQ, "t")
+   @test_throws ArgumentError matrix_ring(R, -1)
+
    S = matrix_ring(R, 3)
 
    @test S === matrix_ring(R, 3)
@@ -177,6 +179,8 @@ end
    @test is_zero_column(M, 1)
 
    @test degree(M) == 2
+
+   @test characteristic(matrix_ring(R, 0)) == 1
 end
 
 @testset "Generic.MatAlg.size/axes" begin
