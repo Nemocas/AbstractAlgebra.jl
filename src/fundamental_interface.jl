@@ -6,6 +6,10 @@
 
 # TODO: Move more generic functions to this file.
 
+function Base.:(==)(::AbstractAlgebra.SetElem, ::AbstractAlgebra.SetElem)
+  error("== is not implemented for the given types")
+end
+
 ###############################################################################
 #
 #   Parents, elements and data type methods
