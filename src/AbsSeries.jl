@@ -522,9 +522,8 @@ power series are precisely the same, to the same precision, are they declared
 equal by this function.
 """
 function isequal(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}) where T <: RingElement
-   if parent(x) != parent(y)
-      return false
-   end
+   parent(x) == parent(y) || return false
+
    if precision(x) != precision(y) || length(x) != length(y)
       return false
    end
