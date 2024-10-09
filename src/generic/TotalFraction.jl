@@ -315,10 +315,6 @@ function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
            denominator(x, false)*numerator(y, false))
 end
 
-function isequal(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
-   return x == y
-end
-
 ###############################################################################
 #
 #   Ad hoc comparisons
