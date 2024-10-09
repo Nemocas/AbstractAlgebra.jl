@@ -66,6 +66,7 @@ end
 
 
 function characteristic(a::MatRing)
+   iszero(a.n) && return 1
    return characteristic(base_ring(a))
 end
 

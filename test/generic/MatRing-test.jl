@@ -179,6 +179,8 @@ end
    @test is_zero_column(M, 1)
 
    @test degree(M) == 2
+
+   @test characteristic(matrix_ring(R, 0)) == 1
 end
 
 @testset "Generic.MatAlg.size/axes" begin
