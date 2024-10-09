@@ -65,7 +65,7 @@ AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
 Random.gentype(::Type{F2}) = F2Elem
 
-const F2MatSpace = AbstractAlgebra.Generic.MatSpace{F2Elem}
+const F2MatSpace = MatSpace{F2Elem}
 
 (S::F2MatSpace)() = zero_matrix(F2(), S.nrows, S.ncols)
 
@@ -120,16 +120,16 @@ end
    @test S === matrix_space(R, 3, 3)
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
-   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
-   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
-   @test base_ring_type(Generic.MatSpace{elem_type(R)}) == typeof(R)
+   @test elem_type(MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
+   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == MatSpace{elem_type(R)}
+   @test base_ring_type(MatSpace{elem_type(R)}) == typeof(R)
    @test base_ring_type(Generic.MatSpaceElem{elem_type(R)}) == typeof(R)
    @test base_ring_type(S) == typeof(R)
    @test base_ring(S) == R
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test typeof(S) <: Generic.MatSpace
+   @test typeof(S) <: MatSpace
 
    f = S(t^2 + 1)
 
@@ -353,8 +353,8 @@ end
    @test base_ring(S) == R
 
    @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
-   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
-   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+   @test elem_type(MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
+   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == MatSpace{elem_type(R)}
 
    @test dense_matrix_type(R) == elem_type(S)
    @test dense_matrix_type(R(1)) == elem_type(S)

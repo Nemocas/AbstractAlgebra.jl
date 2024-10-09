@@ -10,10 +10,6 @@
 #
 ###############################################################################
 
-parent_type(::Type{<:MatElem{T}}) where {T <: NCRingElement} = MatSpace{T}
-
-elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = dense_matrix_type(T)
-
 @doc raw"""
     parent(a::AbstractAlgebra.MatElem)
 
@@ -42,20 +38,6 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #   Basic manipulation
 #
 ###############################################################################
-
-@doc raw"""
-    number_of_rows(a::MatSpace)
-
-Return the number of rows of the given matrix space.
-"""
-number_of_rows(a::Generic.MatSpace) = a.nrows
-
-@doc raw"""
-    number_of_columns(a::MatSpace)
-
-Return the number of columns of the given matrix space.
-"""
-number_of_columns(a::Generic.MatSpace) = a.ncols
 
 number_of_rows(a::Union{Mat, MatRingElem}) = size(a.entries, 1)
 
@@ -140,52 +122,6 @@ promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: Mat{T}} = Mat
 
 function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: Mat{T}, U <: NCRingElement}
    promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
-end
-
-###############################################################################
-#
-#   Parent object call overload
-#
-###############################################################################
-
-
-
-# convert a Julia matrix
-function (a::Generic.MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
-   _check_dim(nrows(a), ncols(a), b)
-   R = base_ring(a)
-
-   # minor optimization for MatSpaceElem
-   if S === T && dense_matrix_type(T) === MatSpaceElem{T} && all(x -> R === parent(x), b)
-      return MatSpaceElem{T}(R, b)
-   end
-
-   # generic code
-   M = a()  # zero matrix
-   for i = 1:nrows(a), j = 1:ncols(a)
-      M[i, j] = R(b[i, j])
-   end
-   return M
-end
-
-# convert a Julia vector
-function (a::Generic.MatSpace{T})(b::AbstractVector) where T <: NCRingElement
-   _check_dim(nrows(a), ncols(a), b)
-   return a(transpose(reshape(b, a.ncols, a.nrows)))
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::AbstractAlgebra.NCRing, r::Int, c::Int; cached::Bool = true)
-   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
-   # (and perhaps future compatibility, in case we need it again)
-   (r < 0 || c < 0) && error("Dimensions must be non-negative")
-   T = elem_type(R)
-   return Generic.MatSpace{T}(R, r, c)
 end
 
 function AbstractAlgebra.add!(A::Mat{T}, B::Mat{T}, C::Mat{T}) where T

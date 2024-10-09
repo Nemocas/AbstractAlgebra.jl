@@ -10,7 +10,11 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{<:MatSpace{T}}) where T <: NCRingElement = parent_type(T)
+elem_type(::Type{MatSpace{T}}) where {T <: NCRingElement} = dense_matrix_type(T)
+
+parent_type(::Type{<:MatElem{T}}) where {T <: NCRingElement} = MatSpace{T}
+
+base_ring_type(::Type{MatSpace{T}}) where T <: NCRingElement = parent_type(T)
 
 base_ring(a::MatSpace{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
@@ -48,44 +52,6 @@ function _check_bases(a, b)
   return nothing
 end
 
-# create a zero matrix
-function (s::MatSpace{T})() where {T <: NCRingElement}
-  return zero_matrix(base_ring(s), nrows(s), ncols(s))::eltype(s)
-end
-
-function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
-  _check_dim(nrows(s), ncols(s), a)
-  _check_bases(s, a)
-  a isa eltype(s) && return a
-  M = s()  # zero matrix
-  R = base_ring(s)
-  if R == base_ring(a)
-    for i = 1:nrows(s)
-      for j = 1:ncols(s)
-        M[i, j] = a[i, j]
-      end
-    end
-  else
-    for i = 1:nrows(s)
-      for j = 1:ncols(s)
-        M[i, j] = R(a[i, j])
-      end
-    end
-  end
-  return M
-end
-
-# create a matrix with b on the diagonal
-function (s::MatSpace)(b::NCRingElement)
-  M = s()  # zero matrix
-  R = base_ring(s)
-  rb = R(b)
-  for i in 1:min(nrows(s), ncols(s))
-    M[i, i] = rb
-  end
-  return M
-end
-
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
 _checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
@@ -114,6 +80,71 @@ function check_square(S::MatSpace)
 end
 
 check_square(S::MatRing) = S
+
+###############################################################################
+#
+#   Parent object call overload
+#
+###############################################################################
+
+# create a zero matrix
+function (s::MatSpace{T})() where {T <: NCRingElement}
+  return zero_matrix(base_ring(s), nrows(s), ncols(s))::eltype(s)
+end
+
+function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+  _check_dim(nrows(s), ncols(s), a)
+  _check_bases(s, a)
+  a isa eltype(s) && return a
+  M = s()  # zero matrix
+  R = base_ring(s)
+  if R == base_ring(a)
+    for i = 1:nrows(s), j = 1:ncols(s)
+      M[i, j] = a[i, j]
+    end
+  else
+    for i = 1:nrows(s), j = 1:ncols(s)
+      M[i, j] = R(a[i, j])
+    end
+  end
+  return M
+end
+
+# create a matrix with b on the diagonal
+function (s::MatSpace)(b::NCRingElement)
+  M = s()  # zero matrix
+  R = base_ring(s)
+  rb = R(b)
+  for i in 1:min(nrows(s), ncols(s))
+    M[i, i] = rb
+  end
+  return M
+end
+
+# convert a Julia matrix
+function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
+  _check_dim(nrows(a), ncols(a), b)
+  R = base_ring(a)
+
+  # minor optimization for MatSpaceElem
+  if S === T && dense_matrix_type(T) === Generic.MatSpaceElem{T} && all(x -> R === parent(x), b)
+     return Generic.MatSpaceElem{T}(R, b)
+  end
+
+  # generic code
+  M = a()  # zero matrix
+  for i = 1:nrows(a), j = 1:ncols(a)
+     M[i, j] = R(b[i, j])
+  end
+  return M
+end
+
+# convert a Julia vector
+function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
+  _check_dim(nrows(a), ncols(a), b)
+  return a(transpose(reshape(b, a.ncols, a.nrows)))
+end
+
 
 ###############################################################################
 #
@@ -7023,7 +7054,11 @@ Return parent object corresponding to the space of $r\times c$ matrices over
 the ring $R$.
 """
 function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
-   return Generic.matrix_space(R, r, c; cached)
+  # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
+  # (and perhaps future compatibility, in case we need it again)
+  (r < 0 || c < 0) && error("Dimensions must be non-negative")
+  T = elem_type(R)
+  return MatSpace{T}(R, r, c)
 end
 
 ###############################################################################

@@ -34,7 +34,7 @@ For the most part, one doesn't want to work directly with the `MatSpaceElem` typ
 but with an abstract type called `Generic.Mat` which includes `MatSpaceElem` and views
 thereof.
 
-Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`. Parents of
+Parents of generic matrices (matrix spaces) have type `MatSpace{T}`. Parents of
 matrices in a matrix algebra have type `Generic.MatRing{T}`.
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object,
@@ -47,9 +47,10 @@ demand.
 ## Abstract types
 
 The generic matrix types (matrix spaces) belong to the abstract type
-`MatElem{T}` and the matrix space parent types belong to
-`MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
-to the abstract type `MatRingElem{T}` and the parent types belong to
+`MatElem{T}` and the all matrix space parents are of the concrete type
+`MatSpace{T}`.
+On the other hand, the generic matrix algebra matrix types belong
+to the abstract type `MatRingElem{T}` and the parent types belong to the abstract
  `MatRing{T}` Note that both
 the concrete type of a matrix space parent object and the abstract class it belongs to
 have the name `MatElem`, therefore disambiguation is required to specify which is

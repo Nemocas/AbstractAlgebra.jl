@@ -93,8 +93,6 @@ abstract type ResidueField{T} <: Field end
 
 abstract type FracField{T} <: Field end
 
-abstract type MatSpace{T} <: Module{T} end
-
 abstract type MatRing{T} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T} <: NCRing end

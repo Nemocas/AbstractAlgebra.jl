@@ -178,6 +178,8 @@ const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
 
 const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 
+include("ConcreteTypes.jl")
+
 ###############################################################################
 #
 #   Fundamental interface for AbstractAlgebra

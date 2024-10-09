@@ -31,9 +31,9 @@ performance.
 
 ## Types and parents
 
-AbstractAlgebra provides two abstract types for matrix spaces and their elements:
+AbstractAlgebra provides two types for matrix spaces and their elements:
 
-  * `MatSpace{T}` is the abstract type for matrix space parent types
+  * `MatSpace{T}` is the concrete type for matrix space parent types
   * `MatElem{T}` is the abstract type for matrix types belonging to a matrix space
 
 It also provides two abstract types for matrix algebras and their elements:
