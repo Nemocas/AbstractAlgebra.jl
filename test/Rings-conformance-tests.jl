@@ -8,10 +8,14 @@
 #
 # The "recursive" variants perform additional tests on algebraic
 # structures derived from the original ring, by calling these helpers:
-# - test_EuclideanRing_interface(R)
 # - test_Poly_interface(R)
 # - test_MatSpace_interface(R)
 # - test_MatAlgebra_interface(R)
+#
+# The following helper needs can be invoked manually if appropriate
+# (it is only automatically called by the "recursive" variants when
+# testing an univariate polynomial ring over a field)
+# - test_EuclideanRing_interface(R)
 
 #
 # add methods for test_elem on ring elements here

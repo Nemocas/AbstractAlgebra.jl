@@ -5,12 +5,25 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
 function test_elem(R::LaurentPolyWrapRing)
    n = rand(0:10)
-   if n == 0
+   if n == 0 || characteristic(R) == 1
       return zero(R)
    else
       m = rand(0:5)
       rand(R, -m:n-m, -99:99)
    end
+end
+
+@testset "Generic.LaurentPoly.conformance" begin
+   L, y = laurent_polynomial_ring(QQ, "y")
+   test_Ring_interface_recursive(L)
+   test_EuclideanRing_interface(L)
+
+   L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
+   test_Ring_interface_recursive(L)
+
+   # special case: over zero ring
+   L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(1))[1], "y")
+   test_Ring_interface(L)  # TODO: fails because `isone(one(L)) == false`
 end
 
 @testset "Generic.LaurentPoly" begin
@@ -490,15 +503,5 @@ end
       @test sprint(show, "text/plain", 3*(y^0)*z) == "3*z"
       @test sprint(show, "text/plain", -y*z + (-y*z^2)) == "-y*z^2 - y*z"
       @test sprint(show, "text/plain", -y^0*z) == "-z"
-   end
-
-   @testset "conformance" begin
-      L, y = laurent_polynomial_ring(QQ, "y")
-      test_Ring_interface(L)
-      test_EuclideanRing_interface(L)
-      test_Ring_interface_recursive(L)
-
-      L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
-      test_Ring_interface(L)
    end
 end

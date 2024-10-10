@@ -16,11 +16,14 @@ end
 
 @testset "Generic.LaurentMPoly.conformance" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
-    test_Ring_interface(L)
     test_Ring_interface_recursive(L)
 
     L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], ["x", "y"])
-    test_Ring_interface(L)
+    test_Ring_interface_recursive(L)
+
+    # special case: over zero ring
+    L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(1))[1], ["x", "y"])
+    test_Ring_interface(L)  # TODO: fails because `isone(one(L)) == false`
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin

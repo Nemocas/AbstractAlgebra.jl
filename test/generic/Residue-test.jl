@@ -1,5 +1,8 @@
 @testset "EuclideanRingResidueRingElem.conformance_tests" begin
-   test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
+   # special case: over zero ring
+   test_Ring_interface_recursive(residue_ring(ZZ, 1)[1])   # polynomial ring fail isone(one(R)) and more
+
+   #
    test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
 
    #
