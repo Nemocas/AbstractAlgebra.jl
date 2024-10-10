@@ -63,3 +63,17 @@ import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{V
 @deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
 @deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
+
+# deprecated during 0.44.*
+PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
+#@deprecate PolyRing(R::NCRing) poly_ring(R)
+
+#polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+#   dense_poly_ring_type(T)(R, s, cached)
+#polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+#   mpoly_ring_type(T)(R, s, internal_ordering, cached)
+
+polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+   poly_ring(R, s; cached)
+polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+   poly_ring(R, s; internal_ordering, cached)
