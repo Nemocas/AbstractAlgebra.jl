@@ -102,6 +102,8 @@ number_of_variables(a::NCPolyRing) = 1
 
 characteristic(a::NCPolyRing) = characteristic(base_ring(a))
 
+is_finite(a::NCPolyRing) = is_trivial(a)
+
 ###############################################################################
 #
 #   Basic manipulation

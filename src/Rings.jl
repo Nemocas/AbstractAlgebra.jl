@@ -207,4 +207,9 @@ is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
 
 is_finite(F::FinField) = true
 
-is_finite(F::Field) = characteristic(F) != 0 && throw(NotImplementedError(:is_finite, F))
+function is_finite(R::NCRing)
+  c = characteristic(R)
+  c == 0 && return false
+  c == 1 && return true
+  throw(NotImplementedError(:is_finite, R))
+end

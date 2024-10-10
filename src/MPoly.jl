@@ -138,9 +138,10 @@ function var_index(x::MPolyRingElem{T}) where {T <: RingElement}
    return index
 end
 
-function characteristic(a::MPolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::MPolyRing) = characteristic(base_ring(R))
+
+is_finite(R::MPolyRing) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+
 
 ###############################################################################
 #
