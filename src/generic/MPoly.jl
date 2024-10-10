@@ -2060,29 +2060,23 @@ end
 #
 ###############################################################################
 
-function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
-   N = size(a.exps, 1)
-   if n == 0
-      return a.length == 0
-   elseif a.length == 1
-      return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
-   end
-   return false
+# Check whether a is constant and a == n
+function _cmp_constant(a::MPoly, n)
+  return is_constant(a) && (is_zero(a) ? is_zero(n) : coeff(a, 1) == n)
 end
+
+==(a::MPoly, n::Union{Integer, Rational, AbstractFloat}) = _cmp_constant(a, n)
 
 ==(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a == n
 
-function ==(a::MPoly{T}, n::T) where {T <: RingElem}
-   N = size(a.exps, 1)
-   if n == 0
-      return a.length == 0
-   elseif a.length == 1
-      return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
-   end
-   return false
-end
+==(a::MPoly{T}, n::T) where {T <: RingElem} = _cmp_constant(a, n)
 
 ==(n::T, a::MPoly{T}) where {T <: RingElem} = a == n
+
+# To avoid ambiguity with ==(::MPolyRingElem, ::MPolyRingElem)
+==(a::MPoly{T}, n::T) where {T <: MPolyRingElem} = _cmp_constant(a, n)
+
+==(n::T, a::MPoly{T}) where {T <: MPolyRingElem} = a == n
 
 ###############################################################################
 #
