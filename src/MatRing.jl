@@ -446,5 +446,6 @@ Return parent object corresponding to the ring of $n\times n$ matrices over
 the ring $R$.
 """
 function matrix_ring(R::NCRing, n::Int)
-   Generic.matrix_ring(R, n)
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
+   return Generic.matrix_ring(R, n)
 end

@@ -823,6 +823,7 @@ that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
 function fraction_field(R::Ring; cached::Bool=true)
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
    return Generic.fraction_field(R; cached=cached)
 end
 

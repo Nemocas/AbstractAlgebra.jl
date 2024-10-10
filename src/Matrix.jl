@@ -6653,6 +6653,7 @@ julia> using LinearAlgebra ; matrix(GF(5), I(2))
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
    Base.require_one_based_indexing(arr)
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    if elem_type(R) === T && all(e -> parent(e) === R, arr)
       z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
@@ -6664,6 +6665,7 @@ function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
 end
 
 function matrix(R::NCRing, arr::MatElem)
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    return map_entries(R, arr)
 end
 
@@ -6702,6 +6704,7 @@ Constructs the $r \times c$ matrix over $R$, where the entries are taken
 row-wise from `arr`.
 """
 function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T && all(e -> parent(e) === R, arr)
@@ -7086,6 +7089,7 @@ the ring $R$.
 function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
   # (and perhaps future compatibility, in case we need it again)
+  @req !is_trivial(R) "Zero rings are currently not supported as base ring."
   (r < 0 || c < 0) && error("Dimensions must be non-negative")
   T = elem_type(R)
   return MatSpace{T}(R, r, c)
