@@ -3886,6 +3886,43 @@ end
 #
 ###############################################################################
 
+function zero!(a::MPoly{T}) where {T <: RingElement}
+   a.length = 0
+   return a
+end
+
+function one!(a::MPoly{T}) where {T <: RingElement}
+   a.length = 1
+   fit!(a, 1)
+   a.coeffs[1] = one(base_ring(a))
+   a.exps = zero(a.exps)
+   return a
+end
+
+function neg!(a::MPoly{T}) where {T <: RingElement}
+   for i in 1:length(a)
+      a.coeffs[i] = neg!(a.coeffs[i])
+   end
+   return a
+end
+
+function neg!(z::MPoly{T}, a::MPoly{T}) where {T <: RingElement}
+   if z === a
+      return neg!(a)
+   end
+   z.length = length(a)
+   fit!(z, length(a))
+   for i in 1:length(a)
+      if isassigned(z.coeffs, i)
+         z.coeffs[i] = neg!(z.coeffs[i], a.coeffs[i])
+      else
+         z.coeffs[i] = -a.coeffs[i]
+      end
+   end
+   z.exps[:,1:length(a)] .= a.exps[:,1:length(a)]
+   return z
+end
+
 function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    t = b + c
    a.coeffs = t.coeffs
@@ -3932,11 +3969,6 @@ function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
       a.exps = resize_exps!(a.exps, n)
    end
    return nothing
-end
-#
-function zero!(a::MPoly{T}) where {T <: RingElement}
-   a.length = 0
-   return a
 end
 
 @doc raw"""

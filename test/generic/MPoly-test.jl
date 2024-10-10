@@ -1704,3 +1704,18 @@ end
    @test leading_coefficient(f, 1) == coefficients(f, 1)[end]
    @test content(f, 1) == y
 end
+
+@testset "Generic.MPoly.Ring_interface" begin
+  S, = polynomial_ring(QQ, 0)
+  test_Ring_interface_recursive(S)
+
+  S, = polynomial_ring(QQ, 1)
+  test_Ring_interface_recursive(S)
+
+  S, = polynomial_ring(ZZ, 2)
+  test_Ring_interface_recursive(S)
+
+  R, = QQ[:x]
+  S, = polynomial_ring(R, :z => 1:3)
+  test_Ring_interface(S) # _recursive needs too many ressources
+end
