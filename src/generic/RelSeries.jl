@@ -419,6 +419,7 @@ end
 ###############################################################################
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative)
+   @req !is_trivial(R) "The zero is currently not supported as a coefficient ring."
    T = elem_type(R)
 
    if model == :capped_relative
