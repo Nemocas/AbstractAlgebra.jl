@@ -178,6 +178,7 @@ import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: number_of_rows
 import ..AbstractAlgebra: number_of_variables
 import ..AbstractAlgebra: numerator
+import ..AbstractAlgebra: one!
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
 import ..AbstractAlgebra: pol_length
@@ -198,6 +199,8 @@ import ..AbstractAlgebra: shift_left
 import ..AbstractAlgebra: shift_right
 import ..AbstractAlgebra: snf
 import ..AbstractAlgebra: sqrt
+import ..AbstractAlgebra: sub!
+import ..AbstractAlgebra: submul!
 import ..AbstractAlgebra: symbols
 import ..AbstractAlgebra: tail
 import ..AbstractAlgebra: term_degree

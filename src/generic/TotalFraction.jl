@@ -391,16 +391,25 @@ end
 
 ###############################################################################
 #
-#   Unsafe operators and functions
+#   Unsafe functions
 #
 ###############################################################################
 
 function zero!(c::TotFrac)
    c.num = zero!(c.num)
-   if !isone(c.den)
-      c.den = one(base_ring(c))
-   end
+   c.den = one!(c.den)
    return c
+end
+
+function one!(c::TotFrac)
+   c.num = one!(c.num)
+   c.den = one!(c.den)
+   return c
+end
+
+function neg!(z::TotFrac, c::TotFrac)
+   z.num = neg!(z.num, c.num)
+   return z
 end
 
 function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}

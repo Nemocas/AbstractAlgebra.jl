@@ -1004,6 +1004,21 @@ end
 #
 ###############################################################################
 
+function zero!(a::UnivPoly{T}) where {T <: RingElement}
+   a.p = zero!(a.p)
+   return a
+end
+
+function one!(a::UnivPoly{T}) where {T <: RingElement}
+   a.p = one!(a.p)
+   return a
+end
+
+function neg!(z::UnivPoly{T}, a::UnivPoly{T}) where {T <: RingElement}
+   z.p = neg!(a.p)
+   return z
+end
+
 function fit!(a::UnivPoly, n::Int)
    fit!(data(a), n)
 end
@@ -1013,8 +1028,25 @@ function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
    return a
 end
 
+function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
+   a.p = add!(a.p, b.p, c)
+   return a
+end
+
+add!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = add!(a, c, b)
+
 function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
    a.p = sub!(a.p, b.p, c.p)
+   return a
+end
+
+function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
+   a.p = sub!(a.p, b.p, c)
+   return a
+end
+
+function sub!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement}
+   a.p = sub!(a.p, b, c.p)
    return a
 end
 
@@ -1023,10 +1055,12 @@ function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingEl
    return a
 end
 
-function zero!(a::UnivPoly{T}) where {T <: RingElement}
-   a.p = zero!(a.p)
+function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
+   a.p = mul!(a.p, b.p, c)
    return a
 end
+
+mul!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = mul!(a, c, b)
 
 ###############################################################################
 #
