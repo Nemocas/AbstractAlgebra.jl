@@ -39,5 +39,7 @@ julia> rand(R, -3:3, -9:9)
 -3*x^2 - 8*x + 4 + 3*x^-1 - 6*x^-2 + 9*x^-3
 ```
 """
-laurent_polynomial_ring(R::Ring, s::VarName; cached::Bool = true) =
-   Generic.laurent_polynomial_ring(R, Symbol(s); cached)
+function laurent_polynomial_ring(R::Ring, s::VarName; cached::Bool = true)
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
+   return Generic.laurent_polynomial_ring(R, Symbol(s); cached)
+end
