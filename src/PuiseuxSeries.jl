@@ -24,8 +24,11 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-puiseux_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true) =
-   Generic.PuiseuxSeriesRing(R, prec, Symbol(s); cached)
+function puiseux_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true)
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
+   return Generic.PuiseuxSeriesRing(R, prec, Symbol(s); cached)
+end
 
-puiseux_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true) =
-   Generic.PuiseuxSeriesField(R, prec, Symbol(s); cached)
+function puiseux_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true)
+   return Generic.PuiseuxSeriesField(R, prec, Symbol(s); cached)
+end
