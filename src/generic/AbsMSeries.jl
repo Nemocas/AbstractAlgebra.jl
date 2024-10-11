@@ -709,6 +709,8 @@ end
 
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
                   s::Vector{Symbol}; cached::Bool=true, model=:capped_absolute)
+
+    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
     U = elem_type(R)
 
     S, _ = AbstractAlgebra.polynomial_ring(R, s)
@@ -724,6 +726,8 @@ end
 function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
         s::Vector{Symbol}; weights::Union{Vector{Int}, Nothing}=nothing,
         cached::Bool=true, model=:capped_absolute)
+
+    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
     U = elem_type(R)
 
     S, _ = AbstractAlgebra.polynomial_ring(R, s)
