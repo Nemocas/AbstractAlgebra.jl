@@ -198,6 +198,29 @@ function zero!(c::Poly{T}) where T <: RingElement
    return c
 end
 
+function one!(c::Poly{T}) where T <: RingElement
+   fit!(c, 1)
+   c = set_length!(c, 1)
+   c.coeffs[1] = one(base_ring(c))
+   return c
+end
+
+function neg!(a::Poly{T}) where T <: RingElement
+   for i in 1:length(a)
+      a.coeffs[i] = neg!(a.coeffs[i])
+   end
+   return a
+end
+
+function neg!(z::Poly{T}, a::Poly{T}) where T <: RingElement
+   fit!(z, length(a))
+   z = set_length!(z, length(a))
+   for i in 1:length(a)
+      z.coeffs[i] = neg!(z.coeffs[i], a.coeffs[i])
+   end
+   return z
+end
+
 function mul!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where T <: RingElement
    lena = length(a)
    lenb = length(b)

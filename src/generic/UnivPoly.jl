@@ -1015,7 +1015,7 @@ function one!(a::UnivPoly{T}) where {T <: RingElement}
 end
 
 function neg!(z::UnivPoly{T}, a::UnivPoly{T}) where {T <: RingElement}
-   z.p = neg!(a.p)
+   z.p = neg!(z.p, a.p)
    return z
 end
 
