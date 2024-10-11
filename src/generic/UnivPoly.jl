@@ -1170,6 +1170,7 @@ x*y - z
 ```
 """
 function universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering::Symbol=:lex)
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
    T = elem_type(R)
    U = mpoly_type(R)
 
