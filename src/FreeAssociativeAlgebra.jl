@@ -270,6 +270,7 @@ function free_associative_algebra(
   s::Vector{Symbol};
   cached::Bool = true,
 )
+  @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
   parent_obj = Generic.FreeAssociativeAlgebra{elem_type(R)}(R, s, cached)
   return (parent_obj, gens(parent_obj))
 end
