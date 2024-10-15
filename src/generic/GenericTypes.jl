@@ -1072,7 +1072,8 @@ function MatSpaceElem{T}(R::NCRing, A::AbstractMatrix{T}) where T <: NCRingEleme
    return MatSpaceElem{T}(R, Matrix(A))
 end
 
-function MatSpaceElem{T}(R::NCRing, r::Int, c::Int, A::Vector{T}) where T <: NCRingElement
+function MatSpaceElem{T}(R::NCRing, r::Int, c::Int, A::AbstractVector{T}) where T <: NCRingElement
+   Base.require_one_based_indexing(A)
    t = Matrix{T}(undef, r, c)
    for i = 1:r, j = 1:c
       t[i, j] = A[(i - 1) * c + j]
