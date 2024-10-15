@@ -393,7 +393,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
 
       @test T <: RingElement
 
-      test_NCRing_interface(R)
+      test_NCRing_interface(R; reps = reps)
 
       @testset "Basic functionality for commutative rings only" begin
          @test isone(AbstractAlgebra.inv(one(R)))
