@@ -113,7 +113,7 @@ end
 Return `mod(f^e, m)` but possibly computed more efficiently.
 """
 function powermod(a::T, n::Integer, m::T) where T <: RingElem
-   parent(a) == parent(m) || error("Incompatible parents")
+   check_parent(a, m)
    if n > 1
       return internal_powermod(a, n, m)
    elseif n == 1
@@ -149,7 +149,7 @@ case `q` is set to the quotient, or `flag` is set to `false` and `q`
 is set to `zero(f)`.
 """
 function divides(a::T, b::T) where T <: RingElem
-   parent(a) == parent(b) || error("Incompatible parents")
+   check_parent(a, b)
    if iszero(b)
       return iszero(a), b
    end
@@ -166,7 +166,7 @@ the cofactor after $f$ is divided by this power.
 See also [`valuation`](@ref), which only returns the valuation.
 """
 function remove(a::T, b::T) where T <: Union{RingElem, Number}
-   parent(a) == parent(b) || error("Incompatible parents")
+   check_parent(a, b)
    if (iszero(b) || is_unit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
@@ -205,7 +205,7 @@ any other common divisor of $a$ and $b$ divides $g$.
     way that if the return is a unit, that unit should be one.
 """
 function gcd(a::T, b::T) where T <: RingElem
-   parent(a) == parent(b) || error("Incompatible parents")
+   check_parent(a, b)
    while !iszero(b)
       (a, b) = (b, mod(a, b))
    end
@@ -287,7 +287,7 @@ Return a triple `d, s, t` such that $d = gcd(f, g)$ and $d = sf + tg$, with $s$
 loosely reduced modulo $g/d$ and $t$ loosely reduced modulo $f/d$.
 """
 function gcdx(a::T, b::T) where T <: RingElem
-   parent(a) == parent(b) || error("Incompatible parents")
+   check_parent(a, b)
    R = parent(a)
    if iszero(a)
       if iszero(b)
