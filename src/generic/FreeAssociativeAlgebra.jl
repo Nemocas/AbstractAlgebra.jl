@@ -639,34 +639,12 @@ end
 
 function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
     z = zero(a)
-    fit!(z, length(a))
-    j = 1
-    for i = 1:length(a)
-        c = a.coeffs[i]*n
-        if !iszero(c)
-            z.coeffs[j] = c
-            z.exps[j] = a.exps[i]
-            j += 1
-        end
-    end
-    z.length = j - 1
-    return z
+    return mul!(z, a, n)
 end
 
 function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
     z = zero(a)
-    fit!(z, length(a))
-    j = 1
-    for i = 1:length(a)
-        c = a.coeffs[i]*n
-        if !iszero(c)
-            z.coeffs[j] = c
-            z.exps[j] = a.exps[i]
-            j += 1
-        end
-    end
-    z.length = j - 1
-    return z
+    return mul!(z, a, n)
 end
 
 *(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
@@ -826,6 +804,33 @@ function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     return z
 end
 
+function mul!(a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
+    for i in 1:length(a)
+        a.coeffs[i] = mul!(a.coeffs[i], n)
+    end
+    return a
+end
+
+function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
+    if z === a
+        return mul!(a, n)
+    end
+    fit!(z, length(a))
+    j = 1
+    for i = 1:length(a)
+        if isassigned(z.coeffs, j)
+            z.coeffs[j] = mul!(z.coeffs[j], a.coeffs[i], n)
+        else
+            z.coeffs[j] = a.coeffs[i] * n
+        end
+        if !iszero(z.coeffs[j])
+            z.exps[j] = a.exps[i]
+            j += 1
+        end
+    end
+    z.length = j - 1
+    return z
+end
 
 ################################################################################
 #
