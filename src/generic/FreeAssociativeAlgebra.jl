@@ -133,10 +133,14 @@ function (a::FreeAssociativeAlgebra{T})(b::T) where T
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::Integer) where T
-    iszero(b) && return zero(a)
+function (a::FreeAssociativeAlgebra{T})(b::Union{Integer, Rational, AbstractFloat}) where T
     R = base_ring(a)
-    return FreeAssociativeAlgebraElem{T}(a, T[R(b)], [Int[]], 1)
+    return a(R(b))
+end
+
+function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+    iszero(b) && return zero(a)
+    return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
 function (a::FreeAssociativeAlgebra{T})(b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
@@ -633,6 +637,20 @@ end
 #
 ###############################################################################
 
+function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
+    z = zero(a)
+    return mul!(z, a, n)
+end
+
+function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
+    z = zero(a)
+    return mul!(z, a, n)
+end
+
+*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
+
+*(n::T, a::FreeAssociativeAlgebraElem{T}) where {T <: RingElem} = a*n
+
 function divexact(
     a::FreeAssociativeAlgebraElem{T},
     b::Integer;
@@ -786,6 +804,33 @@ function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     return z
 end
 
+function mul!(a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
+    for i in 1:length(a)
+        a.coeffs[i] = mul!(a.coeffs[i], n)
+    end
+    return a
+end
+
+function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
+    if z === a
+        return mul!(a, n)
+    end
+    fit!(z, length(a))
+    j = 1
+    for i = 1:length(a)
+        if isassigned(z.coeffs, j)
+            z.coeffs[j] = mul!(z.coeffs[j], a.coeffs[i], n)
+        else
+            z.coeffs[j] = a.coeffs[i] * n
+        end
+        if !iszero(z.coeffs[j])
+            z.exps[j] = a.exps[i]
+            j += 1
+        end
+    end
+    z.length = j - 1
+    return z
+end
 
 ################################################################################
 #
