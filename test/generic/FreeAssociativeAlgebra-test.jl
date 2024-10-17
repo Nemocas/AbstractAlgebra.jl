@@ -216,6 +216,64 @@ end
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.adhoc_binary" begin
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+
+      S, varlist = free_associative_algebra(R, var_names)
+
+      for iter = 1:100
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         d1 = rand(-20:20)
+         d2 = rand(-20:20)
+         g1 = rand(R, 0:2, -10:10)
+         g2 = rand(R, 0:2, -10:10)
+
+         @test f*d1 + f*d2 == (d1 + d2)*f
+         @test f*BigInt(d1) + f*BigInt(d2) == (BigInt(d1) + BigInt(d2))*f
+         @test f*g1 + f*g2 == (g1 + g2)*f
+
+         @test f + d1 + d2 == d1 + d2 + f
+         @test f + BigInt(d1) + BigInt(d2) == BigInt(d1) + BigInt(d2) + f
+         @test f + g1 + g2 == g1 + g2 + f
+
+         @test f - d1 - d2 == -((d1 + d2) - f)
+         @test f - BigInt(d1) - BigInt(d2) == -((BigInt(d1) + BigInt(d2)) - f)
+         @test f - g1 - g2 == -((g1 + g2) - f)
+
+         @test f + d1 - d1 == f
+         @test f + BigInt(d1) - BigInt(d1) == f
+         @test f + g1 - g1 == f
+
+         if !iszero(d1)
+            @test divexact(d1 * f, d1) == f
+            @test divexact(d1 * f, BigInt(d1)) == f
+         end
+      end
+   end
+
+   S, (x,y) = free_associative_algebra(QQ, [:x, :y])
+   f = x^2 + x*y^2*x + QQ(5)*y - QQ(1//2)*y*x
+   
+   @test 2 + f == QQ(2) + f
+   @test f + 2 == f + QQ(2)
+   @test 1//2 + f == QQ(1//2) + f
+   @test f + 1//2 == f + QQ(1//2)
+
+   @test 2 - f == QQ(2) - f
+   @test f - 2 == f - QQ(2)
+   @test 1//2 - f == QQ(1//2) - f
+   @test f - 1//2 == f - QQ(1//2)
+
+   @test 2 * f == QQ(2) * f
+   @test f * 2 == f * QQ(2)
+   @test 1//2 * f == QQ(1//2) * f
+   @test f * 1//2 == f * QQ(1//2)
+end
+
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    S, = free_associative_algebra(ZZ, 3)
    test_NCRing_interface(S)

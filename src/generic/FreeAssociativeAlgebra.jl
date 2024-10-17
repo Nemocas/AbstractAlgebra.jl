@@ -633,6 +633,42 @@ end
 #
 ###############################################################################
 
+function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
+    z = zero(a)
+    fit!(z, length(a))
+    j = 1
+    for i = 1:length(a)
+        c = a.coeffs[i]*n
+        if !iszero(c)
+            z.coeffs[j] = c
+            z.exps[j] = a.exps[i]
+            j += 1
+        end
+    end
+    z.length = j - 1
+    return z
+end
+
+function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
+    z = zero(a)
+    fit!(z, length(a))
+    j = 1
+    for i = 1:length(a)
+        c = a.coeffs[i]*n
+        if !iszero(c)
+            z.coeffs[j] = c
+            z.exps[j] = a.exps[i]
+            j += 1
+        end
+    end
+    z.length = j - 1
+    return z
+end
+
+*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
+
+*(n::T, a::FreeAssociativeAlgebraElem{T}) where {T <: RingElem} = a*n
+
 function divexact(
     a::FreeAssociativeAlgebraElem{T},
     b::Integer;
