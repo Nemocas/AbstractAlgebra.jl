@@ -134,14 +134,13 @@ function (a::FreeAssociativeAlgebra{T})(b::T) where T
 end
 
 function (a::FreeAssociativeAlgebra{T})(b::Union{Integer, Rational, AbstractFloat}) where T
-    iszero(b) && return zero(a)
     R = base_ring(a)
-    return FreeAssociativeAlgebraElem{T}(a, T[R(b)], [Int[]], 1)
+    return a(R(b))
 end
 
 function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
-  iszero(b) && return zero(a)
-  return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
+    iszero(b) && return zero(a)
+    return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
 function (a::FreeAssociativeAlgebra{T})(b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
