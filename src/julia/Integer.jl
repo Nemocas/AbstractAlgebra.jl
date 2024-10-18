@@ -105,11 +105,11 @@ end
 ###############################################################################
 
 function divides(a::Integer, b::Integer)
-   if b == 0
-      return a == 0, b
+   if iszero(b)
+      return iszero(a), b
    end
    q, r = divrem(a, b)
-   return r == 0, q
+   return iszero(r), q
 end
 
 @doc raw"""
@@ -119,32 +119,32 @@ Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
 $a = bc$.
 """
 function is_divisible_by(a::Integer, b::Integer)
-   if b == 0
-      return a == 0
+   if iszero(b)
+      return iszero(a)
    end
    r = rem(a, b)
-   return r == 0
+   return iszero(r)
 end
 
 function is_divisible_by(a::BigInt, b::BigInt)
-   if b == 0
-      return a == 0
+   if iszero(b)
+      return iszero(a)
    end
    return Bool(ccall((:__gmpz_divisible_p, :libgmp), Cint,
                                              (Ref{BigInt}, Ref{BigInt}), a, b))
 end
 
 function is_divisible_by(a::BigInt, b::Int)
-   if b == 0
-      return a == 0
+   if iszero(b)
+      return iszero(a)
    end
    return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
                                         (Ref{BigInt}, Int), a, b < 0 ? -b : b))
 end
 
 function is_divisible_by(a::BigInt, b::UInt)
-   if b == 0
-      return a == 0
+   if iszero(b)
+      return iszero(a)
    end
    return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
                                                     (Ref{BigInt}, UInt), a, b))
@@ -362,7 +362,7 @@ function root(a::T, n::Int; check::Bool=true) where T <: Integer
       exact = true
       if check
          r = a - s*s
-         exact = r == 0
+         exact = iszero(r)
          !exact && error("Not a perfect n-th power (n = $n)")
       end
       return s
@@ -402,7 +402,7 @@ function ispower_moduli(a::Integer, n::Int)
    end
 
    for (p, q_residues) in _p_q_residues
-     if (n % p) == 0
+     if is_divisible_by(n, p)
         for (q, residues) in q_residues
            if !(mod(a, q) in residues)
               return false
@@ -422,7 +422,7 @@ return `false, 0`. We require $n > 0$.
 """
 function is_power(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "exponent n must be positive"))
-   if n == 1 || a == 0 || a == 1
+   if n == 1 || iszero(a) || isone(a)
       return (true, a)
    elseif a == -1
       return isodd(n) ? (true, a) : (false, zero(T))
@@ -510,7 +510,7 @@ Return a pair $(c,d)$ such that $a=c*d$ and $c = gcd(a, b^\infty)$ if $a\neq 0$,
 and $c=b$, $d=0$ if $a=0$.
 """
 function ppio(a::T, b::T) where T <: Integer
-   a == 0 && return (b,T(0))
+   iszero(a) && return (b,T(0))
    c = gcd(a, b)
    n = div(a, c)
    g = gcd(c, n)
