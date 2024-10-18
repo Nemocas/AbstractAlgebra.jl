@@ -23,9 +23,9 @@ end
 function ^(a::T, n::Integer) where T <: RingElem
    if n > 1
       return internal_power(a, n)
-   elseif n == 1
+   elseif isone(n)
       return deepcopy(a)
-   elseif n == 0
+   elseif iszero(n)
       return one(parent(a))
    elseif n == -1
       return inv(a)
@@ -116,9 +116,9 @@ function powermod(a::T, n::Integer, m::T) where T <: RingElem
    parent(a) == parent(m) || error("Incompatible parents")
    if n > 1
       return internal_powermod(a, n, m)
-   elseif n == 1
+   elseif isone(n)
       return mod(a, m)
-   elseif n == 0
+   elseif iszero(n)
       return mod(one(parent(a)), m)
    elseif n == -1
       return invmod(a, m)
