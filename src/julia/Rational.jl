@@ -111,7 +111,7 @@ divexact(a::Integer, b::Rational; check::Bool=true) = a//b
 divexact(a::Rational, b::Rational; check::Bool=true) = a//b
 
 function divides(a::T, b::T) where T <: Rational
-   if b == 0
+   if iszero(b)
       return false, T(0)
    else
       return true, divexact(a, b; check=false)
@@ -206,7 +206,7 @@ function rand(rng::AbstractRNG,
               ) where {T}
    R, n = sp[][1:end]
    d = T(0)
-   while d == 0
+   while iszero(d)
       d = T(rand(rng, n))
    end
    n = T(rand(rng, n))
@@ -231,14 +231,14 @@ rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
 #
 # TODO: what happens to z = 0???
 function remove(z::Rational{T}, p::T) where {T<:Integer}
-    z == 0 && return (0, z)
+    iszero(z) && return (0, z)
     v, d = remove(denominator(z), p)
     w, n = remove(numerator(z), p)
     return w - v, n // d
 end
 
 function valuation(z::Rational{T}, p::T) where {T<:Integer}
-    z == 0 && error("Not yet implemented")
+    iszero(z) && error("Not yet implemented")
     v = valuation(denominator(z), p)
     w = valuation(numerator(z), p)
     return w - v
