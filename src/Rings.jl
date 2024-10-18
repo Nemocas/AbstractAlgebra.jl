@@ -4,25 +4,6 @@
 #
 ###############################################################################
 
-function isequal(a::RingElem, b::RingElem)
-   return parent(a) == parent(b) && a == b
-end
-
-# Implement `isapprox` for ring elements via equality by default. On the one
-# hand, we need isapprox methods to be able to conformance test series rings.
-# On the other hand this is essentially the only sensible thing to do in
-# positive characteristic so we might as well do it in a generic method.
-function Base.isapprox(x::NCRingElem, y::NCRingElem;
-                       atol::Real=0, rtol::Real=0,
-                       nans::Bool=false, norm::Function=abs)
-  if is_exact_type(typeof(x)) && is_exact_type(typeof(y))
-    @req is_zero(atol) "non-zero atol not supported"
-    @req is_zero(rtol) "non-zero rtol not supported"
-    return x == y
-  end
-  throw(NotImplementedError(:isapprox, x, y))
-end
-
 """
     divexact(x, y; check::Bool=true)
 
