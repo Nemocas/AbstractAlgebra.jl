@@ -23,7 +23,7 @@ end
 function ^(a::T, n::Integer) where T <: RingElem
    if n > 1
       return internal_power(a, n)
-   elseif n == 1
+   elseif isone(n)
       return deepcopy(a)
    elseif iszero(n)
       return one(parent(a))
