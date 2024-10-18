@@ -91,7 +91,7 @@ divexact(a::Rational{T}, b::AbstractFloat; check::Bool=true) where T <: Union{Si
 divexact(a::Rational{BigInt}, b::BigFloat; check::Bool=true) = a/b
 
 function divides(a::BigFloat, b::BigFloat)
-   if b == 0
+   if iszero(b)
       return false, BigFloat(0)
    else
       return true, divexact(a, b; check=false)
@@ -109,7 +109,7 @@ end
 ###############################################################################
 
 function gcd(a::T, b::T) where T <: AbstractFloat
-   if a == 0 && b == 0
+   if iszero(a) && iszero(b)
       return T(0)
    else
       return T(1)
@@ -123,7 +123,7 @@ end
 ###############################################################################
 
 function ppio(a::T, b::T) where T <: AbstractFloat
-   if a == 0 && b == 0
+   if iszero(a) && iszero(b)
       return T(0), T(0)
    else
       return T(1), a
