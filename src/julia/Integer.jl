@@ -402,7 +402,7 @@ function ispower_moduli(a::Integer, n::Int)
    end
 
    for (p, q_residues) in _p_q_residues
-     if iszero(n % p)
+     if is_divisible_by(n, p)
         for (q, residues) in q_residues
            if !(mod(a, q) in residues)
               return false
