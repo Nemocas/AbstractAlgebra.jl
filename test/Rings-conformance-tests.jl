@@ -116,9 +116,8 @@ end
 
 
 # helper
-equality(a, b) = isequal(a, b)
-function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
-   if is_exact_type(T)
+function equality(a, b)
+   if is_exact_type(typeof(a)) && is_exact_type(typeof(b))
       return a == b
    else
       return isapprox(a, b)
