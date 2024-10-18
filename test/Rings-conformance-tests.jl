@@ -14,12 +14,29 @@
 # - test_MatAlgebra_interface(R)
 
 #
+#
+#
+const default_adhoc_partner_rings = [
+    AbstractAlgebra.Integers{BigInt}(),
+    AbstractAlgebra.Integers{Int}(),
+    AbstractAlgebra.Integers{UInt}(),
+    AbstractAlgebra.Integers{UInt8}(),
+  ]
+
+adhoc_partner_rings(R::NCRing) = default_adhoc_partner_rings
+
+#
 # add methods for test_elem on ring elements here
 #
 
-function test_elem(R::AbstractAlgebra.Integers)
-   n = big(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+function test_elem(R::AbstractAlgebra.Integers{T}) where {T <: Signed}
+   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
    return rand(R, -n:n)
+end
+
+function test_elem(R::AbstractAlgebra.Integers{T}) where {T <: Unsigned}
+   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+   return rand(R, 0:n)
 end
 
 function test_elem(R::AbstractAlgebra.Rationals)
@@ -99,8 +116,8 @@ end
 
 
 # helper
-function equality(a::T, b::T) where T <: AbstractAlgebra.NCRingElement
-   if is_exact_type(T)
+function equality(a, b)
+   if is_exact_type(typeof(a)) && is_exact_type(typeof(b))
       return a == b
    else
       return isapprox(a, b)
@@ -157,7 +174,7 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B)
    a = f!(a, b, b)
    @test equality(a, f(B, B))
    @test b == B
-   
+
    b = deepcopy(B)
    b = f!(b, b, b)
    @test equality(b, f(B, B))
@@ -187,25 +204,25 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B)
       @test equality(z, f(Z, A, B))
       @test a == A
       @test b == B
-      
+
       a = deepcopy(A)
       b = deepcopy(B)
       a = f!(a, a, b, t)
       @test equality(a, f(A, A, B))
       @test b == B
-      
+
       a = deepcopy(A)
       b = deepcopy(B)
       b = f!(b, a, b, t)
       @test equality(b, f(B, A, B))
       @test a == A
-      
+
       a = deepcopy(A)
       b = deepcopy(B)
       a = f!(a, b, b, t)
       @test equality(a, f(A, B, B))
       @test b == B
-      
+
       b = deepcopy(B)
       b = f!(b, b, b, t)
       @test equality(b, f(B, B, B))
@@ -312,6 +329,34 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          end
       end
 
+      if is_exact_type(T)
+        @testset "Adhoc operations with $S" for S in adhoc_partner_rings(R)
+          s0 = zero(S)
+          r0 = zero(R)
+          s1 = one(S)
+          r1 = one(R)
+          for i in 1:reps
+            s2 = test_elem(S)
+            r2 = R(s2)
+            x = test_elem(R)
+
+            for (s,r) in ((s0, r0), (s1, r1), (s2, r2))
+              @test equality(r, s)
+              @test equality(s, r)
+
+              @test equality(x + s, x + r)
+              @test equality(s + x, r + x)
+
+              @test equality(x - s, x - r)
+              @test equality(s - x, r - x)
+
+              @test equality(x * s, x * r)
+              @test equality(s * x, r * x)
+            end
+          end
+        end
+      end
+
       if !(R isa AbstractAlgebra.Ring)
          @testset "Basic functionality for noncommutative rings only" begin
             for i in 1:reps
@@ -365,7 +410,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             a = test_elem(R)::T
             b = test_elem(R)::T
             c = test_elem(R)::T
-            
+
             test_mutating_op_like_zero(zero, zero!, a)
             test_mutating_op_like_zero(one, one!, a)
 
@@ -537,7 +582,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          @test !(iszero(f) && iszero(g)) || iszero(gcd(f, g))
          @test equality_up_to_units(gcd(f, g)*lcm(f, g), f*g)
 
-         g1 = gcd(f, gcd(g, m)) 
+         g1 = gcd(f, gcd(g, m))
          g2 = gcd(gcd(f, g), m)
          g3 = gcd(f, g, m)
          g4 = gcd([f, g, m])
