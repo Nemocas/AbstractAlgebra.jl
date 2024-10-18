@@ -25,7 +25,7 @@ function ^(a::T, n::Integer) where T <: RingElem
       return internal_power(a, n)
    elseif n == 1
       return deepcopy(a)
-   elseif n == 0
+   elseif iszero(n)
       return one(parent(a))
    elseif n == -1
       return inv(a)
@@ -118,7 +118,7 @@ function powermod(a::T, n::Integer, m::T) where T <: RingElem
       return internal_powermod(a, n, m)
    elseif n == 1
       return mod(a, m)
-   elseif n == 0
+   elseif iszero(n)
       return mod(one(parent(a)), m)
    elseif n == -1
       return invmod(a, m)
