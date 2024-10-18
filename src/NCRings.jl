@@ -84,13 +84,12 @@ end
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
 function ==(x::NCRingElem, y::NCRingElem)
-   fl, u, v = try_promote(x, y)
-   if fl
-     return u == v
-   else
-     return false
-   end
- end
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u == v
+  end
+  return false
+end
  
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
 
