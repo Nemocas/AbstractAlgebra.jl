@@ -422,7 +422,7 @@ return `false, 0`. We require $n > 0$.
 """
 function is_power(a::T, n::Int) where T <: Integer
    n <= 0 && throw(DomainError(n, "exponent n must be positive"))
-   if n == 1 || iszero(a) || a == 1
+   if n == 1 || iszero(a) || isone(a)
       return (true, a)
    elseif a == -1
       return isodd(n) ? (true, a) : (false, zero(T))
