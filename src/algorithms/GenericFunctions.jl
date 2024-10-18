@@ -116,7 +116,7 @@ function powermod(a::T, n::Integer, m::T) where T <: RingElem
    parent(a) == parent(m) || error("Incompatible parents")
    if n > 1
       return internal_powermod(a, n, m)
-   elseif n == 1
+   elseif isone(n)
       return mod(a, m)
    elseif iszero(n)
       return mod(one(parent(a)), m)
