@@ -58,8 +58,12 @@ function expressify(a::Integer; context = nothing)
     return a
 end
 
-function show(io::IO, R::Integers)
+function show(io::IO, R::Integers{BigInt})
    print(io, "Integers")
+end
+
+function show(io::IO, R::Integers{T}) where T
+   print(io, "Integers{$T}()")
 end
 
 ###############################################################################
