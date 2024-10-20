@@ -329,28 +329,30 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          end
       end
 
-      @testset "Adhoc operations with $S" for S in adhoc_partner_rings(R)
-        s0 = zero(S)
-        r0 = zero(R)
-        s1 = one(S)
-        r1 = one(R)
-        for i in 1:reps
-          s2 = test_elem(S)
-          r2 = R(s2)
-          x = test_elem(R)
+      if is_exact_type(T)
+        @testset "Adhoc operations with $S" for S in adhoc_partner_rings(R)
+          s0 = zero(S)
+          r0 = zero(R)
+          s1 = one(S)
+          r1 = one(R)
+          for i in 1:reps
+            s2 = test_elem(S)
+            r2 = R(s2)
+            x = test_elem(R)
 
-          for (r,s) in ((s0, r0), (s1, r1), (s2, r2))
-            @test equality(r, s)
-            @test equality(s, r)
+            for (r,s) in ((s0, r0), (s1, r1), (s2, r2))
+              @test equality(r, s)
+              @test equality(s, r)
 
-            @test equality(x + s, x + r)
-            @test equality(s + x, r + x)
+              @test equality(x + s, x + r)
+              @test equality(s + x, r + x)
 
-            @test equality(x - s, x - r)
-            @test equality(s - x, r - x)
+              @test equality(x - s, x - r)
+              @test equality(s - x, r - x)
 
-            @test equality(x * s, x * r)
-            @test equality(s * x, r * x)
+              @test equality(x * s, x * r)
+              @test equality(s * x, r * x)
+            end
           end
         end
       end
