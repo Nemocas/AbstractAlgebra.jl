@@ -504,21 +504,25 @@ end
 #
 ###############################################################################
 
-function *(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}) where {T}
-   S = parent(p)
-   return UnivPoly{T}(data(p)*n, S)
+for op in (:+, :-, :*)
+  @eval begin
+    function $op(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}) where {T}
+       S = parent(p)
+       return UnivPoly{T}($op(data(p),n), S)
+    end
+
+    function *(p::UnivPoly{T}, n::T) where {T <: RingElem}
+       S = parent(p)
+       return UnivPoly{T}($op(data(p),n), S)
+    end
+
+    $op(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = $op(p,n)
+
+    $op(n::T, p::UnivPoly{T}) where {T <: RingElem} = $op(p,n)
+  end
 end
 
-function *(p::UnivPoly{T}, n::T) where {T <: RingElem}
-   S = parent(p)
-   return UnivPoly{T}(data(p)*n, S)
-end
-
-*(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = p*n
-
-*(n::T, p::UnivPoly{T}) where {T <: RingElem} = p*n
-
-function divexact(p::UnivPoly{T}, n::Union{Integer, Rational, BigFloat}; check::Bool=true) where {T}
+function divexact(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where {T}
    S = parent(p)
    return UnivPoly{T}(divexact(data(p), n; check=check), S)
 end
