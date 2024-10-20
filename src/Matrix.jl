@@ -334,7 +334,7 @@ Create the block diagonal matrix whose blocks are given by the matrices in `V`.
 There must be at least one matrix in V.
 """
 function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
-   length(V) > 0 || error("At least one matrix is required")
+   @req !isempty(V) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `block_diagonal_matrix`"
    rows = sum(nrows(N) for N in V)
    cols = sum(ncols(N) for N in V)
    R = base_ring(V[1])
@@ -6865,7 +6865,10 @@ function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix([x, xs...])
 end
 
-diagonal_matrix(x::Vector{<:NCRingElement}) = diagonal_matrix(parent(x[1]), x)
+function diagonal_matrix(x::Vector{<:NCRingElement})
+   @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
+   return diagonal_matrix(parent(x[1]), x)
+end
 
 @doc raw"""
     diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
