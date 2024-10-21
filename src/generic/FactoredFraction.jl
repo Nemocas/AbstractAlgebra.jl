@@ -304,7 +304,7 @@ function *(b::Integer, a::FactoredFracFieldElem{T}) where T <: RingElem
 end
 
 function *(b::FactoredFracFieldElem{T}, c::FactoredFracFieldElem{T}) where T <: RingElement
-    parent(b) == parent(c) || error("Incompatible rings")
+    check_parent(b, c)
     input_is_good = _bases_are_coprime(b) && _bases_are_coprime(b)
     z = FactoredFracFieldElem{T}(b.unit*c.unit, FactoredFracTerm{T}[], parent(b))
     if iszero(z.unit)
