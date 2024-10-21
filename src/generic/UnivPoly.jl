@@ -511,7 +511,7 @@ for op in (:+, :-, :*)
        return UnivPoly{T}($op(data(p),n), S)
     end
 
-    function *(p::UnivPoly{T}, n::T) where {T <: RingElem}
+    function $op(p::UnivPoly{T}, n::T) where {T <: RingElem}
        S = parent(p)
        return UnivPoly{T}($op(data(p),n), S)
     end
