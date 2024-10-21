@@ -237,7 +237,7 @@ function canonical_unit(p::LaurentPolyWrap)
 end
 
 function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
-   parent(p) == parent(q) || error("Incompatible parents")
+   check_parent(p, q)
    if iszero(p)
       return divexact(q, canonical_unit(q))
    elseif iszero(q)
@@ -249,7 +249,7 @@ function gcd(p::LaurentPolyWrap{T}, q::LaurentPolyWrap{T}) where T
 end
 
 function gcdx(a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   parent(a) == parent(b) || error("Incompatible parents")
+   check_parent(a, b)
    R = parent(a)
    if iszero(a)
       if iszero(b)

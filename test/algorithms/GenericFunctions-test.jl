@@ -145,19 +145,19 @@ end
 # Binary operations
 
 function +(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    R = parent(f)
    return R(f.c + g.c)
 end
 
 function -(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    R = parent(f)
    return R(f.c - g.c)
 end
 
 function *(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    R = parent(f)
    return R(f.c*g.c)
 end
@@ -165,12 +165,12 @@ end
 # Comparison
 
 function ==(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    return f.c == g.c
 end
 
 function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    return isequal(f.c, g.c)
 end
 
@@ -179,7 +179,7 @@ end
 # Exact division
 
 function divexact(f::ConstPoly{T}, g::ConstPoly{T}; check::Bool = true) where T <: RingElement
-   parent(f) != parent(g) && error("Incompatible rings")
+   check_parent(f, g)
    R = parent(f)
    return R(divexact(f.c, g.c, check = check))
 end
@@ -271,7 +271,7 @@ end
 # Euclidean interface
 
 function Base.divrem(a::ConstPoly{elem_type(ZZ)}, b::ConstPoly{elem_type(ZZ)})
-   parent(a) != parent(b) && error("Incompatible rings")
+   check_parent(a, b)
    q, r = AbstractAlgebra.divrem(a.c, b.c)
    return parent(a)(q), parent(a)(r)
 end
