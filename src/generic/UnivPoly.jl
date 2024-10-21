@@ -315,6 +315,8 @@ function coeff(p::UnivPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where {T}
       if vars[i] <= num
          push!(vars2, vars[i])
          push!(exps2, exps[i])
+      else
+         return zero(S)
       end
    end
    return UnivPoly{T}(coeff(data(p), vars2, exps2), S)
