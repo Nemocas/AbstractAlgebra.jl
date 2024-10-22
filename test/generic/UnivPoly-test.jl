@@ -424,7 +424,7 @@ end
          g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
          @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
-         @test collect(exponent_vectors(f)) == [[3, 0, 0], [2, 0, 0], [1, 0, 0], [0, 0, 0]]
+         @test collect(exponent_vectors(f)) == [[3], [2], [1], [0]]
          @test sum(terms(f)) == f
          @test collect(monomials(f)) == [x^3, x^2, x, S(1)]
 
