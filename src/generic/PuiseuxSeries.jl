@@ -555,8 +555,7 @@ end
 ###############################################################################
 
 function ==(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-   fl = check_parent(a, b, false)
-   !fl && return false
+   check_parent(a, b)
    s = gcd(a.scale, b.scale)
    zscale = div(a.scale*b.scale, s)
    ainf = div(a.scale, s)
@@ -565,6 +564,7 @@ function ==(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingEle
 end
 
 function isequal(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+   parent(a) == parent(b) || return false
    return a.scale == b.scale && isequal(a.data, b.data)
 end
 
