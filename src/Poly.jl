@@ -832,15 +832,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
+    ==(x::PolyRingElem, y::PolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
-   b = check_parent(x, y, false)
-   !b && return false
+function ==(x::PolyRingElem, y::PolyRingElem)
+   check_parent(x, y, true)
    if length(x) != length(y)
       return false
    else
@@ -890,6 +889,10 @@ Return `true` if $x == y$.
 ==(x::PolyRingElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
+# To avoid ambiguity with ==(::PolyRingElem, ::PolyRingElem)
+==(x::PolyRingElem{T}, y::T) where T <: PolyRingElem = ((length(x) == 0 && iszero(y))
+                        || (length(x) == 1 && coeff(x, 0) == y))
+
 @doc raw"""
     ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
 
@@ -904,6 +907,9 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 Return `true` if $x = y$.
 """
 ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
+
+# To avoid ambiguity with ==(::PolyRingElem, ::PolyRingElem)
+==(x::T, y::PolyRingElem{T}) where T <: PolyRingElem = y == x
 
 @doc raw"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem)
