@@ -363,6 +363,7 @@ end
 ###############################################################################
 
 function univ_promote(x::UnivPoly{T}, y::UnivPoly{T}) where {T <: RingElement}
+   check_parent(x, y)
    nx = nvars(parent(data(x)))
    ny = nvars(parent(data(y)))
    if nx == ny
@@ -373,19 +374,16 @@ function univ_promote(x::UnivPoly{T}, y::UnivPoly{T}) where {T <: RingElement}
 end
 
 function +(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(data(a) + data(b), parent(a))
 end
 
 function -(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(data(a) - data(b), parent(a))
 end
 
 function *(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(data(a)*data(b), parent(a))
 end
@@ -680,13 +678,11 @@ end
 ###############################################################################
 
 function divexact(a::UnivPoly{T}, b::UnivPoly{T}; check::Bool=true) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(divexact(data(a), data(b); check=check), parent(a))
 end
 
 function divides(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    flag, q = divides(data(a), data(b))
    return flag, UnivPoly{T}(q, parent(a))
@@ -699,13 +695,11 @@ end
 ###############################################################################
 
 function Base.div(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(div(data(a), data(b)), parent(a))
 end
 
 function Base.divrem(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    q, r = divrem(data(a), data(b))
    return UnivPoly{T}(q, parent(a)), UnivPoly{T}(r, parent(a))
@@ -736,11 +730,9 @@ end
 ###############################################################################
 
 function remove(z::UnivPoly{T}, p::UnivPoly{T}) where {T}
-   check_parent(z, p)
-   S = parent(z)
    z, p = univ_promote(z, p)
    val, q = remove(data(z), data(p))
-   return val, UnivPoly{T}(q, S)
+   return val, UnivPoly{T}(q, parent(z))
 end
 
 function valuation(z::UnivPoly{T}, p::UnivPoly{T}) where {T}
@@ -872,13 +864,11 @@ end
 ###############################################################################
 
 function gcd(a::UnivPoly{T}, b::UnivPoly{T}) where {T <: RingElement}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(gcd(data(a), data(b)), parent(a))
 end
 
 function lcm(a::UnivPoly{T}, b::UnivPoly{T}) where {T <: RingElement}
-   check_parent(a, b)
    a, b = univ_promote(a, b)
    return UnivPoly{T}(lcm(data(a), data(b)), parent(a))
 end
