@@ -1001,59 +1001,91 @@ end
 ###############################################################################
 
 function zero!(a::UnivPoly{T}) where {T <: RingElement}
-   a.p = zero!(a.p)
-   return a
+  a.p = zero!(a.p)
+  return a
 end
 
 function one!(a::UnivPoly{T}) where {T <: RingElement}
-   a.p = one!(a.p)
-   return a
+  a.p = one!(a.p)
+  return a
 end
 
 function neg!(z::UnivPoly{T}, a::UnivPoly{T}) where {T <: RingElement}
-   z.p = neg!(z.p, a.p)
-   return z
+  if parent(data(z)) == parent(data(a))
+    z.p = neg!(z.p, a.p)
+  else
+    z.p = -a.p
+  end
+  return z
 end
 
 function fit!(a::UnivPoly, n::Int)
-   fit!(data(a), n)
+  fit!(data(a), n)
 end
 
 function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = add!(a.p, b.p, c.p)
-   return a
+  if parent(data(a)) == parent(data(b)) == parent(data(c))
+    a.p = add!(data(a), data(b), data(c))
+  else
+    a.p = data(b + c)
+  end
+  return a
 end
 
 function add!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
-   a.p = add!(a.p, b.p, c)
-   return a
+  if parent(data(a)) == parent(data(b))
+    a.p = add!(data(a), data(b), c)
+  else
+    a.p = data(b + c)
+  end
+  return a
 end
 
 add!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = add!(a, c, b)
 
 function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = sub!(a.p, b.p, c.p)
-   return a
+  if parent(data(a)) == parent(data(b)) == parent(data(c))
+    a.p = sub!(data(a), data(b), data(c))
+  else
+    a.p = data(b - c)
+  end
+  return a
 end
 
 function sub!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
-   a.p = sub!(a.p, b.p, c)
-   return a
+  if parent(data(a)) == parent(data(b))
+    a.p = sub!(data(a), data(b), c)
+  else
+    a.p = data(b - c)
+  end
+  return a
 end
 
 function sub!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = sub!(a.p, b, c.p)
-   return a
+  if parent(data(a)) == parent(data(c))
+    a.p = sub!(data(a), b, data(c))
+  else
+    a.p = data(b - c)
+  end
+  return a
 end
 
 function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::UnivPoly{T}) where {T <: RingElement}
-   a.p = mul!(a.p, b.p, c.p)
-   return a
+  if parent(data(a)) == parent(data(b)) == parent(data(c))
+    a.p = mul!(data(a), data(b), data(c))
+  else
+    a.p = data(b * c)
+  end
+  return a
 end
 
 function mul!(a::UnivPoly{T}, b::UnivPoly{T}, c::RingElement) where {T <: RingElement}
-   a.p = mul!(a.p, b.p, c)
-   return a
+  if parent(data(a)) == parent(data(b))
+    a.p = mul!(data(a), data(b), c)
+  else
+    a.p = data(b * c)
+  end
+  return a
 end
 
 mul!(a::UnivPoly{T}, b::RingElement, c::UnivPoly{T}) where {T <: RingElement} = mul!(a, c, b)
