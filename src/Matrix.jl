@@ -29,6 +29,7 @@ function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
 end
 
 function _check_dim(r::Int, c::Int, arr::AbstractMatrix{T}, transpose::Bool = false) where {T}
+  Base.require_one_based_indexing(arr)
   if !transpose
     size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
   else
@@ -38,6 +39,7 @@ function _check_dim(r::Int, c::Int, arr::AbstractMatrix{T}, transpose::Bool = fa
 end
 
 function _check_dim(r::Int, c::Int, arr::AbstractVector{T}) where {T}
+  Base.require_one_based_indexing(arr)
   length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
   return nothing
 end
