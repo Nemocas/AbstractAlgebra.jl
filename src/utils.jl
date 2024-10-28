@@ -56,7 +56,7 @@ function is_loaded_directly()
       @static if v"1.11.0-" < VERSION < v"1.12.0-"
         return line_difference >= 68
       else # v"1.12.0-" <= VERSION
-        return line_difference >= 73 # 100 works, but I want do work with failing tests for now 
+        return line_difference >= 100
       end
     end
   catch e
