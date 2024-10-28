@@ -8,7 +8,7 @@ using Pkg, Test
       cmd = Cmd(`$bin $opts`, ignorestatus=true)
       outs = IOBuffer()
       errs = IOBuffer()
-      proc = run(pipeline(`$cmd`, stderr=errs, stdout=outs))
+      proc = run(pipeline(addenv(`$cmd`, "JULIA_DEBUG" => "AbstractAlgebra"), stderr=errs, stdout=outs))
       out = String(take!(outs))
       err = String(take!(errs))
       return out, err, proc.exitcode
