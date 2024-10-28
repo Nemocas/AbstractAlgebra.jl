@@ -516,9 +516,15 @@ for op in (:+, :-, :*)
        return UnivPoly{T}($op(data(p),n), S)
     end
 
-    $op(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = $op(p,n)
+    function $op(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly{T}) where {T}
+       S = parent(p)
+       return UnivPoly{T}($op(n,data(p)), S)
+    end
 
-    $op(n::T, p::UnivPoly{T}) where {T <: RingElem} = $op(p,n)
+    function $op(n::T, p::UnivPoly{T}) where {T <: RingElem}
+       S = parent(p)
+       return UnivPoly{T}($op(n,data(p)), S)
+    end
   end
 end
 
