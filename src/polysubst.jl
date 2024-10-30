@@ -1,4 +1,6 @@
-for T in subtypes(PolyRingElem)
+for T in [
+  Generic.Poly,
+  ]
   (f::T)(a) = subst(f, a)
 
   function (f::T)(a::T)
@@ -18,7 +20,9 @@ for T in subtypes(PolyRingElem)
   end
 end
 
-for T in subtypes(NCPolyRingElem)
+for T in [
+  Generic.NCPoly,
+  ]
   (f::T)(a::Integer) = evaluate(f, a)
 
   function (f::T)(a::NCRingElem)
