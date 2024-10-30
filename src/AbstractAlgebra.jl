@@ -372,8 +372,6 @@ include("error.jl")
 
 
 # Generic functions to be defined after all rings
-include("polysubst.jl")
-
 include("broadcasting.jl")
 
 ################################################################################
