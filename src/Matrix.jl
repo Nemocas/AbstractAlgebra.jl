@@ -6633,13 +6633,27 @@ randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
     matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
 
 Constructs the matrix over $R$ with entries as in `arr`.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> matrix(GF(3), [1 2 ; 3 4])
+[1   2]
+[0   1]
+
+julia> using LinearAlgebra ; matrix(GF(5), I(2))
+[1   0]
+[0   1]
+```
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
+   Base.require_one_based_indexing(arr)
    if elem_type(R) === T && all(e -> parent(e) === R, arr)
       z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
       return z
    else
-      arr_coerce = convert(Matrix{elem_type(R)}, map(R, arr))::Matrix{elem_type(R)}
+      mat = (arr isa Matrix{T}) ? arr : convert(Matrix{T}, arr)
+      arr_coerce = convert(Matrix{elem_type(R)}, map(R, mat))::Matrix{elem_type(R)}
       return matrix(R, arr_coerce)
    end
 end
