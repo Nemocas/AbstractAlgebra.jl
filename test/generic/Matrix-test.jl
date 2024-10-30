@@ -251,6 +251,12 @@ end
 
    @test isa(M3, Generic.MatSpaceElem{elem_type(R)})
    @test M3.base_ring == R
+   @test is_zero(M3)
+
+   M3b = zeros(R, 2, 3)
+   @test is_zero(M3b)
+   @test M3 == matrix(R, M3b)
+   @test Matrix(M3) == M3b
 
    M4 = identity_matrix(R, 3)
 
@@ -264,6 +270,11 @@ end
    @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
    @test base_ring(M5) == R
    @test all(isone, M5)
+
+   M5b = ones(R, 2, 3)
+   @test all(isone, M5b)
+   @test M5 == matrix(R, M5b)
+   @test Matrix(M5) == M5b
 
    # identity_matrix should preserve the type of the input
    M9 = matrix(F2(), F2Elem[1 0; 0 1])
