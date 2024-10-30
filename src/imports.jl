@@ -1,8 +1,6 @@
 using Random: Random, AbstractRNG, GLOBAL_RNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-using InteractiveUtils: InteractiveUtils, subtypes
-
 using Test: @test # for "interface-conformance" functions
 
 import LinearAlgebra
