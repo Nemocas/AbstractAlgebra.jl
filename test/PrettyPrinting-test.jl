@@ -342,6 +342,8 @@ end
   end
 
   function Base.show(io::IO, R::NewRing)
+    @show_name(io, R)
+    @show_special(io, R)
     if PrettyPrinting.is_terse(io)
       # no nested printing
       print(io, "terse printing of newring ")

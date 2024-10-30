@@ -791,6 +791,8 @@ function show(io::IO, ::MIME"text/plain", a::MatSpace)
 end
 
 function show(io::IO, a::MatSpace)
+   @show_name(io, a)
+   @show_special(io, a)
    if is_terse(io)
       print(io, "Matrix space")
    else

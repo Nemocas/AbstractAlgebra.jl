@@ -164,6 +164,8 @@ function show(io::IO, mime::MIME"text/plain", a::MatRing)
 end
 
 function show(io::IO, a::MatRing)
+   @show_name(io, a)
+   @show_special(io, a)
    if is_terse(io)
       print(io, "Matrix ring")
    else
