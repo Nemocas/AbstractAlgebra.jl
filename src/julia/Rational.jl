@@ -70,8 +70,12 @@ function expressify(a::Rational; context = nothing)
     end
 end
 
-function show(io::IO, R::Rationals)
+function show(io::IO, R::Rationals{BigInt})
    print(io, "Rationals")
+end
+
+function show(io::IO, R::Rationals{T}) where T
+   print(io, "Rationals{$T}()")
 end
 
 ###############################################################################

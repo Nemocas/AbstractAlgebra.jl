@@ -54,8 +54,12 @@ is_positive(n::T) where T<:Real = n > zero(T)
 #
 ###############################################################################
 
-function show(io::IO, R::Floats)
+function show(io::IO, R::Floats{BigFloat})
    print(io, "Floats")
+end
+
+function show(io::IO, R::Floats{T}) where T
+   print(io, "Floats{$T}()")
 end
 
 function expressify(a::AbstractFloat; context = nothing)
