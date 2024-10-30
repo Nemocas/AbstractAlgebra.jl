@@ -2064,6 +2064,8 @@ function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
+   elseif a.length == 0
+       return iszero(base_ring(a)(n))
    elseif a.length == 1
       return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
    end
@@ -2076,6 +2078,8 @@ function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
+   elseif a.length == 0
+       return iszero(base_ring(a)(n))
    elseif a.length == 1
       return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
    end
