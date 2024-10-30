@@ -1,31 +1,20 @@
-for T in [
-  Generic.Poly,
-  ]
-  (f::T)(a) = subst(f, a)
+(f::PolyRingElem)(a) = subst(f, a)
 
-  function (f::T)(a::T)
-     if parent(f) != parent(a)
-        return subst(f, a)
-     end
-     return compose(f, a; inner = :second)
-  end
-
-  (f::T)(a::Integer) = evaluate(f, a)
-
-  function (f::T)(a::RingElem)
-     if parent(a) != base_ring(f)
-        return subst(f, a)
-     end
-     return evaluate(f, a)
-  end
+function (f::PolyRingElem)(a::PolyRingElem)
+    typeof(f) == typeof(a) || return subst(f, a)
+    parent(f) == parent(a) || return subst(f, a)
+    return compose(f, a; inner = :second)
 end
 
-for T in [
-  Generic.NCPoly,
-  ]
-  (f::T)(a::Integer) = evaluate(f, a)
+(f::PolyRingElem)(a::Integer) = evaluate(f, a)
 
-  function (f::T)(a::NCRingElem)
-     return evaluate(f, a)
-  end
+function (f::PolyRingElem)(a::RingElem)
+    base_ring(f) == parent(a) || return subst(f, a)
+    return evaluate(f, a)
+end
+
+(f::NCPolyRingElem)(a::Integer) = evaluate(f, a)
+
+function (f::NCPolyRingElem)(a::NCRingElem)
+    return evaluate(f, a)
 end
