@@ -3366,6 +3366,11 @@ function (f::PolyRingElem)(a::PolyRingElem)
     return compose(f, a; inner = :second)
 end
 
+function (f::PolyRingElem{T})(a::T) where T
+    base_ring(f) == parent(a) || return subst(f, a)
+    return evaluate(f, a)
+end
+
 (f::PolyRingElem)(a::Integer) = evaluate(f, a)
 
 function (f::PolyRingElem)(a::RingElem)
