@@ -703,6 +703,10 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
    R = base_ring(S)
    T = elem_type(R)
 
+   @test base_ring_type(S) == typeof(R)
+   @test parent_type(ST) == typeof(S)
+   @test dense_matrix_type(R) == ST
+
    @testset "MatSpace interface for $(S) of type $(typeof(S))" begin
 
       @testset "Constructors" begin
@@ -715,6 +719,11 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
             @test a == matrix(R, T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
             @test a == matrix(R, nrows(S), ncols(S),
                               T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
+
+            b = similar(a)
+            @test b isa ST
+            @test nrows(b) == nrows(S)
+            @test ncols(b) == ncols(S)
          end
          @test iszero(zero_matrix(R, nrows(S), ncols(S)))
       end
@@ -730,12 +739,20 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
          for k in 1:reps
             a = test_elem(S)::ST
             A = deepcopy(a)
+            @test A isa ST
+
             b = zero_matrix(R, nrows(a), ncols(a))
+            @test b isa ST
             for i in 1:nrows(a), j in 1:ncols(a)
                b[i, j] = a[i, j]
             end
             @test b == a
-            @test transpose(transpose(a)) == a
+
+            t = transpose(a)
+            @test t isa ST
+            @test nrows(t) == ncols(S)
+            @test ncols(t) == nrows(S)
+            @test transpose(t) == a
             @test a == A
          end
       end

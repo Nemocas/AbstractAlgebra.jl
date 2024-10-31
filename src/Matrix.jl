@@ -398,14 +398,7 @@ end
 #
 ###############################################################################
 
-function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-   TT = elem_type(R)
-   M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatRingElem{TT}(R, M)
-   return z
-end
-
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = _similar(x, R, r, c)
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
 
 similar(x::MatElem, R::NCRing=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
 

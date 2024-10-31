@@ -82,13 +82,18 @@ is_finite(R::MatRing) = iszero(nrows(a)) || is_finite(base_ring(R))
     similar(x::Generic.MatrixElem, R::NCRing=base_ring(x))
     similar(x::Generic.MatrixElem, R::NCRing, r::Int, c::Int)
     similar(x::Generic.MatrixElem, r::Int, c::Int)
+    similar(x::MatRingElem, R::NCRing=base_ring(x))
     similar(x::MatRingElem, R::NCRing, n::Int)
     similar(x::MatRingElem, n::Int)
 
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatRingElem, R::NCRing, n::Int) = _similar(x, R, n, n)
+function similar(x::MatRingElem, R::NCRing, n::Int)
+   TT = elem_type(R)
+   M = Matrix{TT}(undef, (n, n))
+   return Generic.MatRingElem{TT}(R, M)
+end
 
 similar(x::MatRingElem, R::NCRing=base_ring(x)) = similar(x, R, degree(x))
 
