@@ -1598,7 +1598,7 @@ end
 If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-`obj` is required to have attribute storage available.
+If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1607,10 +1607,12 @@ macro show_special(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        s(i, o)
-        return
+      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+        s = get_attribute(o, :show)
+        if s !== nothing
+          s(i, o)
+          return
+        end
       end
     end
   )
@@ -1622,7 +1624,7 @@ end
 If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
 and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
 
-`obj` is required to have attribute storage available.
+If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1632,14 +1634,16 @@ macro show_special(io, mime, obj)
       local i = $(esc(io))
       local m = $(esc(mime))
       local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
+      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+        s = get_attribute(o, :show)
+        if s !== nothing
+          if applicable(s, i, m, o)
+            s(i, m, o)
+          else
+            s(i, o)
+          end
+          return
         end
-        return
       end
     end
   )
@@ -1651,7 +1655,7 @@ end
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-`parent(obj)` is required to have attribute storage available.
+If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1661,10 +1665,12 @@ macro show_special_elem(io, obj)
       local i = $(esc(io))
       local o = $(esc(obj))
       local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        s(i, o)
-        return
+      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+        s = get_attribute(p, :show_elem)
+        if s !== nothing
+          s(i, o)
+          return
+        end
       end
     end
   )
@@ -1676,7 +1682,7 @@ end
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
 and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
 
-`parent(obj)` is required to have attribute storage available.
+If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
 """
@@ -1687,14 +1693,16 @@ macro show_special_elem(io, mime, obj)
       local m = $(esc(mime))
       local o = $(esc(obj))
       local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
+      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+        s = get_attribute(p, :show_elem)
+        if s !== nothing
+          if applicable(s, i, m, o)
+            s(i, m, o)
+          else
+            s(i, o)
+          end
+          return
         end
-        return
       end
     end
   )
