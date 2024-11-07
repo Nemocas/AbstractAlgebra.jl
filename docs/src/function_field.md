@@ -234,7 +234,7 @@ julia> R1, x1 = rational_function_field(QQ, "x1") # characteristic 0
 (Rational function field over rationals, x1)
 
 julia> U1, z1 = R1["z1"]
-(Univariate polynomial ring in z1 over rational function field, z1)
+(Univariate polynomial ring in z1 over R1, z1)
 
 julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
 (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
@@ -255,7 +255,7 @@ julia> R2, x2 = rational_function_field(GF(23), "x1") # characteristic p
 (Rational function field over finite field F_23, x1)
 
 julia> U2, z2 = R2["z2"]
-(Univariate polynomial ring in z2 over rational function field, z2)
+(Univariate polynomial ring in z2 over R2, z2)
 
 julia> g = z2^2 + 3z2 + 1
 z2^2 + 3*z2 + 1
@@ -283,7 +283,7 @@ julia> R, x = rational_function_field(GF(23), :x) # characteristic p
 (Rational function field over finite field F_23, x)
 
 julia> U, z = R[:z]
-(Univariate polynomial ring in z over rational function field, z)
+(Univariate polynomial ring in z over R, z)
 
 julia> g = z^2 + 3z + 1
 z^2 + 3*z + 1
@@ -359,7 +359,7 @@ julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> U, z = R[:z]
-(Univariate polynomial ring in z over rational function field, z)
+(Univariate polynomial ring in z over R, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1
@@ -422,7 +422,7 @@ julia> R, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
 
 julia> U, z = R[:z]
-(Univariate polynomial ring in z over rational function field, z)
+(Univariate polynomial ring in z over R, z)
 
 julia> g = z^2 + 3*(x + 1)//(x + 2)*z + 1
 z^2 + (3*x + 3)//(x + 2)*z + 1

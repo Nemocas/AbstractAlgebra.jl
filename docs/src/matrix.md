@@ -834,7 +834,7 @@ julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
-  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
+  over residue field of R modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 [      0   2*x + 3   x^2 + 1]
@@ -871,7 +871,7 @@ julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
-  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
+  over residue field of R modulo x^3 + 3*x + 1
 
 julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]
@@ -994,7 +994,7 @@ julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
 
 julia> S = matrix_space(K, 3, 3)
 Matrix space of 3 rows and 3 columns
-  over residue field of univariate polynomial ring modulo x^3 + 3*x + 1
+  over residue field of R modulo x^3 + 3*x + 1
 
 julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 [            0   2*x + 3   x^2 + 1]

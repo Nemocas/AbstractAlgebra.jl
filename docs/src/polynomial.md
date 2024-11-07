@@ -124,7 +124,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = x^3 + 3x + 21
 x^3 + 3*x + 21
@@ -236,7 +236,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> U = base_ring(S)
 Univariate polynomial ring in x over integers
@@ -245,7 +245,7 @@ julia> V = base_ring(y + 1)
 Univariate polynomial ring in x over integers
 
 julia> T = parent(y + 1)
-Univariate polynomial ring in y over univariate polynomial ring
+Univariate polynomial ring in y over R
 ```
 
 ## Euclidean polynomial rings
@@ -286,7 +286,7 @@ julia> R, x = polynomial_ring(QQ, :x)
 julia> S, = residue_ring(R, x^3 + 3x + 1);
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over residue ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = (3*x^2 + x + 2)*y + x^2 + 1
 (3*x^2 + x + 2)*y + x^2 + 1
@@ -443,7 +443,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> T, z = polynomial_ring(QQ, :z)
 (Univariate polynomial ring in z over rationals, z)
@@ -451,7 +451,7 @@ julia> T, z = polynomial_ring(QQ, :z)
 julia> U, = residue_ring(ZZ, 17);
 
 julia> V, w = polynomial_ring(U, :w)
-(Univariate polynomial ring in w over residue ring, w)
+(Univariate polynomial ring in w over U, w)
 
 julia> var(R)
 :x
@@ -577,7 +577,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -607,7 +607,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -637,7 +637,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -723,7 +723,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -785,7 +785,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -837,7 +837,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> T, z = polynomial_ring(QQ, :z)
 (Univariate polynomial ring in z over rationals, z)
@@ -845,7 +845,7 @@ julia> T, z = polynomial_ring(QQ, :z)
 julia> U, = residue_ring(T, z^3 + 3z + 1);
 
 julia> V, w = polynomial_ring(U, :w)
-(Univariate polynomial ring in w over residue ring, w)
+(Univariate polynomial ring in w over U, w)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
@@ -886,7 +886,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
 3*x*y^2 + (x + 1)*y + 3
@@ -924,7 +924,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = 3x*y^2 + (x + 1)*y + 3
 3*x*y^2 + (x + 1)*y + 3
@@ -963,7 +963,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> xs = [R(1), R(2), R(3), R(4)]
 4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
@@ -1035,7 +1035,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> f = chebyshev_t(20, y)
 524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1

@@ -70,7 +70,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> U, z = R[:z]
 (Univariate polynomial ring in z over matrix ring, z)
@@ -124,7 +124,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = x^3 + 3x + 21
 x^3 + [3 0; 0 3]*x + [21 0; 0 21]
@@ -157,7 +157,7 @@ julia> v = var(T)
 :y
 
 julia> U = parent(y + 1)
-Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring
+Univariate polynomial ring in y over S
 
 julia> g == deepcopy(g)
 true
@@ -211,7 +211,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> a = zero(T)
 0
@@ -269,7 +269,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -303,7 +303,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -337,7 +337,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]
@@ -371,7 +371,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
@@ -405,7 +405,7 @@ julia> S, x = polynomial_ring(R, :x)
 (Univariate polynomial ring in x over matrix ring, x)
 
 julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over univariate polynomial ring in x over matrix ring, y)
+(Univariate polynomial ring in y over S, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + [3 0; 0 3]

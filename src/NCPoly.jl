@@ -750,7 +750,7 @@ julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over univariate polynomial ring, y)
+(Univariate polynomial ring in y over R, y)
 ```
 """
 function polynomial_ring(R::NCRing, s::VarName =:x; kw...)

@@ -4170,7 +4170,7 @@ Matrix space of 4 rows and 4 columns
   over residue ring of integers modulo 7
 
 julia> T, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over residue ring, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
@@ -4373,7 +4373,7 @@ julia> R = GF(13)
 Finite field F_13
 
 julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over finite field F_13, y)
+(Univariate polynomial ring in y over R, y)
 
 julia> M = R[7 6 1;
              7 7 5;

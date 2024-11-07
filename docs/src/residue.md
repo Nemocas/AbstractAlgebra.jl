@@ -85,7 +85,7 @@ julia> k = S(x + 1)
 x + 1
 
 julia> U, f = quo(R, x^3 + 3x + 1)
-(Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1, Map: univariate polynomial ring -> residue ring)
+(Residue ring of R modulo x^3 + 3*x + 1, Map: R -> S)
 
 julia> U === S
 true
@@ -205,7 +205,7 @@ julia> V = base_ring(f)
 Univariate polynomial ring in x over rationals
 
 julia> T = parent(f)
-Residue ring of univariate polynomial ring modulo x^3 + 3*x + 1
+Residue ring of R modulo x^3 + 3*x + 1
 
 julia> f == deepcopy(f)
 true
