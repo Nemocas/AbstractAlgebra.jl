@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra.Generic
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Free algebras
