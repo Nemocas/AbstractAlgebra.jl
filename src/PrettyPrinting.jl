@@ -1592,7 +1592,7 @@ macro show_name(io, obj)
   )
 end
 
-"""
+@doc raw"""
     @show_special(io::IO, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
@@ -1601,6 +1601,23 @@ returns from the current scope. Otherwise, does nothing.
 If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special(stdout, R)
+
+julia> set_attribute!(R, :show, (i,o) -> print(i, "=> The One True Ring <="))
+
+julia> AbstractAlgebra.@show_special(stdout, R)
+=> The One True Ring <=
+
+julia> R   # show for R uses @show_special, so we can observe the effect directly
+=> The One True Ring <=
+```
 """
 macro show_special(io, obj)
   return :(
@@ -1618,7 +1635,7 @@ macro show_special(io, obj)
   )
 end
 
-"""
+@doc raw"""
     @show_special(io::IO, mime, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
@@ -1627,6 +1644,27 @@ and `io` and `obj` otherwise, and returns from the current scope. Otherwise, doe
 If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special(stdout, MIME"text/plain"(), R)
+
+julia> myshow(i,o) = print(i, "=> The One True Ring <=");
+
+julia> myshow(i,m,o) = print(i, "=> The One True Ring with mime type $m <=");
+
+julia> set_attribute!(R, :show, myshow)
+
+julia> AbstractAlgebra.@show_special(stdout, MIME"text/plain"(), R)
+=> The One True Ring with mime type text/plain <=
+
+julia> R   # show for R uses @show_special, so we can observe the effect directly
+=> The One True Ring <=
+```
 """
 macro show_special(io, mime, obj)
   return :(
@@ -1649,7 +1687,7 @@ macro show_special(io, mime, obj)
   )
 end
 
-"""
+@doc raw"""
     @show_special_elem(io::IO, obj)
 
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io` and `obj` and
@@ -1658,6 +1696,23 @@ returns from the current scope. Otherwise, does nothing.
 If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special_elem(stdout, x)
+
+julia> set_attribute!(R, :show_elem, (i,o) -> print(i, "=> $o <="))
+
+julia> AbstractAlgebra.@show_special_elem(stdout, x)
+=> x <=
+
+julia> x   # show for x does not uses @show_special_elem, so x prints as before
+x
+```
 """
 macro show_special_elem(io, obj)
   return :(
@@ -1676,7 +1731,7 @@ macro show_special_elem(io, obj)
   )
 end
 
-"""
+@doc raw"""
     @show_special_elem(io::IO, mime, obj)
 
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
@@ -1685,6 +1740,23 @@ and `io` and `obj` otherwise, and returns from the current scope. Otherwise, doe
 If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special_elem(stdout, MIME"text/plain"(), x)
+
+julia> set_attribute!(R, :show_elem, (i,m,o) -> print(i, "=> $o with mime type $m <="))
+
+julia> AbstractAlgebra.@show_special_elem(stdout, MIME"text/plain"(), x)
+=> x with mime type text/plain <=
+
+julia> x   # show for x does not uses @show_special_elem, so x prints as before
+x
+```
 """
 macro show_special_elem(io, mime, obj)
   return :(
