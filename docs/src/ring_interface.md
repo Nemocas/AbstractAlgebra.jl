@@ -762,22 +762,23 @@ permitted.
 Here is a minimal example of implementing the Ring Interface for a constant
 polynomial type (i.e. polynomials of degree less than one).
 
-```julia
+```jldoctest ConstPoly
 # ConstPoly.jl : Implements constant polynomials
 
 using AbstractAlgebra
 
 using Random: Random, SamplerTrivial, GLOBAL_RNG
-using RandomExtensions: RandomExtensions, Make2, AbstractRNG
+using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!,
-       get_cached!, is_unit, characteristic, Ring, RingElem, expressify
+       get_cached!, is_unit, characteristic, Ring, RingElem, expressify,
+       @show_name, @show_special, is_terse, pretty, terse, Lowercase
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
 
-mutable struct ConstPolyRing{T <: RingElement} <: Ring
+@attributes mutable struct ConstPolyRing{T <: RingElement} <: Ring
    base_ring::Ring
 
    function ConstPolyRing{T}(R::Ring, cached::Bool) where T <: RingElement
@@ -846,8 +847,13 @@ canonical_unit(f::ConstPoly) = canonical_unit(f.c)
 # String I/O
 
 function show(io::IO, R::ConstPolyRing)
-   print(io, "Constant polynomials over ")
-   show(io, base_ring(R))
+   @show_name(io, R)
+   @show_special(io, R)
+   print(io, "Constant polynomials")
+   if !is_terse(io)
+     io = pretty(io)
+     print(terse(io), " over ", Lowercase(), base_ring(R))
+   end
 end
 
 function show(io::IO, f::ConstPoly)
@@ -928,6 +934,11 @@ function zero!(f::ConstPoly)
    return f
 end
 
+function one!(f::ConstPoly)
+   f.c = one(base_ring(parent(f)))
+   return f
+end
+
 function mul!(f::ConstPoly{T}, g::ConstPoly{T}, h::ConstPoly{T}) where T <: RingElement
    f.c = g.c*h.c
    return f
@@ -996,19 +1007,55 @@ function constant_polynomial_ring(R::Ring, cached::Bool=true)
    T = elem_type(R)
    return ConstPolyRing{T}(R, cached)
 end
+
+# output
+
+constant_polynomial_ring (generic function with 2 methods)
 ```
 
 The above implementation of `constant_polynomial_ring` may be tested as follows.
 
-```julia
+```jldoctest ConstPoly; filter = r"( +|\d+\.\d+s)"
 using Test
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-S, _ = polynomial_ring(QQ, :x)
-
-function test_elem(R::ConstPolyRing{elem_type(S)})
-   return R(rand(base_ring(R), 1:6, -999:999))
+function test_elem(R::ConstPolyRing{elem_type(ZZ)})
+   n = rand(1:999)
+   return R(rand(-n:n))
 end
 
-test_Ring_interface(constant_polynomial_ring(S))
+test_Ring_interface(constant_polynomial_ring(ZZ))
+
+# output
+
+Test Summary: |  Pass  Total  Time
+Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 13846  13846  0.2s
+```
+
+Note that we only showed a minimal implementation of the ring interface.
+Additional interfaces exists, e.g. for Euclidean rings. Additional interface
+usually require implementing additional methods, and in some cases we also
+provide additional conformance tests. In this case, just one necessary
+method is missing.
+
+```jldoctest ConstPoly
+function Base.divrem(a::ConstPoly{elem_type(ZZ)}, b::ConstPoly{elem_type(ZZ)})
+   check_parent(a, b)
+   q, r = AbstractAlgebra.divrem(a.c, b.c)
+   return parent(a)(q), parent(a)(r)
+end
+
+# output
+
+```
+
+We can test it like this.
+
+```jldoctest ConstPoly; filter = r"( +|\d+\.\d+s)"
+test_EuclideanRing_interface(constant_polynomial_ring(ZZ))
+
+# output
+
+Test Summary: | Pass  Total  Time
+Euclidean Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 2220   2220  0.0s
 ```

@@ -33,7 +33,6 @@ include("algorithms/MPolyEvaluate-test.jl")
 include("algorithms/MPolyFactor-test.jl")
 include("algorithms/MPolyNested-test.jl")
 include("algorithms/DensePoly-test.jl")
-include("algorithms/GenericFunctions-test.jl")
 include("algorithms/coprime_base-test.jl")
 include("generic/PolyRingHom-test.jl")
 

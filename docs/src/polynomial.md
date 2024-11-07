@@ -789,7 +789,6 @@ julia> R, x = polynomial_ring(ZZ, :x)
 julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over univariate polynomial ring, y)
 
-
 julia> f = x*y^2 + (x + 1)*y + 3
 x*y^2 + (x + 1)*y + 3
 
