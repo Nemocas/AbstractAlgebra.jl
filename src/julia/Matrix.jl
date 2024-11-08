@@ -23,7 +23,7 @@ Convert `A` to a Julia `Matrix{U}` of the same dimensions with the same elements
 If `U` is omitted then `eltype(M)` is used in its place.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -49,7 +49,7 @@ Matrix{U}(M::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[M[i, 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, x = ZZ[:x]; A = R[x^0 x^1; x^2 x^3]
 [  1     x]
 [x^2   x^3]

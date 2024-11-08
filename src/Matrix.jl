@@ -1466,7 +1466,7 @@ Alias for `LinearAlgebra.issymmetric`.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
 [1   2   3]
 [2   4   5]
@@ -1501,7 +1501,7 @@ Return the transpose of the given matrix.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1563,7 +1563,7 @@ $i$-th and $j$-th rows, respectively.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1610,7 +1610,7 @@ require the matrix to be square.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1651,7 +1651,7 @@ its entries, assuming it exists.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1695,7 +1695,7 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1740,7 +1740,7 @@ Apply the pemutation $P$ to the columns of the matrix $x$ and return the result.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -2442,7 +2442,7 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
@@ -2562,7 +2562,7 @@ Return an array consisting of the `k`-minors of `A`.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -2584,7 +2584,7 @@ Return an iterator that computes the `k`-minors of `A`.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -2613,7 +2613,7 @@ Return the `k`-th exterior power of `A`.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 julia> exterior_power(A, 2)
@@ -2647,7 +2647,7 @@ Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
 [0   -1   -2]
 [1    0   -3]
@@ -2826,7 +2826,7 @@ Return the rank of the matrix $M$.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = QQ[1 2; 3 4];
 
 julia> d = rank(A)
@@ -3409,7 +3409,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.istriu`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> is_upper_triangular(QQ[1 2 ; 0 4])
 true
 
@@ -3525,7 +3525,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.istril`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> is_lower_triangular(QQ[1 2 ; 0 4])
 false
 
@@ -3560,7 +3560,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.isdiag`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> is_diagonal(QQ[1 0 ; 0 4])
 true
 
@@ -3685,7 +3685,7 @@ function to compute an integral kernel.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
@@ -4162,7 +4162,7 @@ the resulting polynomial is an element of it.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
@@ -4367,7 +4367,7 @@ the resulting polynomial is an element of it.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R = GF(13)
 Finite field F_13
 
@@ -5965,7 +5965,7 @@ preserves the minimal and characteristic polynomials of a matrix.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
@@ -6021,7 +6021,7 @@ Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]
@@ -6052,7 +6052,7 @@ Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
 matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]
@@ -6635,7 +6635,7 @@ Constructs the matrix over $R$ with entries as in `arr`.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> matrix(GF(3), [1 2 ; 3 4])
 [1   2]
 [0   1]
@@ -6821,7 +6821,7 @@ Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
 zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> diagonal_matrix(ZZ(2), 2, 3)
 [2   0   0]
 [0   2   0]
@@ -6853,7 +6853,7 @@ matrix. Otherwise the parent is inferred from the vector $x$.
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> diagonal_matrix(ZZ(1), ZZ(2))
 [1   0]
 [0   2]
@@ -6924,7 +6924,7 @@ $n(n+1)/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> lower_triangular_matrix([1, 2, 3])
 [1   0]
 [2   3]
@@ -6963,7 +6963,7 @@ $n(n+1)/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> upper_triangular_matrix([1, 2, 3])
 [1   2]
 [0   3]
@@ -7002,7 +7002,7 @@ $(n-1)n/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> strictly_lower_triangular_matrix([1, 2, 3])
 [0   0   0]
 [1   0   0]
@@ -7042,7 +7042,7 @@ $(n-1)n/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> strictly_upper_triangular_matrix([1, 2, 3])
 [0   1   2]
 [0   0   3]

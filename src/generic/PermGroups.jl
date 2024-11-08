@@ -72,7 +72,7 @@ it on demand. Since cycle structure is cached in `g` you may call
 `cycles(g)` before calling `parity`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
 
@@ -117,7 +117,7 @@ the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
 whose kernel is the alternating group.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
 
@@ -185,7 +185,7 @@ The cycle decomposition is cached in `g` and used in future computation of
 `permtype`, `parity`, `sign`, `order` and `^` (powering).
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
@@ -247,7 +247,7 @@ The lengths are sorted in decreasing order by default. `permtype(g)` fully
 determines the conjugacy class of `g`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
@@ -302,7 +302,7 @@ as strings). This can be either
 The difference is purely esthetical.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> setpermstyle(:array)
 :array
 
@@ -432,7 +432,7 @@ If `g` and `h` are parametrized by different types, the result is promoted
 accordingly.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
@@ -452,7 +452,7 @@ the cycle structure, repeated powering of `g` will be faster with the default
 method.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> g = Perm([2,3,4,5,1])
 (1,2,3,4,5)
 
@@ -595,7 +595,7 @@ Note: you need to explicitly copy permutations intended to be stored or
 modified.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> elts = Generic.elements!(SymmetricGroup(5));
 
 
@@ -685,7 +685,7 @@ Return the permutation matrix as a sparse matrix representing `a` via natural
 embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> p = Perm([2,3,1])
 (1,2,3)
 
@@ -713,7 +713,7 @@ This corresponds to the natural embedding of $S_k$ into $S_n$ as the
 subgroup permuting points indexed by `V`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> p = Perm([2,1,4,3])
 (1,2)(3,4)
 
@@ -733,7 +733,7 @@ Return the natural embedding of a permutation group into `G` as the
 subgroup permuting points indexed by `V`.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> p = Perm([2,3,1])
 (1,2,3)
 
@@ -870,7 +870,7 @@ of the minimal support is constructed, i.e. the maximal $n$ in the
 decomposition determines the parent group $S_n$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)
 
@@ -936,7 +936,7 @@ For more details see e.g. Chapter 2.8 of *Group Theory and Physics* by
 S.Sternberg.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> G = SymmetricGroup(4)
 Full symmetric group over 4 elements
 

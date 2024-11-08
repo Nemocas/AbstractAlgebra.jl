@@ -16,7 +16,7 @@
 Return parent object of given element $a$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> G = SymmetricGroup(5); g = Perm([3,4,5,2,1])
 (1,3,5)(2,4)
 
@@ -39,7 +39,7 @@ function parent end
 Given a parent object (or its type), return the type of its elements.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S, x = power_series_ring(QQ, 2, :x)
 (Univariate power series ring over rationals, x + O(x^3))
 
@@ -57,7 +57,7 @@ elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 Given an element (or its type), return the type of its parent object.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
@@ -80,7 +80,7 @@ parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
 Return base ring $R$ of given element or parent $a$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
@@ -104,7 +104,7 @@ base_ring(x::NCRingElement) = base_ring(parent(x))
 Return the type of the base ring of the given element, element type, parent or parent type $a$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
@@ -143,7 +143,7 @@ Return the multiplicative identity in the algebraic structure of $a$, which can
 be either an element or parent.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S = matrix_space(ZZ, 2, 2)
 Matrix space of 2 rows and 2 columns
   over integers
@@ -174,7 +174,7 @@ Return the additive identity in the algebraic structure of $a$, which can be
 either an element or parent.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S = matrix_ring(QQ, 2)
 Matrix ring of degree 2
   over rationals
@@ -204,7 +204,7 @@ function zero end
 Return true if $a$ is the multiplicative identity, else return false.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S = matrix_space(ZZ, 2, 2); T = matrix_space(ZZ, 2, 3); U = matrix_space(ZZ, 3, 2);
 
 julia> isone(S([1 0; 0 1]))
@@ -231,7 +231,7 @@ function isone end
 Return true if $a$ is the additative identity, else return false.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> T, x = puiseux_series_field(QQ, 10, :x)
 (Puiseux series field in x over rationals, x + O(x^11))
 
@@ -256,7 +256,7 @@ function iszero end
 # Return element generating parent $a$.
 
 # # Examples
-# ```jldoctest; setup = AbstractAlgebra.doctestsetup()
+# ```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 # julia> S, x = laurent_polynomial_ring(QQ, :x)
 # (Univariate Laurent Polynomial Ring in x over Rationals, x)
 
@@ -272,7 +272,7 @@ function gen end
 # Return elements generating parent $a$ in an array.
 
 # # Examples
-# ```jldoctest; setup = AbstractAlgebra.doctestsetup()
+# ```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 # ```
 # """
 function gens end

@@ -31,7 +31,7 @@ Parameters
 `ord::Base.Order.Ordering` Priority queue ordering
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
 AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1
@@ -134,7 +134,7 @@ Verify if priority queue `pq` has `key` in its keys.
 
 # Example
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> pq = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3)
 AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "a" => 1
@@ -248,7 +248,7 @@ Insert the a key `k` into a priority queue `pq` with priority `v`.
 
 # Examples 
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> a = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3, "e" => 5)
 AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 4 entries:
   "a" => 1
@@ -286,7 +286,7 @@ Remove and return the lowest priority key and value from a priority queue `pq` a
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> a = Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
 AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1
@@ -331,7 +331,7 @@ Delete the mapping for the given `key` in a priority queue `pq` and return the p
 
 # Examples
 
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> q = Generic.PriorityQueue(Base.Order.Forward, "a" => 2, "b" => 3, "c" => 1)
 AbstractAlgebra.Generic.PriorityQueue{String, Int64, Base.Order.ForwardOrdering} with 3 entries:
   "c" => 1

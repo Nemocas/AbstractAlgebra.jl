@@ -29,7 +29,7 @@ An Aho-Corasick automaton, which can be used to efficiently search for a fixed l
 arbitrary lists of integers
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
 julia> aut = Generic.aho_corasick_automaton(keywords);
@@ -56,7 +56,7 @@ The return value of searching in a given word with an AhoCorasickAutomaton. Cont
 the word that matches a keyword in the automaton, an index of the keyword that was matched and the keyword itself.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> keywords = [[1, 2, 3, 4], [1, 5, 4], [4, 1, 2], [1, 2]];
 
 julia> aut = Generic.aho_corasick_automaton(keywords);

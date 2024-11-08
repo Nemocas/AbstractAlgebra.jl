@@ -69,7 +69,7 @@ Base.:\(f::Map, x) = preimage(f, x)
 Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(x))$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> f = map_from_func(x -> x + 1, ZZ, ZZ);
 
 julia> g = map_from_func(x -> QQ(x), ZZ, QQ);
@@ -102,7 +102,7 @@ end
 Return an identity map on the domain $R$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> R, t = ZZ[:t]
 (Univariate polynomial ring in t over integers, t)
 
@@ -129,7 +129,7 @@ Construct the generic functional map with domain and codomain given by the paren
 $R$ and $S$ corresponding to the Julia function $f$.
 
 # Examples
-```jldoctest; setup = AbstractAlgebra.doctestsetup()
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
 Map defined by a Julia function
   from integers
