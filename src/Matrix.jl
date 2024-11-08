@@ -231,15 +231,17 @@ zero(a::MatSpace) = a()
 
 @doc raw"""
     zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-    zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement
     zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement
+    zero(x::MatrixElem{T}, R::NCRing) where T <: NCRingElement
+    zero(x::MatrixElem{T}) where T <: NCRingElement
 
 Return a zero matrix similar to the given matrix, with optionally different
 base ring or dimensions.
 """
-zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem{T}, R::NCRing) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
 zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
-zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero(x, base_ring(x), r, c)
+zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, r, c))
 
 @doc raw"""
     one(a::MatSpace)
