@@ -724,6 +724,24 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
             @test b isa ST
             @test nrows(b) == nrows(S)
             @test ncols(b) == ncols(S)
+
+            b = similar(a, nrows(S)+1, ncols(S)+1)
+            @test b isa ST
+            @test nrows(b) == nrows(S)+1
+            @test ncols(b) == ncols(S)+1
+
+            b = similar(a, R)
+            @test b isa MatElem
+            #@test b isa ST   # undefined
+            @test nrows(b) == nrows(S)
+            @test ncols(b) == ncols(S)
+
+            b = similar(a, R, nrows(S)+1, ncols(S)+1)
+            @test b isa MatElem
+            #@test b isa ST   # undefined
+            @test nrows(b) == nrows(S)+1
+            @test ncols(b) == ncols(S)+1
+
          end
          @test iszero(zero_matrix(R, nrows(S), ncols(S)))
       end
