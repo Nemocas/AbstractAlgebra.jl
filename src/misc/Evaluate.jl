@@ -9,7 +9,7 @@ the variables from the polynomial ring `R`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> evaluate(:((x^2 + 1)//(y + 1//2)), Dict(:x => 1, :y => QQ(2)))
 4//5
 

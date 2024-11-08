@@ -169,7 +169,7 @@ The syntax `a(vals...)` is also supported.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"]);
 
 julia> f = x*y - y*x

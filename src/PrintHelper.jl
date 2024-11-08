@@ -8,7 +8,7 @@ obtain the correct pluralization. But it works well enough in the
 vast majority of cases.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> pluralize("generator")
 "generators"
 
@@ -70,7 +70,7 @@ have. Ideally, though, please instead improve `pluralize` to handle your needs
 correctly.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> ItemQuantity(0, "generator")
 0 generators
 
@@ -82,7 +82,7 @@ julia> ItemQuantity(2, "generator")
 ```
 
 Here is an example with a custom plural form.
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> ItemQuantity(0, "ox", "oxen")
 0 oxen
 

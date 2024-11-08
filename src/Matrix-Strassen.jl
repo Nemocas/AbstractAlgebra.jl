@@ -12,7 +12,7 @@ The speedup depends on the ring and the entry sizes.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> m = matrix(ZZ, rand(-10:10, 1000, 1000));
 
 julia> n1 = similar(m); n2 = similar(m); n3 = similar(m);

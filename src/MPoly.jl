@@ -26,7 +26,7 @@ Falls back to `Generic.MPoly{T}`.
 See also [`mpoly_ring_type`](@ref), [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> mpoly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.MPoly{BigInt}
 
@@ -57,7 +57,7 @@ respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
 See also [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> mpoly_ring_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.MPolyRing{BigInt}
 
@@ -1413,7 +1413,7 @@ See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref
 
 # Example
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 ```
@@ -1439,7 +1439,7 @@ Return a tuple `S, generators...` with `generators[i]` corresponding to `varname
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> S, (a, b, c) = polynomial_ring(ZZ, [:a, :b, :c])
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[a, b, c])
 
@@ -1470,7 +1470,7 @@ Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(:
 
 # Example
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> S, x = polynomial_ring(ZZ, 3)
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x1, x2, x3])
 ```
@@ -1485,7 +1485,7 @@ introduce the generators into the current scope.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> S = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
 Multivariate polynomial ring in 7 variables x11, x21, x12, x22, ..., y3
   over integers

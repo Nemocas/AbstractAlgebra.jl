@@ -36,7 +36,7 @@ enabled. Thus it is not necessary to apply this macro to such a type.
 
 Applying the macro to a struct definition results in internal storage
 of the attributes:
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> @attributes mutable struct MyGroup
            order::Int
            MyGroup(order::Int) = new(order)
@@ -53,7 +53,7 @@ true
 
 Applying the macro to a typename results in external storage of the
 attributes:
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> mutable struct MyOtherGroup
            order::Int
            MyOtherGroup(order::Int) = new(order)
@@ -301,7 +301,7 @@ end
 ```
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> @attributes mutable struct Foo
            x::Int
            Foo(x::Int) = new(x)

@@ -17,7 +17,7 @@ The full symmetric group singleton type.
 `SymmetricGroup(n)` constructs the full symmetric group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> G = SymmetricGroup(5)
 Full symmetric group over 5 elements
 
@@ -78,7 +78,7 @@ Fieldnames:
  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
 
@@ -121,7 +121,7 @@ See also `Combinatorics.partitions(1:n)`.
 Note: All returned partitions share memory, so advancing to the next one will change the previous. For persistent storage one should `copy` the result
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> ap = AllParts(5);
 
 julia> for p in ap; println(p) end
@@ -164,7 +164,7 @@ represented by partitions `lambda` and `mu`.
 (below dots symbolise the removed entries)
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> l = Partition([4,3,2])
 4₁3₁2₁
 
@@ -214,7 +214,7 @@ Fields:
 * `fill` - the row-major fill vector: the entries of the diagram.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> p = Partition([4,3,1]); y = YoungTableau(p)
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -1325,7 +1325,7 @@ So this is a typical matrix to represent an projection from
 a direct sum into a summand or an injection into the sum.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 [0   0   1   0   0]
 [0   0   0   1   0]

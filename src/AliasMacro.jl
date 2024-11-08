@@ -15,7 +15,7 @@ as the two names really refer to the same object.
 The alias also gets a special docstring that points out that it is an alias
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> foo(x::Int) = x
 foo (generic function with 1 method)
 

@@ -40,7 +40,7 @@ There are two inner constructors of `Perm`:
   constitutes a valid permutation. To skip the check call `Perm(v, false)`.
    
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = AbstractAlgebra.doctestsetup()
 julia> Perm([1,2,3])
 ()
    
