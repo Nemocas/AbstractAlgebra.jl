@@ -1028,8 +1028,6 @@ test_Ring_interface(constant_polynomial_ring(ZZ))
 
 # output
 
-Test Summary: |  Pass  Total  Time
-Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 13846  13846  0.2s
 ```
 
 Note that we only showed a minimal implementation of the ring interface.
@@ -1056,6 +1054,4 @@ test_EuclideanRing_interface(constant_polynomial_ring(ZZ))
 
 # output
 
-Test Summary: | Pass  Total  Time
-Euclidean Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 2220   2220  0.0s
 ```
