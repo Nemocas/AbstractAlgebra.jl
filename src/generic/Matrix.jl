@@ -58,6 +58,11 @@ Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
 #
 ################################################################################
 
+function similar(x::MatSpaceElem{T}, r::Int, c::Int) where T <: NCRingElement
+   M = Matrix{T}(undef, (r, c))
+   return MatSpaceElem{T}(base_ring(x), M)
+end
+
 function copy(d::MatSpaceElem{T}) where T <: NCRingElement
    z = similar(d)
    for i = 1:nrows(d)
