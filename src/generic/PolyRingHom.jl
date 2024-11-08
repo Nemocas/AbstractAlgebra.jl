@@ -20,7 +20,7 @@ _image(f::PolyRingAnyMap) = f.img_gen
 ################################################################################
 
 function AbstractAlgebra.show_map_data(io::IO, f::PolyRingAnyMap)
-  println(io, f)
+  println(io)
   println(io, "defined by", Indent())
   R = domain(f)
   g = gen(R)
