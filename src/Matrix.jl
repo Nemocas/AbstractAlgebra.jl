@@ -400,9 +400,11 @@ end
 
 similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
 
-similar(x::MatElem, R::NCRing=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
+similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
 similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
+
+similar(x::MatElem) = similar(x, nrows(x), ncols(x))
 
 ###############################################################################
 #
