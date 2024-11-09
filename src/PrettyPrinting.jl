@@ -1592,39 +1592,79 @@ macro show_name(io, obj)
   )
 end
 
-"""
+@doc raw"""
     @show_special(io::IO, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-`obj` is required to have attribute storage available.
+If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special(stdout, R)
+
+julia> set_attribute!(R, :show, (i,o) -> print(i, "=> The One True Ring <="))
+
+julia> AbstractAlgebra.@show_special(stdout, R)
+=> The One True Ring <=
+
+julia> R   # show for R uses @show_special, so we can observe the effect directly
+=> The One True Ring <=
+```
 """
 macro show_special(io, obj)
   return :(
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        s(i, o)
-        return
+      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+        s = get_attribute(o, :show)
+        if s !== nothing
+          s(i, o)
+          return
+        end
       end
     end
   )
 end
 
-"""
+@doc raw"""
     @show_special(io::IO, mime, obj)
 
 If the `obj` has a `show` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
 and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
 
-`obj` is required to have attribute storage available.
+If `obj` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special(stdout, MIME"text/plain"(), R)
+
+julia> myshow(i,o) = print(i, "=> The One True Ring <=");
+
+julia> myshow(i,m,o) = print(i, "=> The One True Ring with mime type $m <=");
+
+julia> set_attribute!(R, :show, myshow)
+
+julia> AbstractAlgebra.@show_special(stdout, MIME"text/plain"(), R)
+=> The One True Ring with mime type text/plain <=
+
+julia> R   # show for R uses @show_special, so we can observe the effect directly
+=> The One True Ring <=
+```
 """
 macro show_special(io, mime, obj)
   return :(
@@ -1632,28 +1672,47 @@ macro show_special(io, mime, obj)
       local i = $(esc(io))
       local m = $(esc(mime))
       local o = $(esc(obj))
-      s = get_attribute(o, :show)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
+      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+        s = get_attribute(o, :show)
+        if s !== nothing
+          if applicable(s, i, m, o)
+            s(i, m, o)
+          else
+            s(i, o)
+          end
+          return
         end
-        return
       end
     end
   )
 end
 
-"""
+@doc raw"""
     @show_special_elem(io::IO, obj)
 
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io` and `obj` and
 returns from the current scope. Otherwise, does nothing.
 
-`parent(obj)` is required to have attribute storage available.
+If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special_elem(stdout, x)
+
+julia> set_attribute!(R, :show_elem, (i,o) -> print(i, "=> $o <="))
+
+julia> AbstractAlgebra.@show_special_elem(stdout, x)
+=> x <=
+
+julia> x   # show for x does not uses @show_special_elem, so x prints as before
+x
+```
 """
 macro show_special_elem(io, obj)
   return :(
@@ -1661,24 +1720,43 @@ macro show_special_elem(io, obj)
       local i = $(esc(io))
       local o = $(esc(obj))
       local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        s(i, o)
-        return
+      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+        s = get_attribute(p, :show_elem)
+        if s !== nothing
+          s(i, o)
+          return
+        end
       end
     end
   )
 end
 
-"""
+@doc raw"""
     @show_special_elem(io::IO, mime, obj)
 
 If the `parent` of `obj` has a `show_elem` attribute, this gets called with `io`, `mime` and `obj` (if applicable)
 and `io` and `obj` otherwise, and returns from the current scope. Otherwise, does nothing.
 
-`parent(obj)` is required to have attribute storage available.
+If `parent(obj)` does not have attribute storage available, this macro does nothing.
 
 It is supposed to be used at the start of `show` methods as shown in the documentation.
+
+# Examples
+
+```jldoctest; setup = :(using AbstractAlgebra)
+julia> R = @polynomial_ring(QQ, :x; cached=false)
+Univariate polynomial ring in x over rationals
+
+julia> AbstractAlgebra.@show_special_elem(stdout, MIME"text/plain"(), x)
+
+julia> set_attribute!(R, :show_elem, (i,m,o) -> print(i, "=> $o with mime type $m <="))
+
+julia> AbstractAlgebra.@show_special_elem(stdout, MIME"text/plain"(), x)
+=> x with mime type text/plain <=
+
+julia> x   # show for x does not uses @show_special_elem, so x prints as before
+x
+```
 """
 macro show_special_elem(io, mime, obj)
   return :(
@@ -1687,14 +1765,16 @@ macro show_special_elem(io, mime, obj)
       local m = $(esc(mime))
       local o = $(esc(obj))
       local p = parent(o)
-      s = get_attribute(p, :show_elem)
-      if s !== nothing
-        if applicable(s, i, m, o)
-          s(i, m, o)
-        else
-          s(i, o)
+      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+        s = get_attribute(p, :show_elem)
+        if s !== nothing
+          if applicable(s, i, m, o)
+            s(i, m, o)
+          else
+            s(i, o)
+          end
+          return
         end
-        return
       end
     end
   )
