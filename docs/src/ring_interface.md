@@ -1024,7 +1024,10 @@ function test_elem(R::ConstPolyRing{elem_type(ZZ)})
    return R(rand(-n:n))
 end
 
+Test.TESTSET_PRINT_ENABLE[] = false; # hide
 test_Ring_interface(constant_polynomial_ring(ZZ))
+Test.TESTSET_PRINT_ENABLE[] = true; # hide
+nothing  # hide
 
 # output
 
@@ -1050,7 +1053,10 @@ end
 We can test it like this.
 
 ```jldoctest ConstPoly; filter = r".*"
+Test.TESTSET_PRINT_ENABLE[] = false; # hide
 test_EuclideanRing_interface(constant_polynomial_ring(ZZ))
+Test.TESTSET_PRINT_ENABLE[] = true; # hide
+nothing  # hide
 
 # output
 
