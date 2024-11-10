@@ -5285,7 +5285,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
                K[r, j] = reduce!(t1 + t2)
             end
          end
-         S[j, j] = divexact(S[i, i]*S[j, j], d)
+         S[j, j] = S[i, i]*divexact(S[j, j], d)
          S[i, i] = d
       end
    end
