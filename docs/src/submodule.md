@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Submodules
@@ -54,7 +52,7 @@ julia> n = M([ZZ(2), ZZ(-1)])
 (2, -1)
 
 julia> N, f = sub(M, [m, n])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: N -> M)
 
 julia> v = N([ZZ(3), ZZ(4)])
 (3, 4)
@@ -72,7 +70,7 @@ julia> n = V([QQ(2), QQ(-1)])
 (2//1, -1//1)
 
 julia> N, f = sub(V, [m, n])
-(Subspace over rationals with 2 generators and no relations, Hom: subspace over rationals with 2 generators and no relations -> vector space of dimension 2 over rationals)
+(Subspace over rationals with 2 generators and no relations, Hom: N -> V)
 
 ```
 
@@ -112,10 +110,10 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1, = sub(M, [m, n])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: N1 -> M)
 
 julia> N2, = sub(M, [m])
-(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: N2 -> M)
 
 julia> supermodule(N1) == M
 true
@@ -126,7 +124,6 @@ julia> is_compatible(N1, N2)
 julia> is_submodule(N1, M)
 false
 
-
 julia> V = vector_space(QQ, 2)
 Vector space of dimension 2 over rationals
 
@@ -134,14 +131,13 @@ julia> m = V([QQ(2), QQ(3)])
 (2//1, 3//1)
 
 julia> N, = sub(V, [m])
-(Subspace over rationals with 1 generator and no relations, Hom: subspace over rationals with 1 generator and no relations -> vector space of dimension 2 over rationals)
+(Subspace over rationals with 1 generator and no relations, Hom: N -> V)
 
 julia> dim(V)
 2
 
 julia> dim(N)
 1
-
 ```
 
 ### Intersection
@@ -164,10 +160,10 @@ julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
 julia> N1 = sub(M, [m, n])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> M)
 
 julia> N2 = sub(M, [m])
-(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 2 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
 
 julia> I = intersect(N1, N2)
 Any[]

@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Power series
@@ -478,7 +476,7 @@ julia> R, t = power_series_ring(QQ, 10, :t)
 (Univariate power series ring over rationals, t + O(t^11))
 
 julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over univariate power series ring, x + O(x^31))
+(Univariate power series ring over R, x + O(x^31))
 
 julia> a = O(x^4)
 O(x^4)
@@ -561,7 +559,7 @@ julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over R, x + O(x^31))
 
 julia> a = 2x + x^3
 2*x + x^3 + O(x^31)
@@ -602,7 +600,7 @@ julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over R, x + O(x^31))
 
 julia> a = 2x + x^3
 2*x + x^3 + O(x^31)
@@ -643,7 +641,7 @@ julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over R, x + O(x^31))
 
 julia> a = 1 + x + 2x^2 + O(x^5)
 1 + x + 2*x^2 + O(x^5)
@@ -700,7 +698,7 @@ julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over univariate polynomial ring, x + O(x^31))
+(Univariate power series ring over R, x + O(x^31))
 
 julia> T, z = power_series_ring(QQ, 30, :z)
 (Univariate power series ring over rationals, z + O(z^31))

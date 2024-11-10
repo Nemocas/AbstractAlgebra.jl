@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Finitely presented modules
@@ -226,10 +224,10 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: S -> M)
 
 julia> I, g = image(f)
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: I -> M)
 
 julia> is_isomorphic(S, I)
 true
@@ -261,16 +259,14 @@ julia> m2 = rand(M, -10:10)
 (4, 4, -7)
 
 julia> S, f = sub(M, [m1, m2])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 2 generators and no relations, Hom: S -> M)
 
 julia> Q, g = quo(M, S)
 (Quotient module over integers with 2 generators and relations:
-[16 -21], Hom: free module of rank 3 over integers -> quotient module over integers with 2 generators and relations:
-[16 -21])
+[16 -21], Hom: M -> Q)
 
 julia> I, f = snf(Q)
-(Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: invariant factor decomposed module over integers with invariant factors BigInt[0] -> quotient module over integers with 2 generators and relations:
-[16 -21])
+(Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: I -> Q)
 
 julia> invs = invariant_factors(Q)
 1-element Vector{BigInt}:

@@ -142,7 +142,7 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 Return true if $a$ is invertible, else return false.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
@@ -217,7 +217,7 @@ end
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [1   2   3]
 [2   3   4]

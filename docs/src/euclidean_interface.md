@@ -1,6 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = :(using AbstractAlgebra)
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Euclidean Ring Interface

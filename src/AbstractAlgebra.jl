@@ -453,6 +453,10 @@ function test_module(x, y)
    run(`$julia_exe -e $cmd`)
 end
 
+function doctestsetup()
+  return :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+end
+
 ###############################################################################
 #
 #   Utils

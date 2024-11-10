@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Module Homomorphisms
@@ -77,13 +75,13 @@ julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
 (1, 2, 3)
 
 julia> S, f = sub(M, [m])
-(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: S -> M)
 
 julia> Q, g = quo(M, S)
-(Quotient module over integers with 2 generators and no relations, Hom: free module of rank 3 over integers -> quotient module over integers with 2 generators and no relations)
+(Quotient module over integers with 2 generators and no relations, Hom: M -> Q)
 
 julia> kernel(g)
-(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> free module of rank 3 over integers)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
 
 ```
 

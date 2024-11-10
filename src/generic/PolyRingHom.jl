@@ -188,7 +188,7 @@ If no coefficient map is entered, invoke a canonical homomorphism of `C`
 to `S`, if such a homomorphism exists, and throw an error, otherwise.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> Zx, x = ZZ[:x];
 
 julia> F = hom(Zx, Zx, x + 1);

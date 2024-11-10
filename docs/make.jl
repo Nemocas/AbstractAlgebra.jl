@@ -4,7 +4,8 @@ using Documenter, AbstractAlgebra
 # because we want to force that each jldoctest has its individual
 # `setup = :(using AbstractAlgebra)`.
 # The reason is that the AbstractAlgebra doctests are run also in Nemo,
-# where `using AbstractAlgebra` is deliberately avoided.
+# where `using AbstractAlgebra` must be avoided, as a few symbols change
+# their meaning, e.g. `QQ`.
 
 makedocs(
          format = Documenter.HTML(;

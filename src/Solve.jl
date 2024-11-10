@@ -177,7 +177,7 @@ $Ax = b$ or $xA = b$ for different $b$.
 
 # Example
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> A = QQ[1 2 3; 0 3 0; 5 0 0];
 
 julia> C = solve_init(A)

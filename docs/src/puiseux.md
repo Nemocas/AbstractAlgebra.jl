@@ -1,8 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # Generic Puiseux series
@@ -248,7 +246,7 @@ julia> R, t = puiseux_series_ring(QQ, 10, :t)
 (Puiseux series field in t over rationals, t + O(t^11))
 
 julia> S, x = puiseux_series_ring(R, 30, :x)
-(Puiseux series field in x over puiseux series field, x + O(x^31))
+(Puiseux series field in x over R, x + O(x^31))
 
 julia> a = O(x^4)
 O(x^4)
@@ -342,7 +340,7 @@ julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia> S, x = puiseux_series_ring(R, 30, :x)
-(Puiseux series ring in x over univariate polynomial ring, x + O(x^31))
+(Puiseux series ring in x over R, x + O(x^31))
 
 julia> T, z = puiseux_series_ring(QQ, 30, :z)
 (Puiseux series field in z over rationals, z + O(z^31))

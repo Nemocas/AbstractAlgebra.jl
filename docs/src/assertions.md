@@ -1,10 +1,9 @@
-# Assertion and Verbosity Macros
 ```@meta
 CurrentModule = AbstractAlgebra
-DocTestSetup = quote
-    using AbstractAlgebra
-end
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
+
+# Assertion and Verbosity Macros
 
 We describe here various macros provided by AbstractAlgebra.
 

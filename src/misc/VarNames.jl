@@ -27,7 +27,7 @@ is shorthand for `["s$i$j" for i in iter1, j in iter2]`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> AbstractAlgebra.variable_names([:x, :y])
 2-element Vector{Symbol}:
  :x
@@ -121,7 +121,7 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> s = ([:a, :b], "x#" => (1:1, 1:2), "y#" => 1:2, [:z]);
 
 julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
@@ -176,7 +176,7 @@ Mimic usual keyword arguments for usage in macros.
 Return a copy of `default` with the key value pairs from `kvs` applied.
 
 # Example
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:yes)),
        Dict(:a=>0, :b=>:no, :c=>0),
        Dict(:b => [:(:yes), :(:no)]))
@@ -206,7 +206,7 @@ Turn argument list like `(1, a=2; b=3).args` into `(1; a=2, b=3).args`.
 
 Intended to let a macro call `@m(1, a=2; b=3)` mimic a usual function call.
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> args = AbstractAlgebra.normalise_keyword_arguments(:(1, a=2; b=3).args); :($(args...),)
 :((1; a = 2, b = 3))
 
@@ -419,7 +419,7 @@ Setting `macros=:no` disables macro creation.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra)
+```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
 julia> f(a, s::Vector{Symbol}) = a, String.(s)
 f (generic function with 1 method)
 
