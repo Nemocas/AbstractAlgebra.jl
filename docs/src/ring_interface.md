@@ -1015,7 +1015,7 @@ constant_polynomial_ring (generic function with 2 methods)
 
 The above implementation of `constant_polynomial_ring` may be tested as follows.
 
-```jldoctest ConstPoly; filter = r".*"
+```jldoctest ConstPoly; filter = r".*"s
 using Test
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
@@ -1024,13 +1024,11 @@ function test_elem(R::ConstPolyRing{elem_type(ZZ)})
    return R(rand(-n:n))
 end
 
-Test.TESTSET_PRINT_ENABLE[] = false; # hide
 test_Ring_interface(constant_polynomial_ring(ZZ))
-Test.TESTSET_PRINT_ENABLE[] = true; # hide
-nothing  # hide
 
 # output
-
+Test Summary:                                                                       |  Pass  Total  Time
+Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 13844  13844  0.9s
 ```
 
 Note that we only showed a minimal implementation of the ring interface.
@@ -1052,12 +1050,10 @@ end
 
 We can test it like this.
 
-```jldoctest ConstPoly; filter = r".*"
-Test.TESTSET_PRINT_ENABLE[] = false; # hide
+```jldoctest ConstPoly; filter = r".*"s
 test_EuclideanRing_interface(constant_polynomial_ring(ZZ))
-Test.TESTSET_PRINT_ENABLE[] = true; # hide
-nothing  # hide
 
 # output
-
+Test Summary:                                                                                 | Pass  Total  Time
+Euclidean Ring interface for Constant polynomials over integers of type ConstPolyRing{BigInt} | 2212   2212  0.1s
 ```
