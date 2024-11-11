@@ -1069,8 +1069,7 @@ struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
 end
 
 function MatSpaceElem{T}(R::NCRing, ::UndefInitializer, r::Int, c::Int) where T <: NCRingElement
-   t = Matrix{T}(undef, r, c)
-   return MatSpaceElem{T}(R, t)
+   return MatSpaceElem{T}(R, Matrix{T}(undef, r, c))
 end
 
 function MatSpaceElem{T}(R::NCRing, A::AbstractMatrix{T}) where T <: NCRingElement
