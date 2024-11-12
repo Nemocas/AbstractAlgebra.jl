@@ -435,7 +435,7 @@ diagonal_matrix(::RingElement, ::Int, ::Int)
 
 ```@docs
 zero(::MatSpace)
-zero(::MatrixElem{T}, ::Ring) where T <: RingElement
+zero(::MatElem{T}, ::Ring) where T <: RingElement
 ```
 
 ```@docs
