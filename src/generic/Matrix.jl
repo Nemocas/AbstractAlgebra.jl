@@ -59,23 +59,11 @@ Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
 ################################################################################
 
 function copy(d::MatSpaceElem{T}) where T <: NCRingElement
-   z = similar(d)
-   for i = 1:nrows(d)
-      for j = 1:ncols(d)
-         z[i, j] = d[i, j]
-      end
-   end
-   return z
+   return MatSpaceElem{T}(base_ring(d), copy(d.entries))
 end
 
 function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: NCRingElement
-   z = similar(d)
-   for i = 1:nrows(d)
-      for j = 1:ncols(d)
-         z[i, j] = deepcopy_internal(d[i, j], dict)
-      end
-   end
-   return z
+   return MatSpaceElem{T}(base_ring(d), deepcopy_internal(d.entries, dict))
 end
 
 function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingElement
