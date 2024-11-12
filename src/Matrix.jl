@@ -230,18 +230,6 @@ Return the zero matrix in the given matrix space.
 zero(a::MatSpace) = a()
 
 @doc raw"""
-    zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-    zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement
-    zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement
-
-Return a zero matrix similar to the given matrix, with optionally different
-base ring or dimensions.
-"""
-zero(x::MatrixElem{T}, R::NCRing=base_ring(x)) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
-zero(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
-zero(x::MatrixElem{T}, r::Int, c::Int) where T <: NCRingElement = zero(x, base_ring(x), r, c)
-
-@doc raw"""
     one(a::MatSpace)
 
 Return the identity matrix of given matrix space. The matrix space must contain
@@ -398,18 +386,36 @@ end
 #
 ###############################################################################
 
-function _similar(x::MatrixElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-   TT = elem_type(R)
-   M = Matrix{TT}(undef, (r, c))
-   z = x isa MatElem ? Generic.MatSpaceElem{TT}(R, M) : Generic.MatRingElem{TT}(R, M)
-   return z
-end
+@doc raw"""
+    similar(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+    similar(x::MatElem{T}, R::NCRing) where T <: NCRingElement
+    similar(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
+    similar(x::MatElem{T}) where T <: NCRingElement
 
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = _similar(x, R, r, c)
-
-similar(x::MatElem, R::NCRing=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
+Create an uninitialized matrix over the given ring and dimensions,
+with defaults based upon the given source matrix `x`.
+"""
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
+  
+similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
 similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
+
+similar(x::MatElem) = similar(x, nrows(x), ncols(x))
+
+@doc raw"""
+    zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+    zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
+    zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement
+    zero(x::MatElem{T}) where T <: NCRingElement
+
+Create an zero matrix over the given ring and dimensions,
+with defaults based upon the given source matrix `x`.
+"""
+zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
+zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
+zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, r, c))
 
 ###############################################################################
 #
@@ -1014,7 +1020,7 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
+    +(x::MatrixElem{T}, y::T) where {T <: RingElem}
 
 Return $x + S(y)$ where $S$ is the parent of $x$.
 """
