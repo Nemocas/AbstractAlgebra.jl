@@ -216,7 +216,11 @@ end
          @test_throws MethodError T[1;;;]
       end
 
-      @test_throws ArgumentError T[1; 2 3]
+      if VERSION < v"1.12.0-DEV.1612"
+         @test_throws ArgumentError T[1; 2 3]
+      else
+         @test_throws DimensionMismatch T[1; 2 3]
+      end
    end
 
    arr = [1 2; 3 4]
