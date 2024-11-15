@@ -132,6 +132,21 @@ end
   @test Matrix(Sa) == a
 end
 
+@testset "Matrix.keys and pairs" begin
+  a = matrix(ZZ, 2, 3, [6, 3, 0, 10, 12, 14])
+  @test keys(a) == CartesianIndices((2, 3))
+  @test issetequal(
+    keys(a),
+    [CartesianIndex(1, 1), CartesianIndex(1, 2), CartesianIndex(1, 3),
+     CartesianIndex(2, 1), CartesianIndex(2, 2), CartesianIndex(2, 3)],
+  )
+  @test issetequal(
+    pairs(a),
+    [CartesianIndex(1, 1) => 6, CartesianIndex(1, 2) => 3, CartesianIndex(1, 3) => 0,
+     CartesianIndex(2, 1) => 10, CartesianIndex(2, 2) => 12, CartesianIndex(2, 3) => 14],
+  )
+end
+
 @testset "Strassen" begin
    S = matrix(QQ, rand(-10:10, 100, 100))
    T = S*S

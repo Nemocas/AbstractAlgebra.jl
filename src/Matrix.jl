@@ -567,6 +567,7 @@ end
 
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
 
+Base.keys(M::MatElem) = CartesianIndices(axes(M))
 Base.pairs(M::MatElem) = Base.pairs(IndexCartesian(), M)
 Base.pairs(::IndexCartesian, M::MatElem) = Base.Iterators.Pairs(M, CartesianIndices(axes(M)))
 
