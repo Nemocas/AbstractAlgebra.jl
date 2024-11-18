@@ -46,6 +46,7 @@ export inverse_fn
 export inverse_image_fn
 export inverse_mat
 export invmod
+export is_abelian
 export is_compatible
 export is_divisible_by
 export is_free

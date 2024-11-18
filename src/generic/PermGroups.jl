@@ -678,6 +678,8 @@ order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 order(::Type{T}, g::Perm) where {T} =
    convert(T, foldl(lcm, length(c) for c in cycles(g)))
 
+is_abelian(G::SymmetricGroup) = G.n <= 2
+
 @doc raw"""
     matrix_repr(a::Perm)
 
