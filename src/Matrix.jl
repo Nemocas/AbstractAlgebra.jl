@@ -395,7 +395,7 @@ end
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
   
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
@@ -879,7 +879,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
    end
-   x
+   return x
 end
 
 function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
@@ -6725,16 +6725,7 @@ end
 
 Return the $r \times c$ zero matrix over $R$.
 """
-function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Matrix{elem_type(R)}(undef, r, c)
-   for i in 1:r
-      for j in 1:c
-         arr[i, j] = zero(R)
-      end
-   end
-   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
-   return z
-end
+zero_matrix(R::NCRing, r::Int, c::Int) = zero!(dense_matrix_type(R)(R, undef, r, c))
 
 zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 
@@ -6750,11 +6741,9 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 Return the $r \times c$ ones matrix over $R$.
 """
 function ones_matrix(R::NCRing, r::Int, c::Int)
-   z = zero_matrix(R, r, c)
-   for i in 1:r
-      for j in 1:c
-         z[i, j] = one(R)
-      end
+   z = dense_matrix_type(R)(R, undef, r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = one(R)
    end
    return z
 end

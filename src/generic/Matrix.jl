@@ -25,6 +25,10 @@ parent(a::MatElem) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 Return the type of matrices with coefficients of type `T` respectively
 `elem_type(S)`.
+
+Implementations of the ring interface only need to provide a method
+for the argument a subtype of `NCRingElement`; the other variants are
+implemented by calling that method.
 """
 dense_matrix_type(::T) where T <: NCRing = dense_matrix_type(elem_type(T))
 dense_matrix_type(::T) where T <: NCRingElement = dense_matrix_type(T)
