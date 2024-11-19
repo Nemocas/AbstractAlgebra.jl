@@ -30,7 +30,7 @@ Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 See also [`dense_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> dense_poly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.Poly{BigInt}
 
@@ -61,7 +61,7 @@ The type of univariate polynomial rings with coefficients of type `T` respective
 See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> dense_poly_ring_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
@@ -745,7 +745,7 @@ Setting the optional argument `cached` to `false` will prevent the parent object
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 

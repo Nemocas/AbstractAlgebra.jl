@@ -10,7 +10,7 @@
 Return the size of the vector which represents the partition.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> p = Partition([4,3,1]); size(p)
 (3,)
 ```
@@ -137,7 +137,7 @@ Return the vector of all permutations of `n`. For an unsafe generator version
 see `partitions!`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> Generic.partitions(5)
 7-element Vector{AbstractAlgebra.Generic.Partition{Int64}}:
  1₅
@@ -159,7 +159,7 @@ Return the conjugated partition of `part`, i.e. the partition corresponding
 to the Young diagram of `part` reflected through the main diagonal.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
 
@@ -314,7 +314,7 @@ Return `size` of the smallest array containing `Y`, i.e. the tuple of the
 number of rows and the number of columns of `Y`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1]); size(y)
 (3, 4)
 ```
@@ -337,7 +337,7 @@ Return the column-major linear index into the `size(Y)`-array. If a box is
 outside of the array return `0`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -482,7 +482,7 @@ as string). This can be either
 The difference is purely esthetical.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> Generic.setyoungtabstyle(:array)
 :array
 
@@ -530,7 +530,7 @@ end
 Construct sparse integer matrix representing the tableau.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1]);
 
 
@@ -558,7 +558,7 @@ Replace the fill vector `Y.fill` by `V`. No check if the resulting tableau is
 standard (i.e. increasing along rows and columns) is performed.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -591,7 +591,7 @@ Return the conjugated tableau, i.e. the tableau reflected through the main
 diagonal.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -622,7 +622,7 @@ Return the row length of `Y` at box `(i,j)`, i.e. the number of boxes in the
 `i`-th row of the diagram of `Y` located to the right of the `(i,j)`-th box.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -651,7 +651,7 @@ Return the column length of `Y` at box `(i,j)`, i.e. the number of boxes in
 the `j`-th column of the diagram of `Y` located below of the `(i,j)`-th box.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -683,7 +683,7 @@ number of cells in the `j`-th column below the `(i,j)`-th box, plus `1`.
 Return `0` for `(i,j)` not in the tableau `Y`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -721,7 +721,7 @@ Since the computation overflows easily `BigInt` is returned. You may perform
 the computation of the dimension in different type by calling `dim(Int, Y)`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> dim(YoungTableau([4,3,1]))
 70
 
