@@ -36,7 +36,7 @@ If $n < 0$ we throw a `DomainError()`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = ZZ[:x];
 
 julia> rising_factorial(x, 1)
@@ -68,7 +68,7 @@ If $n < 0$ we throw a `DomainError()`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = ZZ[:x];
 
 julia> rising_factorial2(x, 1)

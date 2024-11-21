@@ -372,7 +372,7 @@ coefficient Ring implements isless.
 The order of letters is the reverse of the order given when initialising the algebra.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, (x, y) = free_associative_algebra(QQ, ["x", "y"]);
 
 julia> x < y^2

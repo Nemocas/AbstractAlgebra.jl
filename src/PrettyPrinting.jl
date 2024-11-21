@@ -2190,7 +2190,7 @@ for details.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 
@@ -2213,7 +2213,7 @@ for details.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 
