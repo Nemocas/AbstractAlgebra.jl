@@ -107,16 +107,9 @@ function (s::MatSpace)(b::NCRingElement)
   return diagonal_matrix(R(b), nrows(s), ncols(s))
 end
 
-# convert a Julia matrix
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
-  _check_dim(nrows(a), ncols(a), b)
-  return matrix(base_ring(a), b)
-end
-
-# convert a Julia vector
-function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
-  _check_dim(nrows(a), ncols(a), b)
-  return a(transpose(reshape(b, a.ncols, a.nrows)))
+# convert a Julia matrix or vector
+function (a::MatSpace{T})(b::AbstractVecOrMat) where T <: NCRingElement
+  return matrix(base_ring(a), nrows(a), ncols(a), b)
 end
 
 
