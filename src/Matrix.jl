@@ -49,11 +49,6 @@ function _check_dim(r::Int, c::Int, a::MatrixElem)
   return nothing
 end
 
-function _check_bases(a, b)
-  base_ring(a) == base_ring(b) || throw(DomainError((a, b), "Base rings do not match."))
-  return nothing
-end
-
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
 _checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
@@ -96,49 +91,26 @@ end
 
 function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(s), ncols(s), a)
-  _check_bases(s, a)
+  base_ring(s) == base_ring(a) || throw(DomainError((s, a), "Base rings do not match."))
   a isa eltype(s) && return a
+
   M = s()  # zero matrix
-  R = base_ring(s)
-  if R == base_ring(a)
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = a[i, j]
-    end
-  else
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = R(a[i, j])
-    end
+  for i = 1:nrows(s), j = 1:ncols(s)
+    M[i, j] = a[i, j]
   end
   return M
 end
 
 # create a matrix with b on the diagonal
 function (s::MatSpace)(b::NCRingElement)
-  M = s()  # zero matrix
   R = base_ring(s)
-  rb = R(b)
-  for i in 1:min(nrows(s), ncols(s))
-    M[i, i] = rb
-  end
-  return M
+  return diagonal_matrix(R(b), nrows(s), ncols(s))
 end
 
 # convert a Julia matrix
 function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
   _check_dim(nrows(a), ncols(a), b)
-  R = base_ring(a)
-
-  # minor optimization for MatSpaceElem
-  if S === T && dense_matrix_type(T) === Generic.MatSpaceElem{T} && all(x -> R === parent(x), b)
-     return Generic.MatSpaceElem{T}(R, b)
-  end
-
-  # generic code
-  M = a()  # zero matrix
-  for i = 1:nrows(a), j = 1:ncols(a)
-     M[i, j] = R(b[i, j])
-  end
-  return M
+  return matrix(base_ring(a), b)
 end
 
 # convert a Julia vector
