@@ -6633,6 +6633,7 @@ function matrix(R::NCRing, arr::MatRingElem)
    for i in 1:nrows(arr), j in 1:ncols(arr)
       M[i, j] = arr[i, j]
    end
+   return M
 end
 
 function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
