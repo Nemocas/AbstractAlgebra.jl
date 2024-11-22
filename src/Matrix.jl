@@ -6688,7 +6688,10 @@ end
 
 Return the $r \times c$ zero matrix over $R$.
 """
-zero_matrix(R::NCRing, r::Int, c::Int) = zero!(dense_matrix_type(R)(R, undef, r, c))
+function zero_matrix(R::NCRing, r::Int, c::Int)
+  (r < 0 || c < 0) && error("Dimensions must be non-negative")
+  return zero!(dense_matrix_type(R)(R, undef, r, c))
+end
 
 zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 
