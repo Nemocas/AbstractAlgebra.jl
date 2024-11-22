@@ -93,7 +93,7 @@ function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(s), ncols(s), a)
   base_ring(s) == base_ring(a) || throw(DomainError((s, a), "Base rings do not match."))
   a isa eltype(s) && return a
-  return matrix(base_ring(a), b)
+  return matrix(base_ring(s), a)
 end
 
 # create a matrix with b on the diagonal
@@ -6630,8 +6630,8 @@ end
 
 function matrix(R::NCRing, arr::MatRingElem)
    M = zero_matrix(R, nrows(arr), ncols(arr))
-   for i in 1:nrows(s), j in 1:ncols(s)
-      M[i, j] = a[i, j]
+   for i in 1:nrows(arr), j in 1:ncols(arr)
+      M[i, j] = arr[i, j]
    end
 end
 
