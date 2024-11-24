@@ -260,10 +260,11 @@ end
 @attributes mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    base_ring::Ring
    S::Symbol
+   istrivial::Bool
 
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
       return get_cached!(PolyID, (R, s), cached) do
-         new{T}(R, s)
+         new{T}(R, s, is_trivial(R))
       end::PolyRing{T}
    end
 end

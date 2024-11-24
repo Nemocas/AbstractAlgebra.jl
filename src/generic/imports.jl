@@ -154,6 +154,7 @@ import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_square_with_sqrt
 import ..AbstractAlgebra: is_term
 import ..AbstractAlgebra: is_terse
+import ..AbstractAlgebra: is_trivial
 import ..AbstractAlgebra: is_unit
 import ..AbstractAlgebra: is_univariate
 import ..AbstractAlgebra: is_zero_divisor
