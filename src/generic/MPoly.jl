@@ -18,6 +18,8 @@ elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+is_trivial(R::MPolyRing) = R.istrivial
+
 @doc raw"""
     symbols(a::MPolyRing)
 
@@ -36,6 +38,7 @@ number_of_variables(a::MPolyRing) = a.num_vars
 number_of_generators(a::MPolyRing) = a.num_vars
 
 function gen(a::MPolyRing{T}, i::Int, ::Val{:lex}) where {T <: RingElement}
+    is_trivial(a) && return zero(a)
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape(UInt[UInt(j == n - i + 1)
@@ -43,6 +46,7 @@ function gen(a::MPolyRing{T}, i::Int, ::Val{:lex}) where {T <: RingElement}
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Val{:deglex}) where {T <: RingElement}
+    is_trivial(a) && return zero(a)
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape(UInt[(UInt(j == n - i + 1)
@@ -50,6 +54,7 @@ function gen(a::MPolyRing{T}, i::Int, ::Val{:deglex}) where {T <: RingElement}
 end
 
 function gen(a::MPolyRing{T}, i::Int, ::Val{:degrevlex}) where {T <: RingElement}
+    is_trivial(a) && return zero(a)
     n = nvars(a)
     @boundscheck 1 <= i <= n || throw(ArgumentError("variable index out of range"))
     return a([one(base_ring(a))], reshape(UInt[(UInt(j == i)
@@ -838,7 +843,7 @@ Return the number of terms of the polynomial.
 """
 length(x::MPoly) = x.length
 
-isone(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && is_one(x.coeffs[1])
+isone(x::MPoly) = is_trivial(parent(x)) || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && is_one(x.coeffs[1]))
 
 is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
@@ -3896,6 +3901,7 @@ function zero!(a::MPoly{T}) where {T <: RingElement}
 end
 
 function one!(a::MPoly{T}) where {T <: RingElement}
+   is_trivial(parent(a)) && return zero!(a)
    a.length = 1
    fit!(a, 1)
    a.coeffs[1] = one(base_ring(a))

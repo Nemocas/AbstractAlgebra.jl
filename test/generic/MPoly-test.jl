@@ -1719,3 +1719,11 @@ end
   S, = polynomial_ring(R, :z => 1:3)
   test_Ring_interface(S) # _recursive needs too many ressources
 end
+
+@testset "Generic.MPoly.zero_rings" begin
+  R, = residue_ring(ZZ, 1)
+  S, = polynomial_ring(R, 2)
+  @test is_zero(gen(S, 1)) && is_one(gen(S, 1))
+  @test is_zero(one(S))
+  test_Ring_interface_recursive(S)
+end
