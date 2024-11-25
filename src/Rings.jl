@@ -194,8 +194,7 @@ Test whether the ring $R$ is trivial. A ring is trivial if it consists
 of a single element, or equivalently if its characteristic is 1. Such
 rings are also called zero rings.
 """
-is_trivial(F::NCRing) = iszero(one(F))
-is_trivial(F::Field) = false
+is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
 
 @doc raw"""
     is_perfect(F::Field)
