@@ -200,7 +200,7 @@ number_of_generators(R::PolyRing) = 1
 
 iszero(a::PolynomialElem) = length(a) == 0
 
-isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
+isone(a::PolynomialElem) = length(a) <= 1 && isone(coeff(a, 0))
 
 @doc raw"""
     is_gen(a::PolynomialElem)
@@ -780,6 +780,7 @@ function ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
    b < 0 && throw(DomainError(b, "exponent must be >= 0"))
    # special case powers of x for constructing polynomials efficiently
    R = parent(a)
+   is_trivial(R) && return zero(R)
    if is_gen(a)
       z = R()
       fit!(z, b + 1)
@@ -1352,7 +1353,7 @@ end
 
 function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    check_parent(f, g)
-   iszero(g) && throw(DivideError())
+   is_trivial(parent(f)) || (iszero(g) && throw(DivideError()))
    if iszero(f)
       return zero(parent(f))
    end

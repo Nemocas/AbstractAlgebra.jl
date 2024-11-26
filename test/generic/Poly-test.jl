@@ -3034,3 +3034,10 @@ end
       @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
 end 
+
+@testset "Generic.Poly.zero_rings" begin
+  R, = residue_ring(ZZ, 1)
+  Rx, = R[:x]
+  @test is_zero(gen(Rx)) && is_one(gen(Rx))
+  test_Ring_interface_recursive(Rx)
+end
