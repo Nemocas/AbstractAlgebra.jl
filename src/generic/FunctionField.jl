@@ -1223,7 +1223,7 @@ end
 
 rand(rng::AbstractRNG, K::FunctionField, v...) = rand(rng, make(K, v...))
 
-rand(K::FunctionField, v...) = rand(Random.GLOBAL_RNG, K, v...)
+rand(K::FunctionField, v...) = rand(Random.default_rng(), K, v...)
 
 ###############################################################################
 #

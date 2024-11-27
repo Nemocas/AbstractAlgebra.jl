@@ -432,7 +432,7 @@ end
 
 rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
 
-rand(S::ResidueRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::ResidueRing, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

@@ -29,7 +29,7 @@ julia> using RandomExtensions
 julia> S, x = polynomial_ring(ZZ, :x)
 (Univariate Polynomial Ring in x over Integers, x)
 
-julia> rand(Random.GLOBAL_RNG, make(S, 1:3, -10:10))
+julia> rand(Random.default_rng(), make(S, 1:3, -10:10))
 -5*x + 4
 ```
 
@@ -119,7 +119,7 @@ having to create make instances.
 rand(rng::AbstractRNG, S::PolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
-rand(S::PolyRing, degs, v...) = rand(Random.GLOBAL_RNG, S, degs, v...)
+rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
 ```
 
 To test whether a random generator is working properly, the `test_rand` function

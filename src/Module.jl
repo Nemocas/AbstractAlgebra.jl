@@ -312,7 +312,7 @@ function rand(rng::AbstractRNG, M::FPModule{T}, vals...) where T <: RingElement
    rand(rng, make(M, vals...))
 end
 
-rand(M::FPModule, vals...) = rand(Random.GLOBAL_RNG, M, vals...)
+rand(M::FPModule, vals...) = rand(Random.default_rng(), M, vals...)
 
 ###############################################################################
 #

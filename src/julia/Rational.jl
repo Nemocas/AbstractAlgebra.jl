@@ -220,7 +220,7 @@ end
 
 rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
 
-rand(R::Rationals, n) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #

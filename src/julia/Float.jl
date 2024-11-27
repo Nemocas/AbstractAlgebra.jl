@@ -188,7 +188,7 @@ end
 
 rand(rng::AbstractRNG, R::Floats, n::AbstractUnitRange) = rand(rng, make(R, n))
 
-rand(R::Floats, n) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::Floats, n) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #
