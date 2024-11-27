@@ -1339,7 +1339,7 @@ end
 #
 ###############################################################################
 
-function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
+function rand_ordering(rng::AbstractRNG=Random.default_rng())
    i = rand(rng, 1:3)
    if i == 1
       return :lex

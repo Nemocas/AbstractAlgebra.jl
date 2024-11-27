@@ -6561,13 +6561,13 @@ end
 
 rand(rng::AbstractRNG, S::MatSpace, v...) = rand(rng, make(S, v...))
 
-rand(S::MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::MatSpace, v...) = rand(Random.default_rng(), S, v...)
 
 # resolve ambiguities
 rand(rng::AbstractRNG, S::MatSpace, dims::Integer...) =
    rand(rng, make(S), dims...)
 
-rand(S::MatSpace, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
+rand(S::MatSpace, dims::Integer...) = rand(Random.default_rng(), S, dims...)
 
 function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
    M = S()
@@ -6586,7 +6586,7 @@ function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
    return M
 end
 
-randmat_triu(S::MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+randmat_triu(S::MatSpace, v...) = randmat_triu(Random.default_rng(), S, v...)
 
 function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) where {T <: RingElement}
    if !is_domain_type(T) && !(T <: ResElem)
@@ -6627,7 +6627,7 @@ function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) wh
 end
 
 randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
-   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
+   randmat_with_rank(Random.default_rng(), S, rank, v...)
 
 ################################################################################
 #

@@ -571,7 +571,7 @@ rand(rng::AbstractRNG,
 
 rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
 
-rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::Integers, n) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #

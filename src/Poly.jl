@@ -3351,7 +3351,7 @@ rand(rng::AbstractRNG, S::PolyRing, deg_range::AbstractUnitRange{Int}, v...) =
 rand(rng::AbstractRNG, S::PolyRing, deg::Int, v...) =
    rand(rng, make(S, deg, v...))
 
-rand(S::PolyRing, degs, v...) = rand(Random.GLOBAL_RNG, S, degs, v...)
+rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
 
 ###############################################################################
 #

@@ -727,7 +727,7 @@ rand(rng::AbstractRNG, S::PuiseuxSeriesRingOrField, val_range::AbstractUnitRange
         rand(rng, make(S, val_range, scale_range, v...))
 
 rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =
-   rand(Random.GLOBAL_RNG, S, val_range, scale_range, v...)
+   rand(Random.default_rng(), S, val_range, scale_range, v...)
 
 
 ###############################################################################
