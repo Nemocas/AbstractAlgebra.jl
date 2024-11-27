@@ -519,7 +519,7 @@ end
 rand(rng::AbstractRNG, S::RationalFunctionField, v...) =
    rand(rng, make(S, v...))
 
-rand(S::RationalFunctionField, v...) = rand(GLOBAL_RNG, S, v...)
+rand(S::RationalFunctionField, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

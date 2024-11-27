@@ -256,7 +256,7 @@ function rand(rng::AbstractRNG, S::FreeAssociativeAlgebra,
 end
 
 function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
-   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+   rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 
 ###############################################################################

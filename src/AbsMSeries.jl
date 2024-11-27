@@ -213,5 +213,5 @@ variable in the terms will be less than the precision caps for the Ring $S$
 when it was created.
 """
 function rand(S::MSeriesRing, term_range, v...)
-   rand(GLOBAL_RNG, S, term_range, v...)
+   rand(Random.default_rng(), S, term_range, v...)
 end

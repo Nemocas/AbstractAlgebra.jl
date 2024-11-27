@@ -806,7 +806,7 @@ end
 rand(rng::AbstractRNG, S::FracField, v...) =
    rand(rng, make(S, v...))
 
-rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
+rand(S::FracField, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

@@ -1780,7 +1780,7 @@ rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange
    rand(rng, make(S, val_range, v...))
 
 rand(S::LaurentSeriesRingOrField, val_range, v...) =
-   rand(GLOBAL_RNG, S, val_range, v...)
+   rand(Random.default_rng(), S, val_range, v...)
 
 
 ###############################################################################
