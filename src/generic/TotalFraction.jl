@@ -522,7 +522,7 @@ end
 rand(rng::AbstractRNG, S::TotFracRing, v...) =
    rand(rng, make(S, v...))
 
-rand(S::TotFracRing, v...) = rand(GLOBAL_RNG, S, v...)
+rand(S::TotFracRing, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

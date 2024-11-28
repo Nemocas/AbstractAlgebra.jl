@@ -444,7 +444,7 @@ rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
    rand(rng, make(S, degrees_range, v...))
 
 rand(S::LaurentPolyWrapRing, degrees_range, v...) =
-   rand(GLOBAL_RNG, S, degrees_range, v...)
+   rand(Random.default_rng(), S, degrees_range, v...)
 
 
 ###############################################################################

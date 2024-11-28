@@ -767,7 +767,7 @@ polynomial type (i.e. polynomials of degree less than one).
 
 using AbstractAlgebra
 
-using Random: Random, SamplerTrivial, GLOBAL_RNG
+using Random: Random, SamplerTrivial
 using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,

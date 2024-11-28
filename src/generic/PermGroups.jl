@@ -755,7 +755,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
 end
 
 @doc raw"""
-    rand([rng=GLOBAL_RNG,] G::SymmetricGroup)
+    rand([rng=Random.default_rng(),] G::SymmetricGroup)
 
 Return a random permutation from `G`.
 """

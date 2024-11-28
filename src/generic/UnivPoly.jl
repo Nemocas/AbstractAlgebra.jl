@@ -997,7 +997,7 @@ function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing,
 end
 
 function rand(S::AbstractAlgebra.UniversalPolyRing, term_range, exp_bound, v...)
-   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+   rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 
 ###############################################################################

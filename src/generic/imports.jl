@@ -2,7 +2,7 @@ import LinearAlgebra: norm
 import LinearAlgebra: rank
 import LinearAlgebra: tr
 
-using Random: Random, AbstractRNG, GLOBAL_RNG, randperm!, SamplerTrivial
+using Random: Random, AbstractRNG, randperm!, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 using SparseArrays: sparse, spzeros
 
