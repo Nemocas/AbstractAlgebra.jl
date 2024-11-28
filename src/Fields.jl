@@ -38,7 +38,7 @@ function gcdx(x::T, y::T) where {T <: FieldElem}
    end
 end
 
-function factor(x::FieldElem)
+function factor(x::FieldElement)
   @req !is_zero(x) "Element must be non-zero"
   return Fac(x, Dict{typeof(x), Int}())
 end
