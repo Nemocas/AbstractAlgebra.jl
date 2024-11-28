@@ -113,6 +113,17 @@ end
    @test !(y in keys(Dict(x => 1)))
 end
 
+@testset "EuclideanRingResidueRingElem.is_trivial" begin
+   R, = Generic.residue_ring(ZZ, 49)
+   @test !is_trivial(R)
+
+   R, = Generic.residue_ring(ZZ, 1)
+   @test is_trivial(R)
+
+   R, = Generic.residue_ring(ZZ, -1)
+   @test is_trivial(R)
+end
+
 @testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
