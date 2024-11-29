@@ -398,4 +398,11 @@ end
    @test length(f) == 0
    @test unit(f) == a
    @test_throws ArgumentError factor(zero(F))
+
+   F = QQ
+   a = 28//15
+   f = factor(a)
+   @test length(f) == 0
+   @test unit(f) == a
+   @test_throws ArgumentError factor(zero(F))
 end
