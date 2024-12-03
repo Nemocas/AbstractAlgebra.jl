@@ -3497,7 +3497,11 @@ will be raised.
 
 See also [`AbstractAlgebra.__solve_triu_left`](@ref)
 """
-function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+function _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if side == :left
+     return _solve_triu_left(U, b; side)
+   end
+   @assert side == :right
    n = nrows(U)
    m = ncols(b)
    R = base_ring(U)
@@ -3525,7 +3529,7 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+    _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $U$ over a field which is upper
 triangular, and an $m\times n$ matrix $b$ over the same ring, return an
@@ -3535,7 +3539,11 @@ will be raised.
 See also [`_solve_triu`](@ref) or [`can__solve_left_reduced_triu`](@ref) when
 $U$ is not square or not of full rank.
 """
-function __solve_triu_left(b::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
+function _solve_triu_left(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if side == :right
+     return _solve_triu(U, b; side)
+   end
+   @assert side == :left
    n = ncols(U)
    m = nrows(b)
    R = base_ring(U)
