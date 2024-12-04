@@ -215,7 +215,7 @@ end
          @test_throws MethodError T[1;;;]
       end
 
-      if VERSION < v"1.12.0-DEV.1612"
+      if VERSION < v"1.11.2"
          @test_throws ArgumentError T[1; 2 3]
       else
          @test_throws DimensionMismatch T[1; 2 3]
