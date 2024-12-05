@@ -3487,6 +3487,89 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T 
    return X
 end
 
+@doc raw"""
+    _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
+`side = :right`, let $b$ 
+be an $n\times m$ matrix $b$ over the same field, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
+will be raised.
+
+If `side = :left`, the default, $b$ has to be $m \times n$. In this case
+$xU = b$ is solved - or an error raised.
+
+See also [`AbstractAlgebra._solve_triu_left`](@ref) and [`Strassen`](@ref) for
+  asymptotically fast versions.
+"""
+function _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if side == :left
+     return _solve_triu_left(U, b)
+   end
+   @assert side == :right
+   n = nrows(U)
+   m = ncols(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[j, i]
+      end
+      for j = n:-1:1
+         s = R(0)
+         for k = j + 1:n
+            s = addmul!(s, U[j, k], tmp[k], t)
+#            s = s + U[j, k] * tmp[k]
+         end
+         s = b[j, i] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $m\times n$ matrix $b$ over the same ring, return an
+$m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
+will be raised.
+
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+  versions.
+"""
+function _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   n = ncols(U)
+   m = nrows(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[i, j]
+      end
+      for j = 1:n
+         s = R()
+         for k = 1:j-1
+            s = addmul!(s, U[k, j], tmp[k], t)
+         end
+         s = b[i, j] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[i, j] = tmp[j]
+      end
+   end
+   return X
+end
+
 #solves A x = B for A intended to be lower triangular
 #only the lower part is used. if f is true, then the diagonal is assumed to be 1
 #used to use lu!
