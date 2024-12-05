@@ -366,16 +366,16 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu_left(U, A; cutoff)
-  R = _solve_triu_left(X, A; cutoff)
+  S = _solve_triu_left(A, U; cutoff)
+  R = _solve_triu_left(A, X; cutoff)
 
   SS = mul(S, B; cutoff)
   SS = sub!(SS, V, SS)
-  SS = _solve_triu_left(SS, C; cutoff)
+  SS = _solve_triu_left(C, SS; cutoff)
 
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
-  RR = _solve_triu_left(RR, C; cutoff)
+  RR = _solve_triu_left(C, RR; cutoff)
   #THINK: both pairs of solving could be combined: 
   # solve [U; X], A to get S and R...
 
