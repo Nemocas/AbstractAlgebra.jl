@@ -260,6 +260,7 @@ export hooklength
 export howell_form
 export howell_form_with_transformation
 export ideal
+export ideal_type
 export identity_map
 export identity_matrix
 export image
