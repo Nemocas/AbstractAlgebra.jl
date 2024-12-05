@@ -151,7 +151,7 @@ euclid(n::EuclideanRingResidueRingElem) = degree(gcd(data(n), modulus(n)))
 
 #horrible - and copied from fmpz_mod
 #don't know how to seriously simplify it
-#maybe a durect gcdx should be added as well
+#maybe a direct gcdx should be added as well
 function Base.divrem(n::T, m::T) where {T <: EuclideanRingResidueRingElem}
   @assert !iszero(m)
   R = parent(n)
@@ -197,5 +197,14 @@ function Base.divrem(n::T, m::T) where {T <: EuclideanRingResidueRingElem}
   @assert n == qq*m+rr
   @assert rr == 0 || euclid(rr) < e
   return (qq,rr)::Tuple{T, T}
+end
+
+#copied from fmpz_mod
+function gcdx(a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+  m = modulus(a)
+  R = parent(a)
+  g, u, v = gcdx(data(a), data(b))
+  G, U, V = gcdx(g, m)
+  return R(G), R(U)*R(u), R(U)*R(v)
 end
 
