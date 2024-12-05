@@ -49,11 +49,6 @@ function _check_dim(r::Int, c::Int, a::MatrixElem)
   return nothing
 end
 
-function _check_bases(a, b)
-  base_ring(a) == base_ring(b) || throw(DomainError((a, b), "Base rings do not match."))
-  return nothing
-end
-
 _checkbounds(i::Int, j::Int) = 1 <= j <= i
 
 _checkbounds(i::Int, j::AbstractVector{Int}) = all(jj -> 1 <= jj <= i, j)
@@ -96,55 +91,20 @@ end
 
 function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(s), ncols(s), a)
-  _check_bases(s, a)
+  base_ring(s) == base_ring(a) || throw(DomainError((s, a), "Base rings do not match."))
   a isa eltype(s) && return a
-  M = s()  # zero matrix
-  R = base_ring(s)
-  if R == base_ring(a)
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = a[i, j]
-    end
-  else
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = R(a[i, j])
-    end
-  end
-  return M
+  return matrix(base_ring(s), a)
 end
 
 # create a matrix with b on the diagonal
 function (s::MatSpace)(b::NCRingElement)
-  M = s()  # zero matrix
   R = base_ring(s)
-  rb = R(b)
-  for i in 1:min(nrows(s), ncols(s))
-    M[i, i] = rb
-  end
-  return M
+  return diagonal_matrix(R(b), nrows(s), ncols(s))
 end
 
-# convert a Julia matrix
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
-  _check_dim(nrows(a), ncols(a), b)
-  R = base_ring(a)
-
-  # minor optimization for MatSpaceElem
-  if S === T && dense_matrix_type(T) === Generic.MatSpaceElem{T} && all(x -> R === parent(x), b)
-     return Generic.MatSpaceElem{T}(R, b)
-  end
-
-  # generic code
-  M = a()  # zero matrix
-  for i = 1:nrows(a), j = 1:ncols(a)
-     M[i, j] = R(b[i, j])
-  end
-  return M
-end
-
-# convert a Julia vector
-function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
-  _check_dim(nrows(a), ncols(a), b)
-  return a(transpose(reshape(b, a.ncols, a.nrows)))
+# convert a Julia matrix or vector
+function (a::MatSpace{T})(b::AbstractVecOrMat) where T <: NCRingElement
+  return matrix(base_ring(a), nrows(a), ncols(a), b)
 end
 
 
@@ -395,7 +355,7 @@ end
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
   
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
@@ -879,7 +839,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
    end
-   x
+   return x
 end
 
 function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
@@ -6669,7 +6629,11 @@ function matrix(R::NCRing, arr::MatElem)
 end
 
 function matrix(R::NCRing, arr::MatRingElem)
-   return matrix_space(R, nrows(arr), ncols(arr))(arr)
+   M = zero_matrix(R, nrows(arr), ncols(arr))
+   for i in 1:nrows(arr), j in 1:ncols(arr)
+      M[i, j] = arr[i, j]
+   end
+   return M
 end
 
 function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
@@ -6726,14 +6690,8 @@ end
 Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Matrix{elem_type(R)}(undef, r, c)
-   for i in 1:r
-      for j in 1:c
-         arr[i, j] = zero(R)
-      end
-   end
-   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
-   return z
+  (r < 0 || c < 0) && error("Dimensions must be non-negative")
+  return zero!(dense_matrix_type(R)(R, undef, r, c))
 end
 
 zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
@@ -6750,11 +6708,9 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 Return the $r \times c$ ones matrix over $R$.
 """
 function ones_matrix(R::NCRing, r::Int, c::Int)
-   z = zero_matrix(R, r, c)
-   for i in 1:r
-      for j in 1:c
-         z[i, j] = one(R)
-      end
+   z = dense_matrix_type(R)(R, undef, r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = one(R)
    end
    return z
 end

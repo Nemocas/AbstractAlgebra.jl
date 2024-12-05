@@ -73,11 +73,13 @@ struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
 
+F2Matrix(::F2, ::UndefInitializer, r::Int, c::Int) = F2Matrix(Generic.MatSpaceElem{F2Elem}(F2(), undef, r, c))
+
 AbstractAlgebra.elem_type(::Type{F2MatSpace}) = F2Matrix
 AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
 
 AbstractAlgebra.base_ring(::F2MatSpace) = F2()
-AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
+AbstractAlgebra.dense_matrix_type(::Type{F2Elem}) = F2Matrix
 AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(F2(), r, c)
 
 AbstractAlgebra.number_of_rows(a::F2Matrix) = nrows(a.m)
