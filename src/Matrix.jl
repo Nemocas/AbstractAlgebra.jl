@@ -3488,18 +3488,23 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T 
 end
 
 @doc raw"""
-    _solve_triu(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+    _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
 
-Given a non-singular $n\times n$ matrix $U$ over a field which is upper
-triangular, and an $n\times m$ matrix $b$ over the same ring, return an
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
+`side = :right`, let $b$ 
+be an $n\times m$ matrix $b$ over the same field, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
-See also [`AbstractAlgebra.__solve_triu_left`](@ref)
+If `side = :left`, the default, $b$ has to be $m \times n$. In this case
+$xU = b$ is solved - or an error raised.
+
+See also [`AbstractAlgebra._solve_triu_left`](@ref) and [`Strassen`](@ref) for
+  asymptotically fast versions.
 """
 function _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
    if side == :left
-     return _solve_triu_left(U, b; side)
+     return _solve_triu_left(U, b)
    end
    @assert side == :right
    n = nrows(U)
@@ -3536,14 +3541,10 @@ triangular, and an $m\times n$ matrix $b$ over the same ring, return an
 $m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) or [`can__solve_left_reduced_triu`](@ref) when
-$U$ is not square or not of full rank.
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+  versions.
 """
-function _solve_triu_left(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
-   if side == :right
-     return _solve_triu(U, b; side)
-   end
-   @assert side == :left
+function _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    n = ncols(U)
    m = nrows(b)
    R = base_ring(U)

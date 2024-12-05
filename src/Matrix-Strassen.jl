@@ -1,10 +1,9 @@
 """
 Provides generic asymptotically fast matrix methods:
-  - mul and mul! using the Strassen scheme
-  - _solve_tril!
-  - lu!
-  - _solve_triu
-  - _solve_triu_left 
+  - `mul` and `mul!` using the Strassen scheme
+  - `_solve_tril!`
+  - `lu!`
+  - `_solve_triu`
 
 Just prefix the function by "Strassen." all 4 functions support a keyword
 argument "cutoff" to indicate when the base case should be used.
@@ -289,7 +288,7 @@ function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol 
     return R
   end
   if side == :left
-    return _solve_triu_left(T, b; side)
+    return _solve_triu_left(T, b; cutoff)
   end
   @assert side == :right
   @assert n == nrows(T) == nrows(b)
@@ -333,17 +332,14 @@ function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol 
   return [SS RR; S R]
 end
 
-function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol = :left)
+function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   #b*inv(T), thus solves xT = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu(T, b; side)
+    R = AbstractAlgebra._solve_triu_left(T, b; cutoff)
     return R
   end
-  if side == :right
-    return _solve_triu(T, b, side)
-  end
-  @assert side == :left
+  
   @assert ncols(b) == nrows(T) == n
 
   n2 = div(n, 2) + n % 2
@@ -370,16 +366,16 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Sy
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu_left(U, A; cutoff, side)
-  R = _solve_triu_left(X, A; cutoff, side)
+  S = _solve_triu_left(U, A; cutoff)
+  R = _solve_triu_left(X, A; cutoff)
 
   SS = mul(S, B; cutoff)
   SS = sub!(SS, V, SS)
-  SS = _solve_triu_left(SS, C; cutoff, side)
+  SS = _solve_triu_left(SS, C; cutoff)
 
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
-  RR = _solve_triu_left(RR, C; cutoff, side)
+  RR = _solve_triu_left(RR, C; cutoff)
   #THINK: both pairs of solving could be combined: 
   # solve [U; X], A to get S and R...
 
