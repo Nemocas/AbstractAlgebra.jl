@@ -64,6 +64,8 @@ function modulus(r::ResElem)
    return modulus(parent(r))
 end
 
+is_trivial(S::ResidueRing) = is_unit(modulus(S))
+
 data(a::ResElem) = a.data
 
 lift(a::ResElem) = data(a)

@@ -204,6 +204,10 @@ function ==(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T}) 
    return data(a) == data(b)
 end
 
+function Base.hash(a::LocalizedEuclideanRingElem, h::UInt)
+   return hash(data(a), h)
+end
+
 ###############################################################################
 #
 #   Inversion

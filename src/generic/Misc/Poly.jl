@@ -28,7 +28,7 @@ function factor(R::Field, f::PolyRingElem)
     return factor(f1)
 end
 
-function factor(R::Ring, f::FracElem)
+function factor(R::Ring, f::Union{FracElem, Rational})
     fn = factor(R(numerator(f)))
     fd = factor(R(denominator(f)))
     fn.unit = divexact(fn.unit, fd.unit)
