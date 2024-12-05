@@ -336,7 +336,7 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   #b*inv(T), thus solves xT = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu_left(T, b; cutoff)
+    R = AbstractAlgebra._solve_triu_left(T, b)
     return R
   end
   
