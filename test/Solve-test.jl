@@ -259,3 +259,15 @@ end
   @test ncols(S) == 3
   @test base_ring(S) == QQ
 end
+
+@testset "solve_triu" begin
+  A = matrix(ZZ, 10, 10, [i<=j ? i+j-1 : 0 for i=1:10 for j=1:10])
+  x = matrix(ZZ, rand(-10:10, 10, 10))
+  @test AbstractAlgebra._solve_triu(A, A*x; side = :right) == x
+  @test AbstractAlgebra._solve_triu(A, x*A; side = :left) == x
+
+  A = matrix(ZZ, 20, 20, [i<=j ? i+j-1 : 0 for i=1:20 for j=1:20])
+  x = matrix(ZZ, rand(-10:10, 20, 20))
+  @test AbstractAlgebra.Strassen._solve_triu(A, A*x; cutoff = 10, side = :right) == x
+  @test AbstractAlgebra.Strassen._solve_triu(A, x*A; cutoff = 10, side = :left) == x
+end

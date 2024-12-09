@@ -1,9 +1,9 @@
 """
 Provides generic asymptotically fast matrix methods:
-  - mul and mul! using the Strassen scheme
-  - _solve_tril!
-  - lu!
-  - _solve_triu
+  - `mul` and `mul!` using the Strassen scheme
+  - `_solve_tril!`
+  - `lu!`
+  - `_solve_triu`
 
 Just prefix the function by "Strassen." all 4 functions support a keyword
 argument "cutoff" to indicate when the base case should be used.
@@ -40,6 +40,12 @@ function mul(A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff) where {T}
 end
 
 #scheduling copied from the nmod_mat_mul in Flint
+"""
+Fast, recursive, generic matrix multiplication using the Strassen
+trick.
+
+`cutoff` indicates when the recursion stops and the base case is called.
+"""
 function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff) where {T}
   sA = size(A)
   sB = size(B)
@@ -274,17 +280,82 @@ function lu!(P::Perm{Int}, A; cutoff::Int = 300)
   return r1 + r2
 end
 
-function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
-  #b*inv(T), thus solves Tx = b for T upper triangular
+function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol = :left)
+  #inv(T)*b, thus solves Tx = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu(T, b)
+    R = AbstractAlgebra._solve_triu(T, b; side)
     return R
   end
+  if side == :left
+    return _solve_triu_left(T, b; cutoff)
+  end
+  @assert side == :right
+  @assert n == nrows(T) == nrows(b)
+
+  n2 = div(n, 2) + n % 2
+  m = ncols(b)
+  m2 = div(m, 2) + m % 2
+  #=
+    b = [U X; V Y]
+    T = [A B; 0 C]
+    x = [SS RR; S R]
+
+    [0 C] [SS; S] = CS = V
+    [0 C] [RR; R] = CR = Y
+
+    [A B] [SS; S] = A SS + B S = U => A SS = U - BS
+    [A B] [RR; R] = A RR + B R = U => A RR = X - BR
+    
+ =#   
+
+  U = view(b, 1:n2, 1:m2)
+  X = view(b, 1:n2, m2+1:m)
+  V = view(b, n2+1:n, 1:m2)
+  Y = view(b, n2+1:n, m2+1:m)
+
+  A = view(T, 1:n2, 1:n2)
+  B = view(T, 1:n2, 1+n2:n)
+  C = view(T, 1+n2:n, 1+n2:n)
+
+  S = _solve_triu(C, V; cutoff, side)
+  R = _solve_triu(C, Y; cutoff, side)
+
+  SS = mul(B, S; cutoff)
+  SS = sub!(SS, U, SS)
+  SS = _solve_triu(A, SS; cutoff, side)
+
+  RR = mul(B, R; cutoff)
+  RR = sub!(RR, X, RR)
+  RR = _solve_triu(A, RR; cutoff, side)
+
+  return [SS RR; S R]
+end
+
+function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff)
+  #b*inv(T), thus solves xT = b for T upper triangular
+  n = ncols(T)
+  if n <= cutoff
+    R = AbstractAlgebra._solve_triu_left(T, b)
+    return R
+  end
+  
+  @assert ncols(b) == nrows(T) == n
 
   n2 = div(n, 2) + n % 2
   m = nrows(b)
   m2 = div(m, 2) + m % 2
+  #=
+    b = [U X; V Y]
+    T = [A B; 0 C]
+    x = [S SS; R RR]
+
+    [S SS] [A; 0] = SA = U
+    [R RR] [A; 0] = RA = V
+    [S SS] [B; C] = SB + SS C = X => SS C = Y - SB
+    [R RR] [B; C] = RB + RR C = Y => RR C = Y - RB
+
+ =#   
 
   U = view(b, 1:m2, 1:n2)
   V = view(b, 1:m2, n2+1:n)
@@ -295,18 +366,21 @@ function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu(A, U; cutoff)
-  R = _solve_triu(A, X; cutoff)
+  S = _solve_triu_left(A, U; cutoff)
+  R = _solve_triu_left(A, X; cutoff)
 
   SS = mul(S, B; cutoff)
   SS = sub!(SS, V, SS)
-  SS = _solve_triu(C, SS; cutoff)
+  SS = _solve_triu_left(C, SS; cutoff)
 
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
-  RR = _solve_triu(C, RR; cutoff)
+  RR = _solve_triu_left(C, RR; cutoff)
+  #THINK: both pairs of solving could be combined: 
+  # solve [U; X], A to get S and R...
 
   return [S SS; R RR]
 end
+
 
 end # module
