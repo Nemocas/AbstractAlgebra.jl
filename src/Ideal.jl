@@ -41,3 +41,7 @@ end
 iszero(I::Ideal) = all(iszero, gens(I))
 
 base_ring_type(::Type{<:IdealSet{T}}) where T <: RingElement = parent_type(T)
+
+# fundamental interface, to be documented
+ideal_type(x) = ideal_type(typeof(x))
+ideal_type(T::DataType) = throw(MethodError(ideal_type, (T,)))
