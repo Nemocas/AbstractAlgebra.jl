@@ -2135,7 +2135,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
          V[j, i] = A[j, pivots[np + i]]
       end
    end
-   V = _solve_triu(U, V, false)
+   V = _solve_triu_right(U, V; unipotent = false)
    for i = 1:rnk
       for j = 1:i
          A[j, pivots[i]] = i == j ? one(R) : R()
@@ -3411,14 +3411,14 @@ $n\times m$ matrix $x$ such that $Ux = b$. If $U$ is singular an exception
 is raised. If unit is true then $U$ is assumed to have ones on its
 diagonal, and the diagonal will not be read.
 """
-function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
+function _solve_triu_right(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: FieldElement}
    n = nrows(U)
    m = ncols(b)
    R = base_ring(U)
    X = zero(b)
    Tinv = Vector{elem_type(R)}(undef, n)
    tmp = Vector{elem_type(R)}(undef, n)
-   if unit == false
+   if unipotent == false
       for i = 1:n
          Tinv[i] = inv(U[i, i])
       end
@@ -3435,13 +3435,96 @@ function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T 
          end
          s = reduce!(s)
          s = b[j, i] - s
-         if unit == false
+         if unipotent == false
             s = mul!(s, s, Tinv[j])
          end
          tmp[j] = s
       end
       for j = 1:n
          X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
+`side = :right`, let $b$ 
+be an $n\times m$ matrix $b$ over the same field, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
+will be raised.
+
+If `side = :left`, the default, $b$ has to be $m \times n$. In this case
+$xU = b$ is solved - or an error raised.
+
+See also [`AbstractAlgebra._solve_triu_left`](@ref) and [`Strassen`](@ref) for
+  asymptotically fast versions.
+"""
+function _solve_triu(U::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if side == :left
+     return _solve_triu_left(U, b)
+   end
+   @assert side == :right
+   n = nrows(U)
+   m = ncols(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[j, i]
+      end
+      for j = n:-1:1
+         s = R(0)
+         for k = j + 1:n
+            s = addmul!(s, U[j, k], tmp[k], t)
+#            s = s + U[j, k] * tmp[k]
+         end
+         s = b[j, i] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $m\times n$ matrix $b$ over the same ring, return an
+$m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
+will be raised.
+
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+  versions.
+"""
+function _solve_triu_left(U::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   n = ncols(U)
+   m = nrows(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[i, j]
+      end
+      for j = 1:n
+         s = R()
+         for k = 1:j-1
+            s = addmul!(s, U[k, j], tmp[k], t)
+         end
+         s = b[i, j] - s
+         tmp[j] = divexact(s, U[j,j])
+      end
+      for j = 1:n
+         X[i, j] = tmp[j]
       end
    end
    return X
