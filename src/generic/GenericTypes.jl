@@ -343,11 +343,12 @@ end
    ord::Symbol
    num_vars::Int
    N::Int
+   istrivial::Bool
 
    function MPolyRing{T}(R::Ring, s::Vector{Symbol}, ord::Symbol, N::Int,
                          cached::Bool = true) where T <: RingElement
       return get_cached!(MPolyID, (R, s, ord, N), cached) do
-         new{T}(R, s, ord, length(s), N)
+         new{T}(R, s, ord, length(s), N, is_trivial(R))
       end::MPolyRing{T}
    end
 end
@@ -372,6 +373,7 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyRingElem{T}
       return new{T}(Vector{T}(undef, 0), Matrix{UInt}(undef, N, 0), 0, R)
    end
 
+   # assumes that all elements of a are non-zero
    MPoly{T}(R::MPolyRing, a::Vector{T}, b::Matrix{UInt}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
