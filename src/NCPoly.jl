@@ -729,6 +729,19 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.default_rng(), S, deg_range, 
 
 ###############################################################################
 #
+#   Polynomial substitution
+#
+###############################################################################
+
+(f::NCPolyRingElem)(a::Integer) = evaluate(f, a)
+
+function (f::NCPolyRingElem)(a::NCRingElem)
+    return evaluate(f, a)
+end
+
+
+###############################################################################
+#
 #   polynomial_ring constructor
 #
 ###############################################################################

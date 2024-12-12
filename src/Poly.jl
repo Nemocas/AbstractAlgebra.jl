@@ -3359,6 +3359,26 @@ rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
 #
 ###############################################################################
 
+(f::PolyRingElem)(a) = subst(f, a)
+
+function (f::PolyRingElem)(a::PolyRingElem)
+    typeof(f) == typeof(a) || return subst(f, a)
+    parent(f) == parent(a) || return subst(f, a)
+    return compose(f, a; inner = :second)
+end
+
+function (f::PolyRingElem{T})(a::T) where T
+    base_ring(f) == parent(a) || return subst(f, a)
+    return evaluate(f, a)
+end
+
+(f::PolyRingElem)(a::Integer) = evaluate(f, a)
+
+function (f::PolyRingElem)(a::RingElem)
+    base_ring(f) == parent(a) || return subst(f, a)
+    return evaluate(f, a)
+end
+
 @doc raw"""
     subst(f::PolyRingElem{T}, a::Any) where T <: RingElement
 
