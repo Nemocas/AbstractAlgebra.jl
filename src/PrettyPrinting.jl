@@ -148,7 +148,7 @@ function show_obj(io::IO, mi::MIME, obj)
    finish(S)
 end
 
-global _html_as_latex = Ref{Bool}(false)
+const _html_as_latex = Ref{Bool}(false)
 
 @doc raw"""
     get_html_as_latex()
