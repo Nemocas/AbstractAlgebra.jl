@@ -1662,12 +1662,12 @@ end
    R, t = polynomial_ring(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
    arr = [t + 1 t; t^2 t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
    # transpose input/output types are the same
@@ -2337,7 +2337,7 @@ end
    U = matrix_space(S, 3, 1)
 
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
-   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
+   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4]))
 
    x, d = AbstractAlgebra._solve_rational(M, b)
 
