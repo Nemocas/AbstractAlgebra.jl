@@ -79,3 +79,41 @@ function zeros(R::NCRing, r::Int...)
    end
    return A
 end
+
+###############################################################################
+#
+#   Row & column permutations
+#
+###############################################################################
+
+function swap_rows(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
+   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
+   b = deepcopy(a)
+   swap_rows!(b, i, j)
+   return b
+end
+
+function swap_rows!(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
+   if i != j
+      for k = 1:ncols(a)
+         a[i, k], a[j, k] = a[j, k], a[i, k]
+      end
+   end
+   return a
+end
+
+function swap_cols(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
+   (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
+   b = deepcopy(a)
+   swap_cols!(b, i, j)
+   return b
+end
+
+function swap_cols!(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
+   if i != j
+      for k = 1:nrows(a)
+         a[k, i], a[k, j] = a[k, i], a[k, j]
+      end
+   end
+   return a
+end
