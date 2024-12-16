@@ -101,6 +101,13 @@ is_exact_type(R::Type{T}) where T <: RingElem = true
 # false unless explicitly specified
 is_domain_type(R::Type{T}) where T <: RingElem = false
 
+
+# Default implementation: covers all integral domains
+function is_nilpotent(a::T) where {T <: RingElem}
+  is_domain_type(parent_type(T)) && return izero(a)
+  throw(NotImplementedError(:is_nilpotent, a))
+end
+
 ###############################################################################
 #
 #   Exponential function for generic rings
