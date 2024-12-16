@@ -16,11 +16,11 @@
 #
 ################################################################################
 
-global const VERBOSE_SCOPE = Symbol[]
+const VERBOSE_SCOPE = Symbol[]
 
-global const VERBOSE_LOOKUP = Dict{Symbol, Int}()
+const VERBOSE_LOOKUP = Dict{Symbol, Int}()
 
-global const VERBOSE_PRINT_INDENT = Int[ 0 ]
+const VERBOSE_PRINT_INDENT = Int[ 0 ]
 
 @doc raw"""
     AbstractAlgebra.add_verbosity_scope(s::Symbol) -> Nothing
@@ -375,9 +375,9 @@ end
 #
 ################################################################################
 
-global const ASSERT_SCOPE = Symbol[]
+const ASSERT_SCOPE = Symbol[]
 
-global const ASSERT_LOOKUP = Dict{Symbol, Int}()
+const ASSERT_LOOKUP = Dict{Symbol, Int}()
 
 @doc raw"""
     AbstractAlgebra.add_assertion_scope(s::Symbol) -> Nothing
