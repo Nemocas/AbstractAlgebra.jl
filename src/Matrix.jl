@@ -6731,11 +6731,11 @@ function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
 end
 
 function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
-    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+    return matrix(permutedims(reduce(hcat, arr)))
 end
 
 function matrix(R::NCRing, arr::Vector{<:Vector})
-   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
+   return matrix(R, permutedims(reduce(hcat, arr)))
 end
 
 @doc raw"""

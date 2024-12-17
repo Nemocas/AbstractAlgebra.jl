@@ -518,7 +518,7 @@ end
    S = matrix_ring(R, 3)
    arr = [t + 1 t R(1); t^2 t t; t+1 t^2 R(-1)]
    A = S(arr)
-   B = S(permutedims(arr, [2, 1]))
+   B = S(permutedims(arr))
    @test transpose(A) == B
 
    # Tests over noncommutative ring
