@@ -811,6 +811,24 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
             @test a == A
          end
       end
+
+      @testset "Row & column permutations" begin
+          a = matrix(R, [1 2 ; 3 4])
+          b = swap_rows(a, 1, 2)
+          @test b == matrix(R, [3 4 ; 1 2])
+          @test a == matrix(R, [1 2 ; 3 4])
+
+          a = matrix(R, [1 2 ; 3 4])
+          b = swap_cols(a, 1, 2)
+          @test b == matrix(R, [2 1 ; 4 3])
+          @test a == matrix(R, [1 2 ; 3 4])
+
+          # TODO: reverse_rows, reverse_cols
+          # TODO: add_column, add_row
+          # TODO: multiply_column, multiply_row
+          # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
+      end
+
    end
 
    return nothing

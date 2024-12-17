@@ -6060,7 +6060,7 @@ end
 
 ###############################################################################
 #
-#   Row swapping
+#   Row & column permutations
 #
 ###############################################################################
 
@@ -6120,12 +6120,9 @@ julia> M  # was modified
 ```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    if i != j
       for k = 1:ncols(a)
-         x = a[i, k]
-         a[i, k] = a[j, k]
-         a[j, k] = x
+         a[i, k], a[j, k] = a[j, k], a[i, k]
       end
    end
    return a
@@ -6153,9 +6150,7 @@ matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:nrows(a)
-         x = a[k, i]
-         a[k, i] = a[k, j]
-         a[k, j] = x
+         a[k, i], a[k, j] = a[k, j], a[k, i]
       end
    end
    return a
@@ -6736,11 +6731,11 @@ function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
 end
 
 function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
-    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+    return matrix(permutedims(reduce(hcat, arr)))
 end
 
 function matrix(R::NCRing, arr::Vector{<:Vector})
-   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
+   return matrix(R, permutedims(reduce(hcat, arr)))
 end
 
 @doc raw"""

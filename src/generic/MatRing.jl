@@ -34,7 +34,7 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 ###############################################################################
 
 function transpose(x::MatRingElem{T}) where T <: NCRingElement
-   arr = permutedims(x.entries, [2, 1])
+   arr = permutedims(x.entries)
    z = MatRingElem{T}(base_ring(x), arr)
    return z
 end
