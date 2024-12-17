@@ -473,3 +473,30 @@ end
    @test gen(S) == S(x)
    @test gens(S) == elem_type(S)[one(S), gen(S), gen(S)^2]
 end
+
+@testset "EuclideanRingResidueRingElem.divrem" begin
+   R, x = polynomial_ring(GF(5), "x")
+   S, _ = residue_ring(R, (x^3)*(x+1)^2)
+
+   f = S(x^2*(x+1))
+   g = S(x*(x+1)^2)
+   q, r = divrem(f, g)
+   @test f == q*g+r
+   @test degree(data(r)) < degree(data(g))
+
+   h, r, s = gcdx(f, g)
+   @test h == S(x^2+x)
+   @test h == r*f+s*g
+
+   f *= (x+2)
+   g *= (x^2+x+2)
+   q, r = divrem(f, g)
+   @test f == q*g+r
+
+   h, r, s = gcdx(f, g)
+   @test h == S(x^2+x)
+   @test h == r*f+s*g
+end
+
+
+
