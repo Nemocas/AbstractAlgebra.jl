@@ -640,25 +640,21 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    is_homogeneous(x::MPoly{T}) where {T <: RingElement}
+    is_homogeneous(x::MPolyRingElem)
 
 Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
 """
-function is_homogeneous(x::MPoly{T}) where {T <: RingElement}
+function is_homogeneous(x::MPolyRingElem)
    last_deg = 0
    is_first = true
 
    for e in exponent_vectors(x)
       d = sum(e)
-      if !is_first
-         if d != last_deg
-            return false
-         else
-            last_deg = d
-         end
-      else
+      if is_first
          is_first = false
          last_deg = d
+      elseif d != last_deg
+         return false
       end
    end
    return true
