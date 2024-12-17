@@ -168,3 +168,31 @@ For information about the many ways to specify `varnames...` refer to [`polynomi
 specification in [`AbstractAlgebra.@varnames_interface`](@ref).
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
+
+
+###############################################################################
+#
+#   Some operations
+#
+###############################################################################
+
+function is_unit(f::T) where {T<:LaurentMPolyRingElem}
+  # **NOTE** f.mpoly is not normalized in any way
+  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
+  unit_seen = false
+  for i in 1:length(f.mpoly)
+    if is_nilpotent(coeff(f.mpoly, i))
+      continue
+    end
+    if unit_seen || !is_unit(coeff(f.mpoly, i))
+      return false
+    end
+    unit_seen = true
+  end
+  return unit_seen
+end
+
+
+function is_nilpotent(f::T) where {T<:LaurentMPolyRingElem}
+  return is_nilpotent(f.mpoly);
+end

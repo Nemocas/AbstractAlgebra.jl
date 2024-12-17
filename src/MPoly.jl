@@ -425,16 +425,27 @@ end
 
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
-function is_unit(a::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(a)
-      return is_unit(leading_coefficient(a))
-   elseif is_domain_type(elem_type(coefficient_ring(a)))
+# function is_unit(a::MPolyRingElem{T}) where T <: RingElement
+#    if is_constant(a)
+#       return is_unit(leading_coefficient(a))
+#    elseif is_domain_type(elem_type(coefficient_ring(a)))
+#       return false
+#    elseif length(a) == 1
+#       return false
+#    else
+#       throw(NotImplementedError(:is_unit, a))
+#    end
+# end
+function is_unit(f::T) where {T<:MPolyRingElem}
+  is_unit(constant_coefficient(f)) || return false
+  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
+  is_domain_type(elem_type(coefficient_ring(f))) && return (length(f)==1)
+  for i in 1:length(f)-1  # constant_coefficient seems to be the last one
+    if !is_nilpotent(coeff(f, i))
       return false
-   elseif length(a) == 1
-      return false
-   else
-      throw(NotImplementedError(:is_unit, a))
-   end
+    end
+  end
+  return true
 end
 
 function content(a::MPolyRingElem{T}) where T <: RingElement
@@ -444,6 +455,18 @@ function content(a::MPolyRingElem{T}) where T <: RingElement
    end
    return z
 end
+
+
+function is_nilpotent(f::T) where {T<:MPolyRingElem}
+  is_domain_type(elem_type(coefficient_ring(f))) && return (is_zero(f))
+  for i in 1:length(f)
+    if !is_nilpotent(coeff(f, i))
+      return false
+    end
+  end
+  return true
+end
+
 
 function is_zero_divisor(x::MPolyRingElem{T}) where T <: RingElement
    return is_zero_divisor(content(x))
