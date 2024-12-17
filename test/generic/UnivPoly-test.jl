@@ -1127,3 +1127,90 @@ end
    end
 end
 
+# -------------------------------------------------------
+
+# Coeff rings needed for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+## UPoly over ZeroRing
+@testset "Nilpotent/unit for ZeroRing[x]" begin
+  P,x = polynomial_ring(ZeroRing, "x");
+  @test is_nilpotent(P(0))
+  @test is_nilpotent(P(1))
+  @test is_nilpotent(x)
+  @test is_nilpotent(-x)
+
+  @test is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(x)
+  @test is_unit(-x)
+end
+
+## UPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x]" begin
+  P,x = polynomial_ring(ZZ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+# UPoly over QQ
+@testset "Nilpotent/unit for QQ[x]" begin
+  P,x = polynomial_ring(QQ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## UPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x]" begin
+  P,x = polynomial_ring(ZZmod720, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test is_nilpotent(30*x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+30)
+  @test !is_unit(x-30)
+  @test is_unit(1+30*x)
+  @test is_unit(1-30*x)
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+end
+
