@@ -6492,7 +6492,7 @@ end
 
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
-_change_base_ring(R::NCRing, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::NCRing, a::MatElem) = dense_matrix_type(R)(R, undef, nrows(a), ncols(a))
 _change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
@@ -6707,7 +6707,7 @@ function matrix(R::NCRing, arr::MatElem)
 end
 
 function matrix(R::NCRing, arr::MatRingElem)
-   M = zero_matrix(R, nrows(arr), ncols(arr))
+   M = dense_matrix_type(R)(R, undef, nrows(arr), ncols(arr))
    for i in 1:nrows(arr), j in 1:ncols(arr)
       M[i, j] = arr[i, j]
    end
