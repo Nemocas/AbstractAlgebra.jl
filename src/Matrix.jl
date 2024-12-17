@@ -22,6 +22,18 @@ base_ring_type(::Type{<:MatrixElem{T}}) where T <: NCRingElement = parent_type(T
 
 base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
+"""
+    is_zero_initialized(T::Type{<:MatrixElem})
+    is_zero_initialized(mat::T) where {T<:MatrixElem}
+
+Specify whether the default-constructed matrices of type `T`, via the
+`T(R::Ring, ::UndefInitializerm r::Int, c::Int)` constructor, are
+zero-initialized. The default is `false`, and new matrix types should
+specialize this method to return `true` if suitable, to enable optimizations.
+"""
+is_zero_initialized(::Type{<:MatrixElem}) = false
+is_zero_initialized(::T) where {T<:MatrixElem} = is_zero_initialized(T)
+
 function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
@@ -374,8 +386,16 @@ with defaults based upon the given source matrix `x`.
 """
 zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
 zero(x::MatElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
-zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
-zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, r, c))
+
+function zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+  y = similar(x, R, r, c)
+  return is_zero_initialized(y) ? y : zero!(y)
+end
+
+function zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
+  y = similar(x, r, c)
+  return is_zero_initialized(y) ? y : zero!(y)
+end
 
 ###############################################################################
 #
@@ -6769,7 +6789,8 @@ Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
   (r < 0 || c < 0) && error("Dimensions must be non-negative")
-  return zero!(dense_matrix_type(R)(R, undef, r, c))
+  mat = dense_matrix_type(R)(R, undef, r, c)
+  return is_zero_initialized(mat) ? mat : zero!(mat)
 end
 
 zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
