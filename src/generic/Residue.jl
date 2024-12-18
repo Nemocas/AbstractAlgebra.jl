@@ -126,6 +126,29 @@ function rand(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}
    return r
 end
 
+
+# inspired by Nemo.jl/src/flint/nmod.jl (near line 56)
+function is_unit(res::ResElem{T}) where {T<:Integer}
+  m = modulus(res)
+  r = data(res)
+  return (m == 1) || (gcd(r,m) == 1)
+end
+
+
+# copied from Nemo.jl/src/HeckeMoreStuff.jl
+function is_nilpotent(res::ResElem{T}) where {T<:Integer}
+  m = modulus(res)
+  r = data(res) # the least non-negative class representative as a value of type "unsigned" T; !!note that "lift" casts the value to BigInt!!
+  while true
+    g = gcd(r, m)
+    (g == m) && return true
+    (g == 1) && return false
+    m = divexact(m, g)  #  equiv to:  m /= g
+    mod!(g, m);  r = g^2  # g^2 cannot overflow thanks to mod!
+  end
+end
+
+
 ###############################################################################
 #
 #   Unsafe functions
