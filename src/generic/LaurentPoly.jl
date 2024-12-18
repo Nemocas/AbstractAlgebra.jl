@@ -201,14 +201,14 @@ function Base.inv(p::LaurentPolyWrap)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
 end
 
-function is_unit(p::LaurentPolyWrap)
-   v, g = _remove_gen(p)
-   if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1
-      return is_unit(g)
-   else
-      throw(NotImplementedError(:is_unit, p))
-   end
-end
+# function is_unit(p::LaurentPolyWrap)
+#    v, g = _remove_gen(p)
+#    if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1
+#       return is_unit(g)
+#    else
+#       throw(NotImplementedError(:is_unit, p))
+#    end
+# end
 
 is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)
 
