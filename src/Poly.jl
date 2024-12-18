@@ -234,7 +234,8 @@ end
 #    end
 # end
 
-function is_unit(f::T) where {T<:PolyRingElem}
+# This function handles both PolyRingElem & NCPolyRingElem
+function is_unit(f::T) where {T<:PolynomialElem}
   is_unit(constant_coefficient(f)) || return false
   characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
   is_domain_type(elem_type(coefficient_ring(f))) && return (degree(f)==0)
@@ -247,7 +248,8 @@ function is_unit(f::T) where {T<:PolyRingElem}
 end
 
 
-function is_nilpotent(f::T) where {T<:PolyRingElem}
+# This function handles both PolyRingElem & NCPolyRingElem
+function is_nilpotent(f::T) where {T<:PolynomialElem}
   is_domain_type(elem_type(coefficient_ring(f))) && return (is_zero(f))
   for i in 0:degree(f)
     if !is_nilpotent(coeff(f, i))
