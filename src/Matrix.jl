@@ -784,6 +784,7 @@ function show(io::IO, a::MatSpace)
       io = pretty(io)
       print(io, "Matrix space of ")
       print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
+      print(io, " over ")
       print(terse(io), Lowercase(), base_ring(a))
    end
 end
