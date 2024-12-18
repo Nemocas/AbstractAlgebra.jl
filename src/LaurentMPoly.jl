@@ -178,7 +178,7 @@ laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
 
 function is_unit(f::T) where {T<:LaurentMPolyRingElem}
   # **NOTE** f.mpoly is not normalized in any way
-  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
+  is_trivial(parent(f)) && return true  # coeffs in zero ring
   unit_seen = false
   for i in 1:length(f.mpoly)
     if is_nilpotent(coeff(f.mpoly, i))

@@ -146,7 +146,7 @@ end
 
 function is_unit(f::T) where {T<:LaurentPolyRingElem}
   # **NOTE**  f.poly is not normalized so that the degree 0 coeff is non-zero
-  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
+  is_trivial(parent(f)) && return true  # coeffs in zero ring
   unit_seen = false
   for i in 0:degree(f.poly)
     if is_nilpotent(coeff(f.poly, i))
