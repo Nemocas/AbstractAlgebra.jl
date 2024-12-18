@@ -425,24 +425,16 @@ end
 
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
-# function is_unit(a::MPolyRingElem{T}) where T <: RingElement
-#    if is_constant(a)
-#       return is_unit(leading_coefficient(a))
-#    elseif is_domain_type(elem_type(coefficient_ring(a)))
-#       return false
-#    elseif length(a) == 1
-#       return false
-#    else
-#       throw(NotImplementedError(:is_unit, a))
-#    end
-# end
-function is_unit(f::T) where {T<:MPolyRingElem}
-  is_unit(constant_coefficient(f)) || return false
-  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
-  is_domain_type(elem_type(coefficient_ring(f))) && return (length(f)==1)
-  for i in 1:length(f)-1  # constant_coefficient seems to be the last one
-    if !is_nilpotent(coeff(f, i))
-      return false
+function is_unit(f::T) where { T<:MPolyRingElem }
+  # for constant polynomials we delegate to the coefficient ring:
+  is_constant(f) && return is_unit(constant_coefficient(f))
+  # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
+  is_domain_type(elem_type(coefficient_ring(f))) && return false
+  for (c, expv) in zip(coefficients(f), exponent_vectors(f))
+    if is_zero(v)
+      is_unit(c) || return false
+    else
+      is_nilpotent(c) || return false;
     end
   end
   return true
@@ -458,13 +450,8 @@ end
 
 
 function is_nilpotent(f::T) where {T<:MPolyRingElem}
-  is_domain_type(elem_type(coefficient_ring(f))) && return (is_zero(f))
-  for i in 1:length(f)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
+  is_domain_type(elem_type(coefficient_ring(f))) && return is_zero(f)
+  return all(is_nilpotent, coefficients(f))
 end
 
 
