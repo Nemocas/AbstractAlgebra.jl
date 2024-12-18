@@ -222,42 +222,8 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-# function is_unit(a::PolynomialElem)
-#    if length(a) <= 1
-#       return is_unit(coeff(a, 0))
-#    elseif is_domain_type(elem_type(coefficient_ring(a)))
-#       return false
-#    elseif !is_unit(coeff(a, 0)) || is_unit(coeff(a, length(a) - 1))
-#       return false
-#    else
-#       throw(NotImplementedError(:is_unit, a))
-#    end
-# end
-
-# This function handles both PolyRingElem & NCPolyRingElem
-function is_unit(f::T) where {T<:PolynomialElem}
-  is_unit(constant_coefficient(f)) || return false
-  characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
-  is_domain_type(elem_type(coefficient_ring(f))) && return (degree(f)==0)
-  for i in 1:degree(f) # we have already checked coeff(f,0)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
-end
-
-
-# This function handles both PolyRingElem & NCPolyRingElem
-function is_nilpotent(f::T) where {T<:PolynomialElem}
-  is_domain_type(elem_type(coefficient_ring(f))) && return (is_zero(f))
-  for i in 0:degree(f)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
-end
+# function is_unit(...) see NCPoly.jl
+# function is_nilpotent(...) see NCPoly.jl
 
 
 is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
