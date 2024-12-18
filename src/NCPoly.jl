@@ -794,28 +794,22 @@ PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
 
 # ASSUMES structural interface is analogous to that for univariate polynomials
 
-# **XREF** function is_unit(...) in Poly.jl also handles the NCPolyRingElem case
-# function is_unit(f::T) where {T<:NCPolyRingElem}
-#   is_unit(constant_coefficient(f)) || return false
-#   characteristic(parent(f)) == 1 && return true  # coeffs in zero ring
-#   is_domain_type(elem_type(coefficient_ring(f))) && return (length(f)==1)
-#   for i in 1:degree(f)   # ASSUMES constant_coefficient has index 0
-#     if !is_nilpotent(coeff(f, i))
-#       return false
-#     end
-#   end
-#   return true
-# end
+# This function handles both PolyRingElem & NCPolyRingElem
+function is_unit(f::T) where { T<:PolynomialElem }
+  # for constant polynomials we delegate to the coefficient ring:
+  is_constant(f) && return is_unit(constant_coefficient(f))
+  # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
+  is_domain_type(elem_type(coefficient_ring(f))) && return false
+  for i in 1:degree(f) # we have already checked coeff(f,0)
+    if !is_nilpotent(coeff(f, i))
+      return false
+    end
+  end
+  return true
+end
 
-
-# **XREF** function is_nilpotent(...) in Poly.jl also handles the NCPolyRingElem case
-# function is_nilpotent(f::T) where {T<:NCPolyRingElem}
-#   is_domain_type(elem_type(coefficient_ring(f))) && return (is_zero(f))
-#   for i in 0:degree(f)
-#     if !is_nilpotent(coeff(f, i))
-#       return false
-#     end
-#   end
-#   return true
-# end
-
+# This function handles both PolyRingElem & NCPolyRingElem
+function is_nilpotent(f::T) where { T<:PolynomialElem }
+  is_domain_type(elem_type(coefficient_ring(f))) && return is_zero(f)
+  return all(is_nilpotent, coefficients(f))
+end
