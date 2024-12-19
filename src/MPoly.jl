@@ -431,7 +431,7 @@ function is_unit(f::T) where { T<:MPolyRingElem }
   # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
   is_domain_type(elem_type(coefficient_ring(f))) && return false
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
-    if is_zero(v)
+    if is_zero(expv)
       is_unit(c) || return false
     else
       is_nilpotent(c) || return false;
