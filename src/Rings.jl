@@ -101,7 +101,6 @@ is_exact_type(R::Type{T}) where T <: RingElem = true
 # false unless explicitly specified
 is_domain_type(R::Type{T}) where T <: RingElem = false
 
-
 ###############################################################################
 #
 #   Exponential function for generic rings
