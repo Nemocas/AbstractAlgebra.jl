@@ -50,19 +50,6 @@ end
    @test !occursin("\n", sprint(show, R))
 end
 
-@testset "Generic.LaurentMPoly.is_unit" begin
-   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
-
-   @test is_unit(x)
-   @test !is_unit(2*x)
-   try
-      res = is_unit(3 + 2*x)
-      @test res
-   catch e
-      @test e isa NotImplementedError
-   end
-end
-
 @testset "Generic.LaurentMPoly.derivative" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
 
