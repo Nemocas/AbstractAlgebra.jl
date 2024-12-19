@@ -14,7 +14,7 @@
    #
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 1)
-   #test_Ring_interface_recursive(T)   # TODO: currently fails because `inv(one(T))` fails
+   test_Ring_interface_recursive(T)
 
    @test !occursin("\n", sprint(show, T))
 end
