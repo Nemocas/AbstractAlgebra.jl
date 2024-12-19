@@ -566,7 +566,8 @@ julia> c = M[1, 1]
 ### Transpose
 
 ```@docs
-transpose(::MatrixElem{T}) where T <: RingElement
+transpose(::MatrixElem)
+transpose!(::MatrixElem)
 ```
 
 ### Submatrices
