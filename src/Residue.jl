@@ -85,6 +85,19 @@ function is_unit(a::ResElem)
    return isone(g)
 end
 
+function is_nilpotent(res::ResElem)
+  m = modulus(res)
+  r = data(res)
+  while true
+    g = gcd(r, m)
+    (g == m) && return true
+    is_one(g) && return false
+    m = divexact(m, g)
+    mod!(g, m);   r = g^2  # if computation domain is limited precision integer then mod!(...) guarantees that g^2 will not overflow!
+  end
+end
+
+
 # currently residue rings are only allowed over domains
 # otherwise this function would be more complicated
 is_zero_divisor(a::ResElem) = !is_unit(a)
