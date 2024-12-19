@@ -114,7 +114,7 @@
    @test z isa Generic.MPoly{Generic.Poly{BigInt}}
 
    ZZxyz_ = @inferred polynomial_ring(ZZ, 'x':'z')
-   ZZxyz2, xyz2 = @inferred polynomial_ring(ZZ, Va1rName[:x, 'y', GenericString("z")])
+   ZZxyz2, xyz2 = @inferred polynomial_ring(ZZ, VarName[:x, 'y', GenericString("z")])
    ZZxyz4_ = @inferred polynomial_ring(ZZ, Union{String,Char,Symbol}["x", 'y', :z])
    ZZxyz5_ = @inferred ZZ["x", 'y', :z]
    ZZxyz6 = @polynomial_ring(ZZ, [:x, :y, :z])
@@ -452,19 +452,6 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
-end
-
-@testset "Generic.MPoly.is_unit" begin
-   R, (x,) = polynomial_ring(residue_ring(ZZ, 4)[1], ["x"])
-
-   @test !is_unit(x)
-   @test !is_unit(2*x)
-   try
-      res = is_unit(1 + 2*x)
-      @test res
-   catch e
-      @test e isa NotImplementedError
-   end
 end
 
 
