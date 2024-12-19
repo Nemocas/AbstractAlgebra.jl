@@ -1457,9 +1457,10 @@ end
 
 
 @doc raw"""
-    transpose(x::MatrixElem{T}) where T <: NCRingElement
+    transpose(x::MatElem)
+    transpose(x::MatRingElem)
 
-Return the transpose of the given matrix.
+Return the transpose of `x`.
 
 # Examples
 
@@ -1467,11 +1468,7 @@ Return the transpose of the given matrix.
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
-julia> S = matrix_space(R, 3, 3)
-Matrix space of 3 rows and 3 columns
-  over univariate polynomial ring in t over rationals
-
-julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> A = matrix(R, [t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [t + 1       t             1]
 [  t^2       t             t]
 [   -2   t + 2   t^2 + t + 1]
@@ -1483,9 +1480,42 @@ julia> B = transpose(A)
 
 ```
 """
-transpose(x::MatrixElem{T}) where T <: NCRingElement
+function transpose(x::MatElem)
+  z = similar(base_ring(x), ncols(x), nrows(x))
+  return transpose!(z, x)
+end
 
-transpose!(A::MatrixElem) = transpose(A)
+transpose(x::MatRingElem) = transpose(matrix(x))
+
+@doc raw"""
+    transpose!(x::MatElem)
+    transpose!(x::MatRingElem)
+    transpose!(z::T, x::T) where T <: MatElem
+    transpose!(z::T, x::T) where T <: MatRingElem
+
+Return the transpose of `x`, possibly modifying the object `z` in the process.
+Aliasing is permitted.
+
+The unary version only is supported if `x` is a square matrix.
+"""
+function transpose!(x::MatElem)
+  @req is_square(x) "Matrix must be a square matrix"
+  return transpose!(x, x)
+end
+
+function transpose!(z::T, x::T) where T <: MatElem
+  if z === x
+    n = nrows(x)
+    for i in 1:n, j in i+1:n
+      x[i, j], x[j, i] = x[j, i], x[i, j]
+    end
+  else
+    for i in 1:nrows(x), j in 1:ncols(x)
+      z[j, i] = x[i, j]
+    end
+  end
+  return z
+end
 
 ###############################################################################
 #

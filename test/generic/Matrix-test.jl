@@ -4454,6 +4454,15 @@ end
   c = mul!(c, a, QQ(2))
   @test c == a * QQ(2)
 
+  # test 2-arg transpose! with destination != source
   b = transpose(a)
-  @test AbstractAlgebra.transpose!(a) == b
+  c = zero_matrix(QQ, 3, 2)
+  @test AbstractAlgebra.transpose!(c, a) == b
+
+  # test 2-arg transpose! with destination == source
+  x = QQ[1 2; 3 4]
+  @test AbstractAlgebra.transpose!(x, x) == QQ[1 3; 2 4]
+
+  # in-place transpose of non-square matrix does not work
+  @test_throws ArgumentError AbstractAlgebra.transpose!(a)
 end

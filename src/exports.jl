@@ -586,6 +586,8 @@ export total_degree
 export total_ring_of_fractions
 export tr
 export trailing_coefficient
+export transpose
+export transpose!
 export truncate
 export typed_hcat
 export typed_hvcat
