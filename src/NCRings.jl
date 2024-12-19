@@ -156,8 +156,8 @@ julia> is_unit(ZZ(-1)), is_unit(ZZ(4))
 function is_unit end
 
 # Default implementation: covers all integral domains
-function is_nilpotent(a::T) where { T <: NCRingElem }
-  is_domain_type(typeof(a)) && return is_zero(a)
+function is_nilpotent(a::T) where {T <: NCRingElem}
+  is_domain_type(T) && return is_zero(a)
   throw(NotImplementedError(:is_nilpotent, a))
 end
 
