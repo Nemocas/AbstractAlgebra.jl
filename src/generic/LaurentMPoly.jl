@@ -109,14 +109,27 @@ function Base.inv(a::LaurentMPolyWrap)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
-function is_unit(a::LaurentMPolyWrap)
-    (ap, ad) = _normalize(a)
-    if is_domain_type(elem_type(coefficient_ring(a))) || length(ap) <= 1
-        return is_unit(ap)
-    else
-        throw(NotImplementedError(:is_unit, a))
+function is_unit(f::T) where {T<:LaurentMPolyRingElem}
+  # **NOTE** f.mpoly is not normalized in any way
+  is_trivial(parent(f)) && return true  # coeffs in zero ring
+  unit_seen = false
+  for i in 1:length(f.mpoly)
+    if is_nilpotent(coeff(f.mpoly, i))
+      continue
     end
+    if unit_seen || !is_unit(coeff(f.mpoly, i))
+      return false
+    end
+    unit_seen = true
+  end
+  return unit_seen
 end
+
+
+function is_nilpotent(f::T) where {T<:LaurentMPolyRingElem}
+  return is_nilpotent(f.mpoly);
+end
+
 
 is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
 
