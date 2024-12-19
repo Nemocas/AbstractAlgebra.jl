@@ -232,19 +232,6 @@ end
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
    end
 
-   @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], "x")
-
-      @test is_unit(x)
-      @test !is_unit(2*x)
-      try
-         res = is_unit(3 + 2*x)
-         @test res
-      catch e
-         @test e isa NotImplementedError
-      end
-   end
-
    @testset "coercion" begin
       R, x = polynomial_ring(ZZ, "x")
       L, x1 = laurent_polynomial_ring(ZZ, "x")
@@ -594,6 +581,7 @@ end
   @test is_unit(P(-7))
   @test is_unit(x)
   @test is_unit(-x)
+  @test !is_unit(2*x)
   @test !is_unit(x+1)
   @test !is_unit(x-1)
   @test is_unit(x+30)
