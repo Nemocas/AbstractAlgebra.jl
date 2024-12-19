@@ -1483,9 +1483,9 @@ end
 
 
 @doc raw"""
-    transpose(x::MatrixElem{T}) where T <: NCRingElement
+    transpose(x::MatrixElem)
 
-Return the transpose of the given matrix.
+Return the transpose of `x`.
 
 # Examples
 
@@ -1509,9 +1509,32 @@ julia> B = transpose(A)
 
 ```
 """
-transpose(x::MatrixElem{T}) where T <: NCRingElement
+function transpose(x::MatrixElem)
+  z = similar(base_ring(x), ncols(x), nrows(x))
+  return transpose!(z, x)
+end
 
-transpose!(A::MatrixElem) = transpose(A)
+@doc raw"""
+    transpose!(x::MatrixElem)
+    transpose!(z::T, x::T) where T <: MatrixElem
+
+Return the transpose of `x`, possibly modifying the object `z` in the process.
+Aliasing is permitted.
+The unary version may modify `x` in-place (but this is not always possible).
+"""
+function transpose!(x::MatrixElem)
+  # no way to generically change the dimensions of x, so
+  # we fall back to bare tranpose
+  return transpose(x)
+end
+
+function transpose!(z::T, x::T) where T <: MatrixElem
+  for i in 1:nrows(x), j in 1:ncols(x)
+    z[j, i] = x[i, j]
+  end
+  return z
+end
+
 
 ###############################################################################
 #

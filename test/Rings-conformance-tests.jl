@@ -805,9 +805,22 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
 
             t = transpose(a)
             @test t isa ST
+            @test base_ring(t) == base_ring(a)
             @test nrows(t) == ncols(S)
             @test ncols(t) == nrows(S)
             @test transpose(t) == a
+            @test a == A
+
+            t = transpose!(deepcopy(a))
+            @test t isa ST
+            @test base_ring(t) == base_ring(a)
+            @test t == transpose(a)
+
+            z = zero_matrix(R, ncols(a), nrows(a))
+            t = transpose!(z, a)
+            @test t isa ST
+            @test base_ring(t) == base_ring(a)
+            @test t == transpose(a)
             @test a == A
          end
       end
