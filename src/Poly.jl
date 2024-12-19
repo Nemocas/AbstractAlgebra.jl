@@ -222,7 +222,7 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-# function is_unit(...) see NCPoly.jl
+# function is_unit(...)      see NCPoly.jl
 # function is_nilpotent(...) see NCPoly.jl
 
 
