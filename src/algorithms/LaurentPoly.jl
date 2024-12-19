@@ -138,12 +138,6 @@ function is_monomial_recursive(p::LaurentPolyRingElem)
    is_monomial_recursive(coeff(p, dr[]))
 end
 
-# function is_unit(p::LaurentPolyRingElem)
-#    dr = degrees_range(p)
-#    length(dr) == 1 || return false
-#    is_unit(coeff(p, dr[]))
-# end
-
 function is_unit(f::T) where {T<:LaurentPolyRingElem}
   # **NOTE**  f.poly is not normalized so that the degree 0 coeff is non-zero
   is_trivial(parent(f)) && return true  # coeffs in zero ring
