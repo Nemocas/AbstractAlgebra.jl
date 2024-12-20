@@ -163,7 +163,7 @@ end
 
    a = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
    b = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
-   c = similar(a)
+   c = identity_matrix(ZZ, 10)
 
    Strassen.mul_tt!(c, a, b; cutoff = 5)
    @test c == a*b
