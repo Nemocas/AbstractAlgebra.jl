@@ -93,7 +93,7 @@ function is_nilpotent(res::ResElem)
     (g == m) && return true
     is_one(g) && return false
     m = divexact(m, g)
-    mod!(g, m);   r = g^2  # if computation domain is limited precision integer then mod!(...) guarantees that g^2 will not overflow!
+    g = mod(g, m);   r = g^2  # if computation domain is limited precision integer then g = mod(g,m) guarantees that g^2 will not overflow!
   end
 end
 
