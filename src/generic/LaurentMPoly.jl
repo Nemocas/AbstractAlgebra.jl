@@ -109,7 +109,7 @@ function Base.inv(a::LaurentMPolyWrap)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
-function is_unit(f::T) where {T<:LaurentMPolyRingElem}
+function is_unit(f::T) where {T <: LaurentMPolyRingElem}
   # **NOTE** f.mpoly is not normalized in any way
   is_trivial(parent(f)) && return true  # coeffs in zero ring
   unit_seen = false
@@ -126,7 +126,7 @@ function is_unit(f::T) where {T<:LaurentMPolyRingElem}
 end
 
 
-function is_nilpotent(f::T) where {T<:LaurentMPolyRingElem}
+function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
   return is_nilpotent(f.mpoly);
 end
 
