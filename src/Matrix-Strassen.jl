@@ -283,15 +283,15 @@ function lu!(P::Perm{Int}, A; cutoff::Int = 300)
   return r1 + r2
 end
 
-function _solve_triu(T::MatElem, b::MatElem, f::Int = 0; cutoff::Int = cutoff, side::Symbol = :left)
+function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol = :left, unipotent::Bool = false)
   #inv(T)*b, thus solves Tx = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu(T, b, f; side)
+    R = AbstractAlgebra._solve_triu(T, b; side, unipotent)
     return R
   end
   if side == :left
-    return _solve_triu_left(T, b, f; cutoff)
+    return _solve_triu_left(T, b; cutoff, unipotent)
   end
   @assert side == :right
   @assert n == nrows(T) == nrows(b)
@@ -321,25 +321,25 @@ function _solve_triu(T::MatElem, b::MatElem, f::Int = 0; cutoff::Int = cutoff, s
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu(C, V, f; cutoff, side)
-  R = _solve_triu(C, Y, f; cutoff, side)
+  S = _solve_triu(C, V; cutoff, side, unipotent)
+  R = _solve_triu(C, Y; cutoff, side, unipotent)
 
   SS = mul(B, S; cutoff)
   SS = sub!(SS, U, SS)
-  SS = _solve_triu(A, SS, f; cutoff, side)
+  SS = _solve_triu(A, SS; cutoff, side, unipotent)
 
   RR = mul(B, R; cutoff)
   RR = sub!(RR, X, RR)
-  RR = _solve_triu(A, RR, f; cutoff, side)
+  RR = _solve_triu(A, RR; cutoff, side, unipotent)
 
   return [SS RR; S R]
 end
 
-function _solve_triu_left(T::MatElem, b::MatElem, f::Int = 0; cutoff::Int = cutoff)
+function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, unipotent::Bool = false)
   #b*inv(T), thus solves xT = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu_left(T, b, f)
+    R = AbstractAlgebra._solve_triu_left(T, b; unipotent)
     return R
   end
   
@@ -369,16 +369,16 @@ function _solve_triu_left(T::MatElem, b::MatElem, f::Int = 0; cutoff::Int = cuto
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu_left(A, U, f; cutoff)
-  R = _solve_triu_left(A, X, f; cutoff)
+  S = _solve_triu_left(A, U; cutoff, unipotent)
+  R = _solve_triu_left(A, X; cutoff, unipotent)
 
   SS = mul(S, B; cutoff)
   SS = sub!(SS, V, SS)
-  SS = _solve_triu_left(C, SS, f; cutoff)
+  SS = _solve_triu_left(C, SS; cutoff, unipotent)
 
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
-  RR = _solve_triu_left(C, RR, f; cutoff)
+  RR = _solve_triu_left(C, RR; cutoff, unipotent)
   #THINK: both pairs of solving could be combined: 
   # solve [U; X], A to get S and R...
 
