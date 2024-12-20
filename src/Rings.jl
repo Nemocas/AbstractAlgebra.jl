@@ -117,6 +117,19 @@ is_domain_type(x) = is_domain_type(typeof(x))
 is_domain_type(x::Type{<:Ring}) = is_domain_type(elem_type(x))
 is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
 
+# Type can only represent elements of euclidean rings (which do not need to be domains)
+# false unless explicitly specified
+#
+# implementors should only implement this trait for RingElem subtypes, but for
+# convenience we support calling this also on Ring subtypes as well as Ring
+# and RingElem instances
+is_euclidean_type(R::Type{T}) where T <: RingElem = false
+
+is_euclidean_type(x) = is_euclidean_type(typeof(x))
+is_euclidean_type(x::Type{<:Ring}) = is_euclidean_type(elem_type(x))
+is_euclidean_type(T::DataType) = throw(MethodError(is_euclidean_type, (T,)))
+
+
 ###############################################################################
 #
 #   Exponential function for generic rings
