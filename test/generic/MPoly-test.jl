@@ -1793,12 +1793,18 @@ end
 
 ## MPoly over ZZ/720
 @testset "Nilpotent/unit for ZZ/(720)[x,y]" begin
+  FactorsOf30 = [2, 3, 5, 6, 10, 15]; # non-nilpotent zero-divisors
   P,(x,y) = polynomial_ring(ZZmod720, ["x", "y"]);
   @test is_nilpotent(P(0))
-  @test !is_nilpotent(P(1))
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(P(ZeroDiv))
+  end
   @test is_nilpotent(P(30))
   @test !is_nilpotent(x)
   @test !is_nilpotent(-x)
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(ZeroDiv*x)
+  end
   @test is_nilpotent(30*x)
   @test is_nilpotent(30*x+120*y)
   @test is_nilpotent(30*x-120*y)
@@ -1814,15 +1820,21 @@ end
   @test !is_unit(x)
   @test !is_unit(-x)
   @test !is_unit(x+1)
-  @test !is_unit(x-1)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(x+ZeroDiv)
+  end
   @test !is_unit(x+30)
   @test !is_unit(x-30)
   @test is_unit(1+30*x)
-  @test is_unit(1-30*x)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+x*ZeroDiv)
+  end
   @test is_unit(7+60*x)
   @test is_unit(7-60*x)
   @test is_unit(1+30*(x+y))
-  @test is_unit(1-30*(x-y))
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+ZeroDiv*(x+y))
+  end
   @test is_unit(7+60*x*y)
   @test is_unit(7-60*x*y)
 end
