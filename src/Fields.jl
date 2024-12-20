@@ -6,6 +6,8 @@
 
 is_domain_type(::Type{T}) where {T <: FieldElem} = true
 
+is_euclidean_type(::Type{T}) where {T <: FieldElem} = true
+
 is_zero_divisor(a::T) where T <: FieldElem = is_zero(a)
 
 is_unit(a::FieldElem) = !iszero(a)

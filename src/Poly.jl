@@ -16,13 +16,12 @@ coefficient_ring(R::PolyRing) = base_ring(R)
 
 dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
 
-function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
-   return is_domain_type(S)
-end
+is_exact_type(::Type{<:PolyRingElem{T}}) where {T <: RingElement} = is_exact_type(T)
 
-function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
-   return is_exact_type(S)
-end
+is_domain_type(::Type{<:PolyRingElem{T}}) where {T <: RingElement} = is_domain_type(T)
+
+is_euclidean_type(::Type{<:PolyRingElem{T}}) where {T <: RingElem} = T <: FieldElem
+# TODO: what about polynomials over `Rational{BigInt}`?
 
 @doc raw"""
     var(a::PolyRing)
