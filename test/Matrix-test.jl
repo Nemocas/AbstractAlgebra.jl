@@ -160,4 +160,13 @@ end
    r2 = Strassen.lu!(P, S; cutoff = 50)
    @test r1 == r2
    @test S1 == S
+
+   a = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   b = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   c = similar(a)
+
+   Strassen.mul_tt!(c, a, b; cutoff = 5)
+   @test c == a*b
+   Strassen.mul_tt!(c, a, b; cutoff = 2)
+   @test c == a*b
 end
