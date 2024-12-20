@@ -137,7 +137,7 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 ###############################################################################
 
 @doc raw"""
-    is_unit(a::T) where {T <: NCRingElem}
+    is_unit(a::T) where {T <: NCRingElement}
 
 Return true if $a$ is invertible, else return false.
 
@@ -155,7 +155,19 @@ julia> is_unit(ZZ(-1)), is_unit(ZZ(4))
 """
 function is_unit end
 
-# Default implementation: covers all integral domains
+@doc raw"""
+    is_nilpotent(a::T) where {T <: NCRingElement}
+
+Return true iff $a$ is nilpotent, i.e. a^k == 0 for some k.
+
+# Examples
+```jldoctest
+julia> ZZ720,_ = residue_ring(ZZ,720);
+julia> S, x = polynomial_ring(QQ, :x);
+julia> is_nilpotent(30*x), is_nilpotent(30+90*x), is_nilpotent(S(15))
+(true, true, false)
+```
+"""
 function is_nilpotent(a::T) where {T <: NCRingElement}
   is_domain_type(T) && return is_zero(a)
   throw(NotImplementedError(:is_nilpotent, a))
