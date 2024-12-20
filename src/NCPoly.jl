@@ -810,7 +810,7 @@ function is_unit(f::T) where {T <: PolynomialElem}
 end
 
 # This function handles both PolyRingElem & NCPolyRingElem
-function is_nilpotent(f::T) where { T<:PolynomialElem }
+function is_nilpotent(f::T) where {T <: PolynomialElem}
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end

@@ -425,7 +425,7 @@ end
 
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
-function is_unit(f::T) where { T<:MPolyRingElem }
+function is_unit(f::T) where {T <: MPolyRingElem}
   # for constant polynomials we delegate to the coefficient ring:
   is_constant(f) && return is_unit(constant_coefficient(f))
   # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
@@ -453,7 +453,6 @@ end
 
 
 function is_nilpotent(f::T) where {T<:MPolyRingElem}
-#  is_domain_type(elem_type(coefficient_ring(f))) && return is_zero(f)
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end
