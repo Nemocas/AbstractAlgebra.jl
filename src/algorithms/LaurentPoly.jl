@@ -155,7 +155,7 @@ function is_unit(f::T) where {T <: LaurentPolyRingElem}
 end
 
 
-function is_nilpotent(f::T) where {T<:LaurentPolyRingElem}
+function is_nilpotent(f::T) where {T <: LaurentPolyRingElem}
   return is_nilpotent(f.poly);
 end
 
