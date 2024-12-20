@@ -95,11 +95,27 @@ end
 
 # Type can only represent elements of an exact ring
 # true unless explicitly specified
+#
+# implementors should only implement this trait for RingElem subtypes, but for
+# convenience we support calling this also on Ring subtypes as well as Ring
+# and RingElem instances
 is_exact_type(R::Type{T}) where T <: RingElem = true
 
-# Type can only represent elements of domains
+is_exact_type(x) = is_exact_type(typeof(x))
+is_exact_type(x::Type{<:Ring}) = is_exact_type(elem_type(x))
+is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
+
+# Type can only represent elements of domains, i.e. without zero divisors
 # false unless explicitly specified
+#
+# implementors should only implement this trait for RingElem subtypes, but for
+# convenience we support calling this also on Ring subtypes as well as Ring
+# and RingElem instances
 is_domain_type(R::Type{T}) where T <: RingElem = false
+
+is_domain_type(x) = is_domain_type(typeof(x))
+is_domain_type(x::Type{<:Ring}) = is_domain_type(elem_type(x))
+is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
 
 ###############################################################################
 #
