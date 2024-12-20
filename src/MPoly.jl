@@ -452,7 +452,7 @@ function content(a::MPolyRingElem{T}) where T <: RingElement
 end
 
 
-function is_nilpotent(f::T) where {T<:MPolyRingElem}
+function is_nilpotent(f::T) where {T <: MPolyRingElem}
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end
