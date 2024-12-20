@@ -432,7 +432,7 @@ function is_unit(f::T) where {T <: MPolyRingElem}
   is_domain_type(T) && return false
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
-  # see ????? for a proof.
+  # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
     if is_zero(expv)
       is_unit(c) || return false
