@@ -38,9 +38,7 @@ zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
 one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
-is_unit(a::Rational) = a != 0
-
-is_nilpotent(a::Rational) = (a == 0)
+is_unit(a::Rational) = !is_zero(a)
 
 is_zero_divisor(a::Rational) = is_zero(a)
 
