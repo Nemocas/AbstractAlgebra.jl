@@ -454,19 +454,6 @@ end
    @test !is_univariate(y^4 + 3x + 1)
 end
 
-@testset "Generic.MPoly.is_unit" begin
-   R, (x,) = polynomial_ring(residue_ring(ZZ, 4)[1], ["x"])
-
-   @test !is_unit(x)
-   @test !is_unit(2*x)
-   try
-      res = is_unit(1 + 2*x)
-      @test res
-   catch e
-      @test e isa NotImplementedError
-   end
-end
-
 
 @testset "Generic.MPoly.multivariate_coeff" begin
    R = ZZ
@@ -1726,4 +1713,128 @@ end
   @test is_zero(gen(S, 1)) && is_one(gen(S, 1))
   @test is_zero(one(S))
   test_Ring_interface_recursive(S)
+end
+
+# -------------------------------------------------------
+
+# Coeff rings needed for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+## MPoly over ZeroRing
+@testset "Nilpotent/unit for ZeroRing[x,y]" begin
+  P,(x,y) = polynomial_ring(ZeroRing, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test is_nilpotent(P(1))
+  @test is_nilpotent(x)
+  @test is_nilpotent(-x)
+  @test is_nilpotent(x+y)
+  @test is_nilpotent(x-y)
+  @test is_nilpotent(x*y)
+
+  @test is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(x+y)
+  @test is_unit(x-y)
+  @test is_unit(x*y)
+end
+
+## MPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x,y]" begin
+  P,(x,y) = polynomial_ring(ZZ, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test !is_unit(x*y)
+end
+
+## MPoly over QQ
+@testset "Nilpotent/unit for QQ[x,y]" begin
+  P,(x,y) = polynomial_ring(QQ, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test !is_unit(x*y)
+end
+
+## MPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x,y]" begin
+  FactorsOf30 = [2, 3, 5, 6, 10, 15]; # non-nilpotent zero-divisors
+  P,(x,y) = polynomial_ring(ZZmod720, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(P(ZeroDiv))
+  end
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(ZeroDiv*x)
+  end
+  @test is_nilpotent(30*x)
+  @test is_nilpotent(30*x+120*y)
+  @test is_nilpotent(30*x-120*y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(x+ZeroDiv)
+  end
+  @test !is_unit(x+30)
+  @test !is_unit(x-30)
+  @test is_unit(1+30*x)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+x*ZeroDiv)
+  end
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+  @test is_unit(1+30*(x+y))
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+ZeroDiv*(x+y))
+  end
+  @test is_unit(7+60*x*y)
+  @test is_unit(7-60*x*y)
 end
