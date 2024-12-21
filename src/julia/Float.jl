@@ -38,7 +38,7 @@ zero(::Floats{T}) where T <: AbstractFloat = T(0)
 
 one(::Floats{T}) where T <: AbstractFloat = T(1)
 
-is_unit(a::AbstractFloat) = a != 0
+is_unit(a::AbstractFloat) = !is_zero(a)
 
 canonical_unit(a::AbstractFloat) = a
 

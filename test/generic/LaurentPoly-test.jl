@@ -232,19 +232,6 @@ end
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
    end
 
-   @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], "x")
-
-      @test is_unit(x)
-      @test !is_unit(2*x)
-      try
-         res = is_unit(3 + 2*x)
-         @test res
-      catch e
-         @test e isa NotImplementedError
-      end
-   end
-
    @testset "coercion" begin
       R, x = polynomial_ring(ZZ, "x")
       L, x1 = laurent_polynomial_ring(ZZ, "x")
@@ -501,4 +488,108 @@ end
       L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
       test_Ring_interface(L)
    end
+end
+
+
+# -------------------------------------------------------
+
+# Coeff rings for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+
+# [2024-12-12  laurent_polynomial_ring currently gives error when coeff ring is zero ring]
+# ## LaurentPoly over ZeroRing
+# @testset "Nilpotent/unit for ZeroRing[x, x^(-1)]" begin
+#   P,x = laurent_polynomial_ring(ZeroRing, "x");
+#   @test is_nilpotent(P(0))
+#   @test is_nilpotent(P(1))
+#   @test is_nilpotent(x)
+#   @test is_nilpotent(-x)
+
+#   @test is_unit(P(0))
+#   @test is_unit(P(1))
+#   @test is_unit(x)
+#   @test is_unit(-x)
+# end
+
+## LaurentPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(ZZ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test !is_unit(2/x)
+  @test !is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## LaurentPoly over QQ
+@testset "Nilpotent/unit for QQ[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(QQ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(2*x)
+  @test is_unit(-2*x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test is_unit(2/x)
+  @test is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## LaurentPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(ZZmod720, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test is_nilpotent(30*x)
+  @test is_nilpotent(30/x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test !is_unit(2*x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test is_unit(x+30)
+  @test is_unit(x-30)
+  @test is_unit(1+30*x)
+  @test is_unit(1-30*x)
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+  @test is_unit(600+7*x+30*x^2)
+  @test is_unit(600-7*x+30*x^2)
 end
