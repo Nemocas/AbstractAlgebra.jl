@@ -43,18 +43,18 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #
 ###############################################################################
 
-number_of_rows(a::Union{Mat, MatRingElem}) = size(a.entries, 1)
+number_of_rows(a::Mat) = size(a.entries, 1)
 
-number_of_columns(a::Union{Mat,MatRingElem}) = size(a.entries, 2)
+number_of_columns(a::Mat) = size(a.entries, 2)
 
-Base.@propagate_inbounds getindex(a::Union{Mat, MatRingElem}, r::Int, c::Int) = a.entries[r, c]
+Base.@propagate_inbounds getindex(a::Mat, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::Union{Mat, MatRingElem}, d::NCRingElement,
+Base.@propagate_inbounds function setindex!(a::Mat, d::NCRingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end
 
-Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
+Base.isassigned(a::Mat, i, j) = isassigned(a.entries, i, j)
 
 ################################################################################
 #
