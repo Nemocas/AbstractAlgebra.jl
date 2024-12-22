@@ -67,14 +67,49 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          end
       end
 
-      @testset "Basic functions" begin
+      @testset "Basic properties" begin
          @test iszero(R())       # R() is supposed to construct 0 ?
          @test iszero(zero(R))
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
-         @test isone(R(0)) || !is_unit(R(0))
+
          @test is_unit(R(1))
+         if is_trivial(R)
+            @test isone(R(0))
+            @test iszero(R(1))
+            @test R(0) == R(1)
+         else
+            @test !is_unit(R(0))
+            for i in 1:reps
+               a = generate_element(R)::T
+               @test is_unit(a) == is_unit(a^2)
+            end
+         end
+
+         # test is_nilpotent if it is supported
+         try
+            f = is_nilpotent(R(1))
+            @test is_nilpotent(R(0))
+            if is_trivial(R)
+               @test is_nilpotent(R(1))
+            else
+               @test !is_unit(R(0))
+               @test !is_nilpotent(R(1))
+               for i in 1:reps
+                  a = generate_element(R)::T
+                  @test !(is_unit(a) && is_nilpotent(a))
+                  @test is_nilpotent(a) == is_nilpotent(a^2)
+                  if is_domain_type(typeof(a))
+                     @test is_nilpotent(a) == is_zero(a)
+                  end
+               end
+            end
+         catch
+         end
+      end
+
+      @testset "hash, deepcopy, equality, printing, parent" begin
          for i in 1:reps
             a = generate_element(R)::T
             @test hash(a) isa UInt
@@ -82,11 +117,13 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             @test !ismutable(a) || a !== A
             @test equality(a, A)
             @test hash(a) == hash(A)
-            @test parent(a) === parent(A)
+            @test parent(a) === R
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
+      end
 
+      @testset "Basic arithmetic" begin
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
