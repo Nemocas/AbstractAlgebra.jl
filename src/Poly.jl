@@ -2148,11 +2148,11 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::PolyRingElem, b::T) where T <: RingElement
+    evaluate(a::PolyRingElem, b)
 
 Evaluate the polynomial expression $a$ at the value $b$ and return the result.
 """
-function evaluate(a::PolyRingElem, b::T) where T <: RingElement
+function evaluate(a::PolyRingElem, b)
    i = length(a)
    R = base_ring(a)
    S = parent(b)
@@ -2160,15 +2160,79 @@ function evaluate(a::PolyRingElem, b::T) where T <: RingElement
       return zero(R) + zero(S)
    end
    if i > 25
-      return subst(a, b)
+      return evaluate_brent_kung(a, b)
+   end
+   return evaluate_horner(a, b)
+end
+
+function evaluate_horner(a::PolyRingElem, b)
+   i = length(a)
+   R = base_ring(a)
+   S = parent(b)
+   if i == 0
+      return zero(R) + zero(S)
    end
    z = coeff(a, i - 1) * one(S)
    while i > 1
       i -= 1
-      z = coeff(a, i - 1) + z*b
-      parent(z) # To work around a bug in julia
+      z = z * b
+      # TODO: change to mul!(z, z, b) once Nemo & Hecke require AA 0.45
+      z = add!(z, z, coeff(a, i - 1))
    end
    return z
+end
+
+# uses the algorithm of "A Practical Univariate Polynomial Composition
+# Algorithm" this is asymptotically faster in the following case: Assume that f
+# has coefficient ring R and a is an element of the R-algebra A. If
+# multiplication A x A -> A is more expensive than R x A -> A, this algorithm is
+# asymptotically faster than `evaluate_horner`.
+
+function evaluate_brent_kung(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
+   S = parent(a)
+   n = degree(f)
+   R = base_ring(f)
+   if n < 0
+      return zero(S) + zero(R)
+   elseif n == 0
+      return coeff(f, 0)*one(S)
+   elseif n == 1
+      return coeff(f, 0)*one(S) + coeff(f, 1)*a
+   end
+   d1 = isqrt(n)
+   d = div(n, d1)
+
+   if (U <: Integer && U != BigInt) ||
+      (U <: Rational && U != Rational{BigInt})
+      c = zero(R)*zero(U)
+      V = typeof(c)
+      if U != V
+         A = powers(map(parent(c), a), d)
+      else
+         A = powers(a, d)
+      end
+   else
+      A = powers(a, d)
+   end
+
+   s = coeff(f, d1*d)*A[1]
+   for j = 1:min(n - d1*d, d - 1)
+      c = coeff(f, d1*d + j)
+      if !iszero(c)
+         s = addmul!(s, c, A[j + 1])
+      end
+   end
+   for i = 1:d1
+      s = mul!(s, s, A[d + 1])
+      s = addmul!(s, coeff(f, (d1 - i)*d), A[1])
+      for j = 1:min(n - (d1 - i)*d, d - 1)
+         c = coeff(f, (d1 - i)*d + j)
+         if !iszero(c)
+            s = addmul!(s, c, A[j + 1])
+         end
+      end
+   end
+   return s
 end
 
 @doc raw"""
@@ -2204,14 +2268,9 @@ function _compose_right(a::PolyRingElem, b::PolyRingElem)
       return zero(R) + zero(S)
    end
    if i*length(b) > 25
-      return subst(a, b)
+      return evaluate_brent_kung(a, b)
    end
-   z = coeff(a, i - 1) * one(S)
-   while i > 1
-      i -= 1
-      z = z*b + coeff(a, i - 1)
-   end
-   return z
+   return evaluate_horner(a, b)
 end
 
 ###############################################################################
@@ -3378,50 +3437,7 @@ Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
 a ring element or not.
 """
 function subst(f::PolyRingElem{T}, a::U) where {T <: RingElement, U}
-   S = parent(a)
-   n = degree(f)
-   R = base_ring(f)
-   if n < 0
-      return zero(S) + zero(R)
-   elseif n == 0
-      return coeff(f, 0)*one(S)
-   elseif n == 1
-      return coeff(f, 0)*one(S) + coeff(f, 1)*a
-   end
-   d1 = isqrt(n)
-   d = div(n, d1)
-
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
-      c = zero(R)*zero(U)
-      V = typeof(c)
-      if U != V
-         A = powers(map(parent(c), a), d)
-      else
-         A = powers(a, d)
-      end
-   else
-      A = powers(a, d)
-   end
-
-   s = coeff(f, d1*d)*A[1]
-   for j = 1:min(n - d1*d, d - 1)
-      c = coeff(f, d1*d + j)
-      if !iszero(c)
-         s += c*A[j + 1]
-      end
-   end
-   for i = 1:d1
-      s *= A[d + 1]
-      s += coeff(f, (d1 - i)*d)*A[1]
-      for j = 1:min(n - (d1 - i)*d, d - 1)
-         c = coeff(f, (d1 - i)*d + j)
-         if !iszero(c)
-            s += c*A[j + 1]
-         end
-      end
-   end
-   return s
+  return evaluate_brent_kung(f, a)
 end
 
 ###############################################################################
