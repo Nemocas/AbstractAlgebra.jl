@@ -161,3 +161,39 @@ end
    @test r1 == r2
    @test S1 == S
 end
+
+@testset "Promotion" begin
+  M = matrix(ZZ, 1, 1, [1])
+  N = matrix(QQ, 1, 1, [2])
+
+  L = @inferred M + N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) + N
+  L = @inferred M - N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) - N
+  L = @inferred M * N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) * N
+  L = @inferred N + M
+  @test base_ring(L) === QQ
+  @test L == N + change_base_ring(QQ, M)
+  L = @inferred N - M
+  @test base_ring(L) === QQ
+  @test L == N - change_base_ring(QQ, M)
+  L = @inferred N * M
+  @test base_ring(L) === QQ
+  @test L == N * change_base_ring(QQ, M)
+
+  @test M * QQ[1;] == QQ[1;]
+  @test M * ZZ[1;] == ZZ[1;]
+  @test N * QQ[1;] == QQ[2;]
+  @test N * ZZ[1;] == QQ[2;]
+  @test QQ[1;] * M == QQ[1;]
+  @test ZZ[1;] * M == ZZ[1;]
+  @test QQ[1;] * N == QQ[2;]
+  @test ZZ[1;] * N == QQ[2;]
+
+  @test M * QQ(1) == QQ(1) * M == QQ.(M)
+  @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
+end
