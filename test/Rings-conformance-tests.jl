@@ -835,7 +835,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
             @test is_term(a)
             @test !is_constant(a)
             @test !is_gen(a)
-            @test is_unit(a) == is_unit(R(2))
+            @test !is_unit(a)
             @test is_nilpotent(a) == is_nilpotent(R(2))
             @test length(a) == 1
             @test total_degree(a) == 1
