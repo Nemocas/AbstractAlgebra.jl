@@ -2316,6 +2316,8 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
          return zero(a)
       end
    elseif length(a) == 1
+      c = coeff(a, 1)^b
+      is_zero(c) && return zero(a)
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
@@ -2324,7 +2326,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
             error("Exponent overflow in powering")
          end
       end
-      return parent(a)([coeff(a, 1)^b], exps)
+      return parent(a)([c], exps)
    elseif b == 0
       return one(a)
    elseif b == 1
