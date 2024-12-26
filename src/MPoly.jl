@@ -426,19 +426,18 @@ end
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
 function is_unit(f::T) where {T <: MPolyRingElem}
-  # for constant polynomials we delegate to the coefficient ring:
-  is_constant(f) && return is_unit(constant_coefficient(f))
-  # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
-  is_domain_type(T) && return false
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
   # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
+  !is_unit(constant_coefficient(f)) && return false
+  # for constant polynomials we are done now
+  is_constant(f) && return true
+  # over a domain, non-constant polynomials are never units
+  is_domain_type(T) && return false
+  # remains to check the non-constant non-zero terms have nilpotent coefficients
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
-    if is_zero(expv)
-      is_unit(c) || return false
-    else
-      is_nilpotent(c) || return false
-    end
+    is_zero(expv) && continue # skip constant term
+    is_nilpotent(c) || return false
   end
   return true
 end
