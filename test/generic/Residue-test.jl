@@ -12,7 +12,7 @@
    test_Ring_interface_recursive(T)
 
    #
-   S, x = polynomial_ring(ZZ, "x")
+   S, x = polynomial_ring(QQ, "x")
    T, = residue_ring(S, x^2 + 1)
    test_Ring_interface_recursive(T)
 
