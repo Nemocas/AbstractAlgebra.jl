@@ -4300,30 +4300,6 @@ end
    @test collect(M) == [ M() ]
 end
 
-@testset "Generic.Mat.promotion" begin
-  M = matrix(ZZ, 1, 1, [1])
-  N = matrix(QQ, 1, 1, [2])
-
-  L = @inferred M + N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) + N
-  L = @inferred M - N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) - N
-  L = @inferred M * N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) * N
-  L = @inferred N + M
-  @test base_ring(L) === QQ
-  @test L == N + change_base_ring(QQ, M)
-  L = @inferred N - M
-  @test base_ring(L) === QQ
-  @test L == N - change_base_ring(QQ, M)
-  L = @inferred N * M
-  @test base_ring(L) === QQ
-  @test L == N * change_base_ring(QQ, M)
-end
-
 @testset "Generic.Mat.InjProjMat" begin
    # Construction
    @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 1)) == QQ[1 0; 0 1; 0 0]

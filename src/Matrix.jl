@@ -1207,6 +1207,8 @@ function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRin
    U = promote_rule_sym(S, T)
    if U === S
       return x, base_ring(x)(y)
+   elseif U === T
+      return change_base_ring(parent(y), x), y
    else
       error("Cannot promote to common type")
    end
