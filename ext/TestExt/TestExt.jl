@@ -4,6 +4,9 @@ using AbstractAlgebra
 isdefined(Base, :get_extension) ? (using Test) : (using ..Test)
 
 
+include("Groups-conformance-tests.jl")
+
+
 function ConformanceTests.test_iterate(F::FinField)
   elts = collect(Iterators.take(F, 20))
   @test elts isa Vector{elem_type(F)}
