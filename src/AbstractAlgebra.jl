@@ -364,11 +364,13 @@ getindex(S::Set, i::Int) = gen(S, i)
 
 include("error.jl")
 
-###############################################################################
+################################################################################
 #
-#   Load Groups/Rings/Fields etc.
+#   Conformance tests (function stubs for TestExt)
 #
-###############################################################################
+################################################################################
+
+include("ConformanceTests.jl")
 
 
 # Generic functions to be defined after all rings

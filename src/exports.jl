@@ -25,6 +25,7 @@ export AbsPowerSeriesRingElem
 export AdditiveGroupElem
 export AllParts
 export AllPerms
+export ConformanceTests
 export ErrorConstrDimMismatch
 export EuclideanRingResidueField
 export EuclideanRingResidueFieldElem
