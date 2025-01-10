@@ -317,9 +317,23 @@ end
 end
 
 @testset "Julia.GFElem.iteration" begin
+  function test_iterate(F::FinField)
+    elts = collect(Iterators.take(F, 20))
+    @test elts isa Vector{elem_type(F)}
+    @test allunique(elts)
+    @test length(elts) == min(order(F), 20)
+    if order(F) < 100
+       elts = collect(F)
+       @test elts isa Vector{elem_type(F)}
+       @test allunique(elts)
+       @test length(elts) == order(F)
+    end
+    return elts
+ end
+
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
-      elts = AbstractAlgebra.test_iterate(R)
+      elts = test_iterate(R)
       @test elts == R.(0:n-1)
    end
 end
