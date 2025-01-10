@@ -719,18 +719,152 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          @test symbols(Rx) isa Vector{Symbol}
          @test length(symbols(Rx)) == 1
          @test is_gen(gen(Rx))
+         @test is_gen(x)
          @test is_monic(x)
+         @test is_trivial(Rx) || !is_gen(x^2)
          for i in 1:reps
             a = test_elem(Rx)
             @test iszero(a) || degree(a) >= 0
             @test equality(a, leading_coefficient(a)*x^max(0, degree(a)) + tail(a))
             @test constant_coefficient(a) isa elem_type(R)
             @test trailing_coefficient(a) isa elem_type(R)
-            @test is_gen(x)
-            @test iszero(one(Rx)) || !is_gen(x^2)
             @test is_monic(a) == isone(leading_coefficient(a))
          end
       end
+   end
+
+   return nothing
+end
+
+
+function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
+
+   # for simplicity, these tests for now assume exactly two generators
+   @assert ngens(Rxy) == 2
+
+   T = elem_type(Rxy)
+
+   @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
+
+      test_Ring_interface(Rxy; reps = reps)
+
+      @testset "Basic functionality" begin
+         @test symbols(Rxy) isa Vector{Symbol}
+         @test length(symbols(Rxy)) == ngens(Rxy)
+         @test length(gens(Rxy)) == ngens(Rxy)
+         @test gens(Rxy) == [gen(Rxy, i) for i in 1:ngens(Rxy)]
+         @test all(is_gen, gens(Rxy)) || is_trivial(Rxy)
+      end
+
+      @testset "Polynomial Constructors" begin
+         for i in 1:reps
+            a = test_elem(Rxy)::T
+            for b in coefficients(a)
+               @assert Rxy(b) isa T
+            end
+
+            # test MPolyBuildCtx
+            B = MPolyBuildCtx(Rxy)
+            for (c, e) in zip(AbstractAlgebra.coefficients(a), AbstractAlgebra.exponent_vectors(a))
+               push_term!(B, c, e)
+            end
+            @test finish(B) == a
+         end
+         x, y = gens(Rxy)
+         f = 13*x^3*y^4 + 2*x - 7
+         #@test Rxy([2,-7,13], [[1,0],[0,0],[3,4]]) == f   # FIXME: interface spec does not say this is required?
+
+         R = base_ring(Rxy)
+         @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
+      end
+
+      # skip trivial rings after this, it is not worth the bother
+      is_trivial(Rxy) && return
+
+      @testset "Element properties" begin
+         R = base_ring(Rxy)
+         x, y = gens(Rxy)
+
+         a = zero(Rxy)
+         @test !is_monomial(a)
+         @test !is_term(a)
+         @test is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test is_nilpotent(a)
+         @test length(a) == 0
+         @test total_degree(a) < 0
+         @test all(is_negative, degrees(a))
+
+         a = one(Rxy)
+         @test is_monomial(a)
+         @test is_term(a)
+         @test is_constant(a)
+         @test !is_gen(a)
+         @test is_unit(a)
+         @test !is_nilpotent(a)
+         @test length(a) == 1
+         @test total_degree(a) == 0
+         @test degrees(a) == [0, 0]
+
+         a = x
+         @test is_monomial(a)
+         @test is_term(a)
+         @test !is_constant(a)
+         @test is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test length(a) == 1
+         @test total_degree(a) == 1
+         @test degrees(a) == [1, 0]
+
+         a = x^2
+         @test is_monomial(a)
+         @test is_term(a)
+         @test !is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test length(a) == 1
+         @test total_degree(a) == 2
+         @test degrees(a) == [2, 0]
+
+         if !is_zero(R(2))
+            a = 2*x
+            @test !is_monomial(a)
+            @test is_term(a)
+            @test !is_constant(a)
+            @test !is_gen(a)
+            @test !is_unit(a)
+            @test is_nilpotent(a) == is_nilpotent(R(2))
+            @test length(a) == 1
+            @test total_degree(a) == 1
+            @test degrees(a) == [1, 0]
+         end
+
+         a = x^3 + y^4
+         @test !is_monomial(a)
+         @test !is_term(a)
+         @test !is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test length(a) == 2
+         @test total_degree(a) == 4
+         @test degrees(a) == [3, 4]
+
+         for i in 1:reps
+            a = test_elem(Rxy)
+            iszero(a) && continue
+            @test length(a) >= 0
+            @test sum(degrees(a)) >= total_degree(a)
+         end
+
+      end
+
+      # TODO: add more tests, covering everything described in the manual, see
+      # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
+      # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
    end
 
    return nothing
@@ -891,8 +1025,10 @@ end
 
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
-   Rx, _ = polynomial_ring(R, "x")
+   Rx, _ = polynomial_ring(R, :x)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   Rxy, _ = polynomial_ring(R, [:x, :y])
+   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
    S = matrix_ring(R, rand(0:3))
    test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
    S = matrix_space(R, rand(0:3), rand(0:3))

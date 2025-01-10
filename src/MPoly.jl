@@ -433,14 +433,16 @@ function is_unit(f::T) where {T <: MPolyRingElem}
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
   # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
+  constant_term_is_unit = false
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
     if is_zero(expv)
       is_unit(c) || return false
+      constant_term_is_unit = true
     else
       is_nilpotent(c) || return false
     end
   end
-  return true
+  return constant_term_is_unit
 end
 
 function content(a::MPolyRingElem{T}) where T <: RingElement
