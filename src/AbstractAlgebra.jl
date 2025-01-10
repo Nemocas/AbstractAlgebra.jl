@@ -462,4 +462,18 @@ end
 ###############################################################################
 include("utils.jl")
 
+###############################################################################
+#
+#   Pre-1.9-compatibility for package extensions
+#
+###############################################################################
+
+# Remove once all supported julia versions support package extensions, i.e. 1.9 or later.
+# Same for all other places that use `isdefined(Base, :get_extension)`.
+@static if !isdefined(Base, :get_extension)
+  function __init__()
+      @require Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40" include("../ext/TestExt/TestExt.jl")
+  end
+end
+
 end # module
