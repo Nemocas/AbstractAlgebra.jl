@@ -63,3 +63,6 @@ import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{V
 @deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
 @deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
+
+# to be deprecated in next breaking release
+test_iterate = ConformanceTests.test_iterate
