@@ -319,7 +319,7 @@ end
 @testset "Julia.GFElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
-      elts = AbstractAlgebra.test_iterate(R)
+      elts = ConformanceTests.test_iterate(R)
       @test elts == R.(0:n-1)
    end
 end
