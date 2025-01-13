@@ -1,8 +1,8 @@
 @testset "Julia.GFElem.conformance_tests" begin
-   test_Field_interface_recursive(GF(3))
-   test_Field_interface_recursive(GF(13))
-   test_Field_interface_recursive(GF(big(13)))
-   test_Field_interface_recursive(GF(big(10)^20 + 39))
+   ConformanceTests.test_Field_interface_recursive(GF(3))
+   ConformanceTests.test_Field_interface_recursive(GF(13))
+   ConformanceTests.test_Field_interface_recursive(GF(big(13)))
+   ConformanceTests.test_Field_interface_recursive(GF(big(10)^20 + 39))
 end
 
 @testset "Julia.GFElem.constructors" begin

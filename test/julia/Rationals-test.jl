@@ -1,5 +1,5 @@
 @testset "Julia.Rationals.conformance_tests" begin
-   test_Field_interface_recursive(QQ)
+   ConformanceTests.test_Field_interface_recursive(QQ)
 end
 
 @testset "Julia.Rationals.constructors" begin

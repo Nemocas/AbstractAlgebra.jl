@@ -22,7 +22,7 @@ end
 
 @testset "Generic.LaurentSeries.conformance" begin
    R, x = laurent_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.LaurentSeries.constructors" begin

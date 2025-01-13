@@ -276,10 +276,10 @@ end
 
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    S, = free_associative_algebra(ZZ, 3)
-   test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface(S)
 
    R, = QQ[:x, :y]
    S, = free_associative_algebra(R, :z => 1:3)
-   test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface(S)
 end
 
