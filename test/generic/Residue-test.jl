@@ -1,20 +1,20 @@
 @testset "EuclideanRingResidueRingElem.conformance_tests" begin
-   test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
-   test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
+   ConformanceTests.test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
+   ConformanceTests.test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
 
    #
    R, = residue_ring(ZZ, 16453889)
-   test_Ring_interface_recursive(R)
+   ConformanceTests.test_Ring_interface_recursive(R)
 
    #
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
-   test_Ring_interface_recursive(T)
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    #
    S, x = polynomial_ring(QQ, "x")
    T, = residue_ring(S, x^2 + 1)
-   test_Ring_interface_recursive(T)
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    @test !occursin("\n", sprint(show, T))
 end
