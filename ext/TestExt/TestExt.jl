@@ -7,7 +7,7 @@ using .ConformanceTests:
   equality,
   equality_up_to_units,
   adhoc_partner_rings,
-  test_elem
+  generate_element
 
 include("Groups-conformance-tests.jl")
 include("Mutating-ops.jl")

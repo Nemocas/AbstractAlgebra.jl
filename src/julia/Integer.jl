@@ -579,12 +579,12 @@ rand(R::Integers, n) = rand(Random.default_rng(), R, n)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::Integers{T}) where {T <: Signed}
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Signed}
   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
   return rand(R, -n:n)
 end
 
-function ConformanceTests.test_elem(R::Integers{T}) where {T <: Unsigned}
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Unsigned}
   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
   return rand(R, 0:n)
 end

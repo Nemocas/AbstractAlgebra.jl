@@ -1,4 +1,4 @@
-# very generic testing: just define ConformanceTests.test_elem(R) to produce elements of R,
+# very generic testing: just define ConformanceTests.generate_element(R) to produce elements of R,
 # then invoke one of these functions, as appropriate:
 # - test_NCRing_interface(R)
 # - test_Ring_interface(R)
@@ -27,7 +27,7 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
          @test elem_type(typeof(R)) == T
          @test parent_type(T) == typeof(R)
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test parent(a) == R
          end
          @test is_domain_type(T) isa Bool
@@ -62,7 +62,7 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
          @test R(BigInt(-2)) isa T
          @test R(BigInt(3)^100) isa T
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test R(a) isa T
          end
       end
@@ -76,7 +76,7 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
          @test isone(R(0)) || !is_unit(R(0))
          @test is_unit(R(1))
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test hash(a) isa UInt
             A = deepcopy(a)
             @test !ismutable(a) || a !== A
@@ -88,9 +88,9 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
          @test sprint(show, "text/plain", R) isa String
 
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
-            c = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
+            c = generate_element(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             C = deepcopy(c)
@@ -125,9 +125,9 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
           s1 = one(S)
           r1 = one(R)
           for i in 1:reps
-            s2 = test_elem(S)
+            s2 = generate_element(S)
             r2 = R(s2)
-            x = test_elem(R)
+            x = generate_element(R)
 
             for (s,r) in ((s0, r0), (s1, r1), (s2, r2))
               @test equality(r, s)
@@ -149,8 +149,8 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
       if !(R isa AbstractAlgebra.Ring)
          @testset "Basic functionality for noncommutative rings only" begin
             for i in 1:reps
-               a = test_elem(R)::T
-               b = test_elem(R)::T
+               a = generate_element(R)::T
+               b = generate_element(R)::T
                A = deepcopy(a)
                B = deepcopy(b)
                # documentation is not clear on divexact
@@ -196,9 +196,9 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
 
       @testset "Unsafe ring operators" begin
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
-            c = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
+            c = generate_element(R)::T
 
             ConformanceTests.test_mutating_op_like_zero(zero, zero!, a)
             ConformanceTests.test_mutating_op_like_zero(one, one!, a)
@@ -234,8 +234,8 @@ function ConformanceTests.test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50
          ConformanceTests.test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
          ConformanceTests.test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             @test a*b == b*a
@@ -295,7 +295,7 @@ function ConformanceTests.test_Field_interface(R::AbstractAlgebra.Field; reps = 
       @test iszero(one(R) * characteristic(R))
 
       for i in 1:reps
-         a = test_elem(R)::T
+         a = generate_element(R)::T
          A = deepcopy(a)
          @test is_unit(a) == !iszero(a)
          if !is_zero(a)
@@ -319,9 +319,9 @@ function ConformanceTests.test_EuclideanRing_interface(R::AbstractAlgebra.Ring; 
    @testset "Euclidean Ring interface for $(R) of type $(typeof(R))" begin
 
       for i in 1:reps
-         f = test_elem(R)::T
-         g = test_elem(R)::T
-         m = test_elem(R)::T
+         f = generate_element(R)::T
+         g = generate_element(R)::T
+         m = generate_element(R)::T
          if iszero(m)
             m = one(R)
          end
@@ -411,7 +411,7 @@ function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps
 
       @testset "Polynomial Constructors" begin
          for i in 1:reps
-            a = test_elem(Rx)::T
+            a = generate_element(Rx)::T
             for b in coefficients(a)
                @assert Rx(b) isa T
             end
@@ -433,10 +433,10 @@ function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps
          ConformanceTests.test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
          @testset "Half-GCD" begin
             for i in 1:reps
-               a = test_elem(Rx)
-               b = test_elem(Rx)
+               a = generate_element(Rx)
+               b = generate_element(Rx)
                for j in 1:8
-                  q = test_elem(Rx)
+                  q = generate_element(Rx)
                   a, b = q*a + b, a
                end
                g, s, t = gcdx(a, b)
@@ -466,7 +466,7 @@ function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps
          @test is_monic(x)
          @test is_trivial(Rx) || !is_gen(x^2)
          for i in 1:reps
-            a = test_elem(Rx)
+            a = generate_element(Rx)
             @test iszero(a) || degree(a) >= 0
             @test equality(a, leading_coefficient(a)*x^max(0, degree(a)) + tail(a))
             @test constant_coefficient(a) isa elem_type(R)
@@ -501,7 +501,7 @@ function ConformanceTests.test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; r
 
       @testset "Polynomial Constructors" begin
          for i in 1:reps
-            a = test_elem(Rxy)::T
+            a = generate_element(Rxy)::T
             for b in coefficients(a)
                @assert Rxy(b) isa T
             end
@@ -597,7 +597,7 @@ function ConformanceTests.test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; r
          @test degrees(a) == [3, 4]
 
          for i in 1:reps
-            a = test_elem(Rxy)
+            a = generate_element(Rxy)
             iszero(a) && continue
             @test length(a) >= 0
             @test sum(degrees(a)) >= total_degree(a)
@@ -628,7 +628,7 @@ function ConformanceTests.test_MatSpace_interface(S::MatSpace; reps = 20)
 
       @testset "Constructors" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             @test nrows(a) == nrows(S)
             @test ncols(a) == ncols(S)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
@@ -672,7 +672,7 @@ function ConformanceTests.test_MatSpace_interface(S::MatSpace; reps = 20)
 
       @testset "Basic manipulation of matrices" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             A = deepcopy(a)
             @test A isa ST
 
@@ -728,7 +728,7 @@ function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Constructors" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             @test nrows(a) == nrows(S)
             @test ncols(a) == ncols(S)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
@@ -738,7 +738,7 @@ function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Basic manipulation of matrices" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             A = deepcopy(a)
             b = zero(S)
             for i in 1:nrows(a), j in 1:ncols(a)
@@ -752,8 +752,8 @@ function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Determinant" begin
          for k in 1:reps
-            a = test_elem(S)::ST
-            b = test_elem(S)::ST
+            a = generate_element(S)::ST
+            b = generate_element(S)::ST
             A = deepcopy(a)
             B = deepcopy(b)
             @test det(a*b) == det(a)*det(b)

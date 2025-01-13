@@ -152,7 +152,7 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::LaurentMPolyRing{BigInt})
+function ConformanceTests.generate_element(R::LaurentMPolyRing{BigInt})
   n = rand(1:10)
   # R: length between 1 and 9
   # R: exponents between -n and n
@@ -160,7 +160,7 @@ function ConformanceTests.test_elem(R::LaurentMPolyRing{BigInt})
   rand(R, 1:9, -n:n, -99:99)
 end
 
-function ConformanceTests.test_elem(R::LaurentMPolyRing{<:ResElem{BigInt}})
+function ConformanceTests.generate_element(R::LaurentMPolyRing{<:ResElem{BigInt}})
   n = rand(1:5)
   # R: length between 1 and 9
   # R: exponents between -n and n

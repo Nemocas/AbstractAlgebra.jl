@@ -1788,7 +1788,7 @@ rand(S::LaurentSeriesRingOrField, val_range, v...) =
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::LaurentSeriesRing{BigInt})
+function ConformanceTests.generate_element(R::LaurentSeriesRing{BigInt})
   rand(R, 0:12, -10:10)
 end
 

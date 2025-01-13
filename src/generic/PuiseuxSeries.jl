@@ -735,7 +735,7 @@ rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::PuiseuxSeriesRing{BigInt})
+function ConformanceTests.generate_element(R::PuiseuxSeriesRing{BigInt})
   rand(R, -12:12, 1:6, -10:10)
 end
 

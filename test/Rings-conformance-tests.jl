@@ -7,7 +7,7 @@
 # load TestExt
 using Test
 
-import .ConformanceTests: test_elem as test_elem
+import .ConformanceTests: generate_element as test_elem
 import .ConformanceTests: adhoc_partner_rings as adhoc_partner_rings
 import .ConformanceTests: equality as equality
 
