@@ -1231,7 +1231,7 @@ rand(K::FunctionField, v...) = rand(Random.default_rng(), K, v...)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::FunctionField{Rational{BigInt}})
+function ConformanceTests.generate_element(R::FunctionField{Rational{BigInt}})
   rand(R, 1:10, -10:10)
 end
 

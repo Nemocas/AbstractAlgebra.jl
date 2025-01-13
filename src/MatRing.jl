@@ -411,9 +411,9 @@ randmat_with_rank(S::MatRing{T}, rank::Int, v...) where {T <: RingElement} =
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(S::MatRing)
+function ConformanceTests.generate_element(S::MatRing)
   R = base_ring(S)
-  return S(elem_type(R)[ConformanceTests.test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
+  return S(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:nrows(S), j in 1:ncols(S)])
 end
 
 ###############################################################################

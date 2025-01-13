@@ -694,7 +694,7 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(FF::Generic.FactoredFracField{BigInt})
+function ConformanceTests.generate_element(FF::Generic.FactoredFracField{BigInt})
   limit = 10
   t = one(FF)
   for i in 1:abs(rand(Int)%limit)

@@ -663,7 +663,7 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::Generic.AbsMSeriesRing{BigInt})
+function ConformanceTests.generate_element(R::Generic.AbsMSeriesRing{BigInt})
   rand(R, 0:12, -10:10)
 end
 

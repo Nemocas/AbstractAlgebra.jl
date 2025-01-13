@@ -228,10 +228,10 @@ rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::Rationals)
+function ConformanceTests.generate_element(R::Rationals)
   B = base_ring(R)
-  n = ConformanceTests.test_elem(B)
-  d = ConformanceTests.test_elem(B)
+  n = ConformanceTests.generate_element(B)
+  d = ConformanceTests.generate_element(B)
   return is_zero(d) ? R(n) : R(n, d)
 end
 

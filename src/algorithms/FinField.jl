@@ -74,6 +74,6 @@ Base.eltype(::Type{F}) where {F<:FinField} = elem_type(F)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::FinField)
+function ConformanceTests.generate_element(R::FinField)
   return rand(R)
 end

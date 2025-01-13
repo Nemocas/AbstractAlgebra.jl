@@ -153,6 +153,6 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::EuclideanRingResidueRing)
-  return R(ConformanceTests.test_elem(base_ring(R)))
+function ConformanceTests.generate_element(R::EuclideanRingResidueRing)
+  return R(ConformanceTests.generate_element(base_ring(R)))
 end

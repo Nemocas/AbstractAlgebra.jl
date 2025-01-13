@@ -3410,9 +3410,9 @@ rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(Rx::PolyRing)
+function ConformanceTests.generate_element(Rx::PolyRing)
   R = base_ring(Rx)
-  return Rx(elem_type(R)[ConformanceTests.test_elem(R) for i in 1:rand(0:6)])
+  return Rx(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:rand(0:6)])
 end
 
 ###############################################################################

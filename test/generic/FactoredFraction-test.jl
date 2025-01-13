@@ -70,7 +70,7 @@ end
     test_reps = 20
 
     for i in 1:test_reps
-        a = ConformanceTests.test_elem(FF)
+        a = ConformanceTests.generate_element(FF)
         b = a - FF(1)
         if isone(a)
             @test iszero(b)
@@ -83,8 +83,8 @@ end
     end
 
     for i in 1:test_reps
-        a = ConformanceTests.test_elem(FF)
-        b = ConformanceTests.test_elem(FF)
+        a = ConformanceTests.generate_element(FF)
+        b = ConformanceTests.generate_element(FF)
         c = a*b
         if iszero(b)
             d = c
@@ -104,8 +104,8 @@ end
     end
 
     for i in 1:test_reps
-        a = ConformanceTests.test_elem(FF)
-        b = ConformanceTests.test_elem(FF)
+        a = ConformanceTests.generate_element(FF)
+        b = ConformanceTests.generate_element(FF)
         c = a + b
         d = c - b
         @test d == a

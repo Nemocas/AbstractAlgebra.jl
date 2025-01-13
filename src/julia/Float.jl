@@ -196,7 +196,7 @@ rand(R::Floats, n) = rand(Random.default_rng(), R, n)
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::Floats{T}) where T
+function ConformanceTests.generate_element(R::Floats{T}) where T
   return rand(T)*rand(-100:100)
 end
 

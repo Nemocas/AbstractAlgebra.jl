@@ -1006,7 +1006,7 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::UniversalPolyRing{EuclideanRingResidueRingElem{BigInt}})
+function ConformanceTests.generate_element(R::UniversalPolyRing{EuclideanRingResidueRingElem{BigInt}})
   return rand(R, 0:4, 0:10, -10:10)
 end
 
