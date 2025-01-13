@@ -1,14 +1,3 @@
-function test_elem(FF::Generic.FactoredFracField{BigInt})
-    limit = 10
-    t = one(FF)
-    for i in 1:abs(rand(Int)%limit)
-        s = FF(rand(Int)%(20*limit))
-        e = rand(Int)%limit
-        t *= iszero(s) ? s^abs(e) : s^e
-    end
-    return t
-end
-
 @testset "Generic.FactoredFracFieldElem.ZZ.conformance" begin
     FF = FactoredFractionField(ZZ)
     ConformanceTests.test_Field_interface(FF)
@@ -81,7 +70,7 @@ end
     test_reps = 20
 
     for i in 1:test_reps
-        a = test_elem(FF)
+        a = ConformanceTests.test_elem(FF)
         b = a - FF(1)
         if isone(a)
             @test iszero(b)
@@ -94,8 +83,8 @@ end
     end
 
     for i in 1:test_reps
-        a = test_elem(FF)
-        b = test_elem(FF)
+        a = ConformanceTests.test_elem(FF)
+        b = ConformanceTests.test_elem(FF)
         c = a*b
         if iszero(b)
             d = c
@@ -115,8 +104,8 @@ end
     end
 
     for i in 1:test_reps
-        a = test_elem(FF)
-        b = test_elem(FF)
+        a = ConformanceTests.test_elem(FF)
+        b = ConformanceTests.test_elem(FF)
         c = a + b
         d = c - b
         @test d == a

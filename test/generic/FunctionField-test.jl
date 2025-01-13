@@ -12,10 +12,6 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
      (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
 
 # FIXME/TODO: conformance tests run into infinite loop???
-#function test_elem(R::AbstractAlgebra.Generic.FunctionField{Rational{BigInt}})
-#   rand(R, 1:10, -10:10)
-#end
-#
 #@testset "Generic.FunctionField.conformance" begin
 #   S, y = function_field(P1[4], "y")
 #   ConformanceTests.test_Ring_interface(S)

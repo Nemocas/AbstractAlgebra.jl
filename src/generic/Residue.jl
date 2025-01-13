@@ -146,3 +146,13 @@ function add!(c::T, a::T, b::T) where {T <: EuclideanRingResidueRingElem}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
 end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::EuclideanRingResidueRing)
+  return R(ConformanceTests.test_elem(base_ring(R)))
+end

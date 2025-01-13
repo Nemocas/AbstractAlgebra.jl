@@ -67,3 +67,13 @@ end
 
 Base.length(f::FinField) = BigInt(order(f))
 Base.eltype(::Type{F}) where {F<:FinField} = elem_type(F)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::FinField)
+  return rand(R)
+end

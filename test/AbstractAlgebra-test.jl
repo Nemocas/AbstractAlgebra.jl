@@ -1,5 +1,3 @@
-include("Rings-conformance-tests.jl")
-
 include("error-test.jl")
 include("AliasMacro-test.jl")
 include("Attributes-test.jl")

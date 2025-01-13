@@ -200,6 +200,15 @@ using .PrettyPrinting
 
 import .PrettyPrinting: expressify
 
+
+################################################################################
+#
+#   Conformance tests (function stubs for TestExt)
+#
+################################################################################
+
+include("ConformanceTests.jl")
+
 ###############################################################################
 #
 #   Generic algorithms defined on abstract types
@@ -363,14 +372,6 @@ getindex(S::Set, i::Int) = gen(S, i)
 ###############################################################################
 
 include("error.jl")
-
-################################################################################
-#
-#   Conformance tests (function stubs for TestExt)
-#
-################################################################################
-
-include("ConformanceTests.jl")
 
 
 # Generic functions to be defined after all rings

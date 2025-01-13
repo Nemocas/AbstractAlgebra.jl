@@ -261,6 +261,25 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(S::FreeAssociativeAlgebra)
+  f = S()
+  g = gens(S)
+  R = base_ring(S)
+  isempty(g) && return S(ConformanceTests.test_elem(R))
+  len_bound = 8
+  exp_bound = 6
+  for i in 1:rand(0:len_bound)
+     f += ConformanceTests.test_elem(R) * prod(rand(g) for _ in 1:rand(0:exp_bound); init = S(1))
+  end
+  return f
+end
+
+###############################################################################
+#
 #   free_associative_algebra constructor
 #
 ###############################################################################
