@@ -443,7 +443,7 @@ rand(S::LaurentPolyWrapRing, degrees_range, v...) =
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(R::Generic.LaurentPolyWrapRing)
+function ConformanceTests.pseudo_random_element(R::Generic.LaurentPolyWrapRing)
    n = rand(0:10)
    if n == 0
       return zero(R)

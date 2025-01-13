@@ -1410,14 +1410,14 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.test_elem(Rx::MPolyRing)
+function ConformanceTests.pseudo_random_element(Rx::MPolyRing)
   R = base_ring(Rx)
   num_gens = ngens(Rx)
-  iszero(num_gens) && return Rx(ConformanceTests.test_elem(R))
+  iszero(num_gens) && return Rx(ConformanceTests.pseudo_random_element(R))
   len_bound = 8
   exp_bound = rand(1:5)
   len = rand(0:len_bound)
-  coeffs = [ConformanceTests.test_elem(R) for _ in 1:len]
+  coeffs = [ConformanceTests.pseudo_random_element(R) for _ in 1:len]
   exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
   return Rx(coeffs, exps)
 end
