@@ -16,11 +16,11 @@ end
 
 @testset "Generic.LaurentMPoly.conformance" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
-    test_Ring_interface(L)
-    test_Ring_interface_recursive(L)
+    ConformanceTests.test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface_recursive(L)
 
     L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], ["x", "y"])
-    test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface(L)
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin

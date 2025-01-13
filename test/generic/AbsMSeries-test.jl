@@ -4,7 +4,7 @@ end
 
 @testset "Generic.AbsMSeries.conformance" begin
    R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.AbsMSeries.constructors" begin

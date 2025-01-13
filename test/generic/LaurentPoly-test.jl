@@ -481,12 +481,12 @@ end
 
    @testset "conformance" begin
       L, y = laurent_polynomial_ring(QQ, "y")
-      test_Ring_interface(L)
-      test_EuclideanRing_interface(L)
-      test_Ring_interface_recursive(L)
+      ConformanceTests.test_Ring_interface(L)
+      ConformanceTests.test_EuclideanRing_interface(L)
+      ConformanceTests.test_Ring_interface_recursive(L)
 
       L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
-      test_Ring_interface(L)
+      ConformanceTests.test_Ring_interface(L)
    end
 end
 

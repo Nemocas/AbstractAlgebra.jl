@@ -3,8 +3,15 @@ module TestExt
 using AbstractAlgebra
 isdefined(Base, :get_extension) ? (using Test) : (using ..Test)
 
+using .ConformanceTests:
+  equality,
+  equality_up_to_units,
+  adhoc_partner_rings,
+  test_elem
 
 include("Groups-conformance-tests.jl")
+include("Mutating-ops.jl")
+include("Rings-conformance-tests.jl")
 
 
 function ConformanceTests.test_iterate(F::FinField)

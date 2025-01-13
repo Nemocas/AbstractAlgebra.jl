@@ -22,7 +22,7 @@ end
 
 @testset "Generic.PuiseuxSeries.conformance" begin
    R, x = puiseux_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.PuiseuxSeries.constructors" begin

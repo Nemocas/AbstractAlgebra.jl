@@ -134,7 +134,7 @@ end
 @testset "Generic.UnivPoly.conformance" begin
    S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1])
    gen(S, "x")
-   test_Ring_interface(S)
+   ConformanceTests.test_Ring_interface(S)
 end
 
 @testset "Generic.UnivPoly.printing" begin

@@ -18,7 +18,7 @@
 
 @testset "Generic.AbsSeries.conformance" begin
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.AbsSeries.types" begin

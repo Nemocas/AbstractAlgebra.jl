@@ -18,7 +18,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 #
 #@testset "Generic.FunctionField.conformance" begin
 #   S, y = function_field(P1[4], "y")
-#   test_Ring_interface(S)
+#   ConformanceTests.test_Ring_interface(S)
 #end
 
 @testset "Generic.FunctionField.constructors" begin 

@@ -11,7 +11,7 @@ end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.conformance" begin
     FF = FactoredFractionField(ZZ)
-    test_Field_interface(FF)
+    ConformanceTests.test_Field_interface(FF)
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.adhoc" begin
