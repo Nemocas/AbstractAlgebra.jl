@@ -407,6 +407,17 @@ randmat_with_rank(S::MatRing{T}, rank::Int, v...) where {T <: RingElement} =
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(S::MatRing)
+  R = base_ring(S)
+  return S(elem_type(R)[ConformanceTests.test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
+
+###############################################################################
+#
 #   Identity matrix
 #
 ###############################################################################

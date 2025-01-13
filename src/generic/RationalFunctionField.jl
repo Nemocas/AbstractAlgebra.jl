@@ -523,6 +523,16 @@ rand(S::RationalFunctionField, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::RationalFunctionField{Rational{BigInt}})
+  rand(R, 0:3, -3:3)
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################

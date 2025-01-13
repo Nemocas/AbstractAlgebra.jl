@@ -3,16 +3,6 @@ using AbstractAlgebra: terms_degrees, LaurentPolyRingElem
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
                                trail_degree, lead_degree
 
-function test_elem(R::LaurentPolyWrapRing)
-   n = rand(0:10)
-   if n == 0
-      return zero(R)
-   else
-      m = rand(0:5)
-      rand(R, -m:n-m, -99:99)
-   end
-end
-
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
       L0, y0 = laurent_polynomial_ring(zz, "y0")

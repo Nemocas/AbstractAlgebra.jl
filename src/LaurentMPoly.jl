@@ -148,6 +148,28 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::LaurentMPolyRing{BigInt})
+  n = rand(1:10)
+  # R: length between 1 and 9
+  # R: exponents between -n and n
+  # ZZ: coeffs between -99 and 99
+  rand(R, 1:9, -n:n, -99:99)
+end
+
+function ConformanceTests.test_elem(R::LaurentMPolyRing{<:ResElem{BigInt}})
+  n = rand(1:5)
+  # R: length between 1 and 9
+  # R: exponents between -n and n
+  # ZZ/6ZZ: coeffs between ??? <- TODO
+  rand(R, 1:4, -n:n, 1:10)
+end
+
+###############################################################################
+#
 #   laurent_polynomial_ring constructor
 #
 ###############################################################################

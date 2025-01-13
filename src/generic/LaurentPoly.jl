@@ -437,6 +437,21 @@ rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
 rand(S::LaurentPolyWrapRing, degrees_range, v...) =
    rand(Random.default_rng(), S, degrees_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::Generic.LaurentPolyWrapRing)
+   n = rand(0:10)
+   if n == 0
+      return zero(R)
+   else
+      m = rand(0:5)
+      rand(R, -m:n-m, -99:99)
+   end
+end
 
 ###############################################################################
 #

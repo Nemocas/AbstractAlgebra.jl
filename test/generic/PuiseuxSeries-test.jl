@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.PuiseuxSeriesRing{BigInt})
-   rand(R, -12:12, 1:6, -10:10)
-end
+
 
 @testset "Generic.PuiseuxSeries.conformance" begin
    R, x = puiseux_series_ring(ZZ, 10, "x")

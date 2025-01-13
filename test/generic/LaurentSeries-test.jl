@@ -16,10 +16,6 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.LaurentSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.LaurentSeries.conformance" begin
    R, x = laurent_series_ring(ZZ, 10, "x")
    ConformanceTests.test_Ring_interface(R)

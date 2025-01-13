@@ -729,6 +729,15 @@ rand(rng::AbstractRNG, S::PuiseuxSeriesRingOrField, val_range::AbstractUnitRange
 rand(S::PuiseuxSeriesRingOrField, val_range, scale_range, v...) =
    rand(Random.default_rng(), S, val_range, scale_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.test_elem(R::PuiseuxSeriesRing{BigInt})
+  rand(R, -12:12, 1:6, -10:10)
+end
 
 ###############################################################################
 #
