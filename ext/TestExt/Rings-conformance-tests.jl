@@ -1,4 +1,4 @@
-# very generic testing: just define test_elem(R) to produce elements of R,
+# very generic testing: just define ConformanceTests.test_elem(R) to produce elements of R,
 # then invoke one of these functions, as appropriate:
 # - test_NCRing_interface(R)
 # - test_Ring_interface(R)
