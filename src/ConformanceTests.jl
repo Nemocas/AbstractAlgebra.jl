@@ -26,8 +26,14 @@ const default_adhoc_partner_rings = [
 
 adhoc_partner_rings(R::NCRing) = default_adhoc_partner_rings
 
-# To be implemented in the src files of the respective types.
-# This function is used to generate a pseudo-random element in the Ring conformance tests.
+"""
+    generate_element(::AbstractAlgebra.NCRing)
+
+Generates some random, representative element of the given set for use
+in the conformance tests.
+
+It is supposed to be implemented in the src file of the respective type.
+"""
 function generate_element end
 
 
