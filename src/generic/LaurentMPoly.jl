@@ -126,13 +126,17 @@ function is_unit(f::T) where {T <: LaurentMPolyRingElem}
   return unit_seen
 end
 
+ConformanceTests._implements(::Type{LaurentMPolyRingElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
 
 function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
   return is_nilpotent(f.mpoly);
 end
 
+ConformanceTests._implements(::Type{LaurentMPolyRingElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
 
 is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
+
+ConformanceTests._implements(::Type{LaurentMPolyRingElem{T}}, ::typeof(is_zero_divisor)) where T = _implements(T, is_zero_divisor)
 
 function is_zero_divisor_with_annihilator(p::LaurentMPolyWrap)
    f, b = is_zero_divisor_with_annihilator(p.mpoly)
