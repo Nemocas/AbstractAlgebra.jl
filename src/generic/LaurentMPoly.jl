@@ -130,6 +130,10 @@ function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
   return is_nilpotent(f.mpoly);
 end
 
+_implements(::Type{LaurentMPolyRingElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
+
+_implements(::Type{LaurentMPolyRingElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
+
 
 is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
 
