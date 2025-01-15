@@ -324,6 +324,10 @@ julia> myattr(obj) # second time uses the cached result
 ```
 """
 macro attr(rettype, expr::Expr)
+   return _attr_impl(__module__, __source__, expr, rettype)
+end
+
+function _attr_impl(__module__, __source__, expr::Expr, rettype)
    d = MacroTools.splitdef(expr)
    length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
    length(d[:kwargs]) == 0 || throw(ArgumentError("Keyword arguments are not supported"))
