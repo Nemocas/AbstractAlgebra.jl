@@ -439,3 +439,45 @@ function _number_of_direct_product_factors end
 Return the homomorphism from the domain `D` into the codomain `C` defined by the data.
 """
 function hom end
+
+###############################################################################
+#
+#
+#
+###############################################################################
+
+# Calling `_implements(T, f)` checks whether a "sensible" method for the unary
+# function `f` is implemented for inputs of type `T`. The argument order is
+# meant to be similar to e.g. `isa`, and thus indicates `T implements f`.
+#
+# For example, `_implements(MyRingElem, is_unit)` should return true if
+# invoking `is_unit` on elements of type `MyRingElem` is supported.
+#
+# The generic fallback uses `hasmethod`. However, this may return `true` in
+# cases where it shouldn't, as we often provide generic methods for that rely
+# on other methods being implemented -- either for the same type, or for types
+# derived from it. For example the `is_nilpotent(::PolyElem{T})` method needs
+# `is_nilpotent(::T)` in order to work.
+#
+# To reflect this, additional `_implements` methods need to be provided.
+# We currently do this for at least the following functions:
+# - factor
+# - is_irreducible
+# - is_nilpotent
+# - is_squarefree
+# - is_unit
+# - is_zero_divisor
+#
+_implements(::Type{T}, f::Any) where {T} = hasmethod(f, Tuple{T})
+
+# helper for `_implements` which checks if `f` has a method explicitly for
+# a concrete type `T` (i.e. not a generic method that can be specialized to `T`
+# but really one that is implement for `T` and `T` only).
+function _implements_directly(::Type{T}, f::Any) where {T}
+  isconcretetype(T) || return false  # TODO: drop this?
+  meth = methods(f, Tuple{T})
+  # TODO: deal with type parameters: if `T` is `FreeAssociativeAlgebraElem{ZZRingElem}`
+  # and `f` has a method for `FreeAssociativeAlgebraElem` then we should still consider
+  # this a match.
+  return any(m -> m.sig == Tuple{typeof(f), T}, meth)
+end
