@@ -1185,10 +1185,10 @@ end
 Return the coefficients of p, which is assumed to be univariate,
 as an array in ascending order.
 """
-function coefficients_of_univariate(p::MPolyRingElem,
-                                    check_univariate::Bool=true)
-
-   coeffs = Vector{elem_type(coefficient_ring(p))}(undef, 0)
+function coefficients_of_univariate(p::MPolyRingElem{T},
+                                    check_univariate::Bool=true) where T
+   R = coefficient_ring(p)
+   coeffs = Vector{T}(undef, 0)
    var_index = -1
    for (c, v) in zip(coefficients(p), exponent_vectors(p))
       e = 0
@@ -1205,7 +1205,7 @@ function coefficients_of_univariate(p::MPolyRingElem,
       end
 
       while length(coeffs) <= e
-         push!(coeffs, zero(coefficient_ring(p)))
+         push!(coeffs, zero(R))
       end
       coeffs[1 + e] = c
 

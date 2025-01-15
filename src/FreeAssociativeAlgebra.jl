@@ -126,7 +126,7 @@ end
 function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
    if is_constant(a)
       return is_unit(leading_coefficient(a))
-   elseif is_domain_type(elem_type(coefficient_ring(a)))
+   elseif is_domain_type(T)
       return false
    elseif length(a) == 1
       return false

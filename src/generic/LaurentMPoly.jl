@@ -546,8 +546,7 @@ mutable struct LaurentMPolyBuildCtx{T, S}
     parent::S
 end
 
-function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing)
-    T = elem_type(coefficient_ring(R))
+function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing{T}) where T
     return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 
