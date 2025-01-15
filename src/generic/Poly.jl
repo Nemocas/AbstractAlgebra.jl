@@ -327,8 +327,7 @@ mutable struct PolyBuildCtx{T, S}
 end
 
 # TODO the MPolyBuildCtx function should be renamed BuildCtx
-function MPolyBuildCtx(R::AbstractAlgebra.PolyRing)
-   T = elem_type(coefficient_ring(R))
+function MPolyBuildCtx(R::AbstractAlgebra.PolyRing{T}) where T
    S = typeof(R)
    return PolyBuildCtx{T, S}(T[], R)
 end
