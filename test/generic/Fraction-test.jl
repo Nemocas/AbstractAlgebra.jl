@@ -397,6 +397,7 @@ end
    f = factor(a)
    @test length(f) == 0
    @test unit(f) == a
+   @test f[2] == 0
    @test_throws ArgumentError factor(zero(F))
 
    F = QQ
@@ -404,5 +405,6 @@ end
    f = factor(a)
    @test length(f) == 0
    @test unit(f) == a
+   @test f[2] == 0
    @test_throws ArgumentError factor(zero(F))
 end

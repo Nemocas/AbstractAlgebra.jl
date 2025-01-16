@@ -79,16 +79,9 @@ end
     getindex(a::Fac, b) -> Int
 
 If $b$ is a factor of $a$, the corresponding exponent is returned. Otherwise
-an error is thrown.
+return zero.
 """
-function getindex(a::Fac{T}, b) where {T}
-  b = convert(T, b)
-  if haskey(a.fac, b)
-    return a.fac[b]
-  else
-    error("$b is not a factor of $a")
-  end
-end
+getindex(a::Fac, b) = get(a.fac, b, 0)
 
 @doc raw"""
     setindex!(a::Fac{T}, c::Int, b::T)
