@@ -275,6 +275,7 @@ end
 
 """
     @attr RetType funcdef
+    @attr RetType ignore_kwargs=[...] funcdef
 
 This macro is applied to the definition of a unary function, and enables
 caching ("memoization") of its return values based on the argument. This
@@ -282,6 +283,10 @@ assumes the argument supports attribute storing (see [`@attributes`](@ref))
 via [`get_attribute!`](@ref).
 
 The name of the function is used as name for the underlying attribute.
+
+In case that `funcdef` has keyword arguments that are not relevant for
+attribute caching (e.g. `check::Bool=true`), these can be ignored by
+putting them in the `ignore_kwargs` list.
 
 Effectively, this turns code like this:
 ```julia
@@ -324,9 +329,22 @@ julia> myattr(obj) # second time uses the cached result
 ```
 """
 macro attr(rettype, expr::Expr)
+   return _attr_impl(__module__, __source__, expr, rettype, Symbol[])
+end
+
+macro attr(rettype, options, expr::Expr)
+   @assert options.head == :(=)
+   @assert length(options.args) == 2
+   @assert options.args[1] == :ignore_kwargs
+   @assert options.args[2].head == :vect
+   ignore_kwargs = Vector{Symbol}(options.args[2].args)
+   return _attr_impl(__module__, __source__, expr, rettype, ignore_kwargs)
+end
+
+function _attr_impl(__module__, __source__, expr::Expr, rettype, ignore_kwargs::Vector{Symbol})
    d = MacroTools.splitdef(expr)
    length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
-   length(d[:kwargs]) == 0 || throw(ArgumentError("Keyword arguments are not supported"))
+   length(setdiff(first.(MacroTools.splitarg.(d[:kwargs])), ignore_kwargs)) == 0 || throw(ArgumentError("non-ignored keyword arguments are not supported"))
 
    # store the original function name
    name = d[:name]
@@ -343,7 +361,7 @@ macro attr(rettype, expr::Expr)
    wrapper_def = copy(d)
    wrapper_def[:name] = name
    wrapper_def[:body] = quote
-      return get_attribute!(() -> $(compute_name)($argname), $(argname), Symbol($(string(name))))::$(rettype)
+      return get_attribute!(() -> $(compute_name)($argname; $(first.(MacroTools.splitarg.(d[:kwargs]))...)), $(argname), Symbol($(string(name))))::$(rettype)
    end
    # insert the correct line number, so that `functionloc(name)` works correctly
    wrapper_def[:body].args[1] = __source__
