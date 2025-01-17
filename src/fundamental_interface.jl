@@ -470,6 +470,20 @@ function hom end
 #
 _implements(::Type{T}, f::Any) where {T} = hasmethod(f, Tuple{T})
 
+# Alternatively, the first argument can be a concrete object. By default we
+# then redispatch to the type based version. But one may also choose to
+# implement custom methods for this: certain operations will only work for
+# *some* instances. E.g. for `Z/nZ` it may happen that for `n` a prime we can
+# perform a certain operation, but not if `n` is composite.
+#
+# In that case the recommendation is that `_implements` invoked on the type
+# returns `false`, but invoked on a concrete instance of a type, it may use
+# specifics of the instance to also return `true` if appropriate.
+function _implements(x::T, f::Any) where {T}
+  @assert !(x isa Type) # paranoia
+  return _implements(T, f)
+end
+
 # helper for `_implements` which checks if `f` has a method explicitly for
 # a concrete type `T` (i.e. not a generic method that can be specialized to `T`
 # but really one that is implement for `T` and `T` only).
