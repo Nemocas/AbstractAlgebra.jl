@@ -426,7 +426,7 @@ function is_zero_divisor(a::T) where T <: RingElement
    if !is_domain_type(T)
       throw(NotImplementedError(:is_zero_divisor, a))
    end
-   return is_zero(a) && !is_zero(one(parent(a)))
+   return is_zero(a) && !is_trivial(parent(a))
 end
 
 @doc raw"""
