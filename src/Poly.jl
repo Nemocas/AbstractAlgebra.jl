@@ -2219,16 +2219,20 @@ function evaluate_brent_kung(f::PolyRingElem{T}, a::U) where {T <: RingElement, 
    for j = 1:min(n - d1*d, d - 1)
       c = coeff(f, d1*d + j)
       if !iszero(c)
-         s = addmul!(s, c, A[j + 1])
+         s = s + c * A[j + 1]
+         # s = addmul!(s, c, A[j + 1])
       end
    end
    for i = 1:d1
-      s = mul!(s, s, A[d + 1])
-      s = addmul!(s, coeff(f, (d1 - i)*d), A[1])
+      s = s * A[d + 1]
+      # s = mul!(s, s, A[d + 1])
+      s = s + coeff(f, (d1 - i)*d) * A[1]
+      # s = addmul!(s, coeff(f, (d1 - i)*d), A[1])
       for j = 1:min(n - (d1 - i)*d, d - 1)
          c = coeff(f, (d1 - i)*d + j)
          if !iszero(c)
-            s = addmul!(s, c, A[j + 1])
+            s = s + c * A[j + 1]
+            # s = addmul!(s, c, A[j + 1])
          end
       end
    end
