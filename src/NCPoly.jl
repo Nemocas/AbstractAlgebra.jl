@@ -814,3 +814,7 @@ function is_nilpotent(f::T) where {T <: PolynomialElem}
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end
+
+_implements(::Type{PolynomialElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
+
+_implements(::Type{PolynomialElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
