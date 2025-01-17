@@ -92,7 +92,7 @@ end
 
 function is_gen(a::FreeAssociativeAlgebraElem{T}) where T
     if length(a) < 1
-        return iszero(one(base_ring(a)))
+        return is_trivial(base_ring(a))
     else
         return a.length == 1 && isone(a.coeffs[1]) && length(a.exps[1]) == 1
     end
