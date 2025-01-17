@@ -192,6 +192,16 @@ rand(R::Floats, n) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Floats{T}) where T
+  return rand(T)*rand(-100:100)
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################
@@ -219,3 +229,4 @@ end
 function (a::Floats{BigFloat})(b::Rational{BigInt})
    return BigFloat(b)
 end
+

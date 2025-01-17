@@ -690,6 +690,23 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(FF::Generic.FactoredFracField{BigInt})
+  limit = 10
+  t = one(FF)
+  for i in 1:abs(rand(Int)%limit)
+      s = FF(rand(Int)%(20*limit))
+      e = rand(Int)%limit
+      t *= iszero(s) ? s^abs(e) : s^e
+  end
+  return t
+end
+
+###############################################################################
+#
 #   FactoredFractionField constructor
 #
 ###############################################################################
