@@ -10,14 +10,27 @@ tries to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Started keeping a changelog. Added a changelog file, and added a changelog nagger to CI.
+- Started keeping a changelog!
+
+## [0.44.3] - 2025-01-17
+
+### Added
+
+- Add conformance tests for MPolyRing, and fix bugs in ^ and is_unit for MPoly [PR
+  #1950](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1950)
+
+- Add ignore_kwargs to @attr macro [PR
+  #1958](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1958)
 
 ### Changed
 
-### Deprecated
+- Don't require base_ring in ring conformance tests [issue
+  #1944](https://github.com/Nemocas/AbstractAlgebra.jl/issues/1944) [PR
+  #1946](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1946)
 
-### Removed
+- Fixed promotion for matrix-scalar operations [PR
+  #1949](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1949)
 
-### Fixed
+- Replace uses of elem_type(coefficient_ring(R)) by equivalent compile-time constructs [PR
+  #1956](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1956)
 
-### Security
