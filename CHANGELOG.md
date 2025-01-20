@@ -34,3 +34,21 @@ tries to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Replace uses of elem_type(coefficient_ring(R)) by equivalent compile-time constructs [PR
   #1956](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1956)
 
+## [0.44.2] - 2024-12-22
+
+### Changed
+
+- Re-enable conformance test for residue ring over Z[x] [issue
+  #994](https://github.com/Nemocas/AbstractAlgebra.jl/issues/994) [PR
+  #1938](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1938)
+
+- Make is_exact_type and is_domain_type more convenient [issue
+  #1942](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1942)
+
+### Fixed
+
+- Fix isunit for univariate and multivariate polynomials over Z/nZ [issue
+  #11](https://github.com/Nemocas/AbstractAlgebra.jl/issues/11) [PR
+  #1933](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1933)
+
+- Fix show method for MatSpace [PR #1934](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1934)
