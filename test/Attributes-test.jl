@@ -187,8 +187,8 @@ A cached attribute.
 my_derived_type(::Type{Tmp.Container{T}}) where T = T
 @attr my_derived_type(T) cached_attr3(obj::T) where T <: Tmp.Container = obj.x
 
-@attr Tuple{T,DataType,Vector{Any}} cached_attr_with_kwarg1(obj::T; some_kwarg::Bool) where T = (obj,T,[])
-@attr Tuple{T,DataType,Vector{Any}} cached_attr_with_kwarg2(obj::T; some_kwarg::Bool=true) where T = (obj,T,[])
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg1(obj::T; some_kwarg::Bool) where T = (obj,T,some_kwarg)
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg2(obj::T; some_kwarg::Bool=true) where T = (obj,T,some_kwarg)
 
 @testset "attribute caching for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
@@ -217,20 +217,33 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     # check case of ignored keyword arguments
     x = T()
     y = @inferred cached_attr_with_kwarg1(x; some_kwarg=true)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg1(x; some_kwarg=false)
+    @test y == (x,T,false)
     @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
 
     x = T()
     y = @inferred cached_attr_with_kwarg2(x; some_kwarg=true)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
+    @test cached_attr_with_kwarg2(x) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg2(x; some_kwarg=false)
+    @test y == (x,T,false)
     @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
     @test cached_attr_with_kwarg2(x) === y
 
     x = T()
     y = @inferred cached_attr_with_kwarg2(x)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
     @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
     @test cached_attr_with_kwarg2(x) === y
