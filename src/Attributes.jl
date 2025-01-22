@@ -275,7 +275,6 @@ end
 
 """
     @attr RetType funcdef
-    @attr RetType ignore_kwargs=[...] funcdef
 
 This macro is applied to the definition of a unary function, and enables
 caching ("memoization") of its return values based on the argument. This
@@ -284,9 +283,11 @@ via [`get_attribute!`](@ref).
 
 The name of the function is used as name for the underlying attribute.
 
-In case that `funcdef` has keyword arguments that are not relevant for
-attribute caching (e.g. `check::Bool=true`), these can be ignored by
-putting them in the `ignore_kwargs` list.
+The macro works the same for unary functions with keyword arguments,
+but ignores the keyword arguments when caching the result, i.e.
+different calls with different keyword arguments will return
+the identical (cached) result. In case that there is no result cached yet,
+the function is called with the given keyword arguments.
 
 Effectively, this turns code like this:
 ```julia
@@ -329,22 +330,8 @@ julia> myattr(obj) # second time uses the cached result
 ```
 """
 macro attr(rettype, expr::Expr)
-   return _attr_impl(__module__, __source__, expr, rettype, Symbol[])
-end
-
-macro attr(rettype, options, expr::Expr)
-   @assert options.head == :(=)
-   @assert length(options.args) == 2
-   @assert options.args[1] == :ignore_kwargs
-   @assert options.args[2].head == :vect
-   ignore_kwargs = Vector{Symbol}(options.args[2].args)
-   return _attr_impl(__module__, __source__, expr, rettype, ignore_kwargs)
-end
-
-function _attr_impl(__module__, __source__, expr::Expr, rettype, ignore_kwargs::Vector{Symbol})
    d = MacroTools.splitdef(expr)
    length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
-   length(setdiff(first.(MacroTools.splitarg.(d[:kwargs])), ignore_kwargs)) == 0 || throw(ArgumentError("non-ignored keyword arguments are not supported"))
 
    # store the original function name
    name = d[:name]

@@ -187,8 +187,8 @@ A cached attribute.
 my_derived_type(::Type{Tmp.Container{T}}) where T = T
 @attr my_derived_type(T) cached_attr3(obj::T) where T <: Tmp.Container = obj.x
 
-@attr Tuple{T,DataType,Vector{Any}} ignore_kwargs=[some_kwarg] cached_attr_with_kwarg1(obj::T; some_kwarg::Bool) where T = (obj,T,[])
-@attr Tuple{T,DataType,Vector{Any}} ignore_kwargs=[some_kwarg] cached_attr_with_kwarg2(obj::T; some_kwarg::Bool=true) where T = (obj,T,[])
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg1(obj::T; some_kwarg::Bool) where T = (obj,T,some_kwarg)
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg2(obj::T; some_kwarg::Bool=true) where T = (obj,T,some_kwarg)
 
 @testset "attribute caching for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
@@ -217,20 +217,33 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     # check case of ignored keyword arguments
     x = T()
     y = @inferred cached_attr_with_kwarg1(x; some_kwarg=true)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg1(x; some_kwarg=false)
+    @test y == (x,T,false)
     @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
 
     x = T()
     y = @inferred cached_attr_with_kwarg2(x; some_kwarg=true)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
+    @test cached_attr_with_kwarg2(x) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg2(x; some_kwarg=false)
+    @test y == (x,T,false)
     @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
     @test cached_attr_with_kwarg2(x) === y
 
     x = T()
     y = @inferred cached_attr_with_kwarg2(x)
-    @test y == (x,T,[])
+    @test y == (x,T,true)
     @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
     @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
     @test cached_attr_with_kwarg2(x) === y
@@ -270,22 +283,12 @@ end
         @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
         @test_throws ArgumentError @macroexpand @attr Int foo() = 1
         @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
-        @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
-        @test_throws MethodError @macroexpand @attr Int Int Int
-
-        # wrong handling of keyword arguments
         @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool) = 1
         @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool=true) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int; some_kwarg::Bool) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int; some_kwarg::Bool=true) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(; some_kwarg::Bool) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(; some_kwarg::Bool=true) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(x::Int; some_kwarg::Bool) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(x::Int; some_kwarg::Bool=true) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(; some_kwarg::Bool, other_kwarg::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(; some_kwarg::Bool=true, other_kwarg::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(x::Int; some_kwarg::Bool, other_kwarg::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Any ignore_kwargs=[other_kwarg] foo(x::Int; some_kwarg::Bool=true, other_kwarg::Int) = 1
+        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool) = 1
+        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool=true) = 1
+        @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
+        @test_throws MethodError @macroexpand @attr Int Int Int
 
         # wrong kind of arguments
         #@test_throws ArgumentError @macroexpand @attr Int Int
