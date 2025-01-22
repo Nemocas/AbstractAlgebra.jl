@@ -1341,6 +1341,9 @@ end
          @test q4 == q3
       end
    end
+   Qxy, (x, y) = QQ[:x, :y]
+   @test_throws ArgumentError remove(0*x, y)
+   @test_throws ArgumentError remove(x, y^0)
 end
 
 @testset "Generic.MPoly.derivative" begin

@@ -827,7 +827,8 @@ See also `valuation`, which only returns the valuation.
 """
 function remove(z::MPolyRingElem{T}, p::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(z, p)
-   iszero(z) && error("Not yet implemented")
+   @req !iszero(z) "Element must be non-zero"
+   @req !is_unit(p) "Element must be a non-unit"
    fl, q = divides(z, p)
    if !fl
       return 0, z
