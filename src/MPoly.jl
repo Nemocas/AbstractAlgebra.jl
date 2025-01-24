@@ -449,9 +449,6 @@ function content(a::MPolyRingElem{T}) where T <: RingElement
    z = zero(coefficient_ring(a))
    for c in coefficients(a)
       z = gcd!(z, c)
-      if isone(z)
-         break
-      end
    end
    return z
 end
@@ -1273,9 +1270,6 @@ function content(f::MPolyRingElem, i::Int)
    z = zero(parent(f))
    for c in coefficients(f, i)
       z = gcd!(z, c)
-      if isone(z)
-         break
-      end
    end
    return z
 end

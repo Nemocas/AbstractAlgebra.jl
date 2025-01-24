@@ -1942,9 +1942,6 @@ function content(a::PolyRingElem)
    z = base_ring(a)() # normalise first coefficient
    for i = 1:length(a)
       z = gcd!(z, coeff(a, i - 1))
-      if isone(z)
-         break
-      end
    end
    return z
 end
