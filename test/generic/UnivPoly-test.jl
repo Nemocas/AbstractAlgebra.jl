@@ -1015,6 +1015,10 @@ end
          @test lcm(g*h, g) == g*h*ug
 
          @test lcm(h, h) == h*uh
+
+         @test content(f) == content(f.p)
+         @test content(g) == content(g.p)
+         @test content(h) == content(h.p)
       end
    end
 end
