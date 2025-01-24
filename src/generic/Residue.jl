@@ -146,3 +146,65 @@ function add!(c::T, a::T, b::T) where {T <: EuclideanRingResidueRingElem}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
 end
+
+euclid(n::EuclideanRingResidueRingElem) = degree(gcd(data(n), modulus(n)))
+
+#horrible - and copied from fmpz_mod
+#don't know how to seriously simplify it
+#maybe a direct gcdx should be added as well
+function Base.divrem(n::T, m::T) where {T <: EuclideanRingResidueRingElem}
+  @assert !iszero(m)
+  R = parent(n)
+  e = euclid(m)
+  if iszero(e)
+    fl, q = divides(n, m)
+    @assert fl
+    return q, zero(R)
+  end
+
+  S = typeof(data(n))
+
+  cp = coprime_base(S[data(n), data(m), modulus(m)])::Vector{S}
+
+  q = Vector{Tuple{S, S}}()
+  inf = -1
+  for i=1:length(cp)
+    is_unit(cp[i]) && continue
+    v = valuation(modulus(R), cp[i])::Int
+    if v != 0
+      pk = cp[i]^v
+      nv = iszero(data(n) % pk) ? inf : valuation(data(n) % pk, cp[i])
+      mv = iszero(data(m) % pk) ? inf : valuation(data(m) % pk, cp[i])
+      if nv < mv
+        push!(q, (pk, zero(data(n))))
+      else
+        if nv === inf
+          push!(q, (pk, one(data(n))))
+        else
+          push!(q, (pk, divexact(data(n) % pk, cp[i]^nv)))
+        end
+      end
+    end
+  end
+  qq = R(crt([x[2] for x = q], [x[1] for x = q])::S)::T
+  #need to adjust the leading term of qq so it cancelles:
+  # x * lc(qq)*lc(m) = lc(n)
+  # so x = lc(n)/lc(qq)/lc(m)
+  if !is_zero(qq)
+    qq *= leading_coefficient(data(n)) //leading_coefficient(data(qq)) // leading_coefficient(data(m))
+  end
+  rr = n-qq*m
+  @assert n == qq*m+rr
+  @assert rr == 0 || euclid(rr) < e
+  return (qq,rr)::Tuple{T, T}
+end
+
+#copied from fmpz_mod
+function gcdx(a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+  m = modulus(a)
+  R = parent(a)
+  g, u, v = gcdx(data(a), data(b))
+  G, U, V = gcdx(g, m)
+  return R(G), R(U)*R(u), R(U)*R(v)
+end
+
