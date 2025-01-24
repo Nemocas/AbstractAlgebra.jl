@@ -1341,6 +1341,28 @@ end
 
 ###############################################################################
 #
+#  Factorization
+#
+###############################################################################
+
+function factor_squarefree(f::MPolyRingElem{<: FieldElement})
+  if characteristic(coefficient_ring(f)) == 0
+    return MPolyFactor.mfactor_squarefree_char_zero(f)
+  else
+    throw(NotImplementedError(:factor_squarefree, f))
+  end
+end
+
+function factor(f::MPolyRingElem{<: FieldElement})
+  if characteristic(coefficient_ring(f)) == 0
+    return MPolyFactor.mfactor_char_zero(f)
+  else
+    throw(NotImplementedError(:factor, f))
+  end
+end
+
+###############################################################################
+#
 #   Parent object overload (with coercion)
 #
 ###############################################################################
