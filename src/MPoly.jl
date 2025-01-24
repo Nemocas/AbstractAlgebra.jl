@@ -448,7 +448,10 @@ end
 function content(a::MPolyRingElem{T}) where T <: RingElement
    z = zero(coefficient_ring(a))
    for c in coefficients(a)
-      z = gcd(z, c)
+      z = gcd!(z, c)
+      if isone(z)
+         break
+      end
    end
    return z
 end
@@ -1267,7 +1270,14 @@ Return the content of `f` as a polynomial in the variable `i`, i.e. the gcd of
 all the coefficients when viewed as univariate polynomial in `i`.
 """
 function content(f::MPolyRingElem, i::Int)
-   return reduce(gcd, coefficients(f, i))
+   z = zero(parent(f))
+   for c in coefficients(f, i)
+      z = gcd!(z, c)
+      if isone(z)
+         break
+      end
+   end
+   return z
 end
 
 ################################################################################

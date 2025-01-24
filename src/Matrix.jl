@@ -1663,7 +1663,7 @@ function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
   for i = 1:nrows(x)
      for j = 1:ncols(x)
-        d = gcd(d, x[i, j])
+        d = gcd!(d, x[i, j])
         if isone(d)
            return d
         end
