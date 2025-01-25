@@ -1782,6 +1782,15 @@ rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange
 rand(S::LaurentSeriesRingOrField, val_range, v...) =
    rand(Random.default_rng(), S, val_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::LaurentSeriesRing{BigInt})
+  rand(R, 0:12, -10:10)
+end
 
 ###############################################################################
 #

@@ -68,16 +68,12 @@ end
 Base.length(f::FinField) = BigInt(order(f))
 Base.eltype(::Type{F}) where {F<:FinField} = elem_type(F)
 
-function test_iterate(f::FinField)
-   elts = collect(Iterators.take(f, 20))
-   @test elts isa Vector{elem_type(f)}
-   @test allunique(elts)
-   @test length(elts) == min(order(f), 20)
-   if order(f) < 100
-      elts = collect(f)
-      @test elts isa Vector{elem_type(f)}
-      @test allunique(elts)
-      @test length(elts) == order(f)
-   end
-   return elts
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::FinField)
+  return rand(R)
 end

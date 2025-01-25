@@ -1455,6 +1455,31 @@ rand(S::SeriesRing, val_range, v...) = rand(Random.default_rng(), S, val_range, 
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+function ConformanceTests.generate_element(Rx::SeriesRing)
+  R = base_ring(Rx)
+  prec = rand(3:10)
+  len = rand(0:prec-1)
+  val = rand(0:prec-len)
+  # FIXME: constructors don't seem to catch use of negative val
+  @assert val >= 0
+  A = elem_type(R)[ConformanceTests.generate_element(R) for i in 1:len]
+  if len > 0 && is_zero(A[1])
+    A[1] = one(R)
+  end
+  if elem_type(Rx) <: RelPowerSeriesRingElem
+    @assert prec >= len + val
+    return Rx(A, len, prec, val)
+  else
+    @assert prec >= len
+    return Rx(A, len, prec)
+  end
+end
+
+###############################################################################
+#
 #   power_series_ring constructor
 #
 ###############################################################################

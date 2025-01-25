@@ -1,10 +1,6 @@
-function test_elem(R::AbstractAlgebra.Generic.RationalFunctionField{Rational{BigInt}})
-   rand(R, 0:3, -3:3)
-end
-
 @testset "Generic.FunctionField.conformance" begin
    S, x = rational_function_field(QQ, "x")
-   test_Ring_interface(S)
+   ConformanceTests.test_Ring_interface(S)
 end
 
 @testset "Generic.RationalFunctionField.constructors" begin

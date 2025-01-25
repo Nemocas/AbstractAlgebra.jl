@@ -1,10 +1,6 @@
-function test_elem(R::AbstractAlgebra.Generic.AbsMSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.AbsMSeries.conformance" begin
    R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.AbsMSeries.constructors" begin

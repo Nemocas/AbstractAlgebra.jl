@@ -1,26 +1,10 @@
-function test_elem(R::AbstractAlgebra.LaurentMPolyRing{BigInt})
-    n = rand(1:10)
-    # R: length between 1 and 9
-    # R: exponents between -n and n
-    # ZZ: coeffs between -99 and 99
-    rand(R, 1:9, -n:n, -99:99)
-end
-
-function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.EuclideanRingResidueRingElem{BigInt}})
-    n = rand(1:5)
-    # R: length between 1 and 9
-    # R: exponents between -n and n
-    # ZZ/6ZZ: coeffs between ??? <- TODO
-    rand(R, 1:4, -n:n, 1:10)
-end
-
 @testset "Generic.LaurentMPoly.conformance" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
-    test_Ring_interface(L)
-    test_Ring_interface_recursive(L)
+    ConformanceTests.test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface_recursive(L)
 
     L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], ["x", "y"])
-    test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface(L)
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin

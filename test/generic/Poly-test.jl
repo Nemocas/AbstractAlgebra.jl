@@ -142,11 +142,11 @@ end
 
 @testset "Generic.Poly.conformance" begin
    R, x = polynomial_ring(ZZ, "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
    R, x = polynomial_ring(QQ, "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
    R, x = polynomial_ring(GF(5), "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
 end
 
 @testset "Generic.Poly.printing" begin
@@ -3039,5 +3039,5 @@ end
   R, = residue_ring(ZZ, 1)
   Rx, = R[:x]
   @test is_zero(gen(Rx)) && is_one(gen(Rx))
-  test_Ring_interface_recursive(Rx)
+  ConformanceTests.test_Ring_interface_recursive(Rx)
 end

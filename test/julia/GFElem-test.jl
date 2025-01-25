@@ -1,8 +1,8 @@
 @testset "Julia.GFElem.conformance_tests" begin
-   test_Field_interface_recursive(GF(3))
-   test_Field_interface_recursive(GF(13))
-   test_Field_interface_recursive(GF(big(13)))
-   test_Field_interface_recursive(GF(big(10)^20 + 39))
+   ConformanceTests.test_Field_interface_recursive(GF(3))
+   ConformanceTests.test_Field_interface_recursive(GF(13))
+   ConformanceTests.test_Field_interface_recursive(GF(big(13)))
+   ConformanceTests.test_Field_interface_recursive(GF(big(10)^20 + 39))
 end
 
 @testset "Julia.GFElem.constructors" begin
@@ -319,7 +319,7 @@ end
 @testset "Julia.GFElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
-      elts = AbstractAlgebra.test_iterate(R)
+      elts = ConformanceTests.test_iterate(R)
       @test elts == R.(0:n-1)
    end
 end

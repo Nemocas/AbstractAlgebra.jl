@@ -1017,9 +1017,8 @@ The above implementation of `constant_polynomial_ring` may be tested as follows.
 
 ```jldoctest ConstPoly; filter = r".*"s
 using Test
-include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-function test_elem(R::ConstPolyRing{elem_type(ZZ)})
+function ConformanceTests.generate_element(R::ConstPolyRing{elem_type(ZZ)})
    n = rand(1:999)
    return R(rand(-n:n))
 end

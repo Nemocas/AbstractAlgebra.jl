@@ -1,7 +1,9 @@
 using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-using Test: @test # for "interface-conformance" functions
+if !isdefined(Base, :get_extension)
+  using Requires: @require
+end
 
 import LinearAlgebra
 

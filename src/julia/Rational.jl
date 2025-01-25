@@ -224,6 +224,19 @@ rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Rationals)
+  B = base_ring(R)
+  n = ConformanceTests.generate_element(B)
+  d = ConformanceTests.generate_element(B)
+  return is_zero(d) ? R(n) : R(n, d)
+end
+
+###############################################################################
+#
 #   valutaion / remove
 #
 ###############################################################################

@@ -6687,6 +6687,17 @@ end
 randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
    randmat_with_rank(Random.default_rng(), S, rank, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(S::MatSpace)
+  R = base_ring(S)
+  return S(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
+
 ################################################################################
 #
 #   Matrix constructors
