@@ -5,11 +5,7 @@
 ###############################################################################
 
 function content(a::UniversalPolyRingElem)
-   z = zero(base_ring(a))
-   for c in coefficients(a)
-      z = gcd!(z, c)
-   end
-   return z
+   return content(data(a))
 end
 
 ###############################################################################
