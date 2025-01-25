@@ -7,5 +7,5 @@
 # load TestExt
 using Test
 
-test_Group_interface = ConformanceTests.test_Group_interface
-test_GroupElem_interface = ConformanceTests.test_GroupElem_interface
+import .ConformanceTests: test_Group_interface
+import .ConformanceTests: test_GroupElem_interface
