@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
-tries to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 ## [Unreleased]
@@ -31,8 +31,7 @@ tries to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Fix promotion for matrix-scalar operations [PR
   #1949](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1949)
 
-- Replace uses of elem_type(coefficient_ring(R)) by equivalent compile-time constructs [PR
-  #1956](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1956)
+- Some internal enhancements
 
 ## [0.44.2] - 2024-12-22
 
