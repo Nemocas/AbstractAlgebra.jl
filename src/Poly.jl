@@ -1946,10 +1946,6 @@ function content(a::PolyRingElem)
    return z
 end
 
-function content(a::PolyRingElem{<:FieldElem})
-   return one(base_ring(a))
-end
-
 @doc raw"""
     primpart(a::PolyRingElem)
 
