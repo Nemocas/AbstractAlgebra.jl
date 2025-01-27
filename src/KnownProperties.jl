@@ -9,11 +9,17 @@
 
 Return whether a property of an object `x` called for by `f(x)` is known. 
 
-Note: The default implementation throws an error. It is the programmer's 
-responsibility to implement appropriate methods for their individual 
-types and properties. See `src/KnownProperties.jl` for details.
+Note: The default implementation only checks whether an attribute 
+(from the `@attr`-macro) with the same name as the function exists. 
+Otherwise, it throws an error. It is the programmer's responsibility 
+to implement appropriate methods for their individual types and 
+properties. See `src/KnownProperties.jl` for details.
 """
 function is_known(x::Any, f::Function)
+  return _is_known(x, f)
+end
+
+function _is_known(x::Any, f::Function)
   # If the object `x` has attributes and an attribute with the name 
   # of `f` happens to be stored, return it in good faith.
   hasfield(typeof(x), :__attrs) && has_attribute(x, nameof(f)) && return true
@@ -34,6 +40,10 @@ responsibility to implement appropriate methods for their individual
 types and properties. See `src/KnownProperties.jl` for details.
 """
 function is_known(x::Any, f::Function, args...; kwargs...)
+  return _is_known(x, f, args...; kwargs...)
+end
+
+function _is_known(x::Any, f::Function, args...; kwargs...)
   error("no method implemented to check whether property $(nameof(f)) with arguments $(args) and keyword arguments $(kwargs) is known for object $x")
 end
 
