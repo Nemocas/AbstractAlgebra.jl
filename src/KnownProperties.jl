@@ -14,6 +14,11 @@ Note: The default implementation only checks whether an attribute
 Otherwise, it throws an error. It is the programmer's responsibility 
 to implement appropriate methods for their individual types and 
 properties. See `src/KnownProperties.jl` for details.
+
+# Examples
+```jldoctest
+julia> AbstractAlgebra.is_known(5, is_even)
+true
 """
 function is_known(x::Any, f::Function)
   return _is_known(x, f)
