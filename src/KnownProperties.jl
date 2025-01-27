@@ -22,7 +22,7 @@ end
 function _is_known(x::Any, f::Function)
   # If the object `x` has attributes and an attribute with the name 
   # of `f` happens to be stored, return it in good faith.
-  hasfield(typeof(x), :__attrs) && has_attribute(x, nameof(f)) && return true
+  _is_attribute_storing_type(typeof(x)) && has_attribute(x, nameof(f)) && return true
   # Otherwise notify the user that no method is implemented rather than 
   # just saying "no". The explicit call to this method suggests that 
   # the callee expects the function to return something useful and 
