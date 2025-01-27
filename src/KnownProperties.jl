@@ -24,12 +24,8 @@ function is_known(x::Any, f::Function)
   error("no method implemented to check whether property $(nameof(f)) is known for object $x")
 end
 
-function is_known(x::Any, f::Function, p::Any)
-  return is_known(x, f) && f(x) == p
-end
-
 @doc raw"""
-    is_known(x::Any, f::Function, args...)
+    is_known(x::Any, f::Function, args...; kwargs...)
 
 Return whether the property of `x` called for by `f(x, args...)` is known. 
 
@@ -37,8 +33,8 @@ Note: The default implementation throws an error. It is the programmer's
 responsibility to implement appropriate methods for their individual 
 types and properties. See `src/KnownProperties.jl` for details.
 """
-function is_known(x::Any, f::Function, args...)
-  error("no method implemented to check whether property $(nameof(f)) with arguments $(args) is known for object $x")
+function is_known(x::Any, f::Function, args...; kwargs...)
+  error("no method implemented to check whether property $(nameof(f)) with arguments $(args) and keyword arguments $(kwargs) is known for object $x")
 end
 
 
