@@ -8,12 +8,14 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 We describe here various macros provided by AbstractAlgebra.
 
 ## Verbosity macros
-There is a list of symbols called *verbosity scopes* which represent keywords used to
-trigger some particular macros within the codes. Each of these verbosity scopes is 
-associated with a *verbosity level*, being set to $0$ by default. A verbosity macro
-is joined to a verbosity scope `S` and a value `k` (set to $1$ by default) such that,
+There is a (global) list of symbols called *verbosity scopes* which represent keywords used to
+trigger some verbosity macros within the code. Each of these verbosity scopes has its own
+integer *verbosity level*, which is set to $0$ by default. A verbosity macro
+must specify the verbosity scope `S` and optionally the trigger level `k` (defaulting to $1$) such that,
 if the current verbosity level `l` of `S` is bigger than or equal to `k`, then the
-macro triggers a given action.
+macro triggers a given action.  Inside a module, the function `add_verbosity_scope` must be
+called in the `__init__` function of that module (since the symbol is registered as a global
+within the namespace of the module).
 
 ```@docs
 add_verbosity_scope(s::Symbol)
