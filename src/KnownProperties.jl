@@ -1,5 +1,5 @@
 ########################################################################
-# This is to introduce a common language to ask whether or not a given
+# This file introduces a common framework to ask whether or not a given
 # property (which is potentially hard to compute) is known for some
 # object `x`. 
 ########################################################################
@@ -7,18 +7,32 @@
 @doc raw"""
     is_known(x::Any, f::Function)
 
-Return whether a property of an object `x` called for by `f(x)` is known. 
+Given a unary function `f` and a value `x`, return whether `f(x)` is "known"
+in the sense that evaluating `f(x)` is fast and takes constant time.
+
+For example this might return `true` if `f(x)` was computed before and has
+been cached.
 
 Note: The default implementation only checks whether an attribute 
-(from the `@attr`-macro) with the same name as the function exists. 
-Otherwise, it throws an error. It is the programmer's responsibility 
-to implement appropriate methods for their individual types and 
-properties. See `src/KnownProperties.jl` for details.
+(from the [`@attr`](@ref) macro) with the same name as the function `f` exists. 
+Otherwise, it throws an error. In general for `is_known` to work correctly
+for a given function `f` requires that everyone adding, modifying or removing
+methods for `f` adjusts it as needed. That is, they are responsible for
+ensuring `is_known(x,f)` returns an appropriate result whenever `f(x)` would
+invoke the method they just modified. For example by adding a new method
+`is_known(::MyTypes,::Type{f}) = true` where `MyTypes` is the union of types
+accepted by the method for `f`.
+
+Conversely this means that `is_known` does not work for arbitrary unary
+function `f` but instead only a select supported list.
+
+See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
 
 # Examples
 ```jldoctest
 julia> AbstractAlgebra.is_known(5, is_even)
 true
+```
 """
 function is_known(x::Any, f::Function)
   return _is_known(x, f)
