@@ -30,8 +30,23 @@ See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
 
 # Examples
 ```jldoctest
-julia> AbstractAlgebra.is_known(5, is_even)
+julia> AbstractAlgebra.is_known(::Int, ::typeof(is_even)) = true; # manual installation of the method
+
+julia> AbstractAlgebra.is_known(5, is_even) # sample call to the function
 true
+
+julia> AbstractAlgebra.is_known(::MPolyRing{<:FieldElem}, ::typeof(dim)) = true; # another implementation
+
+julia> AbstractAlgebra.is_known(R::MPolyRing, ::typeof(dim)) = AbstractAlgebra.is_known(coefficient_ring(R), dim) # generic deflection to the `coefficient_ring`
+
+julia> R, (x, y) = ZZ[:x, :y];
+
+julia> try
+         AbstractAlgebra.is_known(R, dim)
+       catch e
+         e
+       end
+ErrorException("no method implemented to check whether property dim is known for object Integers")
 ```
 """
 function is_known(x::Any, f::Function)
@@ -52,11 +67,18 @@ end
 @doc raw"""
     is_known(x::Any, f::Function, args...; kwargs...)
 
-Return whether the property of `x` called for by `f(x, args...)` is known. 
+Given a function `f` on `(x, args...; kwargs)` and a value `x`, 
+return whether `f(x, args...; kwargs...)` is "known" in the sense that 
+evaluating `f(x, args...; kwargs...)` is fast and takes constant time.
 
-Note: The default implementation throws an error. It is the programmer's 
-responsibility to implement appropriate methods for their individual 
-types and properties. See `src/KnownProperties.jl` for details.
+For example this might return `true` if the result was computed before and has
+been cached.
+
+Note: The default implementation only throws an error. In general for `is_known` 
+to work correctly for a given function `f` requires that everyone adding,
+modifying or removing methods for `f` adjusts it as needed.
+
+See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
 """
 function is_known(x::Any, f::Function, args...; kwargs...)
   return _is_known(x, f, args...; kwargs...)
@@ -66,31 +88,3 @@ function _is_known(x::Any, f::Function, args...; kwargs...)
   error("no method implemented to check whether property $(nameof(f)) with arguments $(args) and keyword arguments $(kwargs) is known for object $x")
 end
 
-
-# In general, it is the programmer's responsibility to implement 
-# a method for their types and properties. The above already implements 
-# a generic deflection to the attributes where applicable. But this 
-# will by far not catch all cases. 
-# 
-# We give a few samples. 
-
-is_known(i::Int, ::typeof(is_even)) = true # Almost no computation cost, so known. 
-is_known(i::Int, ::typeof(is_odd)) = true # Almost no computation cost, so known. 
-
-# The dimension of a ring is difficult to compute in general. However, for 
-# some rings it is easy.
-is_known(R::MPolyRing{<:FieldElem}, ::typeof(dim)) = true
-
-# The following needs data types which are only available in OSCAR. However, 
-# we put the code here to illustrate what an implementation could look like.
-#
-# function is_known(A::MPolyQuoRing, ::typeof(dim))
-#   return is_known(modulus(A), dim)
-# end
-#
-# The `MPolyIdeal` caches information about its dimension in a field, not 
-# the attributes via `@attr`. Hence, we check there. 
-#
-# function is_known(I::MPolyIdeal, ::typeof(dim))
-#   return I.dim !== nothing
-# end
