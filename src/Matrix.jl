@@ -4428,8 +4428,8 @@ function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) whe
 end
 
 @doc raw"""
-    minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-    minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(M::MatElem{T}) where {T <: RingElement}
+    minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the square matrix $M$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
