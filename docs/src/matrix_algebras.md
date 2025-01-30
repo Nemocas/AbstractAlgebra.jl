@@ -78,19 +78,19 @@ Matrix ring of degree 3
   over univariate polynomial ring in t over rationals
 
 julia> A = S()
-[0   0   0]
-[0   0   0]
-[0   0   0]
+[.   .   .]
+[.   .   .]
+[.   .   .]
 
 julia> B = S(12)
-[12    0    0]
-[ 0   12    0]
-[ 0    0   12]
+[12    .    .]
+[ .   12    .]
+[ .    .   12]
 
 julia> C = S(R(11))
-[11    0    0]
-[ 0   11    0]
-[ 0    0   11]
+[11    .    .]
+[ .   11    .]
+[ .    .   11]
 
 ```
 
