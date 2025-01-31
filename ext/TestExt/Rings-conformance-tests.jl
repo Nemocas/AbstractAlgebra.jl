@@ -15,7 +15,7 @@
 # - test_MatAlgebra_interface(R)
 
 
-function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
+function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
    T = elem_type(R)
 
@@ -200,17 +200,17 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
             b = generate_element(R)::T
             c = generate_element(R)::T
 
-            ConformanceTests.test_mutating_op_like_zero(zero, zero!, a)
-            ConformanceTests.test_mutating_op_like_zero(one, one!, a)
+            test_mutating_op_like_zero(zero, zero!, a)
+            test_mutating_op_like_zero(one, one!, a)
 
-            ConformanceTests.test_mutating_op_like_neg(-, neg!, a)
+            test_mutating_op_like_neg(-, neg!, a)
 
-            ConformanceTests.test_mutating_op_like_add(+, add!, a, b)
-            ConformanceTests.test_mutating_op_like_add(-, sub!, a, b)
-            ConformanceTests.test_mutating_op_like_add(*, mul!, a, b)
+            test_mutating_op_like_add(+, add!, a, b)
+            test_mutating_op_like_add(-, sub!, a, b)
+            test_mutating_op_like_add(*, mul!, a, b)
 
-            ConformanceTests.test_mutating_op_like_addmul((a, b, c) -> a + b*c, addmul!, a, b, c)
-            ConformanceTests.test_mutating_op_like_addmul((a, b, c) -> a - b*c, submul!, a, b, c)
+            test_mutating_op_like_addmul((a, b, c) -> a + b*c, addmul!, a, b, c)
+            test_mutating_op_like_addmul((a, b, c) -> a - b*c, submul!, a, b, c)
          end
       end
    end
@@ -219,7 +219,7 @@ function ConformanceTests.test_NCRing_interface(R::AbstractAlgebra.NCRing; reps 
 end
 
 
-function ConformanceTests.test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
+function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
 
    T = elem_type(R)
 
@@ -227,12 +227,12 @@ function ConformanceTests.test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50
 
       @test T <: RingElement
 
-      ConformanceTests.test_NCRing_interface(R; reps = reps)
+      test_NCRing_interface(R; reps = reps)
 
       @testset "Basic functionality for commutative rings only" begin
          @test isone(AbstractAlgebra.inv(one(R)))
-         ConformanceTests.test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
-         ConformanceTests.test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
@@ -247,7 +247,7 @@ function ConformanceTests.test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50
                if T isa RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
-               iszero(b) || ConformanceTests.test_mutating_op_like_add(divexact, divexact!, b*a, b)
+               iszero(b) || test_mutating_op_like_add(divexact, divexact!, b*a, b)
             else
                try
                   t = divexact(b*a, b)
@@ -282,13 +282,13 @@ function ConformanceTests.test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50
    return nothing
 end
 
-function ConformanceTests.test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
+function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
 
    T = elem_type(R)
 
    @testset "Field interface for $(R) of type $(typeof(R))" begin
 
-      ConformanceTests.test_Ring_interface(R, reps = reps)
+      test_Ring_interface(R, reps = reps)
 
       @test iszero(R(characteristic(R)))
       @test iszero(characteristic(R) * one(R))
@@ -301,7 +301,7 @@ function ConformanceTests.test_Field_interface(R::AbstractAlgebra.Field; reps = 
          if !is_zero(a)
             @test is_one(a * inv(a))
             @test is_one(inv(a) * a)
-            ConformanceTests.test_mutating_op_like_neg(inv, inv!, a)
+            test_mutating_op_like_neg(inv, inv!, a)
          end
          @test A == a
       end
@@ -310,7 +310,7 @@ function ConformanceTests.test_Field_interface(R::AbstractAlgebra.Field; reps = 
    return nothing
 end
 
-function ConformanceTests.test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
+function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
    T = elem_type(R)
 
@@ -386,10 +386,10 @@ function ConformanceTests.test_EuclideanRing_interface(R::AbstractAlgebra.Ring; 
          @test d == s*f + t*g
          @test gcdinv(f, g) == (d, s)
 
-         ConformanceTests.test_mutating_op_like_add(AbstractAlgebra.div, div!, f, m)
-         ConformanceTests.test_mutating_op_like_add(mod, mod!, f, m)
-         ConformanceTests.test_mutating_op_like_add(gcd, gcd!, f, m)
-         ConformanceTests.test_mutating_op_like_add(lcm, lcm!, f, m)
+         test_mutating_op_like_add(AbstractAlgebra.div, div!, f, m)
+         test_mutating_op_like_add(mod, mod!, f, m)
+         test_mutating_op_like_add(gcd, gcd!, f, m)
+         test_mutating_op_like_add(lcm, lcm!, f, m)
       end
 
    end
@@ -398,13 +398,13 @@ function ConformanceTests.test_EuclideanRing_interface(R::AbstractAlgebra.Ring; 
 end
 
 
-function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
+function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
    T = elem_type(Rx)
 
    @testset "Poly interface for $(Rx) of type $(typeof(Rx))" begin
 
-      ConformanceTests.test_Ring_interface(Rx; reps = reps)
+      test_Ring_interface(Rx; reps = reps)
 
       x = gen(Rx)
       R = base_ring(Rx)
@@ -430,7 +430,7 @@ function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps
       end
 
       if R isa AbstractAlgebra.Field
-         ConformanceTests.test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
+         test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
          @testset "Half-GCD" begin
             for i in 1:reps
                a = generate_element(Rx)
@@ -480,7 +480,7 @@ function ConformanceTests.test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps
 end
 
 
-function ConformanceTests.test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
+function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
 
    # for simplicity, these tests for now assume exactly two generators
    @assert ngens(Rxy) == 2
@@ -489,7 +489,7 @@ function ConformanceTests.test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; r
 
    @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
 
-      ConformanceTests.test_Ring_interface(Rxy; reps = reps)
+      test_Ring_interface(Rxy; reps = reps)
 
       @testset "Basic functionality" begin
          @test symbols(Rxy) isa Vector{Symbol}
@@ -614,7 +614,7 @@ function ConformanceTests.test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; r
 end
 
 
-function ConformanceTests.test_MatSpace_interface(S::MatSpace; reps = 20)
+function test_MatSpace_interface(S::MatSpace; reps = 20)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -714,7 +714,7 @@ function ConformanceTests.test_MatSpace_interface(S::MatSpace; reps = 20)
    return nothing
 end
 
-function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
+function test_MatAlgebra_interface(S::MatRing; reps = 20)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -724,7 +724,7 @@ function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
 
    @testset "MatRing interface for $(S) of type $(typeof(S))" begin
 
-      ConformanceTests.test_NCRing_interface(S, reps = reps)
+      test_NCRing_interface(S, reps = reps)
 
       @testset "Constructors" begin
          for k in 1:reps
@@ -766,19 +766,19 @@ function ConformanceTests.test_MatAlgebra_interface(S::MatRing; reps = 20)
    return nothing
 end
 
-function ConformanceTests.test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
-   ConformanceTests.test_Ring_interface(R; reps = reps)
+function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
+   test_Ring_interface(R; reps = reps)
    Rx, _ = polynomial_ring(R, :x)
-   ConformanceTests.test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
    Rxy, _ = polynomial_ring(R, [:x, :y])
-   ConformanceTests.test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
+   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
    S = matrix_ring(R, rand(0:3))
-   ConformanceTests.test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
+   test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
    S = matrix_space(R, rand(0:3), rand(0:3))
-   ConformanceTests.test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
+   test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
 end
 
-function ConformanceTests.test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
-   ConformanceTests.test_Ring_interface_recursive(R, reps = reps)
-   ConformanceTests.test_Field_interface(R, reps = reps)
+function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
+   test_Ring_interface_recursive(R, reps = reps)
+   test_Field_interface(R, reps = reps)
 end

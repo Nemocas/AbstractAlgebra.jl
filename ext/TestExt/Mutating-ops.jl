@@ -1,13 +1,13 @@
 # The following functions should not expect that their input is a `NCRingElem` or similar.
 # They should be usable in more general types, that don't even have a `parent/elem` correspondence
 
-function ConformanceTests.test_mutating_op_like_zero(f::Function, f!::Function, A)
+function test_mutating_op_like_zero(f::Function, f!::Function, A)
   a = deepcopy(A)
   a = f!(a)
   @test equality(a, f(A))
 end
 
-function ConformanceTests.test_mutating_op_like_neg(f::Function, f!::Function, A)
+function test_mutating_op_like_neg(f::Function, f!::Function, A)
   # initialize storage var with different values to check that its value is not used
   for z in [zero(A), deepcopy(A)]
      a = deepcopy(A)
@@ -21,7 +21,7 @@ function ConformanceTests.test_mutating_op_like_neg(f::Function, f!::Function, A
   @test equality(a, f(A))
 end
 
-function ConformanceTests.test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
+function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
   @req A isa T || B isa T "Invalid argument types"
 
   # initialize storage var with different values to check that its value is not used
@@ -83,7 +83,7 @@ function ConformanceTests.test_mutating_op_like_add(f::Function, f!::Function, A
   end
 end
 
-function ConformanceTests.test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = Any)
+function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = Any)
   @req Z isa T "Invalid argument types"
   @req A isa T || B isa T "Invalid argument types"
 
