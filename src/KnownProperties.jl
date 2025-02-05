@@ -7,7 +7,7 @@
 @doc raw"""
     is_known(f::Function, args...; kwargs...)
 
-Given a unary function `f`, arguments `args`, and potentially keyword arguments 
+Given a function `f`, arguments `args`, and potentially keyword arguments 
 `kwargs`, return whether `f(args...; kwargs...)` is "known" in the sense that 
 evaluating `f(args...; kwargs...)` is fast and takes constant time.
 
@@ -19,12 +19,10 @@ for a given function `f` requires that everyone adding, modifying or removing
 methods for `f` adjusts the corresponding methods for `is_known(::typeof(f), ...)` 
 as needed. That is, they are responsible for ensuring `is_known(f, args...; kwargs...)` 
 returns an appropriate result whenever `f(args...; kwargs...)` would invoke the method 
-they just modified.
+they just added or modified, resp. would have invoked a method they removed.
 
 Conversely this means that `is_known` does not work for an arbitrary
 function `f` but instead only for a select supported list.
-
-See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
 
 # Examples
 ```jldoctest
@@ -48,7 +46,7 @@ function is_known end
 # A generic implementation to look up attributes. This can be used to implement 
 # `is_known` for a specific type of arguments of unary functions.
 function _is_known_via_attributes(f::Function, x::Any)
-  _is_attribute_storing_type(typeof(x)) || error("objects of type $(typeof(x)) do not support attribute storage")
+  @req _is_attribute_storing_type(typeof(x)) "objects of type $(typeof(x)) do not support attribute storage"
   return has_attribute(x, nameof(f))
 end
 
