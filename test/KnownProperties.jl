@@ -1,9 +1,9 @@
 @testset "known properties" begin
   R, (x, y) = ZZ[:x, :y]
   S, (u, v) = QQ[:u, :v]
-  AbstractAlgebra.is_known(R::MPolyRing, ::typeof(dim)) = AbstractAlgebra.is_known(coefficient_ring(R), dim)
-  AbstractAlgebra.is_known(::MPolyRing{<:Rational}, ::typeof(dim)) = true
-  @test AbstractAlgebra.is_known(S, dim)
-  @test_throws ErrorException AbstractAlgebra.is_known(R, dim)
-  @test_throws ErrorException AbstractAlgebra.is_known(5, dim, 7, 8; dummy=true)
+  AbstractAlgebra.is_known(::typeof(dim), R::MPolyRing) = AbstractAlgebra.is_known(dim, coefficient_ring(R))
+  AbstractAlgebra.is_known(::typeof(dim), ::MPolyRing{<:Rational}) = true
+  @test AbstractAlgebra.is_known(dim, S)
+  @test_throws MethodError AbstractAlgebra.is_known(dim, R)
+  @test_throws MethodError AbstractAlgebra.is_known(dim, 5, 7, 8; dummy=true)
 end
