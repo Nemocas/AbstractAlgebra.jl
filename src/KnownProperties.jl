@@ -5,86 +5,50 @@
 ########################################################################
 
 @doc raw"""
-    is_known(x::Any, f::Function)
+    is_known(f::Function, args...; kwargs...)
 
-Given a unary function `f` and a value `x`, return whether `f(x)` is "known"
-in the sense that evaluating `f(x)` is fast and takes constant time.
+Given a unary function `f`, arguments `args`, and potentially keyword arguments 
+`kwargs`, return whether `f(args...; kwargs...)` is "known" in the sense that 
+evaluating `f(args...; kwargs...)` is fast and takes constant time.
 
-For example this might return `true` if `f(x)` was computed before and has
-been cached.
+For example this might return `true` if `f(args...; kwargs...)` was computed 
+before and has been cached.
 
-Note: The default implementation only checks whether an attribute 
-(from the [`@attr`](@ref) macro) with the same name as the function `f` exists. 
-Otherwise, it throws an error. In general for `is_known` to work correctly
+Note: There is no default implementation. In general for `is_known` to work correctly
 for a given function `f` requires that everyone adding, modifying or removing
-methods for `f` adjusts it as needed. That is, they are responsible for
-ensuring `is_known(x,f)` returns an appropriate result whenever `f(x)` would
-invoke the method they just modified. For example by adding a new method
-`is_known(::MyTypes,::Type{f}) = true` where `MyTypes` is the union of types
-accepted by the method for `f`.
+methods for `f` adjusts the corresponding methods for `is_known(::typeof(f), ...)` 
+as needed. That is, they are responsible for ensuring `is_known(f, args...; kwargs...)` 
+returns an appropriate result whenever `f(args...; kwargs...)` would invoke the method 
+they just modified.
 
-Conversely this means that `is_known` does not work for arbitrary unary
-function `f` but instead only a select supported list.
+Conversely this means that `is_known` does not work for an arbitrary
+function `f` but instead only for a select supported list.
 
 See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
 
 # Examples
 ```jldoctest
-julia> AbstractAlgebra.is_known(::Int, ::typeof(is_even)) = true; # manual installation of the method
+julia> AbstractAlgebra.is_known(::typeof(is_even), ::Int) = true; # manual installation of the method
 
-julia> AbstractAlgebra.is_known(5, is_even) # sample call to the function
+julia> AbstractAlgebra.is_known(is_even, 5) # sample call to the function
 true
 
-julia> AbstractAlgebra.is_known(::MPolyRing{<:FieldElem}, ::typeof(dim)) = true; # another implementation
+julia> AbstractAlgebra.is_known(::typeof(dim), ::MPolyRing{<:FieldElem}) = true; # another implementation
 
-julia> AbstractAlgebra.is_known(R::MPolyRing, ::typeof(dim)) = AbstractAlgebra.is_known(coefficient_ring(R), dim) # generic deflection to the `coefficient_ring`
+julia> AbstractAlgebra.is_known(::typeof(dim), R::MPolyRing) = AbstractAlgebra.is_known(dim, coefficient_ring(R)) # generic deflection to the `coefficient_ring`
 
 julia> R, (x, y) = ZZ[:x, :y];
 
-julia> try
-         AbstractAlgebra.is_known(R, dim)
-       catch e
-         e
-       end
-ErrorException("no method implemented to check whether property dim is known for object Integers")
+julia> AbstractAlgebra.is_known(dim, R)
+ERROR: MethodError: no method matching is_known(::typeof(dim), ::AbstractAlgebra.Integers{BigInt})
 ```
 """
-function is_known(x::Any, f::Function)
-  return _is_known(x, f)
-end
+function is_known end
 
-function _is_known(x::Any, f::Function)
-  # If the object `x` has attributes and an attribute with the name 
-  # of `f` happens to be stored, return it in good faith.
-  _is_attribute_storing_type(typeof(x)) && has_attribute(x, nameof(f)) && return true
-  # Otherwise notify the user that no method is implemented rather than 
-  # just saying "no". The explicit call to this method suggests that 
-  # the callee expects the function to return something useful and 
-  # not having a working method at hand is probably a bug. 
-  error("no method implemented to check whether property $(nameof(f)) is known for object $x")
-end
-
-@doc raw"""
-    is_known(x::Any, f::Function, args...; kwargs...)
-
-Given a function `f` on `(x, args...; kwargs)` and a value `x`, 
-return whether `f(x, args...; kwargs...)` is "known" in the sense that 
-evaluating `f(x, args...; kwargs...)` is fast and takes constant time.
-
-For example this might return `true` if the result was computed before and has
-been cached.
-
-Note: The default implementation only throws an error. In general for `is_known` 
-to work correctly for a given function `f` requires that everyone adding,
-modifying or removing methods for `f` adjusts it as needed.
-
-See `src/KnownProperties.jl` in Julia package `AbstractAlgebra.jl` for details.
-"""
-function is_known(x::Any, f::Function, args...; kwargs...)
-  return _is_known(x, f, args...; kwargs...)
-end
-
-function _is_known(x::Any, f::Function, args...; kwargs...)
-  error("no method implemented to check whether property $(nameof(f)) with arguments $(args) and keyword arguments $(kwargs) is known for object $x")
+# A generic implementation to look up attributes. This can be used to implement 
+# `is_known` for a specific type of arguments of unary functions.
+function _is_known_via_attributes(f::Function, x::Any)
+  _is_attribute_storing_type(typeof(x)) || error("objects of type $(typeof(x)) do not support attribute storage")
+  return has_attribute(x, nameof(f))
 end
 
