@@ -65,6 +65,8 @@ makedocs(
              "Matrices" => [
                  "matrix_introduction.md",
                  "matrix.md",
+                 "matrix_spaces.md",
+                 "matrix_implementation.md",
                  "matrix_algebras.md",
              ],
              "Maps" => [
