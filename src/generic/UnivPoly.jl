@@ -244,17 +244,30 @@ total_degree(p::UnivPoly) = total_degree(data(p))
 
 length(p::UnivPoly) = length(data(p))
 
-function gen(S::UniversalPolyRing{T}, s::VarName) where {T <: RingElement}
-   i = findfirst(==(Symbol(s)), S.S)
-   if i === nothing
-      push!(S.S, Symbol(s))
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), S.S; internal_ordering=S.ord, cached=false)
-      i = length(S.S)
+function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
+   idx = Int[]
+   for s_ in v
+      s = Symbol(s_)
+      i = findfirst(==(s), S.S)
+      if i === nothing
+         push!(S.S, s)
+         push!(idx, length(S.S))
+      else
+         push!(idx, i)
+      end
    end
-   return UnivPoly{T}(gen(mpoly_ring(S), i), S)
+   if length(S.S) > ngens(S.mpoly_ring)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), S.S; internal_ordering=S.ord, cached=false)
+   end
+   return idx
 end
 
-gens(S::UniversalPolyRing, v::Vector{<:VarName}) = tuple([gen(S, s) for s in v]...)
+gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
+
+function gens(S::UniversalPolyRing{T}, v::Vector{<:VarName}) where {T <: RingElement}
+   idx = _ensure_variables(S, v)
+   return tuple((UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx)...)
+end
 
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
