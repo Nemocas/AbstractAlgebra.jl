@@ -137,6 +137,141 @@ julia> c = M[1, 1]
 2
 ```
 
+## Inverses
+
+```@docs
+Base.inv{T <: RingElement}(::MatrixElem{T})
+is_invertible{T <: RingElement}(::MatrixElem{T})
+is_invertible_with_inverse{T <: RingElement}(::MatrixElem{T})
+pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+```
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
+
+julia> S = matrix_space(K, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over residue field of R modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> X = inv(A)
+[-343//7817*x^2 + 717//7817*x - 2072//7817   -4964//23451*x^2 + 2195//23451*x - 11162//23451    -232//23451*x^2 - 4187//23451*x - 1561//23451]
+[ 128//7817*x^2 - 655//7817*x + 2209//7817      599//23451*x^2 - 2027//23451*x - 1327//23451   -1805//23451*x^2 + 2702//23451*x - 7394//23451]
+[ 545//7817*x^2 + 570//7817*x + 2016//7817     -1297//23451*x^2 - 5516//23451*x - 337//23451   8254//23451*x^2 - 2053//23451*x + 16519//23451]
+
+julia> is_invertible(A)
+true
+
+julia> is_invertible_with_inverse(A)
+(true, [-343//7817*x^2+717//7817*x-2072//7817 -4964//23451*x^2+2195//23451*x-11162//23451 -232//23451*x^2-4187//23451*x-1561//23451; 128//7817*x^2-655//7817*x+2209//7817 599//23451*x^2-2027//23451*x-1327//23451 -1805//23451*x^2+2702//23451*x-7394//23451; 545//7817*x^2+570//7817*x+2016//7817 -1297//23451*x^2-5516//23451*x-337//23451 8254//23451*x^2-2053//23451*x+16519//23451])
+
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in x over integers
+
+julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> X, d = pseudo_inv(A)
+([4*x^2-x+1 -2*x^3+3 x^3-5*x^2-5*x-1; -2*x^3-5*x^2-2*x-2 x^4+3*x^3+2*x^2+3*x+1 -x^4+x^2+2; -x^3+2*x^2+2*x-1 -2*x^3-9*x^2-11*x-3 2*x^3+3*x^2-4*x-6], -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7)
+```
+
+## LU factorisation
+
+```@docs
+lu{T <: FieldElem}(::MatElem{T}, ::SymmetricGroup)
+
+fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
+
+julia> S = matrix_space(K, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over residue field of R modulo x^3 + 3*x + 1
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
+[      0   2*x + 3   x^2 + 1]
+[x^2 - 2     x - 1       2*x]
+[x^2 - 2     x - 1       2*x]
+
+julia> r, P, L, U = lu(A)
+(2, (1,2), [1 0 0; 0 1 0; 1 0 1], [x^2-2 x-1 2*x; 0 2*x+3 x^2+1; 0 0 0])
+
+julia> r, d, P, L, U = fflu(A)
+(2, 3*x^2 - 10*x - 8, (1,2), [x^2-2 0 0; 0 3*x^2-10*x-8 0; x^2-2 0 1], [x^2-2 x-1 2*x; 0 3*x^2-10*x-8 -4*x^2-x-2; 0 0 0])
+```
+
+## Reduced row-echelon form
+
+```@docs
+rref_rational{T <: RingElem}(::MatElem{T})
+rref{T <: FieldElem}(::MatElem{T})
+
+is_rref{T <: RingElem}(::MatElem{T})
+is_rref{T <: FieldElem}(::MatElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> K, = residue_field(R, x^3 + 3x + 1); a = K(x);
+
+julia> S = matrix_space(K, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over residue field of R modulo x^3 + 3*x + 1
+
+julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> r, A = rref(M)
+(3, [1 0 0; 0 1 0; 0 0 1])
+
+julia> is_rref(A)
+true
+
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in x over integers
+
+julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+[            0   2*x + 3   x^2 + 1]
+[      x^2 - 2     x - 1       2*x]
+[x^2 + 3*x + 1       2*x         1]
+
+julia> r, A, d = rref_rational(M)
+(3, [-x^5-2*x^4-15*x^3-18*x^2-8*x-7 0 0; 0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7 0; 0 0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7], -x^5 - 2*x^4 - 15*x^3 - 18*x^2 - 8*x - 7)
+
+julia> is_rref(A)
+true
+```
+
 ## Matrix element constructors
 
 There are a few ways to construct matrices other than by coercing elements
@@ -229,4 +364,38 @@ julia> P = R[1; 2; t] # create a column vector
 [1]
 [2]
 [t]
+```
+
+### Hessenberg form
+
+```@docs
+hessenberg{T <: RingElem}(::MatElem{T})
+
+is_hessenberg{T <: RingElem}(::MatElem{T})
+```
+
+**Examples**
+
+```jldoctest
+julia> R, = residue_ring(ZZ, 7);
+
+julia> S = matrix_space(R, 4, 4)
+Matrix space of 4 rows and 4 columns
+  over residue ring of integers modulo 7
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> A = hessenberg(M)
+[1   5   5   3]
+[2   1   1   0]
+[0   1   3   2]
+[0   0   2   2]
+
+julia> is_hessenberg(A)
+true
 ```
