@@ -746,7 +746,8 @@ function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRi
    end
 
    # preprint each element to know the widths so as to align the columns
-   strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
+   # also replace zero entries by a dot
+   strings = String[sprint(print, isassigned(a, i, j) ? (iszero(a[i, j]) ? "." : a[i, j]) : Base.undef_ref_str,
                            context = :compact => true) for i=1:r, j=1:c]
    maxs = maximum(length, strings, dims=1)
 
@@ -2636,9 +2637,9 @@ diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
 # Examples
 ```jldoctest
 julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
-[0   -1   -2]
-[1    0   -3]
-[2    3    0]
+[.   -1   -2]
+[1    .   -3]
+[2    3    .]
 
 julia> is_skew_symmetric(M)
 true
@@ -4211,7 +4212,7 @@ julia> T, y = polynomial_ring(R, :y)
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
 [1   2   4   3]
-[2   5   1   0]
+[2   5   1   .]
 [6   1   3   2]
 [1   1   3   5]
 
@@ -6011,7 +6012,7 @@ Matrix space of 4 rows and 4 columns
 julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
               R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
 [1   2   4   3]
-[2   5   1   0]
+[2   5   1   .]
 [6   1   3   2]
 [1   1   3   5]
 
@@ -6059,19 +6060,19 @@ row are swapped.
 # Examples
 ```jldoctest
 julia> M = identity_matrix(ZZ, 3)
-[1   0   0]
-[0   1   0]
-[0   0   1]
+[1   .   .]
+[.   1   .]
+[.   .   1]
 
 julia> swap_rows(M, 1, 2)
-[0   1   0]
-[1   0   0]
-[0   0   1]
+[.   1   .]
+[1   .   .]
+[.   .   1]
 
 julia> M  # was not modified
-[1   0   0]
-[0   1   0]
-[0   0   1]
+[1   .   .]
+[.   1   .]
+[.   .   1]
 ```
 """
 function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
@@ -6090,19 +6091,19 @@ matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 # Examples
 ```jldoctest
 julia> M = identity_matrix(ZZ, 3)
-[1   0   0]
-[0   1   0]
-[0   0   1]
+[1   .   .]
+[.   1   .]
+[.   .   1]
 
 julia> swap_rows!(M, 1, 2)
-[0   1   0]
-[1   0   0]
-[0   0   1]
+[.   1   .]
+[1   .   .]
+[.   .   1]
 
 julia> M  # was modified
-[0   1   0]
-[1   0   0]
-[0   0   1]
+[.   1   .]
+[1   .   .]
+[.   .   1]
 ```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
@@ -6862,13 +6863,13 @@ zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 # Examples
 ```jldoctest
 julia> diagonal_matrix(ZZ(2), 2, 3)
-[2   0   0]
-[0   2   0]
+[2   .   .]
+[.   2   .]
 
 julia> diagonal_matrix(QQ(-1), 3)
-[-1//1    0//1    0//1]
-[ 0//1   -1//1    0//1]
-[ 0//1    0//1   -1//1]
+[-1//1       .       .]
+[    .   -1//1       .]
+[    .       .   -1//1]
 ```
 """
 function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
@@ -6894,16 +6895,16 @@ matrix. Otherwise the parent is inferred from the vector $x$.
 
 ```jldoctest
 julia> diagonal_matrix(ZZ(1), ZZ(2))
-[1   0]
-[0   2]
+[1   .]
+[.   2]
 
 julia> diagonal_matrix([ZZ(3), ZZ(4)])
-[3   0]
-[0   4]
+[3   .]
+[.   4]
 
 julia> diagonal_matrix(ZZ, [5, 6])
-[5   0]
-[0   6]
+[5   .]
+[.   6]
 ```
 """
 function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
@@ -6965,7 +6966,7 @@ An exception is thrown if there is no integer $n$ with this property.
 # Examples
 ```jldoctest
 julia> lower_triangular_matrix([1, 2, 3])
-[1   0]
+[1   .]
 [2   3]
 ```
 """
@@ -7005,7 +7006,7 @@ An exception is thrown if there is no integer $n$ with this property.
 ```jldoctest
 julia> upper_triangular_matrix([1, 2, 3])
 [1   2]
-[0   3]
+[.   3]
 ```
 """
 function upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
@@ -7043,9 +7044,9 @@ An exception is thrown if there is no integer $n$ with this property.
 # Examples
 ```jldoctest
 julia> strictly_lower_triangular_matrix([1, 2, 3])
-[0   0   0]
-[1   0   0]
-[2   3   0]
+[.   .   .]
+[1   .   .]
+[2   3   .]
 ```
 """
 function strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
@@ -7083,9 +7084,9 @@ An exception is thrown if there is no integer $n$ with this property.
 # Examples
 ```jldoctest
 julia> strictly_upper_triangular_matrix([1, 2, 3])
-[0   1   2]
-[0   0   3]
-[0   0   0]
+[.   1   2]
+[.   .   3]
+[.   .   .]
 ```
 """
 function strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}

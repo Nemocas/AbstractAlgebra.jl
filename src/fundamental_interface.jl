@@ -149,8 +149,8 @@ Matrix space of 2 rows and 2 columns
   over integers
 
 julia> one(S)
-[1   0]
-[0   1]
+[1   .]
+[.   1]
 
 julia> R, x = puiseux_series_field(QQ, 4, :x)
 (Puiseux series field in x over rationals, x + O(x^5))
@@ -180,8 +180,8 @@ Matrix ring of degree 2
   over rationals
 
 julia> zero(S)
-[0//1   0//1]
-[0//1   0//1]
+[.   .]
+[.   .]
 
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
