@@ -3422,6 +3422,9 @@ function is_upper_triangular(M::MatrixElem)
     return true
 end
 
+# Remove the following once Nemo is adjusted
+_solve_triu_right(M, b; unipotent = false) = _solve_triu(M, b; unipotent, side = :right)
+
 @doc raw"""
     _solve_triu(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false, side::Symbol = :left) where {T <: RingElement}
 
