@@ -294,6 +294,9 @@ function free_associative_algebra(
   return (parent_obj, gens(parent_obj))
 end
 
+@varnames_interface free_associative_algebra(R::Ring, s)
+
+
 free_associative_algebra_type(::Type{T}) where T<:RingElement = Generic.FreeAssociativeAlgebra{T}
 
 free_associative_algebra_type(::Type{S}) where S<:Ring = free_associative_algebra_type(elem_type(S))
