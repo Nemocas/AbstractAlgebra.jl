@@ -16,7 +16,7 @@
 ###############################################################################
 
 
-function ConformanceTests.test_Group_interface(G::Group)
+function test_Group_interface(G::Group)
   @testset "Group interface" begin
 #        @testset "Iteration protocol" begin
 #            IS = Base.IteratorSize(typeof(G))
@@ -103,7 +103,7 @@ function ConformanceTests.test_Group_interface(G::Group)
   end
 end
 
-function ConformanceTests.test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
+function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
   @testset "GroupElem interface" begin
 
