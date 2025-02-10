@@ -39,6 +39,7 @@ import Base: >
 import Base: >=
 import Base: >>
 import Base: Array
+import Base: Matrix
 import Base: Rational
 import Base: ^
 import Base: abs
