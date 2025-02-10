@@ -277,6 +277,12 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             @test B == b
          end
       end
+
+      @testset "Basic properties" begin
+         @test !is_irreducible(zero(R))
+         @test !is_irreducible(one(R))
+      end
+
    end
 
    return nothing
@@ -472,6 +478,17 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
             @test constant_coefficient(a) isa elem_type(R)
             @test trailing_coefficient(a) isa elem_type(R)
             @test is_monic(a) == isone(leading_coefficient(a))
+         end
+      end
+
+      @testset "Basic properties" begin
+         try
+            flag = is_irreducible(x)
+            @test flag || is_trivial(R)
+         catch e
+            if !(e isa NotImplementedError)
+               rethrow(e)
+            end
          end
       end
    end
