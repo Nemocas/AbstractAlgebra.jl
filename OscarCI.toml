@@ -17,3 +17,13 @@ title = "metadata for oscar CI run"
 
   [pkgs.Hecke]
   test = false
+
+
+[include]
+  [include.justoscarmaster]
+  Oscar = "master"
+  Singular = "release"
+  Hecke = "release"
+  Nemo = "release"
+  julia-version = "1.10"
+  os = "ubuntu-latest"
