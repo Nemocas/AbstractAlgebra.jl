@@ -3,7 +3,6 @@
       for iters = 1:5
          ord = rand_ordering()
 
-         @test universal_polynomial_ring(R; internal_ordering=ord, cached = true) === universal_polynomial_ring(R; internal_ordering=ord, cached = true)
          @test universal_polynomial_ring(R; internal_ordering=ord, cached = false) !== universal_polynomial_ring(R; internal_ordering=ord, cached = false)
 
          S = universal_polynomial_ring(R; internal_ordering=ord)
