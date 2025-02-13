@@ -34,10 +34,6 @@ function is_exact_type(a::Type{S}) where {T <: FieldElement, U <: Union{PolyRing
    return is_exact_type(T)
 end
 
-function characteristic(R::RationalFunctionField)
-   return characteristic(base_ring(R))
-end
-
 ###############################################################################
 #
 #   Constructors
@@ -126,6 +122,12 @@ function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    R = parent(a)
    return R(deepcopy_internal(data(a), dict))
 end
+
+function characteristic(R::RationalFunctionField)
+   return characteristic(base_ring(R))
+end
+
+is_finite(R::RationalFunctionField) = false
 
 ###############################################################################
 #

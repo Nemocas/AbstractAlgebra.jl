@@ -6,6 +6,7 @@ end
 @testset "Generic.RationalFunctionField.constructors" begin
    # Univariate
 
+   T, x = rational_function_field(QQ)  # verify default variable name is provided
    T, x = rational_function_field(QQ, "x")
 
    @test rational_function_field(QQ, "x", cached = true)[1] === rational_function_field(QQ, "x", cached = true)[1]
@@ -75,6 +76,14 @@ end
    @test isa(12//(y + 2), Generic.RationalFunctionFieldElem)
 
    @test isa(((x + 1)//(y + 2))//((y + 3)//(x + 4)), Generic.RationalFunctionFieldElem)
+
+   T, = rational_function_field(QQ)
+   @test characteristic(T) == 0
+   @test !is_finite(T)
+
+   T, = rational_function_field(GF(3))
+   @test characteristic(T) == 3
+   @test !is_finite(T)
 end
 
 @testset "Generic.RationalFunctionField.printing" begin
