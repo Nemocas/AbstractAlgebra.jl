@@ -104,6 +104,7 @@ characteristic(a::NCPolyRing) = characteristic(base_ring(a))
 is_known(::typeof(characteristic), R::NCPolyRing) = is_known(characteristic, base_ring(R))
 
 is_finite(a::NCPolyRing) = is_trivial(a)
+is_known(::typeof(is_finite), R::NCPolyRing) = is_known(is_trivial, R)
 
 ###############################################################################
 #

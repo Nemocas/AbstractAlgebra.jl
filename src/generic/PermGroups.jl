@@ -672,6 +672,7 @@ gen(G::SymmetricGroup, i::Int) = gens(G)[i]
 number_of_generators(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
 
 is_finite(G::SymmetricGroup) = true
+is_known(::typeof(is_finite), ::SymmetricGroup) = true
 
 order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 
