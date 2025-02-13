@@ -96,7 +96,7 @@ Return the variables actually occurring in $p$.
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
    R = parent(p)
    n = nvars(R)
-   isused = [0 for i in 1:n]
+   isused = zeros(Int, n)
    for v in exponent_vectors(p)
       isused .|= v  # accumulate by OR-ing the exponent vectors
    end
