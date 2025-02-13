@@ -21,6 +21,8 @@ canonical_unit(a::NumFieldElem) = a
 
 characteristic(F::NumField) = 0
 
+is_known(::typeof(characteristic), F::NumField) = true
+
 promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
 
 promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S

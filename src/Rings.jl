@@ -211,6 +211,7 @@ of a single element, or equivalently if its characteristic is 1. Such
 rings are also called zero rings.
 """
 is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
+is_known(::typeof(is_trivial), R::NCRing) = is_domain_type(elem_type(R))
 
 @doc raw"""
     is_zero(R::NCRing)
@@ -238,10 +239,14 @@ is_zero(R::NCRing) = is_trivial(R)
 
 Test whether the field $F$ is perfect.
 """
-is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
-                                                 throw(NotImplementedError(:is_perfect, F))
+is_perfect(F::Field) = characteristic(F) == 0 || throw(NotImplementedError(:is_perfect, F))
+is_known(::typeof(is_perfect), F::Field) = is_known(characteristic, F) && characteristic(F) == 0
+
+is_perfect(F::FinField) = true
+is_known(::typeof(is_perfect), F::FinField) = true
 
 is_finite(F::FinField) = true
+is_known(::typeof(is_finite), F::FinField) = true
 
 function is_finite(R::NCRing)
   c = characteristic(R)
@@ -249,3 +254,4 @@ function is_finite(R::NCRing)
   c == 1 && return true
   throw(NotImplementedError(:is_finite, R))
 end
+is_known(::typeof(is_finite), R::NCRing) = is_known(characteristic, R) && characteristic(R) <= 1

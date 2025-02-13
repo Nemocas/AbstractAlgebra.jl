@@ -69,9 +69,10 @@ end
 
 Return the characteristic of the residue field.
 """
-function characteristic(R::ResidueField)
-   return characteristic(base_ring(R))
-end
+characteristic(R::ResidueField) = characteristic(base_ring(R))
+# FIXME: why is the above method correct in general??? Isn't it wrong if
+# we e.g. start with ZZ[:x] and factor out ideal([x, 2]) ?
+is_known(::typeof(characteristic), R::ResidueField) = is_known(characteristic, base_ring(R))
 
 @doc raw"""
     characteristic(r::ResidueField{T}) where T <: Integer
@@ -82,6 +83,7 @@ residue $r$ belongs to.
 function characteristic(r::ResidueField{T}) where T <: Integer
    return modulus(r)
 end
+is_known(::typeof(characteristic), R::ResidueField{T}) where T <: Integer = true
 
 data(a::ResFieldElem) = a.data
 

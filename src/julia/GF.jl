@@ -80,9 +80,8 @@ is_unit(a::GFElem) = a.d != 0
 
 Return the characteristic of the given finite field.
 """
-function characteristic(R::GFField)
-   return R.p
-end
+characteristic(R::GFField) = R.p
+is_known(::typeof(characteristic), ::GFField) = true
 
 @doc raw"""
     order(R::GFField)

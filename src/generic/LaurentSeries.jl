@@ -365,9 +365,8 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-function characteristic(a::LaurentSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(a::LaurentSeriesRing) = characteristic(base_ring(a))
+is_known(::typeof(characteristic), R::LaurentSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
