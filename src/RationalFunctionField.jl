@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-function rational_function_field(k::Field, s::VarName; cached::Bool=true)
+function rational_function_field(k::Field, s::VarName = :t; cached::Bool=true)
    return Generic.rational_function_field(k, Symbol(s); cached=cached)
 end
 
