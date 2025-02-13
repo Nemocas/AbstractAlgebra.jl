@@ -69,6 +69,7 @@ function characteristic(a::MatRing)
    iszero(nrows(a)) && return 1
    return characteristic(base_ring(a))
 end
+is_known(::typeof(characteristic), R::MatRing) = is_known(characteristic, base_ring(R))
 
 is_finite(R::MatRing) = iszero(nrows(a)) || is_finite(base_ring(R))
 

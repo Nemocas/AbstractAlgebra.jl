@@ -30,6 +30,7 @@ symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
 number_of_variables(R::LaurentPolyWrapRing) = number_of_variables(R.polyring)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
+is_known(::typeof(characteristic), R::LaurentPolyWrapRing) = is_known(characteristic, base_ring(R))
 
 
 ###############################################################################

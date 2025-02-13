@@ -20,7 +20,8 @@ base_ring_type(::Type{FactoredFracField{T}}) where T <: NCRingElement = parent_t
 
 base_ring(F::FactoredFracField{T}) where T <: RingElement = F.base_ring::parent_type(T)
 
-characteristic(F::FactoredFracField{T}) where T <: RingElement = characteristic(base_ring(F))
+characteristic(F::FactoredFracField) = characteristic(base_ring(F))
+is_known(::typeof(characteristic), R::FactoredFracField) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

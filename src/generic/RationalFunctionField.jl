@@ -34,9 +34,8 @@ function is_exact_type(a::Type{S}) where {T <: FieldElement, U <: Union{PolyRing
    return is_exact_type(T)
 end
 
-function characteristic(R::RationalFunctionField)
-   return characteristic(base_ring(R))
-end
+characteristic(R::RationalFunctionField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::RationalFunctionField) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
