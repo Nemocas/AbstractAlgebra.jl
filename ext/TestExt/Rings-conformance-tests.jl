@@ -47,6 +47,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
          catch
+            # could not compute characteristic, so verify that is_known
+            # reflects this
+            @test is_known(characteristic, R) == false
          end
       end
 
@@ -289,6 +292,13 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
    @testset "Field interface for $(R) of type $(typeof(R))" begin
 
       test_Ring_interface(R, reps = reps)
+
+      # We implicitly assume all genuine fields (i.e. of type `Field`, not
+      # just rings that happen to be fields) know their characteristic. So
+      # test for that. We may relax this in the future if we have need for it.
+      # But for now if the next tests fail this usually means someone forgot
+      # to implement `characteristic` for their ring type properly.
+      @test is_known(characteristic, R) == true
 
       @test iszero(R(characteristic(R)))
       @test iszero(characteristic(R) * one(R))
