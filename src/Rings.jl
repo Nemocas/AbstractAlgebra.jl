@@ -215,9 +215,8 @@ is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
 @doc raw"""
     is_zero(R::NCRing)
 
-Test whether the ring $R$ is trivial. However, the recommended method is is_trivial. A ring is trivial if it consists
-of a single element, or equivalently if its characteristic is 1. Such
-rings are also called zero rings.
+Test whether the ring $R$ is trivial. However, the recommended method
+for doing this is [`is_trivial`](@ref).
 
 ```jldoctest
 julia> R, (x,) = polynomial_ring(QQ, [:x]);
