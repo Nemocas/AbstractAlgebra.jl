@@ -94,24 +94,13 @@ number_of_generators(R::MPolyRing) = number_of_variables(R)
 Return the variables actually occurring in $p$.
 """
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
-   U = typeof(p)
-   vars_in_p = Vector{U}(undef, 0)
-   n = nvars(parent(p))
-   gen_list = gens(parent(p))
-   biggest = [0 for i in 1:n]
+   R = parent(p)
+   n = nvars(R)
+   isused = zeros(Int, n)
    for v in exponent_vectors(p)
-      for j = 1:n
-         if v[j] > biggest[j]
-            biggest[j] = v[j]
-         end
-      end
+      isused .|= v  # accumulate by OR-ing the exponent vectors
    end
-   for i = 1:n
-      if biggest[i] != 0
-         push!(vars_in_p, gen_list[i])
-      end
-   end
-   return(vars_in_p)
+   return [R[i] for i in 1:n if isused[i] != 0]
 end
 
 @doc raw"""

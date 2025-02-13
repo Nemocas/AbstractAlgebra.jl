@@ -86,7 +86,6 @@ function vars(p::MPoly{T}) where {T <: RingElement}
    vars_in_p = Vector{MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
-   size_exps = size(exps)
    gen_list = gens(p.parent)
    for j = 1:n
       for i = 1:length(p)
