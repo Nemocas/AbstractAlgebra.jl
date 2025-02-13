@@ -229,6 +229,13 @@ function characteristic(R::NCRing)
    error("Characteristic not known")
 end
 
+# All rings are supposed to implement characteristic if they can. If they
+# can not, or only can do it with an expensive computation (e.g. a Groebner
+# basis), then instead they should implement an `is_known` method indicating
+# this. To enforce this via the ring conformance tests, we add this default
+# method for `is_known(characteristic, ::NCRing)`
+is_known(::typeof(characteristic), ::NCRing) = true
+
 ###############################################################################
 #
 #   One and zero
