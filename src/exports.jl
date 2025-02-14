@@ -14,6 +14,7 @@ export @polynomial_ring
 export @power_series_ring
 export @rational_function_field
 export @req
+export @universal_polynomial_ring
 export @v_do
 export @vprint
 export @vprintln
