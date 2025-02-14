@@ -133,6 +133,11 @@ end
    K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    test_rand(K, 0:3, 0:3, -3:3)
+
+   # test that results are reduced
+   K, x = rational_function_field(GF(2), "x")
+   f = rand(K, 1:1)
+   @test is_unit(gcd(numerator(f), denominator(f)))
 end
 
 @testset "Generic.RationalFunctionField.manipulation" begin
