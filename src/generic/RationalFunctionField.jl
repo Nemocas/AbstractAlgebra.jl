@@ -675,7 +675,7 @@ end
 
 function factor_squarefree(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
   R = base_ring(f)
-  return _transport_factor(factor, f, data, R)
+  return _transport_factor(factor_squarefree, f, data, R)
 end
 
 function is_squarefree(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
