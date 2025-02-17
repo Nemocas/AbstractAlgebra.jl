@@ -2577,10 +2577,10 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> minors_with_position(A, 2)
-3-element Vector{Vector{Any}}:
- [-3, [1, 2], [1, 2]]
- [-6, [1, 3], [1, 2]]
- [-3, [2, 3], [1, 2]]
+3-element Vector{Tuple{ZZRingElem, Vector{Int64}, Vector{Int64}}}:
+ (-3, [1, 2], [1, 2])
+ (-6, [1, 2], [1, 3])
+ (-3, [1, 2], [2, 3])
 
 ```
 """
@@ -2628,10 +2628,7 @@ julia> A = ZZ[1 2 3; 4 5 6]
 [4   5   6]
 
 julia> first(minors_iterator_with_position(A, 2))
-3-element Vector{Any}:
- -3
- [1, 2]
- [1, 2]
+(-3, [1, 2], [1, 2])
 
 ```
 """
