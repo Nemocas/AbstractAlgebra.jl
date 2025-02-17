@@ -43,7 +43,7 @@ end
 Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`, return
 a tuple `S, [x1, x2, ...]` of the universal polynomial ring `S = R[x1, x2, \dots]` and its generators `x1, x2, \dots`.
 
-If `varnames` is skipped, return an object representing
+If `varnames` is omitted, return an object representing
 the universal polynomial ring `S = R[\ldots]` with no variables in it initially.
 
 # Examples
