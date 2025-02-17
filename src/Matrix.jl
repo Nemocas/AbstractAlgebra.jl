@@ -2568,6 +2568,21 @@ minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
     minors_with_position(A::MatElem, k::Int)
 
 Return an array consisting of the `k`-minors of `A` and the respective data on the rows and columns involved.
+
+# Examples
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors_with_position(A, 2)
+3-element Vector{Vector{Any}}:
+ [-3, [1, 2], [1, 2]]
+ [-6, [1, 3], [1, 2]]
+ [-3, [2, 3], [1, 2]]
+
+```
 """
 minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
 
@@ -2604,6 +2619,21 @@ end
     minors_iterator_with_position(A::MatElem, k::Int)
 
 Return an iterator that computes the `k`-minors of `A` also specifying the row and column indices of the minor.
+
+# Examples
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> first(minors_iterator_with_position(A, 2))
+3-element Vector{Any}:
+ -3
+ [1, 2]
+ [1, 2]
+
+```
 """
 function minors_iterator_with_position(M::MatElem, k::Int)
     row_indices = combinations(nrows(M), k)
