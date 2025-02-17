@@ -10,6 +10,7 @@
 module MPolyFactor
 
 using AbstractAlgebra
+import AbstractAlgebra: mulpow!
 
 mutable struct pfracinfo{E}
   xalphas           ::Vector{E}                 # [x_i - alpha_i for i = 1..r]
@@ -263,7 +264,7 @@ function pfracinit(
         s = evaluate(betas[1][i], sub)
         t = evaluate(p, sub)
         g, s1, t1 = gcdx(s, t)
-        if degree(g) != 0
+        if !is_constant(g)
           # univariates are not pairwise prime
           return false, I
         end
@@ -1051,7 +1052,7 @@ end
 #=
   Try to determine divisors of the leading coefficients of the factors of A.
   This is accomplished by looking at the bivariate factoration of A when
-  all but one of the minor variables are evaluated away. The resulting 
+  all but one of the minor variables are evaluated away. The resulting
   univariate leading coefficients are lifted against the supplied
   factorization of lc(A). return is Tuple{::Boole, ::Vector{E}}
   If the bool is true, then the method can be considered to have fully found
@@ -1173,7 +1174,7 @@ function mfactor_irred_mvar_char_zero(
   # make sure univar is squarefree. TODO also zassenhaus pruning here
   ok, ufac = mfactor_irred_univar(evals[1], mainvar)
   if !ok
-    @goto next_alpha    
+    @goto next_alpha
   end
 
   if length(ufac) < 2
@@ -1257,7 +1258,7 @@ function mfactor_irred_char_zero(a::E) where E
   if !isone(lc)
     res.unit = lc
     a *= inv(lc)
-  end  
+  end
 
   degs = degrees(a)
   vars = Int[]    # variables that actually appear
