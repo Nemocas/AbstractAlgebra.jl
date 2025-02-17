@@ -94,21 +94,35 @@ function (a::FracField{T})(b::T) where {T <: RingElement}
    return z
 end
 
-function (a::FracField{T})(b::T, c::T) where {T <: RingElement}
+function _reduce_fraction(x, y)
+   iszero(y) && throw(DivideError())
+   g = gcd(x, y)
+   return divexact(x, g), divexact(y, g)
+end
+
+function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
+   if reduce
+     b, c = _reduce_fraction(b, c)
+   end
    z = FracFieldElem{T}(b, c)
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
+function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {U <: FieldElem, T <: PolyRingElem{U}}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
-   u = canonical_unit(c)
-   if !isone(u)
-      b = divexact(b, u)
-      c = divexact(c, u)
+
+   if reduce
+      b, c = _reduce_fraction(b, c)
+   else
+      u = canonical_unit(c)
+      if !isone(u)
+         b = divexact(b, u)
+         c = divexact(c, u)
+      end
    end
    z = FracFieldElem{T}(b, c)
    z.parent = a

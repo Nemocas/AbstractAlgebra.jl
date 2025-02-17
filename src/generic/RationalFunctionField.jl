@@ -515,7 +515,7 @@ function rand(rng::AbstractRNG,
    while iszero(d)
       d = rand(rng, v)
    end
-   return S(fraction_field(S)(n, d))
+   return S(fraction_field(S)(n, d; reduce = true))
 end
 
 rand(rng::AbstractRNG, S::RationalFunctionField, v...) =
@@ -649,4 +649,35 @@ function rational_function_field(k::Field, s::Vector{Symbol}; cached::Bool=true)
    end
 
    return par_object, t
+end
+
+################################################################################
+#
+#  Factoring
+#
+################################################################################
+
+function _transport_factor(factorfun::F, f, fwd::G, bwd::H) where {F, G, H}
+  R = parent(f)
+  g = map_coefficients(fwd, f; cached = false)
+  facg = factorfun(g)
+  D = Dict{typeof(f), Int}()
+  for (pg, e) in facg
+    D[map_coefficients(bwd, pg; parent = R)] = e
+  end
+  return Fac(map_coefficients(bwd, unit(facg); parent = R), D)
+end
+
+function factor(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
+  R = base_ring(f)
+  return _transport_factor(factor, f, data, R)
+end
+
+function factor_squarefree(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
+  R = base_ring(f)
+  return _transport_factor(factor_squarefree, f, data, R)
+end
+
+function is_squarefree(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
+  is_squarefree(map_coefficients(data, f; cached = false))
 end

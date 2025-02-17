@@ -152,6 +152,7 @@ import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
+import ..AbstractAlgebra: is_squarefree
 import ..AbstractAlgebra: is_square_with_sqrt
 import ..AbstractAlgebra: is_term
 import ..AbstractAlgebra: is_terse
