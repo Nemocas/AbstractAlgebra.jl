@@ -423,23 +423,23 @@ end
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
    function UniversalPolyRing{T}(
-      R::Ring, internal_ordering::Symbol, cached::Bool=true
+      R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
    ) where {T<:RingElement}
       @assert elem_type(R) == T
       return get_cached!(
-         UnivPolyID, (R, internal_ordering), cached
+         UnivPolyID, (R, s, internal_ordering), cached
       ) do
          new{T}(
             R,
-            Symbol[],
+            s,
             internal_ordering,
-            AbstractAlgebra.polynomial_ring_only(R, Symbol[]; internal_ordering, cached),
+            AbstractAlgebra.polynomial_ring_only(R, s; internal_ordering, cached=false)
          )
       end::UniversalPolyRing{T}
    end
 end
 
-const UnivPolyID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
+const UnivPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol}, Ring}()
 
 mutable struct UnivPoly{T <: RingElement} <: AbstractAlgebra.UniversalPolyRingElem{T}
    p::MPolyRingElem{T}

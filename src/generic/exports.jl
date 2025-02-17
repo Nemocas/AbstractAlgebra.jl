@@ -127,7 +127,6 @@ export trailing_coefficient
 export truncate
 export truncate!
 export unit
-export universal_polynomial_ring
 export upscale
 export weights
 export zero

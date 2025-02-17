@@ -6,6 +6,12 @@
          @test universal_polynomial_ring(R; internal_ordering=ord, cached = true) === universal_polynomial_ring(R; internal_ordering=ord, cached = true)
          @test universal_polynomial_ring(R; internal_ordering=ord, cached = false) !== universal_polynomial_ring(R; internal_ordering=ord, cached = false)
 
+         @test universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = true)[1] === universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = true)[1]
+         @test universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = false)[1] !== universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = false)[1]
+
+         @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = true)[1] === universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = true)[1]
+         @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = false)[1] !== universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = false)[1]
+
          S = universal_polynomial_ring(R; internal_ordering=ord)
 
          x = gen(S, "x")
@@ -76,6 +82,17 @@
          @test x in keys(Dict(x => 1))
          @test !(y in keys(Dict(x => 1)))
          @test !(y in keys(Dict(z => 1)))
+
+         S2, x = universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord)
+
+         @test length(x) == 3
+         @test isa(x[1], UniversalPolyRingElem)
+         @test parent(x[1]) == S2
+         @test gens(S2) == x
+
+         S3 = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
+         @test ngens(S3) == 7
+         @test parent(x11+y2) == S3
       end
    end
 end
