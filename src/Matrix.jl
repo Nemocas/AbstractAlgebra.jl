@@ -2638,7 +2638,7 @@ julia> first(minors_iterator_with_position(A, 2))
 function minors_iterator_with_position(M::MatElem, k::Int)
     row_indices = combinations(nrows(M), k)
     col_indices = combinations(ncols(M), k)
-  return ([det(M[rows, cols]), rows, cols] for rows in row_indices for cols in col_indices)
+  return ((det(M[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
