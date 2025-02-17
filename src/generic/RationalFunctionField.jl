@@ -127,7 +127,7 @@ function characteristic(R::RationalFunctionField)
    return characteristic(base_ring(R))
 end
 
-is_finite(R::RationalFunctionField) = false
+is_finite(R::RationalFunctionField) = is_finite(base_ring(R.fraction_field))
 
 ###############################################################################
 #
@@ -642,7 +642,7 @@ function rational_function_field(k::Field, s::Vector{Symbol}; cached::Bool=true)
    g = [S(xi) for xi in x]
    t = [RationalFunctionFieldElem{T, U}(gi) for gi in g]
 
-   par_object = RationalFunctionField{T, U}(k, parent(g[1]), s, cached)
+   par_object = RationalFunctionField{T, U}(k, S, s, cached)
 
    for ti in t
       ti.parent = par_object

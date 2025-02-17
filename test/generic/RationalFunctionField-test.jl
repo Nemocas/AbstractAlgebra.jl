@@ -84,6 +84,14 @@ end
    T, = rational_function_field(GF(3))
    @test characteristic(T) == 3
    @test !is_finite(T)
+
+   T, = rational_function_field(GF(3), Symbol[])
+   @test characteristic(T) == 3
+   @test is_finite(T)
+
+   T, = rational_function_field(GF(3), Symbol[:x, :y])
+   @test characteristic(T) == 3
+   @test !is_finite(T)
 end
 
 @testset "Generic.RationalFunctionField.printing" begin
