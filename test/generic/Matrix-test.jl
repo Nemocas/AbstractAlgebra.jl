@@ -1924,6 +1924,7 @@ end
       end
       @test [det(M)] == minors(M, n)
       @test [] == minors(M, n + 1)
+      @test [(det(M),[i for i in 1:n],[j for j in 1:n])] == minors_with_position(M,n)
    end
 end
 
