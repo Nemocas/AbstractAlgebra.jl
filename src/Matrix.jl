@@ -2565,6 +2565,13 @@ julia> minors(A, 2)
 minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
 
 @doc raw"""
+    minors_with_position(A::MatElem, k::Int)
+
+Return an array consisting of the `k`-minors of `A` and the respective data on the rows and columns involved.
+"
+minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
+
+@doc raw"""
     minors_iterator(A::MatElem, k::Int)
 
 Return an iterator that computes the `k`-minors of `A`.
@@ -2591,6 +2598,20 @@ function minors_iterator(M::MatElem, k::Int)
   row_indices = combinations(nrows(M), k)
   col_indices = combinations(ncols(M), k)
   return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
+end
+
+"""
+minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
+
+@doc raw"""
+    minors_iterator(A::MatElem, k::Int)
+
+Return an iterator that computes the `k`-minors of `A` also specifying the row and column indices of the minor.
+"""
+function minors_iterator_with_position(M::MatElem, k::Int)
+    row_indices = combinations(nrows(M), k)
+    col_indices = combinations(ncols(M), k)
+  return ([det(M[rows, cols]), rows, cols] for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
