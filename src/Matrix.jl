@@ -1,4 +1,4 @@
-###############################################################################
+f###############################################################################
 #
 #   Matrix.jl : matrices over rings
 #
@@ -2600,11 +2600,8 @@ function minors_iterator(M::MatElem, k::Int)
   return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
 end
 
-"""
-minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
-
 @doc raw"""
-    minors_iterator(A::MatElem, k::Int)
+    minors_iterator_with_position(A::MatElem, k::Int)
 
 Return an iterator that computes the `k`-minors of `A` also specifying the row and column indices of the minor.
 """
