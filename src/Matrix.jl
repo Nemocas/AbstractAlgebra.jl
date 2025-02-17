@@ -2568,7 +2568,7 @@ minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
     minors_with_position(A::MatElem, k::Int)
 
 Return an array consisting of the `k`-minors of `A` and the respective data on the rows and columns involved.
-"
+"""
 minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
 
 @doc raw"""
