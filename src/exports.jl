@@ -389,7 +389,9 @@ export matrix_space
 export max_fields
 export max_precision
 export minors
+export minors_with_position
 export minors_iterator
+export minors_iterator_with_position
 export minpoly
 export mod
 export mod!
