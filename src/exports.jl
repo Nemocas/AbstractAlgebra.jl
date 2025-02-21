@@ -197,6 +197,7 @@ export divexact_low
 export divexact_right
 export divhigh
 export divides
+export divides!
 export domain
 export downscale
 export echelon_form
