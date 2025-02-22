@@ -475,17 +475,17 @@ end
 ###############################################################################
 
 function zero!(c::RationalFunctionFieldElem)
-   c.d = zero!(data(c))
+   zero!(data(c))
    return c
 end
 
 function mul!(c::RationalFunctionFieldElem{T, U}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   c.d = mul!(data(c), data(a), data(b))
+   mul!(data(c), data(a), data(b))
    return c
 end
 
 function add!(c::RationalFunctionFieldElem{T}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   c.d = add!(data(c), data(a), data(b))
+   add!(data(c), data(a), data(b))
    return c
 end
 
@@ -555,16 +555,14 @@ end
 
 function (a::RationalFunctionField{T, U})() where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K())
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::FracFieldElem{U}) where {T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
    K = fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
-   z = RationalFunctionFieldElem{T, U}(b)
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(b, a)
    return z::RationalFunctionFieldElem{T, U}
 end
 
@@ -591,15 +589,13 @@ end
 
 function (a::RationalFunctionField{T, U})(b::Integer) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K(b))
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::Rational{<:Integer}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K(b))
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
@@ -622,11 +618,8 @@ function rational_function_field(k::Field, s::Symbol; cached::Bool=true)
 
    S = fraction_field(R)
    g = S(x)
-   t = RationalFunctionFieldElem{T, U}(g)
-
    par_object = RationalFunctionField{T, U}(k, parent(g), s, cached)
-
-   t.parent = par_object
+   t = RationalFunctionFieldElem{T, U}(g, par_object)
 
    return par_object, t
 end
@@ -640,13 +633,8 @@ function rational_function_field(k::Field, s::Vector{Symbol}; cached::Bool=true)
 
    S = fraction_field(R)
    g = [S(xi) for xi in x]
-   t = [RationalFunctionFieldElem{T, U}(gi) for gi in g]
-
    par_object = RationalFunctionField{T, U}(k, S, s, cached)
-
-   for ti in t
-      ti.parent = par_object
-   end
+   t = [RationalFunctionFieldElem{T, U}(gi, par_object) for gi in g]
 
    return par_object, t
 end
