@@ -412,6 +412,13 @@ The two argument version is a shorthand for `div(a, a, b)`.
 div!(z, a, b) = AbstractAlgebra.div(a, b)
 div!(a, b) = div!(a, a, b)
 
+@doc """
+    divides!(z, a, b)
+
+Return `divides(a, b)`, possibly modifying the object `z` in the process.
+"""
+divides!(z, a, b) = divides(a, b)
+
 @doc raw"""
     canonical_injection(D, i)
 
