@@ -3,6 +3,7 @@ module ConformanceTests
 using ..AbstractAlgebra
 
 # helper
+
 function equality(a, b)
   if is_exact_type(typeof(a)) && is_exact_type(typeof(b))
      return a == b
@@ -10,6 +11,11 @@ function equality(a, b)
      return isapprox(a, b)
   end
 end
+
+function equality(a::Tuple, b::Tuple)
+  return all(equality.(a, b))
+end
+
 
 function equality_up_to_units(a, b)
   iszero(a) && return iszero(b)
