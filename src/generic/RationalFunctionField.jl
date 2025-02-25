@@ -474,20 +474,26 @@ end
 #
 ###############################################################################
 
-function zero!(c::RationalFunctionFieldElem)
-   zero!(data(c))
-   return c
-end
+zero!(c::RationalFunctionFieldElem) =
+  RationalFunctionFieldElem(zero!(data(c)), parent(c))
 
-function mul!(c::RationalFunctionFieldElem{T, U}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   mul!(data(c), data(a), data(b))
-   return c
-end
+one!(c::RationalFunctionFieldElem) =
+  RationalFunctionFieldElem(one!(data(c)), parent(c))
 
-function add!(c::RationalFunctionFieldElem{T}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   add!(data(c), data(a), data(b))
-   return c
-end
+neg!(c::T, a::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(neg!(data(c), data(a)), parent(c))
+
+inv!(c::T, a::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(inv!(data(c), data(a)), parent(c))
+
+add!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(add!(data(c), data(a), data(b)), parent(c))
+
+sub!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(sub!(data(c), data(a), data(b)), parent(c))
+
+mul!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(mul!(data(c), data(a), data(b)), parent(c))
 
 ###############################################################################
 #
