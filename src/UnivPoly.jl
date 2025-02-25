@@ -32,6 +32,25 @@ end
 
 ###############################################################################
 #
+#  Factorization
+#
+###############################################################################
+
+function _wrap_factorization(f::Fac{<:MPolyRingElem}, S::UniversalPolyRing)
+   res = Fac{elem_type(S)}()
+   res.unit = Generic.UnivPoly(f.unit, S)
+   for (fact, expo) in f
+      mulpow!(res, Generic.UnivPoly(fact, S), expo)
+   end
+   return res
+end
+
+factor_squarefree(f::UniversalPolyRingElem) = _wrap_factorization(factor_squarefree(data(f)), parent(f))
+
+factor(f::UniversalPolyRingElem) = _wrap_factorization(factor(data(f)), parent(f))
+
+###############################################################################
+#
 #   universal_polynomial_ring constructors
 #
 ###############################################################################
