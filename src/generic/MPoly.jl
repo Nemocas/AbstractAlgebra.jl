@@ -1018,6 +1018,7 @@ function -(a::MPoly{T}) where {T <: RingElement}
 end
 
 function +(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    N = size(a.exps, 1)
    par = parent(a)
    r = par()
@@ -1065,6 +1066,7 @@ function +(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    N = size(a.exps, 1)
    par = parent(a)
    r = par()
@@ -1605,6 +1607,7 @@ function unpack_monomials(a::Matrix{UInt}, b::Matrix{UInt}, k::Int, bits::Int, l
 end
 
 function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    v = v1 + v2
@@ -2576,6 +2579,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
 end
 
 function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    d = max(d1, d2)
@@ -2790,6 +2794,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
 end
 
 function Base.div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    d = max(d1, d2)
@@ -3014,6 +3019,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
 end
 
 function Base.divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    d = max(d1, d2)
@@ -3436,6 +3442,7 @@ end
 Return the greatest common divisor of a and b in parent(a).
 """
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    if iszero(a)
       if b.length == 0
          return deepcopy(a)
