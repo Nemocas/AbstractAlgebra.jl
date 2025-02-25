@@ -1841,3 +1841,9 @@ end
   @test is_unit(7+60*x*y)
   @test is_unit(7-60*x*y)
 end
+
+@testset "Generic.MPoly.Issue#2010" begin
+  R1, (y1, z1) = polynomial_ring(QQ, [:y, :z])
+  R2, (x2, y2) = polynomial_ring(QQ, [:x, :y])
+  @test_throws z1 + y2
+end
