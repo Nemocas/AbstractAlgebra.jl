@@ -449,7 +449,7 @@ function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, 
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesRingElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
    p.parent = Generic.LaurentSeriesRing{TT}(R, max_precision, Symbol(var), cached)
@@ -460,7 +460,7 @@ function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int,
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesFieldElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
    p.parent = Generic.LaurentSeriesField{TT}(R, max_precision, Symbol(var), cached)

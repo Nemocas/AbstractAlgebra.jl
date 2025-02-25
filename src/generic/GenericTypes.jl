@@ -354,7 +354,7 @@ end
 end
 
 function MPolyRing{T}(R::Ring, s::Vector{Symbol}, internal_ordering::Symbol=:lex, cached::Bool=true) where T <: RingElement
-   @assert T == elem_type(R)
+   @assert T === elem_type(R)
    N = length(s)
    internal_ordering in (:deglex, :degrevlex) && (N+=1)
    return MPolyRing{T}(R, s, internal_ordering, N, cached)

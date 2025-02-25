@@ -158,7 +158,7 @@ zero(a::AbsPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.AbsSeries{TT}(coeffs, len, prec)
    # Default is supposed to return a Generic polynomial
    p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_precision, Symbol(var), cached)
