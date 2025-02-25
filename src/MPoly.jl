@@ -870,15 +870,12 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
       (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
+      @assert V == elem_type(R)
       if U !== V
-         vals = [parent(c)(v) for v in vals]
-         powers = Dict{Int, V}[Dict{Int, V}() for i in 1:length(vals)]
-      else
-         powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
+         return evaluate(a, [parent(c)(v) for v in vals])
       end
-   else
-      powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
    end
+   powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
