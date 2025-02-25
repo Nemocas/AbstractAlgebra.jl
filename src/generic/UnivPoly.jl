@@ -324,7 +324,7 @@ function coeff(p::UnivPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where {T}
    vars2 = Vector{Int}(undef, 0)
    exps2 = Vector{Int}(undef, 0)
    for i = 1:len
-      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
+      @req 1 <= vars[i] <= nvars(S) "Variable index not in range"
       if vars[i] <= num
          push!(vars2, vars[i])
          push!(exps2, exps[i])
