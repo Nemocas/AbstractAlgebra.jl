@@ -1845,5 +1845,5 @@ end
 @testset "Generic.MPoly.Issue#2010" begin
   R1, (y1, z1) = polynomial_ring(QQ, [:y, :z])
   R2, (x2, y2) = polynomial_ring(QQ, [:x, :y])
-  @test_throws ArgumentError z1 + y2
+  @test_throws ErrorException z1 + y2
 end
