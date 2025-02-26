@@ -1800,6 +1800,8 @@ A permanent change will always override a temporary change.
 
 This function may behave arbitrarily if called from within the scope of a
 `with_unicode` do-block.
+
+See also [`is_unicode_allowed`](@ref) and [`with_unicode`](@ref).
 """
 function allow_unicode(allowed::Bool; temporary::Bool=false)
    if temporary
@@ -1818,6 +1820,8 @@ end
     is_unicode_allowed() -> Bool
 
 Return whether unicode characters are allowed in pretty printing.
+
+See also [`allow_unicode`](@ref) and [`with_unicode`](@ref).
 """
 function is_unicode_allowed()
    override = ALLOW_UNICODE_OVERRIDE_VALUE[]
@@ -1838,6 +1842,8 @@ with_unicode([allowed]) do
    # code that should be executed with unicode allowed/disallowed
 end
 ```
+
+See also [`allow_unicode`](@ref) and [`is_unicode_allowed`](@ref).
 """
 function with_unicode(f::Function, allowed::Bool=true)
    previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
