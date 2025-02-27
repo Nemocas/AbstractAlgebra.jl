@@ -62,6 +62,10 @@ lead_degree(p::LaurentPolyWrap) = p.mindeg + degree(p.poly)
 coeff(p::LaurentPolyWrap, i::Int) =
    i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
 
+function coefficients(p::LaurentPolyWrap)
+  return coefficients(p.poly)
+end
+
 function _enable_deg!(p::LaurentPolyWrap, i::Int)
    diff = p.mindeg - i
    if diff > 0
