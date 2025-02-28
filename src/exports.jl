@@ -312,12 +312,14 @@ export is_monic
 export is_monomial
 export is_monomial_recursive
 export is_negative
+export is_negative_entry
 export is_nilpotent
 export is_odd
 export is_one
 export is_perfect
 export is_popov
 export is_positive
+export is_positive_entry
 export is_power
 export is_probable_prime
 export is_real
