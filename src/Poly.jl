@@ -3320,6 +3320,34 @@ end
 
 ###############################################################################
 #
+#  Separability
+#
+###############################################################################
+
+@doc raw"""
+    is_separable(f::PolyRingElem) -> Bool
+
+Return whether for a polynomial $f$ over a ring $R$ the quotient ring
+$R[x]/(f)$ is separable over $R$. If $R$ is a field, this is equivalent
+to $f$ having no repeated roots in an algebraic closure, or to $f$ being
+coprime to the formal derivative $f'$.
+"""
+is_separable(::PolyRingElem)
+
+function is_separable(f::PolyRingElem{<:RingElement})
+  # Ford, Separable Algebras, 4.6.1 and 8.3.8
+  return is_one(ideal(base_ring(f), [f, derivative(f)]))
+end
+
+function is_separable(f::PolyRingElem{<:FieldElement})
+  # Bourbaki, N. (2003). *Algebra II. Chapters 4--7*. Springer-Verlag, Berlin.
+  # Chapter 5, §7, No. 2.
+  # Or the Ford reference below
+  return is_unit(gcd(f, derivative(f)))
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################

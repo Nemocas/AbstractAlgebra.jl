@@ -326,6 +326,7 @@ export is_real
 export is_reverse
 export is_rimhook
 export is_rref
+export is_separable
 export is_skew_symmetric
 export is_snf
 export is_square
