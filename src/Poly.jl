@@ -3342,7 +3342,7 @@ end
 function is_separable(f::PolyRingElem{<:FieldElement})
   # Bourbaki, N. (2003). *Algebra II. Chapters 4--7*. Springer-Verlag, Berlin.
   # Chapter 5, §7, No. 2.
-  # Or the Ford reference below
+  # Or the Ford reference above
   return is_unit(gcd(f, derivative(f)))
 end
 
