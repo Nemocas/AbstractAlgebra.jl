@@ -972,8 +972,11 @@ end
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [ZZ(V[1])])
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [U(V[1])])
+         @test evaluate(f, [1], [V[1]]) == f(x=V[1])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == f(x=V[1], z=V[2])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == f(z=V[2], x=V[1])
 
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [R(V[1])])
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [ZZ(V[1])])
