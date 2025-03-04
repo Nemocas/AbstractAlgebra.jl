@@ -3406,8 +3406,8 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
-      if ((W <: Integer && W != BigInt) ||
-          (W <: Rational && W != Rational{BigInt}))
+      if ((W <: Integer && W !== BigInt) ||
+          (W <: Rational && W !== Rational{BigInt}))
          c = c*zero(W)
          U[j] = parent(c)
       else
@@ -3420,10 +3420,10 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
       t = c
       for j = 1:length(vals)
          exp = v[j]
-         if !haskey(powers[j], exp)
-            powers[j][exp] = (U[j](vals[j]))^exp
+         pe = get!(powers[j], exp) do
+            return vals[j]^exp
          end
-         t = t*powers[j][exp]
+         t = mul!(t, pe)
       end
       r += t
    end

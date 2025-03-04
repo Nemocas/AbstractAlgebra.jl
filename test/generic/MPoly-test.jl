@@ -1243,6 +1243,8 @@ end
    f = 2x^2*y^2 + 3x + y + 1
 
    @test evaluate(f, [0*x, 0*y]) == 1
+   @test evaluate(f, Any[0*x, 0*y]) == 1
+   @test_throws ArgumentError evaluate(f, [])
 
    @test evaluate(f, BigInt[1, 2]) == ZZ(14)
    @test evaluate(f, [QQ(1), QQ(2)]) == 14//1

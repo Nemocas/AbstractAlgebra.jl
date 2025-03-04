@@ -343,7 +343,7 @@ zero(p::PolyRingElem, var::VarName=var(parent(p)); cached::Bool=true) =
 
 function polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.Poly{TT}(coeffs)
    # Default is supposed to return a polynomial
    p.parent = Generic.PolyRing{TT}(R, Symbol(var), cached)
@@ -2198,11 +2198,11 @@ function evaluate_brent_kung(f::PolyRingElem{T}, a::U) where {T <: RingElement, 
    d1 = isqrt(n)
    d = div(n, d1)
 
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
+   if (U <: Integer && U !== BigInt) ||
+      (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
-      if U != V
+      if U !== V
          A = powers(map(parent(c), a), d)
       else
          A = powers(a, d)

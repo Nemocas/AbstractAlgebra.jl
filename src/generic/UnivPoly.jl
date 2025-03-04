@@ -317,14 +317,14 @@ end
 
 function coeff(p::UnivPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where {T}
    len = length(vars)
-   len != length(exps) && error("Number of variables does not match number of exponents")
+   @req len == length(exps) "Number of variables does not match number of exponents"
    S = parent(p)
    n = nvars(S)
    num = nvars(parent(data(p)))
    vars2 = Vector{Int}(undef, 0)
    exps2 = Vector{Int}(undef, 0)
    for i = 1:len
-      vars[i] > n && error("Variable index not in range")
+      @req 1 <= vars[i] <= nvars(S) "Variable index not in range"
       if vars[i] <= num
          push!(vars2, vars[i])
          push!(exps2, exps[i])

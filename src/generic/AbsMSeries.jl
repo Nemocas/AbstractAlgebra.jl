@@ -568,14 +568,11 @@ array `vars`. The values must be in the same ring as $a$.
 function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where
                                          {T <: RingElement, U <: AbsMSeries{T}}
     R = parent(a)
-    unique(vars) != vars && error("Variables not unique")
-    length(vars) != length(vals) &&
-        error("Number of variables does not match number of values")
+    @req allunique(vars) "Variables not unique"
+    @req length(vars) == length(vals) "Number of variables does not match number of values"
     for i = 1:length(vars)
-        if vars[i] < 1 || vars[i] > nvars(parent(a))
-            error("Variable index not in range")
-        end
-        parent(vals[i]) !== R && error("Element not in series ring")
+        @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
+        @req parent(vals[i]) === R "Element not in series ring"
     end
  
     if length(vars) == 0
