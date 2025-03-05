@@ -1323,7 +1323,7 @@ function mfactor_squarefree_char_zero(a::E) where E
     error("leading coefficient must be invertible")
   end
   # thus lc is invertible in K, which means that it is squarefree
-  # don't use `inv`, it is wrong for `BigInt`
+  # don't use `Base.inv`, it is wrong for `BigInt`
   res.fac = Dict{E, Int}(AbstractAlgebra.inv(lc) * a => 1)
 
   # pure variable powers in the final factorization
