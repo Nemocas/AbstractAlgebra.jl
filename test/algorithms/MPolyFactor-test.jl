@@ -26,4 +26,13 @@
       @test degrees(content) == [0, 1]
       @test p == content*prod(fac)
    end
+
+   R, (x, y) = ZZ[:x,:y]
+   f = x^2
+   fa = AbstractAlgebra.MPolyFactor.mfactor_squarefree_char_zero(x^2)
+   @test is_unit(unit(fa))
+   @test length(fa) == 1 && f == unit(fa) * prod(p^e for (p, e) in fa)
+   fa = AbstractAlgebra.MPolyFactor.mfactor_squarefree_char_zero(x^2)
+   @test is_unit(unit(fa))
+   @test length(fa) == 1 && f == unit(fa) * prod(p^e for (p, e) in fa)
 end
