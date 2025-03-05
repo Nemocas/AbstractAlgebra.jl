@@ -457,6 +457,7 @@ export polynomial_ring
 export polynomial_to_power_sums
 export popov
 export popov_with_transform
+export pow!
 export pow_multinomial
 export power_series_ring
 export power_sums_to_polynomial
