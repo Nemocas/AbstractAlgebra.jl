@@ -31,7 +31,7 @@ Furthermore, there is a function [`kernel`](@ref kernel(::Union{MatElem, SolveCt
 
 Systems $xA = b_1,\dots, xA = b_k$ with the same matrix $A$, but several right hand sides $b_i$ can be solved more efficiently, by first initializing a "context object" `C`.
 ```@docs
-solve_init
+solve_init(::MatElem)
 ```
 Now the functions `solve`, `can_solve`, etc. can be used with `C` in place of $A$.
 This way the time-consuming part of the solving (i.e. computing a reduced form of $A$) is only done once and the result cached in `C` to be reused.
@@ -43,5 +43,5 @@ solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
 can_solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
 can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
 can_solve_with_solution_and_kernel(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
-kernel(:::Union{MatElem, SolveCtx})
+kernel(::Union{MatElem, SolveCtx})
 ```
