@@ -69,7 +69,16 @@ ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
-   return elem_type(a)[gen(a, i, Val(internal_ordering(a))) for i in 1:n]
+   ord = internal_ordering(a)
+   if ord == :lex
+      return elem_type(a)[gen(a, i, Val(:lex)) for i in 1:n]
+   elseif ord == :deglex
+      return elem_type(a)[gen(a, i, Val(:deglex)) for i in 1:n]
+   elseif ord == :degrevlex
+      return elem_type(a)[gen(a, i, Val(:degrevlex)) for i in 1:n]
+   else
+      error("invalid ordering")
+   end
 end
 
 @doc raw"""
@@ -79,7 +88,16 @@ Return the $i$-th generator (variable) of the given polynomial
 ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-   return gen(a, i, Val(a.ord))
+   ord = internal_ordering(a)
+   if ord == :lex
+      return gen(a, i, Val(:lex))
+   elseif ord == :deglex
+      return gen(a, i, Val(:deglex))
+   elseif ord == :degrevlex
+      return gen(a, i, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
@@ -160,7 +178,16 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   return exponent_vector(a, i, Val(internal_ordering(parent(a))))
+   ord = internal_ordering(parent(a))
+   if ord == :lex
+      return exponent_vector(a, i, Val(:lex))
+   elseif ord == :deglex
+      return exponent_vector(a, i, Val(:deglex))
+   elseif ord == :degrevlex
+      return exponent_vector(a, i, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 @doc raw"""
@@ -171,7 +198,16 @@ Term and variable numbering begins at $1$ and variables are ordered as
 during the creation of the ring.
 """
 function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
-   return exponent(a, i, j, Val(internal_ordering(parent(a))))
+   ord = internal_ordering(parent(a))
+   if ord == :lex
+      return exponent(a, i, j, Val(:lex))
+   elseif ord == :deglex
+      return exponent(a, i, j, Val(:deglex))
+   elseif ord == :degrevlex
+      return exponent(a, i, j, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Val{:lex}) where T <: RingElement
@@ -214,7 +250,16 @@ correspond to the exponents of the variables in the order supplied when
 the ring was created. The modified polynomial is returned.
 """
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-   return set_exponent_vector!(a, i, exps, Val(internal_ordering(parent(a))))
+   ord = internal_ordering(parent(a))
+   if ord == :lex
+      return set_exponent_vector!(a, i, exps, Val(:lex))
+   elseif ord == :deglex
+      return set_exponent_vector!(a, i, exps, Val(:deglex))
+   elseif ord == :degrevlex
+      return set_exponent_vector!(a, i, exps, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 @doc raw"""
@@ -635,7 +680,16 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
    if !isone(coeff(x, 1))
       return false
    end
-   return is_gen(x, Val(internal_ordering(parent(x))))
+   ord = internal_ordering(parent(x))
+   if ord == :lex
+      return is_gen(x, Val(:lex))
+   elseif ord == :deglex
+      return is_gen(x, Val(:deglex))
+   elseif ord == :degrevlex
+      return is_gen(x, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 @doc raw"""
@@ -800,7 +854,16 @@ function degree(f::MPoly{T}, i::Int, ::Val{:degrevlex}) where T <: RingElement
 end
 
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
-   return degree(f, i, Val(internal_ordering(parent(f))))
+   ord = internal_ordering(parent(f))
+   if ord == :lex
+      return degree(f, i, Val(:lex))
+   elseif ord == :deglex
+      return degree(f, i, Val(:deglex))
+   elseif ord == :degrevlex
+      return degree(f, i, Val(:degrevlex))
+   else
+      error("invalid ordering")
+   end
 end
 
 @doc raw"""
