@@ -369,16 +369,12 @@ function mul!(z::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T
    return z
 end
 
-function add!(z::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
-   z.poly = add!(z.poly, a.poly, b.poly)
-   z.mindeg = min(a.mindeg, b.mindeg)
-   return z
-end
-
-function pow!(z::LaurentPolyWrap, p::LaurentPolyWrap, e::Integer)
-    z.poly = pow!(z.poly, p.poly, e)
-    z.mindeg = p.mindeg*e
-    return z
+function add!(c::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T}) where T
+   # TODO: optimize
+   d = a + b
+   c.poly = d.poly
+   c.mindeg = d.mindeg
+   c
 end
 
 ###############################################################################
