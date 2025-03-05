@@ -375,7 +375,7 @@ function add!(z::LaurentPolyWrap{T}, a::LaurentPolyWrap{T}, b::LaurentPolyWrap{T
    return z
 end
 
-function pow!(z::LaurentPolyWrap, p::LaurentPolyWrap, e::Integer)    
+function pow!(z::LaurentPolyWrap, p::LaurentPolyWrap, e::Integer)
     z.poly = pow!(z.poly, p.poly, e)
     z.mindeg = p.mindeg*e
     return z
