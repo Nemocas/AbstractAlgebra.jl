@@ -69,16 +69,7 @@ ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    n = a.num_vars
-   ord = internal_ordering(a)
-   if ord == :lex
-      return elem_type(a)[gen(a, i, Val(:lex)) for i in 1:n]
-   elseif ord == :deglex
-      return elem_type(a)[gen(a, i, Val(:deglex)) for i in 1:n]
-   elseif ord == :degrevlex
-      return elem_type(a)[gen(a, i, Val(:degrevlex)) for i in 1:n]
-   else
-      error("invalid ordering")
-   end
+   return elem_type(a)[gen(a, i) for i in 1:n]
 end
 
 @doc raw"""
