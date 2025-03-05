@@ -557,7 +557,7 @@ If no solution exists, an error is raised.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`can_solve_with_solution`](@ref).
+See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 """
 function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return solve(matrix_normal_form_type(A), A, b; side)
@@ -580,7 +580,7 @@ Return `true` if the linear system $xA = b$ or $Ax = b$ with `side == :left`
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`can_solve_with_solution`](@ref).
+See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 """
 function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve(matrix_normal_form_type(A), A, b; side)
@@ -604,7 +604,7 @@ If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`solve`](@ref).
+See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 """
 function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve_with_solution(matrix_normal_form_type(A), A, b; side)
@@ -629,7 +629,7 @@ If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`solve`](@ref) and [`kernel`](@ref).
+See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T) and [`kernel`](@ref kernel(::Union{MatElem, SolveCtx})).
 """
 function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve_with_solution_and_kernel(matrix_normal_form_type(A), A, b; side)
