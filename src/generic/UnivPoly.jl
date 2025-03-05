@@ -876,7 +876,20 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T
    return evaluate(a, varidx, vals)
 end
 
-###############################################################################
+function (a::Union{MPolyRingElem, UniversalPolyRingElem})(;kwargs...)
+   S = parent(a)
+   vars = Array{Int}(undef, length(kwargs))
+   vals = Array{RingElement}(undef, length(kwargs))
+   for (i, (var, val)) in enumerate(kwargs)
+     vari = findfirst(isequal(var), S.S)
+     vari === nothing && error("Given polynomial has no variable $var")
+     vars[i] = vari
+     vals[i] = val
+   end
+   return evaluate(a, vars, vals)
+end
+
+########S,(a,b)=QQ[:a,:b]#######################################################################
 #
 #   GCD
 #
