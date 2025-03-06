@@ -485,7 +485,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
         @test reverse(p) == 3*x^2 + 2*x + 1
         @test reverse(p, 2) == 3*x + 2
         
-        p = x^2 + 2x
+        p = x^2 + 2*x
         reverse!(p)
         @test p == 2*x + 1
 

@@ -1102,6 +1102,7 @@ end
 
 function reverse!(z::PolynomialElem, x::PolynomialElem, len::Int)
   fit!(z, len)
+  set_length!(z, len)
   for i in 1:len
     z = setcoeff!(z, i-1, coeff(x, len-i))
   end
