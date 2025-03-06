@@ -870,7 +870,6 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
       (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
-      @assert V == elem_type(R)
       if U !== V
          return evaluate(a, [parent(c)(v) for v in vals])
       end
