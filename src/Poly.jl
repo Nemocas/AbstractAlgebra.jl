@@ -1102,7 +1102,7 @@ end
 
 function reverse!(z::PolynomialElem, x::PolynomialElem, len::Int)
   fit!(z, len)
-  for i in 1:div(len, 2)
+  for i in 1:cld(len, 2)
     c = coeff(x, i-1) # TODO: use swap monomials, once possible
     z = setcoeff!(z, i-1, coeff(x, len-i))
     z = setcoeff!(z, len-i, c)
