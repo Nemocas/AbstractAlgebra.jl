@@ -291,16 +291,6 @@ function add!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) whe
    return c
 end
 
-function pow!(z::FracFieldElem{T}, a::FracFieldElem{T}, e::Int) where {T <: RingElem}
-  p = abs(e)
-  z.num = pow!(z.num, a.num, p)
-  z.den = pow!(z.den, a.den, p)
-  if e < 0
-    z.num, z.den = z.den, z.num
-  end
-  return z
-end
-
 ###############################################################################
 #
 #   fraction_field constructor
