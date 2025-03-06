@@ -54,6 +54,7 @@ import Base: precision
 import Base: rand
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: setindex!
 import Base: show
 import Base: sign
