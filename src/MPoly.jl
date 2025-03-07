@@ -149,16 +149,11 @@ the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 $x, y, z$ in that order).
 """
 function coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(exps) &&
-       error("Number of variables does not match number of exponents")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(exps) "Number of variables does not match number of exponents"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
-      if exps[i] < 0
-         error("Exponent cannot be negative")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
+      @req exps[i] >= 0 "Exponent must not be negative"
    end
    S = parent(a)
    M = Generic.MPolyBuildCtx(S)
@@ -695,12 +690,12 @@ function deflate(f::MPolyRingElem{T}) where T <: RingElement
 end
 
 function inflate_deflate_vectors(R::MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
-   unique(vars) != vars && error("Variables not unique")
+   @req allunique(vars) "Variables not unique"
    !(length(vars) == length(shift) == length(defl)) && error("Number of variables does not match lengths of shift and deflation vectors")
    shift1 = zeros(Int, nvars(R))
    defl1 = ones(Int, nvars(R))
    for i in 1:(length(vars))
-      !(1 <= vars[i] <= nvars(R)) && error("Variable index not in range")
+      @req 1 <= vars[i] <= nvars(R) "Variable index not in range"
       shift1[vars[i]] = shift[i]
       defl1[vars[i]] = defl[i]
    end
@@ -852,7 +847,12 @@ end
 ###############################################################################
 
 function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   return evaluate(a, parent(a).(vals))
+   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+   newvals = parent(a).(vals)
+   if typeof(vals) == typeof(newvals)
+     throw(NotImplementedError(:evaluate, a, vals))
+   end
+   return evaluate(a, newvals)
 end
 
 @doc raw"""
@@ -864,21 +864,17 @@ defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
 function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
+   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
    R = base_ring(a)
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
+   if (U <: Integer && U !== BigInt) ||
+      (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
-      if U != V
-         vals = [parent(c)(v) for v in vals]
-         powers = [Dict{Int, V}() for i in 1:length(vals)]
-      else
-         powers = [Dict{Int, U}() for i in 1:length(vals)]
+      if U !== V
+         return evaluate(a, [parent(c)(v) for v in vals])
       end
-   else
-      powers = [Dict{Int, U}() for i in 1:length(vals)]
    end
+   powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
@@ -897,10 +893,10 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          if iszero(exp)
            continue
          end
-         if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
+         pe = get!(powers[j], exp) do
+            return vals[j]^exp
          end
-         t = t*powers[j][exp]
+         t = mul!(t, pe)
       end
       push!(r, c*t)
       j = i = i + 1
@@ -926,13 +922,10 @@ array `vars`. The evaluation will succeed if multiplication is defined between
 elements of the coefficient ring of $a$ and elements of `vals`.
 """
 function evaluate(a::MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(vals) &&
-      error("Number of variables does not match number of values")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
    end
 
    if length(vars) == 0
@@ -1006,10 +999,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
@@ -1030,10 +1023,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
