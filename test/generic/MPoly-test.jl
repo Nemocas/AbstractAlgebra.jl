@@ -186,6 +186,12 @@
       ) @test_throws (VERSION < v"1.7" ? LoadError : UndefVarError) let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
+
+   let
+     Qx, (x, ) = polynomial_ring(QQ, [:x])
+     Qxy, (x2, y) = polynomial_ring(QQ, [:x, :y])
+     @test_throws ErrorException x == x2
+   end
 end
 
 # these variables need to be in global scope
