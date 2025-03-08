@@ -638,6 +638,43 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
    return is_gen(x, Val(internal_ordering(parent(x))))
 end
 
+function AbstractAlgebra._is_gen_with_index(x::MPoly)
+   ord = internal_ordering(parent(x))
+   N = nvars(parent(x))
+   if length(x) != 1
+      return false, 0
+   end
+   if !isone(coeff(x, 1))
+      return false, 0
+   end
+   if ord === :degrevlex || ord === :deglex
+     if x.exps[N + 1, 1] != UInt(1)
+       return false, 0
+     end
+   end
+   exps = x.exps
+   for k = 1:N
+     exp = exps[k, 1]
+     if exp != UInt(0)
+       if exp != UInt(1)
+         return false, 0
+       end
+       for j = k + 1:N
+         if exps[j, 1] != UInt(0)
+           return false, 0
+         end
+       end
+       if ord === :degrevlex
+         return true, k
+       else
+         # in the :lex and :deglex case, the "last" variables come frst in the row
+         return true, N - k + 1
+       end
+     end
+   end
+   return false, 0
+ end
+
 @doc raw"""
     is_homogeneous(x::MPoly{T}) where {T <: RingElement}
 
