@@ -54,6 +54,7 @@ import Base: precision
 import Base: rand
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: setindex!
 import Base: show
 import Base: sign
@@ -186,6 +187,7 @@ import ..AbstractAlgebra: one!
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
 import ..AbstractAlgebra: pol_length
+import ..AbstractAlgebra: pow!
 import ..AbstractAlgebra: preimage
 import ..AbstractAlgebra: pretty
 import ..AbstractAlgebra: primpart

@@ -337,7 +337,7 @@ The unary version is a shorthand for `inv!(a, a)`.
 inv!(z, a) = AbstractAlgebra.inv(a)
 inv!(a) = inv!(a, a)
 
-for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
+for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*), (:pow!, :^))
   @eval begin
     @doc """
         $($name)(z, a, b)

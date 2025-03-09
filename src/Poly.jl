@@ -1100,6 +1100,17 @@ end
 #
 ###############################################################################
 
+function reverse!(z::PolynomialElem, x::PolynomialElem, len::Int)
+  fit!(z, len)
+  for i in 1:cld(len, 2)
+    c = coeff(x, i-1) # TODO: use swap monomials, once possible
+    z = setcoeff!(z, i-1, coeff(x, len-i))
+    z = setcoeff!(z, len-i, c)
+  end
+  set_length!(z, normalise(z, len))
+  return z
+end
+
 @doc raw"""
     reverse(x::PolynomialElem, len::Int)
 
@@ -1111,13 +1122,16 @@ The resulting polynomial is normalised. If `len` is negative we throw a
 """
 function reverse(x::PolynomialElem, len::Int)
    len < 0 && throw(DomainError(len, "len must be >= 0"))
-   r = parent(x)()
-   fit!(r, len)
-   for i = 1:len
-      z = setcoeff!(r, i - 1, coeff(x, len - i))
-   end
-   r = set_length!(r, normalise(r, len))
-   return r
+   return reverse!(parent(x)(), x, len)
+end
+
+@doc raw"""
+    reverse!(x::PolynomialElem, len::Int) -> PolynomialElem
+
+In-place version of [`reverse(::PolynomialElem, ::Int)`](@ref).
+"""
+function reverse!(x::PolynomialElem, len::Int)
+  return reverse!(x, x, len)
 end
 
 @doc raw"""
@@ -1129,6 +1143,15 @@ polynomial is normalised.
 """
 function reverse(x::PolynomialElem)
    reverse(x, length(x))
+end
+
+@doc raw"""
+    reverse!(x::PolynomialElem) -> PolynomialElem
+
+In-place version of [`reverse(::PolynomialElem)`](@ref).
+"""
+function reverse!(x::PolynomialElem)
+  return reverse!(x, length(x))
 end
 
 ###############################################################################
