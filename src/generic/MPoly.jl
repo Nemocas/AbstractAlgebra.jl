@@ -397,57 +397,13 @@ end
 # Returns true if the i-th exponent vector of the array A is less than that of
 # the j-th, according to the ordering of R
 function monomial_isless(A::Matrix{UInt}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
-   if R.ord == :degrevlex
-      if (xor(A[N, i], drmask)) < (xor(A[N, j], drmask))
-         return true
-      elseif (xor(A[N, i], drmask)) > (xor(A[N, j], drmask))
-         return false
-      end
-      for k = N-1:-1:1
-         if A[k, i] > A[k, j]
-            return true
-         elseif A[k, i] < A[k, j]
-            return false
-         end
-      end
-   else
-      for k = N:-1:1
-         if A[k, i] < A[k, j]
-            return true
-         elseif A[k, i] > A[k, j]
-            return false
-         end
-      end
-   end
-   return false
+   return monomial_isless(A, i, A, j, N, R, drmask)
 end
 
 # Return true if the i-th exponent vector of the array A is less than the j-th
 # exponent vector of the array B
 function monomial_isless(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
-   if R.ord == :degrevlex
-      if xor(A[N, i], drmask) < xor(B[N, j], drmask)
-         return true
-      elseif xor(A[N, i], drmask) > xor(B[N, j], drmask)
-         return false
-      end
-      for k = N-1:-1:1
-         if A[k, i] > B[k, j]
-            return true
-         elseif A[k, i] < B[k, j]
-            return false
-         end
-      end
-   else
-      for k = N:-1:1
-         if A[k, i] < B[k, j]
-            return true
-         elseif A[k, i] > B[k, j]
-            return false
-         end
-      end
-   end
-   return false
+  return monomial_cmp(A, i, B, j, N, R, drmask) < 0
 end
 
 # Set the i-th exponent vector of the array A to the word by word minimum of
