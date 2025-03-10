@@ -394,6 +394,12 @@ function monomial_isequal(A::Matrix{UInt}, i::Int, j::Int, N::Int)
    return true
 end
 
+# Returns true if the i-th exponent vector of the array A is less than that of
+# the j-th, according to the ordering of R
+function monomial_isless(A::Matrix{UInt}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
+   return monomial_isless(A, i, A, j, N, R, drmask)
+end
+
 # Return true if the i-th exponent vector of the array A is less than the j-th
 # exponent vector of the array B
 function monomial_isless(A::Matrix{UInt}, i::Int, B::Matrix{UInt}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
@@ -1356,7 +1362,7 @@ function heapinsert!(xs::Vector{heap_s}, ys::Vector{heap_t}, m::Int, exp::Int, e
          ys[m] = heap_t(ys[m].i, ys[m].j, xs[j].n)
          xs[j] = heap_s(xs[j].exp, m)
          return false
-      elseif monomial_isless(exps, xs[j].exp, exps, exp, N, R, drmask)
+      elseif monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
          i = j
       else
          break
@@ -1383,7 +1389,7 @@ function nheapinsert!(xs::Vector{heap_s}, ys::Vector{nheap_t}, m::Int, exp::Int,
          ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[j].n)
          xs[j] = heap_s(xs[j].exp, m)
          return false
-      elseif monomial_isless(exps, xs[j].exp, exps, exp, N, R, drmask)
+      elseif monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
          i = j
       else
          break
@@ -1404,7 +1410,7 @@ function heappop!(xs::Vector{heap_s}, exps::Matrix{UInt}, N::Int, R::MPolyRing{T
    i = 1
    j = 2
    @inbounds while j < s
-      if !monomial_isless(exps, xs[j + 1].exp, exps, xs[j].exp, N, R, drmask)
+      if !monomial_isless(exps, xs[j + 1].exp, xs[j].exp, N, R, drmask)
          j += 1
       end
       xs[i] = xs[j]
@@ -1413,7 +1419,7 @@ function heappop!(xs::Vector{heap_s}, exps::Matrix{UInt}, N::Int, R::MPolyRing{T
    end
    exp = xs[s].exp
    j = i >> 1
-   @inbounds while i > 1 && monomial_isless(exps, xs[j].exp, exps, exp, N, R, drmask)
+   @inbounds while i > 1 && monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
       xs[i] = xs[j]
       i = j
       j >>= 1
