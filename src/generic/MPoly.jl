@@ -61,17 +61,20 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 
    ord = internal_ordering(a)
    if ord == :lex
-      return a([one(base_ring(a))], reshape(UInt[UInt(j == n - i + 1)
-              for j = 1:n], n, 1))
+      exps = zeros(UInt, n, 1)
+      exps[n - i + 1] = 1
    elseif ord == :deglex
-      return a([one(base_ring(a))], reshape(UInt[(UInt(j == n - i + 1)
-              for j in 1:n)..., UInt(1)], n + 1, 1))
+      exps = zeros(UInt, n + 1, 1)
+      exps[n - i + 1] = 1
+      exps[end] = 1
    elseif ord == :degrevlex
-      return a([one(base_ring(a))], reshape(UInt[(UInt(j == i)
-              for j in 1:n)..., UInt(1)], n + 1, 1))
+      exps = zeros(UInt, n + 1, 1)
+      exps[i] = 1
+      exps[end] = 1
    else
       error("invalid ordering")
    end
+   return a([one(base_ring(a))], exps)
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
