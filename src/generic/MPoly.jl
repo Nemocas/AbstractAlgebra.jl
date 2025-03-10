@@ -397,7 +397,7 @@ end
 # Returns true if the i-th exponent vector of the array A is less than that of
 # the j-th, according to the ordering of R
 function monomial_isless(A::Matrix{UInt}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
-   return monomial_isless(A, i, A, j, N, R, drmask)
+   return monomial_isless(A, i, A, j, N, R, drmask) < 0
 end
 
 # Return true if the i-th exponent vector of the array A is less than the j-th
