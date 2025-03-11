@@ -264,16 +264,6 @@ end
 
 gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
 
-#function gens(S::UniversalPolyRing{T}, v::Vector{<:VarName}) where {T <: RingElement}
-#   idx = _ensure_variables(S, v)
-#   return tuple((UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx)...)
-#end
-
-# @varnames_interface expects the 
-gens(S::UniversalPolyRing, varnames...) = _gens(S, varnames...)[2:end]
-_gens(S::UniversalPolyRing, v::Vector{Symbol}) = nothing, [gen(S, s) for s in v]
-@varnames_interface _gens(S::UniversalPolyRing, s)
-
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
    return UnivPoly{T}(gen(mpoly_ring(S), i), S)
@@ -282,6 +272,23 @@ end
 function gens(S::UniversalPolyRing{T}) where {T}
    n = nvars(S)
    return UnivPoly{T}[gen(S, i) for i in 1:n]
+end
+
+# HACK: we abuse the @varnames_interface macro to teach gens for UniversalPolyRing
+# some superpowers
+function _univ_poly_gens(S::UniversalPolyRing{T}, vars::Vector{Symbol}) where {T}
+   idx = _ensure_variables(S, vars)
+   # TRICK: @varnames_interface expects two return values, but we only care
+   # for the second; so just return literally nothing for the first
+   return nothing, [UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx]
+end
+
+AbstractAlgebra.@varnames_interface _univ_poly_gens(R::UniversalPolyRing{T}, s) where {T}
+
+function gens(S::UniversalPolyRing{T}, a::AbstractAlgebra.VarNames, as::AbstractAlgebra.VarNames...) where {T}
+   res = _univ_poly_gens(S, a, as...)
+   length(res) == 2 && return res[2] # special case for improved backwards compatibility
+   return res[2:end]
 end
 
 var_index(x::UnivPoly) = var_index(data(x))
