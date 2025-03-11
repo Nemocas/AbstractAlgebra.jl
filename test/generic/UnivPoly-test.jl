@@ -95,6 +95,17 @@
          @test parent(x11+y2) == S3
       end
    end
+
+   R = universal_polynomial_ring(ZZ; cached = false)
+   x = gen(R, :x)
+   @test x == x
+   y = gen(R, :y)
+   @test x != y
+   @test x == x*y^0
+   z = gen(R, :z)
+   @test x != z
+   @test z == z * y^0
+   @test y != z
 end
 
 @testset "Generic.UnivPoly.parent_type" begin

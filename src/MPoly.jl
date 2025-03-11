@@ -110,21 +110,27 @@ Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
 """
 function var_index(x::MPolyRingElem{T}) where {T <: RingElement}
-   !is_monomial(x) && error("Not a variable in var_index")
-   exps = first(exponent_vectors(x))
-   count = 0
-   index = 0
-   for i = 1:length(exps)
-      if exps[i] > 1
-         error("Not a variable in var_index")
-      end
-      if exps[i] == 1
-         count += 1
-         index = i
-      end
-   end
-   count != 1 && error("Not a variable in var_index")
-   return index
+  fl, i = _is_gen_with_index(x)
+  if fl
+    return i
+  else
+    error("Not a variable in var_index")
+  end
+end
+
+# fallback method, MPolyRingElem subtypes can provide an optimized one
+function _is_gen_with_index(x::MPolyRingElem)
+  for i in 1:nvars(parent(x))
+    is_gen(x, i) && return true, i
+  end
+  return false, 0
+end
+
+# fallback method for is_gen(x, i) -- most MPolyRingElem subtypes will provide
+# a more efficient one, though for now this is needed for Nemo.FqMPolyRing
+# (see < https://github.com/Nemocas/Nemo.jl/pull/2047>)
+function is_gen(x::MPolyRingElem, i::Int)
+  return is_monomial(x) == 1 && total_degree(x) == 1 && exponent(x, 1, i) == 1
 end
 
 characteristic(R::MPolyRing) = characteristic(base_ring(R))
