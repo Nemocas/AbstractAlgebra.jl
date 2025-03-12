@@ -323,7 +323,7 @@ end
       @test length(2x2^2 + 3x2 + 1) == 3
 
       @test gen(S, :x) == x
-      @test gens(S, ['x', 'y']) == (x, y)
+      @test gens(S, ['x', 'y']) == [x, y]
       @test gen(S, 1) == x
       @test gen(S, 2) == y
       @test gen(S, 3) == z
