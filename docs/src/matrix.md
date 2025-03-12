@@ -525,8 +525,8 @@ julia> pfaffians(M, 2)
 6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
  x1
  x2
- x4
  x3
+ x4
  x5
  x6
  
