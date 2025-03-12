@@ -294,3 +294,28 @@ end
 ###############################################################################
 
 Base.broadcastable(x::GroupElem) = Ref(x)
+
+###############################################################################
+#
+#   Changing group type
+#
+###############################################################################
+
+function (::Type{T})(G::Group) where T <: Group
+  return codomain(isomorphism(T, G))
+end
+
+function isomorphism(::Type{T}, G::T; on_gens::Bool=false) where T <: Group
+  # Known isomorphisms are cached in the attribute `:isomorphisms`.
+  # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the isomorphism
+  # maps generators to generators.
+  on_gens = true # we ignore the on_gens flag, the identity will *always* map gens onto gens
+  isos = get_attribute!(Dict{Tuple{Type, Bool}, Any}, T, :isomorphisms)::Dict{Tuple{Type, Bool}, Any}
+  return get!(isos, (T, on_gens)) do
+    return identity_map(A)
+  end::AbstractAlgebra.Generic.IdentityMap{T}
+end
+
+function isomorphism(::Type{T}, G::Group; on_gens::Bool=false) where T <: Group
+  throw(NotImplementedError(:isomorphism, T, G))
+end

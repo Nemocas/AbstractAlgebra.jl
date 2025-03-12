@@ -351,6 +351,7 @@ export is_zero_divisor
 export is_zero_divisor_with_annihilator
 export is_zero_entry
 export is_zero_row
+export isomorphism
 export kernel
 export kronecker_product
 export laurent_polynomial_ring
