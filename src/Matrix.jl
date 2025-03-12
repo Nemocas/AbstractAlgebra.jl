@@ -2532,27 +2532,35 @@ end
 @doc raw"""
     combinations(n::Int, k::Int)
 
-Return an array consisting of k-combinations of {1,...,n} as arrays.
+Return a vector consisting of `k`-combinations of ${1,...,n}$ as vectors.
+
+The combinations are sorted in lexicographic order.
 """
 combinations(n::Int, k::Int) = combinations(1:n, k)
 
 @doc raw"""
     combinations(v::AbstractVector, k::Int)
 
-Return an array consisting of k-combinations of a given vector v as arrays.
+Return a vector consisting of `k`-combinations of a given vector `v` as vectors.
+
+The combinations are sorted in lexicographic order.
 """
 function combinations(v::AbstractVector{T}, k::Int) where T
    n = length(v)
    ans = Vector{T}[]
    k > n && return ans
-   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, k)
+   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, 1, 1)
    return ans
 end
-function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, k::Int) where T
-   k < 1 && (pushfirst!(ans, comb[:]); return)
-   for m in n:-1:k
-      comb[k] = v[m]
-      _combinations_dfs!(ans, comb, v, m - 1, k - 1)
+
+function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, i::Int, j::Int) where T
+   if i > length(comb)
+      push!(ans, copy(comb))
+      return
+   end
+   for m in j:n-(length(comb)-i)
+      comb[i] = v[m]
+      _combinations_dfs!(ans, comb, v, n, i+1, m+1)
    end
 end
 
