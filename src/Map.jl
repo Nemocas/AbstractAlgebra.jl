@@ -187,11 +187,11 @@ function is_equal_as_morphism(a::Any, b::Any)
   error("no method implemented to compare $a and $b as morphisms beyond `===`; see `AbstractAlgebra.jl/src/Maps.jl` for details")
 end
 
-function is_equal_as_morphism(a::MapFromFunc, b::MapFromFunc)
+function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
   a === b && return true
   domain(a) === domain(b) || return false
   codomain(a) === codomain(b) || return false
-  a.f === a.b && return true
+  a.image_fn === b.image_fn && return true
   error("all legal methods for comparison of $a and $b are exhausted; further comparison not implemented")
 end
 
