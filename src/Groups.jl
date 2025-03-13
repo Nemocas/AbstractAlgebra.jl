@@ -306,6 +306,9 @@ function (::Type{T})(G::Group) where T <: Group
 end
 
 function isomorphism(::Type{T}, G::T; on_gens::Bool=false) where T <: Group
+  if !_is_attribute_storing_type(T)
+    return identity_map(A)
+  end
   # Known isomorphisms are cached in the attribute `:isomorphisms`.
   # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the isomorphism
   # maps generators to generators.
@@ -326,7 +329,7 @@ If `on_gens` is `true` then `gens(G)` is guaranteed to correspond to
 `gens(H)`;
 an exception is thrown if this is not possible.
 
-Isomorphisms are cached in `G`, subsequent calls of `isomorphism` with the
+Isomorphisms are usually cached in `G`, subsequent calls of `isomorphism` with the
 same `T` (and the same value of `on_gens`) yield identical results.
 
 If only the image of such an isomorphism is needed, use `T(G)`;
