@@ -794,23 +794,28 @@ PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
 
 # ASSUMES structural interface is analogous to that for univariate polynomials
 
-# This function handles both PolyRingElem & NCPolyRingElem
-function is_unit(f::T) where {T <: PolynomialElem}
-  # constant coeff must itself be a unit
-  is_unit(constant_coefficient(f)) || return false
-  is_constant(f) && return true
-  # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
-  is_domain_type(T) && return false
-  for i in 1:degree(f) # we have already checked coeff(f,0)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
-end
+# # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+# # see counter-example in AbstractAlgebra issue 2032 [2025-03-10]; try 1+f^3
+# # The implementation is correct if the coeffs are in a local ring.
+# function is_unit(f::T) where {T <: PolynomialElem}
+#   # constant coeff must itself be a unit
+#   is_unit(constant_coefficient(f)) || return false
+#   is_constant(f) && return true
+#   # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
+#   is_domain_type(T) && return false
+#   for i in 1:degree(f) # we have already checked coeff(f,0)
+#     if !is_nilpotent(coeff(f, i))
+#       return false
+#     end
+#   end
+#   return true
+# end
 
-# This function handles both PolyRingElem & NCPolyRingElem
-function is_nilpotent(f::T) where {T <: PolynomialElem}
-  is_domain_type(T) && return is_zero(f)
-  return all(is_nilpotent, coefficients(f))
-end
+# # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+# # see counter-example in AbstractAlgebra issue 2032 [2025-03-10].
+# # The implementation is correct if the coeffs are in a local ring.
+# # **NOTE** the function "coefficients" does not exist for PolynomialElem.
+# function is_nilpotent(f::T) where {T <: PolynomialElem}
+#   is_domain_type(T) && return is_zero(f)
+#   return all(is_nilpotent, coefficients(f))
+# end
