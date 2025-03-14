@@ -2536,7 +2536,7 @@ Return a vector consisting of `k`-combinations of ${1,...,n}$ as vectors.
 
 The combinations are sorted in lexicographic order.
 """
-combinations(n::Int, k::Int) = combinations(1:n, k)
+combinations(n::Int, k::Int) = Combinations(1:n, k)
 
 @doc raw"""
     combinations(v::AbstractVector, k::Int)
@@ -2546,23 +2546,42 @@ Return a vector consisting of `k`-combinations of a given vector `v` as vectors.
 The combinations are sorted in lexicographic order.
 """
 function combinations(v::AbstractVector{T}, k::Int) where T
-   n = length(v)
-   ans = Vector{T}[]
-   k > n && return ans
-   _combinations_dfs!(ans, Vector{T}(undef, k), v, n, 1, 1)
-   return ans
+  return Combinations(v, k)
 end
 
-function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::AbstractVector{T}, n::Int, i::Int, j::Int) where T
-   if i > length(comb)
-      push!(ans, copy(comb))
-      return
-   end
-   for m in j:n-(length(comb)-i)
-      comb[i] = v[m]
-      _combinations_dfs!(ans, comb, v, n, i+1, m+1)
-   end
+struct Combinations{T}
+  v::T
+  n::Int
+  k::Int
 end
+
+Combinations(v::AbstractArray{T}, k::Int) where T = Combinations(v, length(v), k)
+
+function Base.iterate(C::Combinations, state = [min(C.k - 1, i) for i in 1:C.k])
+  if C.k == 0 # special case to generate 1 result for t==0
+    if isempty(state)
+      return C.v[1:1], state
+    end
+    return nothing
+  end
+  for i in C.k:-1:1
+    state[i] += 1
+    if state[i] > (C.n - (C.k - i))
+      continue
+    end
+    for j in i+1:C.k
+      state[j] = state[j - 1] + 1
+    end
+    break
+  end
+  state[1] > C.n - C.k + 1 && return
+  return C.v[state], state
+end
+
+Base.length(C::Combinations) = binomial(C.n, C.k)
+
+Base.eltype(::Type{Combinations{T}}) where {T} = Vector{eltype(T)}
+
 
 @doc raw"""
     minors(A::MatElem, k::Int)
