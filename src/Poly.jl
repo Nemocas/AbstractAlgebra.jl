@@ -233,7 +233,7 @@ function is_unit(f::T) where {T <: PolyRingElem}
   is_unit(constant_coefficient(f)) || return false
   is_constant(f) && return true
   # Here deg(f) > 0
-  is_domain_type(T) && return false # over an integral domain, non-constant polynomials are never units
+  is_domain_type(base_ring_type(T)) && return false # over an integral domain, non-constant polynomials are never units
   for i in 1:degree(f) # we have already checked coeff(f,0)
     if !is_nilpotent(coeff(f, i))
       return false
