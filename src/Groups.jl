@@ -310,8 +310,8 @@ function isomorphism(::Type{T}, G::T; on_gens::Bool=false) where T <: Group
     return identity_map(A)
   end
   # Known isomorphisms are cached in the attribute `:isomorphisms`.
-  # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the isomorphism
-  # maps generators to generators.
+  # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the stored
+  # isomorphism `f` maps `gen(domain(f),i)` to `gen(codomain(f),i)` for each `i`.
   on_gens = true # we ignore the on_gens flag, the identity will *always* map gens onto gens
   isos = get_attribute!(Dict{Tuple{Type, Bool}, Any}, T, :isomorphisms)::Dict{Tuple{Type, Bool}, Any}
   return get!(isos, (T, on_gens)) do
