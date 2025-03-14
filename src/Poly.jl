@@ -226,7 +226,10 @@ function is_unit(f::T) where {T <: PolyRingElem}
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
   # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
-  # constant coeff must itself be a unit
+  # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+  # see counter-example in AbstractAlgebra issue 2032 [2025-03-10]; try 1+f^3
+
+  # Constant coeff must itself be a unit:
   is_unit(constant_coefficient(f)) || return false
   is_constant(f) && return true
   # Here deg(f) > 0
@@ -242,6 +245,8 @@ end
 function is_nilpotent(f::T) where {T <: PolyRingElem}
   # Makes essential use of the fact that sum of 2 nilpotents is nilpotent.
   # This is true when the coeffs are commutative.
+  # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+  # see counter-example in AbstractAlgebra issue 2032 [2025-03-10].
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end
