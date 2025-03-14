@@ -234,9 +234,6 @@ y
 julia> g = is_gen(y)
 true
 
-julia> m = is_unit(b)
-true
-
 julia> n = degree(d)
 2
 
