@@ -423,7 +423,7 @@ function is_unit(f::T) where {T <: MPolyRingElem}
   is_constant(f) && return is_unit(constant_coefficient(f))
   # Here deg(f) > 0.
   # Over an integral domain, non-constant polynomials are never units:
-  is_domain_type(T) && return false
+  is_domain_type(base_ring_type(T)) && return false
   constant_term_is_unit = false
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
     if is_zero(expv)
