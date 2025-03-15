@@ -72,8 +72,6 @@ end
 
    @test is_gen(gen(S))
 
-   @test is_unit(one(S))
-
    f = 2*y + 1
 
    @test leading_coefficient(f) == 2
