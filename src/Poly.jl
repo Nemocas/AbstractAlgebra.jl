@@ -1202,6 +1202,11 @@ function shift_left!(x::PolynomialElem, n::Int)
 end
 
 function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
+  if iszero(x)
+    z = zero!(z)
+    return z
+  end
+  
   len = length(x) + n
   fit!(z, len)
   for i in 0:(length(x) - 1)
