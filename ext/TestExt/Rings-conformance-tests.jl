@@ -493,6 +493,16 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
         reverse!(p, 2)
         @test p == 2
       end
+      
+      @testset "shifting" begin
+        p = x^2 + 2*x + 3
+        @test shift_left!(p, 1) == x^3 + 2*x^2 + 3*x
+        @test shift_left!(p, 3) == x^6 + 2*x^5 + 3*x^4
+        
+        p = x^2 + 2*x + 3
+        @test shift_right!(p, 1) == x + 2
+        @test shift_right!(p, 2) == zero(Rx)
+      end
    end
 
    return nothing
