@@ -396,11 +396,11 @@ end
 struct PolyCoeffs{T <: RingElement}
    f::T
 end
- 
+
 function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
- 
+
 function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
@@ -419,17 +419,17 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
       return coeff(PCR.itr.f, st), st
    end
 end
- 
+
 Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
 Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
- 
+
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
- 
+
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
- 
+
 function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
@@ -1193,20 +1193,25 @@ Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
 """
 function shift_left(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   if n == 0
-      return f
-   end
-   flen = length(f)
-   r = parent(f)()
-   fit!(r, flen + n)
-   for i = 1:n
-      r = setcoeff!(r, i - 1, zero(base_ring(f)))
-   end
-   for i = 1:flen
-      r = setcoeff!(r, i + n - 1, coeff(f, i - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  shift_left!(parent(f)(), f, n)
+end
+
+function shift_left!(x::PolyRingElem, n::Int)
+  return shift_left!(x, x, n)
+end
+
+function shift_left!(z::PolyRingElem{T}, x::PolyRingElem{T}, n::Int) where {T<:RingElement}
+  len = length(x) + n
+  fit!(z, len)
+  for i in 0:length(x)-1
+    z = setcoeff!(z, i + n, coeff(x, i))
+  end
+  for i in 0:n-1
+    z = setcoeff!(z, i, zero(coefficient_ring(z)))
+  end
+  set_length!(z, len)
+  return z
 end
 
 @doc raw"""
@@ -1216,20 +1221,22 @@ Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
 """
 function shift_right(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   flen = length(f)
-   if n >= flen
-      return zero(parent(f))
-   end
-   if n == 0
-      return f
-   end
-   r = parent(f)()
-   fit!(r, flen - n)
-   for i = 1:flen - n
-      r = setcoeff!(r, i - 1, coeff(f, i + n - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  return shift_right!(parent(f)(), f, n)
+end
+
+function shift_right!(x::PolyRingElem, n::Int)
+  return shift_right!(x, x, n)
+end
+
+function shift_right!(z::PolyRingElem{T}, x::PolyRingElem{T}, n::Int) where {T<:RingElement}
+  len = max(0, length(x) - n)
+  fit!(z, len)
+  for i in 0:(len - 1)
+    z = setcoeff!(z, i, coeff(x, i + n))
+  end
+  set_length!(z, len)
+  return z
 end
 
 ###############################################################################
