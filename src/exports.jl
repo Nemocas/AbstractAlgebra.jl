@@ -530,7 +530,9 @@ export set_valuation!
 export setcoeff!
 export setpermstyle
 export shift_left
+export shift_left!
 export shift_right
+export shift_right!
 export similarity!
 export size
 export snf

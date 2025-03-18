@@ -1201,7 +1201,7 @@ function shift_left!(x::PolynomialElem, n::Int)
   return shift_left!(x, x, n)
 end
 
-function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {T<:RingElement}
+function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
   len = length(x) + n
   fit!(z, len)
   for i in 0:(length(x) - 1)
@@ -1229,7 +1229,7 @@ function shift_right!(x::PolynomialElem, n::Int)
   return shift_right!(x, x, n)
 end
 
-function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {T<:RingElement}
+function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
   len = max(0, length(x) - n)
   fit!(z, len)
   for i in 0:(len - 1)
