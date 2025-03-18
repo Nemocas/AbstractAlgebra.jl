@@ -396,11 +396,11 @@ end
 struct PolyCoeffs{T <: RingElement}
    f::T
 end
-
+ 
 function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
-
+ 
 function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
@@ -419,17 +419,17 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
       return coeff(PCR.itr.f, st), st
    end
 end
-
+ 
 Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
 Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
-
+ 
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
-
+ 
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
-
+ 
 function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
@@ -1204,10 +1204,10 @@ end
 function shift_left!(z::PolyRingElem{T}, x::PolyRingElem{T}, n::Int) where {T<:RingElement}
   len = length(x) + n
   fit!(z, len)
-  for i in 0:length(x)-1
+  for i in 0:(length(x) - 1)
     z = setcoeff!(z, i + n, coeff(x, i))
   end
-  for i in 0:n-1
+  for i in 0:(n - 1)
     z = setcoeff!(z, i, zero(coefficient_ring(z)))
   end
   set_length!(z, len)
