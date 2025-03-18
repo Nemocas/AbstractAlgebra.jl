@@ -396,11 +396,11 @@ end
 struct PolyCoeffs{T <: RingElement}
    f::T
 end
- 
+
 function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
- 
+
 function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
@@ -419,17 +419,17 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
       return coeff(PCR.itr.f, st), st
    end
 end
- 
+
 Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
 Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
- 
+
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
- 
+
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
- 
+
 function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
@@ -1201,15 +1201,15 @@ function shift_left!(x::PolynomialElem, n::Int)
   return shift_left!(x, x, n)
 end
 
-function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
+function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {T}
   if iszero(x)
     z = zero!(z)
     return z
   end
-  
+
   len = length(x) + n
   fit!(z, len)
-  for i in 0:(length(x) - 1)
+  for i in (length(x) - 1):-1:0
     z = setcoeff!(z, i + n, coeff(x, i))
   end
   for i in 0:(n - 1)
@@ -2311,7 +2311,7 @@ function compose(f::PolyRingElem, g::PolyRingElem; inner = nothing)
             Alternatively, use directly f(g) or g(f)
              """)
   end
-            
+
   if inner == :second
     return _compose_right(f, g)
   elseif inner == :first
@@ -3054,7 +3054,7 @@ with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Vector{T}; 
+function power_sums_to_polynomial(P::Vector{T};
                            parent::PolyRing{T}=PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
