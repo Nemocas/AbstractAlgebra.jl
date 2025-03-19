@@ -154,3 +154,44 @@ function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where
    return Generic.FunctionalCompositeMap(f, g)
 end
 
+################################################################################
+#
+#  Comparison of objects as maps
+#
+#  Rationale: Often objects are implicitly used as maps. For instance, a `Ring` 
+#  `R` can be used to type-cast objects `x` into `R`. When objects are 
+#  implicitly used as maps, one may wish to compare them as such. The function 
+#  `==` can not be overloaded for this since it would be expected to compare 
+#  two objects as what they are originally (i.e. as `Ring`s in the above 
+#  example). Therefore, we introduce another function here for which methods 
+#  can be added successively to allow for reasonable comparisons. 
+#
+#  This is, for example, used in recursive setups like the following. 
+#  Suppose `R = ℤ[x₁, x₂]` and `P = ℚ[y₁, y₂]`, together with maps 
+#  
+#    φ, ψ : R → P, xᵢ ↦ yᵢ
+#
+#  Both maps will need to implicitly cast the coefficients in `R` to 
+#  coefficients in `P`. Let us now assume that `φ` is doing this implicitly, 
+#  while `ψ` has `QQ` stored internally as a `coefficient_map`. 
+#    Comparing those two maps (i.e. implementing `==`) will now compare the 
+#  images of the variables (which agree in this case) and then move on to 
+#  comparing the `coefficient_map`s. In this case, this would compare 
+#  `nothing` to `QQ`. Clearly, `nothing == QQ` should return `false` by any 
+#  means. With the function `is_equal_as_morphism` introduced below, we 
+#  could implement a reasonable method for this case. 
+################################################################################
+
+function is_equal_as_morphism(a::Any, b::Any)
+  a === b && return true
+  error("no method implemented to compare $a and $b as morphisms beyond `===`")
+end
+
+function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
+  a === b && return true
+  domain(a) === domain(b) || return false
+  codomain(a) === codomain(b) || return false
+  a.image_fn === b.image_fn && return true
+  error("all legal methods for comparison of $a and $b are exhausted; further comparison not implemented")
+end
+
