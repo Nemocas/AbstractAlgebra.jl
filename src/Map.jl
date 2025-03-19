@@ -184,7 +184,7 @@ end
 
 function is_equal_as_morphism(a::Any, b::Any)
   a === b && return true
-  error("no method implemented to compare $a and $b as morphisms beyond `===`; see `AbstractAlgebra.jl/src/Maps.jl` for details")
+  error("no method implemented to compare $a and $b as morphisms beyond `===`")
 end
 
 function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
