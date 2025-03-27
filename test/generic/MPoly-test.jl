@@ -1312,6 +1312,12 @@ end
    K = RealField
    R, (x, y) = polynomial_ring(K, ["x", "y"])
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
+
+   # Issue oscar-system/Oscar.jl#4762
+   F,t = rational_function_field(QQ, :t)
+   P,(x,y) = polynomial_ring(F, [:x, :y])
+   @test x(t,y) == t
+   @test x == gen(P, 1) # evaluation used to modify the polynomial
 end
 
 @testset "Generic.MPoly.valuation" begin

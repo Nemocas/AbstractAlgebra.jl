@@ -3363,7 +3363,7 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    end
    cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
-      t = c
+      t = deepcopy(c)
       for j = 1:length(vals)
          exp = v[j]
          pe = get!(powers[j], exp) do
@@ -3371,7 +3371,7 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
          end
          t = mul!(t, pe)
       end
-      r += t
+      r = add!(r, t)
    end
    return r
 end
