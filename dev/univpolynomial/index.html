@@ -19,7 +19,7 @@ julia&gt; y, z = gens(S, [:y, :z])
 (y, z)
 
 julia&gt; x*y - z
-x*y - z</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/9d227def14495a553a311a653ceb038ebc6c4c27/src/UnivPoly.jl#L58-L92">source</a></section></article><h2 id="Adding-variables"><a class="docs-heading-anchor" href="#Adding-variables">Adding variables</a><a id="Adding-variables-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-variables" title="Permalink"></a></h2><p>There are two ways to add variables to a universal polynomial ring <code>S</code>.</p><pre><code class="language-julia hljs">gen(S::UniversalPolyRing, var::VarName)
+x*y - z</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/24791645b562449d53360a25054f8eb4b46c6d2a/src/UnivPoly.jl#L58-L92">source</a></section></article><h2 id="Adding-variables"><a class="docs-heading-anchor" href="#Adding-variables">Adding variables</a><a id="Adding-variables-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-variables" title="Permalink"></a></h2><p>There are two ways to add variables to a universal polynomial ring <code>S</code>.</p><pre><code class="language-julia hljs">gen(S::UniversalPolyRing, var::VarName)
 gens(S::UniversalPolyRing, vars::Vector{VarName})</code></pre><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; S = universal_polynomial_ring(ZZ)
 Universal Polynomial Ring over Integers
 
