@@ -3,7 +3,7 @@ CurrentModule = AbstractAlgebra
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# Matrix functionality
+# [Matrix functionality](@id matrix_functionality_chapter)
 
 ## Basic matrix functionality
 
