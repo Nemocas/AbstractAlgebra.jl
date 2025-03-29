@@ -206,3 +206,28 @@ end
   @test M * QQ(1) == QQ(1) * M == QQ.(M)
   @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
 end
+
+@testset "combinations" begin
+  combinations = AbstractAlgebra.combinations
+  @test combinations(0, 0) == [[]]
+  for n in 1:5
+    @test combinations(n, 0) == [[]]
+    @test combinations(n, 1) == [[i] for i in 1:n]
+    @test combinations(n, 2) == [[i, j] for i in 1:n for j in i+1:n]
+    @test combinations(n, 3) == [[i, j, k] for i in 1:n for j in i+1:n for k in j+1:n]
+  end
+  @test combinations(5, 3) == [
+    [1, 2, 3],[1, 2, 4],[1, 2, 5],[1, 3, 4],[1, 3, 5],[1, 4, 5],[2, 3, 4],[2, 3, 5],[2, 4, 5],[3, 4, 5],
+  ]
+  for n in 0:10, k in 0:10
+    comb = combinations(n, k)
+    if k > n
+      @test isempty(comb)
+    elseif k == n
+      @test comb == [collect(1:n)]
+    end
+    @test length(comb) == binomial(n, k)
+    @test issorted(comb)
+    @test allunique(comb)
+  end
+end
