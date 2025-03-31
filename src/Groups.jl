@@ -242,7 +242,7 @@ end
 # inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
 
 """
-    div_right!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    div_right!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `g*inv(h)`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
@@ -253,7 +253,7 @@ function div_right!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    div_left!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    div_left!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(h)*g`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
@@ -264,7 +264,7 @@ function div_left!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    conj!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    conj!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h` with
 `out` is allowed.
@@ -276,7 +276,7 @@ function conj!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    comm!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    comm!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(g)*inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h`
 with `out` is allowed.
