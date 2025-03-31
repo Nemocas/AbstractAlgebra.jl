@@ -91,6 +91,10 @@ function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int
    return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
 end
 
+function Base.view(M::Mat{T}, rows::Int, cols::Int) where T <: NCRingElement
+   return MatSpacePointView(view(M.entries, rows, cols), M.base_ring)
+end
+
 ################################################################################
 #
 #   Size, axes and is_square
@@ -142,9 +146,34 @@ Base.getindex(V::MatSpaceVecView, i::Int) = V.entries[i]
 
 Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = z)
 
-Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
+Base.setindex!(V::MatSpaceVecView, z::NCRingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
+
+Base.length(V::MatSpacePointView) = 1
+
+Base.getindex(V::MatSpacePointView) = V.entries[]
+
+function Base.getindex(V::MatSpacePointView, i::Int)
+  i == 1 || error(BoundsError(V, i))
+  return V.entries[]
+end
+
+Base.setindex!(V::MatSpacePointView{T}, z::T) where {T <: NCRingElement} = (V.entries[] = z)
+
+function Base.setindex!(V::MatSpacePointView{T}, z::T, i::Int) where {T <: NCRingElement}
+  i == 1 || error(BoundsError(V, i))
+  V.entries[i] = z
+end
+
+Base.setindex!(V::MatSpacePointView, z::NCRingElement) = setindex!(V.entries, V.base_ring(z))
+
+function Base.setindex!(V::MatSpacePointView, z::NCRingElement, i::Int)
+  i == 1 || error(BoundsError(V, i))
+  setindex!(V.entries, V.base_ring(z), i)
+end
+
+Base.size(V::MatSpacePointView) = ()
 
 ###############################################################################
 #
