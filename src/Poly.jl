@@ -495,18 +495,6 @@ end
 
 @enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
 
-function show(io::IO, p::PolyRing)
-   @show_name(io, p)
-   @show_special(io, p)
-   if is_terse(io)
-      print(io, "Univariate polynomial ring")
-   else
-      io = pretty(io)
-      print(io, "Univariate polynomial ring in ", var(p), " over ")
-      print(terse(io), Lowercase(), base_ring(p))
-   end
-end
-
 pretty_eq(x::PolyRingElem, y::PolyRingElem) = x == y
 function pretty_lt(x::PolyRingElem, y::PolyRingElem)
   if length(x) < length(y)
