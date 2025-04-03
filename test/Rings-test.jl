@@ -1,4 +1,5 @@
 include("julia/Integers-test.jl")
+include("julia/Matrix-test.jl")
 include("broadcasting-test.jl")
 
 # artificially low cutoffs for testing purposes
