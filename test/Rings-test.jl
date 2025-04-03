@@ -64,6 +64,16 @@ end
    end
 end
 
+@testset "sqrt" begin
+  Base.sqrt(a::EuclideanRingResidueRingElem{BigInt}) = parent(a)(BigInt(sqrt(a.data)))
+  R = residue_ring(ZZ, 101)[1]
+
+  @test sqrt(R(81), check=true) == R(9)
+  @test_throws ErrorException sqrt(R(82), check=true)
+  @test is_square_with_sqrt(R(16)) == (true, R(4))
+  @test is_square_with_sqrt(R(15))[1] == false
+end
+
 @testset "properties" begin
   @test is_perfect(QQ)
   @test is_perfect(GF(2))
