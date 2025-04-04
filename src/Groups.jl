@@ -289,6 +289,17 @@ end
 
 ###############################################################################
 #
+#   Convenience
+#
+###############################################################################
+
+# allow conj and comm also on matrices elements -- of course this may fail when
+# trying to invert things
+conj(x::MatElem, y::MatElem) = inv(y)*x*y
+comm(x::MatElem, y::MatElem) = inv(y*x)*x*y
+
+###############################################################################
+#
 #   Scalar for broadcasting
 #
 ###############################################################################
