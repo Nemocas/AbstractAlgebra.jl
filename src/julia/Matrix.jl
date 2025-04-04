@@ -112,7 +112,7 @@ end
 function swap_cols!(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:nrows(a)
-         a[k, i], a[k, j] = a[k, i], a[k, j]
+         a[k, i], a[k, j] = a[k, j], a[k, i]
       end
    end
    return a
