@@ -216,6 +216,7 @@ export extended_weak_popov_with_transform
 export exterior_power
 export factor
 export factor_squarefree
+export falling_factorial
 export fflu
 export fflu!
 export find_pivot_popov

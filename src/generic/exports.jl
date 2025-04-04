@@ -26,6 +26,7 @@ export exp_gcd
 export exponent
 export exponent_vector
 export exponent_word
+export falling_factorial
 export finish
 export fit!
 export function_field
