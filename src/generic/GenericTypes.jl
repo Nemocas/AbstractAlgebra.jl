@@ -1099,7 +1099,7 @@ struct MatSpaceView{T <: NCRingElement, V, W} <: Mat{T}
    base_ring::NCRing
 end
 
-struct MatSpaceVecView{T <: NCRingElement, V, W} <: AbstractArray{T, 1}
+struct MatSpaceVecView{T <: NCRingElement, V, W} <: AbstractVector{T}
    entries::SubArray{T, 1, Matrix{T}, V, W}
    base_ring::NCRing
 end
