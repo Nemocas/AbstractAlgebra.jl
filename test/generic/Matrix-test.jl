@@ -4050,6 +4050,28 @@ end
    M3[1] = 10
    @test M2 == ZZ[1 2 10; 2 3 4; 3 4 5]
 
+   M2 = deepcopy(M)
+   M3 = @view M2[[1, 2], [1, 3]]
+   @test size(M3) == (2, 2)
+   @test M3 == ZZ[1 3; 2 4]
+   M3[[1, 2], 1] = [8, 9]
+   @test M2 == ZZ[8 2 3; 9 3 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[1, 2]
+   @test size(M3) == ()
+   @test length(M3) == 1
+   # NOTE: The following cases are to cover all types of [gs]etindex functions.
+   M3[] = ZZ(9)
+   @test M3[] == 9
+   M3[1] = ZZ(10)
+   @test M3[1] == 10
+   M3[] = 11
+   @test M3[] == 11
+   M3[1] = 12
+   @test M3[1] == 12
+   @test M2 == ZZ[1 12 3; 2 3 4; 3 4 5]
+
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)
    
