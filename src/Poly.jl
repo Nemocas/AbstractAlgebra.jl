@@ -1210,7 +1210,7 @@ function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {
   len = length(x) + n
   fit!(z, len)
   for i in (length(x) - 1):-1:0
-    z = setcoeff!(z, i + n, coeff(x, i))
+    z = setcoeff!(z, i + n, deepcopy(coeff(x, i)))
   end
   for i in 0:(n - 1)
     z = setcoeff!(z, i, zero(coefficient_ring(z)))
@@ -1238,7 +1238,7 @@ function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where 
   len = max(0, length(x) - n)
   fit!(z, len)
   for i in 0:(len - 1)
-    z = setcoeff!(z, i, coeff(x, i + n))
+    z = setcoeff!(z, i, deepcopy(coeff(x, i + n)))
   end
   set_length!(z, len)
   return z
