@@ -150,28 +150,14 @@ Base.setindex!(V::MatSpaceVecView, z::NCRingElement, i::Int) = setindex!(V.entri
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
 
+
 Base.length(V::MatSpacePointView) = 1
 
 Base.getindex(V::MatSpacePointView) = V.entries[]
 
-function Base.getindex(V::MatSpacePointView, i::Int)
-  i == 1 || error(BoundsError(V, i))
-  return V.entries[]
-end
-
 Base.setindex!(V::MatSpacePointView{T}, z::T) where {T <: NCRingElement} = (V.entries[] = z)
 
-function Base.setindex!(V::MatSpacePointView{T}, z::T, i::Int) where {T <: NCRingElement}
-  i == 1 || error(BoundsError(V, i))
-  V.entries[i] = z
-end
-
 Base.setindex!(V::MatSpacePointView, z::NCRingElement) = setindex!(V.entries, V.base_ring(z))
-
-function Base.setindex!(V::MatSpacePointView, z::NCRingElement, i::Int)
-  i == 1 || error(BoundsError(V, i))
-  setindex!(V.entries, V.base_ring(z), i)
-end
 
 Base.size(V::MatSpacePointView) = ()
 
