@@ -307,15 +307,15 @@ end
 
 function isomorphism(::Type{T}, G::T; on_gens::Bool=false) where T <: Group
   if !_is_attribute_storing_type(T)
-    return identity_map(A)
+    return identity_map(G)
   end
   # Known isomorphisms are cached in the attribute `:isomorphisms`.
   # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the stored
   # isomorphism `f` maps `gen(domain(f),i)` to `gen(codomain(f),i)` for each `i`.
   on_gens = true # we ignore the on_gens flag, the identity will *always* map gens onto gens
-  isos = get_attribute!(Dict{Tuple{Type, Bool}, Any}, T, :isomorphisms)::Dict{Tuple{Type, Bool}, Any}
+  isos = get_attribute!(Dict{Tuple{Type, Bool}, Any}, G, :isomorphisms)::Dict{Tuple{Type, Bool}, Any}
   return get!(isos, (T, on_gens)) do
-    return identity_map(A)
+    return identity_map(G)
   end::AbstractAlgebra.Generic.IdentityMap{T}
 end
 
