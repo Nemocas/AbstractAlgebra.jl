@@ -1123,9 +1123,6 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if !is_univariate(p)
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
    if is_constant(p)
       return R(leading_coefficient(p))
    end
