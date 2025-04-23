@@ -930,6 +930,8 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T}) where {T 
    return to_univariate(R, data(p))
 end
 
+to_univariate(p::UnivPoly) = to_univariate(data(p))
+
 is_univariate(p::UnivPoly) = is_univariate(data(p))
 
 is_univariate_with_data(p::UnivPoly) = is_univariate_with_data(data(p))

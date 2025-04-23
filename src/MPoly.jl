@@ -1130,6 +1130,29 @@ function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingEleme
 end
 
 @doc raw"""
+    to_univariate(p::MPolyRingElem)
+
+Assuming the polynomial $p$ is actually a univariate polynomial in the
+variable $x$, convert the polynomial to a univariate polynomial in a
+univariate polynomial ring over the same base ring in the variable $x$.
+If $p$ is constant, it is considered to be a polynomial in the first
+variable of its parent. An exception is raised if the polynomial $p$
+involves more than one variable or if its parent has no variables.
+"""
+function to_univariate(p::MPolyRingElem)
+   S = parent(p)
+   iszero(ngens(S)) && error("Parent has no variables.")
+   is_uni, var = is_univariate_with_data(p)
+   is_uni || error("Polynomial is not univariate.")
+   if iszero(var)
+      var = 1
+   end
+   x = symbols(S)[var]
+   R, _ = base_ring(S)[x]
+   return to_univariate(R, p)
+end
+
+@doc raw"""
     is_univariate_with_data(p::MPolyRingElem)
 
 Returns `(true,i)` if $p$ is a univariate polynomial in the `i`-th variable

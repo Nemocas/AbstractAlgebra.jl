@@ -1072,6 +1072,10 @@ end
       @test length(f) == length(f1)
       @test length(h) == length(h1)
 
+      p = to_univariate(x)
+      Rp = parent(p)
+      @test symbols(Rp)[1] == :x
+
       @test coefficients_of_univariate(f) == [R(4), R(1), R(2), R(3)]
       @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]
    end

@@ -1553,6 +1553,11 @@ end
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
 
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
+
       for iter in 1:10
          f = zero(R)
          f_univ = zero(R_univ)
