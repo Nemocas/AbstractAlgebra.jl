@@ -932,6 +932,8 @@ end
 
 is_univariate(p::UnivPoly) = is_univariate(data(p))
 
+is_univariate_with_data(p::UnivPoly) = is_univariate_with_data(data(p))
+
 is_univariate(R::UniversalPolyRing) = is_univariate(mpoly_ring(R))
 
 function coefficients_of_univariate(p::UnivPoly, check_univariate::Bool=true)
