@@ -1155,30 +1155,30 @@ end
 @doc raw"""
     is_univariate_with_data(p::MPolyRingElem)
 
-Returns `(true,i)` if $p$ is a univariate polynomial in the `i`-th variable
+Returns `(true, i)` if $p$ is a univariate polynomial in the `i`-th variable
 of its parent i.e. involves exactly one variable. If $p$ is constant,
-`(true,0)` is returned. Otherwise `(false,0)` is returned. The result
+`(true, 0)` is returned. Otherwise `(false, 0)` is returned. The result
 depends on the terms of the polynomial, not simply on the number of
 variables in the polynomial ring.
 """
 function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
    if is_constant(p)
-      return (true, 0)
+      return true, 0
    end
    var = -1
    for v in exponent_vectors(p)
       n = count(x -> x != 0, v)
       if n > 1
-         return (false, 0)
+         return false, 0
       elseif n == 1
          if var == -1
             var = findfirst(x -> x != 0, v)
          elseif v[var] == 0
-            return (false, 0)
+            return false, 0
          end
       end
    end
-   return (true, var)
+   return true, var
 end
 
 @doc raw"""
