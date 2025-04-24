@@ -452,6 +452,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
+
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 

@@ -1066,6 +1066,10 @@ end
       @test !is_univariate(g)
       @test is_univariate(h)
 
+      @test is_univariate_with_data(y) == (true, 2)
+      @test is_univariate_with_data(S()) == (true, 0)
+      @test is_univariate_with_data(x + y) == (false, 0)
+
       f1 = to_univariate(U, f)
       h1 = to_univariate(U, h)
 
