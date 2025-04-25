@@ -452,6 +452,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
+
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 
@@ -1552,6 +1556,11 @@ end
 
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
+
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
 
       for iter in 1:10
          f = zero(R)

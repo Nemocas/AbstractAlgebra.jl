@@ -1066,11 +1066,19 @@ end
       @test !is_univariate(g)
       @test is_univariate(h)
 
+      @test is_univariate_with_data(y) == (true, 2)
+      @test is_univariate_with_data(S()) == (true, 0)
+      @test is_univariate_with_data(x + y) == (false, 0)
+
       f1 = to_univariate(U, f)
       h1 = to_univariate(U, h)
 
       @test length(f) == length(f1)
       @test length(h) == length(h1)
+
+      p = to_univariate(x)
+      Rp = parent(p)
+      @test symbols(Rp)[1] == :x
 
       @test coefficients_of_univariate(f) == [R(4), R(1), R(2), R(3)]
       @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]

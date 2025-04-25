@@ -1123,13 +1123,62 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if !is_univariate(p)
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
    if is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
+end
+
+@doc raw"""
+    to_univariate(p::MPolyRingElem)
+
+Assuming the polynomial $p$ is actually a univariate polynomial in the
+variable $x$, convert the polynomial to a univariate polynomial in a
+univariate polynomial ring over the same base ring in the variable $x$.
+If $p$ is constant, it is considered to be a polynomial in the first
+variable of its parent. An exception is raised if the polynomial $p$
+involves more than one variable or if its parent has no variables.
+"""
+function to_univariate(p::MPolyRingElem)
+   S = parent(p)
+   iszero(ngens(S)) && error("Parent has no variables.")
+   is_uni, var = is_univariate_with_data(p)
+   is_uni || error("Polynomial is not univariate.")
+   if iszero(var)
+      var = 1
+   end
+   x = symbols(S)[var]
+   R, _ = base_ring(S)[x]
+   return to_univariate(R, p)
+end
+
+@doc raw"""
+    is_univariate_with_data(p::MPolyRingElem)
+
+Returns `(true, i)` if $p$ is a univariate polynomial in the `i`-th variable
+of its parent i.e. involves exactly one variable. If $p$ is constant,
+`(true, 0)` is returned. Otherwise `(false, 0)` is returned. The result
+depends on the terms of the polynomial, not simply on the number of
+variables in the polynomial ring.
+"""
+function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
+   if is_constant(p)
+      return true, 0
+   end
+   var = -1
+   for v in exponent_vectors(p)
+      n = count(x -> x != 0, v)
+      if n > 1
+         return false, 0
+      elseif n == 1
+         if var == -1
+            var = findfirst(x -> x != 0, v)
+         elseif v[var] == 0
+            return false, 0
+         end
+      end
+   end
+   return true, var
 end
 
 @doc raw"""
@@ -1141,23 +1190,7 @@ otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
 function is_univariate(p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
-      return true
-   end
-   var = -1
-   for v in exponent_vectors(p)
-      n = count(x -> x != 0, v)
-      if n > 1
-         return false
-      elseif n == 1
-         if var == -1
-            var = findfirst(x -> x != 0, v)
-         elseif v[var] == 0
-            return false
-         end
-      end
-   end
-   return true
+   return is_univariate_with_data(p)[1]
 end
 
 @doc raw"""

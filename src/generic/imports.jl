@@ -160,6 +160,7 @@ import ..AbstractAlgebra: is_terse
 import ..AbstractAlgebra: is_trivial
 import ..AbstractAlgebra: is_unit
 import ..AbstractAlgebra: is_univariate
+import ..AbstractAlgebra: is_univariate_with_data
 import ..AbstractAlgebra: is_zero_divisor
 import ..AbstractAlgebra: is_zero_divisor_with_annihilator
 import ..AbstractAlgebra: isreduced_form

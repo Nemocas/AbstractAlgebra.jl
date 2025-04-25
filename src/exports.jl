@@ -343,6 +343,7 @@ export is_trivial
 export is_unicode_allowed
 export is_unit
 export is_univariate
+export is_univariate_with_data
 export is_upper_triangular
 export is_valid
 export is_weak_popov
