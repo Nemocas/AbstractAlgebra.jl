@@ -558,6 +558,20 @@ If no solution exists, an error is raised.
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
+
+# Example
+
+```jldoctest
+julia> A = QQ[2 0 0;0 3 0;0 0 5]
+[2//1   0//1   0//1]
+[0//1   3//1   0//1]
+[0//1   0//1   5//1]
+
+julia> solve(A, one(A))
+[1//2   0//1   0//1]
+[0//1   1//3   0//1]
+[0//1   0//1   1//5]
+```
 """
 function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return solve(matrix_normal_form_type(A), A, b; side)
@@ -581,6 +595,26 @@ Return `true` if the linear system $xA = b$ or $Ax = b$ with `side == :left`
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
+
+# Example
+
+```jldoctest
+julia> A = QQ[2 0 0;0 3 0;0 0 5]
+[2//1   0//1   0//1]
+[0//1   3//1   0//1]
+[0//1   0//1   5//1]
+
+julia> can_solve(A,one(A))
+true
+
+julia> A = ZZ[2 0 0;0 3 0;0 0 5]
+[2   0   0]
+[0   3   0]
+[0   0   5]
+
+julia> can_solve(A,one(A))
+false
+```
 """
 function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve(matrix_normal_form_type(A), A, b; side)
@@ -653,6 +687,21 @@ If the base ring is a principal ideal domain, the rows or columns respectively o
 are a basis of the respective kernel.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
+#Example
+
+```jldoctest
+julia> A = QQ[2 6 0 0;1 3 0 0;0 0 5 0];
+
+julia> kernel(A, side=:right)
+[-3//1   0//1]
+[ 1//1   0//1]
+[ 0//1   0//1]
+[ 0//1   1//1]
+
+julia> kernel(A)
+[-1//2   1//1   0//1]
+```
 """
 function kernel(A::Union{MatElem, SolveCtx}; side::Symbol = :left)
   return kernel(matrix_normal_form_type(A), A; side)
