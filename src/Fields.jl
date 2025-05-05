@@ -44,5 +44,6 @@ function factor(x::FieldElement)
 end
 
 function canonical_unit(x::FieldElement)
-  return x # this may return the non-unit 0, cf. https://github.com/Nemocas/AbstractAlgebra.jl/issues/1166
+  iszero(x) && return one(x)
+  return x
 end
