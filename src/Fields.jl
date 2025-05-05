@@ -42,3 +42,7 @@ function factor(x::FieldElement)
   @req !is_zero(x) "Element must be non-zero"
   return Fac(x, Dict{typeof(x), Int}())
 end
+
+function canonical_unit(x::FieldElement)
+  return x # this may return the non-unit 0, cf. https://github.com/Nemocas/AbstractAlgebra.jl/issues/1166
+end
