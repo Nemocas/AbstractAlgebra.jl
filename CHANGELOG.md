@@ -90,7 +90,6 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - [#1995](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1995) Add `is_finite` for rational function fields and allow omitting the variable name in `rational_function_field` (then `t` is used)
-- [#1988](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1988) Explicitely import `Base.Matrix` to improve Julia 1.12 compatibility
 - [#1978](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1978) Import more `ConformanceTests` stuff into `TestExt`
 
 ## [0.44.5] - 2025-02-07
