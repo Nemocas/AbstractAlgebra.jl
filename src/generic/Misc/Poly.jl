@@ -13,7 +13,7 @@ function is_power(a::PolyRingElem, n::Int)
     fl || return false, a
     f = factor(a)
     all(i -> i % n == 0, values(f.fac)) || return false, a
-    return true, x*prod(p^div(k, n) for (p, k) = f.fac)
+    return true, f.unit * prod(p^div(k, n) for (p, k) = f.fac)
 end
 
 ################################################################################
