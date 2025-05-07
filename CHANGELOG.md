@@ -6,10 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [0.44.13] - 2025-05-07
 
-### Added
+### Changed
 
+- [#2061](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2061) Fix a promote issue for `AbsMSeries` over Poly tower
+- [#2065](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2065) Fix `swap_cols!` for `Matrix{T}`
+- [#2068](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2068) Remove bad generic `sqrt` method that could lead to stack overflow
+- [#2069](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2069) Fix `canonical_unit` methods returning zero
 
 ## [0.44.12] - 2025-04-25
 
