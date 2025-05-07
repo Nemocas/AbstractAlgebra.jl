@@ -20,9 +20,7 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [#2055](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2055) Add comments and more solving examples
-- [#2058](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2058) Improve univariate conversion
-- [#2057](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2057) Fix a JET issue in `iterate(::ProductIterator)`
+- [#2058](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2058) Improve `to_univariate(::MPoly)`
 - [#2056](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2056) Fix typo in `isomorphism(::Type{T}, ::T) where T <: Group` code
 - [#2054](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2054) Fix stack overflow when constructing non-implemented views
 - [#2048](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2048) Enable point views of matrices
@@ -33,7 +31,6 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [#2043](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2043) Add an `@id` field to a docs header
 - [#2042](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2042) Fix unwanted poly modification during evaluation
 
 ## [0.44.10] - 2025-03-19
@@ -46,10 +43,7 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - [#2037](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2037) Remove broken `is_unit` and `is_nilpotent` for `NCPolyRingElem`
-- [#2028](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2028) Improvements for multivariate and universal polynomials
 - [#2033](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2033) Optimize `gen(::MPolyRing, ::Int)` for `:deglex` and `:degrevlex`
-- [#2024](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2024) Replace `Val`-dispatch by if-else in `Generic.MPoly` for better performance
-- [#2031](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2031) Clean up `monomial_isless` for `Generic.MPoly`
 
 ## [0.44.9] - 2025-03-10
 
@@ -62,11 +56,7 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [#2022](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2022) Fix some references in the Linear Solving docs
-- [#2013](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2013) Some tweaks to `evaluate` methods
-- [#2019](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2019) Make `MPolyFactor` module more robust
 - [#2018](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2018) More intuitive polynomial evaluation
-- [#2016](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2016) Add some refs between `allow_unicode` and friends
 - [#2011](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2011) Add some missing `check_parent` in MPoly arithmetics
 - [#2007](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2007) Wrap `MPoly` factorization for `UnivPoly`
 
@@ -99,8 +89,7 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [#1994](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1994) Simplify and slightly optimize `vars(::MPolyRingElem)`
-- [#1995](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1995) Add `is_finite` for rational function fields and allow omitting the variable name (then `t` is used)
+- [#1995](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1995) Add `is_finite` for rational function fields and allow omitting the variable name in `rational_function_field` (then `t` is used)
 - [#1988](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1988) Explicitely import `Base.Matrix` to improve Julia 1.12 compatibility
 - [#1978](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1978) Import more `ConformanceTests` stuff into `TestExt`
 
@@ -116,15 +105,14 @@ tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [#1982](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1982) Improved matrix documentation
-- [#1985](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1985) Restructure `@varnames_interface` inclusion
+- [#1982](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1982) Improve matrix documentation
 - [#1983](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1983) Optimize `gens` for universal polynomials
 - [#1977](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1977) Don't mention `charpoly_only` in docstrings, it is an internal helper
 - [#1975](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1975) Improve documentation of `add_verbosity_scope`
 - [#1970](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1970) Fix potentially wrong result in `content(::MatrixElem)`
 - [#1970](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1970) Optimize a few `content` methods
 - [#1971](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1971) Remove misleading `content` method
-- [#1972](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1972) Fix docstring for `divides` promises too much
+- [#1972](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1972) Fix docstring for `divides` promising too much
 
 ## [0.44.4] - 2025-01-22
 
