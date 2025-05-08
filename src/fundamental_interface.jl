@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   basic_interface.jl : basic interface for AbstractAlgebra
+#   fundamental_interface.jl : fundamental interface for AbstractAlgebra
 #
 ###############################################################################
 
