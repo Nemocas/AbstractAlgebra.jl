@@ -1322,6 +1322,10 @@ end
    P,(x,y) = polynomial_ring(F, [:x, :y])
    @test x(t,y) == t
    @test x == gen(P, 1) # evaluation used to modify the polynomial
+
+   # Issue #1219
+   Qx, (x, y) = QQ["x", "y"];
+   @test typeof(zero(Qx)(x, y)) == typeof(one(Qx)(x, y)) == typeof((x+y)(x, y))
 end
 
 @testset "Generic.MPoly.valuation" begin
