@@ -3348,17 +3348,13 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    powers = [Dict{Int, Any}() for i in 1:length(vals)]
    # First work out types of products
    r = R()
-   c = zero(R)
-   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W !== BigInt) ||
           (W <: Rational && W !== Rational{BigInt}))
-         c = c*zero(W)
-         U[j] = parent(c)
+         r = r*zero(W)
       else
-         U[j] = parent(vals[j])
-         c = c*zero(parent(vals[j]))
+         r = r*zero(parent(vals[j]))
       end
    end
    cvzip = zip(coefficients(a), exponent_vectors(a))
