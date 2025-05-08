@@ -334,7 +334,7 @@ end
       @test length(2x2^2 + 3x2 + 1) == 3
 
       @test gen(S, :x) == x
-      @test gens(S, ['x', 'y']) == (x, y)
+      @test gens(S, ['x', 'y']) == [x, y]
       @test gen(S, 1) == x
       @test gen(S, 2) == y
       @test gen(S, 3) == z
@@ -348,6 +348,12 @@ end
       @test vars(2x2^2 + 3x2 + 1) == [x]
 
       @test characteristic(S) == 0
+
+      xs, ys = gens(S, :x => (1:4), :y =>(1:2, 1:3))
+      @test xs isa Vector{elem_type(S)}
+      @test length(xs) == 4
+      @test ys isa Matrix{elem_type(S)}
+      @test size(ys) == (2, 3)
    end
 end
 
