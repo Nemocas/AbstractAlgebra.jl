@@ -227,7 +227,8 @@ is_zero(R::NCRing) = is_trivial(R)
 @doc raw"""
     is_perfect(F::Field)
 
-Test whether the field $F$ is perfect.
+Test whether the field $F$ is perfect, that is, whether the characteristic is zero or
+$F^p = F$, where $p > 0$ is the characteristic of $F$.
 """
 is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
                                                  throw(NotImplementedError(:is_perfect, F))
