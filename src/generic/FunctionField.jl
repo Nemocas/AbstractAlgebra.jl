@@ -563,10 +563,7 @@ Return the characteristic of the underlying rational function field.
 characteristic(R::FunctionField) = characteristic(base_ring(R))
 
 function is_perfect(R::FunctionField)
-  if characteristic(R) == 0
-    return true
-  else
-    return false
+  return characteristic(R) == 0
   end
 end
 
