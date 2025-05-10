@@ -151,6 +151,7 @@ import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_squarefree

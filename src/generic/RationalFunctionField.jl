@@ -129,6 +129,18 @@ end
 
 is_finite(R::RationalFunctionField) = is_finite(base_ring(R.fraction_field))
 
+function is_perfect(R::RationalFunctionField)
+  if characteristic(R) == 0
+    return true
+  end
+  # char > 0
+  if number_of_generators(R) > 0
+    return false
+  end
+
+  return is_perfect(base_ring(R))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
