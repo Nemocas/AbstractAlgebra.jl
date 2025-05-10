@@ -69,7 +69,9 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
    @test is_exact_type(typeof(y1)) == true
 
    @test characteristic(S1) == 0
+   @test is_perfect(S1)
    @test characteristic(S2) == 23
+   @test !is_perfect(S2)
 
    @test var(S1) == :y1
 

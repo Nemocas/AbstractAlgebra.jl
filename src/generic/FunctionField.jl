@@ -562,6 +562,8 @@ Return the characteristic of the underlying rational function field.
 """
 characteristic(R::FunctionField) = characteristic(base_ring(R))
 
+is_perfect(R::FunctionField) = characteristic(R) == 0
+
 ###############################################################################
 #
 #   Basic manipulation

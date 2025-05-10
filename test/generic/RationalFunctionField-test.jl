@@ -80,18 +80,22 @@ end
    T, = rational_function_field(QQ)
    @test characteristic(T) == 0
    @test !is_finite(T)
+   @test is_perfect(T)
 
    T, = rational_function_field(GF(3))
    @test characteristic(T) == 3
    @test !is_finite(T)
+   @test !is_perfect(T)
 
    T, = rational_function_field(GF(3), Symbol[])
    @test characteristic(T) == 3
    @test is_finite(T)
+   @test is_perfect(T)
 
    T, = rational_function_field(GF(3), Symbol[:x, :y])
    @test characteristic(T) == 3
    @test !is_finite(T)
+   @test !is_perfect(T)
 end
 
 @testset "Generic.RationalFunctionField.printing" begin
