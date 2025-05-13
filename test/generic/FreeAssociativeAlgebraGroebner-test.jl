@@ -25,7 +25,7 @@ include("AhoCorasick-test.jl")
     f1 = a^2 -1;
     f2 = b^3 -1;
     f3 = a*b*a*b^2*a*b*a - b;
-    g = AbstractAlgebra.groebner_basis([(a*b*a*b^2)^2 - 1]; gb = [f1,f2,f3])
+    g = AbstractAlgebra.groebner_basis([(a*b*a*b^2)^2 - 1]; obstruction_free_set = [f1,f2,f3])
     @test length(g) >= 5
     AbstractAlgebra.interreduce!(g)
     @test length(g) == 5
