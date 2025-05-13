@@ -588,13 +588,13 @@ function groebner_basis_buchberger(
     obstruction_free_set::Vector{FreeAssociativeAlgebraElem{T}}=FreeAssociativeAlgebraElem{T}[]
 ) where T<:FieldElement
 
-    if isempty(gb)
+    if isempty(obstruction_free_set)
       g = copy(g)
       obstruction_queue = get_obstructions(g)
     else
-      temp_g = copy(gb)
+      temp_g = copy(obstruction_free_set)
       obstruction_queue =  PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
-      sizehint!(temp_g, length(g)+length(gb))
+      sizehint!(temp_g, length(g)+length(obstruction_free_set))
 
       for p in g
         push!(temp_g,p)
