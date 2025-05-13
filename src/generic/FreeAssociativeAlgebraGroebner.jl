@@ -681,5 +681,5 @@ function groebner_basis(
     remove_redundancies::Bool = false;
     gb::Vector{FreeAssociativeAlgebraElem{T}}=FreeAssociativeAlgebraElem{T}[]
 ) where T<:FieldElement
-return groebner_basis_buchberger(g, reduction_bound, remove_redundancies;gb=gb)
+    return groebner_basis_buchberger(g, reduction_bound, remove_redundancies; gb=gb)
 end
