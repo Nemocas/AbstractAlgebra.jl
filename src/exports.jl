@@ -356,6 +356,7 @@ export is_zero_row
 export isomorphism
 export kernel
 export kronecker_product
+export krull_dim
 export laurent_polynomial_ring
 export laurent_ring
 export laurent_series

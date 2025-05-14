@@ -38,6 +38,7 @@ end
 Return the dimension of the given vector quotient space.
 """
 dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
+vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 
 @doc raw"""
     supermodule(M::QuotientModule{T}) where T <: RingElement

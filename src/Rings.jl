@@ -241,3 +241,40 @@ function is_finite(R::NCRing)
   c == 1 && return true
   throw(NotImplementedError(:is_finite, R))
 end
+
+function _is_noetherian(R::T) where T<:Ring
+  if R isa Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}
+    return _is_noetherian(coefficient_ring(R))
+  elseif R isa Union{MSeriesRing, SeriesRing}
+    return _is_noetherian(base_ring(R))
+  elseif R isa Union{Integers, <:Field}
+    return true
+  else
+    return false
+  end
+end
+
+@doc raw"""
+    krull_dim(R::Ring)
+
+Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> krull_dim(R)
+2
+```
+"""
+function krull_dim(R::T) where T<:Ring
+  @req _is_noetherian(R) throw(NotImplementedError(:krull_dim, R))
+  return _krull_dim_noetherian(R)::Int
+end
+
+_krull_dim_noetherian(R::Field) = 0
+_krull_dim_noetherian(R::Integers) = 1
+_krull_dim_noetherian(R::MPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + nvars(R)
+_krull_dim_noetherian(R::PolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + 1
+_krull_dim_noetherian(R::LaurentMPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + nvars(R)
+_krull_dim_noetherian(R::LaurentPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + 1
+_krull_dim_noetherian(R::MSeriesRing) = _krull_dim_noetherian(base_ring(R)) + nvars(R)
+_krull_dim_noetherian(R::SeriesRing) = _krull_dim_noetherian(base_ring(R)) + 1

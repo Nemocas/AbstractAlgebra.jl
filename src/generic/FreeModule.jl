@@ -40,6 +40,7 @@ rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 Return the dimension of the given vector space.
 """
 dim(M::FreeModule{T}) where T <: FieldElement = M.rank
+vector_space_dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 
 number_of_generators(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
