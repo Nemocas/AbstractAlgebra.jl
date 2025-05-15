@@ -65,6 +65,7 @@ jobs:
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             using Documenter
+            include("docs/documenter_helpers.jl")
             using AbstractAlgebra
             DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
             doctest(AbstractAlgebra)'
