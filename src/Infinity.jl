@@ -72,13 +72,6 @@ Base.isless(::NegInf, x::Real) = isfinite(x) || !signbit(x)
 
 Base.isless(inf1::AnyInf, inf2::AnyInf) = signbit(inf1) && !signbit(inf2)
 
-
-Base.isless(::PosInf, ::Union{ZZRingElem,QQFieldElem}) = false
-Base.isless(::Union{ZZRingElem,QQFieldElem}, ::PosInf) = true
-
-Base.isless(::NegInf, ::Union{ZZRingElem,QQFieldElem}) = true
-Base.isless(::Union{ZZRingElem,QQFieldElem}, ::NegInf) = false
-
 ########################################
 #
 # other predicates
