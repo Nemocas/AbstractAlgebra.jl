@@ -84,7 +84,9 @@ julia> x = gen(S, :x)
 x
 
 julia> y, z = gens(S, [:y, :z])
-(y, z)
+2-element Vector{AbstractAlgebra.Generic.UnivPoly{BigInt}}:
+ y
+ z
 
 julia> x*y - z
 x*y - z
