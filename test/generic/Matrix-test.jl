@@ -1641,6 +1641,23 @@ end
    @test is_symmetric(M + transpose(M))
 end
 
+@testset "Generic.Mat.is_alternating" begin
+
+  @testset "Test is_alternating for $R" for R in [GF(2), GF(3), ZZ, QQ]
+     @test is_alternating(matrix(R, [0 1 ; -1 0]))
+     @test !is_alternating(matrix(R, [1 1 ; -1 1]))
+     @test !is_alternating(matrix(R, [1 0 ; 1 1]))
+     @test !is_alternating(matrix(R, [0 1 0 ; -1 0 0]))
+  end
+
+  # Tests over noncommutative ring
+  R = matrix_ring(ZZ, 2)
+  S = matrix_space(R, 2, 2)
+  M = rand(S, -10:10)
+
+  @test is_alternating(M - transpose(M))
+end
+
 @testset "Generic.Mat.is_skew_symmetric" begin
 
    @testset "Test is_skew_symmetric for $R" for R in [GF(2), GF(3), ZZ, QQ]
