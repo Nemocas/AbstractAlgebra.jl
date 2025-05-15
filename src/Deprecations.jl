@@ -61,13 +61,3 @@ end
 
 # deprecated in 0.45.0
 @deprecate test_iterate ConformanceTests.test_iterate
-
-# to be removed in next breaking release
-function var"@attr"(__source__::LineNumberNode, __module__::Base.Module, rettype, options, expr::Expr)
-  @assert options.head == :(=)
-  @assert length(options.args) == 2
-  @assert options.args[1] == :ignore_kwargs
-  @assert options.args[2].head == :vect
-  Base.depwarn("The `ignore_kwargs` option is deprecated. It is no longer needed as `@attr` ignores all kwargs by default.", Symbol("@attr"))
-  return var"@attr"(__source__, __module__, rettype, expr)
-end
