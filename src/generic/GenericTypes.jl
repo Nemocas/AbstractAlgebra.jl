@@ -354,7 +354,7 @@ end
 end
 
 function MPolyRing{T}(R::Ring, s::Vector{Symbol}, internal_ordering::Symbol=:lex, cached::Bool=true) where T <: RingElement
-   @assert T == elem_type(R)
+   @assert T === elem_type(R)
    N = length(s)
    internal_ordering in (:deglex, :degrevlex) && (N+=1)
    return MPolyRing{T}(R, s, internal_ordering, N, cached)
@@ -1099,6 +1099,11 @@ end
 
 struct MatSpaceVecView{T <: NCRingElement, V, W} <: AbstractVector{T}
    entries::SubArray{T, 1, Matrix{T}, V, W}
+   base_ring::NCRing
+end
+
+struct MatSpacePointView{T <: NCRingElement, V, W} <: AbstractArray{T, 0}
+   entries::SubArray{T, 0, Matrix{T}, V, W}
    base_ring::NCRing
 end
 

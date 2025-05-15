@@ -317,14 +317,14 @@ end
 
 function coeff(p::UnivPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where {T}
    len = length(vars)
-   len != length(exps) && error("Number of variables does not match number of exponents")
+   @req len == length(exps) "Number of variables does not match number of exponents"
    S = parent(p)
    n = nvars(S)
    num = nvars(parent(data(p)))
    vars2 = Vector{Int}(undef, 0)
    exps2 = Vector{Int}(undef, 0)
    for i = 1:len
-      vars[i] > n && error("Variable index not in range")
+      @req 1 <= vars[i] <= nvars(S) "Variable index not in range"
       if vars[i] <= num
          push!(vars2, vars[i])
          push!(exps2, exps[i])
@@ -559,6 +559,21 @@ end
 
 function ==(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
    check_parent(a, b)
+
+   # quick check if underlying parents agree
+   if parent(data(a)) === parent(data(b))
+     return data(a) == data(b)
+   end
+
+   # check for "generators"
+   fl1, i1 = AbstractAlgebra._is_gen_with_index(data(a))
+   fl2, i2 = AbstractAlgebra._is_gen_with_index(data(b))
+   if fl1 && fl2
+     return i1 == i2
+   elseif fl1 != fl2
+     return false
+   end
+
    if length(a) != length(b)
       return false
    end
@@ -876,7 +891,20 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T
    return evaluate(a, varidx, vals)
 end
 
-###############################################################################
+function (a::Union{MPolyRingElem, UniversalPolyRingElem})(;kwargs...)
+   S = parent(a)
+   vars = Array{Int}(undef, length(kwargs))
+   vals = Array{RingElement}(undef, length(kwargs))
+   for (i, (var, val)) in enumerate(kwargs)
+     vari = findfirst(isequal(var), S.S)
+     vari === nothing && error("Given polynomial has no variable $var")
+     vars[i] = vari
+     vals[i] = val
+   end
+   return evaluate(a, vars, vals)
+end
+
+########S,(a,b)=QQ[:a,:b]#######################################################################
 #
 #   GCD
 #
@@ -902,7 +930,11 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T}) where {T 
    return to_univariate(R, data(p))
 end
 
+to_univariate(p::UnivPoly) = to_univariate(data(p))
+
 is_univariate(p::UnivPoly) = is_univariate(data(p))
+
+is_univariate_with_data(p::UnivPoly) = is_univariate_with_data(data(p))
 
 is_univariate(R::UniversalPolyRing) = is_univariate(mpoly_ring(R))
 

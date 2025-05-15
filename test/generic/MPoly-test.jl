@@ -452,6 +452,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
+
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 
@@ -1243,6 +1247,8 @@ end
    f = 2x^2*y^2 + 3x + y + 1
 
    @test evaluate(f, [0*x, 0*y]) == 1
+   @test evaluate(f, Any[0*x, 0*y]) == 1
+   @test_throws ArgumentError evaluate(f, [])
 
    @test evaluate(f, BigInt[1, 2]) == ZZ(14)
    @test evaluate(f, [QQ(1), QQ(2)]) == 14//1
@@ -1257,6 +1263,13 @@ end
                2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
    @test evaluate(f, [x, 0]) == 3x + 1 # see https://github.com/oscar-system/Oscar.jl/issues/2331
+
+   @test f(x=1, y=2) == 14
+   @test f(y=2, x=1) == 14
+   @test f(x=x+y, y=2y-x) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+   @test f(y=2y-x, x=x+y) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
    S, z = polynomial_ring(R, "z")
 
@@ -1303,6 +1316,16 @@ end
    K = RealField
    R, (x, y) = polynomial_ring(K, ["x", "y"])
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
+
+   # Issue oscar-system/Oscar.jl#4762
+   F,t = rational_function_field(QQ, :t)
+   P,(x,y) = polynomial_ring(F, [:x, :y])
+   @test x(t,y) == t
+   @test x == gen(P, 1) # evaluation used to modify the polynomial
+
+   # Issue #1219
+   Qx, (x, y) = QQ["x", "y"];
+   @test typeof(zero(Qx)(x, y)) == typeof(one(Qx)(x, y)) == typeof((x+y)(x, y))
 end
 
 @testset "Generic.MPoly.valuation" begin
@@ -1537,6 +1560,11 @@ end
 
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
+
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
 
       for iter in 1:10
          f = zero(R)
@@ -1840,4 +1868,10 @@ end
   end
   @test is_unit(7+60*x*y)
   @test is_unit(7-60*x*y)
+end
+
+@testset "Generic.MPoly.Issue#2010" begin
+  R1, (y1, z1) = polynomial_ring(QQ, [:y, :z])
+  R2, (x2, y2) = polynomial_ring(QQ, [:x, :y])
+  @test_throws ErrorException z1 + y2
 end

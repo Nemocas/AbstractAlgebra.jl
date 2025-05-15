@@ -642,3 +642,10 @@ end
       @test evaluate(f, [y], [h]) == evaluate(f, [x, h])
    end
 end
+
+@testset "Generic.AbsMSeries.#2060" begin
+   R, a = polynomial_ring(QQ, :a)
+   F, x = polynomial_ring(R, :x)
+   S, (eps,) = power_series_ring(F, 4, [:ϵ])
+   @test coefficients(eps + a) == [a, 1]
+end

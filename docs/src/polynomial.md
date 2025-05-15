@@ -436,6 +436,10 @@ is_term_recursive(::PolyRingElem)
 is_constant(::PolynomialElem)
 ```
 
+```@docs
+is_separable(::PolyRingElem)
+```
+
 **Examples**
 
 ```jldoctest

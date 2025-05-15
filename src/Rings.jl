@@ -179,15 +179,6 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   error("Element $a does not have a square root")
 end
 
-# assumes the existence of sqrt without check argument for input
-function Base.sqrt(a::RingElem; check::Bool=true)
-  s = sqrt(a)
-  if check
-    s != a^2 && error("Element $a does not have a square root")
-  end
-  return s
-end  
-
 # assumes the existence of is_square and sqrt for input  
 function is_square_with_sqrt(a::RingElem)
   if is_square(a)
@@ -236,7 +227,8 @@ is_zero(R::NCRing) = is_trivial(R)
 @doc raw"""
     is_perfect(F::Field)
 
-Test whether the field $F$ is perfect.
+Test whether the field $F$ is perfect, that is, whether the characteristic is zero or
+else whether every element of $F$ admits a $p$-th root, where $p > 0$ is the characteristic of $F$.
 """
 is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
                                                  throw(NotImplementedError(:is_perfect, F))

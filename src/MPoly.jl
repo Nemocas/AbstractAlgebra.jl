@@ -104,27 +104,33 @@ function vars(p::MPolyRingElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    var_index(p::MPolyRingElem{T}) where {T <: RingElement}
+    var_index(x::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
 """
 function var_index(x::MPolyRingElem{T}) where {T <: RingElement}
-   !is_monomial(x) && error("Not a variable in var_index")
-   exps = first(exponent_vectors(x))
-   count = 0
-   index = 0
-   for i = 1:length(exps)
-      if exps[i] > 1
-         error("Not a variable in var_index")
-      end
-      if exps[i] == 1
-         count += 1
-         index = i
-      end
-   end
-   count != 1 && error("Not a variable in var_index")
-   return index
+  fl, i = _is_gen_with_index(x)
+  if fl
+    return i
+  else
+    error("Not a variable in var_index")
+  end
+end
+
+# fallback method, MPolyRingElem subtypes can provide an optimized one
+function _is_gen_with_index(x::MPolyRingElem)
+  for i in 1:nvars(parent(x))
+    is_gen(x, i) && return true, i
+  end
+  return false, 0
+end
+
+# fallback method for is_gen(x, i) -- most MPolyRingElem subtypes will provide
+# a more efficient one, though for now this is needed for Nemo.FqMPolyRing
+# (see < https://github.com/Nemocas/Nemo.jl/pull/2047>)
+function is_gen(x::MPolyRingElem, i::Int)
+  return is_monomial(x) == 1 && total_degree(x) == 1 && exponent(x, 1, i) == 1
 end
 
 characteristic(R::MPolyRing) = characteristic(base_ring(R))
@@ -149,16 +155,11 @@ the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 $x, y, z$ in that order).
 """
 function coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(exps) &&
-       error("Number of variables does not match number of exponents")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(exps) "Number of variables does not match number of exponents"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
-      if exps[i] < 0
-         error("Exponent cannot be negative")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
+      @req exps[i] >= 0 "Exponent must not be negative"
    end
    S = parent(a)
    M = Generic.MPolyBuildCtx(S)
@@ -415,13 +416,14 @@ end
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
 function is_unit(f::T) where {T <: MPolyRingElem}
-  # for constant polynomials we delegate to the coefficient ring:
-  is_constant(f) && return is_unit(constant_coefficient(f))
-  # Here deg(f) > 0; over an integral domain, non-constant polynomials are never units:
-  is_domain_type(T) && return false
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
   # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
+  # For constant polynomials we delegate to the coefficient ring:
+  is_constant(f) && return is_unit(constant_coefficient(f))
+  # Here deg(f) > 0.
+  # Over an integral domain, non-constant polynomials are never units:
+  is_domain_type(base_ring_type(T)) && return false
   constant_term_is_unit = false
   for (c, expv) in zip(coefficients(f), exponent_vectors(f))
     if is_zero(expv)
@@ -431,7 +433,7 @@ function is_unit(f::T) where {T <: MPolyRingElem}
       is_nilpotent(c) || return false
     end
   end
-  return constant_term_is_unit
+  return constant_term_is_unit  # handles the case that there is no constant term
 end
 
 function content(a::MPolyRingElem{T}) where T <: RingElement
@@ -444,6 +446,7 @@ end
 
 
 function is_nilpotent(f::T) where {T <: MPolyRingElem}
+  # Over a commutative ring a poly is nilpotent iff all coeffs are nilpotent.
   is_domain_type(T) && return is_zero(f)
   return all(is_nilpotent, coefficients(f))
 end
@@ -695,12 +698,12 @@ function deflate(f::MPolyRingElem{T}) where T <: RingElement
 end
 
 function inflate_deflate_vectors(R::MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
-   unique(vars) != vars && error("Variables not unique")
+   @req allunique(vars) "Variables not unique"
    !(length(vars) == length(shift) == length(defl)) && error("Number of variables does not match lengths of shift and deflation vectors")
    shift1 = zeros(Int, nvars(R))
    defl1 = ones(Int, nvars(R))
    for i in 1:(length(vars))
-      !(1 <= vars[i] <= nvars(R)) && error("Variable index not in range")
+      @req 1 <= vars[i] <= nvars(R) "Variable index not in range"
       shift1[vars[i]] = shift[i]
       defl1[vars[i]] = defl[i]
    end
@@ -852,7 +855,12 @@ end
 ###############################################################################
 
 function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   return evaluate(a, parent(a).(vals))
+   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+   newvals = parent(a).(vals)
+   if typeof(vals) == typeof(newvals)
+     throw(NotImplementedError(:evaluate, a, vals))
+   end
+   return evaluate(a, newvals)
 end
 
 @doc raw"""
@@ -864,21 +872,17 @@ defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
 function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
+   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
    R = base_ring(a)
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
+   if (U <: Integer && U !== BigInt) ||
+      (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
-      if U != V
-         vals = [parent(c)(v) for v in vals]
-         powers = [Dict{Int, V}() for i in 1:length(vals)]
-      else
-         powers = [Dict{Int, U}() for i in 1:length(vals)]
+      if U !== V
+         return evaluate(a, [parent(c)(v) for v in vals])
       end
-   else
-      powers = [Dict{Int, U}() for i in 1:length(vals)]
    end
+   powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
@@ -897,10 +901,10 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          if iszero(exp)
            continue
          end
-         if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
+         pe = get!(powers[j], exp) do
+            return vals[j]^exp
          end
-         t = t*powers[j][exp]
+         t = mul!(t, pe)
       end
       push!(r, c*t)
       j = i = i + 1
@@ -926,13 +930,10 @@ array `vars`. The evaluation will succeed if multiplication is defined between
 elements of the coefficient ring of $a$ and elements of `vals`.
 """
 function evaluate(a::MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(vals) &&
-      error("Number of variables does not match number of values")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
    end
 
    if length(vars) == 0
@@ -1006,10 +1007,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
@@ -1030,10 +1031,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
@@ -1122,13 +1123,62 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if !is_univariate(p)
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
    if is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
+end
+
+@doc raw"""
+    to_univariate(p::MPolyRingElem)
+
+Assuming the polynomial $p$ is actually a univariate polynomial in the
+variable $x$, convert the polynomial to a univariate polynomial in a
+univariate polynomial ring over the same base ring in the variable $x$.
+If $p$ is constant, it is considered to be a polynomial in the first
+variable of its parent. An exception is raised if the polynomial $p$
+involves more than one variable or if its parent has no variables.
+"""
+function to_univariate(p::MPolyRingElem)
+   S = parent(p)
+   iszero(ngens(S)) && error("Parent has no variables.")
+   is_uni, var = is_univariate_with_data(p)
+   is_uni || error("Polynomial is not univariate.")
+   if iszero(var)
+      var = 1
+   end
+   x = symbols(S)[var]
+   R, _ = base_ring(S)[x]
+   return to_univariate(R, p)
+end
+
+@doc raw"""
+    is_univariate_with_data(p::MPolyRingElem)
+
+Returns `(true, i)` if $p$ is a univariate polynomial in the `i`-th variable
+of its parent i.e. involves exactly one variable. If $p$ is constant,
+`(true, 0)` is returned. Otherwise `(false, 0)` is returned. The result
+depends on the terms of the polynomial, not simply on the number of
+variables in the polynomial ring.
+"""
+function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
+   if is_constant(p)
+      return true, 0
+   end
+   var = -1
+   for v in exponent_vectors(p)
+      n = count(x -> x != 0, v)
+      if n > 1
+         return false, 0
+      elseif n == 1
+         if var == -1
+            var = findfirst(x -> x != 0, v)
+         elseif v[var] == 0
+            return false, 0
+         end
+      end
+   end
+   return true, var
 end
 
 @doc raw"""
@@ -1140,23 +1190,7 @@ otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
 function is_univariate(p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
-      return true
-   end
-   var = -1
-   for v in exponent_vectors(p)
-      n = count(x -> x != 0, v)
-      if n > 1
-         return false
-      elseif n == 1
-         if var == -1
-            var = findfirst(x -> x != 0, v)
-         elseif v[var] == 0
-            return false
-         end
-      end
-   end
-   return true
+   return is_univariate_with_data(p)[1]
 end
 
 @doc raw"""

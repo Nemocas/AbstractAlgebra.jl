@@ -226,6 +226,12 @@ include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
 
+include("Groups.jl")
+include("Rings.jl")
+include("NCRings.jl")
+include("Fields.jl")
+include("Factor.jl")
+
 include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
 include("Poly.jl")
 include("NCPoly.jl")
@@ -262,13 +268,6 @@ include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
-
-
-include("Groups.jl")
-include("Rings.jl")
-include("NCRings.jl")
-include("Fields.jl")
-include("Factor.jl")
 
 # More functionality for Julia types
 include("julia/Integer.jl")
