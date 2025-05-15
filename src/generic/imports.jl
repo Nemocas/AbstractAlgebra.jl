@@ -54,6 +54,7 @@ import Base: precision
 import Base: rand
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: setindex!
 import Base: show
 import Base: sign
@@ -150,6 +151,7 @@ import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_squarefree
@@ -159,6 +161,7 @@ import ..AbstractAlgebra: is_terse
 import ..AbstractAlgebra: is_trivial
 import ..AbstractAlgebra: is_unit
 import ..AbstractAlgebra: is_univariate
+import ..AbstractAlgebra: is_univariate_with_data
 import ..AbstractAlgebra: is_zero_divisor
 import ..AbstractAlgebra: is_zero_divisor_with_annihilator
 import ..AbstractAlgebra: isreduced_form
@@ -186,6 +189,7 @@ import ..AbstractAlgebra: one!
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
 import ..AbstractAlgebra: pol_length
+import ..AbstractAlgebra: pow!
 import ..AbstractAlgebra: preimage
 import ..AbstractAlgebra: pretty
 import ..AbstractAlgebra: primpart

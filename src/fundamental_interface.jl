@@ -337,7 +337,7 @@ The unary version is a shorthand for `inv!(a, a)`.
 inv!(z, a) = AbstractAlgebra.inv(a)
 inv!(a) = inv!(a, a)
 
-for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
+for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*), (:pow!, :^))
   @eval begin
     @doc """
         $($name)(z, a, b)
@@ -411,6 +411,13 @@ The two argument version is a shorthand for `div(a, a, b)`.
 """
 div!(z, a, b) = AbstractAlgebra.div(a, b)
 div!(a, b) = div!(a, a, b)
+
+@doc """
+    divides!(z, a, b)
+
+Return `divides(a, b)`, possibly modifying the object `z` in the process.
+"""
+divides!(z, a, b) = divides(a, b)
 
 @doc raw"""
     canonical_injection(D, i)

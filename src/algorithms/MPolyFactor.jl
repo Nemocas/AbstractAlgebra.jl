@@ -1,15 +1,20 @@
 ###############################################################################
 #
 #   MPolyFactor.jl : Generic algorithms for multivariate factor and gcd
+#                    over fields of characteristic 0
 #
 ###############################################################################
 
-# experimental module whose parts can be overridden for specific types
-# main functions are mfactor_squarefree_char_zero and mfactor_char_zero
+# Main functions are mfactor_squarefree_char_zero and mfactor_char_zero:
+# - mfactor_squarefree_char_zero works for any field of characteristic 0
+# - mfactor_char_zero reduces it to calls of factor for univariate polynomials
+#   (it might succeed if the polynomials are obviously irreducible, for example,
+#    of degree 1)
 
 module MPolyFactor
 
-using AbstractAlgebra
+using ..AbstractAlgebra
+
 import AbstractAlgebra: mulpow!
 
 mutable struct pfracinfo{E}
@@ -65,7 +70,7 @@ function mulpow!(a::Fac{T}, b::T, e::Int) where T
   if e == 0
     return
   end
-  if is_constant(b)
+  if is_unit(b)
     a.unit *= b^e
   elseif haskey(a.fac, b)
     a.fac[b] += e
@@ -1257,7 +1262,7 @@ function mfactor_irred_char_zero(a::E) where E
   lc = coeff(a, 1)
   if !isone(lc)
     res.unit = lc
-    a *= inv(lc)
+    a *= AbstractAlgebra.inv(lc)
   end
 
   degs = degrees(a)
@@ -1314,7 +1319,12 @@ function mfactor_squarefree_char_zero(a::E) where E
   # start with a monic version of a
   lc = coeff(a, 1)
   res.unit = R(lc)
-  res.fac = Dict{E, Int}(1//lc * a => 1)
+  if !is_unit(lc)
+    error("leading coefficient must be invertible")
+  end
+  # thus lc is invertible in K, which means that it is squarefree
+  # don't use `Base.inv`, it is wrong for `BigInt`
+  res.fac = Dict{E, Int}(AbstractAlgebra.inv(lc) * a => 1)
 
   # pure variable powers in the final factorization
   var_powers = zeros(Int, nvars(R))

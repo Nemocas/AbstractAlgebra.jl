@@ -40,7 +40,7 @@ one(::Floats{T}) where T <: AbstractFloat = T(1)
 
 is_unit(a::AbstractFloat) = !is_zero(a)
 
-canonical_unit(a::AbstractFloat) = a
+canonical_unit(a::AbstractFloat) = iszero(a) ? copysign(one(a), a) : a
 
 characteristic(a::Floats{T}) where T <: AbstractFloat = 0
 
