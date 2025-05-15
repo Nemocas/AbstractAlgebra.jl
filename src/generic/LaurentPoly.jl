@@ -27,7 +27,8 @@ var(R::LaurentPolyWrapRing) = var(R.polyring)
 
 symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
 
-number_of_variables(R::LaurentPolyWrapRing) = number_of_variables(R.polyring)
+number_of_variables(R::LaurentPolyWrapRing) = 1
+number_of_generators(R::LaurentPolyWrapRing) = number_of_variables(R)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 

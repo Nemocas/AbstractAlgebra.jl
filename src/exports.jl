@@ -282,6 +282,7 @@ export inverse_mat
 export invmod
 export iroot
 export is_abelian
+export is_alternating
 export is_associated
 export is_compatible
 export is_constant

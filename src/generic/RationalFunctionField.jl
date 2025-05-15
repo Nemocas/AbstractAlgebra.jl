@@ -34,6 +34,15 @@ function is_exact_type(a::Type{S}) where {T <: FieldElement, U <: Union{PolyRing
    return is_exact_type(T)
 end
 
+function symbols(a::RationalFunctionField)
+  S = a.S
+  if S isa Symbol
+    return [S]
+  else
+    return S
+  end
+end
+
 ###############################################################################
 #
 #   Constructors
