@@ -65,7 +65,7 @@ import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{V
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
 
 # deprecated in 0.45.0
-test_iterate = ConformanceTests.test_iterate
+@deprecate test_iterate ConformanceTests.test_iterate
 
 # to be removed in next breaking release
 function var"@attr"(__source__::LineNumberNode, __module__::Base.Module, rettype, options, expr::Expr)
