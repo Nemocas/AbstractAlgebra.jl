@@ -242,20 +242,30 @@ function is_finite(R::NCRing)
   throw(NotImplementedError(:is_finite, R))
 end
 
-function _is_noetherian(R::T) where T<:Ring
-  if R isa Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}
-    return _is_noetherian(coefficient_ring(R))
-  elseif R isa Union{MSeriesRing, SeriesRing}
-    return _is_noetherian(base_ring(R))
-  elseif R isa Union{Integers, <:Field}
+@doc raw"""
+    is_noetherian(R::T) where T<:Ring
+
+Check if the ring $R$ is Noetherian. The method returns `true` or raises an error, if the check has not been implemented yet for $R$.
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> is_noetherian(R)
+true
+```
+"""
+function is_noetherian(R::T) where T<:Ring
+  if R isa Union{Integers, <:Field}
     return true
   else
-    return false
+    return error("is_noetherian and krull_dim are currently not implemented for rings of type $(typeof(R))")
   end
 end
 
+is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
+is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
+
 @doc raw"""
-    krull_dim(R::Ring)
+    krull_dim(R::T) where T<:Ring
 
 Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
 ```jldoctest
@@ -266,15 +276,15 @@ julia> krull_dim(R)
 ```
 """
 function krull_dim(R::T) where T<:Ring
-  @req _is_noetherian(R) throw(NotImplementedError(:krull_dim, R))
-  return _krull_dim_noetherian(R)::Int
+  @req is_noetherian(R) "Krull dimension is only supported for Noetherian rings."
+  if R isa Integers
+    return 1
+  elseif R isa T where T<:Field
+    return 0
+  else
+    throw(NotImplementedError(:krull_dim, R))
+  end
 end
 
-_krull_dim_noetherian(R::Field) = 0
-_krull_dim_noetherian(R::Integers) = 1
-_krull_dim_noetherian(R::MPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + nvars(R)
-_krull_dim_noetherian(R::PolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + 1
-_krull_dim_noetherian(R::LaurentMPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + nvars(R)
-_krull_dim_noetherian(R::LaurentPolyRing) = _krull_dim_noetherian(coefficient_ring(R)) + 1
-_krull_dim_noetherian(R::MSeriesRing) = _krull_dim_noetherian(base_ring(R)) + nvars(R)
-_krull_dim_noetherian(R::SeriesRing) = _krull_dim_noetherian(base_ring(R)) + 1
+krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
+krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)

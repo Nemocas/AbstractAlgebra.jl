@@ -315,6 +315,7 @@ export is_monomial_recursive
 export is_negative
 export is_negative_entry
 export is_nilpotent
+export is_noetherian
 export is_odd
 export is_one
 export is_perfect
