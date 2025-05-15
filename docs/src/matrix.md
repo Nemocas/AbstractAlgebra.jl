@@ -3,7 +3,7 @@ CurrentModule = AbstractAlgebra
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# Matrix functionality
+# [Matrix functionality](@id matrix_functionality_chapter)
 
 ## Basic matrix functionality
 
@@ -12,7 +12,15 @@ manipulate matrices and to set and retrieve entries and other basic data associa
 with the matrices.
 
 It is possible to create matrices directly, without first
-creating a corresponding matrix space.
+creating a corresponding matrix space. The following constructors are necessary,
+because unfortunately, Julia's matrices and linear algebra cannot be made to work in
+our context due to two independent problems:
+- In empty matrices (0 rows or columns) all that is known is the type of the matrix entries, 
+however for the complex types used in AbstractAlgebra, this information is not sufficient to create elements,
+hence `zero(T)` or friends cannot work
+- Many functions (e.g. `det`) assume that all types used embed into the real or complex numbers,
+in Julia `det(ones(Int, (1,1))) == 1.0`, so the fact that this is exactly the integer `1` is lost.
+Furthermore, more general rings cannot be embedded into the reals at all.
 
 ```julia
 matrix(R::Ring, arr::Matrix{T}) where T <: RingElement

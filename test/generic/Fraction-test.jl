@@ -44,6 +44,7 @@
    TT = fraction_field(polynomial_ring(QQ, "x")[1])
    a = TT(1)
    b = T(2)
+   @test is_perfect(TT)
 
    @test a in [a, b]
    @test a in [b, a]

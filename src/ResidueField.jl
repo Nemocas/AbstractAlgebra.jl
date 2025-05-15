@@ -106,19 +106,6 @@ deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(d
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-function canonical_unit(x::ResFieldElem{<:Union{Integer, RingElem}})
-  if iszero(x)
-    return one(parent(x))
-  end
-  return x
-end
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################

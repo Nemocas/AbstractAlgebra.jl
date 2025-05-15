@@ -248,3 +248,13 @@ getindex(a::Fac, b)
 setindex!(a::Fac{Int}, c::Int, b::Int)
 ```
 
+## Miscellaneous
+
+There are some miscellaneous functions for rings to ease up certain computations.
+
+```@docs
+falling_factorial
+rising_factorial
+rising_factorial2
+```
+

@@ -3041,3 +3041,15 @@ end
   @test is_zero(gen(Rx)) && is_one(gen(Rx))
   ConformanceTests.test_Ring_interface_recursive(Rx)
 end
+
+@testset "Generic.Poly.separability" begin
+  QQx, x = QQ[:x]
+  @test is_separable(x)
+  @test is_separable((x + 1)*x)
+  @test !is_separable(x^2)
+
+  F = GF(2)
+  Fx, x = F[:x]
+  @test is_separable(x)
+  @test !is_separable(x^2)
+end

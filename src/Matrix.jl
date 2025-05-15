@@ -254,6 +254,20 @@ Return `true` if $M_{i,j}$ is zero.
 @inline is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(M[i,j])
 
 @doc raw"""
+    is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
+
+Return `is_positive(M[i,j])`, but with a possibly more efficient implementation.
+"""
+@inline is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_positive(M[i,j])
+
+@doc raw"""
+    is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
+
+Return `is_negative(M[i,j])`, but with a possibly more efficient implementation.
+"""
+@inline is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_negative(M[i,j])
+
+@doc raw"""
     is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
@@ -450,30 +464,31 @@ function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
    return A
  end
 
-getindex(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
+getindex(M::MatElem, ::Colon, cols) = getindex(M, 1:nrows(M), cols)
 
-function _to_indices(x, rows, cols)
-   if rows isa Integer
-      rows = rows
-   elseif rows isa Colon
-      rows = 1:nrows(x)
-   end
-   if cols isa Integer
-      cols = cols
-   elseif cols isa Colon
-      cols = 1:ncols(x)
-   end
-   (rows, cols)
-end
+getindex(M::MatElem, rows, ::Colon) = getindex(M, rows, 1:ncols(M))
+
+getindex(M::MatElem, ::Colon, ::Colon) = getindex(M, 1:nrows(M), 1:ncols(M))
+
 
 sub(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = M[r, c]
 
-function Base.view(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}})
-   return view(M, _to_indices(M, rows, cols)...)
+# fallback method that converts Colons to UnitRanges
+function Base.view(M::MatElem, rows, cols)
+   # indirection to avoid ambiguities
+   return _view(M, rows, cols)
+end
+
+function _view(M::MatElem, ::Colon, cols)
+   return view(M, 1:nrows(M), cols)
+end
+
+function _view(M::MatElem, rows, ::Colon)
+   return view(M, rows, 1:ncols(M))
+end
+
+function _view(M::MatElem, ::Colon, ::Colon)
+   return view(M, 1:nrows(M), 1:ncols(M))
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1

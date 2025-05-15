@@ -21,7 +21,8 @@ function test_mutating_op_like_neg(f::Function, f!::Function, A)
   @test equality(a, f(A))
 end
 
-function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
+function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; only3arg::Bool = false)
+  # only3arg = don't test f!(a, b)
   @req A isa T || B isa T "Invalid argument types"
 
   # initialize storage var with different values to check that its value is not used
@@ -50,11 +51,13 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
      @test equality(a, f(A, B))
      @test b == B
 
-     a = deepcopy(A)
-     b = deepcopy(B)
-     a = f!(a, b)
-     @test equality(a, f(A, B))
-     @test b == B
+     if !only3arg
+       a = deepcopy(A)
+       b = deepcopy(B)
+       a = f!(a, b)
+       @test equality(a, f(A, B))
+       @test b == B
+     end
   end
 
   if B isa T
@@ -77,9 +80,11 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
      b = f!(b, b, b)
      @test equality(b, f(B, B))
 
-     b = deepcopy(B)
-     b = f!(b, b)
-     @test equality(b, f(B, B))
+     if !only3arg
+       b = deepcopy(B)
+       b = f!(b, b)
+       @test equality(b, f(B, B))
+     end
   end
 end
 

@@ -197,6 +197,7 @@ export divexact_low
 export divexact_right
 export divhigh
 export divides
+export divides!
 export domain
 export downscale
 export echelon_form
@@ -215,6 +216,7 @@ export extended_weak_popov_with_transform
 export exterior_power
 export factor
 export factor_squarefree
+export falling_factorial
 export fflu
 export fflu!
 export find_pivot_popov
@@ -311,18 +313,21 @@ export is_monic
 export is_monomial
 export is_monomial_recursive
 export is_negative
+export is_negative_entry
 export is_nilpotent
 export is_odd
 export is_one
 export is_perfect
 export is_popov
 export is_positive
+export is_positive_entry
 export is_power
 export is_probable_prime
 export is_real
 export is_reverse
 export is_rimhook
 export is_rref
+export is_separable
 export is_skew_symmetric
 export is_snf
 export is_square
@@ -338,6 +343,7 @@ export is_trivial
 export is_unicode_allowed
 export is_unit
 export is_univariate
+export is_univariate_with_data
 export is_upper_triangular
 export is_valid
 export is_weak_popov
@@ -347,6 +353,7 @@ export is_zero_divisor
 export is_zero_divisor_with_annihilator
 export is_zero_entry
 export is_zero_row
+export isomorphism
 export kernel
 export kronecker_product
 export laurent_polynomial_ring
@@ -453,6 +460,7 @@ export polynomial_ring
 export polynomial_to_power_sums
 export popov
 export popov_with_transform
+export pow!
 export pow_multinomial
 export power_series_ring
 export power_sums_to_polynomial
@@ -524,7 +532,9 @@ export set_valuation!
 export setcoeff!
 export setpermstyle
 export shift_left
+export shift_left!
 export shift_right
+export shift_right!
 export similarity!
 export size
 export snf
