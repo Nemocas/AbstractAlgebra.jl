@@ -34,6 +34,15 @@ function is_exact_type(a::Type{S}) where {T <: FieldElement, U <: Union{PolyRing
    return is_exact_type(T)
 end
 
+function symbols(a::RationalFunctionField)
+  S = a.S
+  if S isa Symbol
+    return [S]
+  else
+    return S
+  end
+end
+
 ###############################################################################
 #
 #   Constructors
@@ -478,20 +487,26 @@ end
 #
 ###############################################################################
 
-function zero!(c::RationalFunctionFieldElem)
-   c.d = zero!(data(c))
-   return c
-end
+zero!(c::RationalFunctionFieldElem) =
+  RationalFunctionFieldElem(zero!(data(c)), parent(c))
 
-function mul!(c::RationalFunctionFieldElem{T, U}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   c.d = mul!(data(c), data(a), data(b))
-   return c
-end
+one!(c::RationalFunctionFieldElem) =
+  RationalFunctionFieldElem(one!(data(c)), parent(c))
 
-function add!(c::RationalFunctionFieldElem{T}, a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   c.d = add!(data(c), data(a), data(b))
-   return c
-end
+neg!(c::T, a::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(neg!(data(c), data(a)), parent(c))
+
+inv!(c::T, a::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(inv!(data(c), data(a)), parent(c))
+
+add!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(add!(data(c), data(a), data(b)), parent(c))
+
+sub!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(sub!(data(c), data(a), data(b)), parent(c))
+
+mul!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
+  RationalFunctionFieldElem(mul!(data(c), data(a), data(b)), parent(c))
 
 ###############################################################################
 #
@@ -559,16 +574,14 @@ end
 
 function (a::RationalFunctionField{T, U})() where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K())
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::FracFieldElem{U}) where {T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
    K = fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
-   z = RationalFunctionFieldElem{T, U}(b)
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(b, a)
    return z::RationalFunctionFieldElem{T, U}
 end
 
@@ -595,15 +608,13 @@ end
 
 function (a::RationalFunctionField{T, U})(b::Integer) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K(b))
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::Rational{<:Integer}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    K = fraction_field(a)
-   z = RationalFunctionFieldElem{T, U}(K(b))
-   z.parent = a
+   z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
@@ -626,11 +637,8 @@ function rational_function_field(k::Field, s::Symbol; cached::Bool=true)
 
    S = fraction_field(R)
    g = S(x)
-   t = RationalFunctionFieldElem{T, U}(g)
-
    par_object = RationalFunctionField{T, U}(k, parent(g), s, cached)
-
-   t.parent = par_object
+   t = RationalFunctionFieldElem{T, U}(g, par_object)
 
    return par_object, t
 end
@@ -644,13 +652,8 @@ function rational_function_field(k::Field, s::Vector{Symbol}; cached::Bool=true)
 
    S = fraction_field(R)
    g = [S(xi) for xi in x]
-   t = [RationalFunctionFieldElem{T, U}(gi) for gi in g]
-
    par_object = RationalFunctionField{T, U}(k, S, s, cached)
-
-   for ti in t
-      ti.parent = par_object
-   end
+   t = [RationalFunctionFieldElem{T, U}(gi, par_object) for gi in g]
 
    return par_object, t
 end
