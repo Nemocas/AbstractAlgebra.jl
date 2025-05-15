@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.0] - 2025-05-15
+
+### BREAKING
+- [#2003](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2003) Remove `ignore_kwargs` option from `@attr`, that was deprecated in 0.44.4
+- [#2002](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2002) Various changes to the conformance test setup:
+  - Conformance tests are no longer loaded by including some file from the `test` directory, but are put into the submodule `ConformanceTests`, which only contains function stubs. The implementations get added by a package extension triggered by `Test`.
+  - Thus, all code calling a function from the conformance tests (`test_mutating_op_*`, `test_*_interface(_recursive)`) needs to qualify the call with `ConformanceTests.`.
+  - `test_elem` got renamed to `ConformanceTests.generate_element` and its implementations need to be moved form `test` to `src`.
+- [#2006](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2006) Make `RationalFunctionFieldElem` immutable, remove a constructor method
+- [#1809](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1809) Allow more inputs for `gens(::UniversalPolyRing, ...)` and change its return type from `Tuple` to `Vector`
+
+### Added
+
+- [#2072](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2072) Implement `is_perfect` for `RationalFunctionField`
+- [#2081](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2081) Move `Infinity.jl` from Nemo
+- [#2082](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2082) Move parts of Oscar's `MoveToAbstractAlgebra.jl` over
+
+### Changed
+
+- [#2071](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2071) Fix some cases where evaluating a multivariate polynomial returned an object of the wrong type
+
 
 ## [0.44.13] - 2025-05-07
 
