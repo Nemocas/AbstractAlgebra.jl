@@ -452,6 +452,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
+
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 
@@ -1312,6 +1316,16 @@ end
    K = RealField
    R, (x, y) = polynomial_ring(K, ["x", "y"])
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
+
+   # Issue oscar-system/Oscar.jl#4762
+   F,t = rational_function_field(QQ, :t)
+   P,(x,y) = polynomial_ring(F, [:x, :y])
+   @test x(t,y) == t
+   @test x == gen(P, 1) # evaluation used to modify the polynomial
+
+   # Issue #1219
+   Qx, (x, y) = QQ["x", "y"];
+   @test typeof(zero(Qx)(x, y)) == typeof(one(Qx)(x, y)) == typeof((x+y)(x, y))
 end
 
 @testset "Generic.MPoly.valuation" begin
@@ -1546,6 +1560,11 @@ end
 
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
+
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
 
       for iter in 1:10
          f = zero(R)

@@ -222,8 +222,34 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
-# function is_unit(...)      see NCPoly.jl
-# function is_nilpotent(...) see NCPoly.jl
+function is_unit(f::T) where {T <: PolyRingElem}
+  # A polynomial over a commutative ring is a unit iff its
+  # constant term is a unit and all other coefficients are nilpotent:
+  # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
+  # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+  # see counter-example in AbstractAlgebra issue 2032 [2025-03-10]; try 1+f^3
+
+  # Constant coeff must itself be a unit:
+  is_unit(constant_coefficient(f)) || return false
+  is_constant(f) && return true
+  # Here deg(f) > 0
+  is_domain_type(base_ring_type(T)) && return false # over an integral domain, non-constant polynomials are never units
+  for i in 1:degree(f) # we have already checked coeff(f,0)
+    if !is_nilpotent(coeff(f, i))
+      return false
+    end
+  end
+  return true
+end
+
+function is_nilpotent(f::T) where {T <: PolyRingElem}
+  # Makes essential use of the fact that sum of 2 nilpotents is nilpotent.
+  # This is true when the coeffs are commutative.
+  # This implementation is NOT GENERALLY CORRECT for NC coefficients:
+  # see counter-example in AbstractAlgebra issue 2032 [2025-03-10].
+  is_domain_type(T) && return is_zero(f)
+  return all(is_nilpotent, coefficients(f))
+end
 
 
 is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
@@ -370,11 +396,11 @@ end
 struct PolyCoeffs{T <: RingElement}
    f::T
 end
- 
+
 function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
- 
+
 function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
@@ -393,17 +419,17 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
       return coeff(PCR.itr.f, st), st
    end
 end
- 
+
 Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
 Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
- 
+
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
- 
+
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
- 
+
 function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
@@ -1167,20 +1193,30 @@ Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
 """
 function shift_left(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   if n == 0
-      return f
-   end
-   flen = length(f)
-   r = parent(f)()
-   fit!(r, flen + n)
-   for i = 1:n
-      r = setcoeff!(r, i - 1, zero(base_ring(f)))
-   end
-   for i = 1:flen
-      r = setcoeff!(r, i + n - 1, coeff(f, i - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  shift_left!(parent(f)(), f, n)
+end
+
+function shift_left!(x::PolynomialElem, n::Int)
+  return shift_left!(x, x, n)
+end
+
+function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {T}
+  if iszero(x)
+    z = zero!(z)
+    return z
+  end
+
+  len = length(x) + n
+  fit!(z, len)
+  for i in (length(x) - 1):-1:0
+    z = setcoeff!(z, i + n, deepcopy(coeff(x, i)))
+  end
+  for i in 0:(n - 1)
+    z = setcoeff!(z, i, zero(coefficient_ring(z)))
+  end
+  set_length!(z, len)
+  return z
 end
 
 @doc raw"""
@@ -1190,20 +1226,22 @@ Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
 """
 function shift_right(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   flen = length(f)
-   if n >= flen
-      return zero(parent(f))
-   end
-   if n == 0
-      return f
-   end
-   r = parent(f)()
-   fit!(r, flen - n)
-   for i = 1:flen - n
-      r = setcoeff!(r, i - 1, coeff(f, i + n - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  return shift_right!(parent(f)(), f, n)
+end
+
+function shift_right!(x::PolynomialElem, n::Int)
+  return shift_right!(x, x, n)
+end
+
+function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
+  len = max(0, length(x) - n)
+  fit!(z, len)
+  for i in 0:(len - 1)
+    z = setcoeff!(z, i, deepcopy(coeff(x, i + n)))
+  end
+  set_length!(z, len)
+  return z
 end
 
 ###############################################################################
@@ -2273,7 +2311,7 @@ function compose(f::PolyRingElem, g::PolyRingElem; inner = nothing)
             Alternatively, use directly f(g) or g(f)
              """)
   end
-            
+
   if inner == :second
     return _compose_right(f, g)
   elseif inner == :first
@@ -3016,7 +3054,7 @@ with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Vector{T}; 
+function power_sums_to_polynomial(P::Vector{T};
                            parent::PolyRing{T}=PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end

@@ -61,17 +61,20 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 
    ord = internal_ordering(a)
    if ord == :lex
-      return a([one(base_ring(a))], reshape(UInt[UInt(j == n - i + 1)
-              for j = 1:n], n, 1))
+      exps = zeros(UInt, n, 1)
+      exps[n - i + 1] = 1
    elseif ord == :deglex
-      return a([one(base_ring(a))], reshape(UInt[(UInt(j == n - i + 1)
-              for j in 1:n)..., UInt(1)], n + 1, 1))
+      exps = zeros(UInt, n + 1, 1)
+      exps[n - i + 1] = 1
+      exps[end] = 1
    elseif ord == :degrevlex
-      return a([one(base_ring(a))], reshape(UInt[(UInt(j == i)
-              for j in 1:n)..., UInt(1)], n + 1, 1))
+      exps = zeros(UInt, n + 1, 1)
+      exps[i] = 1
+      exps[end] = 1
    else
       error("invalid ordering")
    end
+   return a([one(base_ring(a))], exps)
 end
 
 function vars(p::MPoly{T}) where {T <: RingElement}
@@ -562,6 +565,43 @@ function is_gen(x::MPoly{T}) where {T <: RingElement}
       error("invalid ordering")
    end
 end
+
+function AbstractAlgebra._is_gen_with_index(x::MPoly)
+   ord = internal_ordering(parent(x))
+   N = nvars(parent(x))
+   if length(x) != 1
+      return false, 0
+   end
+   if !isone(coeff(x, 1))
+      return false, 0
+   end
+   if ord === :degrevlex || ord === :deglex
+     if x.exps[N + 1, 1] != UInt(1)
+       return false, 0
+     end
+   end
+   exps = x.exps
+   for k = 1:N
+     exp = exps[k, 1]
+     if exp != UInt(0)
+       if exp != UInt(1)
+         return false, 0
+       end
+       for j = k + 1:N
+         if exps[j, 1] != UInt(0)
+           return false, 0
+         end
+       end
+       if ord === :degrevlex
+         return true, k
+       else
+         # in the :lex and :deglex case, the "last" variables come frst in the row
+         return true, N - k + 1
+       end
+     end
+   end
+   return false, 0
+ end
 
 @doc raw"""
     is_homogeneous(x::MPoly{T}) where {T <: RingElement}
@@ -3308,22 +3348,18 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    powers = [Dict{Int, Any}() for i in 1:length(vals)]
    # First work out types of products
    r = R()
-   c = zero(R)
-   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W !== BigInt) ||
           (W <: Rational && W !== Rational{BigInt}))
-         c = c*zero(W)
-         U[j] = parent(c)
+         r = r*zero(W)
       else
-         U[j] = parent(vals[j])
-         c = c*zero(parent(vals[j]))
+         r = r*zero(parent(vals[j]))
       end
    end
    cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
-      t = c
+      t = deepcopy(c)
       for j = 1:length(vals)
          exp = v[j]
          pe = get!(powers[j], exp) do
@@ -3331,7 +3367,7 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
          end
          t = mul!(t, pe)
       end
-      r += t
+      r = add!(r, t)
    end
    return r
 end

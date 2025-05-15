@@ -307,7 +307,7 @@ end
 #
 ###############################################################################
 
-function (a::AbsPowerSeriesRing{T} where T <: RingElement)(b::RingElement)
+function (a::AbsPowerSeriesRing)(b::RingElement)
    return a(base_ring(a)(b))
 end
 

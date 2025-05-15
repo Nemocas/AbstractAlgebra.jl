@@ -216,6 +216,7 @@ export extended_weak_popov_with_transform
 export exterior_power
 export factor
 export factor_squarefree
+export falling_factorial
 export fflu
 export fflu!
 export find_pivot_popov
@@ -342,6 +343,7 @@ export is_trivial
 export is_unicode_allowed
 export is_unit
 export is_univariate
+export is_univariate_with_data
 export is_upper_triangular
 export is_valid
 export is_weak_popov
@@ -351,6 +353,7 @@ export is_zero_divisor
 export is_zero_divisor_with_annihilator
 export is_zero_entry
 export is_zero_row
+export isomorphism
 export kernel
 export kronecker_product
 export laurent_polynomial_ring
@@ -529,7 +532,9 @@ export set_valuation!
 export setcoeff!
 export setpermstyle
 export shift_left
+export shift_left!
 export shift_right
+export shift_right!
 export similarity!
 export size
 export snf

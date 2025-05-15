@@ -6,11 +6,126 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [0.44.13] - 2025-05-07
+
+### Changed
+
+- [#2061](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2061) Fix a promote issue for `AbsMSeries` over Poly tower
+- [#2065](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2065) Fix `swap_cols!` for `Matrix{T}`
+- [#2068](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2068) Remove bad generic `sqrt` method that could lead to stack overflow
+- [#2069](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2069) Fix `canonical_unit` methods returning zero
+
+## [0.44.12] - 2025-04-25
 
 ### Added
 
-- Started keeping a changelog!
+- [#2039](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2039) Add generic `shift_left!` and `shift_right!` for univariate polynomials
+- [#2047](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2047) Add `falling_factorial`
+
+### Changed
+
+- [#2058](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2058) Improve `to_univariate(::MPoly)`
+- [#2056](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2056) Fix typo in `isomorphism(::Type{T}, ::T) where T <: Group` code
+- [#2054](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2054) Fix stack overflow when constructing non-implemented views
+- [#2048](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2048) Enable point views of matrices
+
+## [0.44.11] - 2025-03-28
+
+### Added
+
+### Changed
+
+- [#2042](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2042) Fix unwanted poly modification during evaluation
+
+## [0.44.10] - 2025-03-19
+
+### Added
+
+- [#2035](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2035) Add stub for `is_equal_as_morphism`
+- [#2036](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2036) Add stub for `isomorphism(::Type{<:Group}, ::Group)`
+
+### Changed
+
+- [#2037](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2037) Remove broken `is_unit` and `is_nilpotent` for `NCPolyRingElem`
+- [#2033](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2033) Optimize `gen(::MPolyRing, ::Int)` for `:deglex` and `:degrevlex`
+
+## [0.44.9] - 2025-03-10
+
+### Added
+
+- [#2020](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2020) Add `is_separable` for univariate polynomials
+- [#2017](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2017) Add `is_positive_entry` and `is_negative_entry` for matrices
+- [#2023](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2023) Add `reverse!` for polynomials
+- [#2023](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2023) Add 2-argument `pow!` method delegating to the existing 3-argument version
+
+### Changed
+
+- [#2018](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2018) More intuitive polynomial evaluation
+- [#2011](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2011) Add some missing `check_parent` in MPoly arithmetics
+- [#2007](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2007) Wrap `MPoly` factorization for `UnivPoly`
+
+## [0.44.8] - 2025-02-23
+
+### Added
+
+- [#2001](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2001) Add `minors_with_position` and `minors_iterator_with_position`
+- [#2004](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2004) Add `divides!`
+
+### Changed
+
+- [#1993](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1993) Allow creating `UniversalPolyRing` with variables
+- [#1998](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1998) Fix `is_finite` for rational function fields
+
+## [0.44.7] - 2025-02-17
+
+### Added
+
+### Changed
+
+- [#1999](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1999) Delegate factorization for function fields to `FracField` over polynomial rings
+- [#1999](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1999) Make `rand` for function fields produce reduced fractions
+
+## [0.44.6] - 2025-02-13
+
+### Added
+
+- [#1991](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1991) Add `is_zero(::NCRing)` as an alias of `is_trivial`
+
+### Changed
+
+- [#1995](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1995) Add `is_finite` for rational function fields and allow omitting the variable name in `rational_function_field` (then `t` is used)
+- [#1978](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1978) Import more `ConformanceTests` stuff into `TestExt`
+
+## [0.44.5] - 2025-02-07
+
+### Added
+
+- [#1973](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1973) Enable multivariate factorization in characteristic 0 (at least over coefficient rings for which univariate factorization is implemented)
+- [#1974](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1974) Add stub for `is_known`
+- [#1962](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1962) Add changelog file
+- [#1970](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1970) Add `content(::UnivPoly)`
+- [#1954](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1954) Move conformance tests to a package extension `TestExt`
+
+### Changed
+
+- [#1982](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1982) Improve matrix documentation
+- [#1983](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1983) Optimize `gens` for universal polynomials
+- [#1977](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1977) Don't mention `charpoly_only` in docstrings, it is an internal helper
+- [#1975](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1975) Improve documentation of `add_verbosity_scope`
+- [#1970](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1970) Fix potentially wrong result in `content(::MatrixElem)`
+- [#1970](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1970) Optimize a few `content` methods
+- [#1971](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1971) Remove misleading `content` method
+- [#1972](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1972) Fix docstring for `divides` promising too much
+
+## [0.44.4] - 2025-01-22
+
+### Added
+
+### Changed
+
+- [#1966](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1966) Ignore all kwargs in `@attr` (deprecating `ignore_kwargs`)
+- [#1967](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1967) Fix the argument check in `remove` for `MPolyRingElem`
+
 
 ## [0.44.3] - 2025-01-17
 

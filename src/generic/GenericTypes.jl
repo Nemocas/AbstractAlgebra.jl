@@ -1104,6 +1104,11 @@ struct MatSpaceVecView{T <: NCRingElement, V, W} <: AbstractVector{T}
    base_ring::NCRing
 end
 
+struct MatSpacePointView{T <: NCRingElement, V, W} <: AbstractArray{T, 0}
+   entries::SubArray{T, 0, Matrix{T}, V, W}
+   base_ring::NCRing
+end
+
 ###############################################################################
 #
 #   MatRing / MatRingElem

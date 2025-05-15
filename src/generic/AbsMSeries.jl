@@ -670,6 +670,10 @@ end
 #
 ###############################################################################
 
+function (R::AbsMSeriesRing)(x::RingElement)
+  return R(base_ring(R)(x))
+end
+
 function (R::AbsMSeriesRing{T, S})(x::S, prec::Vector{Int}) where
                           {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
     for v in prec

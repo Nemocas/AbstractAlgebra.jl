@@ -571,6 +571,21 @@ end
 
 function ==(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
    check_parent(a, b)
+
+   # quick check if underlying parents agree
+   if parent(data(a)) === parent(data(b))
+     return data(a) == data(b)
+   end
+
+   # check for "generators"
+   fl1, i1 = AbstractAlgebra._is_gen_with_index(data(a))
+   fl2, i2 = AbstractAlgebra._is_gen_with_index(data(b))
+   if fl1 && fl2
+     return i1 == i2
+   elseif fl1 != fl2
+     return false
+   end
+
    if length(a) != length(b)
       return false
    end
@@ -927,7 +942,11 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T}) where {T 
    return to_univariate(R, data(p))
 end
 
+to_univariate(p::UnivPoly) = to_univariate(data(p))
+
 is_univariate(p::UnivPoly) = is_univariate(data(p))
+
+is_univariate_with_data(p::UnivPoly) = is_univariate_with_data(data(p))
 
 is_univariate(R::UniversalPolyRing) = is_univariate(mpoly_ring(R))
 
