@@ -52,6 +52,7 @@ export Ideal
 export IdealSet
 export IdentityMap
 export InfiniteOrderError
+export IntExt
 export ItemQuantity
 export LaurentMPolyRing
 export LaurentMPolyRingElem
@@ -75,6 +76,7 @@ export NCPolyRingElem
 export NCRing
 export NCRingElem
 export NCRingElement
+export NegInf
 export NotImplementedError
 export NotInvertibleError
 export NumField
@@ -86,6 +88,7 @@ export PolyCoeffs
 export PolyRing
 export PolyRingElem
 export PolynomialElem
+export PosInf
 export QQ
 export RDF
 export RealField
@@ -270,6 +273,7 @@ export identity_matrix
 export image
 export image_fn
 export image_map
+export inf
 export inflate
 export integral
 export internal_ordering
@@ -302,6 +306,7 @@ export is_hessenberg
 export is_hnf
 export is_homogeneous
 export is_inf
+export is_infinite
 export is_integer
 export is_invertible
 export is_invertible_with_inverse
