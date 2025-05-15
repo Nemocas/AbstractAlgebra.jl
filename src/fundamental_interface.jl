@@ -130,6 +130,12 @@ base_ring_type(T::DataType) = throw(MethodError(base_ring_type, (T,)))
 # generic coefficient_ring method
 coefficient_ring(x::NCRingElement) = coefficient_ring(parent(x))
 
+coefficient_ring_type(x) = coefficient_ring_type(typeof(x))
+coefficient_ring_type(x::Type{<:NCRingElement}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(x::Type{<:ModuleElem}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(x::Type{<:Ideal}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(T::DataType) = throw(MethodError(coefficient_ring_type, (T,)))
+
 ###############################################################################
 #
 #   Special elements

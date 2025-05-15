@@ -10,6 +10,7 @@
 #
 ###############################################################################
 
+coefficient_ring_type(T::Type{<:FreeAssociativeAlgebra}) = base_ring_type(T)
 coefficient_ring(R::FreeAssociativeAlgebra{T}) where T <: RingElement = base_ring(R)
 
 function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssociativeAlgebraElem{T}}

@@ -18,9 +18,9 @@ elem_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} =
 parent(p::LaurentMPolyWrap) = p.parent
 
 base_ring_type(::Type{<:LaurentMPolyWrapRing{T}}) where {T} = parent_type(T)
-
 base_ring(R::LaurentMPolyWrapRing) = base_ring(R.mpolyring)::base_ring_type(R)
 
+coefficient_ring_type(T::Type{<:LaurentMPolyWrapRing}) = base_ring_type(T)
 coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(R.mpolyring)
 
 symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)

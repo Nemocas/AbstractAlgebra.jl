@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:PolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:PolyRing}) = base_ring_type(T)
 coefficient_ring(R::PolyRing) = base_ring(R)
 
 dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}

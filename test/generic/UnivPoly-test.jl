@@ -31,6 +31,7 @@
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
+         @test coefficient_ring_type(S) === typeof(R)
 
          @test typeof(S) <: Generic.UniversalPolyRing
 
