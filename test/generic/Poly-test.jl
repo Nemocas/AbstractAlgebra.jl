@@ -38,6 +38,7 @@ end
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
