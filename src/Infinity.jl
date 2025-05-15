@@ -109,10 +109,10 @@ Base.:-(::PosInf) = NegInf()
 Base.:-(::NegInf) = inf
 
 # binary operations
-Base.:+(::IntegerUnion, inf::AnyInf) = inf
-Base.:+(inf::AnyInf, ::IntegerUnion) = inf
+Base.:+(::Integer, inf::AnyInf) = inf
+Base.:+(inf::AnyInf, ::Integer) = inf
 Base.:+(inf1::AnyInf, inf2::AnyInf) = signbit(inf1) == signbit(inf2) ? inf1 : error("inf - inf is undefined")
 
-Base.:-(inf::AnyInf, ::IntegerUnion) = inf
-Base.:-(::IntegerUnion, inf::AnyInf) = -inf
+Base.:-(inf::AnyInf, ::Integer) = inf
+Base.:-(::Integer, inf::AnyInf) = -inf
 Base.:-(inf1::AnyInf, inf2::AnyInf) = inf1 + (-inf2)
