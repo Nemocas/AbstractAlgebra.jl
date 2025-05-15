@@ -188,6 +188,7 @@ include("ConcreteTypes.jl")
 
 include("fundamental_interface.jl")
 include("misc/VarNames.jl")
+include("Infinity.jl")
 
 ################################################################################
 #
