@@ -505,6 +505,8 @@ throwing an exception, returning meaningless results, hanging or crashing. The
 function should only be called with `check=false` if it is already known that the
 division will be exact.
 
+***Note:*** For the *recursive* ring tests to work, one needs to also implement `divides(f::MyElem, g::MyElem)`. 
+
 ### Inverse
 
 ```julia
