@@ -13,7 +13,7 @@
       @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
       @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
 
-      @test typeof(S) <: Generic.NCPolyRing
+      @test S isa Generic.NCPolyRing
 
       @test isa(y, NCPolyRingElem)
    end
@@ -25,7 +25,7 @@
    S, y = S1
    T, z = polynomial_ring(S, "z")
 
-   @test typeof(T) <: Generic.NCPolyRing
+   @test T isa Generic.NCPolyRing
 
    @test isa(z, NCPolyRingElem)
 

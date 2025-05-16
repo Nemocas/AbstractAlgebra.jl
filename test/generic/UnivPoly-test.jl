@@ -32,7 +32,7 @@
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
 
-         @test typeof(S) <: Generic.UniversalPolyRing
+         @test S isa Generic.UniversalPolyRing
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)

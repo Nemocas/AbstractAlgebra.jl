@@ -43,8 +43,8 @@ end
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
       @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
-      @test typeof(R) <: AbstractAlgebra.Ring
-      @test typeof(S) <: Generic.PolyRing
+      @test R isa AbstractAlgebra.Ring
+      @test S isa Generic.PolyRing
 
       @test isa(y, PolyRingElem)
    end
@@ -52,13 +52,13 @@ end
    R, x = polynomial_ring(ZZ, "x")
    S, y = polynomial_ring(R, "y")
 
-   @test typeof(S) <: Generic.PolyRing
+   @test S isa Generic.PolyRing
 
    @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
-   @test typeof(T) <: Generic.PolyRing
+   @test T isa Generic.PolyRing
 
    @testset "Generic.Poly.constructors.elements" begin
       @test isa(z, PolyRingElem)
