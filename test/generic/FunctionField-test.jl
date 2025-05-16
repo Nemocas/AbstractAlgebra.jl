@@ -28,7 +28,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
       @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
       @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
 
-      @test typeof(S) <: Generic.FunctionField
+      @test S isa Generic.FunctionField
 
       @test isa(y, Generic.FunctionFieldElem)
       @test y isa FieldElem

@@ -7,11 +7,11 @@
    @test SparsePolynomialRing(R, "y", cached = true)[1] === SparsePolynomialRing(R, "y", cached = true)[1]
    @test SparsePolynomialRing(R, "y", cached = true)[1] !== SparsePolynomialRing(R, "y", cached = false)[1]
 
-   @test typeof(S) <: Generic.SparsePolyRing
+   @test S isa Generic.SparsePolyRing
 
    T, z = SparsePolynomialRing(S, "z")
 
-   @test typeof(T) <: Generic.SparsePolyRing
+   @test T isa Generic.SparsePolyRing
 end
 
 @testset "Generic.SparsePoly.printing" begin

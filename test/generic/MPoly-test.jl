@@ -18,9 +18,9 @@
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
 
-      @test typeof(S) <: Generic.MPolyRing
+      @test S isa Generic.MPolyRing
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test isa(varlist[j], MPolyRingElem)
