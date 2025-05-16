@@ -10,7 +10,7 @@
    @test elem_type(Generic.MatRing{elem_type(R)}) == Generic.MatRingElem{elem_type(R)}
    @test parent_type(Generic.MatRingElem{elem_type(R)}) == Generic.MatRing{elem_type(R)}
 
-   @test typeof(S) <: Generic.MatRing
+   @test S isa Generic.MatRing
 
    f = S(t^2 + 1)
 

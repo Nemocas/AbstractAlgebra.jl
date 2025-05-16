@@ -130,7 +130,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test typeof(S) <: MatSpace
+   @test S isa MatSpace
 
    f = S(t^2 + 1)
 

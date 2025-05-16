@@ -22,9 +22,9 @@
       @test coefficient_ring(S) === R
       @test ngens(S) == length(gens(S))
 
-      @test typeof(S) <: Generic.FreeAssociativeAlgebra
+      @test S isa Generic.FreeAssociativeAlgebra
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test coefficient_ring(varlist[j]) === R
