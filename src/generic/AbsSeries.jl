@@ -38,6 +38,8 @@ function gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
+number_of_variables(R::AbsPowerSeriesRing) = 1
+
 @doc raw"""
     max_precision(R::AbsPowerSeriesRing)
 

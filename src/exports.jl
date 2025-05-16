@@ -321,6 +321,7 @@ export is_monomial_recursive
 export is_negative
 export is_negative_entry
 export is_nilpotent
+export is_noetherian
 export is_odd
 export is_one
 export is_perfect
@@ -362,6 +363,7 @@ export is_zero_row
 export isomorphism
 export kernel
 export kronecker_product
+export krull_dim
 export laurent_polynomial_ring
 export laurent_ring
 export laurent_series
