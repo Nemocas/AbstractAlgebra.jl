@@ -20,6 +20,7 @@
       @test parent_type(Generic.FreeAssociativeAlgebraElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
       @test ngens(S) == length(gens(S))
 
       @test S isa Generic.FreeAssociativeAlgebra
