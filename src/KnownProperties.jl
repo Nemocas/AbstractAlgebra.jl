@@ -42,11 +42,3 @@ ERROR: MethodError: no method matching is_known(::typeof(dim), ::AbstractAlgebra
 ```
 """
 function is_known end
-
-# A generic implementation to look up attributes. This can be used to implement 
-# `is_known` for a specific type of arguments of unary functions.
-function _is_known_via_attributes(f::Function, x::Any)
-  @req _is_attribute_storing_type(typeof(x)) "objects of type $(typeof(x)) do not support attribute storage"
-  return has_attribute(x, nameof(f))
-end
-
