@@ -824,6 +824,10 @@ function fraction_field(R::Ring; cached::Bool=true)
    return Generic.fraction_field(R; cached=cached)
 end
 
+function fraction_field(F::Field; cached::Bool=true)
+   return F
+end
+
 @doc raw"""
     factored_fraction_field(R::Ring; cached::Bool=true)
 
