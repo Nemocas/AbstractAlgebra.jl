@@ -707,11 +707,11 @@ end
 
 ###############################################################################
 #
-#   FactoredFractionField constructor
+#   factored_fraction_field constructor
 #
 ###############################################################################
 
-function FactoredFractionField(R::AbstractAlgebra.Ring; cached::Bool=true)
+function factored_fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    return FactoredFracField{AbstractAlgebra.elem_type(R)}(R, cached)
 end 
 

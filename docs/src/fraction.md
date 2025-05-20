@@ -85,7 +85,7 @@ x + 1
 The corresponding factored field uses the following constructor.
 
 ```julia
-FactoredFractionField(R::Ring; cached::Bool = true)
+factored_fraction_field(R::Ring; cached::Bool = true)
 ```
 
 **Examples**
@@ -94,7 +94,7 @@ FactoredFractionField(R::Ring; cached::Bool = true)
 julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-julia> S = FactoredFractionField(R)
+julia> S = factored_fraction_field(R)
 Factored fraction field of Multivariate polynomial ring in 2 variables over integers
 
 julia> (X, Y) = (S(x), S(y))
@@ -400,7 +400,7 @@ and the function `normalise` returns relatively prime terms.
 **Examples**
 
 ```jldoctest
-julia> F = FactoredFractionField(ZZ)
+julia> F = factored_fraction_field(ZZ)
 Factored fraction field of Integers
 
 julia> f = F(-1)

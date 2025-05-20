@@ -33,7 +33,6 @@ export EuclideanRingResidueFieldElem
 export EuclideanRingResidueRing
 export EuclideanRingResidueRingElem
 export Fac
-export FactoredFractionField
 export Field
 export FieldElem
 export FieldElement
@@ -219,6 +218,7 @@ export extended_weak_popov_with_transform
 export exterior_power
 export factor
 export factor_squarefree
+export factored_fraction_field
 export falling_factorial
 export fflu
 export fflu!
