@@ -45,15 +45,27 @@ end
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.evaluate" begin
+    # univariate
     Zx, x = polynomial_ring(ZZ, "x")
     F = FactoredFractionField(Zx)
     x = F(x)
-    @test evaluate(x//(x+1), 2//3) == 2//5
 
+    f = x//(x+1)
+    @test f isa Generic.FactoredFracFieldElem
+
+    @test evaluate(f, 2//3) == 2//5
+    @test f(2//3) == 2//5
+
+    # multivariate
     Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = FactoredFractionField(Zxy)
     (x, y) = (F(x), F(y))
-    @test evaluate(x//(x+y)^2, [1//3, 1//2]) == 12//25
+
+    f = x//(x+y)^2
+    @test f isa Generic.FactoredFracFieldElem
+
+    @test evaluate(f, [1//3, 1//2]) == 12//25
+    @test f(1//3, 1//2) == 12//25
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.valuation" begin

@@ -403,7 +403,7 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem, v::Vector{<:RingElement})
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
@@ -411,12 +411,20 @@ function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingEle
     return z
 end
 
-function evaluate(f::FactoredFracFieldElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem, v::RingElement)
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
     end
     return z
+end
+
+function (a::FactoredFracFieldElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FactoredFracFieldElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ##############################################################################

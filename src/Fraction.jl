@@ -616,20 +616,28 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FracElem{T}, V::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FracElem, V::Vector{<:RingElement})
     return evaluate(numerator(f), V)//evaluate(denominator(f), V)
 end
   
-function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FracElem, v::RingElement)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
+function evaluate(f::FracElem{<:PolyRingElem}, v::Integer)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+function evaluate(f::FracElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+    return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
+function (a::FracElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FracElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ###############################################################################
