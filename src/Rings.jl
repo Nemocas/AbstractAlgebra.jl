@@ -243,9 +243,11 @@ function is_finite(R::NCRing)
 end
 
 @doc raw"""
-    is_noetherian(R::T) where T<:Ring
+    is_noetherian(R::Ring)
 
-Check if the ring $R$ is Noetherian. The method returns `true` or raises an error, if the check has not been implemented yet for $R$.
+Check if the ring $R$ is Noetherian.
+
+#Examples
 ```jldoctest
 julia> R, x = polynomial_ring(ZZ, [:x]);
 
@@ -253,21 +255,23 @@ julia> is_noetherian(R)
 true
 ```
 """
-function is_noetherian(R::T) where T<:Ring
-  if R isa Union{Integers, <:Field}
-    return true
-  else
-    return error("is_noetherian and krull_dim are currently not implemented for rings of type $(typeof(R))")
-  end
+function is_noetherian(R::Ring)
+  throw(NotImplementedError(:is_noetherian, R))
 end
+
+is_noetherian(::Field) = true
+is_noetherian(::Integers) = true
 
 is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
 is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
+is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R))
 
 @doc raw"""
-    krull_dim(R::T) where T<:Ring
+    krull_dim(R::Ring)
 
 Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
+
+#Examples
 ```jldoctest
 julia> R, x = polynomial_ring(ZZ, [:x]);
 
@@ -275,16 +279,13 @@ julia> krull_dim(R)
 2
 ```
 """
-function krull_dim(R::T) where T<:Ring
+function krull_dim(R::Ring)
   @req is_noetherian(R) "Krull dimension is only supported for Noetherian rings."
-  if R isa Integers
-    return 1
-  elseif R isa T where T<:Field
-    return 0
-  else
-    throw(NotImplementedError(:krull_dim, R))
-  end
+  throw(NotImplementedError(:krull_dim, R))
 end
+
+krull_dim(::Field) = 0
+krull_dim(::Integers) = 1
 
 krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
 krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)

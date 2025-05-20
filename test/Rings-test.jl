@@ -72,7 +72,7 @@ end
   R2, = power_series_ring(ZZ, 3, :x)
   @test krull_dim(R2) == 2
   S, = universal_polynomial_ring(ZZ, [:x,:y])
-  @test_throws Exception is_noetherian(S)
+  @test_throws NotImplementedError is_noetherian(S)
 end
 
 @testset "is_associated" begin
