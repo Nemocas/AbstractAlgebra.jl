@@ -819,12 +819,12 @@ function fraction_field(R::Ring; cached::Bool=true)
 end
 
 @doc raw"""
-    FactoredFractionField(R::Ring; cached::Bool=true)
+    factored_fraction_field(R::Ring; cached::Bool=true)
 
 Return the parent object of the fraction field over the given base ring $R$,
 where the elements are maintained in factored form as much as possible.
 """
-function FactoredFractionField(R::Ring; cached::Bool=true)
-   return Generic.FactoredFractionField(R; cached=cached)
+function factored_fraction_field(R::Ring; cached::Bool=true)
+   return Generic.factored_fraction_field(R; cached=cached)
 end
 

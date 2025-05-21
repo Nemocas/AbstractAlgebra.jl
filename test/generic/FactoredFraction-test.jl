@@ -1,10 +1,10 @@
 @testset "Generic.FactoredFracFieldElem.ZZ.conformance" begin
-    FF = FactoredFractionField(ZZ)
+    FF = factored_fraction_field(ZZ)
     ConformanceTests.test_Field_interface(FF)
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.adhoc" begin
-    FF = FactoredFractionField(ZZ)
+    FF = factored_fraction_field(ZZ)
 
     @test FF(2//3) == FF(2, 3)
     @test FF(2//-1) == FF(2, -1)
@@ -20,7 +20,7 @@ end
     @test !iszero(gcd(FF(2//3), FF(4//5)))
 
     Zx, x = polynomial_ring(ZZ, "x")
-    F = FactoredFractionField(Zx)
+    F = factored_fraction_field(Zx)
 
     @test F(2//3) == F(2, 3)
     @test F(2//-1) == F(2, -1)
@@ -46,19 +46,19 @@ end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.evaluate" begin
     Zx, x = polynomial_ring(ZZ, "x")
-    F = FactoredFractionField(Zx)
+    F = factored_fraction_field(Zx)
     x = F(x)
     @test evaluate(x//(x+1), 2//3) == 2//5
 
     Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-    F = FactoredFractionField(Zxy)
+    F = factored_fraction_field(Zxy)
     (x, y) = (F(x), F(y))
     @test evaluate(x//(x+y)^2, [1//3, 1//2]) == 12//25
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.valuation" begin
     Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-    F = FactoredFractionField(Zxy)
+    F = factored_fraction_field(Zxy)
     (X, Y) = (F(x), F(y))
     @test remove(X//(X+Y)^2, x)   == (1, 1//(X+Y)^2)
     @test remove(X//(X+Y)^2, x+y) == (-2, X)
@@ -66,7 +66,7 @@ end
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ._bases_are_nice" begin
-    FF = FactoredFractionField(ZZ)
+    FF = factored_fraction_field(ZZ)
     test_reps = 20
 
     for i in 1:test_reps
@@ -117,7 +117,7 @@ end
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.normalise" begin
-    FF = FactoredFractionField(ZZ)
+    FF = factored_fraction_field(ZZ)
 
     a = one(FF)
     @test length(a) == 0
@@ -155,7 +155,7 @@ end
 
 @testset "Generic.FactoredFracFieldElem.ZZx" begin
     Zx, x = polynomial_ring(ZZ, "x")
-    F = FactoredFractionField(Zx)
+    F = factored_fraction_field(Zx)
     x = F(x)
     a = divexact(x + 1, (x + 2)^2) + x
     @test (a - x)*(x + 1)^-1 == (x + 2)^-2
@@ -165,7 +165,7 @@ end
 
 @testset "Generic.FactoredFracFieldElem.ZZxyz" begin
     Zxyz, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
-    F = FactoredFractionField(Zxyz)
+    F = factored_fraction_field(Zxyz)
     (x, y, z) = (F(x), F(y), F(z))
     @test (inv(x+y) + inv(x+y+z))*(x+y)*(x+y+z) == 2*x+2*y+z
     @test det(matrix(F, [x y z; x^2 y^2 z^2; x^3 y^3 z^3])) == -x*y*z*(y - z)*(x - y)*(x - z)
@@ -173,10 +173,10 @@ end
 
 @testset "Generic.FactoredFracFieldElem.constructors" begin
     S, x = polynomial_ring(ZZ, "x")
-    T = FactoredFractionField(S)
+    T = factored_fraction_field(S)
 
-    @test FactoredFractionField(S, cached = true) === FactoredFractionField(S, cached = true)
-    @test FactoredFractionField(S, cached = false) !== FactoredFractionField(S, cached = true)
+    @test factored_fraction_field(S, cached = true) === factored_fraction_field(S, cached = true)
+    @test factored_fraction_field(S, cached = false) !== factored_fraction_field(S, cached = true)
 
     @test elem_type(T) == Generic.FactoredFracFieldElem{elem_type(S)}
     @test elem_type(Generic.FactoredFracField{elem_type(S)}) == Generic.FactoredFracFieldElem{elem_type(S)}
@@ -203,7 +203,7 @@ end
 
     @test characteristic(T) == 0
 
-    TT = FactoredFractionField(polynomial_ring(QQ, "x")[1])
+    TT = factored_fraction_field(polynomial_ring(QQ, "x")[1])
     a = TT(1)
     b = T(2)
 
@@ -216,7 +216,7 @@ end
 
 @testset "Generic.FactoredFracFieldElem.printing" begin
     S, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
-    F = FactoredFractionField(S)
+    F = factored_fraction_field(S)
     (x, y, z) = (F(x), F(y), F(z))
 
     s = string(x//y//z)
@@ -230,7 +230,7 @@ end
 
 @testset "Generic.FactoredFracFieldElem.derivative" begin
     S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
-    F = FactoredFractionField(S)
+    F = factored_fraction_field(S)
     (X, Y) = (F(x), F(y))
 
     @test derivative((1+X)*(2+X)^2//(3+X)^3//(4+X)^4, x) ==
