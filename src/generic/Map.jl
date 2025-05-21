@@ -16,7 +16,11 @@ map1(f::CompositeMap) = f.map1
 map2(f::CompositeMap) = f.map2
 
 function (f::CompositeMap{D, C})(a) where {D, C}
-   return f.map2(f.map1(a))::elem_type(C)
+  return image(f, a)::elem_type(C)
+end
+
+function image(f::Generic.CompositeMap{D, C}, a) where {D, C}
+  return f.map2(f.map1(a))::elem_type(C)
 end
 
 function preimage(f::Generic.CompositeMap{D, C}, a) where {D, C}
@@ -106,10 +110,13 @@ codomain(f::FunctionalMap) = f.codomain
 image_fn(f::FunctionalMap) = f.image_fn
 
 function (f::FunctionalMap{D, C})(a) where {D, C}
-   parent(a) != domain(f) && throw(DomainError(f))
-   return image_fn(f)(a)::elem_type(C)
+  return image(f, a)::elem_type(C)
 end
 
+function image(f::FunctionalMap{D, C}, a) where {D, C}
+  parent(a) != domain(f) && throw(DomainError(f))
+  return image_fn(f)(a)::elem_type(C)
+end
 
 function Base.show(io::IO, M::FunctionalMap)
    if is_terse(io)
@@ -164,7 +171,11 @@ map1(f::FunctionalCompositeMap) = f.map1
 map2(f::FunctionalCompositeMap) = f.map2
 
 function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
-   return image_fn(f)(a)::elem_type(C)
+  return image(f, a)::elem_type(C)
+end
+
+function image(f::FunctionalCompositeMap{D, C}, a) where {D, C}
+  return image_fn(f)(a)::elem_type(C)
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
