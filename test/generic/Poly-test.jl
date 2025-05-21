@@ -3053,3 +3053,66 @@ end
   @test is_separable(x)
   @test !is_separable(x^2)
 end
+
+@testset "Generic.Poly.Misc" begin
+  # factor function is required for is_power.  Implement naive ones here.
+  function AbstractAlgebra.factor(a::Integer)
+    R = parent(a)
+    f = Fac{typeof(a)}()
+    f.unit = sign(a)
+    a = abs(a)
+    for ix in [R(2), R(3), R(5), R(7), R(11)]
+      if is_zero(a % ix)
+        a /= ix
+        f.fac[ix] = 1
+      end
+      while is_zero(a % ix)
+        a /= ix
+        f.fac[ix] += 1
+      end
+    end
+    if !is_one(a)
+      error()
+    end
+    return f
+  end
+  function AbstractAlgebra.factor(p::PolyRingElem)
+    P = parent(p)
+    x = gen(P)
+    f = Fac{typeof(p)}()
+    ct = content(p)
+    cf = factor(ct)
+    ut = sign(leading_coefficient(p))
+    for (t, k) in cf
+      f.fac[P(t)] = k
+    end
+    f.unit = P(ut)
+    p /= ut * ct
+    for y in [x + c for c in -2:2]
+      if is_zero(p % y)
+        p /= y
+        f.fac[y] = 1
+      end
+      while is_zero(p % y)
+        p /= y
+        f.fac[y] += 1
+      end
+    end
+    if !is_one(p)
+      error()
+    end
+    return f
+  end
+  ZZx, x = ZZ[:x]
+  @test is_power(x, 2) == (false, x)
+  @test is_power(x, 3) == (false, x)
+  @test is_power(x^2, 2) == (true, x)
+  @test is_power(3 * x^2, 2) == (false, 3 * x^2)
+  @test is_power(2^2 * x^2, 2) == (true, 2 * x)
+  @test is_power(2^3 * x^3, 3) == (true, 2 * x)
+  @test is_power(3^4 * x^4, 2) == (true, 9 * x^2)
+  @test is_power(-3^4 * x^4, 2) == (false, -81 * x^4)
+  @test is_power(-3^3 * x^3, 3) == (true, -3 * x)
+  @test is_power(3^2 * (x + 1)^2 * x^2, 2) == (true, 3 * (x + 1) * x)
+  @test is_power(-3^2 * (x + 1)^2 * x^2, 2) == (false, -3^2 * (x + 1)^2 * x^2)
+end
