@@ -9,7 +9,8 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently nothing here =#
+# renamed in 0.45.1
+@alias FactoredFractionField factored_fraction_field
 
 ###############################################################################
 #
