@@ -230,9 +230,11 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R; reps = reps)
 
       @testset "Basic functionality for commutative rings only" begin
-         @test isone(AbstractAlgebra.inv(one(R)))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
+         # FIXME: we can't expect general rings to support inv, not even for the one
+         # element, so don't test this
+         #@test isone(AbstractAlgebra.inv(one(R)))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
