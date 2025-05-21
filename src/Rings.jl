@@ -247,7 +247,7 @@ end
 
 Check if the ring $R$ is Noetherian.
 
-#Examples
+# Examples
 ```jldoctest
 julia> R, x = polynomial_ring(ZZ, [:x]);
 
@@ -264,14 +264,15 @@ is_noetherian(::Integers) = true
 
 is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
 is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
-is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R))
+is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R)) || throw(NotImplementedError(:is_noetherian, R))
+is_noetherian(M::Module) = is_noetherian(base_ring(M)) || throw(NotImplementedError(:is_noetherian, M))
 
 @doc raw"""
     krull_dim(R::Ring)
 
 Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
 
-#Examples
+# Examples
 ```jldoctest
 julia> R, x = polynomial_ring(ZZ, [:x]);
 
