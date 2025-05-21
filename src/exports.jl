@@ -227,6 +227,7 @@ export find_pivot_popov
 export finish
 export fit!
 export fraction_field
+export fraction_field_type
 export free_associative_algebra
 export free_associative_algebra_type
 export free_module
