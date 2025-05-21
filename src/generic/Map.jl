@@ -54,7 +54,10 @@ end
 #
 ################################################################################
 
-(f::IdentityMap)(a) = a
+(f::IdentityMap)(a) = image(f, a)
+
+image(f::IdentityMap, a) = a
+preimage(f::IdentityMap, a) = a
 
 domain(f::IdentityMap) = f.domain
 codomain(f::IdentityMap) = f.domain
