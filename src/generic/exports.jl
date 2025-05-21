@@ -129,6 +129,5 @@ export truncate
 export truncate!
 export unit
 export upscale
-export vector_space_dim
 export weights
 export zero

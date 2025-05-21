@@ -33,3 +33,5 @@ Return the vector space over the field $R$ with the given dimension.
 function vector_space(R::Field, dim::Int; cached::Bool = true)
    Generic.FreeModule(R, dim; cached=cached)
 end
+
+function vector_space_dim end

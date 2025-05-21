@@ -589,6 +589,7 @@ export var
 export var_index
 export vars
 export vector_space
+export vector_space_dim
 export weak_popov
 export weak_popov_with_transform
 export weights
