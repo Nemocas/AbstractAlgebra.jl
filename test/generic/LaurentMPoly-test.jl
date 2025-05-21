@@ -29,6 +29,11 @@ end
     @test X + x == 2*x
 end
 
+@testset "Generic.LaurentMPoly.characteristic" for R in (GF(5), ZZ, residue_ring(ZZ, 6)[1])
+   L, (x, y) = laurent_polynomial_ring(R, 2, "x", cached = true)
+   @test characteristic(L) == characteristic(R)
+end
+
 @testset "Generic.LaurentMPoly.printing" begin
    R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
    @test !occursin("\n", sprint(show, R))
