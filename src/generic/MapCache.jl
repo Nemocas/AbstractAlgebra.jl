@@ -26,21 +26,23 @@ function disable_cache!(M::MapCache)
    nothing
 end
 
-function (M::MapCache{D, C, S, T, De, Ce})(a::De) where {D, C, S, T, De, Ce}
-   if M.enabled
-      if haskey(M.image_cache, a)
-         return M.image_cache[a]::Ce
-      else
-         b = M.map(a)
-         if M.limit > 0
-            M.image_cache[a] = b
-            M.limit -= 1
-         end
-         return b::Ce
+(M::MapCache{D, C, S, T, De, Ce})(a::De) where {D, C, S, T, De, Ce} = image(M, a)
+
+function image(M::MapCache{D, C, S, T, De, Ce}, a::De) where {D, C, S, T, De, Ce}
+  if M.enabled
+    if haskey(M.image_cache, a)
+      return M.image_cache[a]::Ce
+    else
+      b = M.map(a)
+      if M.limit > 0
+          M.image_cache[a] = b
+          M.limit -= 1
       end
-   else
+      return b::Ce
+    end
+  else
       return M.map(a)::Ce
-   end
+  end
 end
 
 show(io::IO, M::MapCache) = show(M.map)
