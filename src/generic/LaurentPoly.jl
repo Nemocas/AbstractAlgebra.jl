@@ -17,11 +17,11 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = p.parent
 
-coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
-
 base_ring_type(::Type{<:LaurentPolyWrapRing{T}}) where {T} = parent_type(T)
-
 base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)::base_ring_type(R)
+
+coefficient_ring_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} = coefficient_ring_type(PR)
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
 

@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:MPolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:MPolyRing}) = base_ring_type(T)
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc raw"""
