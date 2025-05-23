@@ -667,7 +667,7 @@ _make_parent(g::T, p::NCPolyRingElem, cached::Bool) where {T} =
 
 function map_coefficients(g::T, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
-		    parent::NCPolyRing = _make_parent(g, p, cached)) where {T}
+		    parent = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
