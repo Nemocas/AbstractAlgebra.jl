@@ -224,4 +224,5 @@ import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var
 import ..AbstractAlgebra: var_index
 import ..AbstractAlgebra: vars
+import ..AbstractAlgebra: vector_space_dim
 import ..AbstractAlgebra: zero!
