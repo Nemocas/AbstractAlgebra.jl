@@ -2992,6 +2992,15 @@ end
    F = GF(11)
    P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c * (2*one(Q)), x; parent = Qz)
+      @test f == 2*z
+      @test parent(f) === Qz
+   end
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin

@@ -3280,7 +3280,7 @@ via the `cached` keyword argument.
 """
 function map_coefficients(g::T, p::PolyRingElem{<:RingElement};
                     cached::Bool = true,
-                    parent::PolyRing = _make_parent(g, p, cached)) where T
+                    parent = _make_parent(g, p, cached)) where T
    return _map(g, p, parent)
 end
 

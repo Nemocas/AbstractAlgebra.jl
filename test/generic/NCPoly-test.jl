@@ -434,3 +434,14 @@ end
    @test_throws Exception dense_poly_ring_type(Char)
    @test_throws ArgumentError dense_poly_type(Char)
 end
+
+@testset "Generic.NCPoly.map_coefficients" begin
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c[1, 1], 2*z; parent = Qx)
+      @test f == 2*x
+      @test parent(f) === Qx
+   end
+end
