@@ -26,6 +26,9 @@ end
    @test domain(g) == AbstractAlgebra.JuliaZZ
    @test codomain(g) == AbstractAlgebra.JuliaQQ
 
+   @test image(f, ZZ(1)) == 2
+   @test image(g, ZZ(2)) == QQ(2)
+
    @test image_fn(f)(ZZ(1)) == 2
    @test image_fn(g)(ZZ(2)) == QQ(2)
 end
@@ -43,11 +46,13 @@ end
 
    for i in 1:10
       @test h(ZZ(i)) == k(ZZ(i))
+      @test image(h, ZZ(i)) == image(k, ZZ(i))
    end
 
    @test domain(h) == AbstractAlgebra.JuliaZZ
    @test codomain(h) == AbstractAlgebra.JuliaQQ
 
+   @test image(h, ZZ(1)) == QQ(2)
    @test image_fn(h)(ZZ(1)) == QQ(2)
 
    @test map1(h) === f
@@ -65,6 +70,7 @@ end
 
    for i in 1:10
       @test t(ZZ(i)) == 2*(i + 2)
+      @test image(t, ZZ(i)) == 2*(i + 2)
    end
 
    @test domain(t) == AbstractAlgebra.JuliaZZ
@@ -100,6 +106,8 @@ end
    for i = 1:10
       @test g(ZZ(i)) == ZZ(i)
       @test h(ZZ(i)//(i + 1)) == ZZ(i)//(i + 1)
+      @test image(g, ZZ(i)) == ZZ(i)
+      @test image(h, ZZ(i)//(i + 1)) == ZZ(i)//(i + 1)
    end
 
    @test compose(g, g) === g
