@@ -402,12 +402,20 @@ end
 #
 ##############################################################################
 
-function evaluate(f::RationalFunctionFieldElem{T, U}, v::V) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}, V <: RingElement}
+function evaluate(f::RationalFunctionFieldElem, v::RingElement)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::RationalFunctionFieldElem{T, U}, v::Vector{V}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}, V <: RingElement}
+function evaluate(f::RationalFunctionFieldElem, v::Vector{<:RingElement})
    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function (a::RationalFunctionFieldElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::RationalFunctionFieldElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ###############################################################################

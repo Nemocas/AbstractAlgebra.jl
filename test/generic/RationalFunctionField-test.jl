@@ -503,20 +503,28 @@ end
 
 @testset "Generic.RationalFunctionField.evaluate" begin
    # Univariate
-   R, x = polynomial_ring(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    f = (x^2 + 2)//(x + 1)
+   @test f isa Generic.RationalFunctionFieldElem
 
    @test evaluate(f, 1) == QQ(3, 2)
    @test evaluate(f, QQ(2)) == 2
 
+   @test f(1) == QQ(3, 2)
+   @test f(QQ(2)) == 2
+
    # Multivariate
-   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    f = (x^2 + 2)//(y + 1)
+   @test f isa Generic.RationalFunctionFieldElem
 
    @test evaluate(f, [1, 2]) == 1
    @test evaluate(f, [QQ(2), QQ(1)]) == 3
+
+   @test f(1, 2) == 1
+   @test f(QQ(2), QQ(1)) == 3
 end
 
 @testset "Generic.RationalFunctionField.derivative" begin
