@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:MPolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:MPolyRing}) = base_ring_type(T)
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc raw"""
@@ -1467,7 +1468,7 @@ function ConformanceTests.generate_element(Rx::MPolyRing)
   len_bound = 8
   exp_bound = rand(1:5)
   len = rand(0:len_bound)
-  coeffs = [ConformanceTests.generate_element(R) for _ in 1:len]
+  coeffs = elem_type(R)[ConformanceTests.generate_element(R) for _ in 1:len]
   exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
   return Rx(coeffs, exps)
 end

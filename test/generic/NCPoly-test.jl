@@ -9,6 +9,7 @@
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
       @test elem_type(S) == Generic.NCPoly{elem_type(R)}
       @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
       @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
@@ -432,4 +433,15 @@ end
    @test_throws MethodError polynomial_ring(Char, :x)
    @test_throws Exception dense_poly_ring_type(Char)
    @test_throws ArgumentError dense_poly_type(Char)
+end
+
+@testset "Generic.NCPoly.map_coefficients" begin
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c[1, 1], 2*z; parent = Qx)
+      @test f == 2*x
+      @test parent(f) === Qx
+   end
 end

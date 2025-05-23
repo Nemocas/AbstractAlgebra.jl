@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:PolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:PolyRing}) = base_ring_type(T)
 coefficient_ring(R::PolyRing) = base_ring(R)
 
 dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
@@ -3279,7 +3280,7 @@ via the `cached` keyword argument.
 """
 function map_coefficients(g::T, p::PolyRingElem{<:RingElement};
                     cached::Bool = true,
-                    parent::PolyRing = _make_parent(g, p, cached)) where T
+                    parent = _make_parent(g, p, cached)) where T
    return _map(g, p, parent)
 end
 

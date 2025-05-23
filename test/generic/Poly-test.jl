@@ -38,6 +38,7 @@ end
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
@@ -2991,6 +2992,15 @@ end
    F = GF(11)
    P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c * (2*one(Q)), x; parent = Qz)
+      @test f == 2*z
+      @test parent(f) === Qz
+   end
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin

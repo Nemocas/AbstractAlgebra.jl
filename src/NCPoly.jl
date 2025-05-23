@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:NCPolyRing{T}}) where T<:NCRingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:NCPolyRing}) = base_ring_type(T)
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
 function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S}}
@@ -666,7 +667,7 @@ _make_parent(g::T, p::NCPolyRingElem, cached::Bool) where {T} =
 
 function map_coefficients(g::T, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
-		    parent::NCPolyRing = _make_parent(g, p, cached)) where {T}
+		    parent = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 

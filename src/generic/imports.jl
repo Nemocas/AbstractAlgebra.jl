@@ -108,6 +108,7 @@ import ..AbstractAlgebra: check_parent
 import ..AbstractAlgebra: codomain
 import ..AbstractAlgebra: coeff
 import ..AbstractAlgebra: coefficient_ring
+import ..AbstractAlgebra: coefficient_ring_type
 import ..AbstractAlgebra: coefficients
 import ..AbstractAlgebra: coefficients_of_univariate
 import ..AbstractAlgebra: compose
