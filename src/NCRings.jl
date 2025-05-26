@@ -61,7 +61,7 @@ end
 #
 ###############################################################################
 
-+(x::NCRingElem) = x
++(x::NCRingElem) = deepcopy(x)
 
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
@@ -75,7 +75,7 @@ end
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
 
-*(x::NCRingElem) = x
+*(x::NCRingElem) = deepcopy(x)
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
