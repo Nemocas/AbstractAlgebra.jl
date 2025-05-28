@@ -139,6 +139,7 @@ import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
 import ..AbstractAlgebra: hom
 import ..AbstractAlgebra: identity_matrix
+import ..AbstractAlgebra: image
 import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
 import ..AbstractAlgebra: integral
