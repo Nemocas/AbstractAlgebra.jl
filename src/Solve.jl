@@ -241,7 +241,7 @@ function solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NC
 end
 
 function solve_context_type(NF::MatrixNormalFormTrait, T::Type{<:MatElem})
-  return solve_context_type(base_ring_type(T))
+  return solve_context_type(NF, base_ring_type(T))
 end
 
 function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
