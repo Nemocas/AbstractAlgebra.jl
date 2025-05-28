@@ -88,22 +88,25 @@ struct LUTrait <: MatrixNormalFormTrait end # LU factoring for fields
 struct FFLUTrait <: MatrixNormalFormTrait end # "fraction free" LU factoring for fraction fields
 struct MatrixInterpolateTrait <: MatrixNormalFormTrait end # interpolate in fraction fields of polynomial rings
 
-function matrix_normal_form_type(R::Ring)
-  if is_domain_type(elem_type(R))
+function matrix_normal_form_type(T::Type{<:Ring})
+  if is_domain_type(T)
     return HermiteFormTrait()
   else
     return HowellFormTrait()
   end
 end
 
-matrix_normal_form_type(::Field) = RREFTrait()
+matrix_normal_form_type(::Type{<:Field}) = RREFTrait()
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-matrix_normal_form_type(::FracField) = FFLUTrait()
-matrix_normal_form_type(::AbstractAlgebra.Rationals{BigInt}) = FFLUTrait()
-matrix_normal_form_type(::FracField{T}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
+matrix_normal_form_type(::Type{<:FracField}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:AbstractAlgebra.Rationals{BigInt}}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:FracField{T}}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
 
-matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
+matrix_normal_form_type(T::Type{<:MatElem}) = matrix_normal_form_type(base_ring_type(T))
+
+matrix_normal_form_type(x) = matrix_normal_form_type(typeof(x))
+matrix_normal_form_type(T::DataType) = throw(MethodError(matrix_normal_form_type, (T,)))
 
 ################################################################################
 #
@@ -252,7 +255,7 @@ solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRing} = solve_c
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{<: MatElem{T}}) where T = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::MatElem{T}) where T = solve_context_type(NF, T)
 
-matrix_normal_form_type(C::SolveCtx{T, NF}) where {T, NF} = NF()
+matrix_normal_form_type(::Type{<:SolveCtx{T, NF}}) where {T, NF} = NF()
 
 matrix(C::SolveCtx) = C.A
 
