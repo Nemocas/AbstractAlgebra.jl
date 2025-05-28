@@ -265,8 +265,8 @@ object.
 First of all, one needs to implement the function
 
 ```julia
-function Solve.solve_context_type(::NewRing)
-  return Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+function Solve.solve_context_type(T::Type{<:NewRing})
+  return Solve.solve_context_type(::NormalFormTrait, elem_type(T))
 end
 ```
 

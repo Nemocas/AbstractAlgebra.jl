@@ -210,34 +210,38 @@ function solve_init(NF::MatrixNormalFormTrait, A::MatElem)
   return solve_context_type(NF, base_ring(A))(A)
 end
 
-# For a ring R, the following signatures of `solve_context_type` need to be
+# For a ring R of type T, the following signatures of `solve_context_type` need to be
 # implemented:
-# 1) solve_context_type(R)
-# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(R))
+# 1) solve_context_type(::Type{<:T})
+# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(T))
 # Version 1 should pick a matrix_normal_form_type and call 2
 
-function solve_context_type(R::NCRing)
-  return solve_context_type(matrix_normal_form_type(R), elem_type(R))
+function solve_context_type(T::Type{<:NCRing})
+  return solve_context_type(matrix_normal_form_type(T), elem_type(T))
 end
 
-function solve_context_type(K::Field)
-  # matrix_normal_form_type(K) would be RREFTrait, but we want to use
+function solve_context_type(T::Type{<:Field})
+  # matrix_normal_form_type(T) would be RREFTrait, but we want to use
   # LU in solve contexts
-  return solve_context_type(LUTrait(), elem_type(K))
+  return solve_context_type(LUTrait(), elem_type(T))
 end
 
-function solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField})
+function solve_context_type(T::Type{<:Union{AbstractAlgebra.Rationals{BigInt}, FracField}})
   # In this case, we use FFLU
-  return solve_context_type(FFLUTrait(), elem_type(K))
+  return solve_context_type(FFLUTrait(), elem_type(T))
 end
 
-function solve_context_type(A::MatElem)
-  return solve_context_type(base_ring(A))
+function solve_context_type(T::Type{<:MatElem})
+  return solve_context_type(base_ring_type(T))
 end
 
 function solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRingElement}
   MatType = dense_matrix_type(T)
   return SolveCtx{T, typeof(NF), MatType, MatType, LazyTransposeMatElem{T, MatType}}
+end
+
+function solve_context_type(NF::MatrixNormalFormTrait, T::Type{<:MatElem})
+  return solve_context_type(base_ring_type(T))
 end
 
 function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
@@ -249,11 +253,13 @@ function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
   return SolveCtx{T, FFLUTrait, dense_matrix_type(T), IntMatT, IntMatT}
 end
 
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRingElement} = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::Type{<: MatElem{T}}) where T = solve_context_type(NF, T)
-solve_context_type(NF::MatrixNormalFormTrait, ::MatElem{T}) where T = solve_context_type(NF, T)
+
+solve_context_type(x) = solve_context_type(typeof(x))
+solve_context_type(NF::MatrixNormalFormTrait, x) = solve_context_type(NF, typeof(x))
+solve_context_type(T::DataType) = throw(MethodError(solve_context_type, (T,)))
+solve_context_type(NF::MatrixNormalFormTrait, T::DataType) = throw(MethodError(solve_context_type, (NF, T)))
+
 
 matrix_normal_form_type(::Type{<:SolveCtx{T, NF}}) where {T, NF} = NF()
 
