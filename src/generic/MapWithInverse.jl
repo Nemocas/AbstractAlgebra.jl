@@ -19,8 +19,15 @@ image_map(f::MapWithSection) = f.map
 preimage_map(f::MapWithSection) = f.section # for convenience only
 section_map(f::MapWithSection) = f.section
 
-(f::MapWithSection{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
+(f::MapWithSection{D, C})(a) where {D, C} = image(f, a)::elem_type(C)
 
+function preimage(f::MapWithSection{D, C}, a) where {D, C}
+  return inverse_fn(f)(a)::elem_type(D)
+end
+
+function image(f::MapWithSection{D, C}, a) where {D, C}
+  return image_fn(f)(a)::elem_type(C)
+end
 
 function Base.show(io::IO, M::MapWithSection)
    if is_terse(io)
@@ -64,7 +71,15 @@ retraction_map(f::MapWithRetraction) = f.retraction
 
 retraction_map(f::MapCache) = retraction_map(f.map)
 
-(f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
+(f::MapWithRetraction{D, C})(a) where {D, C} = image(f, a)::elem_type(C)
+
+function preimage(f::MapWithRetraction{D, C}, a) where {D, C}
+  return inverse_fn(f)(a)::elem_type(D)
+end
+
+function image(f::MapWithRetraction{D, C}, a) where {D, C}
+  return image_fn(f)(a)::elem_type(C)
+end
 
 function Base.show(io::IO, M::MapWithRetraction)
    if is_terse(io)
