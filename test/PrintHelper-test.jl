@@ -1,5 +1,6 @@
 @testset "pluralize" begin
   @test pluralize("basis") == "bases"
+  @test pluralize("box") == "boxes"
   @test pluralize("child") == "children"
   @test pluralize("generator") == "generators"
   @test pluralize("indeterminate") == "indeterminates"
