@@ -437,6 +437,8 @@ function is_unit(f::T) where {T <: MPolyRingElem}
   return constant_term_is_unit  # handles the case that there is no constant term
 end
 
+ConformanceTests._implements(::Type{MPolyRingElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
+
 function content(a::MPolyRingElem{T}) where T <: RingElement
    z = zero(coefficient_ring(a))
    for c in coefficients(a)
@@ -452,11 +454,15 @@ function is_nilpotent(f::T) where {T <: MPolyRingElem}
   return all(is_nilpotent, coefficients(f))
 end
 
+ConformanceTests._implements(::Type{MPolyRingElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
+
 
 function is_zero_divisor(x::MPolyRingElem{T}) where T <: RingElement
   is_domain_type(T) && return is_zero(x)
   return is_zero_divisor(content(x))
 end
+
+ConformanceTests._implements(::Type{MPolyRingElem{T}}, ::typeof(is_zero_divisor)) where T = _implements(T, is_zero_divisor)
 
 function is_zero_divisor_with_annihilator(a::MPolyRingElem{T}) where T <: RingElement
    f, b = is_zero_divisor_with_annihilator(content(a))
