@@ -542,6 +542,16 @@ function remove_redundancies!(
     # TODO case 4e from Thm 4.1 in Kreuzer Xiu
 end
 
+function get_obstructions(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
+    obstruction_queue = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    for s in 1:length(g)
+      add_obstructions!(obstruction_queue, g, s)
+    end
+    # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
+    return obstruction_queue
+end
+
+
 function add_obstructions!(
     obstruction_queue::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
     g::Vector{FreeAssociativeAlgebraElem{T}},
