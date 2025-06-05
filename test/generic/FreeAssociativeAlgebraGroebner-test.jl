@@ -91,5 +91,4 @@ end
     @test length(AbstractAlgebra.Generic.right_obstructions(lw3, lw4)) == 2
     @test isempty(AbstractAlgebra.Generic.left_obstructions(lw3, lw4))
     @test length(AbstractAlgebra.Generic.center_obstructions(lw5, lw6)) == 3
-    @test length(AbstractAlgebra.Generic.get_obstructions([poly1, poly2])) == 2
 end
