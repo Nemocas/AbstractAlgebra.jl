@@ -543,29 +543,20 @@ function remove_redundancies!(
 end
 
 function get_obstructions(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
-    s = length(g)
-    result = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
-    for i in 1:s, j in 1:i
-        if i == j
-            obs = obstructions(_leading_word(g[i]))
-        else
-            obs = obstructions(_leading_word(g[i]), _leading_word(g[j]))
-        end
-        for o in obs
-            triple = ObstructionTriple{T}(g[i], g[j], o, i, j)
-            push!(result, triple => common_multiple_leading_term(triple))
-        end
+    obstruction_queue = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    for s in 1:length(g)
+      add_obstructions!(obstruction_queue, g, s)
     end
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
-    return result
+    return obstruction_queue
 end
 
 
 function add_obstructions!(
     obstruction_queue::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
     g::Vector{FreeAssociativeAlgebraElem{T}},
+    s::Int = length(g)
 ) where T
-    s = length(g)
     for i in 1:s
         if i == s
             obs = obstructions(_leading_word(g[i]))
@@ -588,19 +579,11 @@ function groebner_basis_buchberger(
     obstruction_free_set::Vector{FreeAssociativeAlgebraElem{T}}=FreeAssociativeAlgebraElem{T}[]
 ) where T<:FieldElement
 
-    if isempty(obstruction_free_set)
-      g = copy(g)
-      obstruction_queue = get_obstructions(g)
-    else
-      temp_g = copy(obstruction_free_set)
-      obstruction_queue =  PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
-      sizehint!(temp_g, length(g)+length(obstruction_free_set))
+    g = vcat(obstruction_free_set, g)
 
-      for p in g
-        push!(temp_g,p)
-        add_obstructions!(obstruction_queue,temp_g)
-      end
-      g = temp_g
+    obstruction_queue = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    for s in length(obstruction_free_set)+1:length(g)
+      add_obstructions!(obstruction_queue, g, s)
     end
 
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
