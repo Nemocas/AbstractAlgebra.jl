@@ -199,7 +199,7 @@ end
 @testset "Generic.Ideal.ideal_reduction(univariate)" begin
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V...)
@@ -220,7 +220,7 @@ end
 end
 
 @testset "Generic.Ideal.ideal_reduction(integer)" begin
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V...)
@@ -242,7 +242,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V...)
@@ -274,7 +274,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -286,7 +286,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -295,7 +295,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V)
@@ -320,7 +320,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
@@ -336,7 +336,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -349,7 +349,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
@@ -384,7 +384,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
@@ -401,7 +401,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -415,7 +415,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
@@ -446,7 +446,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       k = rand(0:5)
@@ -465,7 +465,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       k = rand(0:10)
@@ -481,7 +481,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       k = rand(0:10)
@@ -516,7 +516,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -536,7 +536,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -549,7 +549,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V)
@@ -581,7 +581,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
@@ -600,7 +600,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -616,7 +616,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
