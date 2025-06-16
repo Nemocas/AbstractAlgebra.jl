@@ -304,6 +304,59 @@ end
    end
 end
 
+
+@testset "Generic.Ideal.membership" begin
+   # multivariate
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
+
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:15]
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # univariate
+   R, x = polynomial_ring(ZZ, "x")
+
+   for i = 1:30
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = polynomial_ring(Fp, "x")
+
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # integer
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(ZZ, V)
+
+      @test all(in(I), V)
+   end
+
+   I = Generic.Ideal(ZZ, 2)
+
+   @test ZZ(2) in I
+   @test !(ZZ(3) in I)
+end
+
 @testset "Generic.Ideal.containment" begin
    # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)

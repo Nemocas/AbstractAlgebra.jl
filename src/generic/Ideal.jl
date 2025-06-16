@@ -2108,6 +2108,10 @@ end
 #
 ###############################################################################
 
+function Base.in(v::T, I::Ideal{T}) where T <: RingElement
+  return is_zero(normal_form(v, I))
+end
+
 @doc raw"""
     Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 
