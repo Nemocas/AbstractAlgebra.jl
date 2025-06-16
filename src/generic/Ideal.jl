@@ -2071,12 +2071,25 @@ end
 ###############################################################################
 
 @doc raw"""
-    normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
+    normal_form(p::U, I::Ideal{U}) where {U}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
-function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
+function normal_form(p::U, I::Ideal{U}) where {U}
+   is_zero(p) && return copy(p)
+   is_zero(I) && return copy(p)
    return normal_form(p, gens(I))
+end
+
+function normal_form(p::U, I::Ideal{U}) where {U <: FieldElem}
+   iszero(I) && return copy(p)
+   return zero(p)
+end
+
+function normal_form(p::U, I::Ideal{U}) where {U <: Integer}
+   iszero(I) && return copy(p)
+   m = only(gens(I))
+   return rem(p, m, RoundDown)
 end
 
 ###############################################################################
