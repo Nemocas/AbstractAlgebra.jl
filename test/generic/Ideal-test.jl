@@ -367,7 +367,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # univariate
@@ -382,7 +382,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # Fp[x]
@@ -398,7 +398,7 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # integer
@@ -411,13 +411,13 @@ end
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    I = Generic.Ideal(ZZ, 2)
 
-   @test contains(I, Generic.Ideal(ZZ, BigInt[]))
-   @test !contains(Generic.Ideal(ZZ, BigInt[]), I)
+   @test is_subset(Generic.Ideal(ZZ, BigInt[]), I)
+   @test !is_subset(I, Generic.Ideal(ZZ, BigInt[]))
 end
 
 @testset "Generic.Ideal.addition" begin
@@ -430,8 +430,8 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # univariate
@@ -446,8 +446,8 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # Fp[x]
@@ -463,8 +463,8 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # integer
@@ -477,8 +477,8 @@ end
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 end
 
@@ -627,8 +627,8 @@ end
       
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # univariate
@@ -645,8 +645,8 @@ end
 
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # Fp[x]
@@ -664,8 +664,8 @@ end
 
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # integer
@@ -680,7 +680,7 @@ end
       
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 end

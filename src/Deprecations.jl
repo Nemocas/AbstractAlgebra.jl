@@ -62,3 +62,7 @@ end
 
 # deprecated in 0.45.0
 @deprecate test_iterate ConformanceTests.test_iterate
+
+# deprecated in 0.45.2
+import Base: contains
+@deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
