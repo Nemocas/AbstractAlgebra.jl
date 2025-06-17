@@ -34,7 +34,11 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
 """
-gens(I::Ideal{T}) where T <: RingElement = I.gens
+gens(I::Ideal) = I.gens
+
+number_of_generators(I::Ideal) = length(I.gens)
+
+gen(I::Ideal, i::Int) = I.gens[i]
 
 ###############################################################################
 #
@@ -2202,26 +2206,6 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
    G = filter(x->!in(t, vars(x)), gens(IntSup))
    GInt = elem_type(S)[f(vcat(S(1), gens(S))...) for f in G]
    return Ideal(S, GInt)
-end
-
-###############################################################################
-#
-#   Binary operations
-#
-###############################################################################
-
-function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   return Ideal(R, vcat(G1, G2))
-end
-
-function *(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   return Ideal(R, [v*w for v in G1 for w in G2])
 end
 
 ###############################################################################
