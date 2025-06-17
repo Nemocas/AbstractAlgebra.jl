@@ -34,7 +34,11 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
 """
-gens(I::Ideal{T}) where T <: RingElement = I.gens
+gens(I::Ideal) = I.gens
+
+number_of_generators(I::Ideal) = length(I.gens)
+
+gen(I::Ideal, i::Int) = I.gens[i]
 
 function deepcopy_internal(I::Ideal, dict::IdDict)
    elms = [deepcopy_internal(x, dict) for x in I.gens]
@@ -2099,33 +2103,12 @@ end
 
 ###############################################################################
 #
-#   Comparison
-#
-###############################################################################
-
-function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   check_base_ring(I, J)
-   return gens(I) == gens(J)
-end
-
-###############################################################################
-#
-#   Containment
+#   Membership
 #
 ###############################################################################
 
 function Base.in(v::T, I::Ideal{T}) where T <: RingElement
   return is_zero(normal_form(v, I))
-end
-
-@doc raw"""
-    Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-
-Return `true` if the ideal `I` is a subset of the ideal `J`.
-"""
-function Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   check_base_ring(I, J)
-   return all(in(J), gens(I))
 end
 
 ###############################################################################
