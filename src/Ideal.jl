@@ -70,6 +70,12 @@ function ideal(xs::AbstractVector{T}; kw...) where T<:NCRingElement
   return ideal(parent(xs[1]), xs; kw...)
 end
 
+function Base.similar(I::T, xs::Vector) where {T <: Ideal}
+  R = base_ring(I)
+  @assert T === ideal_type(R)
+  return ideal(R, xs)
+end
+
 ###############################################################################
 #
 #   Basic predicates
@@ -78,10 +84,15 @@ end
 
 iszero(I::Ideal) = all(iszero, gens(I))
 
-function is_subset(I::T, J::T) where {T <: Ideal}
+@doc raw"""
+    Base.issubset(I::T, J::T) where {T <: Ideal}
+
+Return `true` if the ideal `I` is a subset of the ideal `J`.
+"""
+function Base.issubset(I::T, J::T) where {T <: Ideal}
   I === J && return true
   check_base_ring(I, J)
-  return all(x in J for x in gens(I))
+  return all(in(J), gens(I))
 end
 
 ###############################################################################
@@ -107,12 +118,12 @@ end
 
 function Base.:+(I::T, J::T) where {T <: Ideal}
   check_base_ring(I, J)
-  return ideal(base_ring(I), vcat(gens(I), gens(J)))
+  return similar(I, vcat(gens(I), gens(J)))
 end
 
 function Base.:*(I::T, J::T) where {T <: Ideal}
   check_base_ring(I, J)
-  return ideal(base_ring(I), [x*y for x in gens(I) for y in gens(J)])
+  return similar(I, [x*y for x in gens(I) for y in gens(J)])
 end
 
 ###############################################################################
@@ -130,9 +141,8 @@ function *(x::RingElement, R::Ring)
 end
 
 function *(I::Ideal{T}, p::T) where T <: RingElement
-  R = base_ring(I)
-  iszero(p) && return ideal(R, T[])
-  return ideal(R, [v*p for v in gens(I)])
+  iszero(p) && return similar(I, T[])
+  return similar(I, [v*p for v in gens(I)])
 end
 
 function *(p::T, I::Ideal{T}) where T <: RingElement
@@ -140,9 +150,8 @@ function *(p::T, I::Ideal{T}) where T <: RingElement
 end
 
 function *(I::Ideal{T}, p::S) where {S <: RingElement, T <: RingElement}
-  R = base_ring(I)
-  iszero(p*one(R)) && return ideal(R, T[])
-  return ideal(R, [v*p for v in gens(I)])
+  iszero(p*one(R)) && return similar(I, T[])
+  return similar(I, [v*p for v in gens(I)])
 end
 
 function *(p::S, I::Ideal{T}) where {S <: RingElement, T <: RingElement}

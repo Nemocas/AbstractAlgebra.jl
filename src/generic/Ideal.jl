@@ -2098,31 +2098,12 @@ end
 
 ###############################################################################
 #
-#   Comparison
-#
-###############################################################################
-
-function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   return gens(I) == gens(J)
-end
-
-###############################################################################
-#
-#   Containment
+#   Membership
 #
 ###############################################################################
 
 function Base.in(v::T, I::Ideal{T}) where T <: RingElement
   return is_zero(normal_form(v, I))
-end
-
-@doc raw"""
-    Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-
-Return `true` if the ideal `I` is a subset of the ideal `J`.
-"""
-function Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   return all(in(J), gens(I))
 end
 
 ###############################################################################
@@ -2210,41 +2191,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc binary operations
-#
-###############################################################################
-
-function *(I::Ideal{T}, p::T) where T <: RingElement
-   R = base_ring(I)
-   G = gens(I)
-   if iszero(p)
-      return Ideal(R, T[])
-   end
-   p = divexact(p, canonical_unit(p))
-   return Ideal(R, [v*p for v in G])
-end
-
-function *(p::T, I::Ideal{T}) where T <: RingElement
-   return I*p
-end
-
-function *(I::Ideal{T}, p::S) where {S <: RingElement, T <: RingElement}
-   R = base_ring(I)
-   G = gens(I)
-   if iszero(p*one(R))
-      return Ideal(R, T[])
-   end
-   V = [v*p for v in G]
-   V = [divexact(v, canonical_unit(v)) for v in V]
-   return Ideal(R, V)
-end
-
-function *(p::S, I::Ideal{T}) where {S <: RingElement, T <: RingElement}
-   return I*p
-end
-
-###############################################################################
-#
 #   Ideal reduction in Euclidean domain
 #
 ###############################################################################
@@ -2294,7 +2240,9 @@ function Ideal(R::Ring, v::T, vs::T...) where T <: RingElement
 end
 
 Ideal(R::Ring) = Ideal(R, elem_type(R)[])
-Ideal(R::Ring, V::Vector{Any}) = Ideal(R, elem_type(R)[R(v) for v in V])
+Ideal(R::Ring, V::Vector) = Ideal(R, elem_type(R)[R(v) for v in V])
+
+Base.similar(I::Ideal, V::Vector) = Ideal(base_ring(I), V)
 
 ###############################################################################
 #
