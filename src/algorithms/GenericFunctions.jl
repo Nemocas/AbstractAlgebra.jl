@@ -429,6 +429,8 @@ function is_zero_divisor(a::T) where T <: RingElement
    return is_zero(a) && !is_trivial(parent(a))
 end
 
+ConformanceTests._implements(::Type{T}, f::typeof(is_zero_divisor)) where {T} = is_domain_type(T) || _implements_directly(T, f)
+
 @doc raw"""
     is_zero_divisor_with_annihilator(a::T) where T <: RingElement
 
@@ -456,6 +458,8 @@ function factor(a)
    throw(NotImplementedError(:factor, a))
 end
 
+ConformanceTests._implements(::Type{T}, f::typeof(factor)) where {T} = _implements_directly(T, f)
+
 @doc raw"""
     factor_squarefree(a::T) where T <: RingElement -> Fac{T}
 
@@ -465,6 +469,8 @@ The squarefree elements in the factorization are pairwise coprime.
 function factor_squarefree(a)
    throw(NotImplementedError(:factor_squarefree, a))
 end
+
+ConformanceTests._implements(::Type{T}, f::typeof(factor_squarefree)) where {T} = _implements_directly(T, f)
 
 @doc raw"""
     is_irreducible(a::RingElement)
@@ -478,6 +484,8 @@ function is_irreducible(a)
    af = factor(a)
    return length(af) == 1 && all(isone, values(af.fac))
 end
+
+ConformanceTests._implements(::Type{T}, ::typeof(is_irreducible)) where {T} = _implements(T, is_unit) && _implements(T, factor)
 
 @doc raw"""
     is_squarefree(a::RingElement)
@@ -493,3 +501,4 @@ function is_squarefree(a)
    return all(isone, values(af.fac))
 end
 
+ConformanceTests._implements(::Type{T}, ::typeof(is_squarefree)) where {T} = _implements(T, is_unit) && _implements(T, factor_squarefree)
