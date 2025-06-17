@@ -18,6 +18,10 @@ elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+# ideal interface
+ideal_type(::Type{T}) where T <: MPolyRing = Generic.Ideal{elem_type(T)}
+ideal(R::MPolyRing, V::Vector) = Generic.Ideal(R, V)
+
 is_trivial(R::MPolyRing) = R.istrivial
 
 @doc raw"""
