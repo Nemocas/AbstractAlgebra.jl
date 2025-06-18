@@ -37,7 +37,8 @@ end
 @doc raw"""
     vector_space_dim(M::FPModule)
 
-Return the dimension of the given vector space.
+Return the dimension of the given vector space over `base_ring(M)`. 
+This method is only supported, when `base_ring(M)` is a field. 
 
 # Examples
 ```jldoctest
@@ -64,3 +65,4 @@ julia> vector_space_dim(Q)
 ```
 """
 function vector_space_dim end
+vector_space_dimension = vector_space_dim

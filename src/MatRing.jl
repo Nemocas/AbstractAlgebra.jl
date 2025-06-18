@@ -31,6 +31,7 @@ end
 
 number_of_rows(a::MatRing) = a.n
 number_of_columns(a::MatRing) = number_of_rows(a)
+vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.n * a.n
 
 @doc raw"""
     degree(a::MatRing)

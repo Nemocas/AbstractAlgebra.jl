@@ -112,6 +112,14 @@ end
     @test T == matrix(QQ, [42 0 0; 0 42 0; 0 0 42])
 end
 
+@testset "Matrix.vector_space_dim" begin
+  F, = residue_field(ZZ, 2)
+  S1 = matrix_space(F, 3, 4)
+  S2 = matrix_ring(QQ, 2)
+  @test vector_space_dim(S1) == 12
+  @test vector_space_dimension(S2) == 4
+end
+
 @testset "Matrix.conversion" begin
   U, t = polynomial_ring(QQ, "t")
 
