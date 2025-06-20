@@ -285,11 +285,8 @@ function krull_dim(R::Ring)
   throw(NotImplementedError(:krull_dim, R))
 end
 
-krull_dimension = krull_dim
-
 krull_dim(::Field) = 0
 krull_dim(::Integers) = 1
-vector_space_dim(::Field) = 1
 
 krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
 krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)

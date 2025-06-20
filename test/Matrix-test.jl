@@ -117,7 +117,7 @@ end
   S1 = matrix_space(F, 3, 4)
   S2 = matrix_ring(QQ, 2)
   @test vector_space_dim(S1) == 12
-  @test vector_space_dimension(S2) == 4
+  @test vector_space_dim(S2) == 4
 end
 
 @testset "Matrix.conversion" begin

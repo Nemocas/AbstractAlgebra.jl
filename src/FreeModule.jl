@@ -65,4 +65,3 @@ julia> vector_space_dim(Q)
 ```
 """
 function vector_space_dim end
-vector_space_dimension(M::Union{Field, Module, MatRing}) = vector_space_dim(M)

@@ -365,7 +365,6 @@ export isomorphism
 export kernel
 export kronecker_product
 export krull_dim
-export krull_dimension
 export laurent_polynomial_ring
 export laurent_ring
 export laurent_series
@@ -592,7 +591,6 @@ export var_index
 export vars
 export vector_space
 export vector_space_dim
-export vector_space_dimension
 export weak_popov
 export weak_popov_with_transform
 export weights
