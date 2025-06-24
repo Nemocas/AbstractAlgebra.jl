@@ -302,3 +302,12 @@ function fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
 
    return FracField{T}(R, cached)
 end
+
+function ConformanceTests.generate_element(R::FracField{T}) where {T <: RingElem}
+  num = ConformanceTests.generate_element(base_ring(R))
+  den = ConformanceTests.generate_element(base_ring(R))
+  if iszero(den)
+    den = one!(den)
+  end
+  return R(num, den)
+end
