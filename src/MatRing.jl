@@ -54,10 +54,14 @@ is_unit(a::MatRingElem{T}) where T <: RingElement = is_unit(det(a))
 
 is_unit(a::MatRingElem{T}) where T <: FieldElement = rank(a) == degree(a)
 
+ConformanceTests._implements(::Type{MatRingElem{T}}, ::typeof(is_unit)) where {T <: RingElement} = _implements(T, is_unit)
+
 # proof over a commutative ring: use adj(A)*A = det(A)*I = A*adj(A)
 is_zero_divisor(a::MatRingElem{T}) where T <: RingElement = is_zero_divisor(det(a))
 
 is_zero_divisor(a::MatRingElem{T}) where T <: FieldElement = rank(a) != degree(a)
+
+ConformanceTests._implements(::Type{MatRingElem{T}}, ::typeof(is_zero_divisor)) where {T <: RingElement} = _implements(T, is_zero_divisor)
 
 function is_zero_divisor_with_annihilator(a::MatRingElem{T}) where T <: RingElement
    f, b = is_zero_divisor_with_annihilator(det(a))
