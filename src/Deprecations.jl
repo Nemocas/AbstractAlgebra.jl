@@ -66,3 +66,15 @@ end
 # deprecated in 0.45.2
 import Base: contains
 @deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
+
+@deprecate zero_matrix(::Type{Int}, r, c) zeros(Int, r, c)
+@deprecate Array(R::NCRing, r::Int...) Array{elem_type(R)}(undef, r)
+function zeros(R::NCRing, r::Int...)
+    Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
+    T = elem_type(R)
+    A = Array{T}(undef, r)
+    for i in eachindex(A)
+        A[i] = R()
+    end
+    return A
+end
