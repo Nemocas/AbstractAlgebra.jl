@@ -601,10 +601,8 @@ function (a::RationalFunctionField{T, U})(n::U, d::U) where {T <: FieldElement, 
       d = divexact(d, g)
    end
    r = FracFieldElem{U}(n, d)
-   try
-      r.parent = FracDict[R]
-   catch
-      r.parent = fraction_field(R)
+   r.parent = get(FracDict, R) do
+      return fraction_field(R)
    end
    return a(r)
 end

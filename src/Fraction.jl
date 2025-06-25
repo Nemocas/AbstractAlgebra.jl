@@ -55,10 +55,8 @@ function //(x::T, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
-   try
-      z.parent = Generic.FracDict[R]
-   catch
-      z.parent = Generic.fraction_field(R)
+   z.parent = get(Generic.FracDict, R) do
+      return Generic.fraction_field(R)
    end
    return z
 end
