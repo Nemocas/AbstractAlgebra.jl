@@ -110,40 +110,58 @@ the map $f$ as a map of sets, if one exists. The preimage is neither
 unique nor chosen in a canonical way in general. When no such element exists,
 an exception is raised.
 """
-function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
-                                                               T <: RingElement
-   return preimage(f, [v])[1]
+function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where {T<:RingElement}
+  return preimage(f, [v])[1]
 end
 
-function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) where
-                                                               T <: RingElement
-   D = domain(f)
-   C = codomain(f)
-   R = base_ring(C)
-   if length(v) == 0
-      return elem_type(domain(f))[]
-   end
-   parent(v[1]) !== C && error("Incompatible element")
-   M = matrix(f)
-   trels = rels(C)
-   # Put rows of M and target relations into a matrix
-   q = length(trels)
-   m = nrows(M)
-   n = ncols(M)
-   if m == 0 || n == 0
-      return elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
-   else
-      # Put matrix M and target relations in a matrix
-      matr = zero_matrix(R, m + q, n)
-      matr[1:m, 1:n] = M
-      for i = 1:q
-        matr[m + i, :] = trels[i]
-      end
-      # Find left inverse of mat
-      inmat = reduce(vcat, Generic._matrix.(v))
+function preimage(
+  f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}
+) where {T<:RingElement}
+  fl, b = has_preimage_with_preimage(f, v)
+  !fl && error("Element has no preimage")
+  return b
+end
+
+function has_preimage_with_preimage(
+  f::Map(FPModuleHomomorphism), v::FPModuleElem{T}
+) where {T<:RingElement}
+  return has_preimage_with_preimage(f, [v])
+end
+
+function has_preimage_with_preimage(
+  f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}
+) where {T<:RingElement}
+  D = domain(f)
+  C = codomain(f)
+  R = base_ring(C)
+  if length(v) == 0
+    return false, elem_type(domain(f))[]
+  end
+  parent(v[1]) !== C && error("Incompatible element")
+  M = matrix(f)
+  trels = rels(C)
+  # Put rows of M and target relations into a matrix
+  q = length(trels)
+  m = nrows(M)
+  n = ncols(M)
+  if m == 0 || n == 0
+    return true, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+  else
+    # Put matrix M and target relations in a matrix
+    matr = zero_matrix(R, m + q, n)
+    matr[1:m, 1:n] = M
+    for i in 1:q
+      matr[m + i, :] = trels[i]
+    end
+    # Find left inverse of mat
+    inmat = reduce(vcat, Generic._matrix.(v))
+    if can_solve(matr, inmat)
       x = solve(matr, inmat)
-      return elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
-   end
+      return true, elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
+    else
+      return false, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+    end
+  end
 end
 
 ###############################################################################
