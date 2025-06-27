@@ -3398,7 +3398,7 @@ is_separable(::PolyRingElem)
 
 function is_separable(f::PolyRingElem{<:RingElement})
   # Ford, Separable Algebras, 4.6.1 and 8.3.8
-  return is_one(ideal(base_ring(f), [f, derivative(f)]))
+  return gens(Generic.Ideal(parent(f), [f, derivative(f)])) == [1]
 end
 
 function is_separable(f::PolyRingElem{<:FieldElement})
