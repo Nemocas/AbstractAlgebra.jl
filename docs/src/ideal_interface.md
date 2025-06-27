@@ -39,13 +39,12 @@ All ideal types belong to the abstract type `Ideal{T}` and their parents belong
 to the abstract type `Set`. This enables one to write generic functions that
 can accept any AbstractAlgebra ideal type.
 
-New ideal types should come with the following methods:
+New ideal types should come with the following type information:
 
 ```julia
-ideal_type(NewRingType) = NewIdealType 
-ideal_type(R::NewRing) = ideal_type(typeof(R))
-base_ring_type(I::NewIdealType) = NewRingType
-parent_type(I::NewIdealType{T}) = DefaultIdealSet{T}
+ideal_type(::Type{NewRing}) = NewIdealType 
+base_ring_type(::Type{NewIdeal}) = NewRingType
+parent_type(::Type{NewIdeal{T}}) = DefaultIdealSet{T}
 ```
 ## Required functionality for ideals
 
@@ -62,7 +61,7 @@ ideal(R::Ring, xs::Vector{U})
 
 with `U === elem_type(Ring)` and `xs` a list of generators,
 is implemented by anyone implementing ideals for AbstractAlgebra rings. 
-Additionally, the following constructors should be supported:
+Additionally, the following constructors are already implemented generically:
 
 ```julia
 ideal(R::Ring, x::U)
