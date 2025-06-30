@@ -26,6 +26,8 @@ number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M
 
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
+rank(M::DirectSumModule{T}) where T = sum(rank(summand) for summand in summands(M))
+
 function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index is out of range"))
    R = base_ring(N)
