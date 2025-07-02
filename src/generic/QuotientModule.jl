@@ -24,6 +24,8 @@ number_of_generators(N::QuotientModule{T}) where T <: RingElement = length(N.gen
 
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
+rank(M::QuotientModule{T}) where T <: FieldElement = dim(M)
+
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
