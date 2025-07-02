@@ -832,7 +832,7 @@ end
 @doc raw"""
     fraction_field_type(a)
 
-Return the type of the base ring of the given element, element type, parent or parent type $a$.
+Return the type of the fraction field of the given element, element type, parent or parent type $a$.
 
 # Examples
 ```jldoctest
