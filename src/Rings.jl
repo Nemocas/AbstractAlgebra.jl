@@ -301,7 +301,7 @@ krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R
 Return whether a given ring `R` is a local ring.
 """
 function is_local(R::Ring)
-  error("check whether $R is local is not implemented")
+  throw(NotImplementedError(:is_local, R))
 end
 
 # In general we can not assume it to be known whether a given ring is local
