@@ -290,3 +290,25 @@ krull_dim(::Integers) = 1
 
 krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
 krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)
+
+
+########################################################################
+# locality checks
+########################################################################
+@doc raw"""
+    is_local(R::Ring)
+
+Return whether a given ring `R` is a local ring.
+"""
+function is_local(R::Ring)
+  throw(NotImplementedError(:is_local, R))
+end
+
+# In general we can not assume it to be known whether a given ring is local
+is_known(::typeof(is_local), R::Ring) = false
+
+is_local(::Field) = true
+
+is_local(R::MPolyRing{<:FieldElem}) = is_zero(ngens(R))
+is_known(::typeof(is_local), R::MPolyRing{<:FieldElem}) = true
+
