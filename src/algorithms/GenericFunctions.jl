@@ -452,7 +452,7 @@ end
 Return a factorization of $a$ into irreducible elements, as a `Fac{T}`.
 The irreducible elements in the factorization are pairwise coprime.
 """
-function factor(a)
+function factor(a::RingElement)
    throw(NotImplementedError(:factor, a))
 end
 
@@ -462,7 +462,7 @@ end
 Return a factorization of $a$ into squarefree elements, as a `Fac{T}`.
 The squarefree elements in the factorization are pairwise coprime.
 """
-function factor_squarefree(a)
+function factor_squarefree(a::RingElement)
    throw(NotImplementedError(:factor_squarefree, a))
 end
 
@@ -472,7 +472,7 @@ end
 Return `true` if $a$ is irreducible, else return `false`.
 Zero and units are by definition never irreducible.
 """
-function is_irreducible(a)
+function is_irreducible(a::RingElement)
    is_zero(a) && return false
    is_unit(a) && return false
    af = factor(a)
@@ -486,7 +486,7 @@ Return `true` if $a$ is squarefree, else return `false`.
 An element is squarefree if it it is not divisible by any squares
 except the squares of units.
 """
-function is_squarefree(a)
+function is_squarefree(a::RingElement)
    iszero(a) && return false
    is_unit(a) && return true
    af = factor_squarefree(a)
