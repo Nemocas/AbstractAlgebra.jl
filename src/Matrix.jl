@@ -140,6 +140,8 @@ Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
 
+vector_space_dim(a::MatSpace{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.nrows * a.ncols
+
 function Base.hash(a::MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:nrows(a)
