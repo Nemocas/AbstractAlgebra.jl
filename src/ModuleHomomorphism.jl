@@ -135,7 +135,7 @@ function has_preimage_with_preimage(
   C = codomain(f)
   R = base_ring(C)
   if length(v) == 0
-    return false, elem_type(domain(f))[]
+    return true, elem_type(domain(f))[]
   end
   parent(v[1]) !== C && error("Incompatible element")
   M = matrix(f)
