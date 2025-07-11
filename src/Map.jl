@@ -47,7 +47,7 @@ function Base.show(io::IO, mime::MIME"text/plain", M::Map)
    show_map_data(io, M)
 end
 
-# for backwards compatibility
+# for backwards compatibility, but all maps using `@show_name` should overload it
 show_map_head(io::IO, M::Map) = print(terse(io), M)
 
 function show_map_data(io::IO, M::Map)
