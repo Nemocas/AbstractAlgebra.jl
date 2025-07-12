@@ -136,6 +136,8 @@ function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
    end
 end
 
+ConformanceTests._implements(::Type{FreeAssociativeAlgebraElem{T}}, f::typeof(is_unit)) where T = is_domain_type(T) || _implements_directly(T, f)
+
 ###############################################################################
 #
 # Hashing
