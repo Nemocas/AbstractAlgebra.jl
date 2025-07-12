@@ -838,10 +838,10 @@ function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: Ri
    if n < num
       if n == 0
          R = base_ring(a)
-         return evaluate(data(a), zeros(R, num))
+         return evaluate(data(a), [zero(R) for _ in 1:num])
       else
          R = parent(A[1])
-         A = vcat(A, zeros(R, num - n))
+         A = vcat(A, [zero(R) for _ in 1:num-n])
          return evaluate(data(a), A)
      end
    end
