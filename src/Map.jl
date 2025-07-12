@@ -26,16 +26,29 @@ function check_composable(a::Map, b::Map)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", M::Map)
-   # the "header" printed for most map types is identical: the terse output
-   # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
-   # generically here. If desired, map types can provide a custom
-   # show_map_data method to add additional data after this initial "header".
-   println(terse(io), M)
+   # the "header" printed for most map types is identical: a descriptive name
+   # for the map followed by "from DOMAIN" and "to CODOMAIN" lines. We
+   # implement this generically here. If desired, map types can provide a
+   # custom show_map_data method to add additional data after this initial
+   # "header".
+   #
+   # The output will be
+   #
+   # show_map_head(io, M)
+   #   from DOMAIN
+   #   to CODOMAIN
+   # show_map_data(io, M)
+   #
+   show_map_head(io, M)
+   println(io)
    io = pretty(io)
    println(io, Indent(), "from ", Lowercase(), domain(M))
    print(io, "to ", Lowercase(), codomain(M), Dedent())
    show_map_data(io, M)
 end
+
+# for backwards compatibility, but all maps using `@show_name` should overload it
+show_map_head(io::IO, M::Map) = print(terse(io), M)
 
 function show_map_data(io::IO, M::Map)
    # no extra data by default; Map subtypes may overload this
