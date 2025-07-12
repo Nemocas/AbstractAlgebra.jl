@@ -22,8 +22,8 @@ parent(a::RationalFunctionFieldElem) = a.parent
 
 data(x::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}} = x.d::FracFieldElem{U}
 
-function fraction_field(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   return a.fraction_field::Union{FracField{U}}
+function underlying_fraction_field(a::RationalFunctionField{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+   return a.fraction_field::FracField{U}
 end
 
 function is_domain_type(::Type{S}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}, S <: RationalFunctionFieldElem{T, U}}
@@ -119,13 +119,13 @@ iszero(a::RationalFunctionFieldElem) = iszero(data(a))
 
 isone(a::RationalFunctionFieldElem) = isone(data(a))
 
-gen(R::RationalFunctionField) = R(gen(base_ring(R.fraction_field)))
+gen(R::RationalFunctionField) = R(gen(base_ring(underlying_fraction_field(R))))
 
-gen(R::RationalFunctionField, i::Int) = R(gen(base_ring(R.fraction_field), i))
+gen(R::RationalFunctionField, i::Int) = R(gen(base_ring(underlying_fraction_field(R)), i))
 
-gens(R::RationalFunctionField) = R.(gens(base_ring(R.fraction_field)))
+gens(R::RationalFunctionField) = R.(gens(base_ring(underlying_fraction_field(R))))
 
-number_of_generators(R::RationalFunctionField) = number_of_generators(base_ring(R.fraction_field))
+number_of_generators(R::RationalFunctionField) = number_of_generators(base_ring(underlying_fraction_field(R)))
 
 function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    R = parent(a)
@@ -136,7 +136,7 @@ function characteristic(R::RationalFunctionField)
    return characteristic(base_ring(R))
 end
 
-is_finite(R::RationalFunctionField) = is_finite(base_ring(R.fraction_field))
+is_finite(R::RationalFunctionField) = is_finite(base_ring(underlying_fraction_field(R)))
 
 function is_perfect(R::RationalFunctionField)
   if characteristic(R) == 0
@@ -525,7 +525,7 @@ mul!(c::T, a::T, b::T) where {T <: RationalFunctionFieldElem} =
 RandomExtensions.maketype(R::RationalFunctionField, _) = elem_type(R)
 
 function RandomExtensions.make(S::RationalFunctionField, vs...)
-   R = base_ring(fraction_field(S))
+   R = base_ring(underlying_fraction_field(S))
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1]) # forward to default Make constructor
    else
@@ -536,13 +536,13 @@ end
 function rand(rng::AbstractRNG,
               sp::SamplerTrivial{<:Make2{<:FieldElement, <:RationalFunctionField}})
    S, v = sp[][1:end]
-   R = base_ring(fraction_field(S))
+   R = base_ring(underlying_fraction_field(S))
    n = rand(rng, v)
    d = R()
    while iszero(d)
       d = rand(rng, v)
    end
-   return S(fraction_field(S)(n, d; reduce = true))
+   return S(underlying_fraction_field(S)(n, d; reduce = true))
 end
 
 rand(rng::AbstractRNG, S::RationalFunctionField, v...) =
@@ -581,13 +581,13 @@ end
 ###############################################################################
 
 function (a::RationalFunctionField{T, U})() where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   K = fraction_field(a)
+   K = underlying_fraction_field(a)
    z = RationalFunctionFieldElem{T, U}(K(), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::FracFieldElem{U}) where {T <: FieldElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
-   K = fraction_field(a)
+   K = underlying_fraction_field(a)
    parent(b) != K && error("Unable to coerce rational function")
    z = RationalFunctionFieldElem{T, U}(b, a)
    return z::RationalFunctionFieldElem{T, U}
@@ -601,10 +601,8 @@ function (a::RationalFunctionField{T, U})(n::U, d::U) where {T <: FieldElement, 
       d = divexact(d, g)
    end
    r = FracFieldElem{U}(n, d)
-   try
-      r.parent = FracDict[R]
-   catch
-      r.parent = fraction_field(R)
+   r.parent = get(FracDict, R) do
+      return underlying_fraction_field(R)
    end
    return a(r)
 end
@@ -615,19 +613,19 @@ function (a::RationalFunctionField{T, U})(b::RationalFunctionFieldElem{T, U}) wh
 end
 
 function (a::RationalFunctionField{T, U})(b::Integer) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   K = fraction_field(a)
+   K = underlying_fraction_field(a)
    z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
 function (a::RationalFunctionField{T, U})(b::Rational{<:Integer}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-   K = fraction_field(a)
+   K = underlying_fraction_field(a)
    z = RationalFunctionFieldElem{T, U}(K(b), a)
    return z
 end
 
 function (a::RationalFunctionField)(b::RingElem)
-   return a(fraction_field(a)(b))
+   return a(underlying_fraction_field(a)(b))
 end
 
 ###############################################################################
