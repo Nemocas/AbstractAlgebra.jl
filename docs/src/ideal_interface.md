@@ -120,6 +120,3 @@ intersect(I::T, J::T) where {T <: NewIdeal}
 ```julia
 ==(I::T, J::T) where {T <: NewIdeal}
 ```
-```julia
-reduce_gens(I::NewIdeal)
-```
