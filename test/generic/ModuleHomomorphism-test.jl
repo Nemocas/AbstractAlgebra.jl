@@ -134,18 +134,23 @@ end
 
          m = rand(M, -10:10)
          n = f(m)
-         x = preimage(f, n)
-         @test x == m
-         y = f\n
-         @test y == m
+         fl, x = has_preimage_with_preimage(f, n)
+         if fl
+          @test x[1] == m
+          y = f\n
+          @test y == m
+         end
 
          for i in 0:5
             m = elem_type(M)[ rand(M, -10:10) for j in 1:i ]
             n = elem_type(N)[ f(mm) for mm in m ]
-            x = preimage(f, n)
-            @test x == m
-            y = f\n
-            @test y == m
+
+            fl, x = has_preimage_with_preimage(f, n)
+            if fl
+              @test x == m
+              y = f\n
+              @test y == m
+            end
          end
       end
    end

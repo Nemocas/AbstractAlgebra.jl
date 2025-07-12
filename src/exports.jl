@@ -245,6 +245,7 @@ export has_attribute
 export has_bottom_neighbor
 export has_gens
 export has_left_neighbor
+export has_preimage_with_preimage
 export hash
 export hermite_form
 export hermite_form_with_transformation
