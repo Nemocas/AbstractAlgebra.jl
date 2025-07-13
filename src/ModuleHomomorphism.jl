@@ -125,7 +125,8 @@ end
 function has_preimage_with_preimage(
   f::Map(FPModuleHomomorphism), v::FPModuleElem{T}
 ) where {T<:RingElement}
-  return has_preimage_with_preimage(f, [v])
+  fl, b = has_preimage_with_preimage(f, [v])
+  return fl, b[1]
 end
 
 function has_preimage_with_preimage(

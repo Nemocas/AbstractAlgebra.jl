@@ -136,7 +136,7 @@ end
          n = f(m)
          fl, x = has_preimage_with_preimage(f, n)
          if fl
-          @test x[1] == m
+          @test x == m
           y = f\n
           @test y == m
          end
