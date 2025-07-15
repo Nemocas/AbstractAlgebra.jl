@@ -1157,7 +1157,7 @@ function mfactor_irred_mvar_char_zero(
   @assert length(A) > 0
 
   evals = Vector{elem_type(R)}(undef, n + 1)
-  alphas = Vector{elem_type(K)}(undef, n)
+  alphas = [zero(K) for _ in 1:n]
   alpha_modulus = 0
   lcc_fails_remaining = 3
 
