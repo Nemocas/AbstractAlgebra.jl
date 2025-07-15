@@ -275,23 +275,20 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     @test functionloc(uncached_attr)[2] < functionloc(cached_attr)[2]
 end
 
-@static if VERSION >= v"1.7"
-    # the following tests need the improved `@macroexpand` from Julia 1.7
-    @testset "@attr error handling" begin
-        # wrong number of arguments
-        @test_throws ArgumentError @macroexpand @attr Any foo() = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Int foo() = 1
-        @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool=true) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool) = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool=true) = 1
-        @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
-        @test_throws MethodError @macroexpand @attr Int Int Int
+@testset "@attr error handling" begin
+    # wrong number of arguments
+    @test_throws ArgumentError @macroexpand @attr Any foo() = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
+    @test_throws ArgumentError @macroexpand @attr Int foo() = 1
+    @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool=true) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool=true) = 1
+    @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
+    @test_throws MethodError @macroexpand @attr Int Int Int
 
-        # wrong kind of arguments
-        #@test_throws ArgumentError @macroexpand @attr Int Int
-        #@test_throws ArgumentError @macroexpand @attr foo(x::Int) = 1 Int
-    end
+    # wrong kind of arguments
+    #@test_throws ArgumentError @macroexpand @attr Int Int
+    #@test_throws ArgumentError @macroexpand @attr foo(x::Int) = 1 Int
 end

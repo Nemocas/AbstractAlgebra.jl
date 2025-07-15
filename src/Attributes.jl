@@ -1,14 +1,6 @@
 import MacroTools
 
-if VERSION >= v"1.7"
-   import Base: ismutabletype
-else
-   function ismutabletype(@nospecialize(t::Type))
-       t = Base.unwrap_unionall(t)
-       return isa(t, DataType) && t.mutable
-   end
-end
-
+using Base: ismutabletype
 
 """
     @attributes typedef

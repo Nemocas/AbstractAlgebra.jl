@@ -140,6 +140,8 @@ Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
 
+vector_space_dim(a::MatSpace{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.nrows * a.ncols
+
 function Base.hash(a::MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:nrows(a)
@@ -676,13 +678,8 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 #
 ###############################################################################
 
-@static if VERSION < v"1.9"
-  Base.eachrow(a::MatrixElem) = (view(a, i, :) for i in 1:nrows(a))
-  Base.eachcol(a::MatrixElem) = (view(a, :, i) for i in 1:ncols(a))
-else
-  Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
-  Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
-end
+Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
+Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
 
 ###############################################################################
 #
@@ -7205,7 +7202,7 @@ end
 #
 ################################################################################
 
-VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
+Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...))
 Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
 Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))
