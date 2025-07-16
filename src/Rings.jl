@@ -265,7 +265,25 @@ is_noetherian(::Integers) = true
 is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
 is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
 is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R)) || throw(NotImplementedError(:is_noetherian, R))
-is_noetherian(M::Module) = is_noetherian(base_ring(M)) || throw(NotImplementedError(:is_noetherian, M))
+
+@doc raw"""
+    is_noetherian(M::Module)
+
+Check if the module $M$ is Noetherian. This is currently implemented only for finitely generated modules
+in which case it is sufficient to check whether the base ring is Noetherian.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> M = free_module(R, 2)
+Free module of rank 2 over R
+
+julia> is_noetherian(M)
+true
+```
+"""
+is_noetherian(M::Module) = (is_noetherian(base_ring(M)) && is_finitely_generated(M)) || throw(NotImplementedError(:is_noetherian, M))
 
 @doc raw"""
     krull_dim(R::Ring)

@@ -26,6 +26,7 @@ function check_parent(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 end
 
 is_finite(M::FPModule{<:FinFieldElem}) = true
+is_finitely_generated(M::FPModule) = true
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
   fl = is_submodule(N, M)
