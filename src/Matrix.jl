@@ -6799,11 +6799,11 @@ function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
    return matrix(reshape(arr, length(arr), 1))
 end
 
-function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
+function matrix(arr::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
     return matrix(permutedims(reduce(hcat, arr)))
 end
 
-function matrix(R::NCRing, arr::Vector{<:Vector})
+function matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
    return matrix(R, permutedims(reduce(hcat, arr)))
 end
 
@@ -6955,8 +6955,8 @@ diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 @doc raw"""
     diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(x::Vector{T}) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(R::NCRing, x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
 
 Returns a diagonal matrix whose diagonal entries are the elements of $x$.
 If a ring $R$ is given then it is used a parent for the entries of the created
@@ -6978,7 +6978,7 @@ julia> diagonal_matrix(ZZ, [5, 6])
 [0   6]
 ```
 """
-function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
+function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
     x = R.(x)
     M = zero_matrix(R, length(x), length(x))
     for i = 1:length(x)
@@ -6991,17 +6991,17 @@ function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(x::Vector{<:NCRingElement})
+function diagonal_matrix(x::AbstractVector{<:NCRingElement})
    @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
    return diagonal_matrix(parent(x[1]), x)
 end
 
 @doc raw"""
-    diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
+    diagonal_matrix(V::AbstractVector{T}) where T <: MatElem -> MatElem
 
 Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
 """
-function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
+function diagonal_matrix(V::AbstractVector{T}) where {T<:MatElem}
     return block_diagonal_matrix(V)
 end
 
@@ -7009,7 +7009,7 @@ function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
     return block_diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
+function diagonal_matrix(R::NCRing, V::AbstractVector{<:MatElem})
     if length(V) == 0
         return zero_matrix(R, 0, 0)
     else
