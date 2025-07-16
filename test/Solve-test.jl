@@ -73,7 +73,7 @@
   end
 
   N = zero_matrix(R, 2, 1)
-  b = [zero(R), zero(R)]
+  b = zeros(R, 2)
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b, side = :right)
   @test fl
   @test N*x == b
@@ -82,7 +82,7 @@
   @test K == identity_matrix(R, 1)
 
   N = zero_matrix(R, 1, 2)
-  b = [zero(R)]
+  b = zeros(R, 1)
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b, side = :right)
   @test fl
   @test N*x == b
@@ -184,7 +184,7 @@ end
 
   N = zero_matrix(R, 2, 1)
   C = AbstractAlgebra.Solve.solve_init(N)
-  b = [zero(R), zero(R)]
+  b = zeros(R, 2)
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -194,7 +194,7 @@ end
 
   N = zero_matrix(R, 1, 2)
   C = AbstractAlgebra.Solve.solve_init(N)
-  b = [zero(R)]
+  b = zeros(R, 1)
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
