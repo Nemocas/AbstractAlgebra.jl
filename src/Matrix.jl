@@ -6979,6 +6979,7 @@ julia> diagonal_matrix(ZZ, [5, 6])
 ```
 """
 function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
+    Base.require_one_based_indexing(x)
     x = R.(x)
     M = zero_matrix(R, length(x), length(x))
     for i = 1:length(x)
@@ -6993,7 +6994,7 @@ end
 
 function diagonal_matrix(x::AbstractVector{<:NCRingElement})
    @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
-   return diagonal_matrix(parent(x[1]), x)
+   return diagonal_matrix(parent(first(x)), x)
 end
 
 @doc raw"""
