@@ -480,7 +480,7 @@ end
 # a numerator and denominator
 function _rat_poly(p::Poly{RationalFunctionFieldElem{T, U}}, var=parent(p).S; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    K = base_ring(p)
-   R = base_ring(underlying_fraction_field(K))
+   R = base_ring(fraction_field(K))
    S = elem_type(R)
 
    par = PolyRing{S}(R, var, cached)
