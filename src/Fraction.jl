@@ -55,8 +55,10 @@ function //(x::T, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
-   z.parent = get(Generic.FracDict, R) do
-      return Generic.fraction_field(R)
+   try
+      z.parent = Generic.FracDict[R]
+   catch
+      z.parent = Generic.fraction_field(R)
    end
    return z
 end
@@ -823,42 +825,6 @@ base ring $R$ is supplied.
 function fraction_field(R::Ring; cached::Bool=true)
    return Generic.fraction_field(R; cached=cached)
 end
-
-function fraction_field(F::Field; cached::Bool=true)
-   return F
-end
-
-
-@doc raw"""
-    fraction_field_type(a)
-
-Return the type of the fraction field of the given element, element type, parent or parent type $a$.
-
-# Examples
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> fraction_field_type(R) == typeof(fraction_field(R))
-true
-
-julia> fraction_field_type(zero(R)) == typeof(fraction_field(R))
-true
-
-julia> fraction_field_type(typeof(R)) == typeof(fraction_field(R))
-true
-
-julia> fraction_field_type(typeof(zero(R))) == typeof(fraction_field(R))
-true
-```
-"""
-fraction_field_type(x) = fraction_field_type(typeof(x))
-fraction_field_type(x::Type{<:RingElement}) = fraction_field_type(parent_type(x))
-fraction_field_type(T::DataType) = throw(MethodError(fraction_field_type, (T,)))
-
-fraction_field_type(::Type{T}) where {T <: Field} = T
-fraction_field_type(::Type{T}) where {T <: Ring} = AbstractAlgebra.Generic.FracField{elem_type(T)}
-
 
 @doc raw"""
     factored_fraction_field(R::Ring; cached::Bool=true)
