@@ -6998,11 +6998,11 @@ function diagonal_matrix(x::AbstractVector{<:NCRingElement})
 end
 
 @doc raw"""
-    diagonal_matrix(V::AbstractVector{T}) where T <: MatElem -> MatElem
+    diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
 
 Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
 """
-function diagonal_matrix(V::AbstractVector{T}) where {T<:MatElem}
+function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
     return block_diagonal_matrix(V)
 end
 
@@ -7010,7 +7010,7 @@ function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
     return block_diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(R::NCRing, V::AbstractVector{<:MatElem})
+function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
     if length(V) == 0
         return zero_matrix(R, 0, 0)
     else
