@@ -6788,6 +6788,7 @@ function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
+   Base.require_one_based_indexing(arr)
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
