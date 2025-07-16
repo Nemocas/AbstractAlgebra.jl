@@ -107,6 +107,7 @@ image(compose(k, g))
 
 ```@docs
 preimage(::Map(FPModuleHomomorphism), ::FPModuleElem{T}) where T <: RingElement
+has_preimage_with_preimage(::Map(FPModuleHomomorphism), ::FPModuleElem{T}) where T <: RingElement
 ```
 
 ```julia
