@@ -27,6 +27,7 @@ end
 
 is_finite(M::FPModule{<:FinFieldElem}) = true
 is_finitely_generated(M::FPModule) = true
+is_finitely_generated(M::Module) = isfinite(ngens(M)) || throw(NotImplementedError(:is_finitely_generated, M))
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
   fl = is_submodule(N, M)
