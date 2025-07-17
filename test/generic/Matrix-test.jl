@@ -212,6 +212,7 @@ end
       @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
       @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
       @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
+      @test T[1 2; 3 4] == matrix(T, [1:2, 3:4])
       @test_throws MethodError T[;;;]
       @test_throws MethodError T[1;;;]
 
@@ -297,6 +298,12 @@ end
          end
       end
    end
+
+   D4 = diagonal_matrix(R, 1:5)
+   @test size(D4) == (5, 5)
+   @test D4[1, 1] == R(1)
+   @test D4[5, 5] == R(5)
+   @test D4 isa Generic.MatSpaceElem{elem_type(R)}
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
