@@ -22,7 +22,7 @@ base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])::bas
 
 dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
 
-number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
+@attr Int number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
@@ -100,7 +100,10 @@ function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingE
    nrows(v) != 1 && ("Not a vector in DirectSumModuleElem constructor")
    start = 1
    for i = 1:length(N.m)
-      v = reduce_mod_rels(v, rels(N.m[i]), start)
+     if length(rels(N.m[i])) > 0
+        @show :reduce
+        v = reduce_mod_rels(v, rels(N.m[i]), start)
+      end
       start += ngens(N.m[i])
    end
    return DirectSumModuleElem{T}(N, v)
@@ -151,13 +154,27 @@ function direct_sum_injection(i::Int, D::DirectSumModule{T}, v::AbstractAlgebra.
    # Find starting point of the given module in the large vectors
    start = sum(map(x->ngens(x)::Int, S[1:i-1]))
    # create embedded value
-   newv = T[zero(R) for j in 1:ngens(D)]
+   X = zero(D)
    for j = 1:ngens(m)
-      newv[j + start] = v[j]
+      X.v[j + start] = v[j]
    end
-   matv = matrix(R, 1, length(newv), newv)
-   return DirectSumModuleElem{T}(D, matv)
+   return X
 end
+
+function add_direct_sum_injection!(X::DirectSumModuleElem{T}, i::Int, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   D = parent(X)
+   S = summands(D)
+   m = S[i]
+   R = base_ring(m)
+   # Find starting point of the given module in the large vectors
+   start = sum(map(x->ngens(x)::Int, S[1:i-1]))
+   # create embedded value
+   for j = 1:ngens(m)
+     X.v[j+start] += v[j]
+   end
+   return X
+end
+
 
 function AbstractAlgebra.canonical_injection(A::DirectSumModule, i::Int)
   B = summands(A)[i]
@@ -171,8 +188,18 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
    S = summands(D)
    m = S[i]
    R = base_ring(m)
-   start = sum(map(x->ngens(x)::Int, S[1:i-1]))
+   start = 0
+   degs = get_attribute(D, :degs)::Vector{Int}
+   for j=1:i-1
+     start += degs[j]
+   end
+#   start = sum(map(x->ngens(x)::Int, S[1:i-1]))
    # create projected value
+   X = zero(m)
+   for j=1:ngens(m)
+     X.v[j] = v[j+start]
+   end
+   return X
    newv = T[v[j + start] for j in 1:ngens(m)]
    matv = matrix(R, 1, length(newv), newv)
    return elem_type(m)(m, matv)
@@ -191,36 +218,40 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
       base_ring(m[i]) != R && error("Incompatible modules")
    end
    # make vector of rels (only used by external interface, not internally)
-   n = sum(ngens(m[i]) for i in 1:length(m))
+   degs = map(ngens, m)
+   n = sum(degs)
    new_rels = Vector{dense_matrix_type(T)}(undef,
        sum(length(rels(m[i])) for i in 1:length(m)))
-   rel = 1
-   start = 0
-   for i = 1:length(m)
-      irels = rels(m[i])
-      for j = 1:length(irels)
-         new_rel = zero_matrix(R, 1, n)
-         for k = 1:ncols(irels[j])
-            new_rel[1, start + k] = irels[j][1, k]
-         end
-         new_rels[rel] = new_rel
-         rel += 1
-      end
+   if length(new_rels) > 0      
+     rel = 1
+     start = 0
+     for i = 1:length(m)
+        irels = rels(m[i])
+        for j = 1:length(irels)
+           new_rel = zero_matrix(R, 1, n)
+           for k = 1:ncols(irels[j])
+              new_rel[1, start + k] = irels[j][1, k]
+           end
+           new_rels[rel] = new_rel
+           rel += 1
+        end
+     end
    end
    # Construct DirectSumModule object
    M = DirectSumModule{T}(m, new_rels)
+   set_attribute!(M, :degs => degs)
    # construct injections and projections
    inj = Vector{ModuleHomomorphism{T}}(undef, length(m))
    pro = Vector{ModuleHomomorphism{T}}(undef, length(m))
    start = 0
    for i = 1:length(m)
-      igens = ngens(m[i])
+      igens = degs[i]
       inj[i] = ModuleHomomorphism(m[i], M, inj_proj_mat(R, igens, n, start+1))
       pro[i] = ModuleHomomorphism(M, m[i], inj_proj_mat(R, n, igens, start+1))
       # Override image_fns with fast versions that don't do matrix-vector mul
       inj[i].image_fn  = x -> direct_sum_injection(i, M, x)
       pro[i].image_fn = x -> direct_sum_projection(M, i, x)
-      start += ngens(m[i])
+      start += igens
    end
    M.inj = inj
    M.pro = pro
