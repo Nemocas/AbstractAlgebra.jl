@@ -33,7 +33,7 @@ is_finitely_generated(M::Module) = isfinite(ngens(M)) || throw(NotImplementedErr
     is_noetherian(M::Module)
 
 Check if the module $M$ is Noetherian. This is currently implemented only for finitely generated modules
-in which case it is sufficient to check whether the base ring is Noetherian.
+Check if the module $M$ is Noetherian.
 
 # Examples
 ```jldoctest
@@ -46,7 +46,11 @@ julia> is_noetherian(M)
 true
 ```
 """
-is_noetherian(M::Module) = (is_noetherian(base_ring(M)) && is_finitely_generated(M)) || throw(NotImplementedError(:is_noetherian, M))
+function is_noetherian(M::Module)
+  is_finitely_generated(M) || return false
+  is_noetherian(base_ring(M)) && return true
+  throw(NotImplementedError(:is_noetherian, M))
+end
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
   fl = is_submodule(N, M)
