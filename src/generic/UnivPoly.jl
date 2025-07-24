@@ -257,7 +257,7 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
       end
    end
    if length(S.S) > ngens(S.mpoly_ring)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), S.S; internal_ordering=S.ord, cached=false)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), copy(S.S); internal_ordering=S.ord, cached=false)
    end
    return idx
 end
