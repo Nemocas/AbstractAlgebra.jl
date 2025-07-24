@@ -32,7 +32,6 @@ is_finitely_generated(M::Module) = isfinite(ngens(M)) || throw(NotImplementedErr
 @doc raw"""
     is_noetherian(M::Module)
 
-Check if the module $M$ is Noetherian. This is currently implemented only for finitely generated modules
 Check if the module $M$ is Noetherian.
 
 # Examples
