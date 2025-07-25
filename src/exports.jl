@@ -50,6 +50,7 @@ export GroupElem
 export Ideal
 export IdealSet
 export IdentityMap
+export InfiniteDimensionError
 export InfiniteOrderError
 export IntExt
 export ItemQuantity
