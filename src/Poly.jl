@@ -243,6 +243,8 @@ function is_unit(f::T) where {T <: PolyRingElem}
   return true
 end
 
+ConformanceTests._implements(::Type{PolynomialElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
+
 function is_nilpotent(f::T) where {T <: PolyRingElem}
   # Makes essential use of the fact that sum of 2 nilpotents is nilpotent.
   # This is true when the coeffs are commutative.
@@ -252,8 +254,11 @@ function is_nilpotent(f::T) where {T <: PolyRingElem}
   return all(is_nilpotent, coefficients(f))
 end
 
+ConformanceTests._implements(::Type{PolynomialElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
 
 is_zero_divisor(a::PolynomialElem) = is_zero_divisor(content(a))
+
+ConformanceTests._implements(::Type{PolynomialElem{T}}, ::typeof(is_zero_divisor)) where T = _implements(T, is_zero_divisor)
 
 function is_zero_divisor_with_annihilator(a::PolyRingElem{T}) where T <: RingElement
    f, b = is_zero_divisor_with_annihilator(content(a))
