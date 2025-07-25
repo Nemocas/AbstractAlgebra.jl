@@ -484,6 +484,16 @@ function show(io::IO, p::PolyRing)
    end
 end
 
+function pretty_lt(x::PolyRingElem, y::PolyRingElem)
+  if length(x) < length(y)
+    return true
+  end
+  if length(x) > length(y)
+    return false
+  end
+  return pretty_lt_lex(coefficients(x), coefficients(y))
+end
+
 ###############################################################################
 #
 #   Unary operations

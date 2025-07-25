@@ -127,6 +127,8 @@ function show(io::IO, R::GFField)
    print(io, "Finite field F_", R.p)
 end
 
+pretty_lt(x::GFField, y::GFField) = pretty_lt(x.d, y.d)
+
 ###############################################################################
 #
 #   Unary operations
