@@ -88,3 +88,17 @@ function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
     print(io, "got $(e.get_l)")
   end
 end
+
+struct InfiniteDimensionError <: Exception
+  check_available::Bool
+  InfiniteDimensionError(; check_available::Bool = false) = new(check_available)
+end
+
+function Base.showerror(io::IO, e::InfiniteDimensionError)
+  if e.check_available
+    println(io, "Infinite-dimensional vector space")
+    print(io, "You may check finiteness with `is_finite_dimensional_vector_space`")
+  else
+    println(io, "Infinite-dimensional vector space")  
+  end
+end
