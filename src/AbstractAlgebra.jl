@@ -15,6 +15,7 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Group,
+                  :InfiniteDimensionError, # remove in next breaking release, see #2135
                  ]
 
 
