@@ -26,6 +26,30 @@ function check_parent(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 end
 
 is_finite(M::FPModule{<:FinFieldElem}) = true
+is_finitely_generated(M::FPModule) = true
+is_finitely_generated(M::Module) = isfinite(ngens(M)) || throw(NotImplementedError(:is_finitely_generated, M))
+
+@doc raw"""
+    is_noetherian(M::Module)
+
+Check if the module $M$ is Noetherian.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> M = free_module(R, 2)
+Free module of rank 2 over R
+
+julia> is_noetherian(M)
+true
+```
+"""
+function is_noetherian(M::Module)
+  is_finitely_generated(M) || return false
+  is_noetherian(base_ring(M)) && return true
+  throw(NotImplementedError(:is_noetherian, M))
+end
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
   fl = is_submodule(N, M)
