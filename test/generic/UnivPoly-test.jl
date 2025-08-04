@@ -844,6 +844,34 @@ end
    end
 end
 
+@testset "Generic.UnivPoly.resultant" begin
+
+    R, x = universal_polynomial_ring(ZZ, 10)
+
+    @test resultant(x[1]^2 - 1, x[1] - 1, 1) == 0
+
+    @test resultant(x[2]^2 + 1, x[2] + 1, 2) != 0
+    @test isa(resultant(x[2]^2 + 1, x[2] + 1, 2), UnivPoly)
+
+    @test resultant(x[1] + x[2], x[1]^2 + x[2], 1) == x[2]^2 + x[2]
+
+    @test_throws ErrorException resultant(x[1] + 1, x[1] + 2, 11)
+
+    @test resultant(x[3]^2 + x[4], x[3] + 1, 3) == resultant(x[3] + 1, x[3]^2 + x[4], 3)
+
+    S, y = universal_polynomial_ring(QQ, 10)
+
+    @test resultant(y[1]^2 - 2*y[1] + 1, y[1] - 1, 1) == 0
+
+    @test resultant(y[2]^2 + 3//2, y[2] + 1//3, 2) != 0
+    @test isa(resultant(y[2]^2 + 3//2, y[2] + 1//3, 2), UnivPoly)
+
+    @test resultant(y[5]^2 + y[6], y[5] + y[6], 5) == y[6]^2 + y[6]
+
+    @test resultant(y[3] + 1//2, y[3] + 3//4, 3) != 0
+end
+
+
 @testset "Generic.UnivPoly.remove_valuation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
