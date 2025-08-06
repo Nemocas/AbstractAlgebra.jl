@@ -19,6 +19,16 @@ end
    test_rand(F, 1:9)
 end
 
+@testset "Generic.Module.hash" begin
+   # equal objects in the sense of `isequal` must have the same `hash` values
+   F = free_module(QQ, 2)
+   M1 = sub(F, [])[1]
+   M2 = sub(F, [])[1]
+   @test objectid(M1) != objectid(M2)
+   @test isequal(M1, M2)
+   @test hash(M1) == hash(M2)
+end
+
 @testset "Generic.Module.manipulation" begin
    for R in [ZZ, QQ]
       for iter = 1:100
