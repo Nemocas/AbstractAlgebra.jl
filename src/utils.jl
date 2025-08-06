@@ -29,14 +29,14 @@ function is_loaded_directly()
       # inside of the _require_search_from_serialized function.
       # To make it a bit more robust, we check the difference between the line number of the beginning
       # of _require_search_from_serialized and the call to _include_from_serialized.
-      bt = Base.process_backtrace(Base.backtrace())
-      @debug "is_loaded_directly: full backtrace:\n$(sprint(show, "text/plain", bt))"
-      Base.filter!(sf -> contains(string(sf[1].func), "_require_search_from_serialized"), bt)
-      length_bt = length(bt)
-      @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_bt) times in backtrace; expected 1"
-      bt_entry = only(bt)[1]
-      line_call = bt_entry.line
-      line_funcbegin = bt_entry.linfo.def.line
+      st = Base.stacktrace(Base.backtrace())
+      @debug "is_loaded_directly: full backtrace:\n$(sprint(show, "text/plain", st))"
+      Base.filter!(sf -> contains(string(sf.func), "_require_search_from_serialized") && !startswith(string(sf), "kwcall("), st)
+      length_st = length(st)
+      @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_st) times in backtrace; expected 1"
+      sf = only(st)
+      line_call = sf.line
+      line_funcbegin = sf.linfo.def.line
       line_difference = line_call - line_funcbegin
       @debug "is_loaded_directly: `_require_search_from_serialized` called at line $line_call, function begins at line $line_funcbegin, difference $(line_difference)"
       # difference for `using Package` / `using OtherPackage`
