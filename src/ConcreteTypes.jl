@@ -1,9 +1,10 @@
 ###############################################################################
 #
-#   Mat space
+#   Parent types
 #
 ###############################################################################
 
+# parent type for matrices
 struct MatSpace{T <: NCRingElement} <: Module{T}
   base_ring::NCRing
   nrows::Int
@@ -15,4 +16,11 @@ struct MatSpace{T <: NCRingElement} <: Module{T}
      (r < 0 || c < 0) && error("Dimensions must be non-negative")
      return new{T}(R, r, c)
   end
+end
+
+# parent type for two-sided ideals
+struct DefaultIdealSet{T <: NCRingElement} <: IdealSet{T}
+   base_ring::NCRing
+
+   DefaultIdealSet(R::S) where {S <: NCRing}  = new{elem_type(S)}(R)
 end
