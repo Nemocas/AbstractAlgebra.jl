@@ -254,6 +254,9 @@ function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    return true
 end
 
+# Equal `FPModule`s must have the same `hash` value.
+Base.hash(M::FPModule, h::UInt) = h # FIXME
+
 ###############################################################################
 #
 #   Isomorphism
