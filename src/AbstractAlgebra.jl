@@ -90,6 +90,7 @@ include("Assertions.jl")
 
 include("Attributes.jl")
 include("PrintHelper.jl")
+include("PrettyOrdering.jl")
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
