@@ -193,3 +193,7 @@ function show(io::IO, M::FunctionalCompositeMap)
    end
 end
 
+function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
+   check_composable(f, g)
+   return Generic.FunctionalCompositeMap(f, g)
+end

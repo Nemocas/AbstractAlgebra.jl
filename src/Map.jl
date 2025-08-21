@@ -158,17 +158,6 @@ end
 
 ################################################################################
 #
-#  FunctionalCompositeMap
-#
-################################################################################
-
-function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
-   check_composable(f, g)
-   return Generic.FunctionalCompositeMap(f, g)
-end
-
-################################################################################
-#
 #  Comparison of objects as maps
 #
 #  Rationale: Often objects are implicitly used as maps. For instance, a `Ring` 
