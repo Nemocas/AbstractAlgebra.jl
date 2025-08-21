@@ -1277,7 +1277,7 @@ function underscorify(x::String)
       n -= 1
    end
    if n == 1 && length(y[1]) == 1
-      z = y[1]
+      z = string(y[1])
    else
       # at this point we need operatorname and escaped underscores
       z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
