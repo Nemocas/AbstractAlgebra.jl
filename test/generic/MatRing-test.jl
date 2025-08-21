@@ -72,6 +72,25 @@
    @test parent(S()) == S
 end
 
+@testset "Generic.MatAlg.finitiess" begin
+   S = matrix_ring(QQ, 3)
+   @test !is_finite(S)
+   @test !is_trivial(S)
+
+   S = matrix_ring(QQ, 0)
+   @test is_finite(S)
+   @test is_trivial(S)
+
+   S = matrix_ring(GF(5), 3)
+   @test is_finite(S)
+   @test !is_trivial(S)
+
+   S = matrix_ring(GF(5), 0)
+   @test is_finite(S)
+   @test is_trivial(S)
+
+end
+
 @testset "Generic.MatAlg.printing" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
