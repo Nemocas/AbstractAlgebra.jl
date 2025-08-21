@@ -1964,7 +1964,7 @@ IOCustom(io::IO, force_newlines = false) = IOCustom{typeof(io)}(io, 0, false, " 
 
 IOCustom(io::IOCustom, force_newlines = false) = begin io.force_newlines = force_newlines; io; end
 
-in(key_value::Pair, io::IOCustom) = in(key_value, io.io, ===)
+in(key_value::Pair, io::IOCustom) = in(key_value, io.io)
 haskey(io::IOCustom, key) = haskey(io.io, key)
 getindex(io::IOCustom, key) = getindex(io.io, key)
 get(io::IOCustom, key, default) = get(io.io, key, default)
