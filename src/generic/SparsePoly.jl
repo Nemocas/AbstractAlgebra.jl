@@ -682,22 +682,10 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    end
 end
 
-function content(a::SparsePoly{T}) where {T <: RingElem}
-   for i = 1:length(a)
-      if a.coeffs[i].length == 1
-         z = term_content(a.coeffs[1])
-         for j = 2:length(a)
-            if isone(z)
-               return z
-            end
-            z = gcd(z, term_content(a.coeffs[j]))
-         end
-         return z
-      end
-   end
+function content(a::SparsePoly{T}) where {T <: RingElement}
    z = base_ring(a)()
-   for i = 1:length(a)
-      z = gcd(coeff(a, i - 1), z)
+   for x in a.coeffs
+      z = gcd!(z, x)
    end
    return z
 end
