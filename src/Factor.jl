@@ -19,22 +19,22 @@ an iterable collection of `T => Int` pairs for the factors and exponents.
 See [`unit(a::Fac)`](@ref), [`evaluate(a::Fac)`](@ref).
 """
 mutable struct Fac{T <: RingElement}
-   unit::T
    fac::Dict{T, Int}
+   unit::T
 
    function Fac{T}() where {T}
-     f = new()
-     f.fac = Dict{T, Int}()
-     return f
+     return new{T}(Dict{T, Int}())
+   end
+
+   function Fac{T}(u::T, d::Dict{T, Int}) where {T}
+     return new{T}(d, u)
    end
 end
 
-function Fac(u::T, d::Dict{T, Int}) where {T}
-   f = Fac{T}()
-   f.unit = u
-   f.fac = d
-   return f
-end
+ function Fac(u::T, d::Dict{T, Int}) where {T}
+    f = Fac{T}(u, d)
+    return f
+ end
 
 @doc raw"""
     unit(a::Fac{T}) -> T
