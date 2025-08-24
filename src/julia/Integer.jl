@@ -20,9 +20,7 @@ elem_type(::Type{Integers{T}}) where T <: Integer = T
 
 parent_type(::Type{T}) where T <: Integer = Integers{T}
 
-base_ring_type(::Type{<:Integers}) = typeof(Union{})
-
-base_ring(a::Integers{T}) where T <: Integer = Union{}
+base_ring_type(::Type{<:Integers}) = Union{}   # no base ring
 
 is_exact_type(::Type{T}) where T <: Integer = true
 

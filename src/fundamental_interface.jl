@@ -91,7 +91,7 @@ julia> R = GF(7)
 Finite field F_7
 
 julia> base_ring(R)
-Union{}
+ERROR: MethodError: no method matching base_ring(::AbstractAlgebra.GFField{Int64})
 ```
 """
 function base_ring end
@@ -119,6 +119,12 @@ true
 
 julia> base_ring_type(typeof(zero(R))) == typeof(base_ring(zero(R)))
 true
+
+julia> R = GF(7)
+Finite field F_7
+
+julia> base_ring_type(R)
+Union{}
 ```
 """
 base_ring_type(x) = base_ring_type(typeof(x))
