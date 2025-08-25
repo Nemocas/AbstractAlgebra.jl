@@ -100,7 +100,7 @@ true
 julia> iszero(f)
 false
 
-julia> U = base_ring(RR)
+julia> base_ring_type(RR)
 Union{}
 
 julia> T = parent(f)
