@@ -303,6 +303,7 @@ export is_even
 export is_exact_type
 export is_finite
 export is_finite_order
+export is_finitely_generated
 export is_free
 export is_gen
 export is_hermitian
