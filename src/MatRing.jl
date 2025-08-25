@@ -71,7 +71,7 @@ function characteristic(a::MatRing)
    return characteristic(base_ring(a))
 end
 
-is_finite(R::MatRing) = iszero(nrows(a)) || is_finite(base_ring(R))
+is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 
 ###############################################################################
 #

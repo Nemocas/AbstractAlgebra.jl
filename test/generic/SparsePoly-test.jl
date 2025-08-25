@@ -1,5 +1,6 @@
+using AbstractAlgebra: SparsePolynomialRing
+
 @testset "Generic.SparsePoly.constructors" begin
-   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
 
    R, x = SparsePolynomialRing(ZZ, "x")
    S, y = SparsePolynomialRing(R, "y")
@@ -15,7 +16,6 @@
 end
 
 @testset "Generic.SparsePoly.printing" begin
-   SparsePolynomialRing = AbstractAlgebra.SparsePolynomialRing
 
    R, x = SparsePolynomialRing(ZZ, "x")
 
@@ -30,4 +30,12 @@ end
    @test string(one(S)) == "1"
    @test string(y) == "y"
    @test string(x+y+1) == "y + x + 1"
+end
+
+@testset "Generic.SparsePoly.misc" begin
+
+   R, x = SparsePolynomialRing(ZZ, "x")
+
+   @test is_zero(x^15 - 1 - x^15 + 1)
+   @test content(24*x + 15) == 3
 end
