@@ -158,17 +158,6 @@ end
 
 ################################################################################
 #
-#  FunctionalCompositeMap
-#
-################################################################################
-
-function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
-   check_composable(f, g)
-   return Generic.FunctionalCompositeMap(f, g)
-end
-
-################################################################################
-#
 #  Comparison of objects as maps
 #
 #  Rationale: Often objects are implicitly used as maps. For instance, a `Ring` 
@@ -199,12 +188,3 @@ function is_equal_as_morphism(a::Any, b::Any)
   a === b && return true
   error("no method implemented to compare $a and $b as morphisms beyond `===`")
 end
-
-function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
-  a === b && return true
-  domain(a) === domain(b) || return false
-  codomain(a) === codomain(b) || return false
-  a.image_fn === b.image_fn && return true
-  error("all legal methods for comparison of $a and $b are exhausted; further comparison not implemented")
-end
-

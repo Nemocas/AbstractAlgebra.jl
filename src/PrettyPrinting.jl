@@ -1277,7 +1277,7 @@ function underscorify(x::String)
       n -= 1
    end
    if n == 1 && length(y[1]) == 1
-      z = y[1]
+      z = string(y[1])
    else
       # at this point we need operatorname and escaped underscores
       z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
@@ -1964,7 +1964,7 @@ IOCustom(io::IO, force_newlines = false) = IOCustom{typeof(io)}(io, 0, false, " 
 
 IOCustom(io::IOCustom, force_newlines = false) = begin io.force_newlines = force_newlines; io; end
 
-in(key_value::Pair, io::IOCustom) = in(key_value, io.io, ===)
+in(key_value::Pair, io::IOCustom) = in(key_value, io.io)
 haskey(io::IOCustom, key) = haskey(io.io, key)
 getindex(io::IOCustom, key) = getindex(io.io, key)
 get(io::IOCustom, key, default) = get(io.io, key, default)

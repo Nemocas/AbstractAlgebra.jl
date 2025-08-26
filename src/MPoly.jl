@@ -1173,7 +1173,7 @@ function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
          return false, 0
       elseif n == 1
          if var == -1
-            var = findfirst(x -> x != 0, v)
+            var = findfirst(x -> x != 0, v)::Int  # can't be nothing
          elseif v[var] == 0
             return false, 0
          end

@@ -229,7 +229,7 @@ function normalise_keyword_arguments(args)
         kv = Expr(:parameters)
     end
     # Keyword arguments without previous `;`
-    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+    append!(kv.args, [Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))])
     # normal arguments
     args = (e for e in args if !Meta.isexpr(e, :(=)))
     return [kv, args...]

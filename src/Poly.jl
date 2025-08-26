@@ -3001,10 +3001,10 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
-    dfc = collect(Iterators.take(Iterators.reverse(coefficients(derivative(f))), n + 1))
+    dfc = collect(T, Iterators.take(Iterators.reverse(coefficients(derivative(f))), n + 1))
     A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
     S = parent(A)
-    fc = collect(Iterators.take(Iterators.reverse(coefficients(f)), n + 1))
+    fc = collect(T, Iterators.take(Iterators.reverse(coefficients(f)), n + 1))
     B = S(fc, length(fc), n + 1)
     L = A*inv(B)
     s = T[coeff(L, i) for i = 1:n]
