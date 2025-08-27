@@ -139,6 +139,17 @@ function show(io::IO, a::FracField)
   end
 end
 
+pretty_eq(a::FracElem, b::FracElem) = (a == b)
+function pretty_lt(a::FracElem, b::FracElem)
+  if pretty_lt(denominator(b, false), denominator(a, false))
+    return true
+  end
+  if pretty_lt(denominator(a, false), denominator(b, false))
+    return false
+  end
+  return pretty_lt(numerator(a, false), numerator(b, false))
+end
+
 ###############################################################################
 #
 #   Unary operators
