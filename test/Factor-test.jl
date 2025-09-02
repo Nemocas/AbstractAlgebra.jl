@@ -8,6 +8,9 @@
    @test -24 == unit(ff)*prod([p^e for (p, e) in ff])
 
    @test collect(ff) == [2 => 3, 3 => 1]
+
+   ff = Fac(-1, [2 => 3, 3 => 1])
+   @test ff[ZZ(2)] == 3
 end
 
 @testset "Fac.printing" begin
