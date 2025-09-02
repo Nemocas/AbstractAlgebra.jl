@@ -152,7 +152,9 @@ end
 function expressify(@nospecialize(a::Fac); context = nothing)
    prod = Expr(:call, :cdot)
    if isdefined(a, :unit)
-      push!(prod.args, expressify(a.unit, context = context))
+      if !is_one(a.unit)
+         push!(prod.args, expressify(a.unit, context = context))
+      end
    else
       push!(prod.args, Expr(:call, :*, "[unit not set]"))
    end
