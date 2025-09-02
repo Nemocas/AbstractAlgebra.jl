@@ -120,9 +120,9 @@ function getindex(a::Fac{T}, b) where {T}
       error("$b is not a factor of $a")
     end
   else
-    i = findfirst(==(a), first.(b.arr))
+    i = findfirst(==(b), first.(a.arr))
     i === nothing && error("$b is not a factor of $a")
-    return b.arr[i::Int]
+    return a.arr[i::Int][2]
   end
 end
 
