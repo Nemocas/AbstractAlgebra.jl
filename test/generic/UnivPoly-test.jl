@@ -251,8 +251,8 @@ end
       @test !is_monomial(S())
       @test is_constant(S())
       @test !is_term(S())
-      @test trailing_coefficient(S()) == 0
-      @test leading_coefficient(S()) == 0
+      @test_throws ArgumentError trailing_coefficient(S())
+      @test_throws ArgumentError leading_coefficient(S())
       @test constant_coefficient(S()) == 0
       @test total_degree(S()) == -1
       @test length(gens(S)) == 0

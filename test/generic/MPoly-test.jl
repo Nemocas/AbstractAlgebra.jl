@@ -515,15 +515,16 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test leading_coefficient(f*g) ==
-               leading_coefficient(f)*leading_coefficient(g)
+         if !is_zero(f) && !is_zero(g)
+            @test parent(leading_coefficient(f)) == base_ring(f)
+            @test leading_coefficient(f*g) == leading_coefficient(f)*leading_coefficient(g)
+         end
          @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist
             @test leading_coefficient(v) == one(base_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
       end
    end
 
