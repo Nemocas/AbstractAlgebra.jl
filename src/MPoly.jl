@@ -1122,7 +1122,9 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
+   if is_zero(p)
+      zero(R)
+   elseif is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
