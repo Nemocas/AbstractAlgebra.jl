@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.0] - 2025-09-06
+
+### BREAKING
+- [#2132](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2132) Add `fraction_field_type` and define `fraction_field` method for fields
+- [#2144](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2144) Remove `base_ring` methods returning `Union{}`
+- [#2145](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2145) Add `identity_map` to excluded imports
+- [#2150](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2150) Stop printing `1` in factorizations
+- [#2153](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2153) Throw for `leading/trailing_coefficient` of zero in multivariate setting
+
 ## [0.45.0] - 2025-05-15
 
 ### BREAKING
