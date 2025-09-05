@@ -153,8 +153,10 @@ function has_preimage_with_preimage(
   q = length(trels)
   m = nrows(M)
   n = ncols(M)
-  if m == 0 || n == 0
+  if n == 0 #target module is trivial, so v is all zero 
     return true, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+  elseif m == 0 #source module is trivial
+    return all(iszero, v), elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
   else
     # Put matrix M and target relations in a matrix
     matr = zero_matrix(R, m + q, n)
