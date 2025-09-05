@@ -3551,8 +3551,8 @@ end
     _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $U$ over a field which is upper
-triangular, and an $m\times n$ matrix $b$ over the same ring, return an
-$m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
+triangular, and an $n\times m$ matrix $b$ over the same ring, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
 See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 

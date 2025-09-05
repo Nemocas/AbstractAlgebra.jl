@@ -1423,6 +1423,7 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
+   @assert lenq >= 0
    d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
