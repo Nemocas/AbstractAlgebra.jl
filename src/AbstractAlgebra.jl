@@ -16,6 +16,7 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :promote_rule,
                   :Set, :Module, :Group,
                   :InfiniteDimensionError, # remove in next breaking release, see #2135
+                  :identity_map, # see #5188 in Oscar.jl
                  ]
 
 
