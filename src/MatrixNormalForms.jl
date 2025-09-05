@@ -42,9 +42,9 @@ See [`echelon_form`](@ref) for the keyword arguments.
 """
 function echelon_form_with_transformation(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
   if shape === :upper
-    R = hcat(A, identity_matrix(base_ring(A), nrows(A)))
+    R = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
   else
-    R = hcat(identity_matrix(base_ring(A), nrows(A)), A)
+    R = hcat(identity_matrix(base_ring(A), nrows(A)), deepcopy(A))
   end
   echelon_form!(R, reduced = reduced, shape = shape)
   if shape === :upper
@@ -372,7 +372,7 @@ function howell_form_with_transformation(A::MatElem{<:RingElement}; reduced::Boo
   if shape === :lower
     B = hcat(reverse_cols(A), identity_matrix(A, nrows(A)))
   else
-    B = hcat(A, identity_matrix(A, nrows(A)))
+    B = hcat(deepcopy(A), identity_matrix(A, nrows(A)))
   end
   if nrows(B) < ncols(B)
     B = vcat(B, zero(A, ncols(B) - nrows(B), ncols(B)))
