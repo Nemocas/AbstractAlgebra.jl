@@ -97,13 +97,14 @@
       if !iszero(f1)
          @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
          @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
+         @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
       else
+         @test_throws ArgumentError leading_coefficient(f1)
          @test_throws ArgumentError leading_term(f1)
          @test_throws ArgumentError leading_monomial(f1)
          @test_throws ArgumentError leading_exponent_word(f1)
+         @test canonical_unit(f1) == one(R)
       end
-
-      @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
 
       @test !is_gen(zero(S))
       @test !is_gen(one(S))

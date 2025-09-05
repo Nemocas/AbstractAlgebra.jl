@@ -125,7 +125,9 @@ function exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
 end
 
 function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
-   if is_constant(a)
+   if is_zero(a)
+      return false
+   elseif is_constant(a)
       return is_unit(leading_coefficient(a))
    elseif is_domain_type(T)
       return false

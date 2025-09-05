@@ -202,7 +202,8 @@ function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
 end
 
 function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
-    return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
+    @req !is_zero(a) "Zero polynomial does not have a leading monomial"
+    return coeff(a, 1)
 end
 
 function leading_monomial(a::FreeAssociativeAlgebraElem{T}) where T
@@ -244,6 +245,7 @@ end
 ###############################################################################
 
 function canonical_unit(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(a) && return one(base_ring(a))
     return canonical_unit(leading_coefficient(a))
 end
 

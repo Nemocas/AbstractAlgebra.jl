@@ -515,15 +515,16 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test leading_coefficient(f*g) ==
-               leading_coefficient(f)*leading_coefficient(g)
+         if !is_zero(f) && !is_zero(g)
+            @test parent(leading_coefficient(f)) == base_ring(f)
+            @test leading_coefficient(f*g) == leading_coefficient(f)*leading_coefficient(g)
+         end
          @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist
             @test leading_coefficient(v) == one(base_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
       end
    end
 
@@ -567,7 +568,7 @@ end
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y + 5) == 5
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y) == 2
    @test trailing_coefficient(R(2)) == 2
-   @test trailing_coefficient(R()) == 0
+   @test_throws ArgumentError trailing_coefficient(R())
 
    @test tail(2x^2 + 2x*y + 3) == 2x*y + 3
    @test tail(R(1)) == 0

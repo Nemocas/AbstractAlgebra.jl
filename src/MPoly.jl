@@ -253,20 +253,18 @@ end
 Return the leading coefficient of the polynomial $p$.
 """
 function leading_coefficient(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      return zero(base_ring(p))
-   else
-      return first(coefficients(p))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
+   return first(coefficients(p))
 end
 
 @doc raw"""
     trailing_coefficient(p::MPolyRingElem)
 
 Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
-the last nonzero term, or zero if the polynomial is zero.
+the last nonzero term.
 """
 function trailing_coefficient(p::MPolyRingElem{T}) where T <: RingElement
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
    coeff = zero(base_ring(p))
    for c in coefficients(p)
       coeff = c
@@ -1124,7 +1122,9 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
+   if is_zero(p)
+      zero(R)
+   elseif is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
