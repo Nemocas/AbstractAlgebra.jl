@@ -101,7 +101,6 @@ function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingE
    start = 1
    for i = 1:length(N.m)
      if length(rels(N.m[i])) > 0
-        @show :reduce
         v = reduce_mod_rels(v, rels(N.m[i]), start)
       end
       start += ngens(N.m[i])
