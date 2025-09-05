@@ -220,6 +220,7 @@ each method of constructing modules (submodules, quotient modules, products,
 etc.) must extend this notion of equality to the modules they create.
 """
 function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
+   M === N && return true  #object equality is sufficient
    check_parent(M, N)
    # Compute the common supermodule P of M and N
    flag, P = is_compatible(M, N)
