@@ -1,3 +1,10 @@
+@testset "getindex" begin
+  Zxy, (x, y) = ZZ[:x, :y]
+  v = Zxy[x^3, 3 * x^2 * y + 1, -3, ZZ(12)]
+
+  @test v == [x^3, 3 * x^2 * y + 1, Zxy(-3), Zxy(12)]
+end
+
 include("error-test.jl")
 include("AliasMacro-test.jl")
 include("Attributes-test.jl")
