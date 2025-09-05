@@ -127,6 +127,8 @@ base_ring_type(::Type{MyParent})
 Return the type of the of base rings for parent objects with the given parent type.
 For example, `base_ring_type(Generic.PolyRing{T})` will return `parent_type(T)`.
 
+If the rings of this type are not parameterised by another ring, this function must return `Union{}`.
+
 ```julia
 base_ring(R::MyParent)
 ```
@@ -135,7 +137,7 @@ Given a parent object `R`, representing a ring, this function returns the parent
 of any base ring that parameterises this ring. For example, the base ring of the ring
 of polynomials over the integers would be the integer ring.
 
-If the ring is not parameterised by another ring, this function must return `Union{}`.
+If the ring is not parameterised by another ring, calling this function should rais an error.
 
 !!! note
 
@@ -144,6 +146,9 @@ If the ring is not parameterised by another ring, this function must return `Uni
     only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
     been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
     ideal.
+
+    There is no general mathematical definition for base ring, so to know what `base_ring`
+    does for any given type of ring, you need to consult its documentation.
 
 ```julia
 parent(f::MyElem)

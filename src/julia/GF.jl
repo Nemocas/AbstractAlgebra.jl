@@ -14,9 +14,7 @@ parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
-base_ring_type(::Type{<:GFField}) = typeof(Union{})
-
-base_ring(a::GFField) = Union{}
+base_ring_type(::Type{<:GFField}) = Union{}   # no base ring
 
 parent(a::GFElem) = a.parent
 
