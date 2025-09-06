@@ -994,15 +994,15 @@ function lcc_kaltofen_step!(
   @assert r == length(divs)
   Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
 
-  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
+  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx))) for i in 1:r]
 
   Afdegv = 0
   Afp = one(R)
-  for i in Af.fac
-    thisdeg = degree(i.first, v)
+  for (i, _) in Af
+    thisdeg = degree(i, v)
     Afdegv += thisdeg
     if thisdeg != 0
-      Afp *= i.first
+      Afp *= i
     end
   end
 
@@ -1083,7 +1083,7 @@ function lcc_kaltofen(
   ulcs = E[R() for i in 1:r]
 
   for vi in 1:length(minorvars)
-    if isempty(lcAf.fac)
+    if length(lcAf) == 0
       break
     end
 
@@ -1122,7 +1122,7 @@ function lcc_kaltofen(
                                                  other_minorvars, other_alphas)
   end
 
-  return isempty(lcAf.fac), divs
+  return (length(lcAf) == 0), divs
 end
 
 
@@ -1365,7 +1365,7 @@ function mfactor_char_zero(a::E) where E <: MPolyRingElem
   res = Fac{E}()
   res.unit = tres.unit
   empty!(res.fac)
-  for i in tres.fac
+  for i in tres
     mulpow!(res, mfactor_irred_char_zero(i[1]), i[2])
   end
   return res
