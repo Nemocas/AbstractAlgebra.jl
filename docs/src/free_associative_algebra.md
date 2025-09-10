@@ -231,7 +231,7 @@ to the function, to only compute a partial Groebner basis.
 ```@docs
 groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
 
-normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::AhoCorasickAutomaton) where T
+normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::Generic.AhoCorasickAutomaton) where T
 
 interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
 ```
