@@ -194,6 +194,7 @@ import ..AbstractAlgebra: pol_length
 import ..AbstractAlgebra: pow!
 import ..AbstractAlgebra: preimage
 import ..AbstractAlgebra: pretty
+import ..AbstractAlgebra: pretty_sort
 import ..AbstractAlgebra: primpart
 import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudorem

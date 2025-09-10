@@ -12,8 +12,8 @@ function is_power(a::PolyRingElem, n::Int)
     fl, x = is_power(leading_coefficient(a), n)
     fl || return false, a
     f = factor(a)
-    all(i -> i % n == 0, values(f.fac)) || return false, a
-    return true, x*prod(p^div(k, n) for (p, k) = f.fac)
+    all(i % n == 0 for (_, i) in f) || return false, a
+    return true, x*prod(p^div(k, n) for (p, k) = f)
 end
 
 ################################################################################
@@ -31,15 +31,16 @@ end
 function factor(R::Ring, f::Union{FracElem, Rational})
     fn = factor(R(numerator(f)))
     fd = factor(R(denominator(f)))
-    fn.unit = divexact(fn.unit, fd.unit)
-    for (k,v) = fd.fac
-        if Base.haskey(fn.fac, k)
-            fn.fac[k] -= v
+    un = divexact(unit(fn), unit(fd))
+    fndc = Dict{elem_type(R), Int}(p => e for (p, e) in fn)
+    for (k, v) = fd
+        if Base.haskey(fndc, k)
+            fndc[k] -= v
         else
-            fn.fac[k] = -v
+            fndc[k] = -v
         end
     end
-    return fn
+    return Fac(un, sort!(collect(fndc); by = x -> pretty_sort(x[1])))
 end
 
 ################################################################################
