@@ -166,6 +166,7 @@ export compose
 export conj!
 export constant_coefficient
 export content
+export coordinates
 export coprime_base
 export coprime_base_push!
 export crt
