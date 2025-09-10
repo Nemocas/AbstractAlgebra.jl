@@ -229,11 +229,11 @@ Since such a Groebner basis is not necessarily finite, one can additionally pass
 to the function, to only compute a partial Groebner basis.
 
 ```@docs
-groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
+AbstractAlgebra.groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
 
-normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::Generic.AhoCorasickAutomaton) where T
+AbstractAlgebra.normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::Generic.AhoCorasickAutomaton) where T
 
-interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
+AbstractAlgebra.interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
 ```
 
 The implementation uses a non-commutative version of the Buchberger algorithm as described in

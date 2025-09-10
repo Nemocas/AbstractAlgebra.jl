@@ -41,9 +41,9 @@ This way the time-consuming part of the solving (i.e. computing a reduced form o
 ## Detailed documentation
 
 ```@docs
-solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
-can_solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
-can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
-kernel(::Union{MatElem, SolveCtx})
-can_solve_with_solution_and_kernel(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
+solve(::Union{MatElem{T}, Solve.SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
+can_solve(::Union{MatElem{T}, Solve.SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
+can_solve_with_solution(::Union{MatElem{T}, Solve.SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
+kernel(::Union{MatElem, Solve.SolveCtx})
+can_solve_with_solution_and_kernel(::Union{MatElem{T}, Solve.SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T
 ```
