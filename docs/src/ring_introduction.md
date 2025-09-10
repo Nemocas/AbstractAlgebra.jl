@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Introduction
 
 A rich ring hierarchy is provided, supporting both commutative and

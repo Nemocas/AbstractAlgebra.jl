@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Constructing mathematical objects in AbstractAlgebra.jl
 
 ## Constructing objects in Julia

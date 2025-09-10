@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Introduction
 
 As with many generic constructions in AbstractAlgebra, the modules that are

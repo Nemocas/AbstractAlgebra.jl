@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -257,7 +258,7 @@ These can be extended for a ring of type `NewRing` as follows.
 
 #### Solve context type
 
-For a new ring type, one may have to define the type parameters of a `SolveCtx`
+For a new ring type, one may have to define the type parameters of a `Solve.SolveCtx`
 object.
 First of all, one needs to implement the function
 
@@ -289,8 +290,8 @@ To initialize the solve context functionality for a new normal form `NewTrait`,
 one needs to implement the functions
 
 ```julia
-Solve._init_reduce(C::SolveCtx{T, NewTrait}) where T
-Solve._init_reduce_transpose(C::SolveCtx{T, NewTrait}) where T
+Solve._init_reduce(C::Solve.SolveCtx{T, NewTrait}) where T
+Solve._init_reduce_transpose(C::Solve.SolveCtx{T, NewTrait}) where T
 ```
 
 These should fill the corresponding fields of the solve context `C` with a
@@ -305,7 +306,7 @@ As above, one finally needs to implement the functions
 
 ```julia
 Solve._can_solve_internal_no_check(
-  ::NewTrait, C::SolveCtx{T, NewTrait}, b::MatElem{T}, task::Symbol;
+  ::NewTrait, C::Solve.SolveCtx{T, NewTrait}, b::MatElem{T}, task::Symbol;
   side::Symbol = :left
   ) where T
 ```
@@ -313,5 +314,5 @@ Solve._can_solve_internal_no_check(
 and
 
 ```julia
-kernel(::NewTrait, C::SolveCtx{T, NewTrait}; side::Symbol = :left)
+kernel(::NewTrait, C::Solve.SolveCtx{T, NewTrait}; side::Symbol = :left)
 ```

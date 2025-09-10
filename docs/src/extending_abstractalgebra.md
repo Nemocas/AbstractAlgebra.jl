@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Extending the interface of AbstractAlgebra.jl
 
 In this section we will discuss on how to extend the interface of
