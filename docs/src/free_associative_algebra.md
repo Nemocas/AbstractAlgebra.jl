@@ -1,5 +1,6 @@
 ```@meta
-CurrentModule = AbstractAlgebra.Generic
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 

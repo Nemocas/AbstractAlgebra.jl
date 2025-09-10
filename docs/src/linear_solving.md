@@ -1,5 +1,7 @@
 ```@meta
-CurrentModule = AbstractAlgebra.Solve
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
 # [Linear solving](@id solving_chapter)
