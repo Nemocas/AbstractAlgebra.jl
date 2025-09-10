@@ -31,7 +31,7 @@ function is_loaded_directly()
       # of _require_search_from_serialized and the call to _include_from_serialized.
       st = Base.stacktrace(Base.backtrace())
       @debug "is_loaded_directly: full backtrace:\n$(sprint(show, "text/plain", st))"
-      Base.filter!(sf -> contains(string(sf.func), "_require_search_from_serialized") && !startswith(string(sf), "kwcall("), st)
+      Base.filter!(sf -> contains(string(sf.func), "_require_search_from_serialized") && !startswith(string(sf), "kwcall(") && !contains(string(sf), "[inlined]"), st)
       length_st = length(st)
       @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_st) times in backtrace; expected 1"
       sf = only(st)
