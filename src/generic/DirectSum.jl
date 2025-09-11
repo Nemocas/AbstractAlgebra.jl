@@ -27,6 +27,7 @@ dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 rank(M::DirectSumModule{T}) where T = sum(rank, summands(M); init=0)
+vector_space_dim(M::DirectSumModule{<:FieldElem}) = rank(M)
 
 function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index is out of range"))
