@@ -312,6 +312,15 @@ function getindex(v::FPModuleElem{T}, i::Int) where T <: RingElement
    return Generic._matrix(v)[1, i]
 end
 
+@doc raw"""
+    coordinates(v::FPModuleElem{T}, i::Int) where T <: RingElement
+
+Return the coordinates of the module element $v$ as a `Vector{T}`.
+"""
+function coordinates(v::FPModuleElem{T}) where T <: RingElement
+   return collect(Generic._matrix(v)[1, :])
+end
+
 ###############################################################################
 #
 #   Random generation

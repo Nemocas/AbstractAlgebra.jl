@@ -133,6 +133,17 @@ end
    end
 end
 
+@testset "Generic.Module.coordinates" begin
+   for R in [ZZ, QQ]
+      M = free_module(R, 3)
+      v = M([55,12,-3])
+      @test v[1] == 55
+      @test v[2] == 12
+      @test v[3] == -3
+      @test coordinates(v) == [55,12,-3]
+   end
+end
+
 @testset "Generic.Module.intersect" begin
    for R in [ZZ, QQ]
       for iter = 1:100
