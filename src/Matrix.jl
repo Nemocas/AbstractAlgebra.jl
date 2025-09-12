@@ -847,6 +847,7 @@ end
 
 function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+   base_ring(x) != base_ring(y) && error("Base rings do not match")
    A = similar(x, nrows(x), ncols(y))
    C = base_ring(x)()
    for i = 1:nrows(x)
