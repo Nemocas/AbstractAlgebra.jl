@@ -50,7 +50,7 @@ end
 
 Base.isless(x::PrettyOrderWrapper, y::PrettyOrderWrapper) = pretty_lt(x.data, y.data)
 
-==(x::PrettyOrderWrapper, y::PrettyOrderWrapper) = pretty_eq(x.data, y.data)
+Base.:(==)(x::PrettyOrderWrapper, y::PrettyOrderWrapper) = pretty_eq(x.data, y.data)
 
 pretty_sort(x) = PrettyOrderWrapper(x)
 
