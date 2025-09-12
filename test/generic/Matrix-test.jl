@@ -1197,6 +1197,11 @@ end
    @test M + N == N + M
    @test M - N == M + (-N)
    @test M*(N + P) == M*N + M*P
+
+   # Issue Nemocas/Nemo.jl#2143
+   R, _ = residue_ring(ZZ, 2)
+   S, _ = residue_ring(ZZ, 3)
+   @test_throws ErrorException identity_matrix(R, 2) * identity_matrix(S, 2)
 end
 
 # add x to all the elements of the main diagonal of a copy of M
