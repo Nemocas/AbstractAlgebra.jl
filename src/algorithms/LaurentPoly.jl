@@ -159,6 +159,10 @@ function is_nilpotent(f::T) where {T <: LaurentPolyRingElem}
   return is_nilpotent(f.poly);
 end
 
+ConformanceTests._implements(::Type{LaurentPolyRingElem{T}}, ::typeof(is_unit)) where T = _implements(T, is_unit) && _implements(T, is_nilpotent)
+
+ConformanceTests._implements(::Type{LaurentPolyRingElem{T}}, ::typeof(is_nilpotent)) where T = _implements(T, is_nilpotent)
+
 
 ###############################################################################
 #
