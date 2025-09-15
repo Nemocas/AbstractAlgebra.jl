@@ -313,7 +313,7 @@ function n_vars_method(d::Dict{Symbol}, n, range)
         "an alternative name like `m`, not `$n`")
     quote
         $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
+            $f($(argnames...), (Symbol.(s, $range))::Vector{Symbol}; kv...)
     end
 end
 
