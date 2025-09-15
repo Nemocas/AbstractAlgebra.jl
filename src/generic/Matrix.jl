@@ -199,6 +199,10 @@ function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
   return zero(base_ring(K))::T
 end
 
+function Base.setindex!(K::InjProjMat, i::Any, j::Any, val::Any)
+  error("InjProjMat is read-only")
+end
+
 function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}
   @assert ncols(b) == nrows(c)
   R = base_ring(b)

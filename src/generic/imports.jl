@@ -173,6 +173,7 @@ import ..AbstractAlgebra: leading_monomial
 import ..AbstractAlgebra: leading_term
 import ..AbstractAlgebra: log
 import ..AbstractAlgebra: map_coefficients
+import ..AbstractAlgebra: matrix
 import ..AbstractAlgebra: max_precision
 import ..AbstractAlgebra: minpoly
 import ..AbstractAlgebra: modulus
