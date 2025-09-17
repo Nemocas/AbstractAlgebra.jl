@@ -441,6 +441,10 @@ is_constant(::PolynomialElem)
 is_separable(::PolyRingElem)
 ```
 
+```@docs
+is_unit(::PolyRingElem)
+```
+
 **Examples**
 
 ```jldoctest
