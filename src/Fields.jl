@@ -47,3 +47,37 @@ function canonical_unit(x::FieldElement)
   iszero(x) && return one(x)
   return x
 end
+
+@doc raw"""
+   exercise_function(n::Int)
+
+Return n+1 given the number n
+A Practice for the Summer School Exercise
+
+# Examples:
+```jldoctest 
+julia> exercise_function(20)
+21
+
+julia> AbstractAlgebra.exercise_function(10)
+11
+```
+"""
+function exercise_function(n::Int)
+   # create an integer 10^(ceil(n/3))
+   #  k = ceil(Int, n / 3 + (n % 3 != 0))
+   #  b_int = big(10)^k
+   #  # turn into a rational in rational numbers 
+   #  b = QQ(b_int)
+
+   #  # define polynomial ring over rational numbers
+   #  Qx, x = QQ["x"]
+
+   #  # define the cubic polynomial f = x^3 + 3*b*x + 3
+   #  f = x^3 + 3*b*x + 3
+
+   #  #define the number field
+   #  #K, _ = number_field(f)
+
+    return n+1
+end
