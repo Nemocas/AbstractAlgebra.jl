@@ -200,6 +200,8 @@ import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudorem
 import ..AbstractAlgebra: reduce!
 import ..AbstractAlgebra: reduced_form
+import ..AbstractAlgebra: relations
+import ..AbstractAlgebra: rels
 import ..AbstractAlgebra: remove
 import ..AbstractAlgebra: renormalize!
 import ..AbstractAlgebra: set_coefficient!
