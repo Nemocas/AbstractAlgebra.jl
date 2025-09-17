@@ -56,7 +56,7 @@ A Practice for the Summer School Exercise
 
 # Examples:
 ```jldoctest 
-julia> exercise_function(20)
+julia> AbstractAlgebra.exercise_function(20)
 21
 
 julia> AbstractAlgebra.exercise_function(10)
