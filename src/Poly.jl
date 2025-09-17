@@ -223,6 +223,29 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
+@doc raw"""
+    is_unit(f::T) where {T <: PolyRingElem}
+
+Return `true` if the given polynomial over a commutative ring is a invertible, otherwise `false`.
+
+# Examples
+```jldoctest
+julia> Z, x = ZZ[:x]
+(Univariate polynomial ring in x over integers, x)
+
+julia> t = x^2+1
+x^2 + 1
+
+julia> is_unit(t)
+false
+
+julia> f = Z(1)
+1
+
+julia> is_unit(f)
+true
+```
+"""
 function is_unit(f::T) where {T <: PolyRingElem}
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
