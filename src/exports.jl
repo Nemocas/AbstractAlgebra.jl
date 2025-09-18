@@ -293,6 +293,8 @@ export iroot
 export is_abelian
 export is_alternating
 export is_associated
+export is_attribute_storing
+export is_attribute_storing_type
 export is_compatible
 export is_constant
 export is_degree
