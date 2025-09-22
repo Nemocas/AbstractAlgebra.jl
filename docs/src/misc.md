@@ -51,6 +51,8 @@ has_attribute
 get_attribute
 get_attribute!
 set_attribute!
+is_attribute_storing
+is_attribute_storing_type
 ```
 
 ## Advanced printing

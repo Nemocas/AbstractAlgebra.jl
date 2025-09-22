@@ -1499,7 +1499,7 @@ For this to work in doctests, one should call
     This function should not be used directly, but rather through [`AbstractAlgebra.get_name`](@ref).
 """
 function find_name(obj, M=Main; all::Bool=false)
-  AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
+  is_attribute_storing(obj) || return find_new_name(obj, M; all)
 
   cached_name = get_attribute(obj, :_cached_name)
   if !isnothing(cached_name)
@@ -1549,7 +1549,7 @@ This function tries to find a name in the following order:
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)
-  if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
+  if is_attribute_storing(obj)
     name = get_attribute(obj, :_name)
     isnothing(name) || return name
   end
@@ -1624,7 +1624,7 @@ macro show_special(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           s(i, o)
@@ -1672,7 +1672,7 @@ macro show_special(io, mime, obj)
       local i = $(esc(io))
       local m = $(esc(mime))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           if applicable(s, i, m, o)
@@ -1720,7 +1720,7 @@ macro show_special_elem(io, obj)
       local i = $(esc(io))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           s(i, o)
@@ -1765,7 +1765,7 @@ macro show_special_elem(io, mime, obj)
       local m = $(esc(mime))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           if applicable(s, i, m, o)

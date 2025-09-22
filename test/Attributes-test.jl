@@ -51,19 +51,19 @@ end
 @attributes Tmp.Quux
 @attributes Tmp.FooBar{Tmp.Quux}
 
-@testset "_is_attribute_storing_type" begin
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Foo)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Bar)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Quux)
+@testset "is_attribute_storing_type" begin
+  @test is_attribute_storing_type(Tmp.Foo)
+  @test is_attribute_storing_type(Tmp.Bar)
+  @test is_attribute_storing_type(Tmp.Quux)
 
-  @test !AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar)
-  @test !AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Foo})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Bar})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Quux})
+  @test !is_attribute_storing_type(Tmp.FooBar)
+  @test !is_attribute_storing_type(Tmp.FooBar{Tmp.Foo})
+  @test is_attribute_storing_type(Tmp.FooBar{Tmp.Bar})
+  @test is_attribute_storing_type(Tmp.FooBar{Tmp.Quux})
 
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container{Tmp.Bar})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container{Tmp.Quux})
+  @test is_attribute_storing_type(Tmp.Container)
+  @test is_attribute_storing_type(Tmp.Container{Tmp.Bar})
+  @test is_attribute_storing_type(Tmp.Container{Tmp.Quux})
 end
 
 # applying @attributes to a singleton typename is supported but does nothing

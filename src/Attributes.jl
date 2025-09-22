@@ -91,13 +91,13 @@ macro attributes(expr)
       #    @attributes [Module[.Submodule].]Type{T}
       return esc(quote
          # do nothing if the type already has storage for attributes
-         if !AbstractAlgebra._is_attribute_storing_type($expr)
+         if !AbstractAlgebra.is_attribute_storing_type($expr)
            isstructtype($expr) && AbstractAlgebra.ismutabletype($expr) || error("attributes can only be attached to mutable structs")
            let attr = Base.WeakKeyDict{$expr, Dict{Symbol, Any}}()
              AbstractAlgebra._get_attributes(G::$expr) = Base.get(attr, G, nothing)
              AbstractAlgebra._get_attributes!(G::$expr) = Base.get!(() -> Dict{Symbol, Any}(), attr, G)
              AbstractAlgebra._get_attributes(::Type{$expr}) = attr
-             AbstractAlgebra._is_attribute_storing_type(::Type{$expr}) = true
+             AbstractAlgebra.is_attribute_storing_type(::Type{$expr}) = true
            end
          end
       end)
@@ -105,7 +105,7 @@ macro attributes(expr)
    error("attributes can only be attached to mutable structs")
 end
 
-_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && ismutabletype(T) && hasfield(T, :__attrs)
+_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || (isstructtype(T) && ismutabletype(T) && hasfield(T, :__attrs))
 
 # storage for attributes of singletons
 const _singleton_attr_storage = Dict{Type, Dict{Symbol, Any}}()
@@ -125,7 +125,7 @@ function _get_attributes(G::T) where T
    if Base.issingletontype(T)
       return Base.get(_singleton_attr_storage, T, nothing)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   is_attribute_storing_type(T) || error("attributes storage not supported for type $T")
    return isdefined(G, :__attrs) ? G.__attrs : nothing
 end
 
@@ -144,12 +144,27 @@ function _get_attributes!(G::T) where T
    if Base.issingletontype(T)
       return Base.get!(() -> Dict{Symbol, Any}(), _singleton_attr_storage, T)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   is_attribute_storing_type(T) || error("attributes storage not supported for type $T")
    if !isdefined(G, :__attrs)
       G.__attrs = Dict{Symbol, Any}()
    end
    return G.__attrs
 end
+
+"""
+    is_attribute_storing(G::Any)
+
+Return a boolean indicating whether `G` has the ability to store attributes.
+"""
+is_attribute_storing(G::T) where T = is_attribute_storing_type(T)
+
+"""
+    is_attribute_storing_type(T::Type)
+
+Return a boolean indicating whether instances of type `T` have
+the ability to store attributes.
+"""
+is_attribute_storing_type(::Type{T}) where T = _is_attribute_storing_type(T)
 
 """
     has_attribute(G::Any, attr::Symbol)
