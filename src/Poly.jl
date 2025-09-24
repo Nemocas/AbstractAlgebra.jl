@@ -226,7 +226,7 @@ end
 @doc raw"""
     is_unit(f::T) where {T <: PolyRingElem}
 
-Return `true` if the given polynomial over a commutative ring is a invertible, otherwise `false`.
+Return `true` if the given polynomial over a commutative ring is invertible, otherwise `false`.
 
 # Examples
 ```jldoctest
