@@ -158,16 +158,19 @@ function has_preimage_with_preimage(
   elseif m == 0 #source module is trivial
     return all(iszero, v), elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
   else
-    # Put matrix M and target relations in a matrix
-    matr = zero_matrix(R, m + q, n)
-    matr[1:m, 1:n] = M
-    for i in 1:q
-      matr[m + i, :] = trels[i]
+    if !isdefined(f, :solve_ctx)
+      # Put matrix M and target relations in a matrix
+      matr = zero_matrix(R, m + q, n)
+      matr[1:m, 1:n] = M
+      for i in 1:q
+        matr[m + i, :] = trels[i]
+      end
+      # Find left inverse of mat
+      f.solve_ctx = solve_init(matr)
     end
-    # Find left inverse of mat
     inmat = reduce(vcat, Generic._matrix.(v))
-    if can_solve(matr, inmat)
-      x = solve(matr, inmat)
+    fl, x = can_solve_with_solution(f.solve_ctx, inmat)
+    if fl
       return true, elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
     else
       return false, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
