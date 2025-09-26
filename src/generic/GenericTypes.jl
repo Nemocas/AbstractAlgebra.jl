@@ -417,9 +417,6 @@ end
 ###############################################################################
 
 @attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
-   base_ring::Ring
-   S::Vector{Symbol}
-   ord::Symbol
    mpoly_ring::AbstractAlgebra.MPolyRing{T}
 
    function UniversalPolyRing{T}(
@@ -430,9 +427,6 @@ end
          UnivPolyID, (R, s, internal_ordering), cached
       ) do
          new{T}(
-            R,
-            s,
-            internal_ordering,
             AbstractAlgebra.polynomial_ring_only(R, s; internal_ordering, cached=false)
          )
       end::UniversalPolyRing{T}
