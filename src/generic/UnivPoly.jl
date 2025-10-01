@@ -246,19 +246,22 @@ length(p::UnivPoly) = length(data(p))
 
 function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    idx = Int[]
-   ss = copy(symbols(S))
+   current_symbols = symbols(S)
+   n = length(current_symbols)
+   added_symbols = Symbol[]
    for s_ in v
       s = Symbol(s_)
-      i = findfirst(==(s), ss)
+      i = findfirst(==(s), current_symbols)
       if i === nothing
-         push!(ss, s)
-         push!(idx, length(ss))
+         push!(added_symbols, s)
+         push!(idx, n+length(added_symbols))
       else
          push!(idx, i)
       end
    end
-   if length(ss) > ngens(S.mpoly_ring)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), ss; internal_ordering=internal_ordering(S), cached=false)
+   if !isempty(added_symbols)
+      new_symbols = vcat(current_symbols, added_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
    end
    return idx
 end
