@@ -3714,7 +3714,7 @@ end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, A = _can_solve_with_solution_lu(M, identity_matrix(M))
+   flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
 end
