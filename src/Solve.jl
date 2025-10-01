@@ -97,6 +97,7 @@ function matrix_normal_form_type(R::Ring)
 end
 
 matrix_normal_form_type(::Field) = RREFTrait()
+matrix_normal_form_type(::Matrix{Rational{BigInt}}) = FFLUTrait()
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
 matrix_normal_form_type(::FracField) = FFLUTrait()
