@@ -458,3 +458,5 @@ function _number_of_direct_product_factors end
 Return the homomorphism from the domain `D` into the codomain `C` defined by the data.
 """
 function hom end
+
+function can_solve_with_solution end

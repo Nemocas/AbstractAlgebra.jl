@@ -6,6 +6,7 @@ using AbstractAlgebra.PrettyPrinting: @show_name
 using AbstractAlgebra.PrettyPrinting: Dedent
 using AbstractAlgebra.PrettyPrinting: Indent
 using AbstractAlgebra.PrettyPrinting: pretty
+import AbstractAlgebra: can_solve_with_solution
 using AbstractAlgebra: _can_solve_with_solution_fflu
 using AbstractAlgebra: _can_solve_with_solution_interpolation
 using AbstractAlgebra: _solve_fflu_precomp
@@ -20,7 +21,6 @@ export solve
 export solve_init
 export solve_context_type
 export can_solve
-export can_solve_with_solution
 export can_solve_with_solution_and_kernel
 
 ################################################################################
