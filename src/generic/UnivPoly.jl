@@ -266,7 +266,16 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    return idx
 end
 
-gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
+function gen(S::UniversalPolyRing, s::VarName)
+   i = findfirst(==(Symbol(s)), symbols(S))
+   if i === nothing
+      new_symbols = copy(symbols(S))
+      push!(new_symbols, Symbol(s))
+      i = length(new_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+   end
+   return @inbounds gen(S, i)
+end
 
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
