@@ -11,7 +11,7 @@
 ###############################################################################
 
 base_ring_type(::Type{<:UniversalPolyRing{T}}) where T = parent_type(T)
-base_ring(S::UniversalPolyRing) = S.base_ring::base_ring_type(S)
+base_ring(S::UniversalPolyRing) = base_ring(mpoly_ring(S))::base_ring_type(S)
 
 coefficient_ring_type(T::Type{<:UniversalPolyRing}) = base_ring_type(T)
 coefficient_ring(S::UniversalPolyRing) = base_ring(S)
@@ -34,11 +34,11 @@ function mpoly_ring(S::UniversalPolyRing{T}) where {T<:RingElement}
   return S.mpoly_ring::mpoly_ring_type(T)
 end
 
-number_of_variables(S::UniversalPolyRing) = length(S.S)
+number_of_variables(S::UniversalPolyRing) = number_of_variables(mpoly_ring(S))
 
-number_of_generators(S::UniversalPolyRing) = length(S.S)
+number_of_generators(S::UniversalPolyRing) = number_of_generators(mpoly_ring(S))
 
-symbols(S::UniversalPolyRing) = S.S
+symbols(S::UniversalPolyRing) = symbols(mpoly_ring(S))
 
 function vars(p::UnivPoly{T}) where {T}
    S = parent(p)
@@ -246,23 +246,36 @@ length(p::UnivPoly) = length(data(p))
 
 function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    idx = Int[]
+   current_symbols = symbols(S)
+   n = length(current_symbols)
+   added_symbols = Symbol[]
    for s_ in v
       s = Symbol(s_)
-      i = findfirst(==(s), S.S)
+      i = findfirst(==(s), current_symbols)
       if i === nothing
-         push!(S.S, s)
-         push!(idx, length(S.S))
+         push!(added_symbols, s)
+         push!(idx, n+length(added_symbols))
       else
          push!(idx, i)
       end
    end
-   if length(S.S) > ngens(S.mpoly_ring)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), copy(S.S); internal_ordering=S.ord, cached=false)
+   if !isempty(added_symbols)
+      new_symbols = vcat(current_symbols, added_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
    end
    return idx
 end
 
-gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
+function gen(S::UniversalPolyRing, s::VarName)
+   i = findfirst(==(Symbol(s)), symbols(S))
+   if i === nothing
+      new_symbols = copy(symbols(S))
+      push!(new_symbols, Symbol(s))
+      i = length(new_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+   end
+   return @inbounds gen(S, i)
+end
 
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
@@ -904,11 +917,11 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T
 end
 
 function (a::Union{MPolyRingElem, UniversalPolyRingElem})(;kwargs...)
-   S = parent(a)
+   ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
    vals = Array{RingElement}(undef, length(kwargs))
    for (i, (var, val)) in enumerate(kwargs)
-     vari = findfirst(isequal(var), S.S)
+     vari = findfirst(isequal(var), ss)
      vari === nothing && error("Given polynomial has no variable $var")
      vars[i] = vari
      vals[i] = val
@@ -963,7 +976,6 @@ end
 function _change_univ_poly_ring(R, Rx, cached::Bool)
    P = AbstractAlgebra.polynomial_ring_only(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)
    S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached)
-   S.S = deepcopy(symbols(Rx))
    S.mpoly_ring = P
    return S
 end
