@@ -334,6 +334,8 @@ function deepcopy_internal(p::UnivPoly{T}, dict::IdDict) where {T}
    return UnivPoly{T}(deepcopy_internal(data(p), dict), parent(p))
 end
 
+Base.copy(f::UnivPoly{T}) where {T} = UnivPoly{T}(copy(data(f)), parent(f))
+
 ###############################################################################
 #
 #   Multivariate coefficients

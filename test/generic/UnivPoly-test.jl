@@ -1144,26 +1144,38 @@ end
       f1 = add!(f1, g, h)
       
       @test f1 == g + h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f2 = deepcopy(f)
       f2 = add!(f2, g)
 
       @test f2 == f + g
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f3 = deepcopy(f)
       f3 = mul!(f3, g, h)
 
       @test f3 == g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f4 = deepcopy(f)
       f4 = addmul!(f4, g, h)
 
       @test f4 == f + g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f5 = deepcopy(f)
       f5 = zero!(f5)
 
       @test f5 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
+
+      # also verify `copy` works as intended
+      f6 = copy(f)
+      f6 = zero!(f6)
+
+      @test f6 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
    end
 end
 
