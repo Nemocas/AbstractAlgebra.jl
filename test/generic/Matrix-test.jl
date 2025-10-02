@@ -47,8 +47,10 @@ struct F2Elem <: AbstractAlgebra.FieldElem
 end
 
 (::F2)(x::F2Elem) = x
+(::F2)(x::Integer) = F2Elem(x % Bool)
 Base.:-(x::F2Elem) = x
 Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.:-(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
 Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
 Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 
@@ -60,6 +62,7 @@ AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.add!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.sub!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
