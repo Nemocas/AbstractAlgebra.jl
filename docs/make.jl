@@ -1,3 +1,36 @@
+#
+# Usage: from the package root directory, run
+#
+#    julia --proj=docs docs/make.jl
+#
+# To fix doctests instead of merely running them, use
+#
+#   DOCTEST=fix julia --proj=docs docs/make.jl
+#
+# To disable doctests, run
+#
+#   DOCTEST=off julia --proj=docs docs/make.jl
+#
+using Pkg
+Pkg.update()
+
+# parse some options
+doctest_arg = true
+if "--fix" in ARGS
+  doctest_arg = :fix
+else
+  tmp = get(ENV, "DOCTEST", "true")
+  if tmp == "true" || tmp == "on" || tmp == "yes"
+    doctest_arg = true
+  elseif tmp == "false" || tmp == "off" || tmp == "no"
+    doctest_arg = false
+  elseif tmp == "fix"
+    doctest_arg = :fix
+  else
+    error("invalid DOCTEST env var")
+  end
+end
+
 using Documenter, AbstractAlgebra
 
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
@@ -10,7 +43,7 @@ makedocs(
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
-         doctest = true,
+         doctest = doctest_arg,
          checkdocs = :none,
          pages    = [
              "index.md",
