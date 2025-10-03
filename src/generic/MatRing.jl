@@ -55,6 +55,16 @@ function _can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where
    return flag, SA
 end
 
+function AbstractAlgebra.can_solve_with_solution(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+   check_parent(M, B)
+   R = base_ring(M)
+   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
+   BS = MatSpaceElem{T}(R, B.entries)
+   flag, S = can_solve_with_solution(MS, BS)
+   SA = MatRingElem{T}(R, S.entries)
+   return flag, SA
+end
+
 function _can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
