@@ -1113,9 +1113,9 @@ end
       @test length(g) == length(g1)
       @test length(h) == length(h1)
 
-      @test base_ring(f1) === U
-      @test base_ring(g1) === U
-      @test base_ring(h1) === U
+      @test coefficient_ring(f1) === U
+      @test coefficient_ring(g1) === U
+      @test coefficient_ring(h1) === U
 
       f2 = map_coefficients(x->x^2, f)
       g2 = map_coefficients(x->x^2, g)
