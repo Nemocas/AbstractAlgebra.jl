@@ -96,9 +96,10 @@ the usual ways of constructing an element of a ring.
 (R::PolyRing{T})(a::T) where T <: RingElement
 ```
 The third constructor above cannot be used to coerce a polynomial from one ring
-to another; instead use evaluation, for instance: `f(y)` where `y` is the
-generator of the destination polynomial ring.  The fourth constructor creates
-a constant polynomial from an elements of the coefficient ring.
+to another; instead use a call like `map_coefficients(identity,f; parent=dest_ring))`,
+or alternatively, for _small polynomials_ one can simply use evaluation:
+namely, `f(y)` where `y` is the generator of the destination polynomial ring.
+The fourth constructor creates a constant polynomial from an element of the coefficient ring.
 
 For polynomials there is also the following more general constructor accepting
 an array of coefficients.
