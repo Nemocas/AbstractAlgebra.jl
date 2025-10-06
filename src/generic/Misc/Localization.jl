@@ -347,7 +347,7 @@ promote_rule(::Type{LocalizedEuclideanRingElem{T}}, ::Type{T}) where {T} = Local
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
