@@ -30,8 +30,6 @@ elem_type(::Type{UniversalPolyRing{T}}) where {T<:RingElement} = UnivPoly{T}
 
 parent_type(::Type{UnivPoly{T}}) where {T<:RingElement} = UniversalPolyRing{T}
 
-mpoly_ring(S::UniversalPolyRing) = base_ring(S)
-
 number_of_variables(S::UniversalPolyRing) = number_of_variables(base_ring(S))
 
 number_of_generators(S::UniversalPolyRing) = number_of_generators(base_ring(S))
