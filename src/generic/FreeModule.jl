@@ -16,7 +16,7 @@ base_ring_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} 
 
 base_ring(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.base_ring::parent_type(T)
 
-coefficient_ring_type(T::Type{FreeModule}) = base_ring_type(T)
+coefficient_ring_type(T::Type{<:FreeModule}) = base_ring_type(T)
 
 coefficient_ring(M::FreeModule) = base_ring(M)
 

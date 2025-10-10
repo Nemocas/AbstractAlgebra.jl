@@ -20,7 +20,7 @@ base_ring_type(::Type{QuotientModule{T}}) where T <: RingElement = parent_type(T
 
 base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring::parent_type(T)
 
-coefficient_ring_type(T::Type{QuotientModule}) = base_ring_type(T)
+coefficient_ring_type(T::Type{<:QuotientModule}) = base_ring_type(T)
 
 coefficient_ring(N::QuotientModule) = base_ring(N)
 
