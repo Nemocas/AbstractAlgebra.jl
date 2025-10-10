@@ -11,6 +11,9 @@
    @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.FreeModuleElem{elem_type(R)}
    @test parent_type(Generic.FreeModuleElem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
 
+   @test coefficient_ring(M) == R
+   @test coefficient_ring_type(M) == typeof(coefficient_ring(M))
+
    @test isa(M, Generic.FreeModule)
 
    @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
