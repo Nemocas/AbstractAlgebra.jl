@@ -1195,19 +1195,6 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UniversalPolyRing{T}, pp::MPoly{T}) where {T}
-   alloc = length(pp.coeffs)
-   n = nvars(S) - nvars(parent(pp))
-   ctx = MPolyBuildCtx(mpoly_ring(S))
-   v0 = zeros(Int, n)
-   for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-      push_term!(ctx, c, vcat(v, v0))
-   end
-   p = finish(ctx)
-   fit!(p, alloc)
-   return p
-end
-
 function upgrade(S::UniversalPolyRing{T}, pp::MPolyRingElem{T}) where {T}
    n = nvars(S) - nvars(parent(pp))
    ctx = MPolyBuildCtx(mpoly_ring(S))
