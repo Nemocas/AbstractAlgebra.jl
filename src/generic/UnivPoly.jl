@@ -534,6 +534,7 @@ function Base.sqrt(p::UnivPoly{T}; check::Bool=true) where {T}
    return UnivPoly{T}(s, S)
 end
 
+# See generic documentation in NCRings.jl
 function is_square(p::UnivPoly)
    return is_square(data(p))
 end

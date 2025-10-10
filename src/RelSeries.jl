@@ -1187,6 +1187,7 @@ function Base.sqrt(a::RelPowerSeriesRingElem; check::Bool=true)
    return q
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::RelPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag

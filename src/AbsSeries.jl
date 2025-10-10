@@ -920,6 +920,7 @@ function Base.sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
    return q
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::AbsPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag

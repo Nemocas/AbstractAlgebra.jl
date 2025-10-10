@@ -1408,6 +1408,7 @@ function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    return s
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::LaurentSeriesElem)
    flag, q = sqrt_classical(a; check=true)
    return flag

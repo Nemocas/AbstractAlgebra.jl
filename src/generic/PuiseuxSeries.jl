@@ -626,6 +626,7 @@ function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingEle
    return s
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::PuiseuxSeriesElem{T}) where T <: RingElement
    flag, s = sqrt_classical(a; check=true)
    return flag
