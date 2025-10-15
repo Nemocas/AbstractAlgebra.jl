@@ -101,6 +101,13 @@ end
 #
 ################################################################################
 
+@doc raw"""
+    is_square(M::MatElem)
+    is_square(M::MatRingElem)
+
+Return `true` iff the matrix `M` has square shape.
+See also `is_square(a::T)  where {T <: NCRingElement}` which tests whether the given value `a` is a square in its own ring.
+"""
 # See generic documentation in NCRings.jl
 is_square(a::MatElem) = (nrows(a) == ncols(a))
 

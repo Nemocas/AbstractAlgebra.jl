@@ -178,12 +178,9 @@ end
 
 @doc raw"""
     is_square(a::T)  where {T <: NCRingElement}
-    is_square(M::MatElem)
-    is_square(M::MatRingElem)
 
-There are two distinct situations:
-(1) if the argument is matrix then check whether the matrix **shape** is square
-(2) if the argument is not a matrix then check whether the **value** is a square (in the same ring)
+Return `true` iff `a` is the square of a value in its own ring.
+See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
 """
 function is_square end
 
