@@ -84,17 +84,48 @@ end
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
 function ==(x::NCRingElem, y::NCRingElem)
-   fl, u, v = try_promote(x, y)
-   if fl
-     return u == v
-   else
-     return false
-   end
- end
+  fl, u, v = try_promote(x, y)
+  if fl
+    return u == v
+  end
+  return false
+end
  
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
 
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
+
+function isequal(a::NCRingElem, b::NCRingElem)
+   return parent(a) == parent(b) && a == b
+end
+
+# Implement `isapprox` for ring elements via equality by default. On the one
+# hand, we need isapprox methods to be able to conformance test series rings.
+# On the other hand this is essentially the only sensible thing to do in
+# positive characteristic so we might as well do it in a generic method.
+function Base.isapprox(x::T, y::T;
+                       atol::Real=0, rtol::Real=0,
+                       nans::Bool=false, norm::Function=abs) where {T <: NCRingElem}
+  if is_exact_type(typeof(x)) && is_exact_type(typeof(y))
+    @req is_zero(atol) "non-zero atol not supported"
+    @req is_zero(rtol) "non-zero rtol not supported"
+    return x == y
+  end
+  throw(NotImplementedError(:isapprox, x, y))
+end
+
+function Base.isapprox(x::NCRingElem, y::NCRingElem; kwarg...)
+  fl, u, v = try_promote(x, y)
+  if fl
+    return isapprox(u, v; kwarg...)
+  end
+  throw(NotImplementedError(:isapprox, x, y))
+end
+
+Base.isapprox(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}; kwarg...) = isapprox(x, parent(x)(y); kwarg...)
+
+Base.isapprox(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem; kwarg...) = isapprox(parent(y)(x), y; kwarg...)
+
 
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    return divexact_left(promote(x, y)...)
