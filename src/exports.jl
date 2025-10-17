@@ -208,6 +208,7 @@ export downscale
 export echelon_form
 export echelon_form_with_transformation
 export elem_type
+export embed
 export enable_cache!
 export evaluate
 export exp_gcd

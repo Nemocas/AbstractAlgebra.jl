@@ -1369,6 +1369,44 @@ end
 
 ###############################################################################
 #
+#  Embedding
+#
+###############################################################################
+
+@doc raw"""
+    embed(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+
+Return the evaluation of the natural embedding of `parent(p)` into `R` at `p`.
+This effectively replaces the $i$-th variable of `parent(p)` in `p` by the
+$i$-th variable of `R`. For this to work, `R` needs to have at least as many
+variables as `parent(p)`.
+
+# Examples
+```jldoctest
+julia> R, (x,y) = QQ[:x,:y];
+
+julia> S, (z,w,v) = QQ[:z,:w,:v];
+
+julia> p = embed(x^2+x*y-3, S)
+z^2 + z*w - 3
+
+julia> parent(p) == S
+true
+```
+"""
+function embed(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+   n = nvars(R) - nvars(parent(p))
+   n < 0 && error("Too few variables")
+   ctx = MPolyBuildCtx(R)
+   v0 = zeros(Int, n)
+   for (c, v) in zip(coefficients(p), exponent_vectors(p))
+      push_term!(ctx, c, vcat(v, v0))
+   end
+   return finish(ctx)
+end
+
+###############################################################################
+#
 #  Factorization
 #
 ###############################################################################

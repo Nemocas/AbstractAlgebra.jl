@@ -65,7 +65,7 @@ function set_exponent_vector!(p::UnivPoly, i::Int, exps::Vector{Int})
    S = parent(p)
    len = length(exps)
    if len != nvars(parent(data(p)))
-      p.p = upgrade(S, data(p))
+      p.p = embed(data(p), base_ring(S))
       if len < nvars(S)
          exps = vcat(exps, zeros(Int, nvars(S) - len))
       end
@@ -96,7 +96,7 @@ function setcoeff!(p::UnivPoly, exps::Vector{Int}, c::T) where T <: RingElement
    S = parent(p)
    len = length(exps)
    if len != nvars(parent(data(p)))
-      p.p = upgrade(S, data(p))
+      p.p = embed(data(p), base_ring(S))
       if len < nvars(S)
          exps = vcat(exps, zeros(Int, nvars(S) - len))
       end
@@ -639,10 +639,10 @@ function isless(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
    s = data(a)
    t = data(b)
    if nvars(parent(s)) != num
-      s = upgrade(S, s)
+      s = embed(s, base_ring(S))
    end
    if nvars(parent(t)) != num
-      t = upgrade(S, t)
+      t = embed(t, base_ring(S))
    end
    return isless(s, t)
 end
@@ -690,7 +690,7 @@ function deflate(p::UnivPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where {T
       return UnivPoly{T}(deflate(pp, shift, defl), S)
    end
    if vlen > num
-      pp = upgrade(S, pp)
+      pp = embed(pp, base_ring(S))
       num = nvars(parent(pp))
    end
    if vlen < num
@@ -714,7 +714,7 @@ function inflate(p::UnivPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where {T
       return UnivPoly{T}(inflate(pp, shift, defl), S)
    end
    if vlen > num
-      pp = upgrade(S, pp)
+      pp = embed(pp, base_ring(S))
       num = nvars(parent(pp))
    end
    if vlen < num
@@ -1191,16 +1191,6 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UniversalPolyRing{T}, pp::MPolyRingElem{T}) where {T}
-   n = nvars(S) - nvars(parent(pp))
-   ctx = MPolyBuildCtx(base_ring(S))
-   v0 = zeros(Int, n)
-   for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-      push_term!(ctx, c, vcat(v, v0))
-   end
-   return finish(ctx)
-end
-
 function (a::UniversalPolyRing{T})(b::RingElement) where {T <: RingElement}
    return a(coefficient_ring(a)(b))
 end
@@ -1221,7 +1211,7 @@ function (S::UniversalPolyRing{T})(p::UnivPoly{T}) where {T <: RingElement}
    parent(p) !== S && error("Unable to coerce")
    n = nvars(S) - nvars(parent(data(p)))
    if n != 0
-      p = UnivPoly{T}(upgrade(S, data(p)), S)
+      p = UnivPoly{T}(embed(data(p), base_ring(S)), S)
    end
    return p
 end
