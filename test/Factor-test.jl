@@ -31,12 +31,12 @@ end
 end
 
 @testset "Fac.equality" begin
-  # 2025-10-20  equality test on factorizations always gives error (except if the args are ===)
+  # 2025-10-20  equality test on factorizations always gives error (even if the args are ===)
    f = Fac(-1, Dict{Int, Int}(2 => 3, 3 => 1))
    ff = Fac(-1, [2 => 3, 3 => 1])
    fzz = Fac(ZZ(-1), Dict{ZZRingElem, Int}(ZZ(2) => 3, ZZ(3) => 1))
 
-   @test  f == f
-   @test_throws  MethodError  (f == ff) 
-   @test_throws  MethodError  (f == fzz)
+   @test_throws  ErrorException  f == f
+   @test_throws  ErrorException  (f == ff) 
+   @test_throws  ErrorException  (f == fzz)
 end
