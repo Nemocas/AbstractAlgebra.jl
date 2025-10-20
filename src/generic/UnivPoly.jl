@@ -14,7 +14,7 @@ base_ring_type(::Type{<:UniversalPolyRing{T}}) where T = mpoly_ring_type(T)
 base_ring(S::UniversalPolyRing) = S.mpoly_ring::base_ring_type(S)
 
 coefficient_ring_type(::Type{<:UniversalPolyRing{T}}) where T = parent_type(T)
-coefficient_ring(S::UniversalPolyRing) = base_ring(base_ring(S))::coefficient_ring_type(S)
+coefficient_ring(S::UniversalPolyRing) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
 
 function is_domain_type(::Type{<:UnivPoly{S}}) where {S <: RingElement}
    return is_domain_type(S)
