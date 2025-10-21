@@ -18,22 +18,6 @@ some cases, to select more efficient algorithms.
 
 ## Types and parents
 
-New implementations of ideals needn't necessarily supply new types and could just extend
-the existing functionality for new rings as AbstractAlgebra.jl provides a generic ideal type
-based on Julia arrays which is implemented in `src/generic/Ideal.jl`. For information 
-about implementing new rings, see the [Ring interface](@ref "Ring Interface").
-
-The generic ideals have type `Generic.Ideal{T}` where `T` is the type of
-elements of the ring the ideals belong to. Internally they consist of a Julia
-array of generators and some additional fields for a parent object, etc. See
-the file `src/generic/GenericTypes.jl` for details.
-
-Parent objects of ideals have type `Generic.IdealSet{T}`.
-
-All ideal types belong to the abstract type `Ideal{T}` and their parents belong
-to the abstract type `Set`. This enables one to write generic functions that
-can accept any AbstractAlgebra ideal type.
-
 New ideal types should come with the following type information:
 
 ```julia
@@ -41,6 +25,12 @@ ideal_type(::Type{NewRing}) = NewIdealType
 base_ring_type(::Type{NewIdeal}) = NewRingType
 parent_type(::Type{NewIdeal{T}}) = DefaultIdealSet{T}
 ```
+
+However, new implementations of ideals needn't necessarily supply new types and could just extend
+the existing functionality for new rings as AbstractAlgebra.jl provides a generic ideal type
+based on Julia arrays which is implemented in `src/generic/Ideal.jl`. For information 
+about implementing new rings, see the [Ring interface](@ref "Ring Interface").
+
 ## Required functionality for ideals
 
 In the following, we list all the functions that are required to be provided for ideals
