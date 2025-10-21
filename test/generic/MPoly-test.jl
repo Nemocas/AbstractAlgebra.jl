@@ -93,7 +93,7 @@
       @test !(y in keys(Dict(x => 1)))
    end
 
-   R1, (x, y) = QQ["x", "y"]
+   R1, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    B = MPolyBuildCtx(R1)
 
@@ -187,6 +187,40 @@
       ) @test_throws UndefVarError let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
+
+   @testset "Generic.MPoly.constructors.getindex" begin
+      S, vs = ZZ[:x][:y,:z]
+      @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
+      @test length(vs) == 3
+      for v in vs
+         @test v isa Generic.MPoly{Generic.Poly{BigInt}}
+         @test parent(v) == S
+      end
+
+      S, vs = ZZ[:x,:y][:z]
+      @test S isa Generic.PolyRing{Generic.MPoly{BigInt}}
+      @test length(vs) == 3
+      for v in vs
+         @test v isa Generic.Poly{Generic.MPoly{BigInt}}
+         @test parent(v) == S
+      end
+
+      S, vs = ZZ[:x,:y][:z,:w]
+      @test S isa Generic.MPolyRing{Generic.MPoly{BigInt}}
+      @test length(vs) == 4
+      for v in vs
+         @test v isa Generic.MPoly{Generic.MPoly{BigInt}}
+         @test parent(v) == S
+      end
+
+      S, vs = ZZ[:x][:y][:z,:w]
+      @test length(vs) == 4
+      @test S isa Generic.MPolyRing{Generic.Poly{Generic.Poly{BigInt}}}
+      for v in vs
+         @test v isa Generic.MPoly{Generic.Poly{Generic.Poly{BigInt}}}
+         @test parent(v) == S
+      end
+   end
 end
 
 # these variables need to be in global scope

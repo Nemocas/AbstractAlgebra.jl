@@ -23,6 +23,10 @@
    @test elem_type(S3) == Generic.NCPoly{Generic.NCPoly{Generic.MatRingElem{BigInt}}}
    @test typeof(S3) == Generic.NCPolyRing{Generic.NCPoly{Generic.MatRingElem{BigInt}}}
 
+   S4, _ = R["x"]["y"]["z"]
+   @test elem_type(S4) == Generic.NCPoly{Generic.NCPoly{Generic.NCPoly{Generic.MatRingElem{BigInt}}}}
+   @test typeof(S4) == Generic.NCPolyRing{Generic.NCPoly{Generic.NCPoly{Generic.MatRingElem{BigInt}}}}
+
    S, y = S1
    T, z = polynomial_ring(S, "z")
 
