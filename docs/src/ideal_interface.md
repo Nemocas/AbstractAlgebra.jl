@@ -16,11 +16,6 @@ provided for certain types of ideals e.g., for ideals of polynomial rings. If im
 these allow the generic code to provide additional functionality for those ideals, or in
 some cases, to select more efficient algorithms.
 
-Currently AbstractAlgebra.jl provides ideals of a Euclidean domain (assuming the existence of a `gcdx` function)
-or of a univariate or multivariate polynomial ring over the integers. 
-Univariate and multivariate polynomial rings over other
-domains (other than fields) are not supported at this time.
-
 ## Types and parents
 
 New implementations of ideals needn't necessarily supply new types and could just extend
