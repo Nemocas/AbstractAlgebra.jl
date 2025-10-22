@@ -56,8 +56,8 @@ _is_legal(a::Fac) = xor(isdefined(a, :fac), isdefined(a, :arr))
 
 _is_dic(a::Fac) = _is_legal(a) && isdefined(a, :fac)
 
-function Base.:(==)(F1::Fac{T1}, F2::Fac{T2})  where {T1 <: RingElement, T2 <: RingElement}
-  error("Equality testing of factorizations is not supported");
+function Base.:(==)(F1::Fac, F2::Fac)
+  error("Equality testing of factorizations is not supported")
 end
 
 @doc raw"""
