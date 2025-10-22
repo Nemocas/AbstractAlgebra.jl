@@ -3594,8 +3594,8 @@ function getindex((R,x)::Union{Tuple{PolyRing, PolyRingElem}, Tuple{NCPolyRing, 
   return S, elem_type(S)[S(x),y]
 end
 
-# syntax: S, (x,y,z) = R[:x][:y][:z]
-function getindex((R,xs)::Union{Tuple{PolyRing, Vector{<:PolyRingElem}}, Tuple{NCPolyRing, Vector{<:NCPolyRingElem}}}, s::VarName)
+# syntax: S, (x,y,z) = R[:x][:y][:z] and S, (x,y,z) = R[:x,:y][:z]
+function getindex((R,xs)::Union{Tuple{PolyRing, Vector{<:PolyRingElem}}, Tuple{NCPolyRing, Vector{<:NCPolyRingElem}}, Tuple{MPolyRing, Vector{<:MPolyRingElem}}}, s::VarName)
   S, y = polynomial_ring(R, s)
   return S, elem_type(S)[S.(xs)...,y]
 end
@@ -3610,10 +3610,4 @@ end
 function getindex((R,xs)::Union{Tuple{PolyRing, Vector{<:PolyRingElem}}, Tuple{MPolyRing, Vector{<:MPolyRingElem}}}, s::VarName, t::VarName, ss::VarName...)
   S, ys = polynomial_ring(R, [Symbol(y) for y in (s, t, ss...)])
   return S, elem_type(S)[S.(xs)...,ys...]
-end
-
-# syntax: S, (x,y,z) = R[:x,:y][:z]
-function getindex((R,xs)::Tuple{MPolyRing, Vector{<:MPolyRingElem}}, s::VarName)
-  S, y = polynomial_ring(R, s)
-  return S, elem_type(S)[S.(xs)...,y]
 end
