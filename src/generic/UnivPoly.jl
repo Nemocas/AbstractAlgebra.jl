@@ -11,7 +11,7 @@
 ###############################################################################
 
 base_ring_type(::Type{<:UniversalPolyRing{T}}) where T = mpoly_ring_type(T)
-base_ring(S::UniversalPolyRing) = S.mpoly_ring::base_ring_type(S)
+base_ring(S::UniversalPolyRing) = S.base_ring::base_ring_type(S)
 
 coefficient_ring_type(::Type{<:UniversalPolyRing{T}}) where T = parent_type(T)
 coefficient_ring(S::UniversalPolyRing) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
@@ -237,7 +237,7 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    end
    if !isempty(added_symbols)
       new_symbols = vcat(current_symbols, added_symbols)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
    end
    return idx
 end
@@ -248,7 +248,7 @@ function gen(S::UniversalPolyRing, s::VarName)
       new_symbols = copy(symbols(S))
       push!(new_symbols, Symbol(s))
       i = length(new_symbols)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
    end
    return @inbounds gen(S, i)
 end
