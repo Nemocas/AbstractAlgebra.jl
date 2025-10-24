@@ -385,20 +385,28 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem}
+struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra.RingElement}
    poly::T
+   inplace::Bool
+   temp::S # only used if inplace == true
 end
 
 struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
    poly::T
+   inplace::Bool
+   temp::Vector{Int} # only used if inplace == true
 end
 
 struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::T # only used if inplace == true
 end
 
 struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::T # only used if inplace == true
 end
 
 mutable struct MPolyBuildCtx{T, S}

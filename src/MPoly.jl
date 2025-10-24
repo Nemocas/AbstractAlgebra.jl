@@ -500,8 +500,9 @@ end
 Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
 """
-function coefficients(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyCoeffs(a)
+function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   t = zero(coefficient_ring(parent(a)))
+   return Generic.MPolyCoeffs(a, inplace, t)
 end
 
 @doc raw"""
@@ -511,8 +512,9 @@ Return an iterator for the exponent vectors of the given polynomial. To
 retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
 """
-function exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyExponentVectors(a)
+function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   t = zeros(Int, nvars(parent(a)))
+   return Generic.MPolyExponentVectors(a, inplace, t)
 end
 
 @doc raw"""
@@ -521,8 +523,9 @@ end
 Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
 """
-function monomials(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyMonomials(a)
+function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   t = zero(parent(a))
+   return Generic.MPolyMonomials(a, inplace, t)
 end
 
 @doc raw"""
@@ -531,8 +534,9 @@ end
 Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
 """
-function terms(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyTerms(a)
+function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   t = zero(parent(a))
+   return Generic.MPolyTerms(a, inplace, t)
 end
 
 ###############################################################################
