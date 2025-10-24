@@ -975,12 +975,7 @@ end
 #
 ################################################################################
 
-function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P = AbstractAlgebra.polynomial_ring_only(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)
-   S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached)
-   S.mpoly_ring = P
-   return S
-end
+_change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
 function change_base_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
