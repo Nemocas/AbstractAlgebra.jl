@@ -150,28 +150,8 @@ is_term(p::UnivPoly) = is_term(data(p))
 coeff(p::UnivPoly, i::Int) = coeff(data(p), i)
 
 function coeff(p::UnivPoly{T}, m::UnivPoly{T}) where {T}
-   !is_monomial(m) && error("Not a monomial")
-   check_parent(p, m)
-   v1 = first(exponent_vectors(m))
-   len = length(v1)
-   n = nvars(parent(data(p)))
-   R = base_ring(p)
-   if len > n
-      if !iszero(v1[n + 1:len])
-         return zero(R)
-      end
-      v1 = v1[1:n]
-   end
-   if len < n
-      v1 = vcat(v1, zeros(Int, n - len))
-   end
-   cvzip = zip(coefficients(data(p)), exponent_vectors(data(p)))
-   for (c, v) in cvzip
-      if v == v1
-         return c
-      end
-   end
-   return zero(R)
+   p, m = univ_promote(p, m)
+   return coeff(data(p), data(m))
 end
 
 function monomial(p::UnivPoly{T}, i::Int) where {T}
