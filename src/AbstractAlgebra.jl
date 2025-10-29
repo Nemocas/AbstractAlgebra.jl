@@ -440,30 +440,13 @@ function test_module(x, y)
    pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
-   test_function_name = "test_"
-
-   x == "generic"
-   if y == "RelSeries"
-      test_function_name *= "gen_rel_series"
-   elseif y == "AbsSeries"
-      test_function_name *= "gen_abs_series"
-   elseif y == "Matrix"
-      test_function_name *= "gen_mat"
-   elseif y == "Fraction"
-      test_function_name *= "gen_frac"
-   elseif y == "Residue"
-      test_function_name *= "gen_res"
-   else
-      test_function_name *= "gen_$(lowercase(y))"
-   end
-
    rand_file = joinpath(pkgdir, "test/rand.jl")
+
    cmd = """
          using Test
          using AbstractAlgebra
          include("$rand_file")
          include("$test_file")
-         $test_function_name()
          """
    @info("spawning ", `$julia_exe --project=$(Base.active_project()) -e $cmd`)
    run(`$julia_exe -e $cmd`)
