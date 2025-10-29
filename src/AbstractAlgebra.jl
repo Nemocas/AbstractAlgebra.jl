@@ -457,10 +457,11 @@ function test_module(x, y)
       test_function_name *= "gen_$(lowercase(y))"
    end
 
+   rand_file = joinpath(pkgdir, "test/rand.jl")
    cmd = """
          using Test
          using AbstractAlgebra
-         include("test/rand.jl")
+         include("$rand_file")
          include("$test_file")
          $test_function_name()
          """
