@@ -517,7 +517,8 @@ function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <:
 end
 
 function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool = false) where {T <: RingElement, S}
-   t = zeros(S, nvars(parent(a)))
+   # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
+   t = [zero(S) for _ in 1:nvars(parent(a))]
    return Generic.MPolyExponentVectors(a, inplace, t)
 end
 
