@@ -311,11 +311,7 @@ function is_square_with_sqrt(a::BigInt)
    end
 end
 
-@doc raw"""
-    is_square(a::T) where T <: Integer
-
-Return true if $a$ is a square.
-"""
+# See generic documentation in NCRings.jl
 function is_square(a::T) where T <: Integer
    if a < 0
       return false
@@ -324,6 +320,7 @@ function is_square(a::T) where T <: Integer
    return a == s*s
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::BigInt)
    if a < 0
       return false

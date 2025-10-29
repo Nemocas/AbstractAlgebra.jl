@@ -143,12 +143,13 @@ function Base.sqrt(a::AbstractFloat; check::Bool=true)
    return Base.sqrt(a)
 end
 
+# See generic documentation in NCRings.jl
 function is_square(a::AbstractFloat)
-   return a > 0
+   return a >= 0
 end
 
 function is_square_with_sqrt(a::T) where T <: AbstractFloat
-   if a > 0
+   if a >= 0
       return true, Base.sqrt(a)
    else
       return false, zero(T)
