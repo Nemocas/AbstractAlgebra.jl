@@ -513,7 +513,11 @@ retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
 """
 function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
-   t = zeros(Int, nvars(parent(a)))
+   return exponent_vectors(Vector{Int}, a, inplace=inplace)
+end
+
+function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool = false) where {T <: RingElement, S}
+   t = zeros(S, nvars(parent(a)))
    return Generic.MPolyExponentVectors(a, inplace, t)
 end
 
