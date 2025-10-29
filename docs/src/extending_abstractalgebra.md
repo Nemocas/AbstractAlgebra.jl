@@ -29,6 +29,14 @@ base_ring
 base_ring_type
 ```
 
+If there is a well-defined notion of a coefficient ring (e.g. in the case of
+polynomial rings or modules), then one should implement
+
+```@docs
+coefficient_ring
+coefficient_ring_type
+```
+
 ## Special elements
 
 For rings, one has to extend the following methods:
