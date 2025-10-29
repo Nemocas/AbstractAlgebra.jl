@@ -395,10 +395,12 @@ function MPolyCoeffs(f::AbstractAlgebra.NCRingElem)
    return MPolyCoeffs(f, false, zero(coefficient_ring(parent(f))))
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
+# S may be the type of anything that can store an exponent vector, for example
+# Vector{Int}, ZZMatrix, ...
+struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
    poly::T
    inplace::Bool
-   temp::Vector{Int} # only used if inplace == true
+   temp::S # only used if inplace == true
 end
 
 function MPolyExponentVectors(f::AbstractAlgebra.RingElem)

@@ -129,7 +129,7 @@ function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector!(e, a, i)
 end
 
-function exponent_vector!(e::Vector{Int}, a::MPoly{T}, i::Int) where T <: RingElement
+function exponent_vector!(e::Vector{S}, a::MPoly{T}, i::Int) where {T <: RingElement, S}
    @assert length(e) == nvars(parent(a))
    A = a.exps
    N = size(A, 1)
@@ -146,7 +146,7 @@ function exponent_vector!(e::Vector{Int}, a::MPoly{T}, i::Int) where T <: RingEl
    end
    k = 1
    for j in range
-      e[k] = Int(A[j, i])
+      e[k] = S(A[j, i])
       k += 1
    end
    return e
@@ -877,8 +877,8 @@ function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T <: AbstractAlgebra.MPol
    return S
 end
 
-function Base.eltype(::Type{MPolyExponentVectors{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
-   return Vector{Int}
+function Base.eltype(::Type{MPolyExponentVectors{T, V}}) where {V, T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement}
+   return V
 end
 
 function Base.eltype(::Type{MPolyMonomials{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
