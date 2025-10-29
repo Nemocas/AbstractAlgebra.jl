@@ -90,6 +90,7 @@ makedocs(
                  "field_interface.md",
                  "fraction_interface.md",
                  "module_interface.md",
+                 "ideal_interface.md",
                  "matrix_interface.md",
                  "map_interface.md",
                  "rand.md",
