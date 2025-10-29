@@ -873,7 +873,7 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(::Type{MPolyCoeffs{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T <: AbstractAlgebra.MPolyRingElem, S <: RingElement}
    return S
 end
 
