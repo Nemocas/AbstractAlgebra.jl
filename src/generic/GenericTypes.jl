@@ -462,31 +462,37 @@ end
 
 ###############################################################################
 #
+#   UniversalRing / UniversalRingElem
+#
+###############################################################################
+
+@attributes mutable struct UniversalRing{T <: RingElement} <: AbstractAlgebra.UniversalRing{T}
+   base_ring::Ring
+
+   function UniversalRing{T}(R::Ring; cached::Bool=true) where {T<:RingElement}
+      @assert elem_type(R) == T
+      return get_cached!(UniversalRingID, (base_ring(R), typeof(R)), cached) do
+         new{T}(R)
+      end::UniversalRing{T}
+   end
+end
+
+const UniversalRingID = CacheDictType{Tuple{Ring, DataType}, Ring}()
+
+mutable struct UniversalRingElem{T <: RingElement} <: AbstractAlgebra.UniversalRingElem{T}
+   p::T
+   parent::UniversalRing{T}
+end
+
+###############################################################################
+#
 #   UniversalPolyRing / UnivPoly
 #
 ###############################################################################
 
-@attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
-   base_ring::AbstractAlgebra.MPolyRing{T}
+const UniversalPolyRing{T} = UniversalRing{<:AbstractAlgebra.MPolyRingElem{T}}
 
-   function UniversalPolyRing{T}(
-      R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
-   ) where {T<:RingElement}
-      @assert elem_type(R) == T
-      return get_cached!(
-         UnivPolyID, (R, s, internal_ordering), cached
-      ) do
-         new{T}(AbstractAlgebra.poly_ring(R, s; internal_ordering))
-      end::UniversalPolyRing{T}
-   end
-end
-
-const UnivPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol}, Ring}()
-
-mutable struct UnivPoly{T <: RingElement} <: AbstractAlgebra.UniversalPolyRingElem{T}
-   p::MPolyRingElem{T}
-   parent::UniversalPolyRing{T}
-end
+const UnivPoly{T} = UniversalRingElem{<:AbstractAlgebra.MPolyRingElem{T}}
 
 struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
    poly::T
