@@ -57,7 +57,7 @@ gens(S::UniversalPolyRing, vars::Vector{VarName})
 
 ```jldoctest
 julia> S = universal_polynomial_ring(ZZ)
-Universal Polynomial Ring over Integers
+Universal polynomial ring over Integers
 
 julia> x = gen(S, :x)
 x
@@ -66,7 +66,7 @@ julia> number_of_generators(S)
 1
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{AbstractAlgebra.Generic.UnivPoly{BigInt}}:
+2-element Vector{AbstractAlgebra.Generic.UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}}:
  y
  z
 
