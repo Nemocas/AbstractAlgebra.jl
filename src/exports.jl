@@ -181,7 +181,6 @@ export degrees
 export denest
 export dense_matrix_type
 export dense_poly_ring_type
-export dense_poly_type
 export derivative
 export det
 export det_popov
@@ -471,6 +470,7 @@ export pol_length
 export polcoeff
 export poly
 export poly_ring
+export poly_type
 export polynomial
 export polynomial_ring
 export polynomial_to_power_sums
