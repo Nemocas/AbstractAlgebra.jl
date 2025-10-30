@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-function content(a::UniversalPolyRingElem)
+function content(a::UniversalRingElem{<:MPolyRingElem})
    return content(data(a))
 end
 
@@ -69,19 +69,19 @@ end
 #
 ###############################################################################
 
-function coefficients(a::UniversalPolyRingElem)
+function coefficients(a::UniversalRingElem{<:MPolyRingElem})
    return Generic.UnivPolyCoeffs(a)
 end
 
-function exponent_vectors(a::UniversalPolyRingElem)
+function exponent_vectors(a::UniversalRingElem{<:MPolyRingElem})
    return Generic.UnivPolyExponentVectors(a)
 end
 
-function monomials(a::UniversalPolyRingElem)
+function monomials(a::UniversalRingElem{<:MPolyRingElem})
    return Generic.UnivPolyMonomials(a)
 end
 
-function terms(a::UniversalPolyRingElem)
+function terms(a::UniversalRingElem{<:MPolyRingElem})
    return Generic.UnivPolyTerms(a)
 end
 
@@ -91,7 +91,7 @@ end
 #
 ###############################################################################
 
-function _wrap_factorization(f::Fac{<:MPolyRingElem}, S::UniversalPolyRing)
+function _wrap_factorization(f::Fac{<:MPolyRingElem}, S::UniversalRing{<:MPolyRingElem})
    res = Fac{elem_type(S)}()
    res.unit = Generic.UnivPoly(f.unit, S)
    for (fact, expo) in f
@@ -100,9 +100,9 @@ function _wrap_factorization(f::Fac{<:MPolyRingElem}, S::UniversalPolyRing)
    return res
 end
 
-factor_squarefree(f::UniversalPolyRingElem) = _wrap_factorization(factor_squarefree(data(f)), parent(f))
+factor_squarefree(f::UniversalRingElem{<:MPolyRingElem}) = _wrap_factorization(factor_squarefree(data(f)), parent(f))
 
-factor(f::UniversalPolyRingElem) = _wrap_factorization(factor(data(f)), parent(f))
+factor(f::UniversalRingElem{<:MPolyRingElem}) = _wrap_factorization(factor(data(f)), parent(f))
 
 ###############################################################################
 #
@@ -124,7 +124,7 @@ the universal polynomial ring `S = R[\ldots]` with no variables in it initially.
 
 ```jldoctest
 julia> S, (x,y) = universal_polynomial_ring(ZZ, [:x,:y])
-(Universal Polynomial Ring over Integers, AbstractAlgebra.Generic.UnivPoly{BigInt}[x, y])
+(Universal Polynomial Ring over Integers, AbstractAlgebra.Generic.UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}[x, y])
 
 julia> z = gen(S, :z)
 z
@@ -139,7 +139,7 @@ julia> x = gen(S, :x)
 x
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{AbstractAlgebra.Generic.UnivPoly{BigInt}}:
+2-element Vector{AbstractAlgebra.Generic.UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}}:
  y
  z
 
@@ -149,10 +149,10 @@ x*y - z
 """
 function universal_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bool=true, internal_ordering::Symbol=:lex)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   T = elem_type(R)
-   U = mpoly_type(R)
+   P = poly_ring(R, varnames; internal_ordering)
+   T = elem_type(P)
 
-   S = Generic.UniversalPolyRing{T}(R, varnames, internal_ordering, cached)
+   S = Generic.UniversalRing{T}(P; cached)
    return (S, gens(S))
 end
 
