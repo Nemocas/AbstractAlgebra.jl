@@ -385,20 +385,46 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem}
+struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra.RingElement}
    poly::T
+   inplace::Bool
+   temp::S # only used if inplace == true
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
+function MPolyCoeffs(f::AbstractAlgebra.NCRingElem)
+   return MPolyCoeffs(f, false, zero(coefficient_ring(parent(f))))
+end
+
+# S may be the type of anything that can store an exponent vector, for example
+# Vector{Int}, ZZMatrix, ...
+struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
    poly::T
+   inplace::Bool
+   temp::S # only used if inplace == true
+end
+
+function MPolyExponentVectors(f::AbstractAlgebra.RingElem)
+   return MPolyExponentVectors(f, false, Vector{Int}())
 end
 
 struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::T # only used if inplace == true
+end
+
+function MPolyTerms(f::AbstractAlgebra.NCRingElem)
+   return MPolyTerms(f, false, zero(parent(f)))
 end
 
 struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::T # only used if inplace == true
+end
+
+function MPolyMonomials(f::NCRingElem)
+   return MPolyMonomials(f, false, zero(parent(f)))
 end
 
 mutable struct MPolyBuildCtx{T, S}
