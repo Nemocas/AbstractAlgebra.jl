@@ -150,7 +150,7 @@ julia> coefficient_ring(x^2+1) == QQ
 true
 
 julia> S, (z,w) = universal_polynomial_ring(QQ, [:z,:w])
-(Universal Polynomial Ring over Rationals, AbstractAlgebra.Generic.UnivPoly{Rational{BigInt}}[z, w])
+(Universal polynomial ring over Rationals, AbstractAlgebra.Generic.UniversalRingElem{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[z, w])
 
 julia> coefficient_ring(S) == QQ
 true
