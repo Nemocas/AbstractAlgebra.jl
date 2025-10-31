@@ -136,7 +136,7 @@ polynomial ring. This is provided for uniformity with the multivariate interface
 there is more than one variable and hence an array of symbols.
 
 ```julia
-dense_poly_type(::Type{T}) where T <: RingElement
+poly_type(::Type{T}) where T <: RingElement
 ```
 
 Return the type of a polynomial whose coefficients have the given type. In our
@@ -150,7 +150,7 @@ polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
 ```
 
 The default implementation figures out the appropriate polynomial ring type via
-`dense_poly_type` and calls its constructor with `R, s, cached` as arguments.
+`poly_type` and calls its constructor with `R, s, cached` as arguments.
 In our example, this would be
 
 ```julia

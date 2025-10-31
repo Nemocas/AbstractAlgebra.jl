@@ -15,7 +15,7 @@ base_ring_type(::Type{<:PolyRing{T}}) where T<:RingElement = parent_type(T)
 coefficient_ring_type(T::Type{<:PolyRing}) = base_ring_type(T)
 coefficient_ring(R::PolyRing) = base_ring(R)
 
-dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
+poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)

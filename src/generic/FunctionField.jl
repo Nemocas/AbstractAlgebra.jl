@@ -526,7 +526,7 @@ parent_type(::Type{FunctionFieldElem{T}}) where T <: FieldElement = FunctionFiel
 elem_type(::Type{FunctionField{T}}) where T <: FieldElement = FunctionFieldElem{T}
 
 function base_ring_type(::Type{FunctionField{T}}) where T <: FieldElement
-   U = dense_poly_type(T)
+   U = poly_type(T)
    return RationalFunctionField{T, U}
 end
 
@@ -581,19 +581,19 @@ defining_polynomial(R::FunctionField) = R.pol
 modulus(R::FunctionField) = defining_polynomial(R)
 
 function power_precomp(R::FunctionField{T}, n::Int) where T <: FieldElement
-   return R.powers[n + 1]::Poly{dense_poly_type(T)}
+   return R.powers[n + 1]::Poly{poly_type(T)}
 end
 
 function power_precomp_den(R::FunctionField{T}, n::Int) where T <: FieldElement
-   return R.powers_den[n + 1]::dense_poly_type(T)
+   return R.powers_den[n + 1]::poly_type(T)
 end
 
 function trace_precomp(R::FunctionField{T}, n::Int) where T <: FieldElement
-   return R.traces[n + 1]::dense_poly_type(T)
+   return R.traces[n + 1]::poly_type(T)
 end
 
 function trace_precomp_den(R::FunctionField{T}) where T <: FieldElement
-   return R.traces_den::dense_poly_type(T)
+   return R.traces_den::poly_type(T)
 end
 
 @doc raw"""
@@ -610,13 +610,13 @@ interface.
 function Base.numerator(R::FunctionField{T},
                                canonicalise::Bool=true) where T <: FieldElement
    # only used for type assert, so no need to canonicalise
-   return R.num::Poly{dense_poly_type(T)}
+   return R.num::Poly{poly_type(T)}
 end                 
 
 function Base.denominator(R::FunctionField{T},
                                canonicalise::Bool=true) where T <: FieldElement
    # only used for type assert, so no need to canonicalise
-   return R.den::dense_poly_type(T)
+   return R.den::poly_type(T)
 end                 
 
 @doc raw"""
@@ -630,8 +630,8 @@ If `canonicalise` is set to `true` the fraction is first canonicalised.
 """
 function Base.numerator(a::FunctionFieldElem{T},
                                canonicalise::Bool=true) where T <: FieldElement
-   anum = a.num::Poly{dense_poly_type(T)}
-   aden = a.den::dense_poly_type(T)
+   anum = a.num::Poly{poly_type(T)}
+   aden = a.den::poly_type(T)
    if canonicalise
       u = canonical_unit(aden)
       return divexact(anum, u)
@@ -642,7 +642,7 @@ end
 
 function Base.denominator(a::FunctionFieldElem{T},
                                canonicalise::Bool=true) where T <: FieldElement
-   aden = a.den::dense_poly_type(T)
+   aden = a.den::poly_type(T)
    if canonicalise
       u = canonical_unit(aden)
       return divexact(aden, u)
@@ -1248,7 +1248,7 @@ promote_rule(::Type{FunctionFieldElem{T}}, ::Type{FunctionFieldElem{T}}) where T
 function promote_rule(::Type{FunctionFieldElem{T}}, ::Type{V}) where
       {T <: FieldElement, V <: RingElem}
    # The base ring element type of FunctionFieldElem{T} is RationalFunctionFieldElem{T, U}, not T
-   U = dense_poly_type(T)
+   U = poly_type(T)
    promote_rule(RationalFunctionFieldElem{T, U}, V) == RationalFunctionFieldElem{T, U} ? FunctionFieldElem{T} : Union{}
 end
 
