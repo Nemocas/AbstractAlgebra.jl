@@ -45,8 +45,3 @@ function number_of_variables end
 @alias ngens number_of_generators
 @alias nrows number_of_rows
 @alias nvars number_of_variables
-
-# TEMPORARY HACK -- delete after Nemo & Hecke have been updated
-function poly_type end
-
-@alias dense_poly_type  poly_type
