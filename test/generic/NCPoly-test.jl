@@ -431,7 +431,7 @@ end
 
 @testset "Generic.NCPoly.exceptions" begin
    @test_throws MethodError polynomial_ring(Char, :x)
-   @test_throws Exception dense_poly_ring_type(Char)
+   @test_throws Exception poly_ring_type(Char)
    @test_throws ArgumentError poly_type(Char)
 end
 

@@ -28,7 +28,7 @@ end
 The type of univariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
-See also [`dense_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+See also [`poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -51,10 +51,10 @@ poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursi
 poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
 @doc raw"""
-    dense_poly_ring_type(::Type{T}) where T<:NCRingElement
-    dense_poly_ring_type(::T) where T<:NCRingElement
-    dense_poly_ring_type(::Type{S}) where S<:NCRing
-    dense_poly_ring_type(::S) where S<:NCRing
+    poly_ring_type(::Type{T}) where T<:NCRingElement
+    poly_ring_type(::T) where T<:NCRingElement
+    poly_ring_type(::Type{S}) where S<:NCRing
+    poly_ring_type(::S) where S<:NCRing
 
 The type of univariate polynomial rings with coefficients of type `T` respectively
 `elem_type(S)`. Implemented via [`poly_type`](@ref).
@@ -63,20 +63,20 @@ See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ(1))
+julia> poly_ring_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(elem_type(AbstractAlgebra.ZZ))
+julia> poly_ring_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ)
+julia> poly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(typeof(AbstractAlgebra.ZZ))
+julia> poly_ring_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 ```
 """
-dense_poly_ring_type(x) = parent_type(poly_type(x))
+poly_ring_type(x) = parent_type(poly_type(x))
 
 @doc raw"""
     var(a::NCPolyRing)
@@ -779,7 +779,7 @@ Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
 polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   dense_poly_ring_type(T)(R, s, cached)
+   poly_ring_type(T)(R, s, cached)
 
 # Simplified constructor
 

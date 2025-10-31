@@ -24,7 +24,7 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
 The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
 Falls back to `Generic.MPoly{T}`.
 
-See also [`mpoly_ring_type`](@ref), [`poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+See also [`mpoly_ring_type`](@ref), [`poly_type`](@ref) and [`poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -55,7 +55,7 @@ mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype o
 The type of multivariate polynomial rings with coefficients of type `T`
 respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
 
-See also [`poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+See also [`poly_type`](@ref) and [`poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
