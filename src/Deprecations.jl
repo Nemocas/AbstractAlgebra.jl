@@ -12,7 +12,7 @@
 # renamed in 0.45.1
 @alias FactoredFractionField factored_fraction_field
 
-#renamed in 1.6.0
+#renamed in 0.47.4
 @alias dense_poly_type  poly_type
 
 ###############################################################################
