@@ -90,15 +90,40 @@ function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
 end
 
 struct InfiniteDimensionError <: Exception
+  msg::String
   check_available::Bool
-  InfiniteDimensionError(; check_available::Bool = false) = new(check_available)
+
+  @doc """
+      InfiniteDimensionError(msg; check_available = false)
+
+  A computation cannot be carried out because of an infinite-dimensional vector
+  space. `msg` is a descriptive error message.
+
+  Set `check_available` to `true` to add the line "You may check finiteness with
+  `is_finite_dimensional_vector_space`" to the error message.
+
+  # Examples
+
+  ```jldoctest
+  julia> throw(InfiniteDimensionError(check_available=true))
+  ERROR: Infinite-dimensional vector space
+  You may check finiteness with `is_finite_dimensional_vector_space`
+  [...]
+
+  julia> throw(InfiniteDimensionError("A custom message"))
+  ERROR: A custom message
+  [...]
+  ```
+  """
+  function InfiniteDimensionError(msg::String = "Infinite-dimensional vector space";
+                                  check_available::Bool = false)
+    return new(msg, check_available)
+  end
 end
 
 function Base.showerror(io::IO, e::InfiniteDimensionError)
+  println(io, e.msg)
   if e.check_available
-    println(io, "Infinite-dimensional vector space")
-    print(io, "You may check finiteness with `is_finite_dimensional_vector_space`")
-  else
-    println(io, "Infinite-dimensional vector space")  
+    println(io, "You may check finiteness with `is_finite_dimensional_vector_space`")
   end
 end
