@@ -96,8 +96,8 @@ struct InfiniteDimensionError <: Exception
   @doc """
       InfiniteDimensionError(msg; check_available = false)
 
-  A computation cannot be carried out because of an infinite-dimensional vector
-  space. `msg` is a descriptive error message.
+  A computation could not be carried out because of something being
+  infinite-dimensional. `msg` is a descriptive error message.
 
   Set `check_available` to `true` to add the line "You may check finiteness with
   `is_finite_dimensional_vector_space`" to the error message.
