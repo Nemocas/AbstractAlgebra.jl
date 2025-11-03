@@ -12,6 +12,10 @@
 # renamed in 0.45.1
 @alias FactoredFractionField factored_fraction_field
 
+#renamed in 0.47.4
+@alias dense_poly_type poly_type
+@alias dense_poly_ring_type poly_ring_type
+
 ###############################################################################
 #
 #   Deprecated bindings
