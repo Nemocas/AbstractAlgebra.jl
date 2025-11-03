@@ -106,23 +106,27 @@ struct InfiniteDimensionError <: Exception
 
   ```jldoctest
   julia> throw(InfiniteDimensionError(check_available=true))
-  ERROR: Infinite-dimensional vector space
+  ERROR: InfiniteDimensionError
   You may check finiteness with `is_finite_dimensional_vector_space`
   [...]
 
-  julia> throw(InfiniteDimensionError("A custom message"))
-  ERROR: A custom message
+  julia> throw(InfiniteDimensionError("The vector space is infinite-dimensional"))
+  ERROR: InfiniteDimensionError: The vector space is infinite-dimensional
   [...]
   ```
   """
-  function InfiniteDimensionError(msg::String = "Infinite-dimensional vector space";
-                                  check_available::Bool = false)
+  function InfiniteDimensionError(msg::String = ""; check_available::Bool = false)
     return new(msg, check_available)
   end
 end
 
 function Base.showerror(io::IO, e::InfiniteDimensionError)
-  println(io, e.msg)
+  m = "InfiniteDimensionError"
+  if !isempty(e.msg)
+    m *= ": "
+    m *= e.msg
+  end
+  println(io, m)
   if e.check_available
     println(io, "You may check finiteness with `is_finite_dimensional_vector_space`")
   end
