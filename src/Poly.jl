@@ -1837,7 +1837,6 @@ function Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    return q
 end
 
-# See generic documentation in NCRings.jl
 function is_square(f::PolyRingElem{T}) where T <: RingElement
    flag, q = sqrt_classical(f)
    return flag

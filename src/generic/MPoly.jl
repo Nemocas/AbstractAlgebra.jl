@@ -1872,7 +1872,6 @@ function Base.sqrt(a::MPoly{T}; check::Bool=true) where {T <: RingElement}
    return q
 end
 
-# See generic documentation in NCRings.jl
 function is_square(a::MPoly{T}) where {T <: RingElement}
    flag, q = sqrt_heap(a; check=true)
    return flag

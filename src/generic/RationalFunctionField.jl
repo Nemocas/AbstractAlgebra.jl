@@ -451,7 +451,6 @@ end
 #
 ###############################################################################
 
-# See generic documentation in NCRings.jl
 function is_square(a::RationalFunctionFieldElem)
    return is_square(data(a))
 end

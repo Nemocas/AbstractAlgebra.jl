@@ -152,8 +152,7 @@ end
 #
 ################################################################################
 
-# See generic documentation in NCRings.jl
-is_square(a::MatRingElem) = true
+# is_square(a::MatRingElem) = true
 
 ###############################################################################
 #

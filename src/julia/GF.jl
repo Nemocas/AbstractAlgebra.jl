@@ -332,7 +332,6 @@ function Base.sqrt(a::GFElem{T}; check::Bool=true) where T <: Integer
    return s1
 end
 
-# See generic documentation in NCRings.jl
 function is_square(a::GFElem{T}) where T <: Integer
    f1, s1 = sqrt_tonelli_shanks(a; check=true)
    return f1

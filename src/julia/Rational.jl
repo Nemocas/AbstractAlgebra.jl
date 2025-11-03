@@ -132,7 +132,6 @@ function sqrt(a::Rational{T}; check::Bool=true) where T <: Integer
    return sqrt(numerator(a, false); check=check)//sqrt(denominator(a, false); check=check)
 end
 
-# See generic documentation in NCRings.jl
 function is_square(a::Rational{T}) where T <: Integer
    return is_square(numerator(a)) && is_square(denominator(a))
 end
