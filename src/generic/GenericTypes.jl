@@ -416,6 +416,10 @@ mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
       return I
    end
 
+   function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem)
+      return MPolyExponentVectors(Vector{Int}, f)
+   end
+
    function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::S) where S
       return new{typeof(f), S}(f, inplace, temp)
    end
