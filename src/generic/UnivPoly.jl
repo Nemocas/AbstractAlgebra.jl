@@ -923,8 +923,7 @@ end
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
 function change_base_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
-   base_ring(parent) != R && error("Base rings do not match.")
-   return _map(R, p, parent)
+   return UnivPoly(change_base_ring(R, data(p); parent = mpoly_ring(parent)), parent)
 end
 
 function change_coefficient_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
@@ -938,17 +937,7 @@ end
 ################################################################################
 
 function map_coefficients(f::T, p::UnivPoly; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where T
-   return _map(f, p, parent)
-end
-
-function _map(g::T, p::UnivPoly, Rx) where T
-   cvzip = zip(coefficients(p), exponent_vectors(p))
-   M = MPolyBuildCtx(Rx)
-   for (c, v) in cvzip
-      push_term!(M, g(c), v)
-   end
-
-   return finish(M)
+   return UnivPoly(map_coefficients(f, data(p); parent = mpoly_ring(parent)), parent)
 end
 
 ###############################################################################
