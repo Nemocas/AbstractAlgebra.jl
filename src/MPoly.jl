@@ -501,8 +501,11 @@ Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
 """
 function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
-   t = zero(coefficient_ring(parent(a)))
-   return Generic.MPolyCoeffs(a, inplace, t)
+   if inplace
+      t = zero(coefficient_ring(parent(a)))
+      return Generic.MPolyCoeffs(a, inplace, t)
+   end
+   return Generic.MPolyCoeffs(a)
 end
 
 @doc raw"""
@@ -517,9 +520,12 @@ function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <:
 end
 
 function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool = false) where {T <: RingElement, S}
-   # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
-   t = [zero(S) for _ in 1:nvars(parent(a))]
-   return Generic.MPolyExponentVectors(a, inplace, t)
+   if inplace
+      # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
+      t = [zero(S) for _ in 1:nvars(parent(a))]
+      return Generic.MPolyExponentVectors(a, inplace, t)
+   end
+   return Generic.MPolyExponentVectors(Vector{S}, a)
 end
 
 @doc raw"""
@@ -529,8 +535,11 @@ Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
 """
 function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
-   t = zero(parent(a))
-   return Generic.MPolyMonomials(a, inplace, t)
+   if inplace
+      t = zero(parent(a))
+      return Generic.MPolyMonomials(a, inplace, t)
+   end
+   return Generic.MPolyMonomials(a)
 end
 
 @doc raw"""
@@ -540,8 +549,11 @@ Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
 """
 function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
-   t = zero(parent(a))
-   return Generic.MPolyTerms(a, inplace, t)
+   if inplace
+      t = zero(parent(a))
+      return Generic.MPolyTerms(a, inplace, t)
+   end
+   return Generic.MPolyTerms(a)
 end
 
 ###############################################################################
