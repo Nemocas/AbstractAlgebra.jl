@@ -386,77 +386,90 @@ end
 # Iterators
 
 mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra.RingElement}
-   poly::T
-   inplace::Bool
-   temp::S # only used if inplace == true
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
 
-   function MPolyCoeffs(f::AbstractAlgebra.NCRingElem)
-     I = new{typeof(f), elem_type(coefficient_ring_type(f))}()
-      I.poly = f
-      I.inplace = false
-      return I
-   end
+  function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f), elem_type(coefficient_ring_type(f))}()
+    I.poly = f
+    I.inplace = inplace
+    if inplace
+      I.temp = zero(coefficient_ring(parent(f)))
+    end
+    return I
+  end
 
-   function MPolyCoeffs(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::AbstractAlgebra.RingElement)
-      return new{typeof(f), typeof(temp)}(f, inplace, temp)
-   end
+  function MPolyCoeffs(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::AbstractAlgebra.RingElement)
+    return new{typeof(f), typeof(temp)}(f, inplace, temp)
+  end
 end
 
 # S may be the type of anything that can store an exponent vector, for example
 # Vector{Int}, ZZMatrix, ...
 mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
-   poly::T
-   inplace::Bool
-   temp::S # only used if inplace == true
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
 
-   function MPolyExponentVectors(::Type{S}, f::AbstractAlgebra.NCRingElem) where S
-      I = new{typeof(f), S}()
-      I.poly = f
-      I.inplace = false
-      return I
-   end
+  function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    return MPolyExponentVectors(Vector{Int}, f, inplace=inplace)
+  end
 
-   function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem)
-      return MPolyExponentVectors(Vector{Int}, f)
-   end
+  function MPolyExponentVectors(::Type{Vector{S}}, f::AbstractAlgebra.NCRingElem; inplace::Bool = false) where S
+    I = new{typeof(f), Vector{S}}()
+    I.poly = f
+    I.inplace = inplace
+    if inplace
+      # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
+      I.temp = [zero(S) for _ in 1:nvars(parent(f))]
+    end
+    return I
+  end
 
-   function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::S) where S
-      return new{typeof(f), S}(f, inplace, temp)
-   end
+  function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::S) where S
+    return new{typeof(f), S}(f, inplace, temp)
+  end
 end
 
 mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
-   poly::T
-   inplace::Bool
-   temp::T # only used if inplace == true
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
 
-   function MPolyTerms(f::AbstractAlgebra.NCRingElem)
-      I = new{typeof(f)}()
-      I.poly = f
-      I.inplace = false
-      return I
-   end
+  function MPolyTerms(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}()
+    I.poly = f
+    I.inplace = inplace
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 
-   function MPolyTerms(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
-      return new{T}(f, inplace, temp)
-   end
+  function MPolyTerms(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
+    return new{T}(f, inplace, temp)
+  end
 end
 
 mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
-   poly::T
-   inplace::Bool
-   temp::T # only used if inplace == true
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
 
-   function MPolyMonomials(f::AbstractAlgebra.NCRingElem)
-      I = new{typeof(f)}()
-      I.poly = f
-      I.inplace = false
-      return I
-   end
+  function MPolyMonomials(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}()
+    I.poly = f
+    I.inplace = inplace
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 
-   function MPolyMonomials(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
-      return new{T}(f, inplace, temp)
-   end
+  function MPolyMonomials(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
+    return new{T}(f, inplace, temp)
+  end
 end
 
 mutable struct MPolyBuildCtx{T, S}
