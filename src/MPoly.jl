@@ -488,6 +488,22 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coefficients(x)))
 end
 
+function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return S.(exponent_vector(a, i))
+end
+
+function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+   return coeff(a, i)
+end
+
+function term!(t::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return term(a, i)
+end
+
+function monomial!(m::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return monomial(a, i)
+end
+
 ###############################################################################
 #
 #   Iterators
