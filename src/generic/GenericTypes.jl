@@ -399,10 +399,6 @@ mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra
     end
     return I
   end
-
-  function MPolyCoeffs(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::AbstractAlgebra.RingElement)
-    return new{typeof(f), typeof(temp)}(f, inplace, temp)
-  end
 end
 
 # S may be the type of anything that can store an exponent vector, for example
@@ -426,10 +422,6 @@ mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
     end
     return I
   end
-
-  function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem, inplace::Bool, temp::S) where S
-    return new{typeof(f), S}(f, inplace, temp)
-  end
 end
 
 mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
@@ -446,10 +438,6 @@ mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
     end
     return I
   end
-
-  function MPolyTerms(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
-    return new{T}(f, inplace, temp)
-  end
 end
 
 mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
@@ -465,10 +453,6 @@ mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
       I.temp = zero(parent(f))
     end
     return I
-  end
-
-  function MPolyMonomials(f::T, inplace::Bool, temp::T) where {T <: AbstractAlgebra.NCRingElem}
-    return new{T}(f, inplace, temp)
   end
 end
 
