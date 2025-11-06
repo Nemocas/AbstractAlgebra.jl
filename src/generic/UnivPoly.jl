@@ -923,12 +923,7 @@ end
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
 function change_base_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, new_parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
-   if nvars(parent(p)) > nvars(parent(data(p)))
-      pp = upgrade(parent(p), data(p))
-   else
-      pp = data(p)
-   end
-   return UnivPoly(change_base_ring(R, pp; parent = mpoly_ring(new_parent)), new_parent)
+   return UnivPoly(change_base_ring(R, upgrade(parent(p), data(p)); parent = mpoly_ring(new_parent)), new_parent)
 end
 
 function change_coefficient_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
@@ -942,12 +937,7 @@ end
 ################################################################################
 
 function map_coefficients(f::T, p::UnivPoly; cached::Bool=true, new_parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where T
-   if nvars(parent(p)) > nvars(parent(data(p)))
-      pp = upgrade(parent(p), data(p))
-   else
-      pp = data(p)
-   end
-   return UnivPoly(map_coefficients(f, pp; parent = mpoly_ring(new_parent)), new_parent)
+   return UnivPoly(map_coefficients(f, upgrade(parent(p), data(p)); parent = mpoly_ring(new_parent)), new_parent)
 end
 
 ###############################################################################
