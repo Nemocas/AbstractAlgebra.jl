@@ -391,9 +391,7 @@ mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra
   temp::S # only used if inplace == true
 
   function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
-    I = new{typeof(f), elem_type(coefficient_ring_type(f))}()
-    I.poly = f
-    I.inplace = inplace
+    I = new{typeof(f), elem_type(coefficient_ring_type(f))}(f, inplace)
     if inplace
       I.temp = zero(coefficient_ring(parent(f)))
     end
@@ -413,9 +411,7 @@ mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
   end
 
   function MPolyExponentVectors(::Type{Vector{S}}, f::AbstractAlgebra.NCRingElem; inplace::Bool = false) where S
-    I = new{typeof(f), Vector{S}}()
-    I.poly = f
-    I.inplace = inplace
+    I = new{typeof(f), Vector{S}}(f, inplace)
     if inplace
       # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
       I.temp = [zero(S) for _ in 1:nvars(parent(f))]
@@ -430,9 +426,7 @@ mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
   temp::T # only used if inplace == true
 
   function MPolyTerms(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
-    I = new{typeof(f)}()
-    I.poly = f
-    I.inplace = inplace
+    I = new{typeof(f)}(f, inplace)
     if inplace
       I.temp = zero(parent(f))
     end
@@ -446,9 +440,7 @@ mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
   temp::T # only used if inplace == true
 
   function MPolyMonomials(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
-    I = new{typeof(f)}()
-    I.poly = f
-    I.inplace = inplace
+    I = new{typeof(f)}(f, inplace)
     if inplace
       I.temp = zero(parent(f))
     end
