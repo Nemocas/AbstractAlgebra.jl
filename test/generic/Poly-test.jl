@@ -29,13 +29,15 @@ end
    @test isa(S1, Generic.PolyRing)
 
    R, x = ZZ["x"]
-   S1 = R["y"]
-   S2 = ZZ["x"]["y"]
+   S1, y = R["y"]
+   @test isa(y, PolyRingElem)
+   S2, (x,y) = ZZ["x"]["y"]
+   @test isa(y, PolyRingElem)
 
    @test polynomial_ring(R, "y", cached = true)[1] === polynomial_ring(R, "y", cached = true)[1]
    @test polynomial_ring(R, "y", cached = true)[1] !== polynomial_ring(R, "y", cached = false)[1]
 
-   for (S, y) in (S1, S2)
+   for S in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
       @test coefficient_ring_type(S) === typeof(R)
@@ -46,8 +48,6 @@ end
 
       @test R isa AbstractAlgebra.Ring
       @test S isa Generic.PolyRing
-
-      @test isa(y, PolyRingElem)
    end
 
    R, x = polynomial_ring(ZZ, "x")
@@ -120,6 +120,24 @@ end
       @test Rx1 == Rx5
       @test Rx1 == Rx6
       @test Rx1 == (Rx7, x)
+   end
+
+   @testset "Generic.Poly.constructors.getindex" begin
+      S, vs = ZZ[:x][:y]
+      @test S isa Generic.PolyRing{Generic.Poly{BigInt}}
+      @test length(vs) == 2
+      for v in vs
+         @test v isa Generic.Poly{Generic.Poly{BigInt}}
+         @test parent(v) == S
+      end
+
+      S, vs = ZZ[:x][:y][:z]
+      @test S isa Generic.PolyRing{Generic.Poly{Generic.Poly{BigInt}}}
+      @test length(vs) == 3
+      for v in vs
+         @test v isa Generic.Poly{Generic.Poly{Generic.Poly{BigInt}}}
+         @test parent(v) == S
+      end
    end
 end
 

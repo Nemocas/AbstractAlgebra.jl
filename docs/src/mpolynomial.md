@@ -63,6 +63,13 @@ provided when the number of generators is greater than `1`: given a base ring
 R[:x, :y, ...]
 ```
 
+In addition to that, it is also possible to construct univariate polynomial rings
+over other univariate polynomial rings in a similar fashion:
+
+```julia
+R[:x][:y]...
+```
+
 Here are some examples of creating multivariate polynomial rings and making use
 of the resulting parent objects to coerce various elements into the polynomial
 ring.
@@ -100,6 +107,9 @@ julia> derivative(k, 2)
 julia> R, x = polynomial_ring(ZZ, 10); R
 Multivariate polynomial ring in 10 variables x1, x2, x3, x4, ..., x10
   over integers
+
+julia> T, (z, t) = QQ[:z][:t]
+(Univariate polynomial ring in t over univariate polynomial ring, AbstractAlgebra.Generic.Poly{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}[z, t])
 
 ```
 
