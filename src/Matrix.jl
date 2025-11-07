@@ -823,7 +823,7 @@ end
 #
 ###############################################################################
 
-function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function +(x::T, y::T) where {T <: MatrixElem}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -834,7 +834,7 @@ function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    return r
 end
 
-function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function -(x::T, y::T) where {T <: MatrixElem}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -845,7 +845,7 @@ function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    return r
 end
 
-function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+function *(x::T, y::T) where {T <: MatrixElem}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
    base_ring(x) !== base_ring(y) && error("Base rings do not match")
    A = similar(x, nrows(x), ncols(y))
@@ -2627,6 +2627,8 @@ function minors_iterator(M::MatElem, k::Int)
   col_indices = combinations(ncols(M), k)
   return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
 end
+
+# TODO: how to get the 'positions' of the minors?
 
 @doc raw"""
     minors_iterator_with_position(A::MatElem, k::Int)

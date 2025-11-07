@@ -1117,22 +1117,17 @@ struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
 end
 
 struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
-   base_ring::NCRing
-   entries::Matrix{T}
+   data::MatElem{T}
 
-   function MatRingElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
-      @assert elem_type(R) === T
-      return new{T}(R, A)
+   function MatRingElem{T}(A::MatElem{T}) where T <: NCRingElement
+      return new{T}(A)
    end
 end
 
 function MatRingElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
    @assert elem_type(R) === T
-   t = Matrix{T}(undef, n, n)
-   for i = 1:n, j = 1:n
-      t[i, j] = A[(i - 1) * n + j]
-   end
-   return MatRingElem{T}(R, t)
+   t = matrix(R, n, n, A)
+   return MatRingElem{T}(t)
 end
 
 ###############################################################################
