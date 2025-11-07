@@ -262,18 +262,26 @@ macro enable_all_show_via_expressify(T)
        AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
-    function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
+    function Base.showable(mi::MIME"text/latex", x::$(esc(T)))
        if isdefined(Main, :IJulia) && Main.IJulia.inited
-          error("Dummy error for jupyter")
+          return false
        end
+       return true
+     end
+
+    function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
-    function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
+    function Base.showable(mi::MIME"text/html", x::$(esc(T)))
        if isdefined(Main, :IJulia) && Main.IJulia.inited &&
              !AbstractAlgebra.get_html_as_latex()
-          error("Dummy error for jupyter")
+          return false
        end
+       return true
+    end
+
+    function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
   end
