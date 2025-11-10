@@ -511,21 +511,29 @@ end
 ###############################################################################
 
 @doc raw"""
-    coefficients(a::MPolyRingElem{T}) where T <: RingElement
+    coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
 """
 function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyCoeffs(a, inplace=inplace)
 end
 
 @doc raw"""
-    exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
+    exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the exponent vectors of the given polynomial. To
 retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
 """
 function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyExponentVectors(a, inplace=inplace)
@@ -536,20 +544,28 @@ function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool 
 end
 
 @doc raw"""
-    monomials(a::MPolyRingElem{T}) where T <: RingElement
+    monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
 """
 function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyMonomials(a, inplace=inplace)
 end
 
 @doc raw"""
-    terms(a::MPolyRingElem{T}) where T <: RingElement
+    terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
 """
 function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyTerms(a, inplace=inplace)
