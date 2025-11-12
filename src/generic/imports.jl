@@ -107,6 +107,7 @@ import ..AbstractAlgebra: characteristic
 import ..AbstractAlgebra: check_parent
 import ..AbstractAlgebra: codomain
 import ..AbstractAlgebra: coeff
+import ..AbstractAlgebra: coeff!
 import ..AbstractAlgebra: coefficient_ring
 import ..AbstractAlgebra: coefficient_ring_type
 import ..AbstractAlgebra: coefficients
@@ -131,6 +132,7 @@ import ..AbstractAlgebra: elem_type
 import ..AbstractAlgebra: evaluate
 import ..AbstractAlgebra: exp
 import ..AbstractAlgebra: exponent_vectors
+import ..AbstractAlgebra: exponent_vector!
 import ..AbstractAlgebra: expressify
 import ..AbstractAlgebra: factor
 import ..AbstractAlgebra: factor_squarefree
@@ -178,6 +180,7 @@ import ..AbstractAlgebra: max_precision
 import ..AbstractAlgebra: minpoly
 import ..AbstractAlgebra: modulus
 import ..AbstractAlgebra: monomials
+import ..AbstractAlgebra: monomial!
 import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mul_classical
 import ..AbstractAlgebra: mul_karatsuba
@@ -217,6 +220,7 @@ import ..AbstractAlgebra: symbols
 import ..AbstractAlgebra: tail
 import ..AbstractAlgebra: term_degree
 import ..AbstractAlgebra: terms
+import ..AbstractAlgebra: term!
 import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate

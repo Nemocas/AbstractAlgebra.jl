@@ -385,20 +385,67 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra.RingElement}
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
+
+  function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f), elem_type(coefficient_ring_type(f))}(f, inplace)
+    if inplace
+      I.temp = zero(coefficient_ring(parent(f)))
+    end
+    return I
+  end
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
-   poly::T
+# S may be the type of anything that can store an exponent vector, for example
+# Vector{Int}, ZZMatrix, ...
+mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
+
+  function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    return MPolyExponentVectors(Vector{Int}, f, inplace=inplace)
+  end
+
+  function MPolyExponentVectors(::Type{Vector{S}}, f::AbstractAlgebra.NCRingElem; inplace::Bool = false) where S
+    I = new{typeof(f), Vector{S}}(f, inplace)
+    if inplace
+      # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
+      I.temp = [zero(S) for _ in 1:nvars(parent(f))]
+    end
+    return I
+  end
 end
 
-struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
+
+  function MPolyTerms(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}(f, inplace)
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 end
 
-struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
+
+  function MPolyMonomials(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}(f, inplace)
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 end
 
 mutable struct MPolyBuildCtx{T, S}
