@@ -519,6 +519,9 @@ an array of the coefficients, use `collect(coefficients(a))`.
 If `inplace` is `true`, the elements of the iterator may share their memory. This
 means that an element returned by the iterator may be overwritten 'in place' in
 the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
 function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyCoeffs(a, inplace=inplace)
@@ -534,6 +537,9 @@ retrieve an array of the exponent vectors, use
 If `inplace` is `true`, the elements of the iterator may share their memory. This
 means that an element returned by the iterator may be overwritten 'in place' in
 the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
 function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyExponentVectors(a, inplace=inplace)
@@ -552,6 +558,9 @@ an array of the monomials, use `collect(monomials(a))`.
 If `inplace` is `true`, the elements of the iterator may share their memory. This
 means that an element returned by the iterator may be overwritten 'in place' in
 the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
 function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyMonomials(a, inplace=inplace)
@@ -566,6 +575,9 @@ an array of the terms, use `collect(terms(a))`.
 If `inplace` is `true`, the elements of the iterator may share their memory. This
 means that an element returned by the iterator may be overwritten 'in place' in
 the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
 function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.MPolyTerms(a, inplace=inplace)
