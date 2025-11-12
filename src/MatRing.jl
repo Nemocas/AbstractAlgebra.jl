@@ -152,7 +152,7 @@ end
 #
 ################################################################################
 
-# is_square(a::MatRingElem) = true
+is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
 
 ###############################################################################
 #
