@@ -302,10 +302,6 @@ julia> h = gcd(f, g)
 ### Square root
 
 ```@docs
-is_square{T <: RingElem}(::FracElem{T})
-```
-
-```@docs
 Base.sqrt(::FracElem{T}) where {T <: RingElem}
 ```
 

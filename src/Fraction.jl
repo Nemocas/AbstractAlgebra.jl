@@ -693,11 +693,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::FracElem{T}) where T <: RingElem
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::FracElem{T}) where T <: RingElem
    return is_square(numerator(a)) && is_square(denominator(a))
 end
