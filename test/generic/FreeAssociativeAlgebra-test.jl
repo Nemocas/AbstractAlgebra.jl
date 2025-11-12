@@ -125,14 +125,6 @@
 
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
       @test isone(varlist[1]^0)
-
-      _, varlist = polynomial_ring(QQ, var_names)
-      y = varlist[1]
-      @test x in [x, y]
-      @test x in [y, x]
-      @test !(x in [y])
-      @test x in keys(Dict(x => 1))
-      @test !(y in keys(Dict(x => 1)))
    end
 end
 

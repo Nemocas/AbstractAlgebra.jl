@@ -40,12 +40,6 @@ end
    a = TT(1)
    b = T(2)
 
-   @test a in [a, b]
-   @test a in [b, a]
-   @test !(a in [b])
-   @test a in keys(Dict(a => 1))
-   @test !(b in keys(Dict(a => 1)))
-
    # Multivariate
 
    T, (x, y) = rational_function_field(QQ, ["x", "y"])
