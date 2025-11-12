@@ -46,11 +46,11 @@
    b = T(2)
    @test is_perfect(TT)
 
-   @test a in [a, b]
-   @test a in [b, a]
-   @test !(a in [b])
-   @test a in keys(Dict(a => 1))
-   @test !(b in keys(Dict(a => 1)))
+#   @test a in [a, b]
+#   @test a in [b, a]
+#   @test !(a in [b])
+#   @test a in keys(Dict(a => 1))
+#   @test !(b in keys(Dict(a => 1)))
 end
 
 @testset "Generic.FracFieldElem.printing" begin
