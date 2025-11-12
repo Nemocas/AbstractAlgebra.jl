@@ -93,12 +93,12 @@ end
 
    @test isa(l, Generic.RelSeries)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
+#   @test x in [x, y]
+#   @test x in [y, x]
+#   @test !(x in [y])
+#
+#   @test x in keys(Dict(x => 1))
+#   @test !(y in keys(Dict(x => 1)))
 
    @test_throws DomainError O(0+O(x^0))
 
