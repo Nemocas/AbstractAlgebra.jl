@@ -786,10 +786,8 @@ end
 function evaluate(a::UnivPoly, A::Vector{<:Union{NCRingElem, RingElement}})
    a2 = data(a)
    varidx = Int[var_index(x) for x in vars(a2)]
-   if isempty(A)
-      isempty(varidx) || error("Number of variables does not match number of values")
-      return constant_coefficient(a2)
-   end
+   isempty(varidx) && return constant_coefficient(a2)
+   isempty(A) && error("Number of variables does not match number of values")
    vals = zeros(parent(A[1]), nvars(parent(a2)))
    n = length(A)
    for i in varidx
