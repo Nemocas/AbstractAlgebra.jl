@@ -12,6 +12,7 @@ export abs_series_type
 export base_field
 export basis
 export character
+export coeff!
 export collength
 export combine_like_terms!
 export cycles
@@ -25,6 +26,7 @@ export enable_cache!
 export exp_gcd
 export exponent
 export exponent_vector
+export exponent_vector!
 export exponent_word
 export falling_factorial
 export finish
@@ -122,6 +124,7 @@ export summands
 export supermodule
 export term
 export terms
+export term!
 export to_univariate
 export total_degree
 export trailing_coefficient
