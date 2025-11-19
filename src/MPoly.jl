@@ -90,18 +90,26 @@ Return the number of variables in `R`.
 number_of_generators(R::MPolyRing) = number_of_variables(R)
 
 @doc raw"""
+    var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the indices of the variables actually occurring in $p$.
+"""
+function var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+   isused = zeros(Int, nvars(parent(p)))
+   for v in exponent_vectors(p)
+      isused .|= v  # accumulate by OR-ing the exponent vectors
+   end
+   return findall(!iszero, isused)
+end
+
+@doc raw"""
     vars(p::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the variables actually occurring in $p$.
 """
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
    R = parent(p)
-   n = nvars(R)
-   isused = zeros(Int, n)
-   for v in exponent_vectors(p)
-      isused .|= v  # accumulate by OR-ing the exponent vectors
-   end
-   return [R[i] for i in 1:n if isused[i] != 0]
+   return [gen(R, i) for i in var_indices(p)]
 end
 
 @doc raw"""
