@@ -129,8 +129,12 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   e = Vector{Int}(undef, nvars(parent(a)))
-   return exponent_vector!(e, a, i)
+  return exponent_vector(Vector{Int}, a, i)
+end
+
+function exponent_vector(::Type{Vector{S}}, a::MPoly{T}, i::Int) where {T <: RingElement, S}
+  e = Vector{S}(undef, nvars(parent(a)))
+  return exponent_vector!(e, a, i)
 end
 
 function exponent_vector!(e::Vector{S}, a::MPoly{T}, i::Int) where {T <: RingElement, S}
@@ -843,10 +847,10 @@ function Base.iterate(x::MPolyCoeffs, state::Union{Nothing, Int} = nothing)
    end
 end
 
-function Base.iterate(x::MPolyExponentVectors, state::Union{Nothing, Int} = nothing)
+function Base.iterate(x::MPolyExponentVectors{T, S}, state::Union{Nothing, Int} = nothing) where {T, S}
    s = isnothing(state) ? 1 : state + 1
    if length(x.poly) >= s
-      v = x.inplace ? exponent_vector!(x.temp, x.poly, s) : exponent_vector(x.poly, s)
+      v = x.inplace ? exponent_vector!(x.temp, x.poly, s) : exponent_vector(S, x.poly, s)
       return v, s
    else
       return nothing
