@@ -340,11 +340,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::ResFieldElem{T}) where T <: Integer
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
