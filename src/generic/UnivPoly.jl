@@ -40,12 +40,6 @@ number_of_generators(S::UniversalPolyRing) = number_of_generators(mpoly_ring(S))
 
 symbols(S::UniversalPolyRing) = symbols(mpoly_ring(S))
 
-function vars(p::UnivPoly{T}) where {T}
-   S = parent(p)
-   V = vars(data(p))
-   return [UnivPoly{T}(v, S) for v in V]
-end
-
 internal_ordering(p::UniversalPolyRing) = internal_ordering(mpoly_ring(p))
 
 data(p::UnivPoly{T}) where {T<:RingElement} = p.p::mpoly_type(T)
