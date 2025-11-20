@@ -182,28 +182,6 @@ end
 
 ###############################################################################
 #
-#   Binary operations
-#
-###############################################################################
-
-function *(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
-   degree(x) != degree(y) && error("Incompatible matrix degrees")
-   A = similar(x)
-   C = base_ring(x)()
-   for i = 1:nrows(x)
-      for j = 1:ncols(y)
-         A[i, j] = base_ring(x)()
-         for k = 1:ncols(x)
-            C = mul!(C, x[i, k], y[k, j])
-            A[i, j] = add!(A[i, j], C)
-         end
-      end
-   end
-   return A
-end
-
-###############################################################################
-#
 #   Ad hoc comparisons
 #
 ###############################################################################
