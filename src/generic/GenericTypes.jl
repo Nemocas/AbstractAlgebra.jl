@@ -464,7 +464,7 @@ end
 ###############################################################################
 
 @attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
-   mpoly_ring::AbstractAlgebra.MPolyRing{T}
+   base_ring::AbstractAlgebra.MPolyRing{T}
 
    function UniversalPolyRing{T}(
       R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
