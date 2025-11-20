@@ -286,6 +286,8 @@ end
 
 var_index(x::UnivPoly) = var_index(data(x))
 
+var_indices(p::UnivPoly) = var_indices(data(p))
+
 function vars(p::UnivPoly{T}) where {T <: RingElement}
    V = vars(data(p))
    S = parent(p)
