@@ -45,9 +45,15 @@ end
    @test elem_type(Generic.RelPowerSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
    @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelPowerSeriesRing{BigInt}
 
+   @test coefficient_ring(R) === ZZ
+   @test coefficient_ring_type(R) == typeof(coefficient_ring(R))
+
    @test elem_type(T) == Generic.RelSeries{elem_type(S)}
    @test elem_type(Generic.RelPowerSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
    @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelPowerSeriesRing{elem_type(S)}
+
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
 
    @test isa(R, Generic.RelPowerSeriesRing)
 

@@ -40,9 +40,15 @@ end
    @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.LaurentSeriesRing)
    @test isa(T, Generic.LaurentSeriesRing)
