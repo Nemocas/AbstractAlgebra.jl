@@ -77,18 +77,17 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
    return a([one(base_ring(a))], exps)
 end
 
-function vars(p::MPoly{T}) where {T <: RingElement}
-   vars_in_p = Vector{MPoly{T}}(undef, 0)
-   n = nvars(p.parent)
+function var_indices(p::MPoly)
+   vars_in_p = Int[]
+   n = nvars(parent(p))
    exps = p.exps
-   gen_list = gens(p.parent)
    for j = 1:n
       for i = 1:length(p)
          if exps[j, i] > 0
             if p.parent.ord == :degrevlex
-               push!(vars_in_p, gen_list[j])
+               push!(vars_in_p, j)
             else
-               push!(vars_in_p, gen_list[n - j + 1])
+               push!(vars_in_p, n - j + 1)
             end
             break
          end
@@ -97,7 +96,12 @@ function vars(p::MPoly{T}) where {T <: RingElement}
    if p.parent.ord != :degrevlex
       vars_in_p = reverse(vars_in_p)
    end
-   return(vars_in_p)
+   return vars_in_p
+end
+
+function vars(p::MPoly{T}) where {T <: RingElement}
+   R = parent(p)
+   return MPoly{T}[gen(R, i) for i in var_indices(p)]
 end
 
 @doc raw"""

@@ -598,6 +598,7 @@ export use_karamul
 export valuation
 export var
 export var_index
+export var_indices
 export vars
 export vector_space
 export vector_space_dim

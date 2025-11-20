@@ -230,6 +230,7 @@ import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var
 import ..AbstractAlgebra: var_index
+import ..AbstractAlgebra: var_indices
 import ..AbstractAlgebra: vars
 import ..AbstractAlgebra: vector_space_dim
 import ..AbstractAlgebra: zero!
