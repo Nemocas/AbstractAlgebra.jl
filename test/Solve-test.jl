@@ -244,8 +244,8 @@ end
 
   @test base_ring(MT) == QQ
 
-  @test @inferred zero(MT) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 5))
-  @test @inferred zero(MT, 2, 3) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 2))
+  @test (@inferred zero(MT)) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 5))
+  @test (@inferred zero(MT, 2, 3)) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 2))
 
   S = @inferred similar(MT)
   @test S isa AbstractAlgebra.Solve.LazyTransposeMatElem
