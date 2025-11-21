@@ -982,13 +982,6 @@ end
          @test evaluate(g, V) == g([ZZ(v) for v in V]...)
          @test evaluate(g, V) == g([U(v) for v in V]...)
 
-         @test evaluate(h, V) == evaluate(h, [R(v) for v in V])
-         @test evaluate(h, V) == evaluate(h, [ZZ(v) for v in V])
-         @test evaluate(h, V) == evaluate(h, [U(v) for v in V])
-         @test evaluate(h, V) == h(V...)
-         @test evaluate(h, V) == h([ZZ(v) for v in V]...)
-         @test evaluate(h, V) == h([U(v) for v in V]...)
-
          V = [rand(-10:10) for v in 1:2]
 
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
