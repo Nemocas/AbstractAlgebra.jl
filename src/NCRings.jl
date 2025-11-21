@@ -175,6 +175,8 @@ function is_nilpotent(a::T) where {T <: NCRingElement}
   throw(NotImplementedError(:is_nilpotent, a))
 end
 
+ConformanceTests._implements(::Type{T}, f::typeof(is_nilpotent)) where {T <: NCRingElement} = is_domain_type(T) || _implements_directly(T, f)
+
 
 ###############################################################################
 #
