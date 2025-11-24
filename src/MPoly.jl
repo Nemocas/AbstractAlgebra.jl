@@ -500,6 +500,10 @@ function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <:
    return S.(exponent_vector(a, i))
 end
 
+function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return S.(exponent_vector(a, i))
+end
+
 function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
    return coeff(a, i)
 end

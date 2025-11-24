@@ -131,6 +131,7 @@ import ..AbstractAlgebra: domain
 import ..AbstractAlgebra: elem_type
 import ..AbstractAlgebra: evaluate
 import ..AbstractAlgebra: exp
+import ..AbstractAlgebra: exponent_vector
 import ..AbstractAlgebra: exponent_vectors
 import ..AbstractAlgebra: exponent_vector!
 import ..AbstractAlgebra: expressify
