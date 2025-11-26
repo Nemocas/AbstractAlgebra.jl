@@ -406,10 +406,6 @@ is_monic(::PolyRingElem)
 ```
 
 ```@docs
-is_square(::PolyRingElem)
-```
-
-```@docs
 length(::PolynomialElem)
 ```
 

@@ -265,10 +265,6 @@ julia> h = gcd(f, g)
 ### Square Root
 
 ```@docs
-is_square{T <: Integer}(::ResFieldElem{T})
-```
-
-```@docs
 Base.sqrt{T <: Integer}(::ResFieldElem{T})
 ```
 
