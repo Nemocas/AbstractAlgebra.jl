@@ -851,7 +851,7 @@ function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: Unio
    return evaluate(a, [val, vals...])
 end
 
-function (a::UnivPoly{T})(vals::Union{NCRingElem, RingElement}...) where {T <: RingElement}
+function (a::UnivPoly{T})(vals::NCRingElement...) where {T <: RingElement}
    A = [vals...]
    n = length(vals)
    num = nvars(parent(data(a)))

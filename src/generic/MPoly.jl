@@ -3322,7 +3322,7 @@ function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: Union{I
 end
 
 @doc raw"""
-    (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+    (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
 
 Evaluate the polynomial at the supplied values, which may be any ring elements,
 commutative or non-commutative. Evaluation always proceeds in the order of the
@@ -3332,7 +3332,7 @@ all of the supplied values in order is defined. Note that this evaluation is
 more general than those provided by the evaluate function. The values do not
 need to be in the same ring, just in compatible rings.
 """
-function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+function (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values

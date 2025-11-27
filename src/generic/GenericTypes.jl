@@ -1344,11 +1344,11 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct FreeModule{T <: NCRingElement} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
 
-   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
       return get_cached!(FreeModuleDict, (R, rank), cached) do
          new{T}(rank, R)
       end::FreeModule{T}
@@ -1357,11 +1357,11 @@ end
 
 const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
-struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
    parent::FreeModule{T}
    v::MatElem{T}
 
-   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: Union{RingElement, NCRingElem}
+   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: NCRingElement
       new{T}(m, v)
    end
 end
