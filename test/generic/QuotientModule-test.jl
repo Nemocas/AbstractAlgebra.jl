@@ -18,6 +18,9 @@
    @test elem_type(Generic.QuotientModule{elem_type(R)}) == Generic.QuotientModuleElem{elem_type(R)}
    @test parent_type(Generic.QuotientModuleElem{elem_type(R)}) == Generic.QuotientModule{elem_type(R)}
 
+   @test coefficient_ring(M) == R
+   @test coefficient_ring_type(M) == typeof(coefficient_ring(M))
+
    @test isa(Q([R(2)]), Generic.QuotientModuleElem)
 
    R = QQ

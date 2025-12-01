@@ -16,6 +16,10 @@ base_ring_type(::Type{FreeModule{T}}) where T <: NCRingElement = parent_type(T)
 
 base_ring(M::FreeModule{T}) where T <: NCRingElement = M.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:FreeModule}) = base_ring_type(T)
+
+coefficient_ring(M::FreeModule) = base_ring(M)
+
 elem_type(::Type{FreeModule{T}}) where T <: NCRingElement = FreeModuleElem{T}
 
 parent(m::FreeModuleElem{T}) where T <: NCRingElement = m.parent
