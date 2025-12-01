@@ -322,6 +322,10 @@ is_univariate(::MPolyRing{T}) where T <: RingElement
 ```
 
 ```@docs
+var_indices(p::MPolyRingElem{T}) where T <: RingElement
+```
+
+```@docs
 vars(p::MPolyRingElem{T}) where T <: RingElement
 ```
 

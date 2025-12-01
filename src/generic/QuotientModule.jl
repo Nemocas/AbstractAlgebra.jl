@@ -145,7 +145,7 @@ function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    return QuotientModuleElem{T}(N, mat)
 end
 
-function (M::QuotientModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
+function (M::QuotientModule{T})(a::Vector{Any}) where T <: NCRingElement
    length(a) != 0 && error("Incompatible element")
    return M(T[])
 end

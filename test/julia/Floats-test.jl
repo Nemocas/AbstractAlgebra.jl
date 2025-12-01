@@ -83,13 +83,26 @@ end
    end
 end
 
-@testset "Julia.Floats.gcd" begin
+@testset "Julia.Floats.is_square" begin
    R = RDF
    S = RealField
 
+   z1 = R(0.0)
+   z2 = S(0.0)
+
+   @test is_square(z1)
+   @test is_square(z2)
+
+   fz1, z1root = is_square_with_sqrt(z1)
+   @test fz1
+   @test is_zero(z1root)
+
+   fz2, z2root = is_square_with_sqrt(z2)
+   @test fz2
+   @test is_zero(z2root)
+
    r = R(-0.1)
    s = S(-0.1)
-
    @test !is_square(r)
    @test !is_square(s)
 

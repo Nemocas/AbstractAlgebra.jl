@@ -29,3 +29,12 @@ end
    @test string(f) == "x * (x + y) * (x*y)" ||
          string(f) == "x * (x*y) * (x + y)"
 end
+
+@testset "Fac.equality" begin
+  # 2025-10-20  equality test on factorizations always gives error (even if the args are ===)
+   f = Fac(-1, Dict{Int, Int}(2 => 3, 3 => 1))
+   ff = Fac(-1, [2 => 3, 3 => 1])
+
+   @test_throws  ErrorException  f == f
+   @test_throws  ErrorException  (f == ff) 
+end

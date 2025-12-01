@@ -58,10 +58,12 @@ end
 function AbstractAlgebra.can_solve_with_solution(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = MatSpaceElem{T}(R, M.entries) # convert to ordinary matrix
-   BS = MatSpaceElem{T}(R, B.entries)
+   # TODO: Once #1955 is resolved, the conversion to matrix and back to MatRingElem
+   # should be done better
+   MS = matrix(R, M.entries) # convert to ordinary matrix
+   BS = matrix(R, B.entries)
    flag, S = can_solve_with_solution(MS, BS)
-   SA = MatRingElem{T}(R, S.entries)
+   SA = MatRingElem{T}(R, Array(S))
    return flag, SA
 end
 

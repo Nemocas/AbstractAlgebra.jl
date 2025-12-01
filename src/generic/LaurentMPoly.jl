@@ -428,6 +428,10 @@ function constant_coefficient(a::LaurentMPolyWrap)
     return coeff(a.mpoly, e)
 end
 
+function coeff(a::LaurentMPolyWrap, e::Vector{Int})
+  return coeff(a.mpoly, e - a.mindegs)
+end
+
 #### exponent vectors
 
 function leading_exponent_vector(a::LaurentMPolyWrap)

@@ -147,9 +147,13 @@ end
          @test symbols(S) == [:x, :y, :z]
 
          @test length(vars(S())) == 0
+         @test length(var_indices(S())) == 0
          @test vars(x^2 + 2x + 1) == [x]
+         @test var_indices(x^2 + 2x + 1) == [1]
          @test vars(x*y + 1) == [x, y]
+         @test var_indices(x*y + 1) == [1, 2]
          @test vars(x*y + z) == [x, y, z]
+         @test var_indices(x*y + z) == [1, 2, 3]
 
          @test internal_ordering(S) == ord
       end
