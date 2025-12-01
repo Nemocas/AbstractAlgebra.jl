@@ -686,10 +686,7 @@ Base.log(a::SeriesElem{T}) where T <: FieldElem
 ```@docs
 Base.exp(a::RelPowerSeriesRingElem)
 ```
-
-```@docs
-Base.sqrt(a::RelPowerSeriesRingElem)
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `RelPowerSeriesRingElem`.
 
 
 **Examples**

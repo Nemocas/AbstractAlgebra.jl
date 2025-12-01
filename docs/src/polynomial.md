@@ -674,9 +674,7 @@ deflate(::PolyRingElem)
 
 ### Square root
 
-```@docs
-Base.sqrt(::PolyRingElem{T}; check::Bool) where T <: RingElement
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `PolyRingElem`.
 
 **Examples**
 
