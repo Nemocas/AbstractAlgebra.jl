@@ -185,7 +185,7 @@ See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
 function is_square end
 
 @doc raw"""
-    sqrt(a::T; check::Bool=true) where {T <: NCRingElement}
+    sqrt(a::NCRingElem; check::Bool=true)
 
 Return a square root of `a`, if it exists. By default (`check=true`),
 implementations should raise an exception if `a` is not a square in its ring.
@@ -193,7 +193,7 @@ If `check=false`, implementations may skip this verification.
 
 See also `is_square` and `is_square_with_sqrt`.
 """
-sqrt
+sqrt(::NCRingElem)
 
 ###############################################################################
 #
