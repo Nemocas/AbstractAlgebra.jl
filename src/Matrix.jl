@@ -737,16 +737,7 @@ function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElemen
    return mat
 end
 
-function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
-   show_via_expressify(io, a)
-end
-
-function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited && !get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
-   show_via_expressify(io, mi, a)
-end
+@enable_all_show_via_expressify MatrixElem
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRingElement
    r = nrows(a)
