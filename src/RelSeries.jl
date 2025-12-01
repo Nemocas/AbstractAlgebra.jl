@@ -1172,13 +1172,6 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::RelPowerSeriesRingElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
 function Base.sqrt(a::RelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag

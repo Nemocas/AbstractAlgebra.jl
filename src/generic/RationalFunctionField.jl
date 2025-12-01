@@ -455,12 +455,6 @@ function is_square(a::RationalFunctionFieldElem)
    return is_square(data(a))
 end
 
-@doc raw"""
-    Base.sqrt(a::RationalFunctionFieldElem; check::Bool=true)
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::RationalFunctionFieldElem; check::Bool=true)
    R = parent(a)
    return R(sqrt(data(a); check=check))

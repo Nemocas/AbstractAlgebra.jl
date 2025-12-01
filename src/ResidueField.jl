@@ -349,12 +349,6 @@ function is_square(a::ResFieldElem{T}) where T <: Integer
    return isone(a^pm1div2)
 end
 
-@doc raw"""
-    sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)

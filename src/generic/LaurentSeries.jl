@@ -1395,13 +1395,6 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
     return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    flag, s = sqrt_classical(a, check=check)
    check && !flag && error("Not a square in sqrt")
