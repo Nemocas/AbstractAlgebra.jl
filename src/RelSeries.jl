@@ -787,36 +787,16 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem, y::JuliaRingElement)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::RelPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                     ((pol_length(x) == 0 && iszero(base_ring(x)(y))) ||
                      (pol_length(x) == 1 && valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::RelPowerSeriesRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::RelPowerSeriesRingElem) = y == x
 
 ###############################################################################

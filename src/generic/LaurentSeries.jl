@@ -1123,36 +1123,16 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::Generic.LaurentSeriesElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::LaurentSeriesElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem, y::JuliaRingElement)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::LaurentSeriesElem, y::JuliaRingElement) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::Generic.LaurentSeriesElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::LaurentSeriesElem) = y == x
 
 ###############################################################################

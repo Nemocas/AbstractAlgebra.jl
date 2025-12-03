@@ -238,41 +238,21 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(a::ResFieldElem, b::JuliaRingElement)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResFieldElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::JuliaRingElement, b::ResFieldElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::JuliaRingElement, b::ResFieldElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc raw"""
-    ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))

@@ -283,41 +283,21 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(a::ResElem, b::JuliaRingElement)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::JuliaRingElement, b::ResElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::JuliaRingElement, b::ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc raw"""
-    ==(a::ResElem{T}, b::T) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::T, b::ResElem{T}) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::T, b::ResElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))

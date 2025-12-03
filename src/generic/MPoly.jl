@@ -4029,11 +4029,6 @@ function (a::MPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-@doc raw"""
-    (a::MPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
-
-Construct the constant polynomial `b` in the given polynomial ring.
-"""
 function (a::MPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    z = MPoly{T}(a, base_ring(a)(b))
    return z
@@ -4045,7 +4040,7 @@ function (a::MPolyRing{T})(b::T) where {T <: JuliaRingElement}
 end
 
 @doc raw"""
-    (a::MPolyRing{T})(b::T) where {T <: RingElement}
+    (a::MPolyRing)(b::RingElement)
 
 Construct the constant polynomial `b` in the given polynomial ring.
 """

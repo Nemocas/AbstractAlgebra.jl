@@ -563,34 +563,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
+    ==(x::AbsPowerSeriesRingElem{<:RingElem}, y::RingElement)
+    ==(x::RingElement, y::AbsPowerSeriesRingElem{<:RingElem})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::AbsPowerSeriesRingElem, y::JuliaRingElement)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::AbsPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                      ((length(x) == 0 && iszero(base_ring(x)(y))) ||
                       (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::AbsPowerSeriesRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::AbsPowerSeriesRingElem) = y == x
 
 ###############################################################################

@@ -401,11 +401,6 @@ Return `true` if $x = y$.
 """
 ==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem = y == x
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::NCPolyRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::NCPolyRingElem) = y == x
 
 ###############################################################################
@@ -532,7 +527,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_right(a::NCPolyRingElem{<:NCRingElem}, b::NCRingElement; check::Bool=true)
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
@@ -549,7 +544,7 @@ function divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <:
 end
 
 @doc raw"""
-    divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_left(a::NCPolyRingElem{<:NCRingElem}, b::NCRingElement; check::Bool=true)
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
@@ -565,12 +560,6 @@ function divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: 
    return z
 end
 
-@doc raw"""
-    divexact_right(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
-
-Assuming $a = qb$, return $q$. By default if the division is not exact an
-exception is raised. If `check=false` this test is omitted.
-"""
 function divexact_right(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
@@ -582,12 +571,6 @@ function divexact_right(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true
    return z
 end
 
-@doc raw"""
-    divexact_left(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
-
-Assuming $a = bq$, return $q$. By default if the division is not exact an
-exception is raised. If `check=false` this test is omitted.
-"""
 function divexact_left(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
    return divexact_right(a, b; check=check)
 end
@@ -599,7 +582,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
+    evaluate(a::NCPolyRingElem, b::NCRingElement)
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
@@ -618,11 +601,6 @@ function evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
    return z
 end
 
-@doc raw"""
-    evaluate(a::NCPolyRingElem, b::JuliaRingElement)
-
-Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
 function evaluate(a::NCPolyRingElem, b::JuliaRingElement)
    i = length(a)
    R = base_ring(a)

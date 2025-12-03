@@ -959,11 +959,6 @@ function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-@doc raw"""
-    +(x::JuliaRingElement, y::MatrixElem)
-
-Return $S(x) + y$ where $S$ is the parent of $y$.
-"""
 function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
@@ -979,15 +974,10 @@ function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
-@doc raw"""
-    +(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
-
-Return $x + S(y)$ where $S$ is the parent of $x$.
-"""
 +(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement = y + x
 
 @doc raw"""
-    +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    +(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
@@ -1006,17 +996,12 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    +(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
-Return $x + S(y)$ where $S$ is the parent of $x$.
+Return $x + S(y)$, where $S$ is the parent of $a$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
 
-@doc raw"""
-    -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
-
-Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
 function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
@@ -1032,11 +1017,6 @@ function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
-@doc raw"""
-    -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
-
-Return $x - S(y)$, where $S$ is the parent of $x$.
-"""
 function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    R = base_ring(x)
@@ -1053,7 +1033,7 @@ function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
 end
 
 @doc raw"""
-    -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    -(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
@@ -1073,7 +1053,7 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    -(x::MatrixElem{<:NCRingElem}, y::NCRingElement)
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
@@ -1338,12 +1318,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
-
-Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
-otherwise return `false`.
-"""
 function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
@@ -1360,16 +1334,10 @@ function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    return true
 end
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
-
-Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
-otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement = y == x
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    ==(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
@@ -1391,7 +1359,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    ==(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.

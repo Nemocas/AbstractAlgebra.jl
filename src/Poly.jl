@@ -936,34 +936,14 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::PolyRingElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$.
-"""
 ==(x::PolyRingElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::PolynomialElem, y::JuliaRingElement)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::PolynomialElem, y::JuliaRingElement) = ((length(x) == 0 && iszero(base_ring(x)(y)))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
-
-Return `true` if $x = y$.
-"""
 ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
-@doc raw"""
-    ==(x::JuliaRingElement, y::PolyRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::JuliaRingElement, y::PolyRingElem) = y == x
 
 ###############################################################################
