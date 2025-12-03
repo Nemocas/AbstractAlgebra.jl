@@ -230,12 +230,12 @@ end
 #
 ###############################################################################
 
-function *(a::RationalFunctionFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::RationalFunctionFieldElem, b::JuliaRingElement)
    R = parent(a)
    return R(data(a)*b)
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::RationalFunctionFieldElem)
+function *(a::JuliaRingElement, b::RationalFunctionFieldElem)
    R = parent(b)
    return R(a*data(b))
 end
@@ -250,12 +250,12 @@ function *(a::T, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <:
    return R(a*data(b))
 end
 
-function +(a::RationalFunctionFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function +(a::RationalFunctionFieldElem, b::JuliaRingElement)
    R = parent(a)
    return R(data(a) + b)
 end
 
-function +(a::Union{Integer, Rational, AbstractFloat}, b::RationalFunctionFieldElem)
+function +(a::JuliaRingElement, b::RationalFunctionFieldElem)
    R = parent(b)
    return R(a + data(b))
 end
@@ -270,12 +270,12 @@ function +(a::T, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <:
    return R(a + data(b))
 end
 
-function -(a::RationalFunctionFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function -(a::RationalFunctionFieldElem, b::JuliaRingElement)
    R = parent(a)
    return R(data(a) - b)
 end
 
-function -(a::Union{Integer, Rational, AbstractFloat}, b::RationalFunctionFieldElem)
+function -(a::JuliaRingElement, b::RationalFunctionFieldElem)
    R = parent(b)
    return R(a - data(b))
 end
@@ -312,12 +312,12 @@ end
 #
 ###############################################################################
 
-function ==(a::RationalFunctionFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::RationalFunctionFieldElem, b::JuliaRingElement)
    R = parent(a)
    return data(a) == b
 end
 
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::RationalFunctionFieldElem)
+function ==(a::JuliaRingElement, b::RationalFunctionFieldElem)
    R = parent(b)
    return a == data(b)
 end
@@ -376,12 +376,12 @@ end
 #
 ###############################################################################
 
-function divexact(a::RationalFunctionFieldElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::RationalFunctionFieldElem, b::JuliaRingElement; check::Bool=true)
    R = parent(a)
    return R(divexact(data(a), b; check=check))
 end
 
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::RationalFunctionFieldElem; check::Bool=true)
+function divexact(a::JuliaRingElement, b::RationalFunctionFieldElem; check::Bool=true)
    R = parent(b)
    return R(divexact(a, data(b); check=check))
 end

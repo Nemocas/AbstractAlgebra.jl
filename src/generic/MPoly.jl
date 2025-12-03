@@ -1892,7 +1892,7 @@ end
 #
 ###############################################################################
 
-function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+function *(a::MPoly, n::JuliaRingElement)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -1928,11 +1928,11 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a*n
+*(n::JuliaRingElement, a::MPoly) = a*n
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
-function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::MPoly, n::JuliaRingElement; check::Bool=true)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -2013,7 +2013,7 @@ end
 #
 ###############################################################################
 
-function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+function ==(a::MPoly, n::JuliaRingElement)
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -2025,7 +2025,7 @@ function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    return false
 end
 
-==(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a == n
+==(n::JuliaRingElement, a::MPoly) = a == n
 
 function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
@@ -3320,7 +3320,7 @@ function (a::MPoly{T})(vals::T...) where T <: RingElement
    return evaluate(a, [vals...])
 end
 
-function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: JuliaRingElement}
    length(vals) + 1 != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [val, vals...])
 end
@@ -4030,16 +4030,16 @@ function (a::MPolyRing{T})() where {T <: RingElement}
 end
 
 @doc raw"""
-    (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+    (a::MPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
 
 Construct the constant polynomial `b` in the given polynomial ring.
 """
-function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    z = MPoly{T}(a, base_ring(a)(b))
    return z
 end
 
-function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+function (a::MPolyRing{T})(b::T) where {T <: JuliaRingElement}
    z = MPoly{T}(a, b)
    return z
 end

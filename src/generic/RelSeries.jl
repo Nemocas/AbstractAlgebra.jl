@@ -366,7 +366,7 @@ function (R::RelPowerSeriesRing{T})() where T <: RingElement
    return z
 end
 
-function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    bb = base_ring(R)(b)
    if is_zero(bb)
       z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)

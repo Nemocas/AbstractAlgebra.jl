@@ -522,7 +522,7 @@ end
 
 for op in (:+, :-, :*)
   @eval begin
-    function $op(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}) where {T}
+    function $op(p::UnivPoly{T}, n::JuliaRingElement) where {T}
        S = parent(p)
        return UnivPoly{T}($op(data(p),n), S)
     end
@@ -532,7 +532,7 @@ for op in (:+, :-, :*)
        return UnivPoly{T}($op(data(p),n), S)
     end
 
-    function $op(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly{T}) where {T}
+    function $op(n::JuliaRingElement, p::UnivPoly{T}) where {T}
        S = parent(p)
        return UnivPoly{T}($op(n,data(p)), S)
     end
@@ -544,7 +544,7 @@ for op in (:+, :-, :*)
   end
 end
 
-function divexact(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where {T}
+function divexact(p::UnivPoly{T}, n::JuliaRingElement; check::Bool=true) where {T}
    S = parent(p)
    return UnivPoly{T}(divexact(data(p), n; check=check), S)
 end
@@ -633,9 +633,9 @@ end
 #
 ###############################################################################
 
-==(p::UnivPoly, n::Union{Integer, Rational, AbstractFloat}) = data(p) == n
+==(p::UnivPoly, n::JuliaRingElement) = data(p) == n
 
-==(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = data(p) == n
+==(n::JuliaRingElement, p::UnivPoly) = data(p) == n
 
 ==(p::UnivPoly{T}, n::T) where {T <: RingElem} = data(p) == n
 
@@ -800,7 +800,7 @@ function evaluate(a::UnivPoly{T}, A::Vector{T}) where {T <: RingElem}
    return evaluate(data(a), A)
 end
 
-function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: Union{Integer, Rational, AbstractFloat}}
+function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: JuliaRingElement}
    n = length(A)
    num = nvars(parent(data(a)))
    if n > num
@@ -847,7 +847,7 @@ function (a::UnivPoly{T})(vals::T...) where {T <: RingElement}
    return evaluate(a, [vals...])
 end
 
-function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: Union{Integer, Rational, AbstractFloat}}
+function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: JuliaRingElement}
    return evaluate(a, [val, vals...])
 end
 
@@ -1184,7 +1184,7 @@ function (a::UniversalPolyRing{T})() where {T <: RingElement}
    return UnivPoly{T}(mpoly_ring(a)(), a)
 end
 
-function (a::UniversalPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::UniversalPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    return UnivPoly{T}(mpoly_ring(a)(b), a)
 end
 

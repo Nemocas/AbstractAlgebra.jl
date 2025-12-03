@@ -166,27 +166,27 @@ end
 #
 ###############################################################################
 
-*(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) * b)
 
 *(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a * data(b))
+*(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a * data(b))
 
 *(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
-+(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) + b)
 
 +(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a + data(b))
++(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a + data(b))
 
 +(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
--(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) - b)
 
 -(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
--(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a - data(b))
+-(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a - data(b))
 
 -(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
@@ -239,21 +239,21 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+    ==(a::ResFieldElem, b::JuliaRingElement)
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
-function ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::ResFieldElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 @doc raw"""
-    ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
+    ==(a::JuliaRingElement, b::ResFieldElem)
 
 Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
+function ==(a::JuliaRingElement, b::ResFieldElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end

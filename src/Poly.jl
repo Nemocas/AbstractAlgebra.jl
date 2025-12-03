@@ -778,7 +778,7 @@ function *(a::T, b::PolyRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
+function *(a::JuliaRingElement, b::PolynomialElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -791,7 +791,7 @@ end
 
 *(a::PolyRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::PolynomialElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -945,11 +945,11 @@ Return `true` if $x == y$.
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc raw"""
-    ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::PolynomialElem, y::JuliaRingElement)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && iszero(base_ring(x)(y)))
+==(x::PolynomialElem, y::JuliaRingElement) = ((length(x) == 0 && iszero(base_ring(x)(y)))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc raw"""
@@ -960,11 +960,11 @@ Return `true` if $x = y$.
 ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
 @doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem)
+    ==(x::JuliaRingElement, y::PolyRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem) = y == x
+==(x::JuliaRingElement, y::PolyRingElem) = y == x
 
 ###############################################################################
 #
@@ -1486,7 +1486,7 @@ function divexact(a::PolyRingElem{T}, b::T; check::Bool=true) where {T <: RingEl
    return z
 end
 
-function divexact(a::PolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::PolyRingElem, b::JuliaRingElement; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))

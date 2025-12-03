@@ -337,7 +337,7 @@ function *(a::T, b::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsPowerSeriesRingElem)
+function *(a::JuliaRingElement, b::AbsPowerSeriesRingElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -351,7 +351,7 @@ end
 
 *(a::AbsPowerSeriesRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::AbsPowerSeriesRingElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::AbsPowerSeriesRingElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -578,20 +578,20 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
 @doc raw"""
-    ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbsPowerSeriesRingElem, y::JuliaRingElement)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::AbsPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                      ((length(x) == 0 && iszero(base_ring(x)(y))) ||
                       (length(x) == 1 && coeff(x, 0) == y))
 
 @doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)
+    ==(x::JuliaRingElement, y::AbsPowerSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem) = y == x
+==(x::JuliaRingElement, y::AbsPowerSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -654,7 +654,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::AbsPowerSeriesRingElem, y::JuliaRingElement; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()

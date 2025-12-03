@@ -374,7 +374,7 @@ end
 
 -(a::FracElem, b::Rational) = return a - parent(a)(b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::FracElem) = b + a
++(a::JuliaRingElement, b::FracElem) = b + a
 
 function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
@@ -452,7 +452,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::FracElem, y::JuliaRingElement)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -470,11 +470,11 @@ function ==(x::FracElem, y::Rational)
 end
 
 @doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem)
+    ==(x::JuliaRingElement, y::FracElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem) = y == x
+==(x::JuliaRingElement, y::FracElem) = y == x
 
 @doc raw"""
     ==(x::FracElem{T}, y::T) where {T <: RingElem}
