@@ -254,17 +254,10 @@ setindex!(a::Fac{Int}, c::Int, b::Int)
 ```
 ## Square root
 
-Many rings in AbstractAlgebra provide functionality for detecting and computing
-square roots. Two functions form the basic interface:
-
-- `is_square(a)` – return `true` if the element `a` is a square in its ring.
-- `sqrt(a; check=true)` – return a square root of `a`, when available.
+Rings may implement functionality for detecting and computing square roots.
 
 The exact behaviour depends on the ring. Some rings provide both operations,
-while others only implement `is_square`. If `check=false`, the square root
-check may be omitted.
-
-The following entries link to the generic interface documentation:
+while others only implement `is_square`.
 
 ```@docs
 is_square
