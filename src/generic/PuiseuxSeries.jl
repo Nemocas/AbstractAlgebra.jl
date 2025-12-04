@@ -621,13 +621,6 @@ function sqrt_classical(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: Ri
    return true, S(s, sscale)
 end
 
-@doc raw"""
-    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
-
-Return the square root of the given Puiseux series $a$. By default the function
-will throw an exception if the input is not square. If `check=false` this test
-is omitted.
-"""
 function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    flag, s = sqrt_classical(a; check=check)
    check && !flag && error("Not a square in sqrt")

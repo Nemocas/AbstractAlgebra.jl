@@ -160,13 +160,6 @@ end
 #
 ################################################################################
 
-@doc raw"""
-    sqrt(a::FieldElem)
-
-Return the square root of the element `a`. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
   R, t = polynomial_ring(R, :t; cached = false)
