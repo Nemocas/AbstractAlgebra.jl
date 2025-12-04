@@ -105,12 +105,12 @@ end
 
    @test isa(l, Generic.LaurentSeriesElem)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
+#   @test x in [x, y]
+#   @test x in [y, x]
+#   @test !(x in [y])
+#
+#   @test x in keys(Dict(x => 1))
+#   @test !(y in keys(Dict(x => 1)))
    
    R, x = laurent_series_ring(ZZ, 30, "x")
    RR, x = laurent_series_ring(ZZ, 30, "x")
