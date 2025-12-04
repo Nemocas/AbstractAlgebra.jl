@@ -10,6 +10,25 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+function (a::UniversalPolyRingElem)(;kwargs...)
+   ss = symbols(parent(a))
+   vars = Int[]
+   vals = RingElement[]
+   for (var, val) in kwargs
+     vari = findfirst(isequal(var), ss)
+     vari === nothing && continue
+     push!(vars, vari)
+     push!(vals, val)
+   end
+   return evaluate(a, vars, vals)
+end
+
+###############################################################################
+#
 #   Iterators
 #
 ###############################################################################
