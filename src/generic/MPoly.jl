@@ -18,6 +18,10 @@ elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
 base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+# ideal interface
+ideal_type(::Type{T}) where T <: MPolyRing = Generic.Ideal{elem_type(T)}
+ideal(R::MPolyRing, V::Vector) = Generic.Ideal(R, V)
+
 is_trivial(R::MPolyRing) = R.istrivial
 
 @doc raw"""
@@ -820,7 +824,7 @@ isone(x::MPoly) = is_trivial(parent(x)) || (x.length == 1 && monomial_iszero(x.e
 
 is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
+function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length

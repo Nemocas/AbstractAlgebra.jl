@@ -34,7 +34,16 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
 """
-gens(I::Ideal{T}) where T <: RingElement = I.gens
+gens(I::Ideal) = I.gens
+
+number_of_generators(I::Ideal) = length(I.gens)
+
+gen(I::Ideal, i::Int) = I.gens[i]
+
+function deepcopy_internal(I::Ideal, dict::IdDict)
+   elms = [deepcopy_internal(x, dict) for x in I.gens]
+   return Ideal(base_ring(I), elms)
+end
 
 ###############################################################################
 #
@@ -2094,31 +2103,12 @@ end
 
 ###############################################################################
 #
-#   Comparison
-#
-###############################################################################
-
-function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   return gens(I) == gens(J)
-end
-
-###############################################################################
-#
-#   Containment
+#   Membership
 #
 ###############################################################################
 
 function Base.in(v::T, I::Ideal{T}) where T <: RingElement
   return is_zero(normal_form(v, I))
-end
-
-@doc raw"""
-    Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-
-Return `true` if the ideal `I` is a subset of the ideal `J`.
-"""
-function Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   return all(in(J), gens(I))
 end
 
 ###############################################################################
@@ -2133,29 +2123,21 @@ end
 Return the intersection of the ideals `I` and `J`.
 """
 function intersect(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   ngens(I) == 0 && return deepcopy(I)
+   ngens(J) == 0 && return deepcopy(J)
    R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   if isempty(G1)
-      return deepcopy(I)
-   end
-   if isempty(G2)
-      return deepcopy(J)
-   end
-   return Ideal(R, lcm(G1[1], G2[1]))
+   g1 = only(gens(I))
+   g2 = only(gens(J))
+   return Ideal(R, lcm(g1, g2))
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyRingElem{U}}
+   ngens(I) == 0 && return deepcopy(I)
+   ngens(J) == 0 && return deepcopy(J)
    R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   if isempty(G1)
-      return deepcopy(I)
-   end
-   if isempty(G2)
-      return deepcopy(J)
-   end
-   return Ideal(R, lcm(G1[1], G2[1]))
+   g1 = only(gens(I))
+   g2 = only(gens(J))
+   return Ideal(R, lcm(g1, g2))
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
@@ -2202,26 +2184,6 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
    G = filter(x->!in(t, vars(x)), gens(IntSup))
    GInt = elem_type(S)[f(vcat(S(1), gens(S))...) for f in G]
    return Ideal(S, GInt)
-end
-
-###############################################################################
-#
-#   Binary operations
-#
-###############################################################################
-
-function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   return Ideal(R, vcat(G1, G2))
-end
-
-function *(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   R = base_ring(I)
-   G1 = gens(I)
-   G2 = gens(J)
-   return Ideal(R, [v*w for v in G1 for w in G2])
 end
 
 ###############################################################################
