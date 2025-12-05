@@ -20,19 +20,22 @@ some cases, to select more efficient algorithms.
 
 ## Types and parents
 
-Below we describe this interface for a fictitious type `NewIdeal` which is a subtype of
-`Ideal`, representing ideals over a base ring of type `NewRing`, with element type
-`NewRingElem`. To inform the system about this relationship, it is necessary to provide the
-following methods:
-
+Below we describe this interface for a fictitious type `NewIdeal` representing
+ideals over a base ring of type `NewRing`, with element type `NewRingElem`. To
+make use of the functionality described on this page, `NewIdeal` must be a
+subtype of `Ideal{NewRingElem}`. To inform the system about this relationship,
+it is necessary to provide the following method:
 ```julia
 ideal_type(::Type{NewRing}) = NewIdeal
+```julia
+The system automatically provides the following reverse method:
+```
 base_ring_type(::Type{NewIdeal}) = NewRing
 ```
 
-However, new implementations of ideals needn't necessarily supply new types and could just extend
-the existing functionality for new rings as AbstractAlgebra.jl provides a generic ideal type
-based on Julia arrays which is implemented in `src/generic/Ideal.jl`. For information 
+For ideals of a Euclidean domain, it may also be possibly to opt into using the existing
+functionality  which is implemented in `src/generic/Ideal.jl`. In that case you would
+essentially defined `const NewIdeal = Generic.Ideal{NewRingElem}`. For more information
 about implementing new rings, see the [Ring interface](@ref "Ring Interface").
 
 ## Required functionality for ideals
