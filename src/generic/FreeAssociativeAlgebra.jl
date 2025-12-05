@@ -44,7 +44,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
     return FreeAssociativeAlgebraElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),

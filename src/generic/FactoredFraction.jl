@@ -76,7 +76,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
    return FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
                           deepcopy_internal(a.terms, dict),
                           a.parent)
