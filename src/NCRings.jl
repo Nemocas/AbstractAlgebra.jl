@@ -106,7 +106,7 @@ end
 
 function divexact_left(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_left(x, parent(x)(y); check = check)
@@ -114,7 +114,7 @@ end
 
 function divexact_right(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_right(x, parent(x)(y); check = check)
@@ -122,11 +122,11 @@ end
 
 #Base.:/(x::ModuleElem, y::RingElement) = divexact_right(x, y; check=true)
 Base.:/(x::NCRingElem, y::NCRingElement) = divexact_right(x, y; check=true)
-Base.:/(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = divexact_right(x, y; check=true)
+Base.:/(x::NCRingElem, y::JuliaRingElement) = divexact_right(x, y; check=true)
 
 #Base.:\(y::RingElement, x::ModuleElem) = divexact_left(x, y; check=true)
 Base.:\(y::NCRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
-Base.:\(y::Union{Integer, Rational, AbstractFloat}, x::NCRingElem) = divexact_left(x, y; check=true)
+Base.:\(y::JuliaRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
@@ -319,6 +319,6 @@ Base.broadcastable(x::NCRingElem) = Ref(x)
 
 dot(x::NCRingElem, y::NCRingElem) = x * y
 
-dot(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = x * y
+dot(x::NCRingElem, y::JuliaRingElement) = x * y
 
-dot(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem) = x * y
+dot(x::JuliaRingElement, y::NCRingElem) = x * y

@@ -374,7 +374,7 @@ end
 
 -(a::FracElem, b::Rational) = return a - parent(a)(b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::FracElem) = b + a
++(a::JuliaRingElement, b::FracElem) = b + a
 
 function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
@@ -451,11 +451,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 function ==(x::FracElem, y::Union{Integer, AbstractFloat})
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
           (isone(denominator(x, true)) && numerator(x, true) == y) ||
@@ -469,15 +464,11 @@ function ==(x::FracElem, y::Rational)
             denominator(x, false)*numerator(y, false))
 end
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem) = y == x
+==(x::JuliaRingElement, y::FracElem) = y == x
 
 @doc raw"""
-    ==(x::FracElem{T}, y::T) where {T <: RingElem}
+    ==(x::FracElem{<:RingElem}, y::RingElement)
+    ==(x::RingElement, y::FracElem{<:RingElem})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -487,11 +478,6 @@ function ==(x::FracElem{T}, y::T) where {T <: RingElem}
           (numerator(x, false) == denominator(x, false)*y)
 end
 
-@doc raw"""
-    ==(x::T, y::FracElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::FracElem{T}) where {T <: RingElem} = y == x
 
 ###############################################################################

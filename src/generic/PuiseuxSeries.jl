@@ -446,7 +446,7 @@ function *(a::PuiseuxSeriesElem{T}, b::T) where T <: RingElem
    return z
 end
 
-function *(a::PuiseuxSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::PuiseuxSeriesElem, b::JuliaRingElement)
    z = parent(a)(a.data*b, a.scale)
    z = rescale!(z)
    return z
@@ -454,7 +454,7 @@ end
 
 *(a::T, b::PuiseuxSeriesElem{T}) where T <: RingElem = b*a
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::PuiseuxSeriesElem) = b*a
+*(a::JuliaRingElement, b::PuiseuxSeriesElem) = b*a
 
 ###############################################################################
 #
@@ -492,7 +492,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::PuiseuxSeriesElem, y::JuliaRingElement; check::Bool=true)
    return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
@@ -586,9 +586,9 @@ end
 
 ==(x::T, y::PuiseuxSeriesElem{T}) where T <: RingElem = y == x
 
-==(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = x.data == y
+==(x::PuiseuxSeriesElem, y::JuliaRingElement) = x.data == y
 
-==(x::Union{Integer, Rational, AbstractFloat}, y::PuiseuxSeriesElem) = y == x
+==(x::JuliaRingElement, y::PuiseuxSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -832,7 +832,7 @@ function (R::PuiseuxSeriesField{T})(b::LaurentSeriesFieldElem{T}, scale::Int) wh
    return z
 end
 
-function (R::PuiseuxSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::PuiseuxSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z

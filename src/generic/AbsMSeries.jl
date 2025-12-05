@@ -411,14 +411,14 @@ function *(a::T, b::AbsMSeries{T}) where {T <: RingElem}
     return R(a*poly(b), b.prec) 
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsMSeries)
+function *(a::JuliaRingElement, b::AbsMSeries)
     R = parent(b)
     return R(a*poly(b), b.prec) 
 end
 
 *(a::AbsMSeries{T}, b::T) where T <: RingElem = b*a
  
-*(a::AbsMSeries, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::AbsMSeries, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -704,7 +704,7 @@ function (R::AbsMSeriesRing{T})(x::AbsMSeries{T}) where T <: RingElement
     return x
 end
 
-function (R::AbsMSeriesRing)(b::Union{Integer, Rational, AbstractFloat})
+function (R::AbsMSeriesRing)(b::JuliaRingElement)
     if R.weighted_prec == -1
         return R(poly_ring(R)(b), max_precision(R))
     else

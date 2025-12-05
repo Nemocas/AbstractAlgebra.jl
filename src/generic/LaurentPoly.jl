@@ -296,8 +296,8 @@ end
 *(p::LaurentPolyWrap{T}, a::T) where {T<:RingElem} = LaurentPolyWrap(parent(p), p.poly * a, p.mindeg)
 *(a::T, p::LaurentPolyWrap{T}) where {T<:RingElem} = p * a
 
-*(p::LaurentPolyWrap, a::Union{Integer,Rational,AbstractFloat}) = LaurentPolyWrap(parent(p), p.poly * a, p.mindeg)
-*(a::Union{Integer,Rational,AbstractFloat}, p::LaurentPolyWrap) = p * a
+*(p::LaurentPolyWrap, a::JuliaRingElement) = LaurentPolyWrap(parent(p), p.poly * a, p.mindeg)
+*(a::JuliaRingElement, p::LaurentPolyWrap) = p * a
 
 +(p::LaurentPolyWrap, a::RingElement) = p + LaurentPolyWrap(parent(p), one(p.poly) * a)
 +(a::RingElement, p::LaurentPolyWrap) = p + a

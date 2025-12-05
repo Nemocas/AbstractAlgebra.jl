@@ -133,12 +133,12 @@ function (a::FreeAssociativeAlgebra{T})(b::T) where T
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::Union{Integer, Rational, AbstractFloat}) where T
+function (a::FreeAssociativeAlgebra{T})(b::JuliaRingElement) where T
     R = base_ring(a)
     return a(R(b))
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: JuliaRingElement}
     iszero(b) && return zero(a)
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
@@ -639,7 +639,7 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
+function *(a::FreeAssociativeAlgebraElem, n::JuliaRingElement)
     z = zero(a)
     return mul!(z, a, n)
 end
@@ -649,7 +649,7 @@ function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
     return mul!(z, a, n)
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
+*(n::JuliaRingElement, a::FreeAssociativeAlgebraElem) = a*n
 
 *(n::T, a::FreeAssociativeAlgebraElem{T}) where {T <: RingElem} = a*n
 

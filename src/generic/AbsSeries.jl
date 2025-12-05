@@ -319,7 +319,7 @@ function (a::AbsPowerSeriesRing{T})() where T <: RingElement
    return z
 end
 
-function (a::AbsPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (a::AbsPowerSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    bb = base_ring(a)(b)
    if is_zero(bb)
       z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)

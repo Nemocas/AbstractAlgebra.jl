@@ -170,6 +170,7 @@ import ..AbstractAlgebra: is_univariate_with_data
 import ..AbstractAlgebra: is_zero_divisor
 import ..AbstractAlgebra: is_zero_divisor_with_annihilator
 import ..AbstractAlgebra: isreduced_form
+import ..AbstractAlgebra: JuliaRingElement
 import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial

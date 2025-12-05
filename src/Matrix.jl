@@ -919,7 +919,7 @@ end
 #
 ###############################################################################
 
-function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function *(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -939,7 +939,7 @@ function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function *(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -959,12 +959,7 @@ function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-@doc raw"""
-    +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
-
-Return $S(x) + y$ where $S$ is the parent of $y$.
-"""
-function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -979,15 +974,10 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc raw"""
-    +(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return $x + S(y)$ where $S$ is the parent of $x$.
-"""
-+(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement = y + x
++(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement = y + x
 
 @doc raw"""
-    +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    +(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
@@ -1006,18 +996,13 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    +(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
-Return $x + S(y)$ where $S$ is the parent of $x$.
+Return $x + S(y)$, where $S$ is the parent of $a$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
 
-@doc raw"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-
-Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
-function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -1032,12 +1017,7 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc raw"""
-    -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return $x - S(y)$, where $S$ is the parent of $x$.
-"""
-function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -1053,7 +1033,7 @@ function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T
 end
 
 @doc raw"""
-    -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    -(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
@@ -1073,7 +1053,7 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    -(x::MatrixElem{<:NCRingElem}, y::NCRingElement)
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
@@ -1338,13 +1318,7 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
-otherwise return `false`.
-"""
-function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1360,16 +1334,10 @@ function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where 
    return true
 end
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-
-Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
-otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement = y == x
+==(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement = y == x
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    ==(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
@@ -1391,7 +1359,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    ==(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
@@ -1404,7 +1372,7 @@ otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: NCRingElement
+function divexact(x::MatrixElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)

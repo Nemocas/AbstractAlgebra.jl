@@ -810,7 +810,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
+function *(a::JuliaRingElement, b::LaurentSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -828,7 +828,7 @@ end
 
 *(a::LaurentSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::LaurentSeriesElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -1123,37 +1123,17 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::Generic.LaurentSeriesElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::LaurentSeriesElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::LaurentSeriesElem, y::JuliaRingElement) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Generic.LaurentSeriesElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::LaurentSeriesElem) = y == x
+==(x::JuliaRingElement, y::LaurentSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -1223,7 +1203,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::LaurentSeriesElem, y::JuliaRingElement; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1837,7 +1817,7 @@ function (R::LaurentSeriesField{T})() where {T <: FieldElement}
    return z
 end
 
-function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::JuliaRingElement) where {T <: RingElement}
    if b == 0
       z = LaurentSeriesRingElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else

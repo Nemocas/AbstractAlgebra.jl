@@ -47,8 +47,8 @@ divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x
 
 Base.:/(x::ModuleElem, y::RingElement) = divexact(x, y; check=true)
 Base.:/(x::RingElem, y::RingElem) = divexact(x, y; check=true)
-Base.:/(x::RingElem, y::Union{Integer, Rational, AbstractFloat}) = divexact(x, y; check=true)
-Base.:/(x::Union{Integer, Rational, AbstractFloat}, y::RingElem) = divexact(x, y; check=true)
+Base.:/(x::RingElem, y::JuliaRingElement) = divexact(x, y; check=true)
+Base.:/(x::JuliaRingElement, y::RingElem) = divexact(x, y; check=true)
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
