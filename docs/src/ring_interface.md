@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Ring Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it
@@ -127,6 +132,8 @@ base_ring_type(::Type{MyParent})
 Return the type of the of base rings for parent objects with the given parent type.
 For example, `base_ring_type(Generic.PolyRing{T})` will return `parent_type(T)`.
 
+If the rings of this type are not parameterised by another ring, this function must return `Union{}`.
+
 ```julia
 base_ring(R::MyParent)
 ```
@@ -135,7 +142,7 @@ Given a parent object `R`, representing a ring, this function returns the parent
 of any base ring that parameterises this ring. For example, the base ring of the ring
 of polynomials over the integers would be the integer ring.
 
-If the ring is not parameterised by another ring, this function must return `Union{}`.
+If the ring is not parameterised by another ring, calling this function should rais an error.
 
 !!! note
 
@@ -144,6 +151,9 @@ If the ring is not parameterised by another ring, this function must return `Uni
     only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
     been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
     ideal.
+
+    There is no general mathematical definition for base ring, so to know what `base_ring`
+    does for any given type of ring, you need to consult its documentation.
 
 ```julia
 parent(f::MyElem)
@@ -767,7 +777,7 @@ polynomial type (i.e. polynomials of degree less than one).
 
 using AbstractAlgebra
 
-using Random: Random, SamplerTrivial, GLOBAL_RNG
+using Random: Random, SamplerTrivial
 using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
@@ -958,7 +968,7 @@ rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ConstPoly,ConstPolyRing}}) =
 
 rand(rng::AbstractRNG, R::ConstPolyRing, n::AbstractUnitRange{Int}) = R(rand(rng, n))
 
-rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.default_rng(), R, n)
 
 # Promotion rules
 
@@ -1017,9 +1027,8 @@ The above implementation of `constant_polynomial_ring` may be tested as follows.
 
 ```jldoctest ConstPoly; filter = r".*"s
 using Test
-include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-function test_elem(R::ConstPolyRing{elem_type(ZZ)})
+function ConformanceTests.generate_element(R::ConstPolyRing{elem_type(ZZ)})
    n = rand(1:999)
    return R(rand(-n:n))
 end

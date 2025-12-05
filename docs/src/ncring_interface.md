@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Noncommutative ring Interface
 
 AbstractAlgebra.jl supports commutative rings through its `Ring` interface.

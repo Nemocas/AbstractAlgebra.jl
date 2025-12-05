@@ -12,6 +12,7 @@ export abs_series_type
 export base_field
 export basis
 export character
+export coeff!
 export collength
 export combine_like_terms!
 export cycles
@@ -25,7 +26,9 @@ export enable_cache!
 export exp_gcd
 export exponent
 export exponent_vector
+export exponent_vector!
 export exponent_word
+export falling_factorial
 export finish
 export fit!
 export function_field
@@ -46,6 +49,7 @@ export inverse_fn
 export inverse_image_fn
 export inverse_mat
 export invmod
+export is_abelian
 export is_compatible
 export is_divisible_by
 export is_free
@@ -120,13 +124,13 @@ export summands
 export supermodule
 export term
 export terms
+export term!
 export to_univariate
 export total_degree
 export trailing_coefficient
 export truncate
 export truncate!
 export unit
-export universal_polynomial_ring
 export upscale
 export weights
 export zero

@@ -9,7 +9,12 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently nothing here =#
+# renamed in 0.45.1
+@alias FactoredFractionField factored_fraction_field
+
+#renamed in 0.47.4
+@alias dense_poly_type poly_type
+@alias dense_poly_ring_type poly_ring_type
 
 ###############################################################################
 #
@@ -53,13 +58,28 @@ end
 @deprecate _popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _popov(A, Val(S))
 @deprecate _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _hnf_via_popov(A, Val(S))
 @deprecate gen(a::MPolyRing{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} gen(a, i, Val(ord))
-import .Generic: exponent_vector; @deprecate exponent_vector(a::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} exponent_vector(a, i, Val(ord))
-import .Generic: exponent; @deprecate exponent(a::Generic.MPoly{T}, i::Int, j::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} exponent(a, i, j, Val(ord))
-import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generic.MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{ord}}) where {T <: RingElement, ord} set_exponent_vector!(a, i, exps, Val(ord))
-import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
-import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
 
 # deprecated in 0.43.0
 @deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
 @deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
+
+# deprecated in 0.45.0
+@deprecate test_iterate ConformanceTests.test_iterate
+
+# deprecated in 0.45.2
+import Base: contains
+@deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
+
+# to be deprecated in the next breaking release
+zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
+Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
+function zeros(R::NCRing, r::Int...)
+    #Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
+    T = elem_type(R)
+    A = Array{T}(undef, r)
+    for i in eachindex(A)
+        A[i] = R()
+    end
+    return A
+end

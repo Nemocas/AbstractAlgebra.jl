@@ -1,10 +1,6 @@
-function test_elem(R::AbstractAlgebra.Generic.AbsMSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.AbsMSeries.conformance" begin
    R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.AbsMSeries.constructors" begin
@@ -645,4 +641,11 @@ end
       @test evaluate(f, [x], [g]) == evaluate(f, [g, y])
       @test evaluate(f, [y], [h]) == evaluate(f, [x, h])
    end
+end
+
+@testset "Generic.AbsMSeries.#2060" begin
+   R, a = polynomial_ring(QQ, :a)
+   F, x = polynomial_ring(R, :x)
+   S, (eps,) = power_series_ring(F, 4, [:ϵ])
+   @test coefficients(eps + a) == [a, 1]
 end

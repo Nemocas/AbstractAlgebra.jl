@@ -1,9 +1,12 @@
+# FIXME: the doctest below is disabled because it takes way too long,
+# especially on macOS, see https://github.com/Nemocas/AbstractAlgebra.jl/issues/2083
+
 """
 Provides generic asymptotically fast matrix methods:
-  - mul and mul! using the Strassen scheme
-  - _solve_tril!
-  - lu!
-  - _solve_triu
+  - `mul` and `mul!` using the Strassen scheme
+  - `_solve_tril!`
+  - `lu!`
+  - `_solve_triu`
 
 Just prefix the function by "Strassen." all 4 functions support a keyword
 argument "cutoff" to indicate when the base case should be used.
@@ -12,7 +15,7 @@ The speedup depends on the ring and the entry sizes.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```julia
 julia> m = matrix(ZZ, rand(-10:10, 1000, 1000));
 
 julia> n1 = similar(m); n2 = similar(m); n3 = similar(m);
@@ -40,6 +43,12 @@ function mul(A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff) where {T}
 end
 
 #scheduling copied from the nmod_mat_mul in Flint
+"""
+Fast, recursive, generic matrix multiplication using the Strassen
+trick.
+
+`cutoff` indicates when the recursion stops and the base case is called.
+"""
 function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff) where {T}
   sA = size(A)
   sB = size(B)
@@ -103,6 +112,7 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #nmod_mat_mul(C21, X1, X2);
   C21 = mul!(C21, X1, X2; cutoff)
 
+
   X1 = add!(X1, A21, A22);
   X2 = sub!(X2, B12, B11);
   #nmod_mat_mul(C22, X1, X2);
@@ -117,8 +127,10 @@ function mul!(C::MatElem{T}, A::MatElem{T}, B::MatElem{T}; cutoff::Int = cutoff)
   #nmod_mat_mul(C11, X1, B22);
   C11 = mul!(C11, X1, B22; cutoff)
 
-  #X1->c = bnc;
+  #X1->c = bnc;  #this resizes X1!!!!
   #nmod_mat_mul(X1, A11, B11);
+
+  X1 = zero_matrix(base_ring(A11), nrows(A11), ncols(B11))
   X1 = mul!(X1, A11, B11; cutoff)
 
   C12 = add!(C12, X1, C12);
@@ -274,17 +286,82 @@ function lu!(P::Perm{Int}, A; cutoff::Int = 300)
   return r1 + r2
 end
 
-function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
-  #b*inv(T), thus solves Tx = b for T upper triangular
+function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol = :left, unipotent::Bool = false)
+  #inv(T)*b, thus solves Tx = b for T upper triangular
   n = ncols(T)
   if n <= cutoff
-    R = AbstractAlgebra._solve_triu(T, b)
+    R = AbstractAlgebra._solve_triu(T, b; side, unipotent)
     return R
   end
+  if side == :left
+    return _solve_triu_left(T, b; cutoff, unipotent)
+  end
+  @assert side == :right
+  @assert n == nrows(T) == nrows(b)
+
+  n2 = div(n, 2) + n % 2
+  m = ncols(b)
+  m2 = div(m, 2) + m % 2
+  #=
+    b = [U X; V Y]
+    T = [A B; 0 C]
+    x = [SS RR; S R]
+
+    [0 C] [SS; S] = CS = V
+    [0 C] [RR; R] = CR = Y
+
+    [A B] [SS; S] = A SS + B S = U => A SS = U - BS
+    [A B] [RR; R] = A RR + B R = U => A RR = X - BR
+    
+ =#   
+
+  U = view(b, 1:n2, 1:m2)
+  X = view(b, 1:n2, m2+1:m)
+  V = view(b, n2+1:n, 1:m2)
+  Y = view(b, n2+1:n, m2+1:m)
+
+  A = view(T, 1:n2, 1:n2)
+  B = view(T, 1:n2, 1+n2:n)
+  C = view(T, 1+n2:n, 1+n2:n)
+
+  S = _solve_triu(C, V; cutoff, side, unipotent)
+  R = _solve_triu(C, Y; cutoff, side, unipotent)
+
+  SS = mul(B, S; cutoff)
+  SS = sub!(SS, U, SS)
+  SS = _solve_triu(A, SS; cutoff, side, unipotent)
+
+  RR = mul(B, R; cutoff)
+  RR = sub!(RR, X, RR)
+  RR = _solve_triu(A, RR; cutoff, side, unipotent)
+
+  return [SS RR; S R]
+end
+
+function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, unipotent::Bool = false)
+  #b*inv(T), thus solves xT = b for T upper triangular
+  n = ncols(T)
+  if n <= cutoff
+    R = AbstractAlgebra._solve_triu_left(T, b; unipotent)
+    return R
+  end
+  
+  @assert ncols(b) == nrows(T) == n
 
   n2 = div(n, 2) + n % 2
   m = nrows(b)
   m2 = div(m, 2) + m % 2
+  #=
+    b = [U X; V Y]
+    T = [A B; 0 C]
+    x = [S SS; R RR]
+
+    [S SS] [A; 0] = SA = U
+    [R RR] [A; 0] = RA = V
+    [S SS] [B; C] = SB + SS C = X => SS C = Y - SB
+    [R RR] [B; C] = RB + RR C = Y => RR C = Y - RB
+
+ =#   
 
   U = view(b, 1:m2, 1:n2)
   V = view(b, 1:m2, n2+1:n)
@@ -295,18 +372,153 @@ function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff)
   B = view(T, 1:n2, 1+n2:n)
   C = view(T, 1+n2:n, 1+n2:n)
 
-  S = _solve_triu(A, U; cutoff)
-  R = _solve_triu(A, X; cutoff)
+  S = _solve_triu_left(A, U; cutoff, unipotent)
+  R = _solve_triu_left(A, X; cutoff, unipotent)
 
   SS = mul(S, B; cutoff)
   SS = sub!(SS, V, SS)
-  SS = _solve_triu(C, SS; cutoff)
+  SS = _solve_triu_left(C, SS; cutoff, unipotent)
 
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
-  RR = _solve_triu(C, RR; cutoff)
+  RR = _solve_triu_left(C, RR; cutoff, unipotent)
+  #THINK: both pairs of solving could be combined: 
+  # solve [U; X], A to get S and R...
 
   return [S SS; R RR]
+end
+
+function mul_tt!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
+  #A = BC for upper triagular square matrices A, B, C
+  @assert is_upper_triangular(B)
+  @assert is_upper_triangular(C)
+  n = ncols(A)
+  n <= cutoff && return mul!(A, B, C)
+
+  @assert nrows(A) == n
+  @assert size(A) == size(B) == size(C)
+  
+  #A = [a1 a2; 0 a4]
+  #B = [b1 b2; 0 b4]
+  #C = [c1 c2; 0 c4]
+  
+  n2 = div(n, 2)
+
+  a1 = view(A, 1:n2, 1:n2)
+  a2 = view(A, 1:n2, 1+n2:n)
+  a4 = view(A, 1+n2:n, 1+n2:n)
+
+  b1 = view(B, 1:n2, 1:n2)
+  b2 = view(B, 1:n2, 1+n2:n)
+  b4 = view(B, 1+n2:n, 1+n2:n)
+
+  c1 = view(C, 1:n2, 1:n2)
+  c2 = view(C, 1:n2, 1+n2:n)
+  c4 = view(C, 1+n2:n, 1+n2:n)
+
+  mul_tt!(a1, b1, c1; cutoff)
+  mul_tu!(a2, b1, c2; cutoff)
+  x = similar(a2)
+  mul_ut!(x,  b2, c4; cutoff)
+  add!(a2, a2, x)
+  mul_tt!(a4, b4, c4; cutoff)
+#  @assert A == B*C
+end
+
+function mul_tu!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
+  #A = BC for square matrices A, B, C, B is upper triangular
+  @assert is_upper_triangular(B)
+  n = nrows(A)
+  n <= cutoff && return mul!(A, B, C)
+
+  m = ncols(A)
+  k = ncols(B)
+  @assert nrows(C) == k
+  
+  #A = [a1 a2; a3 a4]
+  #B = [b1 b2; 0 b4]
+  #C = [c1 c2; c3 c4]
+  
+  n2 = div(n, 2)
+  m2 = div(m, 2)
+  k2 = div(k, 2)
+
+  a1 = view(A, 1:n2, 1:m2)
+  a2 = view(A, 1:n2, 1+m2:m)
+  a3 = view(A, 1+n2:n, 1:m2)
+  a4 = view(A, 1+n2:n, 1+m2:m)
+
+  b1 = view(B, 1:n2, 1:k2)
+  b2 = view(B, 1:n2, 1+k2:k)
+  b4 = view(B, 1+n2:n, 1+k2:k)
+
+  c1 = view(C, 1:k2, 1:m2)
+  c2 = view(C, 1:k2, 1+m2:m)
+  c3 = view(C, 1+k2:k, 1:m2)
+  c4 = view(C, 1+k2:k, 1+m2:m)
+
+  mul_tu!(a1, b1, c1; cutoff)
+  x = similar(a1)
+  mul!(x, b2, c3; cutoff)
+  add!(a1, a1, x)
+
+  mul_tu!(a2, b1, c2; cutoff)
+  x = similar(a2)
+  mul!(x, b2, c4; cutoff)
+  add!(a2, a2, x)
+
+  mul_tu!(a3, b4, c3; cutoff)
+  mul_tu!(a4, b4, c4; cutoff)
+#  @assert A == B*C
+end
+
+function mul_ut!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
+  #A = BC for square matrices A, B, C, C is upper triangular
+  @assert is_upper_triangular(C)
+  n = nrows(A)
+  n <= cutoff && return mul!(A, B, C)
+
+  @assert nrows(A) == n
+  m = ncols(A)
+  k = ncols(B)
+  @assert nrows(C) == k
+  
+  #A = [a1 a2; a3 a4]
+  #B = [b1 b2; b3 b4]
+  #C = [c1 c2;  0 c4]
+  
+  n2 = div(n, 2)
+  m2 = div(k, 2)
+  k2 = div(k, 2)
+
+  a1 = view(A, 1:n2, 1:m2)
+  a2 = view(A, 1:n2, 1+m2:m)
+  a3 = view(A, 1+n2:n, 1:m2)
+  a4 = view(A, 1+n2:n, 1+m2:m)
+
+  b1 = view(B, 1:n2, 1:k2)
+  b2 = view(B, 1:n2, 1+k2:k)
+  b3 = view(B, 1+n2:n, 1:k2)
+  b4 = view(B, 1+n2:n, 1+k2:k)
+
+  c1 = view(C, 1:k2, 1:m2)
+  c2 = view(C, 1:k2, 1+m2:m)
+  c4 = view(C, 1+k2:k, 1+m2:m)
+
+  mul_ut!(a1, b1, c1; cutoff)
+
+  mul!(a2, b1, c2; cutoff)
+  x = similar(a2)
+  mul_ut!(x, b2, c4; cutoff)
+  add!(a2, a2, x)
+
+  mul_ut!(a3, b3, c1; cutoff)
+
+  mul!(a4, b3, c2; cutoff)
+  x = similar(a4)
+  mul_ut!(x, b4, c4; cutoff)
+  add!(a4, a4, x)
+#  @assert A == B*C
 end
 
 end # module

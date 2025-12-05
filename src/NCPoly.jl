@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:NCPolyRing{T}}) where T<:NCRingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:NCPolyRing}) = base_ring_type(T)
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
 function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S}}
@@ -19,63 +20,63 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
 end
 
 @doc raw"""
-    dense_poly_type(::Type{T}) where T<:NCRingElement
-    dense_poly_type(::T) where T<:NCRingElement
-    dense_poly_type(::Type{S}) where S<:NCRing
-    dense_poly_type(::S) where S<:NCRing
+    poly_type(::Type{T}) where T<:NCRingElement
+    poly_type(::T) where T<:NCRingElement
+    poly_type(::Type{S}) where S<:NCRing
+    poly_type(::S) where S<:NCRing
 
 The type of univariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
 Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
 
-See also [`dense_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+See also [`poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
-julia> dense_poly_type(AbstractAlgebra.ZZ(1))
+```jldoctest
+julia> poly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(elem_type(AbstractAlgebra.ZZ))
+julia> poly_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(AbstractAlgebra.ZZ)
+julia> poly_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(typeof(AbstractAlgebra.ZZ))
+julia> poly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
-dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
-dense_poly_type(::Type{S}) where S<:NCRing = dense_poly_type(elem_type(S))
-dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
-dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
+poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+poly_type(::Type{S}) where S<:NCRing = poly_type(elem_type(S))
+poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
 
 @doc raw"""
-    dense_poly_ring_type(::Type{T}) where T<:NCRingElement
-    dense_poly_ring_type(::T) where T<:NCRingElement
-    dense_poly_ring_type(::Type{S}) where S<:NCRing
-    dense_poly_ring_type(::S) where S<:NCRing
+    poly_ring_type(::Type{T}) where T<:NCRingElement
+    poly_ring_type(::T) where T<:NCRingElement
+    poly_ring_type(::Type{S}) where S<:NCRing
+    poly_ring_type(::S) where S<:NCRing
 
 The type of univariate polynomial rings with coefficients of type `T` respectively
-`elem_type(S)`. Implemented via [`dense_poly_type`](@ref).
+`elem_type(S)`. Implemented via [`poly_type`](@ref).
 
 See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ(1))
+```jldoctest
+julia> poly_ring_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(elem_type(AbstractAlgebra.ZZ))
+julia> poly_ring_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ)
+julia> poly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(typeof(AbstractAlgebra.ZZ))
+julia> poly_ring_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 ```
 """
-dense_poly_ring_type(x) = parent_type(dense_poly_type(x))
+poly_ring_type(x) = parent_type(poly_type(x))
 
 @doc raw"""
     var(a::NCPolyRing)
@@ -666,7 +667,7 @@ _make_parent(g::T, p::NCPolyRingElem, cached::Bool) where {T} =
 
 function map_coefficients(g::T, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
-		    parent::NCPolyRing = _make_parent(g, p, cached)) where {T}
+		    parent = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
@@ -724,7 +725,20 @@ end
 rand(rng::AbstractRNG, S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
-rand(S::NCPolyRing, deg_range, v...) = rand(Random.GLOBAL_RNG, S, deg_range, v...)
+rand(S::NCPolyRing, deg_range, v...) = rand(Random.default_rng(), S, deg_range, v...)
+
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+(f::NCPolyRingElem)(a::Integer) = evaluate(f, a)
+
+function (f::NCPolyRingElem)(a::NCRingElem)
+    return evaluate(f, a)
+end
 
 
 ###############################################################################
@@ -745,7 +759,7 @@ Setting the optional argument `cached` to `false` will prevent the parent object
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
@@ -766,9 +780,10 @@ polynomial ring.
 """
 function polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   return dense_poly_ring_type(T)(R, s, cached)
+   return poly_ring_type(T)(R, s, cached)
 end
 
 # Simplified constructor
 
 PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
+

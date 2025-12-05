@@ -22,6 +22,18 @@ base_ring_type(::Type{<:MatrixElem{T}}) where T <: NCRingElement = parent_type(T
 
 base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T)
 
+"""
+    is_zero_initialized(T::Type{<:MatrixElem})
+    is_zero_initialized(mat::T) where {T<:MatrixElem}
+
+Specify whether the default-constructed matrices of type `T`, via the
+`T(R::Ring, ::UndefInitializerm r::Int, c::Int)` constructor, are
+zero-initialized. The default is `false`, and new matrix types should
+specialize this method to return `true` if suitable, to enable optimizations.
+"""
+is_zero_initialized(::Type{<:MatrixElem}) = false
+is_zero_initialized(::T) where {T<:MatrixElem} = is_zero_initialized(T)
+
 function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
@@ -46,11 +58,6 @@ end
 
 function _check_dim(r::Int, c::Int, a::MatrixElem)
   size(a) == (r, c) || throw(ErrorConstrDimMismatch(r, c, size(a)...))
-  return nothing
-end
-
-function _check_bases(a, b)
-  base_ring(a) == base_ring(b) || throw(DomainError((a, b), "Base rings do not match."))
   return nothing
 end
 
@@ -96,55 +103,20 @@ end
 
 function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(s), ncols(s), a)
-  _check_bases(s, a)
+  base_ring(s) == base_ring(a) || throw(DomainError((s, a), "Base rings do not match."))
   a isa eltype(s) && return a
-  M = s()  # zero matrix
-  R = base_ring(s)
-  if R == base_ring(a)
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = a[i, j]
-    end
-  else
-    for i = 1:nrows(s), j = 1:ncols(s)
-      M[i, j] = R(a[i, j])
-    end
-  end
-  return M
+  return matrix(base_ring(s), a)
 end
 
 # create a matrix with b on the diagonal
 function (s::MatSpace)(b::NCRingElement)
-  M = s()  # zero matrix
   R = base_ring(s)
-  rb = R(b)
-  for i in 1:min(nrows(s), ncols(s))
-    M[i, i] = rb
-  end
-  return M
+  return diagonal_matrix(R(b), nrows(s), ncols(s))
 end
 
-# convert a Julia matrix
-function (a::MatSpace{T})(b::AbstractMatrix{S}) where {T <: NCRingElement, S}
-  _check_dim(nrows(a), ncols(a), b)
-  R = base_ring(a)
-
-  # minor optimization for MatSpaceElem
-  if S === T && dense_matrix_type(T) === Generic.MatSpaceElem{T} && all(x -> R === parent(x), b)
-     return Generic.MatSpaceElem{T}(R, b)
-  end
-
-  # generic code
-  M = a()  # zero matrix
-  for i = 1:nrows(a), j = 1:ncols(a)
-     M[i, j] = R(b[i, j])
-  end
-  return M
-end
-
-# convert a Julia vector
-function (a::MatSpace{T})(b::AbstractVector) where T <: NCRingElement
-  _check_dim(nrows(a), ncols(a), b)
-  return a(transpose(reshape(b, a.ncols, a.nrows)))
+# convert a Julia matrix or vector
+function (a::MatSpace{T})(b::AbstractVecOrMat) where T <: NCRingElement
+  return matrix(base_ring(a), nrows(a), ncols(a), b)
 end
 
 
@@ -167,6 +139,8 @@ number_of_rows(a::MatSpace) = a.nrows
 Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
+
+vector_space_dim(a::MatSpace{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.nrows * a.ncols
 
 function Base.hash(a::MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
@@ -282,6 +256,20 @@ Return `true` if $M_{i,j}$ is zero.
 @inline is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(M[i,j])
 
 @doc raw"""
+    is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
+
+Return `is_positive(M[i,j])`, but with a possibly more efficient implementation.
+"""
+@inline is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_positive(M[i,j])
+
+@doc raw"""
+    is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
+
+Return `is_negative(M[i,j])`, but with a possibly more efficient implementation.
+"""
+@inline is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_negative(M[i,j])
+
+@doc raw"""
     is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
 Return `true` if the $i$-th row of the matrix $M$ is zero.
@@ -395,7 +383,7 @@ end
 Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = zero_matrix(R, r, c)
+similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
   
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
@@ -414,8 +402,16 @@ with defaults based upon the given source matrix `x`.
 """
 zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
 zero(x::MatElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
-zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, R, r, c))
-zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement = zero!(similar(x, r, c))
+
+function zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+  y = similar(x, R, r, c)
+  return is_zero_initialized(y) ? y : zero!(y)
+end
+
+function zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
+  y = similar(x, r, c)
+  return is_zero_initialized(y) ? y : zero!(y)
+end
 
 ###############################################################################
 #
@@ -470,30 +466,31 @@ function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
    return A
  end
 
-getindex(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
+getindex(M::MatElem, ::Colon, cols) = getindex(M, 1:nrows(M), cols)
 
-function _to_indices(x, rows, cols)
-   if rows isa Integer
-      rows = rows
-   elseif rows isa Colon
-      rows = 1:nrows(x)
-   end
-   if cols isa Integer
-      cols = cols
-   elseif cols isa Colon
-      cols = 1:ncols(x)
-   end
-   (rows, cols)
-end
+getindex(M::MatElem, rows, ::Colon) = getindex(M, rows, 1:ncols(M))
+
+getindex(M::MatElem, ::Colon, ::Colon) = getindex(M, 1:nrows(M), 1:ncols(M))
+
 
 sub(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = M[r, c]
 
-function Base.view(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}})
-   return view(M, _to_indices(M, rows, cols)...)
+# fallback method that converts Colons to UnitRanges
+function Base.view(M::MatElem, rows, cols)
+   # indirection to avoid ambiguities
+   return _view(M, rows, cols)
+end
+
+function _view(M::MatElem, ::Colon, cols)
+   return view(M, 1:nrows(M), cols)
+end
+
+function _view(M::MatElem, rows, ::Colon)
+   return view(M, rows, 1:ncols(M))
+end
+
+function _view(M::MatElem, ::Colon, ::Colon)
+   return view(M, 1:nrows(M), 1:ncols(M))
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
@@ -567,6 +564,7 @@ end
 
 Base.IteratorSize(::Type{<:MatrixElem}) = Base.HasShape{2}()
 
+Base.keys(M::MatElem) = CartesianIndices(axes(M))
 Base.pairs(M::MatElem) = Base.pairs(IndexCartesian(), M)
 Base.pairs(::IndexCartesian, M::MatElem) = Base.Iterators.Pairs(M, CartesianIndices(axes(M)))
 
@@ -680,13 +678,8 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 #
 ###############################################################################
 
-@static if VERSION < v"1.9"
-  Base.eachrow(a::MatrixElem) = (view(a, i, :) for i in 1:nrows(a))
-  Base.eachcol(a::MatrixElem) = (view(a, :, i) for i in 1:ncols(a))
-else
-  Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
-  Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
-end
+Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
+Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
 
 ###############################################################################
 #
@@ -744,16 +737,7 @@ function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElemen
    return mat
 end
 
-function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
-   show_via_expressify(io, a)
-end
-
-function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited && !get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
-   show_via_expressify(io, mi, a)
-end
+@enable_all_show_via_expressify MatrixElem
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRingElement
    r = nrows(a)
@@ -803,6 +787,7 @@ function show(io::IO, a::MatSpace)
       io = pretty(io)
       print(io, "Matrix space of ")
       print(io, ItemQuantity(nrows(a), "row"), " and ", ItemQuantity(ncols(a), "column"))
+      print(io, " over ")
       print(terse(io), Lowercase(), base_ring(a))
    end
 end
@@ -853,6 +838,7 @@ end
 
 function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+   base_ring(x) !== base_ring(y) && error("Base rings do not match")
    A = similar(x, nrows(x), ncols(y))
    C = base_ring(x)()
    for i = 1:nrows(x)
@@ -878,7 +864,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
    end
-   x
+   return x
 end
 
 function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
@@ -1225,6 +1211,8 @@ function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRin
    U = promote_rule_sym(S, T)
    if U === S
       return x, base_ring(x)(y)
+   elseif U === T
+      return change_base_ring(parent(y), x), y
    else
       error("Cannot promote to common type")
    end
@@ -1472,7 +1460,7 @@ Alias for `LinearAlgebra.issymmetric`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> M = matrix(ZZ, [1 2 3; 2 4 5; 3 5 6])
 [1   2   3]
 [2   4   5]
@@ -1507,7 +1495,7 @@ Return the transpose of the given matrix.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1569,7 +1557,7 @@ $i$-th and $j$-th rows, respectively.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1616,7 +1604,7 @@ require the matrix to be square.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1657,7 +1645,7 @@ its entries, assuming it exists.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1679,10 +1667,7 @@ function content(x::MatrixElem{T}) where T <: RingElement
   d = zero(base_ring(x))
   for i = 1:nrows(x)
      for j = 1:ncols(x)
-        d = gcd(d, x[i, j])
-        if isone(d)
-           return d
-        end
+        d = gcd!(d, x[i, j])
      end
   end
   return d
@@ -1701,7 +1686,7 @@ Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -1746,7 +1731,7 @@ Apply the pemutation $P$ to the columns of the matrix $x$ and return the result.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
@@ -2174,7 +2159,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
          V[j, i] = A[j, pivots[np + i]]
       end
    end
-   V = _solve_triu(U, V, false)
+   V = _solve_triu(U, V; unipotent = false, side = :right)
    for i = 1:rnk
       for j = 1:i
          A[j, pivots[i]] = i == j ? one(R) : R()
@@ -2448,7 +2433,7 @@ Return the determinant of the matrix $M$. We assume $M$ is square.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
@@ -2568,7 +2553,7 @@ Return an array consisting of the `k`-minors of `A`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -2584,13 +2569,35 @@ julia> minors(A, 2)
 minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
 
 @doc raw"""
+    minors_with_position(A::MatElem, k::Int)
+
+Return an array consisting of the `k`-minors of `A` and the respective data on the rows and columns involved.
+
+# Examples
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> minors_with_position(A, 2)
+3-element Vector{Tuple{BigInt, Vector{Int64}, Vector{Int64}}}:
+ (-3, [1, 2], [1, 2])
+ (-6, [1, 2], [1, 3])
+ (-3, [1, 2], [2, 3])
+
+```
+"""
+minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
+
+@doc raw"""
     minors_iterator(A::MatElem, k::Int)
 
 Return an iterator that computes the `k`-minors of `A`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> A = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
@@ -2613,13 +2620,36 @@ function minors_iterator(M::MatElem, k::Int)
 end
 
 @doc raw"""
+    minors_iterator_with_position(A::MatElem, k::Int)
+
+Return an iterator that computes the `k`-minors of `A` also specifying the row and column indices of the minor.
+
+# Examples
+
+```jldoctest
+julia> A = ZZ[1 2 3; 4 5 6]
+[1   2   3]
+[4   5   6]
+
+julia> first(minors_iterator_with_position(A, 2))
+(-3, [1, 2], [1, 2])
+
+```
+"""
+function minors_iterator_with_position(M::MatElem, k::Int)
+  row_indices = combinations(nrows(M), k)
+  col_indices = combinations(ncols(M), k)
+  return ((det(M[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
+end
+
+@doc raw"""
     exterior_power(A::MatElem, k::Int) -> MatElem
 
 Return the `k`-th exterior power of `A`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 julia> exterior_power(A, 2)
@@ -2647,13 +2677,28 @@ end
 ###############################################################################
 
 """
+    is_alternating(M::MatrixElem)
+
+Return whether the form corresponding to the matrix `M` is alternating,
+i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
+Return `false` if `M` is not a square matrix.
+"""
+function is_alternating(M::MatrixElem)
+  is_skew_symmetric(M) || return false
+  for i in 1:nrows(M)
+    is_zero_entry(M, i, i) || return false
+  end
+  return true
+end
+
+"""
     is_skew_symmetric(M::MatrixElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
 [0   -1   -2]
 [1    0   -3]
@@ -2832,7 +2877,7 @@ Return the rank of the matrix $M$.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> A = QQ[1 2; 3 4];
 
 julia> d = rank(A)
@@ -3415,7 +3460,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.istriu`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> is_upper_triangular(QQ[1 2 ; 0 4])
 true
 
@@ -3441,46 +3486,95 @@ function is_upper_triangular(M::MatrixElem)
     return true
 end
 
-@doc raw"""
-    _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
+# Remove the following once Nemo is adjusted
+_solve_triu_right(M, b; unipotent = false) = _solve_triu(M, b; unipotent, side = :right)
 
-Given a non-singular $n\times n$ matrix $U$ over a field which is upper
-triangular, and an $n\times m$ matrix $b$ over the same field, return an
-$n\times m$ matrix $x$ such that $Ux = b$. If $U$ is singular an exception
-is raised. If unit is true then $U$ is assumed to have ones on its
-diagonal, and the diagonal will not be read.
+@doc raw"""
+    _solve_triu(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false, side::Symbol = :left) where {T <: RingElement}
+
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
+`side = :right`, let $b$ 
+be an $n\times m$ matrix $b$ over the same field, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
+will be raised.
+
+If `side = :left`, the default, $b$ has to be $m \times n$. In this case
+$xU = b$ is solved - or an error raised.
+
+See also [`AbstractAlgebra._solve_triu_left`](@ref) and [`Strassen`](@ref) for
+  asymptotically fast versions.
 """
-function _solve_triu(U::MatElem{T}, b::MatElem{T}, unit::Bool = false) where {T <: FieldElement}
+function _solve_triu(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false, side::Symbol = :left) where {T <: RingElement}
+   if side == :left
+     return _solve_triu_left(U, b; unipotent)
+   end
+   @assert side == :right
    n = nrows(U)
    m = ncols(b)
    R = base_ring(U)
    X = zero(b)
-   Tinv = Vector{elem_type(R)}(undef, n)
    tmp = Vector{elem_type(R)}(undef, n)
-   if unit == false
-      for i = 1:n
-         Tinv[i] = inv(U[i, i])
-      end
-   end
    t = R()
    for i = 1:m
       for j = 1:n
          tmp[j] = X[j, i]
       end
       for j = n:-1:1
-         s = R()
+         s = R(0)
          for k = j + 1:n
-            s = addmul_delayed_reduction!(s, U[j, k], tmp[k], t)
+            s = addmul!(s, U[j, k], tmp[k], t)
+#            s = s + U[j, k] * tmp[k]
          end
-         s = reduce!(s)
-         s = b[j, i] - s
-         if unit == false
-            s = mul!(s, s, Tinv[j])
+         s = sub!(s, b[j, i], s)
+         if unipotent
+           tmp[j] = s
+         else
+           tmp[j] = divexact(s, U[j,j])
          end
-         tmp[j] = s
       end
       for j = 1:n
          X[j, i] = tmp[j]
+      end
+   end
+   return X
+end
+
+@doc raw"""
+    _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}
+
+Given a non-singular $n\times n$ matrix $U$ over a field which is upper
+triangular, and an $n\times m$ matrix $b$ over the same ring, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
+will be raised.
+
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+  versions.
+"""
+function _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}
+   n = ncols(U)
+   m = nrows(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = Vector{elem_type(R)}(undef, n)
+   t = R()
+   for i = 1:m
+      for j = 1:n
+         tmp[j] = X[i, j]
+      end
+      for j = 1:n
+         s = R()
+         for k = 1:j-1
+            s = addmul!(s, U[k, j], tmp[k], t)
+         end
+         s = sub!(s, b[i, j], s)
+         if unipotent
+           tmp[j] = s
+         else
+           tmp[j] = divexact(s, U[j,j])
+         end
+      end
+      for j = 1:n
+         X[i, j] = tmp[j]
       end
    end
    return X
@@ -3531,7 +3625,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.istril`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> is_lower_triangular(QQ[1 2 ; 0 4])
 false
 
@@ -3566,7 +3660,7 @@ definition also applies to non-square matrices.
 Alias for `LinearAlgebra.isdiag`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> is_diagonal(QQ[1 0 ; 0 4])
 true
 
@@ -3612,7 +3706,7 @@ end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, A = _can_solve_with_solution_lu(M, identity_matrix(M))
+   flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
 end
@@ -3691,7 +3785,7 @@ function to compute an integral kernel.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, x = polynomial_ring(ZZ, :x)
 (Univariate polynomial ring in x over integers, x)
 
@@ -4168,7 +4262,7 @@ the resulting polynomial is an element of it.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
@@ -4364,8 +4458,8 @@ function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) whe
 end
 
 @doc raw"""
-    minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-    minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(M::MatElem{T}) where {T <: RingElement}
+    minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the square matrix $M$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
@@ -4373,7 +4467,7 @@ the resulting polynomial is an element of it.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R = GF(13)
 Finite field F_13
 
@@ -5291,7 +5385,7 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
                K[r, j] = reduce!(t1 + t2)
             end
          end
-         S[j, j] = divexact(S[i, i]*S[j, j], d)
+         S[j, j] = S[i, i]*divexact(S[j, j], d)
          S[i, i] = d
       end
    end
@@ -5971,7 +6065,7 @@ preserves the minimal and characteristic polynomials of a matrix.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, = residue_ring(ZZ, 7);
 
 julia> S = matrix_space(R, 4, 4)
@@ -6016,7 +6110,7 @@ end
 
 ###############################################################################
 #
-#   Row swapping
+#   Row & column permutations
 #
 ###############################################################################
 
@@ -6027,7 +6121,7 @@ Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 row are swapped.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]
@@ -6058,7 +6152,7 @@ Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
 matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
 [0   1   0]
@@ -6076,12 +6170,9 @@ julia> M  # was modified
 ```
 """
 function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    if i != j
       for k = 1:ncols(a)
-         x = a[i, k]
-         a[i, k] = a[j, k]
-         a[j, k] = x
+         a[i, k], a[j, k] = a[j, k], a[i, k]
       end
    end
    return a
@@ -6109,9 +6200,7 @@ matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
 function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:nrows(a)
-         x = a[k, i]
-         a[k, i] = a[k, j]
-         a[k, j] = x
+         a[k, i], a[k, j] = a[k, j], a[k, i]
       end
    end
    return a
@@ -6453,7 +6542,7 @@ end
 
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
-_change_base_ring(R::NCRing, a::MatElem) = zero_matrix(R, nrows(a), ncols(a))
+_change_base_ring(R::NCRing, a::MatElem) = dense_matrix_type(R)(R, undef, nrows(a), ncols(a))
 _change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
@@ -6560,13 +6649,13 @@ end
 
 rand(rng::AbstractRNG, S::MatSpace, v...) = rand(rng, make(S, v...))
 
-rand(S::MatSpace, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::MatSpace, v...) = rand(Random.default_rng(), S, v...)
 
 # resolve ambiguities
 rand(rng::AbstractRNG, S::MatSpace, dims::Integer...) =
    rand(rng, make(S), dims...)
 
-rand(S::MatSpace, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
+rand(S::MatSpace, dims::Integer...) = rand(Random.default_rng(), S, dims...)
 
 function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
    M = S()
@@ -6585,7 +6674,7 @@ function randmat_triu(rng::AbstractRNG, S::MatSpace, v...)
    return M
 end
 
-randmat_triu(S::MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+randmat_triu(S::MatSpace, v...) = randmat_triu(Random.default_rng(), S, v...)
 
 function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) where {T <: RingElement}
    if !is_domain_type(T) && !(T <: ResElem)
@@ -6626,7 +6715,18 @@ function randmat_with_rank(rng::AbstractRNG, S::MatSpace{T}, rank::Int, v...) wh
 end
 
 randmat_with_rank(S::MatSpace{T}, rank::Int, v...) where {T <: RingElement} =
-   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
+   randmat_with_rank(Random.default_rng(), S, rank, v...)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(S::MatSpace)
+  R = base_ring(S)
+  return S(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
 
 ################################################################################
 #
@@ -6641,7 +6741,7 @@ Constructs the matrix over $R$ with entries as in `arr`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> matrix(GF(3), [1 2 ; 3 4])
 [1   2]
 [0   1]
@@ -6668,7 +6768,11 @@ function matrix(R::NCRing, arr::MatElem)
 end
 
 function matrix(R::NCRing, arr::MatRingElem)
-   return matrix_space(R, nrows(arr), ncols(arr))(arr)
+   M = dense_matrix_type(R)(R, undef, nrows(arr), ncols(arr))
+   for i in 1:nrows(arr), j in 1:ncols(arr)
+      M[i, j] = arr[i, j]
+   end
+   return M
 end
 
 function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
@@ -6676,6 +6780,7 @@ function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
+   Base.require_one_based_indexing(arr)
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
@@ -6687,12 +6792,12 @@ function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
    return matrix(reshape(arr, length(arr), 1))
 end
 
-function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
-    return matrix(permutedims(reduce(hcat, arr), (2, 1)))
+function matrix(arr::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
+    return matrix(permutedims(reduce(hcat, arr)))
 end
 
-function matrix(R::NCRing, arr::Vector{<:Vector})
-   return matrix(R, permutedims(reduce(hcat, arr), (2, 1)))
+function matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
+   return matrix(R, permutedims(reduce(hcat, arr)))
 end
 
 @doc raw"""
@@ -6725,14 +6830,9 @@ end
 Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
-   arr = Matrix{elem_type(R)}(undef, r, c)
-   for i in 1:r
-      for j in 1:c
-         arr[i, j] = zero(R)
-      end
-   end
-   z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
-   return z
+  (r < 0 || c < 0) && error("Dimensions must be non-negative")
+  mat = dense_matrix_type(R)(R, undef, r, c)
+  return is_zero_initialized(mat) ? mat : zero!(mat)
 end
 
 zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
@@ -6749,11 +6849,9 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 Return the $r \times c$ ones matrix over $R$.
 """
 function ones_matrix(R::NCRing, r::Int, c::Int)
-   z = zero_matrix(R, r, c)
-   for i in 1:r
-      for j in 1:c
-         z[i, j] = one(R)
-      end
+   z = dense_matrix_type(R)(R, undef, r, c)
+   for i in 1:r, j in 1:c
+      z[i, j] = one(R)
    end
    return z
 end
@@ -6827,7 +6925,7 @@ Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
 zeroes elsewhere. If `n` is not specified, it defaults to `m`.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> diagonal_matrix(ZZ(2), 2, 3)
 [2   0   0]
 [0   2   0]
@@ -6850,8 +6948,8 @@ diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 @doc raw"""
     diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(x::Vector{T}) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(R::NCRing, x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
 
 Returns a diagonal matrix whose diagonal entries are the elements of $x$.
 If a ring $R$ is given then it is used a parent for the entries of the created
@@ -6859,7 +6957,7 @@ matrix. Otherwise the parent is inferred from the vector $x$.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> diagonal_matrix(ZZ(1), ZZ(2))
 [1   0]
 [0   2]
@@ -6873,7 +6971,8 @@ julia> diagonal_matrix(ZZ, [5, 6])
 [0   6]
 ```
 """
-function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
+function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
+    Base.require_one_based_indexing(x)
     x = R.(x)
     M = zero_matrix(R, length(x), length(x))
     for i = 1:length(x)
@@ -6886,9 +6985,9 @@ function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(x::Vector{<:NCRingElement})
+function diagonal_matrix(x::AbstractVector{<:NCRingElement})
    @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
-   return diagonal_matrix(parent(x[1]), x)
+   return diagonal_matrix(parent(first(x)), x)
 end
 
 @doc raw"""
@@ -6930,7 +7029,7 @@ $n(n+1)/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> lower_triangular_matrix([1, 2, 3])
 [1   0]
 [2   3]
@@ -6969,7 +7068,7 @@ $n(n+1)/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> upper_triangular_matrix([1, 2, 3])
 [1   2]
 [0   3]
@@ -7008,7 +7107,7 @@ $(n-1)n/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> strictly_lower_triangular_matrix([1, 2, 3])
 [0   0   0]
 [1   0   0]
@@ -7048,7 +7147,7 @@ $(n-1)n/2$.
 An exception is thrown if there is no integer $n$ with this property.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> strictly_upper_triangular_matrix([1, 2, 3])
 [0   1   2]
 [0   0   3]
@@ -7097,7 +7196,7 @@ end
 #
 ################################################################################
 
-VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
+Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...))
 Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
 Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))

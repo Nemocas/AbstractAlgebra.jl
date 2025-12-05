@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -166,6 +167,7 @@ julia> z = zero(M)
 
 ```@docs
 Base.getindex(m::FPModuleElem{T}) where T <: RingElement
+coordinates(m::FPModuleElem{T}) where T <: RingElement
 ```
 
 **Examples**

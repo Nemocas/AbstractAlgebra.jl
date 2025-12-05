@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # AbstractAlgebra.jl
 
 ## Introduction
@@ -38,7 +43,7 @@ AbstractAlgebra.jl type hierarchy.
 
 ## Installation
 
-To use AbstractAlgebra we require Julia 1.6 or higher. Please see
+To use AbstractAlgebra we require Julia 1.10 or higher. Please see
 <https://julialang.org/downloads/> for instructions on
 how to obtain Julia for your system.
 

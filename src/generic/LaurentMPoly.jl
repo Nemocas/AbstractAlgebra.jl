@@ -18,16 +18,17 @@ elem_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} =
 parent(p::LaurentMPolyWrap) = p.parent
 
 base_ring_type(::Type{<:LaurentMPolyWrapRing{T}}) where {T} = parent_type(T)
-
 base_ring(R::LaurentMPolyWrapRing) = base_ring(R.mpolyring)::base_ring_type(R)
 
+coefficient_ring_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} = coefficient_ring_type(PR)
 coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(R.mpolyring)
 
 symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
 
 number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
-
 number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
+
+characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
 
 ###############################################################################
 #
@@ -109,14 +110,27 @@ function Base.inv(a::LaurentMPolyWrap)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
 end
 
-function is_unit(a::LaurentMPolyWrap)
-    (ap, ad) = _normalize(a)
-    if is_domain_type(elem_type(coefficient_ring(a))) || length(ap) <= 1
-        return is_unit(ap)
-    else
-        throw(NotImplementedError(:is_unit, a))
+function is_unit(f::T) where {T <: LaurentMPolyRingElem}
+  # **NOTE** f.mpoly is not normalized in any way
+  is_trivial(parent(f)) && return true  # coeffs in zero ring
+  unit_seen = false
+  for i in 1:length(f.mpoly)
+    if is_nilpotent(coeff(f.mpoly, i))
+      continue
     end
+    if unit_seen || !is_unit(coeff(f.mpoly, i))
+      return false
+    end
+    unit_seen = true
+  end
+  return unit_seen
 end
+
+
+function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
+  return is_nilpotent(f.mpoly);
+end
+
 
 is_zero_divisor(p::LaurentMPolyWrap) = is_zero_divisor(p.mpoly)
 
@@ -414,6 +428,10 @@ function constant_coefficient(a::LaurentMPolyWrap)
     return coeff(a.mpoly, e)
 end
 
+function coeff(a::LaurentMPolyWrap, e::Vector{Int})
+  return coeff(a.mpoly, e - a.mindegs)
+end
+
 #### exponent vectors
 
 function leading_exponent_vector(a::LaurentMPolyWrap)
@@ -533,8 +551,7 @@ mutable struct LaurentMPolyBuildCtx{T, S}
     parent::S
 end
 
-function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing)
-    T = elem_type(coefficient_ring(R))
+function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing{T}) where T
     return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 

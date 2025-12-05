@@ -16,13 +16,9 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.LaurentSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.LaurentSeries.conformance" begin
    R, x = laurent_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.LaurentSeries.constructors" begin
@@ -44,9 +40,15 @@ end
    @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.LaurentSeriesRing)
    @test isa(T, Generic.LaurentSeriesRing)

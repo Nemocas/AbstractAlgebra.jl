@@ -106,19 +106,6 @@ deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(d
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-function canonical_unit(x::ResFieldElem{<:Union{Integer, RingElem}})
-  if iszero(x)
-    return one(parent(x))
-  end
-  return x
-end
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -353,11 +340,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::ResFieldElem{T}) where T <: Integer
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
@@ -367,12 +349,6 @@ function is_square(a::ResFieldElem{T}) where T <: Integer
    return isone(a^pm1div2)
 end
 
-@doc raw"""
-    sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)
@@ -473,7 +449,7 @@ end
 
 rand(rng::AbstractRNG, S::ResidueField, v...) = rand(rng, make(S, v...))
 
-rand(S::ResidueField, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::ResidueField, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

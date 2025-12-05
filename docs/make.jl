@@ -1,11 +1,6 @@
 using Documenter, AbstractAlgebra
 
-# We do *not* call `DocMeta.setdocmeta!` with value `:(using AbstractAlgebra)`
-# because we want to force that each jldoctest has its individual
-# `setup = :(using AbstractAlgebra)`.
-# The reason is that the AbstractAlgebra doctests are run also in Nemo,
-# where `using AbstractAlgebra` must be avoided, as a few symbols change
-# their meaning, e.g. `QQ`.
+DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
 makedocs(
          format = Documenter.HTML(;
@@ -70,6 +65,8 @@ makedocs(
              "Matrices" => [
                  "matrix_introduction.md",
                  "matrix.md",
+                 "matrix_spaces.md",
+                 "matrix_implementation.md",
                  "matrix_algebras.md",
              ],
              "Maps" => [
@@ -93,6 +90,7 @@ makedocs(
                  "field_interface.md",
                  "fraction_interface.md",
                  "module_interface.md",
+                 "ideal_interface.md",
                  "matrix_interface.md",
                  "map_interface.md",
                  "rand.md",

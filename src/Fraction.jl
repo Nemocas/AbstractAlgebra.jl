@@ -55,10 +55,8 @@ function //(x::T, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
-   try
-      z.parent = Generic.FracDict[R]
-   catch
-      z.parent = Generic.fraction_field(R)
+   z.parent = get(Generic.FracDict, R) do
+      return Generic.fraction_field(R)
    end
    return z
 end
@@ -101,14 +99,6 @@ is_unit(a::FracElem) = !iszero(numerator(a, false))
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::FracElem) = a
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -145,6 +135,17 @@ function show(io::IO, a::FracField)
     print(io, "Fraction field of ")
     print(terse(io), Lowercase(), base_ring(a))
   end
+end
+
+pretty_eq(a::FracElem, b::FracElem) = (a == b)
+function pretty_lt(a::FracElem, b::FracElem)
+  if pretty_lt(denominator(b, false), denominator(a, false))
+    return true
+  end
+  if pretty_lt(denominator(a, false), denominator(b, false))
+    return false
+  end
+  return pretty_lt(numerator(a, false), numerator(b, false))
 end
 
 ###############################################################################
@@ -624,20 +625,28 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FracElem{T}, V::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FracElem, V::Vector{<:RingElement})
     return evaluate(numerator(f), V)//evaluate(denominator(f), V)
 end
   
-function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FracElem, v::RingElement)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
+function evaluate(f::FracElem{<:PolyRingElem}, v::Integer)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+function evaluate(f::FracElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+    return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
+function (a::FracElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FracElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ###############################################################################
@@ -684,21 +693,10 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::FracElem{T}) where T <: RingElem
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::FracElem{T}) where T <: RingElem
    return is_square(numerator(a)) && is_square(denominator(a))
 end
 
-@doc raw"""
-    Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
-
-Return the square root of $a$. By default the function will throw an
-exception if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
    return parent(a)(sqrt(numerator(a); check=check), sqrt(denominator(a); check=check))
 end
@@ -806,7 +804,7 @@ end
 rand(rng::AbstractRNG, S::FracField, v...) =
    rand(rng, make(S, v...))
 
-rand(S::FracField, v...) = rand(GLOBAL_RNG, S, v...)
+rand(S::FracField, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #
@@ -827,13 +825,49 @@ function fraction_field(R::Ring; cached::Bool=true)
    return Generic.fraction_field(R; cached=cached)
 end
 
+function fraction_field(F::Field; cached::Bool=true)
+   return F
+end
+
+
 @doc raw"""
-    FactoredFractionField(R::Ring; cached::Bool=true)
+    fraction_field_type(a)
+
+Return the type of the base ring of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> fraction_field_type(R) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(zero(R)) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(typeof(R)) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(typeof(zero(R))) == typeof(fraction_field(R))
+true
+```
+"""
+fraction_field_type(x) = fraction_field_type(typeof(x))
+fraction_field_type(x::Type{<:RingElement}) = fraction_field_type(parent_type(x))
+fraction_field_type(T::DataType) = throw(MethodError(fraction_field_type, (T,)))
+
+fraction_field_type(::Type{T}) where {T <: Field} = T
+fraction_field_type(::Type{T}) where {T <: Ring} = AbstractAlgebra.Generic.FracField{elem_type(T)}
+
+
+@doc raw"""
+    factored_fraction_field(R::Ring; cached::Bool=true)
 
 Return the parent object of the fraction field over the given base ring $R$,
 where the elements are maintained in factored form as much as possible.
 """
-function FactoredFractionField(R::Ring; cached::Bool=true)
-   return Generic.FactoredFractionField(R; cached=cached)
+function factored_fraction_field(R::Ring; cached::Bool=true)
+   return Generic.factored_fraction_field(R; cached=cached)
 end
 

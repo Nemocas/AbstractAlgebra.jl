@@ -1,26 +1,10 @@
-function test_elem(R::AbstractAlgebra.LaurentMPolyRing{BigInt})
-    n = rand(1:10)
-    # R: length between 1 and 9
-    # R: exponents between -n and n
-    # ZZ: coeffs between -99 and 99
-    rand(R, 1:9, -n:n, -99:99)
-end
-
-function test_elem(R::AbstractAlgebra.Generic.LaurentMPolyWrapRing{AbstractAlgebra.EuclideanRingResidueRingElem{BigInt}})
-    n = rand(1:5)
-    # R: length between 1 and 9
-    # R: exponents between -n and n
-    # ZZ/6ZZ: coeffs between ??? <- TODO
-    rand(R, 1:4, -n:n, 1:10)
-end
-
 @testset "Generic.LaurentMPoly.conformance" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
-    test_Ring_interface(L)
-    test_Ring_interface_recursive(L)
+    ConformanceTests.test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface_recursive(L)
 
     L, (x, y) = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], ["x", "y"])
-    test_Ring_interface(L)
+    ConformanceTests.test_Ring_interface(L)
 end
 
 @testset "Generic.LaurentMPoly.constructors" begin
@@ -30,8 +14,10 @@ end
 
     @test base_ring(L) == GF(5)
     @test coefficient_ring(L) == GF(5)
+    @test coefficient_ring_type(L) === typeof(GF(5))
     @test base_ring(x) == GF(5)
     @test coefficient_ring(x) == GF(5)
+    @test coefficient_ring_type(x) === typeof(GF(5))
 
     L, (x, y) = laurent_polynomial_ring(GF(5), ["x", "y"])
     @test L == laurent_polynomial_ring(GF(5), ['x', 'y'])[1]
@@ -45,22 +31,14 @@ end
     @test X + x == 2*x
 end
 
+@testset "Generic.LaurentMPoly.characteristic" for R in (GF(5), ZZ, residue_ring(ZZ, 6)[1])
+   L, (x, y) = laurent_polynomial_ring(R, 2, "x", cached = true)
+   @test characteristic(L) == characteristic(R)
+end
+
 @testset "Generic.LaurentMPoly.printing" begin
    R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
    @test !occursin("\n", sprint(show, R))
-end
-
-@testset "Generic.LaurentMPoly.is_unit" begin
-   R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
-
-   @test is_unit(x)
-   @test !is_unit(2*x)
-   try
-      res = is_unit(3 + 2*x)
-      @test res
-   catch e
-      @test e isa NotImplementedError
-   end
 end
 
 @testset "Generic.LaurentMPoly.derivative" begin
@@ -111,6 +89,9 @@ end
     @test a == sum(coefficients(a) .* monomials(a))
     @test a == L(collect(coefficients(a)), collect(exponent_vectors(a)))
     @test iszero((@inferred constant_coefficient(a)))
+    @test coeff(a, [-2, 1]) == 2
+    @test coeff(a, [1, -3]) == 3
+    @test coeff(a, [1, 1]) == 0
 
     b = MPolyBuildCtx(L)
     for (c, e) in zip(coefficients(a), exponent_vectors(a))
@@ -133,4 +114,146 @@ end
 
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
+end
+
+
+# -------------------------------------------------------
+
+# Coeff rings for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+# [2024-12-12  laurent_polynomial_ring currently gives error when coeff ring is zero ring]
+# ## LaurentMPoly over ZeroRing
+# @testset "Nilpotent/unit for ZeroRing[x,y, x^(-1),y^(-1)]" begin
+#   P,(x,y) = laurent_polynomial_ring(ZeroRing, ["x","y"]);
+#   @test is_nilpotent(P(0))
+#   @test is_nilpotent(P(1))
+#   @test is_nilpotent(x)
+#   @test is_nilpotent(-x)
+#   @test is_nilpotent(x+y)
+#   @test is_nilpotent(x-y)
+#   @test is_nilpotent(x*y)
+
+#   @test is_unit(P(0))
+#   @test is_unit(P(1))
+#   @test is_unit(x)
+#   @test is_unit(-x)
+#   @test is_unit(x+y)
+#   @test is_unit(x-y)
+#   @test is_unit(x*y)
+# end
+
+## LaurentMPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x,y, x^(-1),y^(-1)]" begin
+  P,(x,y) = laurent_polynomial_ring(ZZ, ["x","y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test !is_unit(2/x)
+  @test !is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test is_unit(x*y)
+end
+
+## LaurentMPoly over QQ
+@testset "Nilpotent/unit for QQ[x,y, x^(-1),y^(-1)]" begin
+  P,(x,y) = laurent_polynomial_ring(QQ, ["x","y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(2))
+  @test is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(2*x)
+  @test is_unit(-2*x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test is_unit(2/x)
+  @test is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test is_unit(x*y)
+end
+
+## LaurentMPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x,y, x^(-1), y^(-1)]" begin
+  P,(x,y) = laurent_polynomial_ring(ZZmod720, ["x","y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test is_nilpotent(30*x)
+  @test is_nilpotent(30/x)
+  @test is_nilpotent(30*x+120*y)
+  @test is_nilpotent(30*x-120*y)
+  @test !is_nilpotent(x*y)
+  @test is_nilpotent(30*x*y)
+  @test is_nilpotent(30*x/y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test !is_unit(35*x)
+  @test !is_unit(35/x)
+  @test !is_unit(30*x)
+  @test !is_unit(30/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test is_unit(x+30)
+  @test is_unit(x-30)
+  @test is_unit(1+30*x)
+  @test is_unit(1-30*x)
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+  @test is_unit(600+7*x+30*x^2)
+  @test is_unit(600-7*x+30*x^2)
+  @test is_unit(x+30/y)
+  @test is_unit(x-30/y)
+  @test is_unit(1+30*x/y)
+  @test is_unit(1-30*x*y)
+  @test is_unit(7+60*x+210/y)
+  @test is_unit(7-60*x+210/y)
+  @test is_unit(600+7*x/y+30*x^2)
+  @test is_unit(600-7*x*y+30*x^2)
+  @test !is_unit(30*x+120*y)
+  @test !is_unit(30*x-120*y)
+  @test is_unit(x*y)
+  @test !is_unit(30*x*y)
+  @test !is_unit(30*x/y)
 end

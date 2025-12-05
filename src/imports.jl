@@ -1,7 +1,5 @@
-using Random: Random, AbstractRNG, GLOBAL_RNG, SamplerTrivial
+using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-
-using Test: @test # for "interface-conformance" functions
 
 import LinearAlgebra
 
@@ -37,6 +35,7 @@ import Base: >
 import Base: >=
 import Base: >>
 import Base: Array
+import Base: Matrix
 import Base: Rational
 import Base: ^
 import Base: abs
@@ -80,6 +79,7 @@ import Base: precision
 import Base: rand
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: setindex!
 import Base: show
 import Base: similar

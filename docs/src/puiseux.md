@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -327,11 +328,7 @@ true
 Base.log(a::Generic.PuiseuxSeriesElem)
 Base.exp(a::Generic.PuiseuxSeriesElem)
 ```
-
-```@docs
-Base.sqrt(a::Generic.PuiseuxSeriesElem)
-```
-
+Methods for `is_square` and `sqrt` are provided for inputs of type `PuiseuxSeriesElem`.
 
 **Examples**
 

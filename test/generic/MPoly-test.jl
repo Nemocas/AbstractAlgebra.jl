@@ -17,10 +17,11 @@
       @test parent_type(Generic.MPoly{elem_type(R)}) == Generic.MPolyRing{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
-      @test typeof(S) <: Generic.MPolyRing
+      @test S isa Generic.MPolyRing
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test isa(varlist[j], MPolyRingElem)
@@ -183,7 +184,7 @@
    @test_logs (:warn, """The variable name "x-1" sadly is no Julia identifier. You can still access it as `var"x-1"`."""
       ) @macroexpand @polynomial_ring(QQ, :x => -1:1)
    @test_logs (:error, "Inconveniently, you may only use literals and variables from the global scope of the current module (`Main`) when using variable name constructor macros"
-      ) @test_throws (VERSION < v"1.7" ? LoadError : UndefVarError) let local_name = 3
+      ) @test_throws UndefVarError let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
 end
@@ -452,19 +453,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
-end
 
-@testset "Generic.MPoly.is_unit" begin
-   R, (x,) = polynomial_ring(residue_ring(ZZ, 4)[1], ["x"])
-
-   @test !is_unit(x)
-   @test !is_unit(2*x)
-   try
-      res = is_unit(1 + 2*x)
-      @test res
-   catch e
-      @test e isa NotImplementedError
-   end
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 
@@ -523,15 +515,16 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test leading_coefficient(f*g) ==
-               leading_coefficient(f)*leading_coefficient(g)
+         if !is_zero(f) && !is_zero(g)
+            @test parent(leading_coefficient(f)) == base_ring(f)
+            @test leading_coefficient(f*g) == leading_coefficient(f)*leading_coefficient(g)
+         end
          @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist
             @test leading_coefficient(v) == one(base_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
       end
    end
 
@@ -575,7 +568,7 @@ end
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y + 5) == 5
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y) == 2
    @test trailing_coefficient(R(2)) == 2
-   @test trailing_coefficient(R()) == 0
+   @test_throws ArgumentError trailing_coefficient(R())
 
    @test tail(2x^2 + 2x*y + 3) == 2x*y + 3
    @test tail(R(1)) == 0
@@ -1256,6 +1249,8 @@ end
    f = 2x^2*y^2 + 3x + y + 1
 
    @test evaluate(f, [0*x, 0*y]) == 1
+   @test evaluate(f, Any[0*x, 0*y]) == 1
+   @test_throws ArgumentError evaluate(f, [])
 
    @test evaluate(f, BigInt[1, 2]) == ZZ(14)
    @test evaluate(f, [QQ(1), QQ(2)]) == 14//1
@@ -1270,6 +1265,13 @@ end
                2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
    @test evaluate(f, [x, 0]) == 3x + 1 # see https://github.com/oscar-system/Oscar.jl/issues/2331
+
+   @test f(x=1, y=2) == 14
+   @test f(y=2, x=1) == 14
+   @test f(x=x+y, y=2y-x) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+   @test f(y=2y-x, x=x+y) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
 
    S, z = polynomial_ring(R, "z")
 
@@ -1316,6 +1318,16 @@ end
    K = RealField
    R, (x, y) = polynomial_ring(K, ["x", "y"])
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
+
+   # Issue oscar-system/Oscar.jl#4762
+   F,t = rational_function_field(QQ, :t)
+   P,(x,y) = polynomial_ring(F, [:x, :y])
+   @test x(t,y) == t
+   @test x == gen(P, 1) # evaluation used to modify the polynomial
+
+   # Issue #1219
+   Qx, (x, y) = QQ["x", "y"];
+   @test typeof(zero(Qx)(x, y)) == typeof(one(Qx)(x, y)) == typeof((x+y)(x, y))
 end
 
 @testset "Generic.MPoly.valuation" begin
@@ -1354,6 +1366,9 @@ end
          @test q4 == q3
       end
    end
+   Qxy, (x, y) = QQ[:x, :y]
+   @test_throws ArgumentError remove(0*x, y)
+   @test_throws ArgumentError remove(x, y^0)
 end
 
 @testset "Generic.MPoly.derivative" begin
@@ -1548,6 +1563,11 @@ end
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
 
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
+
       for iter in 1:10
          f = zero(R)
          f_univ = zero(R_univ)
@@ -1707,15 +1727,170 @@ end
 
 @testset "Generic.MPoly.Ring_interface" begin
   S, = polynomial_ring(QQ, 0)
-  test_Ring_interface_recursive(S)
+  ConformanceTests.test_Ring_interface_recursive(S)
 
   S, = polynomial_ring(QQ, 1)
-  test_Ring_interface_recursive(S)
+  ConformanceTests.test_Ring_interface_recursive(S)
 
   S, = polynomial_ring(ZZ, 2)
-  test_Ring_interface_recursive(S)
+  ConformanceTests.test_Ring_interface_recursive(S)
 
   R, = QQ[:x]
   S, = polynomial_ring(R, :z => 1:3)
-  test_Ring_interface(S) # _recursive needs too many ressources
+  ConformanceTests.test_Ring_interface(S) # _recursive needs too many ressources
+end
+
+@testset "Generic.MPoly.zero_rings" begin
+  R, = residue_ring(ZZ, 1)
+  S, = polynomial_ring(R, 2)
+  @test is_zero(gen(S, 1)) && is_one(gen(S, 1))
+  @test is_zero(one(S))
+  ConformanceTests.test_Ring_interface_recursive(S)
+end
+
+# -------------------------------------------------------
+
+# Coeff rings needed for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+## MPoly over ZeroRing
+@testset "Nilpotent/unit for ZeroRing[x,y]" begin
+  P,(x,y) = polynomial_ring(ZeroRing, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test is_nilpotent(P(1))
+  @test is_nilpotent(x)
+  @test is_nilpotent(-x)
+  @test is_nilpotent(x+y)
+  @test is_nilpotent(x-y)
+  @test is_nilpotent(x*y)
+
+  @test is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(x+y)
+  @test is_unit(x-y)
+  @test is_unit(x*y)
+end
+
+## MPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x,y]" begin
+  P,(x,y) = polynomial_ring(ZZ, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test !is_unit(x*y)
+end
+
+## MPoly over QQ
+@testset "Nilpotent/unit for QQ[x,y]" begin
+  P,(x,y) = polynomial_ring(QQ, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test !is_nilpotent(x+y)
+  @test !is_nilpotent(x-y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+y)
+  @test !is_unit(x-y)
+  @test !is_unit(x*y)
+end
+
+## MPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x,y]" begin
+  FactorsOf30 = [2, 3, 5, 6, 10, 15]; # non-nilpotent zero-divisors
+  P,(x,y) = polynomial_ring(ZZmod720, ["x", "y"]);
+  @test is_nilpotent(P(0))
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(P(ZeroDiv))
+  end
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  for ZeroDiv in FactorsOf30
+    @test !is_nilpotent(ZeroDiv*x)
+  end
+  @test is_nilpotent(30*x)
+  @test is_nilpotent(30*x+120*y)
+  @test is_nilpotent(30*x-120*y)
+  @test !is_nilpotent(x*y)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(x+ZeroDiv)
+  end
+  @test !is_unit(x+30)
+  @test !is_unit(x-30)
+  @test is_unit(1+30*x)
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+x*ZeroDiv)
+  end
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+  @test is_unit(1+30*(x+y))
+  for ZeroDiv in FactorsOf30
+    @test !is_unit(1+ZeroDiv*(x+y))
+  end
+  @test is_unit(7+60*x*y)
+  @test is_unit(7-60*x*y)
+end
+
+@testset "Generic.MPoly.Issue#2010" begin
+  R1, (y1, z1) = polynomial_ring(QQ, [:y, :z])
+  R2, (x2, y2) = polynomial_ring(QQ, [:x, :y])
+  @test_throws ErrorException z1 + y2
+end
+
+@testset "Generic.MPoly.Iterators" begin
+  R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
+  f = x * y + 2 * x - 3 * z
+
+  @test (@inferred collect(exponent_vectors(f))) == [[1, 1, 0], [1, 0, 0], [0, 0, 1]]
+  @test (@inferred collect(exponent_vectors(Vector{UInt}, f))) == [UInt[1, 1, 0], UInt[1, 0, 0], UInt[0, 0, 1]]
+  @test (@inferred collect(coefficients(f))) == [QQ(1), QQ(2), QQ(-3)]
+  @test (@inferred collect(terms(f))) == [x * y, 2 * x, -3 * z]
+  @test (@inferred collect(monomials(f))) == [x * y, x, z]
+
+  @test (@inferred first(exponent_vectors(f, inplace = true))) == [1, 1, 0]
+  @test (@inferred first(exponent_vectors(Vector{UInt}, f, inplace = true))) == UInt[1, 1, 0]
+  @test (@inferred first(coefficients(f, inplace = true))) == QQ(1)
+  @test (@inferred first(monomials(f, inplace = true))) == x * y
+  @test (@inferred first(terms(f, inplace = true))) == x * y
 end

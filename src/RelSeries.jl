@@ -29,6 +29,10 @@ base_ring_type(::Type{<:SeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:SeriesRing}) = base_ring_type(T)
+
+coefficient_ring(R::SeriesRing) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
    return is_domain_type(S)
 end
@@ -273,7 +277,7 @@ zero(a::RelPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.RelSeries{TT}(coeffs, len, prec, val)
    # Default is supposed to return a Generic polynomial
    p.parent = Generic.RelPowerSeriesRing{TT}(R, max_precision, Symbol(var), cached)
@@ -1172,13 +1176,6 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::RelPowerSeriesRingElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
 function Base.sqrt(a::RelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
@@ -1451,7 +1448,32 @@ end
 rand(rng::AbstractRNG, S::SeriesRing, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::SeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)
+rand(S::SeriesRing, val_range, v...) = rand(Random.default_rng(), S, val_range, v...)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+function ConformanceTests.generate_element(Rx::SeriesRing)
+  R = base_ring(Rx)
+  prec = rand(3:10)
+  len = rand(0:prec-1)
+  val = rand(0:prec-len)
+  # FIXME: constructors don't seem to catch use of negative val
+  @assert val >= 0
+  A = elem_type(R)[ConformanceTests.generate_element(R) for i in 1:len]
+  if len > 0 && is_zero(A[1])
+    A[1] = one(R)
+  end
+  if elem_type(Rx) <: RelPowerSeriesRingElem
+    @assert prec >= len + val
+    return Rx(A, len, prec, val)
+  else
+    @assert prec >= len
+    return Rx(A, len, prec)
+  end
+end
 
 ###############################################################################
 #

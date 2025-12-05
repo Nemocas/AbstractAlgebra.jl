@@ -31,6 +31,7 @@ end
 
 number_of_rows(a::MatRing) = a.n
 number_of_columns(a::MatRing) = number_of_rows(a)
+vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.n * a.n
 
 @doc raw"""
     degree(a::MatRing)
@@ -70,7 +71,7 @@ function characteristic(a::MatRing)
    return characteristic(base_ring(a))
 end
 
-is_finite(R::MatRing) = iszero(nrows(a)) || is_finite(base_ring(R))
+is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 
 ###############################################################################
 #
@@ -151,7 +152,7 @@ end
 #
 ################################################################################
 
-is_square(a::MatRingElem) = true
+is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
 
 ###############################################################################
 #
@@ -339,13 +340,13 @@ end
 
 rand(rng::AbstractRNG, S::MatRing, v...) = rand(rng, make(S, v...))
 
-rand(S::MatRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::MatRing, v...) = rand(Random.default_rng(), S, v...)
 
 # resolve ambiguities
 rand(rng::AbstractRNG, S::MatRing, dims::Integer...) =
    rand(rng, make(S), dims...)
 
-rand(S::MatRing, dims::Integer...) = rand(Random.GLOBAL_RNG, S, dims...)
+rand(S::MatRing, dims::Integer...) = rand(Random.default_rng(), S, dims...)
 
 function randmat_triu(rng::AbstractRNG, S::MatRing, v...)
    M = S()
@@ -365,7 +366,7 @@ function randmat_triu(rng::AbstractRNG, S::MatRing, v...)
    return M
 end
 
-randmat_triu(S::MatRing, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+randmat_triu(S::MatRing, v...) = randmat_triu(Random.default_rng(), S, v...)
 
 function randmat_with_rank(rng::AbstractRNG, S::MatRing{T}, rank::Int, v...) where {T <: RingElement}
    M = S()
@@ -403,7 +404,18 @@ function randmat_with_rank(rng::AbstractRNG, S::MatRing{T}, rank::Int, v...) whe
 end
 
 randmat_with_rank(S::MatRing{T}, rank::Int, v...) where {T <: RingElement} =
-   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
+   randmat_with_rank(Random.default_rng(), S, rank, v...)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(S::MatRing)
+  R = base_ring(S)
+  return S(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:nrows(S), j in 1:ncols(S)])
+end
 
 ###############################################################################
 #

@@ -22,6 +22,7 @@
    F = free_module(QQ,2)
    D, inj, pro = direct_sum(F, F)
    f = D([gen(F, 1), gen(F,2)])
+   @test rank(D) == 4
    @test gen(D, 1) == D[1]
    @test isa(f, Generic.DirectSumModuleElem)
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))

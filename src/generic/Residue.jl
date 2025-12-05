@@ -28,7 +28,7 @@ end
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
@@ -145,4 +145,14 @@ end
 function add!(c::T, a::T, b::T) where {T <: EuclideanRingResidueRingElem}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
+end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::EuclideanRingResidueRing)
+  return R(ConformanceTests.generate_element(base_ring(R)))
 end

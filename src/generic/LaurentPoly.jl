@@ -17,17 +17,18 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = p.parent
 
-coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
-
 base_ring_type(::Type{<:LaurentPolyWrapRing{T}}) where {T} = parent_type(T)
-
 base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)::base_ring_type(R)
+
+coefficient_ring_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} = coefficient_ring_type(PR)
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
 
 var(R::LaurentPolyWrapRing) = var(R.polyring)
 
 symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
 
-number_of_variables(R::LaurentPolyWrapRing) = number_of_variables(R.polyring)
+number_of_variables(R::LaurentPolyWrapRing) = 1
+number_of_generators(R::LaurentPolyWrapRing) = number_of_variables(R)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
 
@@ -199,15 +200,6 @@ end
 function Base.inv(p::LaurentPolyWrap)
    v, g = _remove_gen(p)
    return LaurentPolyWrap(parent(p), inv(g), -p.mindeg-v)
-end
-
-function is_unit(p::LaurentPolyWrap)
-   v, g = _remove_gen(p)
-   if is_domain_type(elem_type(coefficient_ring(p))) || length(g) <= 1
-      return is_unit(g)
-   else
-      throw(NotImplementedError(:is_unit, p))
-   end
 end
 
 is_zero_divisor(p::LaurentPolyWrap) = is_zero_divisor(p.poly)
@@ -444,8 +436,23 @@ rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
    rand(rng, make(S, degrees_range, v...))
 
 rand(S::LaurentPolyWrapRing, degrees_range, v...) =
-   rand(GLOBAL_RNG, S, degrees_range, v...)
+   rand(Random.default_rng(), S, degrees_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Generic.LaurentPolyWrapRing)
+   n = rand(0:10)
+   if n == 0
+      return zero(R)
+   else
+      m = rand(0:5)
+      rand(R, -m:n-m, -99:99)
+   end
+end
 
 ###############################################################################
 #

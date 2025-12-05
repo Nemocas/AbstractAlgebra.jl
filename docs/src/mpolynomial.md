@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -318,6 +319,10 @@ The following functionality is also provided for all multivariate polynomials.
 
 ```@docs
 is_univariate(::MPolyRing{T}) where T <: RingElement
+```
+
+```@docs
+var_indices(p::MPolyRingElem{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -918,10 +923,8 @@ x + 1
 
 ### Homogeneous polynomials
 
-It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
-
 ```@docs
-is_homogeneous(x::MPolyRingElem{T}) where T <: RingElement
+is_homogeneous(x::MPolyRingElem)
 ```
 
 ## Random generation

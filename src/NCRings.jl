@@ -61,7 +61,7 @@ end
 #
 ###############################################################################
 
-+(x::NCRingElem) = x
++(x::NCRingElem) = deepcopy(x)
 
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
@@ -75,7 +75,7 @@ end
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
 
-*(x::NCRingElem) = x
+*(x::NCRingElem) = deepcopy(x)
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
@@ -137,12 +137,12 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 ###############################################################################
 
 @doc raw"""
-    is_unit(a::T) where {T <: NCRingElem}
+    is_unit(a::T) where {T <: NCRingElement}
 
 Return true if $a$ is invertible, else return false.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> S, x = polynomial_ring(QQ, :x)
 (Univariate polynomial ring in x over rationals, x)
 
@@ -154,6 +154,46 @@ julia> is_unit(ZZ(-1)), is_unit(ZZ(4))
 ```
 """
 function is_unit end
+
+@doc raw"""
+    is_nilpotent(a::T) where {T <: NCRingElement}
+
+Return true iff $a$ is nilpotent, i.e. a^k == 0 for some k.
+
+# Examples
+```jldoctest
+julia> R, _ = residue_ring(ZZ,720);
+
+julia> S, x = polynomial_ring(R, :x);
+
+julia> is_nilpotent(30*x), is_nilpotent(30+90*x), is_nilpotent(S(15))
+(true, true, false)
+```
+"""
+function is_nilpotent(a::T) where {T <: NCRingElement}
+  is_domain_type(T) && return is_zero(a)
+  throw(NotImplementedError(:is_nilpotent, a))
+end
+
+
+@doc raw"""
+    is_square(a::T)  where {T <: NCRingElement}
+
+Return `true` iff `a` is the square of a value in its own ring.
+See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
+"""
+function is_square end
+
+@doc raw"""
+    sqrt(a::NCRingElem; check::Bool=true)
+
+Return a square root of `a`, if it exists. By default (`check=true`),
+implementations should raise an exception if `a` is not a square in its ring.
+If `check=false`, implementations may skip this verification.
+
+See also `is_square` and `is_square_with_sqrt`.
+"""
+sqrt(::NCRingElem)
 
 ###############################################################################
 #
@@ -217,7 +257,7 @@ end
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [1   2   3]
 [2   3   4]

@@ -15,6 +15,8 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Group,
+                  :InfiniteDimensionError, # remove in next breaking release, see #2135
+                  :identity_map, # see #5188 in Oscar.jl
                  ]
 
 
@@ -89,6 +91,7 @@ include("Assertions.jl")
 
 include("Attributes.jl")
 include("PrintHelper.jl")
+include("PrettyOrdering.jl")
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -170,6 +173,9 @@ include("AbstractTypes.jl")
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
 const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
+pretty_lt(x::Number, y::Number) = isless(x, y)
+pretty_eq(x::Number, y::Number) = (x == y)
+
 include("julia/JuliaTypes.jl")
 
 # Unions of AbstactAlgebra abstract types and Julia types
@@ -187,6 +193,8 @@ include("ConcreteTypes.jl")
 ###############################################################################
 
 include("fundamental_interface.jl")
+include("misc/VarNames.jl")
+include("Infinity.jl")
 
 ################################################################################
 #
@@ -199,6 +207,15 @@ include("PrettyPrinting.jl")
 using .PrettyPrinting
 
 import .PrettyPrinting: expressify
+
+
+################################################################################
+#
+#   Conformance tests (function stubs for TestExt)
+#
+################################################################################
+
+include("ConformanceTests.jl")
 
 ###############################################################################
 #
@@ -215,6 +232,12 @@ end
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
+
+include("Groups.jl")
+include("Rings.jl")
+include("NCRings.jl")
+include("Fields.jl")
+include("Factor.jl")
 
 include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
 include("Poly.jl")
@@ -252,13 +275,6 @@ include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
-
-
-include("Groups.jl")
-include("Rings.jl")
-include("NCRings.jl")
-include("Fields.jl")
-include("Factor.jl")
 
 # More functionality for Julia types
 include("julia/Integer.jl")
@@ -346,7 +362,14 @@ end
 
 include("misc/ProductIterator.jl")
 include("misc/Evaluate.jl")
-include("misc/VarNames.jl")
+
+###############################################################################
+#
+#   methods to inquire about known properties of objects
+#
+###############################################################################
+
+include("KnownProperties.jl")
 
 ###############################################################################
 #
@@ -364,16 +387,8 @@ getindex(S::Set, i::Int) = gen(S, i)
 
 include("error.jl")
 
-###############################################################################
-#
-#   Load Groups/Rings/Fields etc.
-#
-###############################################################################
-
 
 # Generic functions to be defined after all rings
-include("polysubst.jl")
-
 include("broadcasting.jl")
 
 ################################################################################
@@ -425,29 +440,13 @@ function test_module(x, y)
    pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
-   test_function_name = "test_"
-
-   x == "generic"
-   if y == "RelSeries"
-      test_function_name *= "gen_rel_series"
-   elseif y == "AbsSeries"
-      test_function_name *= "gen_abs_series"
-   elseif y == "Matrix"
-      test_function_name *= "gen_mat"
-   elseif y == "Fraction"
-      test_function_name *= "gen_frac"
-   elseif y == "Residue"
-      test_function_name *= "gen_res"
-   else
-      test_function_name *= "gen_$(lowercase(y))"
-   end
+   rand_file = joinpath(pkgdir, "test/rand.jl")
 
    cmd = """
          using Test
          using AbstractAlgebra
-         include("test/rand.jl")
+         include("$rand_file")
          include("$test_file")
-         $test_function_name()
          """
    @info("spawning ", `$julia_exe --project=$(Base.active_project()) -e $cmd`)
    run(`$julia_exe -e $cmd`)
@@ -463,5 +462,6 @@ end
 #
 ###############################################################################
 include("utils.jl")
+
 
 end # module

@@ -20,6 +20,8 @@ parent(a::Poly) = a.parent
 
 var(a::PolyRing) = a.S
 
+is_trivial(a::PolyRing) = a.istrivial
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -199,6 +201,7 @@ function zero!(c::Poly{T}) where T <: RingElement
 end
 
 function one!(c::Poly{T}) where T <: RingElement
+   is_trivial(parent(c)) && return zero!(c)
    fit!(c, 1)
    c = set_length!(c, 1)
    c.coeffs[1] = one(base_ring(c))
@@ -324,8 +327,7 @@ mutable struct PolyBuildCtx{T, S}
 end
 
 # TODO the MPolyBuildCtx function should be renamed BuildCtx
-function MPolyBuildCtx(R::AbstractAlgebra.PolyRing)
-   T = elem_type(coefficient_ring(R))
+function MPolyBuildCtx(R::AbstractAlgebra.PolyRing{T}) where T
    S = typeof(R)
    return PolyBuildCtx{T, S}(T[], R)
 end

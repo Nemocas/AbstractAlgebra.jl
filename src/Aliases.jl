@@ -15,6 +15,11 @@
 @alias is_zero iszero
 @alias number_of_digits ndigits
 
+if VERSION >= v"1.13.0-DEV.534" # https://github.com/JuliaLang/julia/pull/53677
+  @alias is_positive ispositive
+  @alias is_negative isnegative
+end
+
 
 # alternative names for some functions from LinearAlgebra
 # we don't use the `@alias` macro here because we provide custom

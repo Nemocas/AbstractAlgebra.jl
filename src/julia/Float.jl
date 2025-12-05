@@ -20,9 +20,7 @@ elem_type(::Type{Floats{T}}) where T <: AbstractFloat = T
 
 parent_type(::Type{T}) where T <: AbstractFloat = Floats{T}
 
-base_ring_type(::Type{Floats{T}}) where T <: AbstractFloat = typeof(Union{})
-
-base_ring(a::Floats{T}) where T <: AbstractFloat = Union{}
+base_ring_type(::Type{Floats{T}}) where T <: AbstractFloat = Union{}   # no base ring
 
 is_domain_type(::Type{T}) where T <: AbstractFloat = true
 
@@ -38,15 +36,16 @@ zero(::Floats{T}) where T <: AbstractFloat = T(0)
 
 one(::Floats{T}) where T <: AbstractFloat = T(1)
 
-is_unit(a::AbstractFloat) = a != 0
+is_unit(a::AbstractFloat) = !is_zero(a)
 
-canonical_unit(a::AbstractFloat) = a
+canonical_unit(a::AbstractFloat) = iszero(a) ? copysign(one(a), a) : a
 
 characteristic(a::Floats{T}) where T <: AbstractFloat = 0
 
-is_negative(n::T) where T<:Real = n < zero(T)
-
-is_positive(n::T) where T<:Real = n > zero(T)
+if VERSION < v"1.13.0-DEV.534" # https://github.com/JuliaLang/julia/pull/53677
+  is_negative(n::T) where T<:Real = n < zero(T)
+  is_positive(n::T) where T<:Real = n > zero(T)
+end
 
 ###############################################################################
 #
@@ -145,11 +144,11 @@ function Base.sqrt(a::AbstractFloat; check::Bool=true)
 end
 
 function is_square(a::AbstractFloat)
-   return a > 0
+   return a >= 0
 end
 
 function is_square_with_sqrt(a::T) where T <: AbstractFloat
-   if a > 0
+   if a >= 0
       return true, Base.sqrt(a)
    else
       return false, zero(T)
@@ -188,7 +187,17 @@ end
 
 rand(rng::AbstractRNG, R::Floats, n::AbstractUnitRange) = rand(rng, make(R, n))
 
-rand(R::Floats, n) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::Floats, n) = rand(Random.default_rng(), R, n)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Floats{T}) where T
+  return rand(T)*rand(-100:100)
+end
 
 ###############################################################################
 #
@@ -219,3 +228,4 @@ end
 function (a::Floats{BigFloat})(b::Rational{BigInt})
    return BigFloat(b)
 end
+

@@ -19,6 +19,16 @@ end
    test_rand(F, 1:9)
 end
 
+@testset "Generic.Module.hash" begin
+   # equal objects in the sense of `isequal` must have the same `hash` values
+   F = free_module(QQ, 2)
+   M1 = sub(F, [])[1]
+   M2 = sub(F, [])[1]
+   @test objectid(M1) != objectid(M2)
+   @test isequal(M1, M2)
+   @test hash(M1) == hash(M2)
+end
+
 @testset "Generic.Module.manipulation" begin
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -120,6 +130,17 @@ end
 
          @test m1 == m2
       end
+   end
+end
+
+@testset "Generic.Module.coordinates" begin
+   for R in [ZZ, QQ]
+      M = free_module(R, 3)
+      v = M([55,12,-3])
+      @test v[1] == 55
+      @test v[2] == 12
+      @test v[3] == -3
+      @test coordinates(v) == [55,12,-3]
    end
 end
 

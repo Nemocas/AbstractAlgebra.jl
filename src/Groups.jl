@@ -242,7 +242,7 @@ end
 # inv!(out::T, g::T) where {T<:GroupElem} = inv(g)
 
 """
-    div_right!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    div_right!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `g*inv(h)`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
@@ -253,7 +253,7 @@ function div_right!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    div_left!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    div_left!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(h)*g`, possibly modifying `out`. Aliasing of `g` or `h` with `out`
 is allowed.
@@ -264,7 +264,7 @@ function div_left!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    conj!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    conj!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h` with
 `out` is allowed.
@@ -276,7 +276,7 @@ function conj!(out::T, g::T, h::T) where {T<:GroupElem}
 end
 
 """
-    comm!(out::T, g::T, h::T) where {GEl <: GroupElem}
+    comm!(out::T, g::T, h::T) where {T <: GroupElem}
 
 Return `inv(g)*inv(h)*g*h`, possibly modifying `out`. Aliasing of `g` or `h`
 with `out` is allowed.
@@ -294,3 +294,47 @@ end
 ###############################################################################
 
 Base.broadcastable(x::GroupElem) = Ref(x)
+
+###############################################################################
+#
+#   Changing group type
+#
+###############################################################################
+
+function (::Type{T})(G::Group) where T <: Group
+  return codomain(isomorphism(T, G))
+end
+
+function isomorphism(::Type{T}, G::T; on_gens::Bool=false) where T <: Group
+  if !_is_attribute_storing_type(T)
+    return identity_map(G)
+  end
+  # Known isomorphisms are cached in the attribute `:isomorphisms`.
+  # The key is a tuple `(T, on_gens)`, where `on_gens` is `true` if the stored
+  # isomorphism `f` maps `gen(domain(f),i)` to `gen(codomain(f),i)` for each `i`.
+  on_gens = true # we ignore the on_gens flag, the identity will *always* map gens onto gens
+  isos = get_attribute!(Dict{Tuple{Type, Bool}, Any}, G, :isomorphisms)::Dict{Tuple{Type, Bool}, Any}
+  return get!(isos, (T, on_gens)) do
+    return identity_map(G)
+  end::AbstractAlgebra.Generic.IdentityMap{T}
+end
+
+"""
+    isomorphism(::Type{T}, G::Group; on_gens=false) where T <: Group
+
+Return an isomorphism from `G` to a group `H` of type `T`.
+An exception is thrown if no such isomorphism exists.
+
+If `on_gens` is `true` then `gens(G)` is guaranteed to correspond to
+`gens(H)`;
+an exception is thrown if this is not possible.
+
+Isomorphisms are usually cached in `G`, subsequent calls of `isomorphism` with the
+same `T` (and the same value of `on_gens`) yield identical results.
+
+If only the image of such an isomorphism is needed, use `T(G)`;
+but this will assume `on_gens=false`.
+"""
+function isomorphism(::Type{T}, G::Group; on_gens::Bool=false) where T <: Group
+  throw(NotImplementedError(:isomorphism, T, G))
+end

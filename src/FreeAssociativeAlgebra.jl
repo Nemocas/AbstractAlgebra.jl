@@ -10,6 +10,7 @@
 #
 ###############################################################################
 
+coefficient_ring_type(T::Type{<:FreeAssociativeAlgebra}) = base_ring_type(T)
 coefficient_ring(R::FreeAssociativeAlgebra{T}) where T <: RingElement = base_ring(R)
 
 function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssociativeAlgebraElem{T}}
@@ -124,9 +125,11 @@ function exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
 end
 
 function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
-   if is_constant(a)
+   if is_zero(a)
+      return false
+   elseif is_constant(a)
       return is_unit(leading_coefficient(a))
-   elseif is_domain_type(elem_type(coefficient_ring(a)))
+   elseif is_domain_type(T)
       return false
    elseif length(a) == 1
       return false
@@ -169,7 +172,7 @@ The syntax `a(vals...)` is also supported.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, (x, y) = free_associative_algebra(ZZ, ["x", "y"]);
 
 julia> f = x*y - y*x
@@ -256,7 +259,26 @@ function rand(rng::AbstractRNG, S::FreeAssociativeAlgebra,
 end
 
 function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
-   rand(GLOBAL_RNG, S, term_range, exp_bound, v...)
+   rand(Random.default_rng(), S, term_range, exp_bound, v...)
+end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(S::FreeAssociativeAlgebra)
+  f = S()
+  g = gens(S)
+  R = base_ring(S)
+  isempty(g) && return S(ConformanceTests.generate_element(R))
+  len_bound = 8
+  exp_bound = 6
+  for i in 1:rand(0:len_bound)
+     f += ConformanceTests.generate_element(R) * prod(rand(g) for _ in 1:rand(0:exp_bound); init = S(1))
+  end
+  return f
 end
 
 ###############################################################################
@@ -274,6 +296,9 @@ function free_associative_algebra(
   parent_obj = Generic.FreeAssociativeAlgebra{elem_type(R)}(R, s, cached)
   return (parent_obj, gens(parent_obj))
 end
+
+@varnames_interface free_associative_algebra(R::Ring, s)
+
 
 free_associative_algebra_type(::Type{T}) where T<:RingElement = Generic.FreeAssociativeAlgebra{T}
 

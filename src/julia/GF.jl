@@ -14,9 +14,7 @@ parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
-base_ring_type(::Type{<:GFField}) = typeof(Union{})
-
-base_ring(a::GFField) = Union{}
+base_ring_type(::Type{<:GFField}) = Union{}   # no base ring
 
 parent(a::GFElem) = a.parent
 
@@ -109,14 +107,6 @@ end
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(x::GFElem) = x
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -134,6 +124,9 @@ function show(io::IO, R::GFField)
    @show_special(io, R)
    print(io, "Finite field F_", R.p)
 end
+
+pretty_lt(x::GFElem, y::GFElem) = pretty_lt(x.d, y.d)
+pretty_eq(x::GFElem, y::GFElem) = (x == y)
 
 ###############################################################################
 #

@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -65,7 +66,9 @@ julia> number_of_generators(S)
 1
 
 julia> y, z = gens(S, [:y, :z])
-(y, z)
+2-element Vector{AbstractAlgebra.Generic.UnivPoly{BigInt}}:
+ y
+ z
 
 julia> number_of_generators(S)
 3

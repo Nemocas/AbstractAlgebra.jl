@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -263,13 +264,7 @@ julia> h = gcd(f, g)
 
 ### Square Root
 
-```@docs
-is_square{T <: Integer}(::ResFieldElem{T})
-```
-
-```@docs
-Base.sqrt{T <: Integer}(::ResFieldElem{T})
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `ResFieldElem`.
 
 **Examples**
 

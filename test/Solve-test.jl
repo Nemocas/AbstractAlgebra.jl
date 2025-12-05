@@ -73,7 +73,7 @@
   end
 
   N = zero_matrix(R, 2, 1)
-  b = zeros(R, 2)
+  b = [zero(R), zero(R)]
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b, side = :right)
   @test fl
   @test N*x == b
@@ -82,7 +82,7 @@
   @test K == identity_matrix(R, 1)
 
   N = zero_matrix(R, 1, 2)
-  b = zeros(R, 1)
+  b = [zero(R)]
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(N, b, side = :right)
   @test fl
   @test N*x == b
@@ -184,7 +184,7 @@ end
 
   N = zero_matrix(R, 2, 1)
   C = AbstractAlgebra.Solve.solve_init(N)
-  b = zeros(R, 2)
+  b = [zero(R), zero(R)]
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -194,7 +194,7 @@ end
 
   N = zero_matrix(R, 1, 2)
   C = AbstractAlgebra.Solve.solve_init(N)
-  b = zeros(R, 1)
+  b = [zero(R)]
   fl, x, K = @inferred AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -244,8 +244,8 @@ end
 
   @test base_ring(MT) == QQ
 
-  @test @inferred zero(MT) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 5))
-  @test @inferred zero(MT, 2, 3) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 2))
+  @test (@inferred zero(MT)) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 5))
+  @test (@inferred zero(MT, 2, 3)) == AbstractAlgebra.Solve.lazy_transpose(zero_matrix(QQ, 3, 2))
 
   S = @inferred similar(MT)
   @test S isa AbstractAlgebra.Solve.LazyTransposeMatElem
@@ -258,4 +258,16 @@ end
   @test nrows(S) == 2
   @test ncols(S) == 3
   @test base_ring(S) == QQ
+end
+
+@testset "solve_triu" begin
+  A = matrix(ZZ, 10, 10, [i<=j ? i+j-1 : 0 for i=1:10 for j=1:10])
+  x = matrix(ZZ, rand(-10:10, 10, 10))
+  @test AbstractAlgebra._solve_triu(A, A*x; side = :right) == x
+  @test AbstractAlgebra._solve_triu(A, x*A; side = :left) == x
+
+  A = matrix(ZZ, 20, 20, [i<=j ? i+j-1 : 0 for i=1:20 for j=1:20])
+  x = matrix(ZZ, rand(-10:10, 20, 20))
+  @test AbstractAlgebra.Strassen._solve_triu(A, A*x; cutoff = 10, side = :right) == x
+  @test AbstractAlgebra.Strassen._solve_triu(A, x*A; cutoff = 10, side = :left) == x
 end

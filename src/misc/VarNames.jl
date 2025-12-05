@@ -27,7 +27,7 @@ is shorthand for `["s$i$j" for i in iter1, j in iter2]`.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.variable_names([:x, :y])
 2-element Vector{Symbol}:
  :x
@@ -121,7 +121,7 @@ Turn `vec` into the shape of `varnames`. Reverse flattening from [`variable_name
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> s = ([:a, :b], "x#" => (1:1, 1:2), "y#" => 1:2, [:z]);
 
 julia> AbstractAlgebra.reshape_to_varnames(AbstractAlgebra.variable_names(s...), s...)
@@ -176,7 +176,7 @@ Mimic usual keyword arguments for usage in macros.
 Return a copy of `default` with the key value pairs from `kvs` applied.
 
 # Example
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:yes)),
        Dict(:a=>0, :b=>:no, :c=>0),
        Dict(:b => [:(:yes), :(:no)]))
@@ -206,7 +206,7 @@ Turn argument list like `(1, a=2; b=3).args` into `(1; a=2, b=3).args`.
 
 Intended to let a macro call `@m(1, a=2; b=3)` mimic a usual function call.
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> args = AbstractAlgebra.normalise_keyword_arguments(:(1, a=2; b=3).args); :($(args...),)
 :((1; a = 2, b = 3))
 
@@ -229,7 +229,7 @@ function normalise_keyword_arguments(args)
         kv = Expr(:parameters)
     end
     # Keyword arguments without previous `;`
-    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+    append!(kv.args, [Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))])
     # normal arguments
     args = (e for e in args if !Meta.isexpr(e, :(=)))
     return [kv, args...]
@@ -313,7 +313,7 @@ function n_vars_method(d::Dict{Symbol}, n, range)
         "an alternative name like `m`, not `$n`")
     quote
         $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
+            $f($(argnames...), (Symbol.(s, $range))::Vector{Symbol}; kv...)
     end
 end
 
@@ -419,7 +419,7 @@ Setting `macros=:no` disables macro creation.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> f(a, s::Vector{Symbol}) = a, String.(s)
 f (generic function with 1 method)
 
@@ -474,13 +474,3 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros], opts[:n], opts[:range]))
     end
 end
-
-@varnames_interface free_associative_algebra(R::Ring, s)
-@varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
-@varnames_interface Generic.rational_function_field(K::Field, s)
-
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
-
-@varnames_interface polynomial_ring(R::Ring, s)

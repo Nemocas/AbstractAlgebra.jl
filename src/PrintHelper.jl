@@ -8,7 +8,7 @@ obtain the correct pluralization. But it works well enough in the
 vast majority of cases.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> pluralize("generator")
 "generators"
 
@@ -25,6 +25,9 @@ function pluralize(noun::String)
   # simplex -> simplices
   # vertex -> vertices
   endswith(noun, "ex") && return noun[1:end-2] * "ices"
+
+  # box -> boxes
+  endswith(noun, "ox") && return noun[1:end-2] * "oxes"
 
   # polyhedron -> polyhedra
   endswith(noun, "ron") && return noun[1:end-2] * "a"
@@ -70,7 +73,7 @@ have. Ideally, though, please instead improve `pluralize` to handle your needs
 correctly.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> ItemQuantity(0, "generator")
 0 generators
 
@@ -82,7 +85,7 @@ julia> ItemQuantity(2, "generator")
 ```
 
 Here is an example with a custom plural form.
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> ItemQuantity(0, "ox", "oxen")
 0 oxen
 

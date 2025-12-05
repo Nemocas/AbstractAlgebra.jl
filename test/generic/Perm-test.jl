@@ -305,6 +305,13 @@ end
    @test collect(cycles(p^5)) == [T[1,9], T[2], T[3], T[4], T[5], T[6,10,8], T[7]]
    @test Generic.permtype(p^5) == [3, 2, 1, 1, 1, 1, 1]
    @test order(p^5) == 6
+
+   @test is_abelian(SymmetricGroup(T(1)))
+   @test is_abelian(SymmetricGroup(T(2)))
+   @test !is_abelian(SymmetricGroup(T(3)))
+   @test !is_abelian(SymmetricGroup(T(4)))
+   @test !is_abelian(SymmetricGroup(T(5)))
+   @test !is_abelian(SymmetricGroup(T(10)))
 end
 
 @testset "Perm.characters" begin

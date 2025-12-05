@@ -26,9 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - '1.6'
           - '1.10'
           - '1.11'
+          - '1.12'
+          - '1.13-nightly'
           - 'nightly'
         os:
           - ubuntu-latest
@@ -40,7 +41,7 @@ jobs:
             os: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # For Codecov, we must also fetch the parent of the HEAD commit to
           # be able to properly deal with PRs / merges
@@ -65,6 +66,7 @@ jobs:
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             using Documenter
+            include("docs/documenter_helpers.jl")
             using AbstractAlgebra
             DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
             doctest(AbstractAlgebra)'
@@ -72,7 +74,7 @@ jobs:
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -80,7 +82,7 @@ jobs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'

@@ -64,6 +64,8 @@ function modulus(r::ResElem)
    return modulus(parent(r))
 end
 
+is_trivial(S::ResidueRing) = is_unit(modulus(S))
+
 data(a::ResElem) = a.data
 
 lift(a::ResElem) = data(a)
@@ -82,6 +84,19 @@ function is_unit(a::ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
+
+function is_nilpotent(res::ResElem)
+  m = modulus(res)
+  r = data(res)
+  while true
+    g = gcd(r, m)
+    (g == m) && return true
+    is_one(g) && return false
+    m = divexact(m, g)
+    g = mod(g, m);   r = g^2  # if computation domain is limited precision integer then g = mod(g,m) guarantees that g^2 will not overflow!
+  end
+end
+
 
 # currently residue rings are only allowed over domains
 # otherwise this function would be more complicated
@@ -432,7 +447,7 @@ end
 
 rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
 
-rand(S::ResidueRing, v...) = rand(Random.GLOBAL_RNG, S, v...)
+rand(S::ResidueRing, v...) = rand(Random.default_rng(), S, v...)
 
 ###############################################################################
 #

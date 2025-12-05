@@ -47,8 +47,10 @@ struct F2Elem <: AbstractAlgebra.FieldElem
 end
 
 (::F2)(x::F2Elem) = x
+(::F2)(x::Integer) = F2Elem(x % Bool)
 Base.:-(x::F2Elem) = x
 Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.:-(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
 Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
 Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 
@@ -60,6 +62,7 @@ AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.add!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.sub!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
@@ -73,11 +76,13 @@ struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
 
+F2Matrix(::F2, ::UndefInitializer, r::Int, c::Int) = F2Matrix(Generic.MatSpaceElem{F2Elem}(F2(), undef, r, c))
+
 AbstractAlgebra.elem_type(::Type{F2MatSpace}) = F2Matrix
 AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
 
 AbstractAlgebra.base_ring(::F2MatSpace) = F2()
-AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
+AbstractAlgebra.dense_matrix_type(::Type{F2Elem}) = F2Matrix
 AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(F2(), r, c)
 
 AbstractAlgebra.number_of_rows(a::F2Matrix) = nrows(a.m)
@@ -128,7 +133,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test typeof(S) <: MatSpace
+   @test S isa MatSpace
 
    f = S(t^2 + 1)
 
@@ -204,18 +209,17 @@ end
       @test T[[];] == matrix(T, 0, 0, [])
       @test T[[] ()...] == matrix(T, 0, 1, [])
       @test T[[] []] == matrix(T, 0, 2, [])
-      if VERSION >= v"1.7"
-         # @test T[;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         # @test T[;;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         @test T[1;;] == matrix(T, 1, 1, [1])
-         @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
-         @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
-         @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
-         # @test_throws MethodError T[;;;] # stalls Julia 1.6 parser
-         @test_throws MethodError T[1;;;]
-      end
+      @test T[;] == matrix(T, 0, 0, [])
+      @test T[;;] == matrix(T, 0, 0, [])
+      @test T[1;;] == matrix(T, 1, 1, [1])
+      @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
+      @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
+      @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
+      @test T[1 2; 3 4] == matrix(T, [1:2, 3:4])
+      @test_throws MethodError T[;;;]
+      @test_throws MethodError T[1;;;]
 
-      if VERSION < v"1.12.0-DEV.1612"
+      if VERSION < v"1.11.2"
          @test_throws ArgumentError T[1; 2 3]
       else
          @test_throws DimensionMismatch T[1; 2 3]
@@ -297,6 +301,12 @@ end
          end
       end
    end
+
+   D4 = diagonal_matrix(R, 1:5)
+   @test size(D4) == (5, 5)
+   @test D4[1, 1] == R(1)
+   @test D4[5, 5] == R(5)
+   @test D4 isa Generic.MatSpaceElem{elem_type(R)}
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
@@ -1190,6 +1200,11 @@ end
    @test M + N == N + M
    @test M - N == M + (-N)
    @test M*(N + P) == M*N + M*P
+
+   # Issue Nemocas/Nemo.jl#2143
+   R, _ = residue_ring(ZZ, 2)
+   S, _ = residue_ring(ZZ, 3)
+   @test_throws ErrorException identity_matrix(R, 2) * identity_matrix(S, 2)
 end
 
 # add x to all the elements of the main diagonal of a copy of M
@@ -1639,6 +1654,23 @@ end
    @test is_symmetric(M + transpose(M))
 end
 
+@testset "Generic.Mat.is_alternating" begin
+
+  @testset "Test is_alternating for $R" for R in [GF(2), GF(3), ZZ, QQ]
+     @test is_alternating(matrix(R, [0 1 ; -1 0]))
+     @test !is_alternating(matrix(R, [1 1 ; -1 1]))
+     @test !is_alternating(matrix(R, [1 0 ; 1 1]))
+     @test !is_alternating(matrix(R, [0 1 0 ; -1 0 0]))
+  end
+
+  # Tests over noncommutative ring
+  R = matrix_ring(ZZ, 2)
+  S = matrix_space(R, 2, 2)
+  M = rand(S, -10:10)
+
+  @test is_alternating(M - transpose(M))
+end
+
 @testset "Generic.Mat.is_skew_symmetric" begin
 
    @testset "Test is_skew_symmetric for $R" for R in [GF(2), GF(3), ZZ, QQ]
@@ -1660,12 +1692,12 @@ end
    R, t = polynomial_ring(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
    arr = [t + 1 t; t^2 t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
    # transpose input/output types are the same
@@ -1922,6 +1954,7 @@ end
       end
       @test [det(M)] == minors(M, n)
       @test [] == minors(M, n + 1)
+      @test [(det(M),[i for i in 1:n],[j for j in 1:n])] == minors_with_position(M,n)
    end
 end
 
@@ -2335,7 +2368,7 @@ end
    U = matrix_space(S, 3, 1)
 
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
-   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
+   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4]))
 
    x, d = AbstractAlgebra._solve_rational(M, b)
 
@@ -2656,7 +2689,7 @@ end
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
 
-      x = AbstractAlgebra._solve_triu(M, b, false)
+      x = AbstractAlgebra._solve_triu(M, b; unipotent = false, side = :right)
 
       @test M*x == b
    end
@@ -4047,6 +4080,28 @@ end
    M3[1] = 10
    @test M2 == ZZ[1 2 10; 2 3 4; 3 4 5]
 
+   M2 = deepcopy(M)
+   M3 = @view M2[[1, 2], [1, 3]]
+   @test size(M3) == (2, 2)
+   @test M3 == ZZ[1 3; 2 4]
+   M3[[1, 2], 1] = [8, 9]
+   @test M2 == ZZ[8 2 3; 9 3 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[1, 2]
+   @test size(M3) == ()
+   @test length(M3) == 1
+   # NOTE: The following cases are to cover all types of [gs]etindex functions.
+   M3[] = ZZ(9)
+   @test M3[] == 9
+   M3[1] = ZZ(10)
+   @test M3[1] == 10
+   M3[] = 11
+   @test M3[] == 11
+   M3[1] = 12
+   @test M3[1] == 12
+   @test M2 == ZZ[1 12 3; 2 3 4; 3 4 5]
+
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)
    
@@ -4296,30 +4351,6 @@ end
 
    M = matrix_space(F, 1, 0)
    @test collect(M) == [ M() ]
-end
-
-@testset "Generic.Mat.promotion" begin
-  M = matrix(ZZ, 1, 1, [1])
-  N = matrix(QQ, 1, 1, [2])
-
-  L = @inferred M + N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) + N
-  L = @inferred M - N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) - N
-  L = @inferred M * N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) * N
-  L = @inferred N + M
-  @test base_ring(L) === QQ
-  @test L == N + change_base_ring(QQ, M)
-  L = @inferred N - M
-  @test base_ring(L) === QQ
-  @test L == N - change_base_ring(QQ, M)
-  L = @inferred N * M
-  @test base_ring(L) === QQ
-  @test L == N * change_base_ring(QQ, M)
 end
 
 @testset "Generic.Mat.InjProjMat" begin

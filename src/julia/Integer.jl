@@ -20,9 +20,7 @@ elem_type(::Type{Integers{T}}) where T <: Integer = T
 
 parent_type(::Type{T}) where T <: Integer = Integers{T}
 
-base_ring_type(::Type{<:Integers}) = typeof(Union{})
-
-base_ring(a::Integers{T}) where T <: Integer = Union{}
+base_ring_type(::Type{<:Integers}) = Union{}   # no base ring
 
 is_exact_type(::Type{T}) where T <: Integer = true
 
@@ -313,11 +311,6 @@ function is_square_with_sqrt(a::BigInt)
    end
 end
 
-@doc raw"""
-    is_square(a::T) where T <: Integer
-
-Return true if $a$ is a square.
-"""
 function is_square(a::T) where T <: Integer
    if a < 0
       return false
@@ -571,7 +564,23 @@ rand(rng::AbstractRNG,
 
 rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
 
-rand(R::Integers, n) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::Integers, n) = rand(Random.default_rng(), R, n)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Signed}
+  n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+  return rand(R, -n:n)
+end
+
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Unsigned}
+  n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+  return rand(R, 0:n)
+end
 
 ###############################################################################
 #
@@ -586,4 +595,3 @@ end
 function (a::Integers{T})(b::Union{Integer, Rational}) where T <: Integer
    return T(b)
 end
-

@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -165,7 +166,6 @@ AbstractAlgebra.sqrt(a::BigInt)
 ```
 
 ```@docs
-is_square(a::BigInt)
 is_square_with_sqrt(a::BigInt)
 ```
 

@@ -6,6 +6,12 @@
          @test universal_polynomial_ring(R; internal_ordering=ord, cached = true) === universal_polynomial_ring(R; internal_ordering=ord, cached = true)
          @test universal_polynomial_ring(R; internal_ordering=ord, cached = false) !== universal_polynomial_ring(R; internal_ordering=ord, cached = false)
 
+         @test universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = true)[1] === universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = true)[1]
+         @test universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = false)[1] !== universal_polynomial_ring(R, [:x,:y]; internal_ordering=ord, cached = false)[1]
+
+         @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = true)[1] === universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = true)[1]
+         @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = false)[1] !== universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = false)[1]
+
          S = universal_polynomial_ring(R; internal_ordering=ord)
 
          x = gen(S, "x")
@@ -25,8 +31,9 @@
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
+         @test coefficient_ring_type(S) === typeof(R)
 
-         @test typeof(S) <: Generic.UniversalPolyRing
+         @test S isa Generic.UniversalPolyRing
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)
@@ -76,8 +83,30 @@
          @test x in keys(Dict(x => 1))
          @test !(y in keys(Dict(x => 1)))
          @test !(y in keys(Dict(z => 1)))
+
+         S2, x = universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord)
+
+         @test length(x) == 3
+         @test isa(x[1], UniversalPolyRingElem)
+         @test parent(x[1]) == S2
+         @test gens(S2) == x
+
+         S3 = @polynomial_ring(ZZ, "x#" => (1:2, 1:2), "y#" => 1:3)
+         @test ngens(S3) == 7
+         @test parent(x11+y2) == S3
       end
    end
+
+   R = universal_polynomial_ring(ZZ; cached = false)
+   x = gen(R, :x)
+   @test x == x
+   y = gen(R, :y)
+   @test x != y
+   @test x == x*y^0
+   z = gen(R, :z)
+   @test x != z
+   @test z == z * y^0
+   @test y != z
 end
 
 @testset "Generic.UnivPoly.parent_type" begin
@@ -118,23 +147,25 @@ end
          @test symbols(S) == [:x, :y, :z]
 
          @test length(vars(S())) == 0
+         @test length(var_indices(S())) == 0
          @test vars(x^2 + 2x + 1) == [x]
+         @test var_indices(x^2 + 2x + 1) == [1]
          @test vars(x*y + 1) == [x, y]
+         @test var_indices(x*y + 1) == [1, 2]
          @test vars(x*y + z) == [x, y, z]
+         @test var_indices(x*y + z) == [1, 2, 3]
 
          @test internal_ordering(S) == ord
       end
    end
 end
 
-function test_elem(R::AbstractAlgebra.Generic.UniversalPolyRing{EuclideanRingResidueRingElem{BigInt}})
-    return rand(R, 0:4, 0:10, -10:10)
-end
+
 
 @testset "Generic.UnivPoly.conformance" begin
    S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1])
    gen(S, "x")
-   test_Ring_interface(S)
+   ConformanceTests.test_Ring_interface(S)
 end
 
 @testset "Generic.UnivPoly.printing" begin
@@ -214,145 +245,147 @@ end
 
 @testset "Generic.UnivPoly.basic_manipulation" begin
    for R in [ZZ, QQ]
-      for iters = 1:100
-         S = universal_polynomial_ring(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
-         @test iszero(zero(S))
-         @test isone(one(S))
-         @test is_unit(one(S))
-         @test !is_gen(S())
-         @test is_homogeneous(S())
-         @test !is_monomial(S())
-         @test is_constant(S())
-         @test !is_term(S())
-         @test trailing_coefficient(S()) == 0
-         @test leading_coefficient(S()) == 0
-         @test constant_coefficient(S()) == 0
-         @test total_degree(S()) == -1
-         @test length(gens(S)) == 0
-         @test characteristic(S) == 0
+      @test iszero(zero(S))
+      @test isone(one(S))
+      @test is_unit(one(S))
+      @test !is_gen(S())
+      @test is_homogeneous(S())
+      @test !is_monomial(S())
+      @test is_constant(S())
+      @test !is_term(S())
+      @test_throws ArgumentError trailing_coefficient(S())
+      @test_throws ArgumentError leading_coefficient(S())
+      @test constant_coefficient(S()) == 0
+      @test total_degree(S()) == -1
+      @test length(gens(S)) == 0
+      @test characteristic(S) == 0
 
-         x = gen(S, "x")
-         y, z = gens(S, ["y", "z"])
-         x2 = gen(S, "x")
+      x = gen(S, "x")
+      y, z = gens(S, ["y", "z"])
+      x2 = gen(S, "x")
 
-         @test !iszero(x)
-         @test !iszero(x2)
-         @test iszero(zero(S))
-         @test !isone(x)
-         @test !isone(x2)
-         @test isone(one(S))
-         @test !is_unit(x)
-         @test !is_unit(x2)
-         @test is_unit(one(S))
-         @test is_zero_divisor(S())
-         @test !is_zero_divisor(x)
-         @test is_gen(x)
-         @test is_gen(x2)
-         @test is_gen(y)
-         @test is_homogeneous(x + y + z)
-         @test is_homogeneous(x2)
-         @test is_homogeneous(S())
-         @test is_monomial(x^2)
-         @test is_monomial(x2^2)
-         @test is_monomial(y)
-         @test !is_constant(x)
-         @test !is_constant(x2)
-         @test is_constant(S(1))
-         @test is_term(2x^2*y)
-         @test is_term(3x2)
-         @test coeff(3x^2 + 2y + z, 2) == 2
-         @test coeff(2x2^2 + 3x2 + 5, 1) == 2
-         @test coeff(3x^2 + 2y + z, x2^2) == 3
-         @test coeff(3x2^2, x^2) == 3
-         @test coeff(3x^2 + 2y, x2) == 0
-         @test coeff(3x2^2, x) == 0
-         @test monomial(3x^2 + 2y + z, 1) == x^2
-         @test monomial(2x2^2 + 2x2 + 4, 2) == x
+      @test !iszero(x)
+      @test !iszero(x2)
+      @test iszero(zero(S))
+      @test !isone(x)
+      @test !isone(x2)
+      @test isone(one(S))
+      @test !is_unit(x)
+      @test !is_unit(x2)
+      @test is_unit(one(S))
+      @test is_zero_divisor(S())
+      @test !is_zero_divisor(x)
+      @test is_gen(x)
+      @test is_gen(x2)
+      @test is_gen(y)
+      @test is_homogeneous(x + y + z)
+      @test is_homogeneous(x2)
+      @test is_homogeneous(S())
+      @test is_monomial(x^2)
+      @test is_monomial(x2^2)
+      @test is_monomial(y)
+      @test !is_constant(x)
+      @test !is_constant(x2)
+      @test is_constant(S(1))
+      @test is_term(2x^2*y)
+      @test is_term(3x2)
+      @test coeff(3x^2 + 2y + z, 2) == 2
+      @test coeff(2x2^2 + 3x2 + 5, 1) == 2
+      @test coeff(3x^2 + 2y + z, x2^2) == 3
+      @test coeff(3x2^2, x^2) == 3
+      @test coeff(3x^2 + 2y, x2) == 0
+      @test coeff(3x2^2, x) == 0
+      @test monomial(3x^2 + 2y + z, 1) == x^2
+      @test monomial(2x2^2 + 2x2 + 4, 2) == x
 
-         v = S()
-         monomial!(v, 3x^2 + 2y + z, 1)
+      v = S()
+      monomial!(v, 3x^2 + 2y + z, 1)
 
-         @test v == x^2
+      @test v == x^2
 
-         v = deepcopy(x2)
-         monomial!(v, 3x^2 + 2y + z, 2)
+      v = deepcopy(x2)
+      monomial!(v, 3x^2 + 2y + z, 2)
 
-         @test v == y
+      @test v == y
 
-         @test term(3x^2 + 2y + z, 1) == 3x^2
-         @test term(2x2^2 + 2x2 + 4, 2) == 2x
-         @test leading_coefficient(3x^2 + 2y + z) == 3
-         @test leading_coefficient(2x2^2 + 2x2 + 4) == 2
-         @test trailing_coefficient(3x^2 + 2y + z) == 1
-         @test trailing_coefficient(2x2^2 + 2x2) == 2
-         @test tail(3x^2 + 2y + z) == 2y + z
-         @test tail(2x2^2 + 2x2 + 4) == 2x + 4
-         @test constant_coefficient(3x^2 + 2y + z + 4) == 4
-         @test constant_coefficient(2x2^2 + 2x2) == 0
-         @test leading_monomial(3x^2 + 2y + z + 4) == x^2
-         @test leading_monomial(2x2^2 + 2x2) == x^2
-         @test leading_term(3x^2 + 2y + z + 4) == 3x^2
-         @test leading_term(2x2^2 + 2x2) == 2x^2
-         @test max_fields(3x^2 + 2y + z + 4) == ([1, 1, 2], 2)
-         @test max_fields(2x2^2 + 2x2) == ([0, 0, 2], 2)
-         @test degree(3x^2 + 2y + z + 4, 1) == 2
-         @test degree(2x2^2 + 2x2, 1) == 2
-         @test degree(3x^2*y + 2x + 3y + 1, x) == 2
-         @test degree(2x2^2 + 3x2 + 1, x) == 2
-         @test degree(2x2^2 + 3x2 + 1, y) == 0
-         @test degrees(3x^2*y + 2x + 3y + 1) == [2, 1, 0]
-         @test degrees(2x2^2 + 2x2 + 1) == [2, 0, 0]
-         @test total_degree(3x^2*y + 2x + 3y + 1) == 3
-         @test total_degree(2x2^2 + 3x2 + 1) == 2
-         @test length(3x^2*y + 2x + 3y + 1) == 4
-         @test length(2x2^2 + 3x2 + 1) == 3
+      @test term(3x^2 + 2y + z, 1) == 3x^2
+      @test term(2x2^2 + 2x2 + 4, 2) == 2x
+      @test leading_coefficient(3x^2 + 2y + z) == 3
+      @test leading_coefficient(2x2^2 + 2x2 + 4) == 2
+      @test trailing_coefficient(3x^2 + 2y + z) == 1
+      @test trailing_coefficient(2x2^2 + 2x2) == 2
+      @test tail(3x^2 + 2y + z) == 2y + z
+      @test tail(2x2^2 + 2x2 + 4) == 2x + 4
+      @test constant_coefficient(3x^2 + 2y + z + 4) == 4
+      @test constant_coefficient(2x2^2 + 2x2) == 0
+      @test leading_monomial(3x^2 + 2y + z + 4) == x^2
+      @test leading_monomial(2x2^2 + 2x2) == x^2
+      @test leading_term(3x^2 + 2y + z + 4) == 3x^2
+      @test leading_term(2x2^2 + 2x2) == 2x^2
+      @test max_fields(3x^2 + 2y + z + 4) == ([1, 1, 2], 2)
+      @test max_fields(2x2^2 + 2x2) == ([0, 0, 2], 2)
+      @test degree(3x^2 + 2y + z + 4, 1) == 2
+      @test degree(2x2^2 + 2x2, 1) == 2
+      @test degree(3x^2*y + 2x + 3y + 1, x) == 2
+      @test degree(2x2^2 + 3x2 + 1, x) == 2
+      @test degree(2x2^2 + 3x2 + 1, y) == 0
+      @test degrees(3x^2*y + 2x + 3y + 1) == [2, 1, 0]
+      @test degrees(2x2^2 + 2x2 + 1) == [2, 0, 0]
+      @test total_degree(3x^2*y + 2x + 3y + 1) == 3
+      @test total_degree(2x2^2 + 3x2 + 1) == 2
+      @test length(3x^2*y + 2x + 3y + 1) == 4
+      @test length(2x2^2 + 3x2 + 1) == 3
 
-         @test gen(S, :x) == x
-         @test gens(S, ['x', 'y']) == (x, y)
-         @test gen(S, 1) == x
-         @test gen(S, 2) == y
-         @test gen(S, 3) == z
-         @test gens(S) == [x, y, z]
+      @test gen(S, :x) == x
+      @test gens(S, ['x', 'y']) == [x, y]
+      @test gen(S, 1) == x
+      @test gen(S, 2) == y
+      @test gen(S, 3) == z
+      @test gens(S) == [x, y, z]
 
-         @test var_index(x) == 1
-         @test var_index(x2) == 1
-         @test var_index(y) == 2
+      @test var_index(x) == 1
+      @test var_index(x2) == 1
+      @test var_index(y) == 2
 
-         @test vars(3x^2*y + 2x + 3y + 1) == [x, y]
-         @test vars(2x2^2 + 3x2 + 1) == [x]
+      @test vars(3x^2*y + 2x + 3y + 1) == [x, y]
+      @test vars(2x2^2 + 3x2 + 1) == [x]
 
-         @test characteristic(S) == 0
-      end
+      @test characteristic(S) == 0
+
+      xs, ys = gens(S, :x => (1:4), :y =>(1:2, 1:3))
+      @test xs isa Vector{elem_type(S)}
+      @test length(xs) == 4
+      @test ys isa Matrix{elem_type(S)}
+      @test size(ys) == (2, 3)
    end
 end
 
 @testset "Generic.UnivPoly.multivariate_coefficients" begin
    for R in [ZZ, QQ]
-      for iters = 1:100
-         S = universal_polynomial_ring(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
-         x = gen(S, "x")
-         y, z = gens(S, ["y", "z"])
-         x2 = gen(S, "x")
+      x = gen(S, "x")
+      y, z = gens(S, ["y", "z"])
+      x2 = gen(S, "x")
 
-         f = 3x^3 + 2x^2 + x + 4
-         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
-         @test coeff(f, [1], [3]) == 3
-         @test coeff(f, [1, 2, 3], [3, 1, 2]) == 0
-         @test coeff(f, [1, 2, 3], [3, 0, 0]) == 3
-         @test coeff(g, [1], [3]) == 3y^2 + 2y*z
-         @test coeff(g, [2], [1]) == 2x^3*z + 2x^2*z + 2
-         @test coeff(g, [1, 2, 3], [0, 0, 0]) == 1
+      @test coeff(f, [1], [3]) == 3
+      @test coeff(f, [1, 2, 3], [3, 1, 2]) == 0
+      @test coeff(f, [1, 2, 3], [3, 0, 0]) == 3
+      @test coeff(g, [1], [3]) == 3y^2 + 2y*z
+      @test coeff(g, [2], [1]) == 2x^3*z + 2x^2*z + 2
+      @test coeff(g, [1, 2, 3], [0, 0, 0]) == 1
 
-         @test coeff(f, [x], [3]) == 3
-         @test coeff(f, [x2, y, z], [3, 1, 2]) == 0
-         @test coeff(f, [x, y, z], [3, 0, 0]) == 3
-         @test coeff(g, [x2], [3]) == 3y^2 + 2y*z
-         @test coeff(g, [y], [1]) == 2x^3*z + 2x^2*z + 2
-         @test coeff(g, [x2, y, z], [0, 0, 0]) == 1
-      end
+      @test coeff(f, [x], [3]) == 3
+      @test coeff(f, [x2, y, z], [3, 1, 2]) == 0
+      @test coeff(f, [x, y, z], [3, 0, 0]) == 3
+      @test coeff(g, [x2], [3]) == 3y^2 + 2y*z
+      @test coeff(g, [y], [1]) == 2x^3*z + 2x^2*z + 2
+      @test coeff(g, [x2, y, z], [0, 0, 0]) == 1
    end
 end
 
@@ -409,30 +442,28 @@ end
 
 @testset "Generic.UnivPoly.iterators" begin
    for R in [ZZ, QQ]
-      for iters = 1:100
-         S = universal_polynomial_ring(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
-         x = gen(S, "x")
+      x = gen(S, "x")
 
-         h = 3x^3 + 2x^2 + x + 4
+      h = 3x^3 + 2x^2 + x + 4
 
-         @test collect(exponent_vectors(h)) == [[3], [2], [1], [0]]
+      @test collect(exponent_vectors(h)) == [[3], [2], [1], [0]]
 
-         y, z = gens(S, ["y", "z"])
+      y, z = gens(S, ["y", "z"])
 
-         f = 3x^3 + 2x^2 + x + 4
-         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
-         @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
-         @test collect(exponent_vectors(f)) == [[3], [2], [1], [0]]
-         @test sum(terms(f)) == f
-         @test collect(monomials(f)) == [x^3, x^2, x, S(1)]
+      @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
+      @test collect(exponent_vectors(f)) == [[3], [2], [1], [0]]
+      @test sum(terms(f)) == f
+      @test collect(monomials(f)) == [x^3, x^2, x, S(1)]
 
-         @test collect(coefficients(g)) == [R(v) for v in [3, 2, 2, 3, 2, 1]]
-         @test collect(exponent_vectors(g)) == [[3, 2, 0], [3, 1, 1], [2, 1, 1], [1, 0, 0], [0, 1, 0], [0, 0, 0]]
-         @test sum(terms(g)) == g
-         @test collect(monomials(g)) == [x^3*y^2, x^3*y*z, x^2*y*z, x, y, S(1)]
-      end
+      @test collect(coefficients(g)) == [R(v) for v in [3, 2, 2, 3, 2, 1]]
+      @test collect(exponent_vectors(g)) == [[3, 2, 0], [3, 1, 1], [2, 1, 1], [1, 0, 0], [0, 1, 0], [0, 0, 0]]
+      @test sum(terms(g)) == g
+      @test collect(monomials(g)) == [x^3*y^2, x^3*y*z, x^2*y*z, x, y, S(1)]
    end
 end
 
@@ -792,30 +823,28 @@ end
 
 @testset "Generic.UnivPoly.derivative" begin
    for R in [ZZ, QQ]
-      for iters = 1:100
-         S = universal_polynomial_ring(R; cached=false)
+      S = universal_polynomial_ring(R; cached=false)
 
-         x = gen(S, "x")
-         y, z = gens(S, ["y", "z"])
-         x2 = gen(S, "x")
+      x = gen(S, "x")
+      y, z = gens(S, ["y", "z"])
+      x2 = gen(S, "x")
 
-         f = 3x^3 + 2x^2 + x + 4
-         g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
+      f = 3x^3 + 2x^2 + x + 4
+      g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
-         @test derivative(f, 1) == 9x^2 + 4x + 1
-         @test derivative(f, 2) == 0
+      @test derivative(f, 1) == 9x^2 + 4x + 1
+      @test derivative(f, 2) == 0
 
-         @test derivative(g, 1) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
-         @test derivative(g, 2) == 6x^3*y + 2x^3*z + 2x^2*z + 2
-         
-         @test derivative(f, x) == 9x^2 + 4x + 1
-         @test derivative(f, x2) == 9x^2 + 4x + 1
-         @test derivative(f, y) == 0
+      @test derivative(g, 1) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+      @test derivative(g, 2) == 6x^3*y + 2x^3*z + 2x^2*z + 2
 
-         @test derivative(g, x) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
-         @test derivative(g, x2) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
-         @test derivative(g, y) == 6x^3*y + 2x^3*z + 2x^2*z + 2
-      end
+      @test derivative(f, x) == 9x^2 + 4x + 1
+      @test derivative(f, x2) == 9x^2 + 4x + 1
+      @test derivative(f, y) == 0
+
+      @test derivative(g, x) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+      @test derivative(g, x2) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
+      @test derivative(g, y) == 6x^3*y + 2x^3*z + 2x^2*z + 2
    end
 end
 
@@ -964,9 +993,11 @@ end
 
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [ZZ(V[1])])
-         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [U(V[1])])
+         @test evaluate(f, [1], [V[1]]) == f(x=V[1])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == f(x=V[1], z=V[2])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == f(z=V[2], x=V[1])
 
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [R(V[1])])
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [ZZ(V[1])])
@@ -1015,6 +1046,10 @@ end
          @test lcm(g*h, g) == g*h*ug
 
          @test lcm(h, h) == h*uh
+
+         @test content(f) == content(f.p)
+         @test content(g) == content(g.p)
+         @test content(h) == content(h.p)
       end
    end
 end
@@ -1041,11 +1076,19 @@ end
       @test !is_univariate(g)
       @test is_univariate(h)
 
+      @test is_univariate_with_data(y) == (true, 2)
+      @test is_univariate_with_data(S()) == (true, 0)
+      @test is_univariate_with_data(x + y) == (false, 0)
+
       f1 = to_univariate(U, f)
       h1 = to_univariate(U, h)
 
       @test length(f) == length(f1)
       @test length(h) == length(h1)
+
+      p = to_univariate(x)
+      Rp = parent(p)
+      @test symbols(Rp)[1] == :x
 
       @test coefficients_of_univariate(f) == [R(4), R(1), R(2), R(3)]
       @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]
@@ -1104,26 +1147,125 @@ end
       f1 = add!(f1, g, h)
       
       @test f1 == g + h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f2 = deepcopy(f)
       f2 = add!(f2, g)
 
       @test f2 == f + g
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f3 = deepcopy(f)
       f3 = mul!(f3, g, h)
 
       @test f3 == g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f4 = deepcopy(f)
       f4 = addmul!(f4, g, h)
 
       @test f4 == f + g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f5 = deepcopy(f)
       f5 = zero!(f5)
 
       @test f5 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
+
+      # also verify `copy` works as intended
+      f6 = copy(f)
+      f6 = zero!(f6)
+
+      @test f6 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
    end
+end
+
+# -------------------------------------------------------
+
+# Coeff rings needed for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+## UPoly over ZeroRing
+@testset "Nilpotent/unit for ZeroRing[x]" begin
+  P,x = polynomial_ring(ZeroRing, "x");
+  @test is_nilpotent(P(0))
+  @test is_nilpotent(P(1))
+  @test is_nilpotent(x)
+  @test is_nilpotent(-x)
+
+  @test is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(x)
+  @test is_unit(-x)
+end
+
+## UPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x]" begin
+  P,x = polynomial_ring(ZZ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+# UPoly over QQ
+@testset "Nilpotent/unit for QQ[x]" begin
+  P,x = polynomial_ring(QQ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## UPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x]" begin
+  P,x = polynomial_ring(ZZmod720, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test is_nilpotent(30*x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test !is_unit(x)
+  @test !is_unit(-x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test !is_unit(x+30)
+  @test !is_unit(x-30)
+  @test is_unit(1+30*x)
+  @test is_unit(1-30*x)
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
 end
 

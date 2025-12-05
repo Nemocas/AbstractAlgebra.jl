@@ -1,20 +1,20 @@
 @testset "EuclideanRingResidueRingElem.conformance_tests" begin
-   test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
-   test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
+   ConformanceTests.test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
+   ConformanceTests.test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
 
    #
    R, = residue_ring(ZZ, 16453889)
-   test_Ring_interface_recursive(R)
+   ConformanceTests.test_Ring_interface_recursive(R)
 
    #
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
-   test_Ring_interface_recursive(T)
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    #
-   S, x = polynomial_ring(ZZ, "x")
+   S, x = polynomial_ring(QQ, "x")
    T, = residue_ring(S, x^2 + 1)
-   #test_Ring_interface_recursive(T)   # TODO: currently fails because `inv(one(T))` fails
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    @test !occursin("\n", sprint(show, T))
 end
@@ -111,6 +111,17 @@ end
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+end
+
+@testset "EuclideanRingResidueRingElem.is_trivial" begin
+   R, = Generic.residue_ring(ZZ, 49)
+   @test !is_trivial(R)
+
+   R, = Generic.residue_ring(ZZ, 1)
+   @test is_trivial(R)
+
+   R, = Generic.residue_ring(ZZ, -1)
+   @test is_trivial(R)
 end
 
 @testset "EuclideanRingResidueRingElem.rand" begin

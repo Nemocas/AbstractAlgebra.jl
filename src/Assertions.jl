@@ -16,20 +16,23 @@
 #
 ################################################################################
 
-global const VERBOSE_SCOPE = Symbol[]
+const VERBOSE_SCOPE = Symbol[]
 
-global const VERBOSE_LOOKUP = Dict{Symbol, Int}()
+const VERBOSE_LOOKUP = Dict{Symbol, Int}()
 
-global const VERBOSE_PRINT_INDENT = Int[ 0 ]
+const VERBOSE_PRINT_INDENT = Int[ 0 ]
 
 @doc raw"""
     AbstractAlgebra.add_verbosity_scope(s::Symbol) -> Nothing
 
 Add the symbol `s` to the list of (global) verbosity scopes.
+For use inside a module this function must be called in the
+ `__init__` function of that module; the verbosity scope is
+then available to all functions in the module.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
 ```
@@ -92,7 +95,7 @@ function [`get_verbosity_level`](@ref).
 We will set up different verbosity scopes with different verbosity levels in a
 custom function to show how to use this macro.
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_verbosity_scope(:Test1);
 
 julia> AbstractAlgebra.add_verbosity_scope(:Test2);
@@ -198,7 +201,7 @@ function [`get_verbosity_level`](@ref).
 We will set up different verbosity scopes with different verbosity levels in a
 custom function to show how to use this macro.
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_verbosity_scope(:Test1);
 
 julia> AbstractAlgebra.add_verbosity_scope(:Test2);
@@ -315,7 +318,7 @@ verbosity scopes by calling the function [`add_verbosity_scope`](@ref).
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
 julia> AbstractAlgebra.set_verbosity_level(:MyScope, 4)
@@ -345,7 +348,7 @@ verbosity scopes by calling the function [`add_verbosity_scope`](@ref).
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_verbosity_scope(:MyScope)
 
 julia> AbstractAlgebra.get_verbosity_level(:MyScope)
@@ -375,9 +378,9 @@ end
 #
 ################################################################################
 
-global const ASSERT_SCOPE = Symbol[]
+const ASSERT_SCOPE = Symbol[]
 
-global const ASSERT_LOOKUP = Dict{Symbol, Int}()
+const ASSERT_LOOKUP = Dict{Symbol, Int}()
 
 @doc raw"""
     AbstractAlgebra.add_assertion_scope(s::Symbol) -> Nothing
@@ -386,7 +389,7 @@ Add the symbol `s` to the list of (global) assertion scopes.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
 ```
@@ -411,7 +414,7 @@ assertion scopes by calling the function [`add_assertion_scope`](@ref).
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
 julia> AbstractAlgebra.set_assertion_level(:MyScope, 4)
@@ -444,7 +447,7 @@ assertion scopes by calling the function [`add_assertion_scope`](@ref).
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
 julia> AbstractAlgebra.get_assertion_level(:MyScope)
@@ -499,7 +502,7 @@ function [`get_assertion_level`](@ref).
 We will set up different assertion scopes with different assertion levels in a
 custom function to show how to use this macro.
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.add_assertion_scope(:MyScope)
 
 julia> AbstractAlgebra.get_assertion_level(:MyScope)
@@ -574,7 +577,7 @@ If the number of arguments is not 2, an `AssertionError` is raised.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> function req_test(x::Int)
        @req iseven(x) "x must be even"
        return div(x,2)

@@ -1,4 +1,4 @@
-# very generic testing: just define test_elem(R) to produce elements of R,
+# very generic testing: just define ConformanceTests.generate_element(R) to produce elements of R,
 # then invoke one of these functions, as appropriate:
 # - test_NCRing_interface(R)
 # - test_Ring_interface(R)
@@ -10,261 +10,10 @@
 # structures derived from the original ring, by calling these helpers:
 # - test_EuclideanRing_interface(R)
 # - test_Poly_interface(R)
+# - test_MPoly_interface(R)
 # - test_MatSpace_interface(R)
 # - test_MatAlgebra_interface(R)
 
-#
-#
-#
-const default_adhoc_partner_rings = [
-    AbstractAlgebra.Integers{BigInt}(),
-    AbstractAlgebra.Integers{Int}(),
-    AbstractAlgebra.Integers{UInt}(),
-    AbstractAlgebra.Integers{UInt8}(),
-  ]
-
-adhoc_partner_rings(R::NCRing) = default_adhoc_partner_rings
-
-#
-# add methods for test_elem on ring elements here
-#
-
-function test_elem(R::AbstractAlgebra.Integers{T}) where {T <: Signed}
-   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
-   return rand(R, -n:n)
-end
-
-function test_elem(R::AbstractAlgebra.Integers{T}) where {T <: Unsigned}
-   n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
-   return rand(R, 0:n)
-end
-
-function test_elem(R::AbstractAlgebra.Rationals)
-   B = base_ring(R)
-   n = test_elem(B)
-   d = test_elem(B)
-   return is_zero(d) ? R(n) : R(n, d)
-end
-
-function test_elem(R::AbstractAlgebra.FinField)
-   return rand(R)
-end
-
-function test_elem(R::AbstractAlgebra.Floats{T}) where T
-   return rand(T)*rand(-100:100)
-end
-
-function test_elem(Rx::AbstractAlgebra.PolyRing)
-   R = base_ring(Rx)
-   return Rx(elem_type(R)[test_elem(R) for i in 1:rand(0:6)])
-end
-
-function test_elem(Rx::AbstractAlgebra.MPolyRing)
-   R = base_ring(Rx)
-   num_gens = ngens(Rx)
-   iszero(num_gens) && return Rx(test_elem(R))
-   len_bound = 8
-   exp_bound = rand(1:5)
-   len = rand(0:len_bound)
-   coeffs = [test_elem(R) for _ in 1:len]
-   exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
-   return Rx(coeffs, exps)
-end
-
-function test_elem(S::Union{AbstractAlgebra.MatSpace,
-                            AbstractAlgebra.MatRing})
-   R = base_ring(S)
-   return S(elem_type(R)[test_elem(R) for i in 1:nrows(S), j in 1:ncols(S)])
-end
-
-function test_elem(R::AbstractAlgebra.EuclideanRingResidueRing)
-   return R(test_elem(base_ring(R)))
-end
-
-function test_elem(Rx::AbstractAlgebra.SeriesRing)
-   R = base_ring(Rx)
-   prec = rand(3:10)
-   len = rand(0:prec-1)
-   val = rand(0:prec-len)
-   # FIXME: constructors don't seem to catch use of negative val
-   @assert val >= 0
-   A = elem_type(R)[test_elem(R) for i in 1:len]
-   if len > 0 && is_zero(A[1])
-     A[1] = one(R)
-   end
-   if elem_type(Rx) <: RelPowerSeriesRingElem
-     @assert prec >= len + val
-     return Rx(A, len, prec, val)
-   else
-     @assert prec >= len
-     return Rx(A, len, prec)
-   end
-end
-
-function test_elem(S::AbstractAlgebra.FreeAssociativeAlgebra)
-   f = S()
-   g = gens(S)
-   R = base_ring(S)
-   isempty(g) && return S(test_elem(R))
-   len_bound = 8
-   exp_bound = 6
-   for i in 1:rand(0:len_bound)
-      f += test_elem(R) * prod(rand(g) for _ in 1:rand(0:exp_bound); init = S(1))
-   end
-   return f
-end
-
-
-# helper
-function equality(a, b)
-   if is_exact_type(typeof(a)) && is_exact_type(typeof(b))
-      return a == b
-   else
-      return isapprox(a, b)
-   end
-end
-
-# The following functions should not expect that their input is a `NCRingElem` or similar.
-# They should be usable in more general types, that don't even have a `parent/elem` correspondence
-function test_mutating_op_like_zero(f::Function, f!::Function, A)
-   a = deepcopy(A)
-   a = f!(a)
-   @test equality(a, f(A))
-end
-
-function test_mutating_op_like_neg(f::Function, f!::Function, A)
-   # initialize storage var with different values to check that its value is not used
-   for z in [zero(A), deepcopy(A)]
-      a = deepcopy(A)
-      z = f!(z, a)
-      @test equality(z, f(A))
-      @test a == A
-   end
-
-   a = deepcopy(A)
-   a = f!(a)
-   @test equality(a, f(A))
-end
-
-function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any)
-   @req A isa T || B isa T "Invalid argument types"
-
-   # initialize storage var with different values to check that its value is not used
-   storage_values = T[]
-   if A isa T
-      push!(storage_values, zero(A))
-      push!(storage_values, deepcopy(A))
-   end
-   if B isa T
-      push!(storage_values, zero(B))
-      push!(storage_values, deepcopy(B))
-   end
-   for z in storage_values
-      a = deepcopy(A)
-      b = deepcopy(B)
-      z = f!(z, a, b)
-      @test equality(z, f(A, B))
-      @test a == A
-      @test b == B
-   end
-
-   if A isa T
-      a = deepcopy(A)
-      b = deepcopy(B)
-      a = f!(a, a, b)
-      @test equality(a, f(A, B))
-      @test b == B
-
-      a = deepcopy(A)
-      b = deepcopy(B)
-      a = f!(a, b)
-      @test equality(a, f(A, B))
-      @test b == B
-   end
-
-   if B isa T
-      a = deepcopy(A)
-      b = deepcopy(B)
-      b = f!(b, a, b)
-      @test equality(b, f(A, B))
-      @test a == A
-   end
-
-   if A isa T && B isa T
-      # `f(B, B)` may fail if `!(A isa T)`, since we call it with different arguments than the intended `f(A, B)` (same for f!)
-      a = deepcopy(A)
-      b = deepcopy(B)
-      a = f!(a, b, b)
-      @test equality(a, f(B, B))
-      @test b == B
-   
-      b = deepcopy(B)
-      b = f!(b, b, b)
-      @test equality(b, f(B, B))
-
-      b = deepcopy(B)
-      b = f!(b, b)
-      @test equality(b, f(B, B))
-   end
-end
-
-function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = Any)
-   @req Z isa T "Invalid argument types"
-   @req A isa T || B isa T "Invalid argument types"
-
-   f!(z, a, b, ::Nothing) = f!_(z, a, b)
-   f!(z, a, b, t) = f!_(z, a, b, t)
-
-   # initialize storage var with different values to check that its value is not used
-   # and `nothing` for the three-arg dispatch
-   storage_values = Union{T,Nothing}[nothing]
-   if A isa T
-      push!(storage_values, zero(A))
-      push!(storage_values, deepcopy(A))
-   end
-   if B isa T
-      push!(storage_values, zero(B))
-      push!(storage_values, deepcopy(B))
-   end
-   for t in storage_values
-      z = deepcopy(Z)
-      a = deepcopy(A)
-      b = deepcopy(B)
-      z = f!(z, a, b, t)
-      @test equality(z, f(Z, A, B))
-      @test a == A
-      @test b == B
-
-      if A isa T
-         a = deepcopy(A)
-         b = deepcopy(B)
-         a = f!(a, a, b, t)
-         @test equality(a, f(A, A, B))
-         @test b == B
-      end
-
-      if B isa T
-         a = deepcopy(A)
-         b = deepcopy(B)
-         b = f!(b, a, b, t)
-         @test equality(b, f(B, A, B))
-         @test a == A
-      end
-
-      if A isa T && B isa T
-         # `f(B, B)` may fail if `!(A isa T)`, since we call it with different arguments than the intended `f(A, B)` (same for f!)
-         a = deepcopy(A)
-         b = deepcopy(B)
-         a = f!(a, b, b, t)
-         @test equality(a, f(A, B, B))
-         @test b == B
-
-         b = deepcopy(B)
-         b = f!(b, b, b, t)
-         @test equality(b, f(B, B, B))
-      end
-   end
-end
 
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
@@ -278,16 +27,19 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test elem_type(typeof(R)) == T
          @test parent_type(T) == typeof(R)
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test parent(a) == R
          end
          @test is_domain_type(T) isa Bool
          @test is_exact_type(T) isa Bool
 
-         @test base_ring_type(R) == typeof(base_ring(R))
-         @test base_ring_type(zero(R)) == typeof(base_ring(zero(R)))
-         @test base_ring_type(typeof(R)) == typeof(base_ring(R))
-         @test base_ring_type(T) == typeof(base_ring(zero(R)))
+         # if the ring supports base_ring, verify it also supports base_ring_type and is consistent
+         if applicable(base_ring, R)
+           @test base_ring_type(R) == typeof(base_ring(R))
+           @test base_ring_type(zero(R)) == typeof(base_ring(zero(R)))
+           @test base_ring_type(typeof(R)) == typeof(base_ring(R))
+           @test base_ring_type(T) == typeof(base_ring(zero(R)))
+        end
 
          # some rings don't support characteristic and raise an exception (see issue #993)
          try ch = characteristic(R)
@@ -310,7 +62,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test R(BigInt(-2)) isa T
          @test R(BigInt(3)^100) isa T
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test R(a) isa T
          end
       end
@@ -324,7 +76,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test isone(R(0)) || !is_unit(R(0))
          @test is_unit(R(1))
          for i in 1:reps
-            a = test_elem(R)::T
+            a = generate_element(R)::T
             @test hash(a) isa UInt
             A = deepcopy(a)
             @test !ismutable(a) || a !== A
@@ -336,9 +88,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test sprint(show, "text/plain", R) isa String
 
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
-            c = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
+            c = generate_element(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             C = deepcopy(c)
@@ -373,9 +125,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
           s1 = one(S)
           r1 = one(R)
           for i in 1:reps
-            s2 = test_elem(S)
+            s2 = generate_element(S)
             r2 = R(s2)
-            x = test_elem(R)
+            x = generate_element(R)
 
             for (s,r) in ((s0, r0), (s1, r1), (s2, r2))
               @test equality(r, s)
@@ -397,8 +149,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
       if !(R isa AbstractAlgebra.Ring)
          @testset "Basic functionality for noncommutative rings only" begin
             for i in 1:reps
-               a = test_elem(R)::T
-               b = test_elem(R)::T
+               a = generate_element(R)::T
+               b = generate_element(R)::T
                A = deepcopy(a)
                B = deepcopy(b)
                # documentation is not clear on divexact
@@ -444,9 +196,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 
       @testset "Unsafe ring operators" begin
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
-            c = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
+            c = generate_element(R)::T
 
             test_mutating_op_like_zero(zero, zero!, a)
             test_mutating_op_like_zero(one, one!, a)
@@ -478,12 +230,14 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R; reps = reps)
 
       @testset "Basic functionality for commutative rings only" begin
-         @test isone(AbstractAlgebra.inv(one(R)))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
+         # FIXME: we can't expect general rings to support inv, not even for the one
+         # element, so don't test this
+         #@test isone(AbstractAlgebra.inv(one(R)))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
-            a = test_elem(R)::T
-            b = test_elem(R)::T
+            a = generate_element(R)::T
+            b = generate_element(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
             @test a*b == b*a
@@ -543,7 +297,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
       @test iszero(one(R) * characteristic(R))
 
       for i in 1:reps
-         a = test_elem(R)::T
+         a = generate_element(R)::T
          A = deepcopy(a)
          @test is_unit(a) == !iszero(a)
          if !is_zero(a)
@@ -558,12 +312,6 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
    return nothing
 end
 
-function equality_up_to_units(a, b)
-   iszero(a) && return iszero(b)
-   iszero(b) && return iszero(a)
-   return divides(a, b)[1] && divides(b, a)[1]
-end
-
 function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 
    T = elem_type(R)
@@ -573,9 +321,9 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
    @testset "Euclidean Ring interface for $(R) of type $(typeof(R))" begin
 
       for i in 1:reps
-         f = test_elem(R)::T
-         g = test_elem(R)::T
-         m = test_elem(R)::T
+         f = generate_element(R)::T
+         g = generate_element(R)::T
+         m = generate_element(R)::T
          if iszero(m)
             m = one(R)
          end
@@ -644,6 +392,10 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
          test_mutating_op_like_add(mod, mod!, f, m)
          test_mutating_op_like_add(gcd, gcd!, f, m)
          test_mutating_op_like_add(lcm, lcm!, f, m)
+         if !iszero(f*m)
+           test_mutating_op_like_add(divides, divides!, f, f*m; only3arg = true)
+           test_mutating_op_like_add(divides, divides!, f, m; only3arg = true)
+         end
       end
 
    end
@@ -665,7 +417,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 
       @testset "Polynomial Constructors" begin
          for i in 1:reps
-            a = test_elem(Rx)::T
+            a = generate_element(Rx)::T
             for b in coefficients(a)
                @assert Rx(b) isa T
             end
@@ -687,10 +439,10 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          test_EuclideanRing_interface(Rx, reps = 2 + fld(reps, 2))
          @testset "Half-GCD" begin
             for i in 1:reps
-               a = test_elem(Rx)
-               b = test_elem(Rx)
+               a = generate_element(Rx)
+               b = generate_element(Rx)
                for j in 1:8
-                  q = test_elem(Rx)
+                  q = generate_element(Rx)
                   a, b = q*a + b, a
                end
                g, s, t = gcdx(a, b)
@@ -716,18 +468,182 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
          @test symbols(Rx) isa Vector{Symbol}
          @test length(symbols(Rx)) == 1
          @test is_gen(gen(Rx))
+         @test is_gen(x)
          @test is_monic(x)
+         @test is_trivial(Rx) || !is_gen(x^2)
          for i in 1:reps
-            a = test_elem(Rx)
+            a = generate_element(Rx)
             @test iszero(a) || degree(a) >= 0
             @test equality(a, leading_coefficient(a)*x^max(0, degree(a)) + tail(a))
             @test constant_coefficient(a) isa elem_type(R)
             @test trailing_coefficient(a) isa elem_type(R)
-            @test is_gen(x)
-            @test iszero(one(Rx)) || !is_gen(x^2)
             @test is_monic(a) == isone(leading_coefficient(a))
          end
       end
+      
+      @testset "reverse" begin
+        p = x^2 + 2*x + 3
+        @test reverse(p) !== p
+        @test reverse(p) == 3*x^2 + 2*x + 1
+        @test reverse(p, 2) == 3*x + 2
+        
+        p = x^2 + 2*x
+        reverse!(p)
+        @test p == 2*x + 1
+
+        p = x^2 + 2x
+        reverse!(p, 2)
+        @test p == 2
+      end
+      
+      @testset "shifting" begin
+        p = x^2 + 2*x + 3
+        @test shift_left!(p, 1) == x^3 + 2*x^2 + 3*x
+        @test shift_left!(p, 3) == x^6 + 2*x^5 + 3*x^4
+        
+        p = x^2 + 2*x + 3
+        @test shift_right!(p, 1) == x + 2
+        @test shift_right!(p, 2) == zero(Rx)
+      end
+   end
+
+   return nothing
+end
+
+
+function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
+
+   # for simplicity, these tests for now assume exactly two generators
+   @assert ngens(Rxy) == 2
+
+   T = elem_type(Rxy)
+
+   @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
+
+      test_Ring_interface(Rxy; reps = reps)
+
+      @testset "Basic functionality" begin
+         @test symbols(Rxy) isa Vector{Symbol}
+         @test length(symbols(Rxy)) == ngens(Rxy)
+         @test length(gens(Rxy)) == ngens(Rxy)
+         @test gens(Rxy) == [gen(Rxy, i) for i in 1:ngens(Rxy)]
+         @test all(is_gen, gens(Rxy)) || is_trivial(Rxy)
+      end
+
+      @testset "Polynomial Constructors" begin
+         for i in 1:reps
+            a = generate_element(Rxy)::T
+            for b in coefficients(a)
+               @assert Rxy(b) isa T
+            end
+
+            # test MPolyBuildCtx
+            B = MPolyBuildCtx(Rxy)
+            for (c, e) in zip(AbstractAlgebra.coefficients(a), AbstractAlgebra.exponent_vectors(a))
+               push_term!(B, c, e)
+            end
+            @test finish(B) == a
+         end
+         x, y = gens(Rxy)
+         f = 13*x^3*y^4 + 2*x - 7
+         #@test Rxy([2,-7,13], [[1,0],[0,0],[3,4]]) == f   # FIXME: interface spec does not say this is required?
+
+         R = base_ring(Rxy)
+         @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
+      end
+
+      # skip trivial rings after this, it is not worth the bother
+      is_trivial(Rxy) && return
+
+      @testset "Element properties" begin
+         R = base_ring(Rxy)
+         x, y = gens(Rxy)
+
+         a = zero(Rxy)
+         @test !is_monomial(a)
+         @test !is_term(a)
+         @test is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test is_nilpotent(a)
+         @test is_homogeneous(a)
+         @test length(a) == 0
+         @test total_degree(a) < 0
+         @test all(is_negative, degrees(a))
+
+         a = one(Rxy)
+         @test is_monomial(a)
+         @test is_term(a)
+         @test is_constant(a)
+         @test !is_gen(a)
+         @test is_unit(a)
+         @test !is_nilpotent(a)
+         @test is_homogeneous(a)
+         @test length(a) == 1
+         @test total_degree(a) == 0
+         @test degrees(a) == [0, 0]
+
+         a = x
+         @test is_monomial(a)
+         @test is_term(a)
+         @test !is_constant(a)
+         @test is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test is_homogeneous(a)
+         @test length(a) == 1
+         @test total_degree(a) == 1
+         @test degrees(a) == [1, 0]
+
+         a = x^2
+         @test is_monomial(a)
+         @test is_term(a)
+         @test !is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test is_homogeneous(a)
+         @test length(a) == 1
+         @test total_degree(a) == 2
+         @test degrees(a) == [2, 0]
+
+         if !is_zero(R(2))
+            a = 2*x
+            @test !is_monomial(a)
+            @test is_term(a)
+            @test !is_constant(a)
+            @test !is_gen(a)
+            @test !is_unit(a)
+            @test is_nilpotent(a) == is_nilpotent(R(2))
+            @test length(a) == 1
+            @test total_degree(a) == 1
+            @test degrees(a) == [1, 0]
+         end
+
+         a = x^3 + y^4
+         @test !is_monomial(a)
+         @test !is_term(a)
+         @test !is_constant(a)
+         @test !is_gen(a)
+         @test !is_unit(a)
+         @test !is_nilpotent(a)
+         @test !is_homogeneous(a)
+         @test length(a) == 2
+         @test total_degree(a) == 4
+         @test degrees(a) == [3, 4]
+
+         for i in 1:reps
+            a = generate_element(Rxy)
+            iszero(a) && continue
+            @test length(a) >= 0
+            @test sum(degrees(a)) >= total_degree(a)
+         end
+
+      end
+
+      # TODO: add more tests, covering everything described in the manual, see
+      # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
+      # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
    end
 
    return nothing
@@ -748,7 +664,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
 
       @testset "Constructors" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             @test nrows(a) == nrows(S)
             @test ncols(a) == ncols(S)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
@@ -792,7 +708,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
 
       @testset "Basic manipulation of matrices" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             A = deepcopy(a)
             @test A isa ST
 
@@ -811,6 +727,24 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
             @test a == A
          end
       end
+
+      @testset "Row & column permutations" begin
+          a = matrix(R, [1 2 ; 3 4])
+          b = swap_rows(a, 1, 2)
+          @test b == matrix(R, [3 4 ; 1 2])
+          @test a == matrix(R, [1 2 ; 3 4])
+
+          a = matrix(R, [1 2 ; 3 4])
+          b = swap_cols(a, 1, 2)
+          @test b == matrix(R, [2 1 ; 4 3])
+          @test a == matrix(R, [1 2 ; 3 4])
+
+          # TODO: reverse_rows, reverse_cols
+          # TODO: add_column, add_row
+          # TODO: multiply_column, multiply_row
+          # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
+      end
+
    end
 
    return nothing
@@ -830,7 +764,7 @@ function test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Constructors" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             @test nrows(a) == nrows(S)
             @test ncols(a) == ncols(S)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
@@ -840,7 +774,7 @@ function test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Basic manipulation of matrices" begin
          for k in 1:reps
-            a = test_elem(S)::ST
+            a = generate_element(S)::ST
             A = deepcopy(a)
             b = zero(S)
             for i in 1:nrows(a), j in 1:ncols(a)
@@ -854,8 +788,8 @@ function test_MatAlgebra_interface(S::MatRing; reps = 20)
 
       @testset "Determinant" begin
          for k in 1:reps
-            a = test_elem(S)::ST
-            b = test_elem(S)::ST
+            a = generate_element(S)::ST
+            b = generate_element(S)::ST
             A = deepcopy(a)
             B = deepcopy(b)
             @test det(a*b) == det(a)*det(b)
@@ -870,8 +804,10 @@ end
 
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Ring_interface(R; reps = reps)
-   Rx, _ = polynomial_ring(R, "x")
+   Rx, _ = polynomial_ring(R, :x)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   Rxy, _ = polynomial_ring(R, [:x, :y])
+   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
    S = matrix_ring(R, rand(0:3))
    test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
    S = matrix_space(R, rand(0:3), rand(0:3))

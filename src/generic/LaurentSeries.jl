@@ -41,6 +41,14 @@ base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_
 
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:LaurentSeriesRing}) = base_ring_type(T)
+
+coefficient_ring_type(T::Type{<:LaurentSeriesField}) = base_ring_type(T)
+
+coefficient_ring(R::LaurentSeriesRing) = base_ring(R)
+
+coefficient_ring(R::LaurentSeriesField) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
    return is_domain_type(S)
 end
@@ -449,7 +457,7 @@ function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, 
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesRingElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
    p.parent = Generic.LaurentSeriesRing{TT}(R, max_precision, Symbol(var), cached)
@@ -460,7 +468,7 @@ function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int,
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.LaurentSeriesFieldElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
    p.parent = Generic.LaurentSeriesField{TT}(R, max_precision, Symbol(var), cached)
@@ -1395,13 +1403,6 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
     return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    flag, s = sqrt_classical(a, check=check)
    check && !flag && error("Not a square in sqrt")
@@ -1780,8 +1781,17 @@ rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange
    rand(rng, make(S, val_range, v...))
 
 rand(S::LaurentSeriesRingOrField, val_range, v...) =
-   rand(GLOBAL_RNG, S, val_range, v...)
+   rand(Random.default_rng(), S, val_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::LaurentSeriesRing{BigInt})
+  rand(R, 0:12, -10:10)
+end
 
 ###############################################################################
 #

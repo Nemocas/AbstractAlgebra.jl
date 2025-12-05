@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Visualization of the types of AbstractAlgebra.jl
 
 AbstractAlgebra.jl implements a couple of abstract types which can be extended.
@@ -42,6 +47,6 @@ are defined over.
   - `Generic.AbsSeries{T}` (`Generic.AbsPowerSeriesRing{T}`)
   - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
-  - `Generic.ResidueRingElem{T}` (`Generic.ResidueRing{T}`)
+  - `Generic.EuclideanRingResidueRingElem{T}` (`Generic.EuclideanRingResidueRing{T}`)
   - `Generic.FracFieldElem{T}` (`Generic.FracField{T}`)
   - `Generic.Mat{T}` (`MatSpace{T}`)

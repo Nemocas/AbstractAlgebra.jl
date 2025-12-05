@@ -1,15 +1,21 @@
 ###############################################################################
 #
 #   MPolyFactor.jl : Generic algorithms for multivariate factor and gcd
+#                    over fields of characteristic 0
 #
 ###############################################################################
 
-# experimental module whose parts can be overridden for specific types
-# main functions are mfactor_squarefree_char_zero and mfactor_char_zero
+# Main functions are mfactor_squarefree_char_zero and mfactor_char_zero:
+# - mfactor_squarefree_char_zero works for any field of characteristic 0
+# - mfactor_char_zero reduces it to calls of factor for univariate polynomials
+#   (it might succeed if the polynomials are obviously irreducible, for example,
+#    of degree 1)
 
 module MPolyFactor
 
-using AbstractAlgebra
+using ..AbstractAlgebra
+
+import AbstractAlgebra: mulpow!
 
 mutable struct pfracinfo{E}
   xalphas           ::Vector{E}                 # [x_i - alpha_i for i = 1..r]
@@ -64,7 +70,7 @@ function mulpow!(a::Fac{T}, b::T, e::Int) where T
   if e == 0
     return
   end
-  if is_constant(b)
+  if is_unit(b)
     a.unit *= b^e
   elseif haskey(a.fac, b)
     a.fac[b] += e
@@ -263,7 +269,7 @@ function pfracinit(
         s = evaluate(betas[1][i], sub)
         t = evaluate(p, sub)
         g, s1, t1 = gcdx(s, t)
-        if degree(g) != 0
+        if !is_constant(g)
           # univariates are not pairwise prime
           return false, I
         end
@@ -470,7 +476,7 @@ function hlift_have_lcs(
   @assert n > 0
   @assert r > 1
 
-  lc_evals = zeros(R, n + 1, r)
+  lc_evals = Matrix{elem_type(R)}(undef, n + 1, r)
   for j in 1:r
     lc_evals[n + 1, j] = lcs[j]
     for i in n:-1:1
@@ -478,13 +484,13 @@ function hlift_have_lcs(
     end
   end
 
-  A_evals = zeros(R, n + 1)
+  A_evals = Vector{elem_type(R)}(undef, n + 1)
   A_evals[n + 1] = A
   for i in n:-1:1
     A_evals[i] = eval_one(A_evals[i + 1], minorvars[i], alphas[i])
   end
 
-  fac = zeros(R, r)
+  fac = Vector{elem_type(R)}(undef, r)
   for j in 1:r
     @assert is_constant(lc_evals[1, j])
     fac[j] = Auf[j]*divexact(lc_evals[1, j], get_lc(Auf[j], mainvar))
@@ -568,7 +574,7 @@ function hliftstep_quartic2(
   a, t = divrem(a, xalpha)
   @assert t == B[1][1] * B[2][1]
 
-  M = zeros(R, liftdegs[m] + 1)
+  M = Vector{elem_type(R)}(undef, liftdegs[m] + 1)
 
   for j in 1:liftdegs[m]
     a, t = divrem(a, xalpha)
@@ -988,15 +994,15 @@ function lcc_kaltofen_step!(
   @assert r == length(divs)
   Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
 
-  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
+  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx))) for i in 1:r]
 
   Afdegv = 0
   Afp = one(R)
-  for i in Af.fac
-    thisdeg = degree(i.first, v)
+  for (i, _) in Af
+    thisdeg = degree(i, v)
     Afdegv += thisdeg
     if thisdeg != 0
-      Afp *= i.first
+      Afp *= i
     end
   end
 
@@ -1051,7 +1057,7 @@ end
 #=
   Try to determine divisors of the leading coefficients of the factors of A.
   This is accomplished by looking at the bivariate factoration of A when
-  all but one of the minor variables are evaluated away. The resulting 
+  all but one of the minor variables are evaluated away. The resulting
   univariate leading coefficients are lifted against the supplied
   factorization of lc(A). return is Tuple{::Boole, ::Vector{E}}
   If the bool is true, then the method can be considered to have fully found
@@ -1077,7 +1083,7 @@ function lcc_kaltofen(
   ulcs = E[R() for i in 1:r]
 
   for vi in 1:length(minorvars)
-    if isempty(lcAf.fac)
+    if length(lcAf) == 0
       break
     end
 
@@ -1116,7 +1122,7 @@ function lcc_kaltofen(
                                                  other_minorvars, other_alphas)
   end
 
-  return isempty(lcAf.fac), divs
+  return (length(lcAf) == 0), divs
 end
 
 
@@ -1150,8 +1156,8 @@ function mfactor_irred_mvar_char_zero(
   K = base_ring(R)
   @assert length(A) > 0
 
-  evals = zeros(R, n + 1)
-  alphas = zeros(K, n)
+  evals = Vector{elem_type(R)}(undef, n + 1)
+  alphas = [zero(K) for _ in 1:n]
   alpha_modulus = 0
   lcc_fails_remaining = 3
 
@@ -1173,7 +1179,7 @@ function mfactor_irred_mvar_char_zero(
   # make sure univar is squarefree. TODO also zassenhaus pruning here
   ok, ufac = mfactor_irred_univar(evals[1], mainvar)
   if !ok
-    @goto next_alpha    
+    @goto next_alpha
   end
 
   if length(ufac) < 2
@@ -1256,8 +1262,8 @@ function mfactor_irred_char_zero(a::E) where E
   lc = coeff(a, 1)
   if !isone(lc)
     res.unit = lc
-    a *= inv(lc)
-  end  
+    a *= AbstractAlgebra.inv(lc)
+  end
 
   degs = degrees(a)
   vars = Int[]    # variables that actually appear
@@ -1313,7 +1319,12 @@ function mfactor_squarefree_char_zero(a::E) where E
   # start with a monic version of a
   lc = coeff(a, 1)
   res.unit = R(lc)
-  res.fac = Dict{E, Int}(1//lc * a => 1)
+  if !is_unit(lc)
+    error("leading coefficient must be invertible")
+  end
+  # thus lc is invertible in K, which means that it is squarefree
+  # don't use `Base.inv`, it is wrong for `BigInt`
+  res.fac = Dict{E, Int}(AbstractAlgebra.inv(lc) * a => 1)
 
   # pure variable powers in the final factorization
   var_powers = zeros(Int, nvars(R))
@@ -1354,7 +1365,7 @@ function mfactor_char_zero(a::E) where E <: MPolyRingElem
   res = Fac{E}()
   res.unit = tres.unit
   empty!(res.fac)
-  for i in tres.fac
+  for i in tres
     mulpow!(res, mfactor_irred_char_zero(i[1]), i[2])
   end
   return res

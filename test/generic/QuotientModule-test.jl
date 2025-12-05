@@ -18,6 +18,9 @@
    @test elem_type(Generic.QuotientModule{elem_type(R)}) == Generic.QuotientModuleElem{elem_type(R)}
    @test parent_type(Generic.QuotientModuleElem{elem_type(R)}) == Generic.QuotientModule{elem_type(R)}
 
+   @test coefficient_ring(M) == R
+   @test coefficient_ring_type(M) == typeof(coefficient_ring(M))
+
    @test isa(Q([R(2)]), Generic.QuotientModuleElem)
 
    R = QQ
@@ -69,6 +72,35 @@
    SS, ff = sub(F, [m])
    Q, g = quo(S, SS)
    @test dim(Q) == 1
+end
+
+@testset "Generic.QuotientModule.rank" begin
+    F = free_module(QQ, 3)
+    S1, _ = sub(F, elem_type(F)[])
+    Q1, _ = quo(F, S1)
+    @test rank(Q1) == 3
+
+    S2, _ = sub(F, gens(F))
+    Q2, _ = quo(F, S2)
+    @test rank(Q2) == 0
+
+    S3, _ = sub(F, [gen(F, 1)])
+    Q3, _ = quo(F, S3)
+    @test rank(Q3) == 2
+
+    S4, _ = sub(F, [gen(F, 1), gen(F, 2)])
+    Q4, _ = quo(F, S4)
+    @test rank(Q4) == 1
+
+    for iter = 1:40
+        n = rand(1:20)
+        F = free_module(QQ, n)
+        k = rand(0:n)
+        gens = [rand(F, -10:10) for i in 1:k]
+        S, _ = sub(F, gens)
+        Q, _ = quo(F, S)
+        @test rank(Q) == n - dim(S)
+    end
 end
 
 @testset "Generic.QuotientModule.manipulation" begin

@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Type interface of AbstractAlgebra.jl
 
 Apart from how we usually think of types in programming, we shall in this

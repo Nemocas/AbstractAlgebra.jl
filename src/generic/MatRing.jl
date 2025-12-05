@@ -34,7 +34,7 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 ###############################################################################
 
 function transpose(x::MatRingElem{T}) where T <: NCRingElement
-   arr = permutedims(x.entries, [2, 1])
+   arr = permutedims(x.entries)
    z = MatRingElem{T}(base_ring(x), arr)
    return z
 end
@@ -55,6 +55,18 @@ function _can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where
    return flag, SA
 end
 
+function AbstractAlgebra.can_solve_with_solution(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+   check_parent(M, B)
+   R = base_ring(M)
+   # TODO: Once #1955 is resolved, the conversion to matrix and back to MatRingElem
+   # should be done better
+   MS = matrix(R, M.entries) # convert to ordinary matrix
+   BS = matrix(R, B.entries)
+   flag, S = can_solve_with_solution(MS, BS)
+   SA = MatRingElem{T}(R, Array(S))
+   return flag, SA
+end
+
 function _can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
@@ -72,7 +84,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    minpoly(S::Ring, M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+    minpoly(S::Ring, M::MatRingElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.

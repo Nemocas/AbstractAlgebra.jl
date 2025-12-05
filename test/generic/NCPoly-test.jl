@@ -9,11 +9,12 @@
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
       @test elem_type(S) == Generic.NCPoly{elem_type(R)}
       @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
       @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
 
-      @test typeof(S) <: Generic.NCPolyRing
+      @test S isa Generic.NCPolyRing
 
       @test isa(y, NCPolyRingElem)
    end
@@ -25,7 +26,7 @@
    S, y = S1
    T, z = polynomial_ring(S, "z")
 
-   @test typeof(T) <: Generic.NCPolyRing
+   @test T isa Generic.NCPolyRing
 
    @test isa(z, NCPolyRingElem)
 
@@ -71,8 +72,6 @@ end
    @test isone(one(S))
 
    @test is_gen(gen(S))
-
-   @test is_unit(one(S))
 
    f = 2*y + 1
 
@@ -432,6 +431,17 @@ end
 
 @testset "Generic.NCPoly.exceptions" begin
    @test_throws MethodError polynomial_ring(Char, :x)
-   @test_throws Exception dense_poly_ring_type(Char)
-   @test_throws ArgumentError dense_poly_type(Char)
+   @test_throws Exception poly_ring_type(Char)
+   @test_throws ArgumentError poly_type(Char)
+end
+
+@testset "Generic.NCPoly.map_coefficients" begin
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c[1, 1], 2*z; parent = Qx)
+      @test f == 2*x
+      @test parent(f) === Qx
+   end
 end

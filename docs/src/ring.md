@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Ring functionality
 
 AbstractAlgebra has both commutative and noncommutative rings. Together we
@@ -246,5 +251,26 @@ unit(a::Fac)
 evaluate(a::Fac)
 getindex(a::Fac, b)
 setindex!(a::Fac{Int}, c::Int, b::Int)
+```
+## Square root
+
+Rings may implement functionality for detecting and computing square roots.
+
+The exact behaviour depends on the ring. Some rings provide both operations,
+while others only implement `is_square`.
+
+```@docs
+is_square
+sqrt(::NCRingElem)
+```
+
+## Miscellaneous
+
+There are some miscellaneous functions for rings to ease up certain computations.
+
+```@docs
+falling_factorial
+rising_factorial
+rising_factorial2
 ```
 

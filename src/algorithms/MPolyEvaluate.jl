@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function pow!(z::T, a, b)::T where T
-  return a^b
-end
-
 # a *= x^p, using ta and tx as temps. Must return the modified a, ta, tx
 function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T, S}
   tx = pow!(tx, x, p)

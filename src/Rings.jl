@@ -95,11 +95,27 @@ end
 
 # Type can only represent elements of an exact ring
 # true unless explicitly specified
+#
+# implementors should only implement this trait for RingElem subtypes, but for
+# convenience we support calling this also on Ring subtypes as well as Ring
+# and RingElem instances
 is_exact_type(R::Type{T}) where T <: RingElem = true
 
-# Type can only represent elements of domains
+is_exact_type(x) = is_exact_type(typeof(x))
+is_exact_type(x::Type{<:Ring}) = is_exact_type(elem_type(x))
+is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
+
+# Type can only represent elements of domains, i.e. without zero divisors
 # false unless explicitly specified
+#
+# implementors should only implement this trait for RingElem subtypes, but for
+# convenience we support calling this also on Ring subtypes as well as Ring
+# and RingElem instances
 is_domain_type(R::Type{T}) where T <: RingElem = false
+
+is_domain_type(x) = is_domain_type(typeof(x))
+is_domain_type(x::Type{<:Ring}) = is_domain_type(elem_type(x))
+is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
 
 ###############################################################################
 #
@@ -144,13 +160,6 @@ end
 #
 ################################################################################
 
-@doc raw"""
-    sqrt(a::FieldElem)
-
-Return the square root of the element `a`. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
   R, t = polynomial_ring(R, :t; cached = false)
@@ -162,15 +171,6 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   end
   error("Element $a does not have a square root")
 end
-
-# assumes the existence of sqrt without check argument for input
-function Base.sqrt(a::RingElem; check::Bool=true)
-  s = sqrt(a)
-  if check
-    s != a^2 && error("Element $a does not have a square root")
-  end
-  return s
-end  
 
 # assumes the existence of is_square and sqrt for input  
 function is_square_with_sqrt(a::RingElem)
@@ -194,13 +194,34 @@ Test whether the ring $R$ is trivial. A ring is trivial if it consists
 of a single element, or equivalently if its characteristic is 1. Such
 rings are also called zero rings.
 """
-is_trivial(F::NCRing) = characteristic(F) == 1
-is_trivial(F::Field) = false
+is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
+
+@doc raw"""
+    is_zero(R::NCRing)
+
+Test whether the ring $R$ is trivial. However, the recommended method
+for doing this is [`is_trivial`](@ref).
+
+```jldoctest
+julia> R, (x,) = polynomial_ring(QQ, [:x]);
+
+julia> S=quo(R,1)[1]
+Residue ring of R modulo 1
+
+julia> is_trivial(S)
+true
+
+julia> is_zero(S)
+true
+```
+"""
+is_zero(R::NCRing) = is_trivial(R)
 
 @doc raw"""
     is_perfect(F::Field)
 
-Test whether the field $F$ is perfect.
+Test whether the field $F$ is perfect, that is, whether the characteristic is zero or
+else whether every element of $F$ admits a $p$-th root, where $p > 0$ is the characteristic of $F$.
 """
 is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
                                                  throw(NotImplementedError(:is_perfect, F))
@@ -213,3 +234,73 @@ function is_finite(R::NCRing)
   c == 1 && return true
   throw(NotImplementedError(:is_finite, R))
 end
+
+@doc raw"""
+    is_noetherian(R::Ring)
+
+Check if the ring $R$ is Noetherian.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> is_noetherian(R)
+true
+```
+"""
+function is_noetherian(R::Ring)
+  throw(NotImplementedError(:is_noetherian, R))
+end
+
+is_noetherian(::Field) = true
+is_noetherian(::Integers) = true
+
+is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
+is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
+is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R)) || throw(NotImplementedError(:is_noetherian, R))
+
+@doc raw"""
+    krull_dim(R::Ring)
+
+Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> krull_dim(R)
+2
+```
+"""
+function krull_dim(R::Ring)
+  @req is_noetherian(R) "Krull dimension is only supported for Noetherian rings."
+  throw(NotImplementedError(:krull_dim, R))
+end
+
+krull_dim(::Field) = 0
+krull_dim(::Integers) = 1
+
+krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
+krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)
+
+
+########################################################################
+# locality checks
+########################################################################
+@doc raw"""
+    is_local(R::Ring)
+
+Return whether a given ring `R` is a local ring.
+"""
+function is_local(R::Ring)
+  throw(NotImplementedError(:is_local, R))
+end
+
+# In general we can not assume it to be known whether a given ring is local
+is_known(::typeof(is_local), R::Ring) = false
+
+is_local(::Field) = true
+
+is_local(R::MPolyRing{<:FieldElem}) = is_zero(ngens(R))
+is_known(::typeof(is_local), R::MPolyRing{<:FieldElem}) = true
+

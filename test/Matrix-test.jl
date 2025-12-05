@@ -112,6 +112,14 @@ end
     @test T == matrix(QQ, [42 0 0; 0 42 0; 0 0 42])
 end
 
+@testset "Matrix.vector_space_dim" begin
+  F, = residue_field(ZZ, 2)
+  S1 = matrix_space(F, 3, 4)
+  S2 = matrix_ring(QQ, 2)
+  @test vector_space_dim(S1) == 12
+  @test vector_space_dim(S2) == 4
+end
+
 @testset "Matrix.conversion" begin
   U, t = polynomial_ring(QQ, "t")
 
@@ -132,6 +140,21 @@ end
   @test Matrix(Sa) == a
 end
 
+@testset "Matrix.keys and pairs" begin
+  a = matrix(ZZ, 2, 3, [6, 3, 0, 10, 12, 14])
+  @test keys(a) == CartesianIndices((2, 3))
+  @test issetequal(
+    keys(a),
+    [CartesianIndex(1, 1), CartesianIndex(1, 2), CartesianIndex(1, 3),
+     CartesianIndex(2, 1), CartesianIndex(2, 2), CartesianIndex(2, 3)],
+  )
+  @test issetequal(
+    pairs(a),
+    [CartesianIndex(1, 1) => 6, CartesianIndex(1, 2) => 3, CartesianIndex(1, 3) => 0,
+     CartesianIndex(2, 1) => 10, CartesianIndex(2, 2) => 12, CartesianIndex(2, 3) => 14],
+  )
+end
+
 @testset "Strassen" begin
    S = matrix(QQ, rand(-10:10, 100, 100))
    T = S*S
@@ -145,4 +168,49 @@ end
    r2 = Strassen.lu!(P, S; cutoff = 50)
    @test r1 == r2
    @test S1 == S
+
+   a = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   b = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   c = identity_matrix(ZZ, 10)
+
+   Strassen.mul_tt!(c, a, b; cutoff = 5)
+   @test c == a*b
+   Strassen.mul_tt!(c, a, b; cutoff = 2)
+   @test c == a*b
+end
+
+@testset "Promotion" begin
+  M = matrix(ZZ, 1, 1, [1])
+  N = matrix(QQ, 1, 1, [2])
+
+  L = @inferred M + N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) + N
+  L = @inferred M - N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) - N
+  L = @inferred M * N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) * N
+  L = @inferred N + M
+  @test base_ring(L) === QQ
+  @test L == N + change_base_ring(QQ, M)
+  L = @inferred N - M
+  @test base_ring(L) === QQ
+  @test L == N - change_base_ring(QQ, M)
+  L = @inferred N * M
+  @test base_ring(L) === QQ
+  @test L == N * change_base_ring(QQ, M)
+
+  @test M * QQ[1;] == QQ[1;]
+  @test M * ZZ[1;] == ZZ[1;]
+  @test N * QQ[1;] == QQ[2;]
+  @test N * ZZ[1;] == QQ[2;]
+  @test QQ[1;] * M == QQ[1;]
+  @test ZZ[1;] * M == ZZ[1;]
+  @test QQ[1;] * N == QQ[2;]
+  @test ZZ[1;] * N == QQ[2;]
+
+  @test M * QQ(1) == QQ(1) * M == QQ.(M)
+  @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
 end

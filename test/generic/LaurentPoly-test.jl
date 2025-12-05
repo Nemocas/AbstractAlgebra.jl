@@ -3,16 +3,6 @@ using AbstractAlgebra: terms_degrees, LaurentPolyRingElem
 using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
                                trail_degree, lead_degree
 
-function test_elem(R::LaurentPolyWrapRing)
-   n = rand(0:10)
-   if n == 0
-      return zero(R)
-   else
-      m = rand(0:5)
-      rand(R, -m:n-m, -99:99)
-   end
-end
-
 @testset "Generic.LaurentPoly" begin
    @testset "constructors" begin
       L0, y0 = laurent_polynomial_ring(zz, "y0")
@@ -47,6 +37,8 @@ end
 
          @test base_ring(L) == R
          @test base_ring(L) == base_ring(P)
+         @test coefficient_ring(L) == R
+         @test coefficient_ring_type(L) === typeof(R)
 
          @test var(L) == :y
          @test symbols(L) == [:y]
@@ -230,19 +222,6 @@ end
 
       @test is_divisible_by(2*y+3, 2+3*y^-1)
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
-   end
-
-   @testset "Generic.LaurentMPoly.is_unit" begin
-      R, x = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], "x")
-
-      @test is_unit(x)
-      @test !is_unit(2*x)
-      try
-         res = is_unit(3 + 2*x)
-         @test res
-      catch e
-         @test e isa NotImplementedError
-      end
    end
 
    @testset "coercion" begin
@@ -494,11 +473,115 @@ end
 
    @testset "conformance" begin
       L, y = laurent_polynomial_ring(QQ, "y")
-      test_Ring_interface(L)
-      test_EuclideanRing_interface(L)
-      test_Ring_interface_recursive(L)
+      ConformanceTests.test_Ring_interface(L)
+      ConformanceTests.test_EuclideanRing_interface(L)
+      ConformanceTests.test_Ring_interface_recursive(L)
 
       L, y = laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1], "y")
-      test_Ring_interface(L)
+      ConformanceTests.test_Ring_interface(L)
    end
+end
+
+
+# -------------------------------------------------------
+
+# Coeff rings for the tests below
+ZeroRing,_ = residue_ring(ZZ,1);
+ZZmod720,_ = residue_ring(ZZ, 720);
+
+
+# [2024-12-12  laurent_polynomial_ring currently gives error when coeff ring is zero ring]
+# ## LaurentPoly over ZeroRing
+# @testset "Nilpotent/unit for ZeroRing[x, x^(-1)]" begin
+#   P,x = laurent_polynomial_ring(ZeroRing, "x");
+#   @test is_nilpotent(P(0))
+#   @test is_nilpotent(P(1))
+#   @test is_nilpotent(x)
+#   @test is_nilpotent(-x)
+
+#   @test is_unit(P(0))
+#   @test is_unit(P(1))
+#   @test is_unit(x)
+#   @test is_unit(-x)
+# end
+
+## LaurentPoly over ZZ
+@testset "Nilpotent/unit for ZZ[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(ZZ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(-2))
+  @test !is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test !is_unit(2/x)
+  @test !is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## LaurentPoly over QQ
+@testset "Nilpotent/unit for QQ[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(QQ, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test is_unit(P(-2))
+  @test is_unit(P(-2))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test is_unit(2*x)
+  @test is_unit(-2*x)
+  @test is_unit(1/x)
+  @test is_unit(-1/x)
+  @test is_unit(2/x)
+  @test is_unit(-2/x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+end
+
+## LaurentPoly over ZZ/720
+@testset "Nilpotent/unit for ZZ/(720)[x, x^(-1)]" begin
+  P,x = laurent_polynomial_ring(ZZmod720, "x");
+  @test is_nilpotent(P(0))
+  @test !is_nilpotent(P(1))
+  @test is_nilpotent(P(30))
+  @test !is_nilpotent(x)
+  @test !is_nilpotent(-x)
+  @test is_nilpotent(30*x)
+  @test is_nilpotent(30/x)
+
+  @test !is_unit(P(0))
+  @test is_unit(P(1))
+  @test is_unit(P(-1))
+  @test !is_unit(P(2))
+  @test !is_unit(P(-2))
+  @test is_unit(P(7))
+  @test is_unit(P(-7))
+  @test is_unit(x)
+  @test is_unit(-x)
+  @test !is_unit(2*x)
+  @test !is_unit(x+1)
+  @test !is_unit(x-1)
+  @test is_unit(x+30)
+  @test is_unit(x-30)
+  @test is_unit(1+30*x)
+  @test is_unit(1-30*x)
+  @test is_unit(7+60*x)
+  @test is_unit(7-60*x)
+  @test is_unit(600+7*x+30*x^2)
+  @test is_unit(600-7*x+30*x^2)
 end

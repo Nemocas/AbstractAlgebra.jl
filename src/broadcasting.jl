@@ -28,7 +28,7 @@ Base.BroadcastStyle(::Type{<:MatElem}) = Broadcast.ArrayStyle{BroadcastDummy}()
 #
 ################################################################################
 
-# I use a non-recursive version at the leaft to not confusing inference too much
+# I use a non-recursive version at the leaf to not confuse inference too much
 function _compute_target_size(a::Tuple)
   if length(a) == 1
     return _compute_target_size_nonrec(a[1])
@@ -107,6 +107,8 @@ function _promote_dest_func_elem(f::T, a::Tuple) where {T}
   return zero(K)
 end
 
+Base.maybeview(A::MatElem, x...) = view(A, x...)
+
 ################################################################################
 #
 #  Similar functionality
@@ -116,7 +118,7 @@ end
 # The most tricky part:
 #
 # Any expression of the form fun.(args...) is transformed into a
-# Broadcasted object bc with bc.fun == and bc.args == x (a Tuple)
+# Broadcasted object bc with bc.f == fun and bc.args == x (a Tuple)
 # Note that the x can themselves be again objects of type Broadcasted.
 # So we end up with a nice expression tree and our aim is to find
 # the shape and coefficient ring of the final output matrix

@@ -92,7 +92,7 @@ end
 
 function is_gen(a::FreeAssociativeAlgebraElem{T}) where T
     if length(a) < 1
-        return iszero(one(base_ring(a)))
+        return is_trivial(base_ring(a))
     else
         return a.length == 1 && isone(a.coeffs[1]) && length(a.exps[1]) == 1
     end
@@ -202,7 +202,8 @@ function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
 end
 
 function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
-    return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
+    @req !is_zero(a) "Zero polynomial does not have a leading monomial"
+    return coeff(a, 1)
 end
 
 function leading_monomial(a::FreeAssociativeAlgebraElem{T}) where T
@@ -244,6 +245,7 @@ end
 ###############################################################################
 
 function canonical_unit(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(a) && return one(base_ring(a))
     return canonical_unit(leading_coefficient(a))
 end
 
@@ -372,7 +374,7 @@ coefficient Ring implements isless.
 The order of letters is the reverse of the order given when initialising the algebra.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> R, (x, y) = free_associative_algebra(QQ, ["x", "y"]);
 
 julia> x < y^2

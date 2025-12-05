@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -232,9 +233,6 @@ julia> y = gen(T)
 y
 
 julia> g = is_gen(y)
-true
-
-julia> m = is_unit(b)
 true
 
 julia> n = degree(d)

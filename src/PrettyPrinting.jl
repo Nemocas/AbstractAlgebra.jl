@@ -148,7 +148,7 @@ function show_obj(io::IO, mi::MIME, obj)
    finish(S)
 end
 
-global _html_as_latex = Ref{Bool}(false)
+const _html_as_latex = Ref{Bool}(false)
 
 @doc raw"""
     get_html_as_latex()
@@ -262,18 +262,26 @@ macro enable_all_show_via_expressify(T)
        AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
-    function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
+    function Base.showable(mi::MIME"text/latex", x::$(esc(T)))
        if isdefined(Main, :IJulia) && Main.IJulia.inited
-          error("Dummy error for jupyter")
+          return false
        end
+       return true
+     end
+
+    function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
-    function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
+    function Base.showable(mi::MIME"text/html", x::$(esc(T)))
        if isdefined(Main, :IJulia) && Main.IJulia.inited &&
              !AbstractAlgebra.get_html_as_latex()
-          error("Dummy error for jupyter")
+          return false
        end
+       return true
+    end
+
+    function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
   end
@@ -1277,7 +1285,7 @@ function underscorify(x::String)
       n -= 1
    end
    if n == 1 && length(y[1]) == 1
-      z = y[1]
+      z = string(y[1])
    else
       # at this point we need operatorname and escaped underscores
       z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
@@ -1499,7 +1507,7 @@ For this to work in doctests, one should call
     This function should not be used directly, but rather through [`AbstractAlgebra.get_name`](@ref).
 """
 function find_name(obj, M=Main; all::Bool=false)
-  AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
+  is_attribute_storing(obj) || return find_new_name(obj, M; all)
 
   cached_name = get_attribute(obj, :_cached_name)
   if !isnothing(cached_name)
@@ -1549,7 +1557,7 @@ This function tries to find a name in the following order:
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)
-  if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
+  if is_attribute_storing(obj)
     name = get_attribute(obj, :_name)
     isnothing(name) || return name
   end
@@ -1624,7 +1632,7 @@ macro show_special(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           s(i, o)
@@ -1672,7 +1680,7 @@ macro show_special(io, mime, obj)
       local i = $(esc(io))
       local m = $(esc(mime))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           if applicable(s, i, m, o)
@@ -1720,7 +1728,7 @@ macro show_special_elem(io, obj)
       local i = $(esc(io))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           s(i, o)
@@ -1765,7 +1773,7 @@ macro show_special_elem(io, mime, obj)
       local m = $(esc(mime))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           if applicable(s, i, m, o)
@@ -1800,6 +1808,8 @@ A permanent change will always override a temporary change.
 
 This function may behave arbitrarily if called from within the scope of a
 `with_unicode` do-block.
+
+See also [`is_unicode_allowed`](@ref) and [`with_unicode`](@ref).
 """
 function allow_unicode(allowed::Bool; temporary::Bool=false)
    if temporary
@@ -1818,6 +1828,8 @@ end
     is_unicode_allowed() -> Bool
 
 Return whether unicode characters are allowed in pretty printing.
+
+See also [`allow_unicode`](@ref) and [`with_unicode`](@ref).
 """
 function is_unicode_allowed()
    override = ALLOW_UNICODE_OVERRIDE_VALUE[]
@@ -1838,6 +1850,8 @@ with_unicode([allowed]) do
    # code that should be executed with unicode allowed/disallowed
 end
 ```
+
+See also [`allow_unicode`](@ref) and [`is_unicode_allowed`](@ref).
 """
 function with_unicode(f::Function, allowed::Bool=true)
    previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
@@ -1958,7 +1972,7 @@ IOCustom(io::IO, force_newlines = false) = IOCustom{typeof(io)}(io, 0, false, " 
 
 IOCustom(io::IOCustom, force_newlines = false) = begin io.force_newlines = force_newlines; io; end
 
-in(key_value::Pair, io::IOCustom) = in(key_value, io.io, ===)
+in(key_value::Pair, io::IOCustom) = in(key_value, io.io)
 haskey(io::IOCustom, key) = haskey(io.io, key)
 getindex(io::IOCustom, key) = getindex(io.io, key)
 get(io::IOCustom, key, default) = get(io.io, key, default)
@@ -2190,7 +2204,7 @@ for details.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 
@@ -2213,7 +2227,7 @@ for details.
 
 # Examples
 
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> AbstractAlgebra.is_terse(stdout)
 false
 

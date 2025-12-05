@@ -71,7 +71,7 @@ end
 
 function temp_ring(f::PolyRingAnyMap{<:Any, <: Any, <: Map})
   if isdefined(f, :temp_ring)
-    return f.temp_ring::dense_poly_ring_type(codomain(_coefficient_map(f)))
+    return f.temp_ring::poly_ring_type(codomain(_coefficient_map(f)))
   end
 
   S, = polynomial_ring(codomain(_coefficient_map(f)), cached = false)
@@ -188,7 +188,7 @@ If no coefficient map is entered, invoke a canonical homomorphism of `C`
 to `S`, if such a homomorphism exists, and throw an error, otherwise.
 
 # Examples
-```jldoctest; setup = :(using AbstractAlgebra; AbstractAlgebra.set_current_module(@__MODULE__))
+```jldoctest
 julia> Zx, x = ZZ[:x];
 
 julia> F = hom(Zx, Zx, x + 1);

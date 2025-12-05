@@ -16,13 +16,11 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.PuiseuxSeriesRing{BigInt})
-   rand(R, -12:12, 1:6, -10:10)
-end
+
 
 @testset "Generic.PuiseuxSeries.conformance" begin
    R, x = puiseux_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.PuiseuxSeries.constructors" begin
@@ -44,9 +42,15 @@ end
    @test elem_type(Generic.PuiseuxSeriesRing{elem_type(S)}) == Generic.PuiseuxSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.PuiseuxSeriesRingElem{elem_type(S)}) == Generic.PuiseuxSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.PuiseuxSeriesField{Rational{BigInt}}) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}) == Generic.PuiseuxSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.PuiseuxSeriesRing)
    @test isa(T, Generic.PuiseuxSeriesRing)
