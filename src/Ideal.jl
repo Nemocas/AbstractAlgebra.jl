@@ -54,8 +54,8 @@ function ideal(R::NCRing, xs::AbstractVector{T}; kw...) where T<:NCRingElement
   return ideal(R, elem_type(R)[R(x) for x in xs]; kw...)
 end
 
-function ideal(R::NCRing, x, y...; kw...)
-  return ideal(R, elem_type(R)[R(z) for z in [x, y...]]; kw...)
+function ideal(R::NCRing, x...; kw...)
+  return ideal(R, elem_type(R)[R(z) for z in x]; kw...)
 end
 
 function ideal(x::T, y::T...; kw...) where T<:NCRingElement
