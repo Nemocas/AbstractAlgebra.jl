@@ -51,6 +51,11 @@
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(b in keys(Dict(a => 1)))
+
+   # trivial rings can not be fields
+   R = residue_ring(ZZ, 1)[1]
+   @test is_trivial(R)
+   @test_throws ArgumentError fraction_field(R)
 end
 
 @testset "Generic.FracFieldElem.printing" begin

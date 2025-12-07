@@ -466,7 +466,9 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$.
 """
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
+   @req !is_trivial(R) "Base ring must not be the zero ring."
    iszero(a) && throw(DivideError())
+   @req !is_unit(a) "Cannot create a field with one element"
    T = elem_type(R)
    S = EuclideanRingResidueField{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)
