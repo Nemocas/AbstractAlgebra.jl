@@ -1,8 +1,24 @@
 ###############################################################################
 #
-#   Ideal constructor
+#   Generic functionality for ideals
 #
 ###############################################################################
+
+###############################################################################
+#
+#   Type and parent functions
+#
+###############################################################################
+
+# fundamental interface
+@doc raw"""
+    ideal_type(a)
+
+Return the type of the base ring of the given element, element type, ring or ring type $a$.
+"""
+ideal_type(x) = ideal_type(typeof(x))
+ideal_type(x::Type{<:RingElement}) = ideal_type(parent_type(x))
+ideal_type(T::DataType) = throw(MethodError(ideal_type, (T,)))
 
 # We assume that the function
 #   ideal(R::T, xs::Vector{U})
@@ -41,7 +57,3 @@ end
 iszero(I::Ideal) = all(iszero, gens(I))
 
 base_ring_type(::Type{<:IdealSet{T}}) where T <: RingElement = parent_type(T)
-
-# fundamental interface, to be documented
-ideal_type(x) = ideal_type(typeof(x))
-ideal_type(T::DataType) = throw(MethodError(ideal_type, (T,)))
