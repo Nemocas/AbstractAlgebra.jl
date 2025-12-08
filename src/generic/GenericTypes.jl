@@ -1173,12 +1173,12 @@ struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
 end
 
 function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
-   @assert elem_type(R) === T
+#   @assert elem_type(R) === T
    t = matrix(R, n, n, A)
    return MatRingElem(t)
 end
 
-matrix(A::MatRingElem{T}) where {T} = A.data::dense_matrix_type(T)
+matrix(A::MatRingElem{T}) where {T <: NCRingElement} = A.data::dense_matrix_type(T)
 
 ###############################################################################
 #
