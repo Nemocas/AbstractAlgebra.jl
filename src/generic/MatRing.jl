@@ -35,9 +35,9 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 #
 ###############################################################################
 
-number_of_rows(a::MatRingElem) = nrows(a.data)::Int  # Julia needs guidance here
+number_of_rows(a::MatRingElem) = nrows(matrix(a))
 
-number_of_columns(a::MatRingElem) = ncols(a.data)::Int  # Julia needs guidance here
+number_of_columns(a::MatRingElem) = ncols(matrix(a))
 
 Base.@propagate_inbounds getindex(a::MatRingElem, r::Int, c::Int) = a.data[r, c]
 
