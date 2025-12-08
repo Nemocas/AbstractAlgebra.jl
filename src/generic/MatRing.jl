@@ -35,9 +35,9 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 #
 ###############################################################################
 
-number_of_rows(a::MatRingElem) = nrows(a.data)
+number_of_rows(a::MatRingElem) = nrows(a.data)::Int  # Julia needs guidance here
 
-number_of_columns(a::MatRingElem) = ncols(a.data)
+number_of_columns(a::MatRingElem) = ncols(a.data)::Int  # Julia needs guidance here
 
 Base.@propagate_inbounds getindex(a::MatRingElem, r::Int, c::Int) = a.data[r, c]
 
@@ -54,8 +54,8 @@ Base.isassigned(a::MatRingElem, i, j) = isassigned(a.data, i, j)
 #
 ###############################################################################
 
-function transpose(x::MatRingElem{T}) where T <: NCRingElement
-   return MatRingElem{T}(transpose(x.data))
+function transpose(x::MatRingElem)
+   return MatRingElem(transpose(matrix(x)))
 end
 
 ###############################################################################
@@ -67,30 +67,30 @@ end
 function _can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = M.data  # TODO: is this right?
-   BS = B.data  # TODO: is this right?
+   MS = matrix(M)
+   BS = matrix(B)
    flag, S = _can_solve_with_solution_lu(MS, BS)
-   SA = MatRingElem{T}(S)
+   SA = MatRingElem(S)
    return flag, SA
 end
 
 function AbstractAlgebra.can_solve_with_solution(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = M.data  # TODO: is this right?
-   BS = B.data  # TODO: is this right?
+   MS = matrix(M)
+   BS = matrix(B)
    flag, S = can_solve_with_solution(MS, BS)
-   SA = MatRingElem{T}(R, S.entries)
+   SA = MatRingElem(S)
    return flag, SA
 end
 
 function _can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = M.data # convert to ordinary matrix
-   BS = B.data
+   MS = matrix(M)
+   BS = matrix(B)
    flag, S, d = _can_solve_with_solution_fflu(MS, BS)
-   SA = MatRingElem{T}(S)
+   SA = MatRingElem(S)
    return flag, SA, d
 end
 
@@ -107,13 +107,13 @@ Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   return minpoly(S, M.data, charpoly_only)
+   return minpoly(S, matrix(M), charpoly_only)
 end
 
 function minpoly(M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    R = base_ring(M)
    Rx, x = polynomial_ring(R; cached=false)
-   return minpoly(Rx, M, charpoly_only)
+   return minpoly(Rx, matrix(M), charpoly_only)
 end
 
 ###############################################################################
@@ -123,7 +123,7 @@ end
 ###############################################################################
 
 function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
-   A.data = add!(A.data, B.data)
+   #=A.data ==# add!(A.data, B.data)  ### !!struct is NOT mutable!!
    return A
 end
 
@@ -147,20 +147,20 @@ end
 
 function (a::MatRing{T})() where {T <: NCRingElement}
    R = base_ring(a)
-   z = MatRingElem{T}(zero_matrix(R, a.n, a.n))
+   z = MatRingElem(zero_matrix(R, a.n, a.n))
    return z
 end
 
 function (a::MatRing{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   z = MatRingElem{T}(scalar_matrix(R, a.n, R(b)))
+   z = MatRingElem(scalar_matrix(R, a.n, R(b)))
    return z
 end
 
 # to resolve ambiguity for MatRing{MatRing{...}}
 function (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
    R = base_ring(a)
-   z = MatRingElem{T}(scalar_matrix(R, a.n, R(b)))
+   z = MatRingElem(scalar_matrix(R, a.n, R(b)))
    return z
 end
 
@@ -172,20 +172,21 @@ end
 function (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(nrows(a), ncols(a), b)
-   z = MatRingElem{T}(matrix(R, b))
+   z = MatRingElem(matrix(R, b))
    return z
 end
 
 function (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
-   R = base_ring(a)
    _check_dim(a.n, a.n, b)
-   z = MatRingElem{T}(matrix(R, b))
+   R = base_ring(a)
+   z = MatRingElem(matrix(R, b))
    return z
 end
 
 function (a::MatRing{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
-   _check_dim(a.n, a.n, b)
-   z = MatRingElem{T}(matrix(R, a.n, a.n, b))
+  _check_dim(a.n, a.n, b)
+   R = base_ring(a)
+   z = MatRingElem(matrix(R, a.n, a.n, b))
    return z
 end
 

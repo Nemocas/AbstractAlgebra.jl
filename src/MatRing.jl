@@ -89,9 +89,10 @@ Create an uninitialized matrix ring element over the given ring and dimension,
 with defaults based upon the given source matrix ring element `x`.
 """
 function similar(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x))
+   @assert (n >= 0) && (n < 2^30)   # so that n^2 cannot overflow
    TT = elem_type(R)
-   M = Matrix{TT}(undef, (n, n))
-   return Generic.MatRingElem{TT}(R, M)
+   M = fill(zero(R), n^2)
+   return Generic.MatRingElem(R, n, M)
 end
 
 similar(x::MatRingElem, n::Int) = similar(x, base_ring(x), n)
@@ -226,9 +227,30 @@ end
 
 ###############################################################################
 #
+#   Basic arithmetic -- delegate to MatElem
+#
+###############################################################################
+
+*(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) * matrix(y))
+
++(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) + matrix(y))
+
+-(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) - matrix(y))
+
+==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
+
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
+
+# TO DO: using pseudo_inv is not ideal
+#   consider case M = matrix(ZZmod4, 2,2, [2,1,0,1])
+#   pseudo_inv(M) gives error, but copuld give matrix(ZZ4, 2,2, [1,-1,0,2]) with denom=2
+# HINT: Consider using solve(f,g;side=:right)  or side=:left
+# The unused kwargs in the field cases are necessary for generic code to compile.
 
 function divexact_left(f::MatRingElem{T},
                        g::MatRingElem{T}; check::Bool=true) where T <: RingElement
@@ -237,7 +259,7 @@ function divexact_left(f::MatRingElem{T},
 end
 
 function divexact_right(f::MatRingElem{T},
-                       g::MatRingElem{T}; check::Bool=true) where T <: RingElement
+                        g::MatRingElem{T}; check::Bool=true) where T <: RingElement
    ginv, d = pseudo_inv(g)
    return divexact(f*ginv, d; check=check)
 end
@@ -297,6 +319,9 @@ function RandomExtensions.make(S::MatRing, vs...)
    end
 end
 
+# Sampler for a MatRing not needing arguments (passed via make)
+# this allows to obtain the Sampler in simple cases without having to know about make
+# (when one can do `rand(M)`, one can expect to be able to do `rand(Sampler(rng, M))`)
 Random.Sampler(::Type{RNG}, S::MatRing, n::Random.Repetition
                ) where {RNG<:AbstractRNG} =
    Random.Sampler(RNG, make(S), n)
@@ -402,14 +427,14 @@ end
 ###############################################################################
 
 function identity_matrix(M::MatRingElem{T}, n::Int) where T <: NCRingElement
-   R = base_ring(M)
-   arr = Matrix{T}(undef, n, n)
-   for i in 1:n
-      for j in 1:n
-         arr[i, j] = i == j ? one(R) : zero(R)
-      end
-   end
-   z = Generic.MatRingElem{T}(R, arr)
+  @assert (n >= 0) && (n < 2^30)   # so that n^2 cannot overflow
+  R = base_ring(M)
+  # ??Simpler??  Generic.MatRingElem(matrix_space(R,n,n)(1))
+  arr = fill(zero(R), n^2)
+  for i in 1:n
+    arr[i+(i-1)*n] = one(R)
+  end
+   z = Generic.MatRingElem(R, n, arr)::MatRingElem{T}
    return z
 end
 

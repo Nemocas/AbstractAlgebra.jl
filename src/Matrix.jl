@@ -27,7 +27,7 @@ base_ring(a::MatrixElem{T}) where {T <: NCRingElement} = a.base_ring::parent_typ
     is_zero_initialized(mat::T) where {T<:MatrixElem}
 
 Specify whether the default-constructed matrices of type `T`, via the
-`T(R::Ring, ::UndefInitializerm r::Int, c::Int)` constructor, are
+`T(R::Ring, ::UndefInitializer, r::Int, c::Int)` constructor, are
 zero-initialized. The default is `false`, and new matrix types should
 specialize this method to return `true` if suitable, to enable optimizations.
 """
@@ -823,7 +823,7 @@ end
 #
 ###############################################################################
 
-function +(x::T, y::T) where {T <: MatrixElem}
+function +(x::MatElem{T}, y::MatElem{T}) where {T}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -834,7 +834,7 @@ function +(x::T, y::T) where {T <: MatrixElem}
    return r
 end
 
-function -(x::T, y::T) where {T <: MatrixElem}
+function -(x::MatElem{T}, y::MatElem{T}) where {T}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -845,7 +845,7 @@ function -(x::T, y::T) where {T <: MatrixElem}
    return r
 end
 
-function *(x::T, y::T) where {T <: MatrixElem}
+function *(x::MatElem{T}, y::MatElem{T}) where {T}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
    base_ring(x) !== base_ring(y) && error("Base rings do not match")
    A = similar(x, nrows(x), ncols(y))
@@ -1197,7 +1197,7 @@ function Base.promote(x::MatrixElem{S},
                                                T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
-      return x, map(base_ring(x), y)
+      return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
    elseif U === T && length(y) != 0
       return change_base_ring(parent(y[1]), x), y
    else

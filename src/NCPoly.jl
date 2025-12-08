@@ -697,6 +697,8 @@ end
 #
 ###############################################################################
 
+##?? Base.eltype(::Type{M}) where {M<:NCPolyRing} = elem_type(M)
+
 RandomExtensions.maketype(S::NCPolyRing, dr::AbstractUnitRange{Int}, _) = elem_type(S)
 
 function RandomExtensions.make(S::NCPolyRing, deg_range::AbstractUnitRange{Int}, vs...)
@@ -714,6 +716,7 @@ function rand(rng::AbstractRNG,
                                          <:AbstractUnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
+   local f::elem_type(S)  # Julia needs some guidance
    f = S()
    x = gen(S)
    for i = 0:rand(rng, deg_range)

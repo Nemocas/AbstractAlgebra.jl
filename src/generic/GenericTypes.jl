@@ -1119,16 +1119,19 @@ end
 struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
    data::MatElem{T}
 
-   function MatRingElem{T}(A::MatElem{T}) where T <: NCRingElement
-      return new{T}(A)
+  function MatRingElem(A::MatElem{TT}) where TT <: NCRingElement
+    nrows(A) == ncols(A) || error("Matrix must be square")
+      return new{TT}(A)
    end
 end
 
-function MatRingElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
+function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
    @assert elem_type(R) === T
    t = matrix(R, n, n, A)
-   return MatRingElem{T}(t)
+   return MatRingElem(t)
 end
+
+matrix(A::MatRingElem) = A.data
 
 ###############################################################################
 #
