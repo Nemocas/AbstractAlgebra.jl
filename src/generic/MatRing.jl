@@ -186,7 +186,7 @@ end
 function (a::MatRing{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
   _check_dim(a.n, a.n, b)
    R = base_ring(a)
-   z = MatRingElem(matrix(R, a.n, a.n, b))
+   z = MatRingElem(R, a.n, b)
    return z
 end
 
