@@ -697,8 +697,6 @@ end
 #
 ###############################################################################
 
-##?? Base.eltype(::Type{M}) where {M<:NCPolyRing} = elem_type(M)
-
 RandomExtensions.maketype(S::NCPolyRing, dr::AbstractUnitRange{Int}, _) = elem_type(S)
 
 function RandomExtensions.make(S::NCPolyRing, deg_range::AbstractUnitRange{Int}, vs...)
