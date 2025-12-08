@@ -1178,7 +1178,7 @@ function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
    return MatRingElem(t)
 end
 
-matrix(A::MatRingElem) = A.data
+matrix(A::MatRingElem{T}) where {T} = A.data::dense_matrix_type(T)
 
 ###############################################################################
 #
