@@ -252,6 +252,17 @@ evaluate(a::Fac)
 getindex(a::Fac, b)
 setindex!(a::Fac{Int}, c::Int, b::Int)
 ```
+## Square root
+
+Rings may implement functionality for detecting and computing square roots.
+
+The exact behaviour depends on the ring. Some rings provide both operations,
+while others only implement `is_square`.
+
+```@docs
+is_square
+sqrt(::NCRingElem)
+```
 
 ## Miscellaneous
 

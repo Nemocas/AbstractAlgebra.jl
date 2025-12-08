@@ -176,6 +176,25 @@ function is_nilpotent(a::T) where {T <: NCRingElement}
 end
 
 
+@doc raw"""
+    is_square(a::T)  where {T <: NCRingElement}
+
+Return `true` iff `a` is the square of a value in its own ring.
+See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
+"""
+function is_square end
+
+@doc raw"""
+    sqrt(a::NCRingElem; check::Bool=true)
+
+Return a square root of `a`, if it exists. By default (`check=true`),
+implementations should raise an exception if `a` is not a square in its ring.
+If `check=false`, implementations may skip this verification.
+
+See also `is_square` and `is_square_with_sqrt`.
+"""
+sqrt(::NCRingElem)
+
 ###############################################################################
 #
 #   Characteristic

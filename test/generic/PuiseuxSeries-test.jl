@@ -42,9 +42,15 @@ end
    @test elem_type(Generic.PuiseuxSeriesRing{elem_type(S)}) == Generic.PuiseuxSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.PuiseuxSeriesRingElem{elem_type(S)}) == Generic.PuiseuxSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.PuiseuxSeriesField{Rational{BigInt}}) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}) == Generic.PuiseuxSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.PuiseuxSeriesRing)
    @test isa(T, Generic.PuiseuxSeriesRing)

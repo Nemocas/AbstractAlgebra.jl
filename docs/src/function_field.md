@@ -162,13 +162,7 @@ julia> h = gcd(f, g)
 
 ### Square root
 
-```@docs
-is_square(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
-```
-
-```@docs
-Base.sqrt(::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElem, U <: Union{PolyRingElem, MPolyRingElem}}
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `RationalFunctionFieldElem`.
 
 **Examples**
 

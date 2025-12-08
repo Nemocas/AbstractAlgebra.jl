@@ -154,6 +154,7 @@ export check_composable
 export check_parent
 export codomain
 export coeff
+export coeff!
 export coefficient_ring
 export coefficient_ring_type
 export coefficients
@@ -211,6 +212,7 @@ export evaluate
 export exp_gcd
 export exponent
 export exponent_vector
+export exponent_vector!
 export exponent_vectors
 export exponent_word
 export exponent_words
@@ -579,6 +581,7 @@ export symbols
 export tail
 export term
 export terms
+export term!
 export to_univariate
 export total_degree
 export total_ring_of_fractions
@@ -595,6 +598,7 @@ export use_karamul
 export valuation
 export var
 export var_index
+export var_indices
 export vars
 export vector_space
 export vector_space_dim

@@ -147,9 +147,13 @@ end
          @test symbols(S) == [:x, :y, :z]
 
          @test length(vars(S())) == 0
+         @test length(var_indices(S())) == 0
          @test vars(x^2 + 2x + 1) == [x]
+         @test var_indices(x^2 + 2x + 1) == [1]
          @test vars(x*y + 1) == [x, y]
+         @test var_indices(x*y + 1) == [1, 2]
          @test vars(x*y + z) == [x, y, z]
+         @test var_indices(x*y + z) == [1, 2, 3]
 
          @test internal_ordering(S) == ord
       end
@@ -989,7 +993,6 @@ end
 
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [ZZ(V[1])])
-         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [U(V[1])])
          @test evaluate(f, [1], [V[1]]) == f(x=V[1])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])

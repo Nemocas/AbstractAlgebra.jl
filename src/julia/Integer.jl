@@ -311,11 +311,6 @@ function is_square_with_sqrt(a::BigInt)
    end
 end
 
-@doc raw"""
-    is_square(a::T) where T <: Integer
-
-Return true if $a$ is a square.
-"""
 function is_square(a::T) where T <: Integer
    if a < 0
       return false

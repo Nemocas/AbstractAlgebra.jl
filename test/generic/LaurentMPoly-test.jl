@@ -89,6 +89,9 @@ end
     @test a == sum(coefficients(a) .* monomials(a))
     @test a == L(collect(coefficients(a)), collect(exponent_vectors(a)))
     @test iszero((@inferred constant_coefficient(a)))
+    @test coeff(a, [-2, 1]) == 2
+    @test coeff(a, [1, -3]) == 3
+    @test coeff(a, [1, 1]) == 0
 
     b = MPolyBuildCtx(L)
     for (c, e) in zip(coefficients(a), exponent_vectors(a))

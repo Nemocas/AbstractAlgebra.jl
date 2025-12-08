@@ -385,20 +385,67 @@ end
 
 # Iterators
 
-struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra.RingElement}
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
+
+  function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f), elem_type(coefficient_ring_type(f))}(f, inplace)
+    if inplace
+      I.temp = zero(coefficient_ring(parent(f)))
+    end
+    return I
+  end
 end
 
-struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem}
-   poly::T
+# S may be the type of anything that can store an exponent vector, for example
+# Vector{Int}, ZZMatrix, ...
+mutable struct MPolyExponentVectors{T <: AbstractAlgebra.RingElem, S}
+  poly::T
+  inplace::Bool
+  temp::S # only used if inplace == true
+
+  function MPolyExponentVectors(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    return MPolyExponentVectors(Vector{Int}, f, inplace=inplace)
+  end
+
+  function MPolyExponentVectors(::Type{Vector{S}}, f::AbstractAlgebra.NCRingElem; inplace::Bool = false) where S
+    I = new{typeof(f), Vector{S}}(f, inplace)
+    if inplace
+      # Don't use `zeros`: If S === ZZRingElem, then all the entries would be identical
+      I.temp = [zero(S) for _ in 1:nvars(parent(f))]
+    end
+    return I
+  end
 end
 
-struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyTerms{T <: AbstractAlgebra.NCRingElem}
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
+
+  function MPolyTerms(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}(f, inplace)
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 end
 
-struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
-   poly::T
+mutable struct MPolyMonomials{T <: AbstractAlgebra.NCRingElem}
+  poly::T
+  inplace::Bool
+  temp::T # only used if inplace == true
+
+  function MPolyMonomials(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+    I = new{typeof(f)}(f, inplace)
+    if inplace
+      I.temp = zero(parent(f))
+    end
+    return I
+  end
 end
 
 mutable struct MPolyBuildCtx{T, S}
@@ -1295,11 +1342,11 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModule{T}
+@attributes mutable struct FreeModule{T <: NCRingElement} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
 
-   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
       return get_cached!(FreeModuleDict, (R, rank), cached) do
          new{T}(rank, R)
       end::FreeModule{T}
@@ -1308,11 +1355,11 @@ end
 
 const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
 
-struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
    parent::FreeModule{T}
    v::MatElem{T}
 
-   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: Union{RingElement, NCRingElem}
+   function FreeModuleElem{T}(m::FreeModule{T}, v::MatElem{T}) where T <: NCRingElement
       new{T}(m, v)
    end
 end

@@ -57,6 +57,14 @@ base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ri
 
 base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))
 
+coefficient_ring_type(T::Type{<:PuiseuxSeriesRing}) = base_ring_type(T)
+
+coefficient_ring_type(T::Type{<:PuiseuxSeriesField}) = base_ring_type(T)
+
+coefficient_ring(R::PuiseuxSeriesRing) = base_ring(R)
+
+coefficient_ring(R::PuiseuxSeriesField) = base_ring(R)
+
 @doc raw"""
     max_precision(R::PuiseuxSeriesRing{T}) where T <: RingElement
 
@@ -613,13 +621,6 @@ function sqrt_classical(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: Ri
    return true, S(s, sscale)
 end
 
-@doc raw"""
-    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
-
-Return the square root of the given Puiseux series $a$. By default the function
-will throw an exception if the input is not square. If `check=false` this test
-is omitted.
-"""
 function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    flag, s = sqrt_classical(a; check=check)
    check && !flag && error("Not a square in sqrt")

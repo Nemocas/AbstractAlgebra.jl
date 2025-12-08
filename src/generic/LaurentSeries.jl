@@ -41,6 +41,14 @@ base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_
 
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:LaurentSeriesRing}) = base_ring_type(T)
+
+coefficient_ring_type(T::Type{<:LaurentSeriesField}) = base_ring_type(T)
+
+coefficient_ring(R::LaurentSeriesRing) = base_ring(R)
+
+coefficient_ring(R::LaurentSeriesField) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
    return is_domain_type(S)
 end
@@ -1395,13 +1403,6 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
     return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    flag, s = sqrt_classical(a, check=check)
    check && !flag && error("Not a square in sqrt")

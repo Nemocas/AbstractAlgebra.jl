@@ -29,6 +29,10 @@ base_ring_type(::Type{<:SeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:SeriesRing}) = base_ring_type(T)
+
+coefficient_ring(R::SeriesRing) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
    return is_domain_type(S)
 end
@@ -1172,13 +1176,6 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::RelPowerSeriesRingElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
 function Base.sqrt(a::RelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
