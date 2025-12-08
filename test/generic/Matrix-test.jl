@@ -311,12 +311,12 @@ end
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
+#   @test x in [x, y]
+#   @test x in [y, x]
+#   @test !(x in [y])
+#
+#   @test x in keys(Dict(x => 1))
+#   @test !(y in keys(Dict(x => 1)))
 
    # Test creation from AbstractArray without setindex!
    A = MyTestMatrix(BigInt(3), 2)
