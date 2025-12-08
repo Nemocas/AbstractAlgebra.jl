@@ -113,7 +113,7 @@ end
 function minpoly(M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    R = base_ring(M)
    Rx, x = polynomial_ring(R; cached=false)
-   return minpoly(Rx, matrix(M), charpoly_only)
+   return minpoly(Rx, M, charpoly_only)
 end
 
 ###############################################################################
