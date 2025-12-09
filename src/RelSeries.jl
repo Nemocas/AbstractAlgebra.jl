@@ -529,7 +529,7 @@ function *(a::T, b::RelPowerSeriesRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::RelPowerSeriesRingElem)
+function *(a::JuliaRingElement, b::RelPowerSeriesRingElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -545,7 +545,7 @@ end
 
 *(a::RelPowerSeriesRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::RelPowerSeriesRingElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::RelPowerSeriesRingElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -787,37 +787,17 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::RelPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                     ((pol_length(x) == 0 && iszero(base_ring(x)(y))) ||
                      (pol_length(x) == 1 && valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem) = y == x
+==(x::JuliaRingElement, y::RelPowerSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -900,7 +880,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::RelPowerSeriesRingElem, y::JuliaRingElement; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()

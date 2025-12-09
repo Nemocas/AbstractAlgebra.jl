@@ -193,7 +193,7 @@ function (a::NCPolyRing{T})() where T <: NCRingElem
    return z
 end
 
-function (a::NCPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElem
+function (a::NCPolyRing{T})(b::JuliaRingElement) where T <: NCRingElem
    z = NCPoly{T}(base_ring(a)(b))
    z.parent = a
    return z

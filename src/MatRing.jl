@@ -208,7 +208,7 @@ end
 #
 ###############################################################################
 
-function ==(x::MatRingElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::MatRingElem, y::JuliaRingElement)
    n = degree(x)
    for i = 1:n
       if x[i, i] != y
@@ -225,7 +225,7 @@ function ==(x::MatRingElem, y::Union{Integer, Rational, AbstractFloat})
    return true
 end
 
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatRingElem) = y == x
+==(x::JuliaRingElement, y::MatRingElem) = y == x
 
 function ==(x::MatRingElem{T}, y::T) where T <: NCRingElem
    n = degree(x)

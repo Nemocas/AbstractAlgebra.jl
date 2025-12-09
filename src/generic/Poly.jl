@@ -381,7 +381,7 @@ function (a::PolyRing{T})() where T <: RingElement
    return z
 end
 
-function (a::PolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (a::PolyRing{T})(b::JuliaRingElement) where T <: RingElement
    z = Poly{T}(base_ring(a)(b))
    z.parent = a
    return z
