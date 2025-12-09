@@ -43,7 +43,7 @@ Base.@propagate_inbounds getindex(a::MatRingElem, r::Int, c::Int) = matrix(a)[r,
 
 Base.@propagate_inbounds function setindex!(a::MatRingElem, d::NCRingElement,
                                             r::Int, c::Int)
-    matrix(a)[r, c] = base_ring(a)(d)
+    matrix(a)[r, c] = d
 end
 
 Base.isassigned(a::MatRingElem, i, j) = isassigned(matrix(a), i, j)

@@ -2619,8 +2619,6 @@ function minors_iterator(M::MatElem, k::Int)
   return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
 end
 
-# TODO: how to get the 'positions' of the minors?
-
 @doc raw"""
     minors_iterator_with_position(A::MatElem, k::Int)
 
