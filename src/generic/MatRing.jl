@@ -23,7 +23,7 @@ base_ring(a::MatRingElem{T}) where {T <: NCRingElement} = base_ring(matrix(a))
 
 Return the parent object of the given matrix.
 """
-parent(a::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(a), nrows(a.data))
+parent(a::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(a), nrows(matrix(a)))
 
 is_exact_type(::Type{MatRingElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
@@ -39,14 +39,14 @@ number_of_rows(a::MatRingElem) = nrows(matrix(a))
 
 number_of_columns(a::MatRingElem) = ncols(matrix(a))
 
-Base.@propagate_inbounds getindex(a::MatRingElem, r::Int, c::Int) = a.data[r, c]
+Base.@propagate_inbounds getindex(a::MatRingElem, r::Int, c::Int) = matrix(a)[r, c]
 
 Base.@propagate_inbounds function setindex!(a::MatRingElem, d::NCRingElement,
                                             r::Int, c::Int)
-    a.data[r, c] = base_ring(a)(d)
+    matrix(a)[r, c] = base_ring(a)(d)
 end
 
-Base.isassigned(a::MatRingElem, i, j) = isassigned(a.data, i, j)
+Base.isassigned(a::MatRingElem, i, j) = isassigned(matrix(a), i, j)
 
 ###############################################################################
 #
@@ -123,7 +123,7 @@ end
 ###############################################################################
 
 function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
-   #=A.data ==# add!(A.data, B.data)  ### !!struct is NOT mutable!!
+   #=A.data ==# add!(matrix(A), matrix(B))  ### !!struct is NOT mutable!!
    return A
 end
 
