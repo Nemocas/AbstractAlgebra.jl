@@ -96,7 +96,6 @@ export perm
 export permtype
 export polcoeff
 export poly
-export poly_ring
 export precision
 export preimage_map
 export prime
