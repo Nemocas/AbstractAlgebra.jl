@@ -1168,7 +1168,7 @@ struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
 
   function MatRingElem(A::MatElem{TT}) where TT <: NCRingElement
     nrows(A) == ncols(A) || error("Matrix must be square")
-      return new{TT}(A)
+    return new{TT}(A)
    end
 end
 
