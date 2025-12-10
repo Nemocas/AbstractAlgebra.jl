@@ -753,10 +753,9 @@ end
 ###############################################################################
 
 function evaluate(a::UnivPoly, A::Vector{<:NCRingElement})
-   isempty(A) && error("Too few values")
+   isempty(A) && error("Evaluating at an empty list of values is not allowed")
    a2 = data(a)
    varidx = var_indices(a2)
-   isempty(varidx) && return constant_coefficient(a2)
    vals = zeros(parent(A[1]), nvars(parent(a2)))
    n = length(A)
    for i in varidx
