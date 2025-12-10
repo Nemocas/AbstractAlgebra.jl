@@ -714,7 +714,6 @@ function rand(rng::AbstractRNG,
                                          <:AbstractUnitRange{Int}}})
    S, deg_range, v = sp[][1:end]
    R = base_ring(S)
-   local f::elem_type(S)  # Julia needs some guidance
    f = S()
    x = gen(S)
    for i = 0:rand(rng, deg_range)
