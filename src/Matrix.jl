@@ -814,7 +814,7 @@ end
 #
 ###############################################################################
 
-function +(x::MatElem{T}, y::MatElem{T}) where {T}
+function +(x::T, y::T) where {T <: MatElem}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
@@ -825,7 +825,7 @@ function +(x::MatElem{T}, y::MatElem{T}) where {T}
    return r
 end
 
-function -(x::MatElem{T}, y::MatElem{T}) where {T}
+function -(x::T, y::T) where {T <: MatElem}
    check_parent(x, y)
    r = similar(x)
    for i = 1:nrows(x)
