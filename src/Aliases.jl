@@ -38,7 +38,8 @@ function number_of_columns end
 function number_of_generators end
 function number_of_rows end
 function number_of_variables end
-function rels end
+function number_of_relations end
+function relations end
 
 @alias characteristic_polynomial charpoly
 @alias minimal_polynomial minpoly
@@ -46,4 +47,5 @@ function rels end
 @alias ngens number_of_generators
 @alias nrows number_of_rows
 @alias nvars number_of_variables
-@alias relations rels
+@alias rels relations
+@alias nrels number_of_relations
