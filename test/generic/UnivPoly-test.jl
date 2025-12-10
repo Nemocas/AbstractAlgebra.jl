@@ -12,7 +12,7 @@
          @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = true)[1] === universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = true)[1]
          @test universal_polynomial_ring(R, :x => 1:3 ; internal_ordering=ord, cached = false)[1] !== universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = false)[1]
 
-         S = universal_polynomial_ring(R; internal_ordering=ord)
+         S = universal_polynomial_ring(R; internal_ordering=ord, cached = false)
 
          x = gen(S, "x")
          @test x == S[1]
