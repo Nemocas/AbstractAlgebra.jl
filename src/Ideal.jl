@@ -12,12 +12,12 @@
 
 # fundamental interface
 @doc raw"""
-    ideal_type(R::T) where T <: Ring
-    ideal_type(::Type{T}) where T <: Ring
+    ideal_type(R)
+    ideal_type(::Type{T}) where T
 
 Return the type of ideals over the given ring `R`, respectively over rings of type `T`.
 """
-ideal_type(x::Ring) = ideal_type(typeof(x))
+ideal_type(x) = ideal_type(typeof(x))
 ideal_type(T::DataType) = throw(MethodError(ideal_type, (T,)))
 
 # We assume that the function
