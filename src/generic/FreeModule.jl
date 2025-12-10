@@ -24,7 +24,7 @@ elem_type(::Type{FreeModule{T}}) where T <: NCRingElement = FreeModuleElem{T}
 
 parent(m::FreeModuleElem{T}) where T <: NCRingElement = m.parent
 
-function rels(M::FreeModule{T}) where T <: RingElement
+function relations(M::FreeModule{T}) where T <: RingElement
    # there are no relations in a free module
    return Vector{dense_matrix_type(T)}(undef, 0)
 end

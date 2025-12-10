@@ -32,7 +32,7 @@ end
 
 invariant_factors(N::SNFModule{T}) where T <: RingElement = N.invariant_factors
 
-function rels(N::SNFModule{T}) where T <: RingElement
+function relations(N::SNFModule{T}) where T <: RingElement
    T1 = dense_matrix_type(T)
    R = base_ring(N)
    invs = invariant_factors(N)

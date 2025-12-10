@@ -89,6 +89,7 @@ Return a Julia array of the generators of the module $M$.
 
 ```julia
 rels(M::MyModule{T}) where T <: RingElement
+relations(M::MyModule{T}) where T <: RingElement
 ```
 
 Return a Julia vector of all the relations between the generators of `M`. Each

@@ -17,13 +17,20 @@
 end
 
 @doc raw"""
-    rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+    relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return a vector of all the relations between generators of the given
 module, where each relation is given as row matrix. The relation matrix
 whose rows are the returned relations will be in reduced form (hnf/rref).
 """
-rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
+relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
+
+@doc raw"""
+    rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+
+Alias for `relations(M)`.
+"""
+rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = relations(M)
 
 @doc raw"""
     is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
