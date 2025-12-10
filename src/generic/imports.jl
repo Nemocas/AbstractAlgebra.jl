@@ -104,6 +104,7 @@ import ..AbstractAlgebra: base_ring_type
 import ..AbstractAlgebra: canonical_unit
 import ..AbstractAlgebra: change_base_ring
 import ..AbstractAlgebra: characteristic
+import ..AbstractAlgebra: check_base_ring
 import ..AbstractAlgebra: check_parent
 import ..AbstractAlgebra: codomain
 import ..AbstractAlgebra: coeff

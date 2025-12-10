@@ -2104,6 +2104,7 @@ end
 ###############################################################################
 
 function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    return gens(I) == gens(J)
 end
 
@@ -2123,6 +2124,7 @@ end
 Return `true` if the ideal `I` is a subset of the ideal `J`.
 """
 function Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    return all(in(J), gens(I))
 end
 
@@ -2138,6 +2140,7 @@ end
 Return the intersection of the ideals `I` and `J`.
 """
 function intersect(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
@@ -2147,6 +2150,7 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyRingElem{U}}
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
@@ -2156,6 +2160,7 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: Abst
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
+   check_base_ring(I, J)
    if is_subset(J, I)
       return J
    elseif is_subset(I, J)
@@ -2179,6 +2184,7 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.MPolyRingElem{U}}
+   check_base_ring(I, J)
    if is_subset(J, I)
       return J
    elseif is_subset(I, J)
@@ -2208,6 +2214,7 @@ end
 ###############################################################################
 
 function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
@@ -2215,6 +2222,7 @@ function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 end
 
 function *(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
