@@ -12,10 +12,10 @@
 
 # fundamental interface
 @doc raw"""
-    ideal_type(::Ring)
-    ideal_type(::Type{T}) where {T <: Ring}
+    ideal_type(R::T) where T <: Ring
+    ideal_type(::Type{T}) where T <: Ring
 
-Return the type of ideals over the given ring, respectively over rings of the given type
+Return the type of ideals over the given ring `R`, respectively over rings of type `T`.
 """
 ideal_type(x::Ring) = ideal_type(typeof(x))
 ideal_type(T::DataType) = throw(MethodError(ideal_type, (T,)))
