@@ -89,8 +89,8 @@ Create an uninitialized matrix ring element over the given ring and dimension,
 with defaults based upon the given source matrix ring element `x`.
 """
 function similar(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x))
-   (n >= 0) || error("Matrix dimension must be non-negative")
-   (n < 2^30) || error("Matrix dimension is excessively large")
+   @req (n >= 0)  "Matrix dimension must be non-negative"
+   @req (n < 2^30)  "Matrix dimension is excessively large"
    return Generic.MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
 end
 
@@ -426,7 +426,8 @@ end
 ###############################################################################
 
 function identity_matrix(M::MatRingElem{T}, n::Int) where T <: NCRingElement
-  @assert (n >= 0) && (n < 2^30)   # so that n^2 cannot overflow
+  @req (n >= 0)  "Matrix dimension must be non-negative"
+  @req (n < 2^30)  "Matrix dimension is excessively large"
   R = base_ring(M)
   return Generic.MatRingElem(identity_matrix(R,n))
 end
