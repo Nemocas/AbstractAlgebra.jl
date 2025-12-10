@@ -233,6 +233,12 @@ function check_parent(a, b, throw::Bool = true)
    return flag
 end
 
+function check_base_ring(a, b, throw::Bool = true)
+   flag = base_ring(a) === base_ring(b)
+   flag || !throw || error("base rings do not match")
+   return flag
+end
+
 include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
