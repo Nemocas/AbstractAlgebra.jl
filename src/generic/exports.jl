@@ -102,6 +102,7 @@ export prime
 export push_term!
 export reduce!
 export rel_series_type
+export relations
 export rels
 export rescale!
 export retraction_map
