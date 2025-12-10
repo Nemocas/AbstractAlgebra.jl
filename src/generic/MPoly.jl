@@ -77,18 +77,17 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
    return a([one(base_ring(a))], exps)
 end
 
-function vars(p::MPoly{T}) where {T <: RingElement}
-   vars_in_p = Vector{MPoly{T}}(undef, 0)
-   n = nvars(p.parent)
+function var_indices(p::MPoly)
+   vars_in_p = Int[]
+   n = nvars(parent(p))
    exps = p.exps
-   gen_list = gens(p.parent)
    for j = 1:n
       for i = 1:length(p)
          if exps[j, i] > 0
             if p.parent.ord == :degrevlex
-               push!(vars_in_p, gen_list[j])
+               push!(vars_in_p, j)
             else
-               push!(vars_in_p, gen_list[n - j + 1])
+               push!(vars_in_p, n - j + 1)
             end
             break
          end
@@ -97,7 +96,12 @@ function vars(p::MPoly{T}) where {T <: RingElement}
    if p.parent.ord != :degrevlex
       vars_in_p = reverse(vars_in_p)
    end
-   return(vars_in_p)
+   return vars_in_p
+end
+
+function vars(p::MPoly{T}) where {T <: RingElement}
+   R = parent(p)
+   return MPoly{T}[gen(R, i) for i in var_indices(p)]
 end
 
 @doc raw"""
@@ -125,19 +129,35 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+  return exponent_vector(Vector{Int}, a, i)
+end
+
+function exponent_vector(::Type{Vector{S}}, a::MPoly{T}, i::Int) where {T <: RingElement, S}
+  e = Vector{S}(undef, nvars(parent(a)))
+  return exponent_vector!(e, a, i)
+end
+
+function exponent_vector!(e::Vector{S}, a::MPoly{T}, i::Int) where {T <: RingElement, S}
+   @assert length(e) == nvars(parent(a))
    A = a.exps
    N = size(A, 1)
 
    ord = internal_ordering(parent(a))
    if ord == :lex
-      return [Int(A[j, i]) for j in N:-1:1]
+      range = N:-1:1
    elseif ord == :deglex
-      return [Int(A[j, i]) for j in N - 1:-1:1]
+      range = N - 1:-1:1
    elseif ord == :degrevlex
-      return [Int(A[j, i]) for j in 1:N - 1]
+      range = 1:N - 1
    else
       error("invalid ordering")
    end
+   k = 1
+   for j in range
+      e[k] = S(A[j, i])
+      k += 1
+   end
+   return e
 end
 
 @doc raw"""
@@ -604,25 +624,23 @@ function AbstractAlgebra._is_gen_with_index(x::MPoly)
  end
 
 @doc raw"""
-    is_homogeneous(x::MPoly{T}) where {T <: RingElement}
+    is_homogeneous(x::MPolyRingElem)
 
-Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
+Return `true` if the given polynomial is homogeneous with respect to the
+standard grading and `false` otherwise. Here by standard grading we mean that
+all variables of the polynomial ring are graded with weight 1.
 """
-function is_homogeneous(x::MPoly{T}) where {T <: RingElement}
+function is_homogeneous(x::MPolyRingElem)
    last_deg = 0
    is_first = true
 
    for e in exponent_vectors(x)
       d = sum(e)
-      if !is_first
-         if d != last_deg
-            return false
-         else
-            last_deg = d
-         end
-      else
+      if is_first
          is_first = false
          last_deg = d
+      elseif d != last_deg
+         return false
       end
    end
    return true
@@ -637,12 +655,14 @@ function coeff(x::MPoly, i::Int)
    return x.coeffs[i]
 end
 
+# Only for compatibility, we can't do anything in place here
+function coeff!(c::T, x::MPoly{T}, i::Int) where T <: RingElement
+  return x.coeffs[i]
+end
+
 function trailing_coefficient(p::MPoly{T}) where T <: RingElement
-   if iszero(p)
-      return zero(base_ring(p))
-   else
-      return coeff(p, length(p))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
+   return coeff(p, length(p))
 end
 
 @doc raw"""
@@ -669,7 +689,9 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
    N = size(x.exps, 1)
    fit!(m, 1)
    monomial_set!(m.exps, 1, x.exps, i, N)
-   m.coeffs[1] = one(base_ring(x))
+   if !isassigned(m.coeffs, 1) || !is_one(m.coeffs[1])
+     m.coeffs[1] = one(base_ring(x))
+   end
    m.length = 1
    return m
 end
@@ -680,11 +702,17 @@ end
 Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 """
 function term(x::MPoly, i::Int)
-   R = base_ring(x)
+   y = zero(parent(x))
+   return term!(y, x, i)
+end
+
+function term!(y::T, x::T, i::Int) where T <: MPoly
    N = size(x.exps, 1)
-   exps = Matrix{UInt}(undef, N, 1)
-   monomial_set!(exps, 1, x.exps, i, N)
-   return parent(x)([deepcopy(x.coeffs[i])], exps)
+   fit!(y, 1)
+   monomial_set!(y.exps, 1, x.exps, i, N)
+   y.coeffs[1] = deepcopy(x.coeffs[i])
+   y.length = 1
+   return y
 end
 
 @doc raw"""
@@ -792,7 +820,7 @@ isone(x::MPoly) = is_trivial(parent(x)) || (x.length == 1 && monomial_iszero(x.e
 
 is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
+function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
@@ -809,69 +837,41 @@ Base.copy(f::Generic.MPoly) = deepcopy(f)
 #
 ###############################################################################
 
-function Base.iterate(x::MPolyCoeffs)
-   if length(x.poly) >= 1
-      return coeff(x.poly, 1), 1
+function Base.iterate(x::MPolyCoeffs, state::Union{Nothing, Int} = nothing)
+   s = isnothing(state) ? 1 : state + 1
+   if length(x.poly) >= s
+      c = x.inplace ? coeff!(x.temp, x.poly, s) : coeff(x.poly, s)
+      return c, s
    else
       return nothing
    end
 end
 
-function Base.iterate(x::MPolyCoeffs, state)
-   state += 1
-   if length(x.poly) >= state
-      return coeff(x.poly, state), state
+function Base.iterate(x::MPolyExponentVectors{T, S}, state::Union{Nothing, Int} = nothing) where {T, S}
+   s = isnothing(state) ? 1 : state + 1
+   if length(x.poly) >= s
+      v = x.inplace ? exponent_vector!(x.temp, x.poly, s) : exponent_vector(S, x.poly, s)
+      return v, s
    else
       return nothing
    end
 end
 
-function Base.iterate(x::MPolyExponentVectors)
-   if length(x.poly) >= 1
-      return exponent_vector(x.poly, 1), 1
+function Base.iterate(x::MPolyTerms, state::Union{Nothing, Int} = nothing)
+   s = isnothing(state) ? 1 : state + 1
+   if length(x.poly) >= s
+      t = x.inplace ? term!(x.temp, x.poly, s) : term(x.poly, s)
+      return t, s
    else
       return nothing
    end
 end
 
-function Base.iterate(x::MPolyExponentVectors, state)
-   state += 1
-   if length(x.poly) >= state
-      return exponent_vector(x.poly, state), state
-   else
-      return nothing
-   end
-end
-
-function Base.iterate(x::MPolyTerms)
-   if length(x.poly) >= 1
-      return term(x.poly, 1), 1
-   else
-      return nothing
-   end
-end
-
-function Base.iterate(x::MPolyTerms, state)
-   state += 1
-   if length(x.poly) >= state
-      return term(x.poly, state), state
-   else
-      return nothing
-   end
-end
-
-function Base.iterate(x::MPolyMonomials)
-   if length(x.poly) >= 1
-      return monomial(x.poly, 1), 1
-   else
-      return nothing
-   end
-end
-
-function Base.iterate(x::MPolyMonomials, state)
-   state += 1
-   if length(x.poly) >= state
-      return monomial(x.poly, state), state
+function Base.iterate(x::MPolyMonomials, state::Union{Nothing, Int} = nothing)
+   s = isnothing(state) ? 1 : state + 1
+   if length(x.poly) >= s
+      m = x.inplace ? monomial!(x.temp, x.poly, s) : monomial(x.poly, s)
+      return m, s
    else
       return nothing
    end
@@ -881,12 +881,12 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(::Type{MPolyCoeffs{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T <: AbstractAlgebra.MPolyRingElem, S <: RingElement}
    return S
 end
 
-function Base.eltype(::Type{MPolyExponentVectors{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
-   return Vector{Int}
+function Base.eltype(::Type{MPolyExponentVectors{T, V}}) where {V, T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement}
+   return V
 end
 
 function Base.eltype(::Type{MPolyMonomials{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
@@ -1892,7 +1892,7 @@ end
 #
 ###############################################################################
 
-function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+function *(a::MPoly, n::JuliaRingElement)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -1928,11 +1928,11 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a*n
+*(n::JuliaRingElement, a::MPoly) = a*n
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
-function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::MPoly, n::JuliaRingElement; check::Bool=true)
    N = size(a.exps, 1)
    r = zero(a)
    fit!(r, length(a))
@@ -2013,7 +2013,7 @@ end
 #
 ###############################################################################
 
-function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+function ==(a::MPoly, n::JuliaRingElement)
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -2025,7 +2025,7 @@ function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    return false
 end
 
-==(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a == n
+==(n::JuliaRingElement, a::MPoly) = a == n
 
 function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
@@ -3320,13 +3320,13 @@ function (a::MPoly{T})(vals::T...) where T <: RingElement
    return evaluate(a, [vals...])
 end
 
-function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: JuliaRingElement}
    length(vals) + 1 != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [val, vals...])
 end
 
 @doc raw"""
-    (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+    (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
 
 Evaluate the polynomial at the supplied values, which may be any ring elements,
 commutative or non-commutative. Evaluation always proceeds in the order of the
@@ -3336,7 +3336,7 @@ all of the supplied values in order is defined. Note that this evaluation is
 more general than those provided by the evaluate function. The values do not
 need to be in the same ring, just in compatible rings.
 """
-function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+function (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
@@ -3348,17 +3348,13 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    powers = [Dict{Int, Any}() for i in 1:length(vals)]
    # First work out types of products
    r = R()
-   c = zero(R)
-   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W !== BigInt) ||
           (W <: Rational && W !== Rational{BigInt}))
-         c = c*zero(W)
-         U[j] = parent(c)
+         r = r*zero(W)
       else
-         U[j] = parent(vals[j])
-         c = c*zero(parent(vals[j]))
+         r = r*zero(parent(vals[j]))
       end
    end
    cvzip = zip(coefficients(a), exponent_vectors(a))
@@ -4033,23 +4029,18 @@ function (a::MPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-@doc raw"""
-    (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
-
-Construct the constant polynomial `b` in the given polynomial ring.
-"""
-function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    z = MPoly{T}(a, base_ring(a)(b))
    return z
 end
 
-function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+function (a::MPolyRing{T})(b::T) where {T <: JuliaRingElement}
    z = MPoly{T}(a, b)
    return z
 end
 
 @doc raw"""
-    (a::MPolyRing{T})(b::T) where {T <: RingElement}
+    (a::MPolyRing)(b::RingElement)
 
 Construct the constant polynomial `b` in the given polynomial ring.
 """

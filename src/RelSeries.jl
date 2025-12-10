@@ -29,6 +29,10 @@ base_ring_type(::Type{<:SeriesRing{T}}) where T <: RingElement = parent_type(T)
 
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:SeriesRing}) = base_ring_type(T)
+
+coefficient_ring(R::SeriesRing) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: SeriesElem{S}}
    return is_domain_type(S)
 end
@@ -525,7 +529,7 @@ function *(a::T, b::RelPowerSeriesRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::RelPowerSeriesRingElem)
+function *(a::JuliaRingElement, b::RelPowerSeriesRingElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -541,7 +545,7 @@ end
 
 *(a::RelPowerSeriesRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::RelPowerSeriesRingElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::RelPowerSeriesRingElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -783,37 +787,17 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::RelPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::RelPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::RelPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                     ((pol_length(x) == 0 && iszero(base_ring(x)(y))) ||
                      (pol_length(x) == 1 && valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::RelPowerSeriesRingElem) = y == x
+==(x::JuliaRingElement, y::RelPowerSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -896,7 +880,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::RelPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::RelPowerSeriesRingElem, y::JuliaRingElement; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1172,13 +1156,6 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::RelPowerSeriesRingElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
 function Base.sqrt(a::RelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag

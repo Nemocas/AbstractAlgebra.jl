@@ -230,9 +230,11 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
       test_NCRing_interface(R; reps = reps)
 
       @testset "Basic functionality for commutative rings only" begin
-         @test isone(AbstractAlgebra.inv(one(R)))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
-         test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
+         # FIXME: we can't expect general rings to support inv, not even for the one
+         # element, so don't test this
+         #@test isone(AbstractAlgebra.inv(one(R)))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, one(R))
+         #test_mutating_op_like_neg(AbstractAlgebra.inv, inv!, -one(R))
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
@@ -493,6 +495,16 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
         reverse!(p, 2)
         @test p == 2
       end
+      
+      @testset "shifting" begin
+        p = x^2 + 2*x + 3
+        @test shift_left!(p, 1) == x^3 + 2*x^2 + 3*x
+        @test shift_left!(p, 3) == x^6 + 2*x^5 + 3*x^4
+        
+        p = x^2 + 2*x + 3
+        @test shift_right!(p, 1) == x + 2
+        @test shift_right!(p, 2) == zero(Rx)
+      end
    end
 
    return nothing
@@ -554,6 +566,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 0
          @test total_degree(a) < 0
          @test all(is_negative, degrees(a))
@@ -565,6 +578,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 0
          @test degrees(a) == [0, 0]
@@ -576,6 +590,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 1
          @test degrees(a) == [1, 0]
@@ -587,6 +602,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test is_homogeneous(a)
          @test length(a) == 1
          @test total_degree(a) == 2
          @test degrees(a) == [2, 0]
@@ -611,6 +627,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
          @test !is_gen(a)
          @test !is_unit(a)
          @test !is_nilpotent(a)
+         @test !is_homogeneous(a)
          @test length(a) == 2
          @test total_degree(a) == 4
          @test degrees(a) == [3, 4]

@@ -44,12 +44,18 @@
    TT = fraction_field(polynomial_ring(QQ, "x")[1])
    a = TT(1)
    b = T(2)
+   @test is_perfect(TT)
 
    @test a in [a, b]
    @test a in [b, a]
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(b in keys(Dict(a => 1)))
+
+   # trivial rings can not be fields
+   R = residue_ring(ZZ, 1)[1]
+   @test is_trivial(R)
+   @test_throws ArgumentError fraction_field(R)
 end
 
 @testset "Generic.FracFieldElem.printing" begin
@@ -280,17 +286,24 @@ end
 end
 
 @testset "Generic.FracFieldElem.evaluate" begin
+   # univariate
    R, = residue_ring(ZZ, 5)
    S, x = polynomial_ring(R, "x")
 
    f = (x^2 + 2)//(x + 1)
+   @test f isa Generic.FracFieldElem
 
    @test evaluate(f, 1) == R(4)
    @test evaluate(f, R(1)) == R(4)
 
+   @test f(1) == R(4)
+   @test f(R(1)) == R(4)
+
+   # multivariate
    R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    f = (x^2 + y)//(y + 2)
+   @test f isa Generic.FracFieldElem
 
    @test evaluate(f, [1, 2]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
@@ -298,16 +311,24 @@ end
    @test evaluate(f, [2, 1], [ZZ(2), ZZ(1)]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [1], [ZZ(2)]) == (y + 4)//(y + 2)
 
+   @test f(1, 2) == ZZ(3)//ZZ(4)
+   @test f(ZZ(1), ZZ(2)) == ZZ(3)//ZZ(4)
+
+   # universal
    R = universal_polynomial_ring(ZZ)
    x, y = gens(R, [:x, :y])
 
    f = (x^2 + y)//(y + 2)
+   @test f isa Generic.FracFieldElem
 
    @test evaluate(f, [1, 2]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [1, 2], [ZZ(1), ZZ(2)]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [2, 1], [ZZ(2), ZZ(1)]) == ZZ(3)//ZZ(4)
    @test evaluate(f, [1], [ZZ(2)]) == (y + 4)//(y + 2)
+
+   @test f(1, 2) == ZZ(3)//ZZ(4)
+   @test f(ZZ(1), ZZ(2)) == ZZ(3)//ZZ(4)
 end
 
 @testset "Generic.FracFieldElem.derivative" begin

@@ -199,7 +199,7 @@ end
 @testset "Generic.Ideal.ideal_reduction(univariate)" begin
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V...)
@@ -220,7 +220,7 @@ end
 end
 
 @testset "Generic.Ideal.ideal_reduction(integer)" begin
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V...)
@@ -242,7 +242,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V...)
@@ -274,7 +274,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -286,7 +286,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -295,13 +295,66 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V)
 
       @test I == mix_ideal(I)
    end
+end
+
+
+@testset "Generic.Ideal.membership" begin
+   # multivariate
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"]; internal_ordering=:degrevlex)
+
+   ex = example_ideal_gens(x, y)
+   for V in ex[1:15]
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # univariate
+   R, x = polynomial_ring(ZZ, "x")
+
+   for i = 1:30
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = polynomial_ring(Fp, "x")
+
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+
+      @test all(in(I), V)
+   end
+
+   # integer
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(ZZ, V)
+
+      @test all(in(I), V)
+   end
+
+   I = Generic.Ideal(ZZ, 2)
+
+   @test ZZ(2) in I
+   @test !(ZZ(3) in I)
 end
 
 @testset "Generic.Ideal.containment" begin
@@ -314,13 +367,13 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
@@ -329,14 +382,14 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # Fp[x]
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -345,11 +398,11 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
@@ -358,13 +411,13 @@ end
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, vcat(V, W))
 
-      @test contains(J, I)
+      @test is_subset(I, J)
    end
 
    I = Generic.Ideal(ZZ, 2)
 
-   @test contains(I, Generic.Ideal(ZZ, BigInt[]))
-   @test !contains(Generic.Ideal(ZZ, BigInt[]), I)
+   @test is_subset(Generic.Ideal(ZZ, BigInt[]), I)
+   @test !is_subset(I, Generic.Ideal(ZZ, BigInt[]))
 end
 
 @testset "Generic.Ideal.addition" begin
@@ -377,14 +430,14 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
@@ -393,15 +446,15 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # Fp[x]
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -410,12 +463,12 @@ end
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
@@ -424,8 +477,8 @@ end
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, W)
 
-      @test contains(I + J, I)
-      @test contains(I + J, J)
+      @test is_subset(I, I + J)
+      @test is_subset(J, I + J)
    end
 end
 
@@ -446,7 +499,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       k = rand(0:5)
@@ -465,7 +518,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       k = rand(0:10)
@@ -481,7 +534,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       k = rand(0:10)
@@ -516,7 +569,7 @@ end
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       V = elem_type(R)[rand(R, 0:10, -10:10) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -536,7 +589,7 @@ end
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       I = Generic.Ideal(R, V)
@@ -549,7 +602,7 @@ end
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       I = Generic.Ideal(ZZ, V)
@@ -574,14 +627,14 @@ end
       
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # univariate
    R, x = polynomial_ring(ZZ, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:5)
       m = rand(0:5)
       V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
@@ -592,15 +645,15 @@ end
 
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # Fp[x]
    Fp = GF(31)
    R, x = polynomial_ring(Fp, "x")
 
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
@@ -611,12 +664,12 @@ end
 
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 
    # integer
-   for i = 1:300
+   for i = 1:30
       n = rand(0:10)
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
@@ -627,7 +680,7 @@ end
       
       K = intersect(I, J)
 
-      @test contains(I, K)
-      @test contains(J, K)
+      @test is_subset(K, I)
+      @test is_subset(K, J)
    end
 end

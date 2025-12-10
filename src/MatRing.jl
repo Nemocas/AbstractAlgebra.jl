@@ -31,6 +31,7 @@ end
 
 number_of_rows(a::MatRing) = a.n
 number_of_columns(a::MatRing) = number_of_rows(a)
+vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.n * a.n
 
 @doc raw"""
     degree(a::MatRing)
@@ -70,7 +71,7 @@ function characteristic(a::MatRing)
    return characteristic(base_ring(a))
 end
 
-is_finite(R::MatRing) = iszero(nrows(a)) || is_finite(base_ring(R))
+is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 
 ###############################################################################
 #
@@ -151,7 +152,7 @@ end
 #
 ################################################################################
 
-is_square(a::MatRingElem) = true
+is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
 
 ###############################################################################
 #
@@ -207,7 +208,7 @@ end
 #
 ###############################################################################
 
-function ==(x::MatRingElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::MatRingElem, y::JuliaRingElement)
    n = degree(x)
    for i = 1:n
       if x[i, i] != y
@@ -224,7 +225,7 @@ function ==(x::MatRingElem, y::Union{Integer, Rational, AbstractFloat})
    return true
 end
 
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatRingElem) = y == x
+==(x::JuliaRingElement, y::MatRingElem) = y == x
 
 function ==(x::MatRingElem{T}, y::T) where T <: NCRingElem
    n = degree(x)

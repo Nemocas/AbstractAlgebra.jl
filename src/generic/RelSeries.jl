@@ -50,6 +50,8 @@ function gen(R::RelPowerSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
+number_of_variables(R::RelPowerSeriesRing) = 1
+
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
    coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
@@ -364,7 +366,7 @@ function (R::RelPowerSeriesRing{T})() where T <: RingElement
    return z
 end
 
-function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    bb = base_ring(R)(b)
    if is_zero(bb)
       z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)

@@ -61,7 +61,7 @@ end
 #
 ###############################################################################
 
-+(x::NCRingElem) = x
++(x::NCRingElem) = deepcopy(x)
 
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
@@ -75,7 +75,7 @@ end
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
 
-*(x::NCRingElem) = x
+*(x::NCRingElem) = deepcopy(x)
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
@@ -106,7 +106,7 @@ end
 
 function divexact_left(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_left(x, parent(x)(y); check = check)
@@ -114,7 +114,7 @@ end
 
 function divexact_right(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_right(x, parent(x)(y); check = check)
@@ -122,11 +122,11 @@ end
 
 #Base.:/(x::ModuleElem, y::RingElement) = divexact_right(x, y; check=true)
 Base.:/(x::NCRingElem, y::NCRingElement) = divexact_right(x, y; check=true)
-Base.:/(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = divexact_right(x, y; check=true)
+Base.:/(x::NCRingElem, y::JuliaRingElement) = divexact_right(x, y; check=true)
 
 #Base.:\(y::RingElement, x::ModuleElem) = divexact_left(x, y; check=true)
 Base.:\(y::NCRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
-Base.:\(y::Union{Integer, Rational, AbstractFloat}, x::NCRingElem) = divexact_left(x, y; check=true)
+Base.:\(y::JuliaRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
@@ -175,6 +175,25 @@ function is_nilpotent(a::T) where {T <: NCRingElement}
   throw(NotImplementedError(:is_nilpotent, a))
 end
 
+
+@doc raw"""
+    is_square(a::T)  where {T <: NCRingElement}
+
+Return `true` iff `a` is the square of a value in its own ring.
+See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
+"""
+function is_square end
+
+@doc raw"""
+    sqrt(a::NCRingElem; check::Bool=true)
+
+Return a square root of `a`, if it exists. By default (`check=true`),
+implementations should raise an exception if `a` is not a square in its ring.
+If `check=false`, implementations may skip this verification.
+
+See also `is_square` and `is_square_with_sqrt`.
+"""
+sqrt(::NCRingElem)
 
 ###############################################################################
 #
@@ -300,6 +319,6 @@ Base.broadcastable(x::NCRingElem) = Ref(x)
 
 dot(x::NCRingElem, y::NCRingElem) = x * y
 
-dot(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = x * y
+dot(x::NCRingElem, y::JuliaRingElement) = x * y
 
-dot(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem) = x * y
+dot(x::JuliaRingElement, y::NCRingElem) = x * y

@@ -26,6 +26,9 @@ function pluralize(noun::String)
   # vertex -> vertices
   endswith(noun, "ex") && return noun[1:end-2] * "ices"
 
+  # box -> boxes
+  endswith(noun, "ox") && return noun[1:end-2] * "oxes"
+
   # polyhedron -> polyhedra
   endswith(noun, "ron") && return noun[1:end-2] * "a"
 

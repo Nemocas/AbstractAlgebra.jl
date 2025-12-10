@@ -1,3 +1,6 @@
+# FIXME: the doctest below is disabled because it takes way too long,
+# especially on macOS, see https://github.com/Nemocas/AbstractAlgebra.jl/issues/2083
+
 """
 Provides generic asymptotically fast matrix methods:
   - `mul` and `mul!` using the Strassen scheme
@@ -12,7 +15,7 @@ The speedup depends on the ring and the entry sizes.
 
 # Examples
 
-```jldoctest
+```julia
 julia> m = matrix(ZZ, rand(-10:10, 1000, 1000));
 
 julia> n1 = similar(m); n2 = similar(m); n3 = similar(m);

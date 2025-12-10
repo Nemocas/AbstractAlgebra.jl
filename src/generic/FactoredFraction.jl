@@ -76,7 +76,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
    return FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
                           deepcopy_internal(a.terms, dict),
                           a.parent)
@@ -403,7 +403,7 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem, v::Vector{<:RingElement})
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
@@ -411,12 +411,20 @@ function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingEle
     return z
 end
 
-function evaluate(f::FactoredFracFieldElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FactoredFracFieldElem, v::RingElement)
     z = evaluate(unit(f), v)
     for (b, e) in f
         z *= evaluate(b, v)^e
     end
     return z
+end
+
+function (a::FactoredFracFieldElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FactoredFracFieldElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ##############################################################################
@@ -707,11 +715,11 @@ end
 
 ###############################################################################
 #
-#   FactoredFractionField constructor
+#   factored_fraction_field constructor
 #
 ###############################################################################
 
-function FactoredFractionField(R::AbstractAlgebra.Ring; cached::Bool=true)
+function factored_fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    return FactoredFracField{AbstractAlgebra.elem_type(R)}(R, cached)
 end 
 

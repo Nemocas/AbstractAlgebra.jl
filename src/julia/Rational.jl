@@ -42,7 +42,7 @@ is_unit(a::Rational) = !is_zero(a)
 
 is_zero_divisor(a::Rational) = is_zero(a)
 
-canonical_unit(a::Rational)  = a
+canonical_unit(a::Rational) = iszero(a) ? one(a) : a
 
 function numerator(a::Rational, canonicalise::Bool=true)
    return Base.numerator(a) # all other types ignore canonicalise

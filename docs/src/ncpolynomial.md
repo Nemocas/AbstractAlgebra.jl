@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -350,8 +351,7 @@ x
 ### Evaluation
 
 ```@docs
-evaluate{T <: NCRingElem}(::NCPolyRingElem{T}, ::T)
-evaluate(::NCPolyRingElem, ::Integer)
+evaluate(::NCPolyRingElem, ::NCRingElem)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be

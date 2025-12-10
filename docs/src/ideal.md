@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -116,7 +117,7 @@ ideals.
 ### Containment
 
 ```@docs
-contains(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
+is_subset(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
 ```
 
 ```@docs
@@ -146,10 +147,10 @@ AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate p
 julia> J = Generic.Ideal(R, W)
 AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[282, 3*x + 255, x^2 + 107])
 
-julia> contains(J, I)
+julia> is_subset(I, J)
 false
 
-julia> contains(I, J)
+julia> is_subset(J, I)
 true
 
 julia> intersect(I, J) == J

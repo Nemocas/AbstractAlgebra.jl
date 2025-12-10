@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:MPolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:MPolyRing}) = base_ring_type(T)
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc raw"""
@@ -23,7 +24,7 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
 The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
 Falls back to `Generic.MPoly{T}`.
 
-See also [`mpoly_ring_type`](@ref), [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+See also [`mpoly_ring_type`](@ref), [`poly_type`](@ref) and [`poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -54,7 +55,7 @@ mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype o
 The type of multivariate polynomial rings with coefficients of type `T`
 respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
 
-See also [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+See also [`poly_type`](@ref) and [`poly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -89,22 +90,30 @@ Return the number of variables in `R`.
 number_of_generators(R::MPolyRing) = number_of_variables(R)
 
 @doc raw"""
+    var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the indices of the variables actually occurring in $p$.
+"""
+function var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+   isused = zeros(Int, nvars(parent(p)))
+   for v in exponent_vectors(p)
+      isused .|= v  # accumulate by OR-ing the exponent vectors
+   end
+   return findall(!iszero, isused)
+end
+
+@doc raw"""
     vars(p::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the variables actually occurring in $p$.
 """
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
    R = parent(p)
-   n = nvars(R)
-   isused = zeros(Int, n)
-   for v in exponent_vectors(p)
-      isused .|= v  # accumulate by OR-ing the exponent vectors
-   end
-   return [R[i] for i in 1:n if isused[i] != 0]
+   return [gen(R, i) for i in var_indices(p)]
 end
 
 @doc raw"""
-    var_index(p::MPolyRingElem{T}) where {T <: RingElement}
+    var_index(x::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
@@ -252,20 +261,18 @@ end
 Return the leading coefficient of the polynomial $p$.
 """
 function leading_coefficient(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      return zero(base_ring(p))
-   else
-      return first(coefficients(p))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
+   return first(coefficients(p))
 end
 
 @doc raw"""
     trailing_coefficient(p::MPolyRingElem)
 
 Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
-the last nonzero term, or zero if the polynomial is zero.
+the last nonzero term.
 """
 function trailing_coefficient(p::MPolyRingElem{T}) where T <: RingElement
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
    coeff = zero(base_ring(p))
    for c in coefficients(p)
       coeff = c
@@ -489,6 +496,26 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coefficients(x)))
 end
 
+function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return S.(exponent_vector(a, i))
+end
+
+function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return S.(exponent_vector(a, i))
+end
+
+function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+   return coeff(a, i)
+end
+
+function term!(t::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return term(a, i)
+end
+
+function monomial!(m::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return monomial(a, i)
+end
+
 ###############################################################################
 #
 #   Iterators
@@ -496,44 +523,76 @@ end
 ###############################################################################
 
 @doc raw"""
-    coefficients(a::MPolyRingElem{T}) where T <: RingElement
+    coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function coefficients(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyCoeffs(a)
+function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyCoeffs(a, inplace=inplace)
 end
 
 @doc raw"""
-    exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
+    exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the exponent vectors of the given polynomial. To
 retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyExponentVectors(a)
+function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyExponentVectors(a, inplace=inplace)
+end
+
+function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool = false) where {T <: RingElement, S}
+   return Generic.MPolyExponentVectors(Vector{S}, a, inplace=inplace)
 end
 
 @doc raw"""
-    monomials(a::MPolyRingElem{T}) where T <: RingElement
+    monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function monomials(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyMonomials(a)
+function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyMonomials(a, inplace=inplace)
 end
 
 @doc raw"""
-    terms(a::MPolyRingElem{T}) where T <: RingElement
+    terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function terms(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyTerms(a)
+function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyTerms(a, inplace=inplace)
 end
 
 ###############################################################################
@@ -1123,13 +1182,64 @@ $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if !is_univariate(p)
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
-   if is_constant(p)
+   if is_zero(p)
+      zero(R)
+   elseif is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
+end
+
+@doc raw"""
+    to_univariate(p::MPolyRingElem)
+
+Assuming the polynomial $p$ is actually a univariate polynomial in the
+variable $x$, convert the polynomial to a univariate polynomial in a
+univariate polynomial ring over the same base ring in the variable $x$.
+If $p$ is constant, it is considered to be a polynomial in the first
+variable of its parent. An exception is raised if the polynomial $p$
+involves more than one variable or if its parent has no variables.
+"""
+function to_univariate(p::MPolyRingElem)
+   S = parent(p)
+   iszero(ngens(S)) && error("Parent has no variables.")
+   is_uni, var = is_univariate_with_data(p)
+   is_uni || error("Polynomial is not univariate.")
+   if iszero(var)
+      var = 1
+   end
+   x = symbols(S)[var]
+   R, _ = base_ring(S)[x]
+   return to_univariate(R, p)
+end
+
+@doc raw"""
+    is_univariate_with_data(p::MPolyRingElem)
+
+Returns `(true, i)` if $p$ is a univariate polynomial in the `i`-th variable
+of its parent i.e. involves exactly one variable. If $p$ is constant,
+`(true, 0)` is returned. Otherwise `(false, 0)` is returned. The result
+depends on the terms of the polynomial, not simply on the number of
+variables in the polynomial ring.
+"""
+function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
+   if is_constant(p)
+      return true, 0
+   end
+   var = -1
+   for v in exponent_vectors(p)
+      n = count(x -> x != 0, v)
+      if n > 1
+         return false, 0
+      elseif n == 1
+         if var == -1
+            var = findfirst(x -> x != 0, v)::Int  # can't be nothing
+         elseif v[var] == 0
+            return false, 0
+         end
+      end
+   end
+   return true, var
 end
 
 @doc raw"""
@@ -1141,23 +1251,7 @@ otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
 function is_univariate(p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
-      return true
-   end
-   var = -1
-   for v in exponent_vectors(p)
-      n = count(x -> x != 0, v)
-      if n > 1
-         return false
-      elseif n == 1
-         if var == -1
-            var = findfirst(x -> x != 0, v)
-         elseif v[var] == 0
-            return false
-         end
-      end
-   end
-   return true
+   return is_univariate_with_data(p)[1]
 end
 
 @doc raw"""
@@ -1434,7 +1528,7 @@ function ConformanceTests.generate_element(Rx::MPolyRing)
   len_bound = 8
   exp_bound = rand(1:5)
   len = rand(0:len_bound)
-  coeffs = [ConformanceTests.generate_element(R) for _ in 1:len]
+  coeffs = elem_type(R)[ConformanceTests.generate_element(R) for _ in 1:len]
   exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
   return Rx(coeffs, exps)
 end

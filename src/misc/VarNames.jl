@@ -229,7 +229,7 @@ function normalise_keyword_arguments(args)
         kv = Expr(:parameters)
     end
     # Keyword arguments without previous `;`
-    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+    append!(kv.args, [Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))])
     # normal arguments
     args = (e for e in args if !Meta.isexpr(e, :(=)))
     return [kv, args...]
@@ -313,7 +313,7 @@ function n_vars_method(d::Dict{Symbol}, n, range)
         "an alternative name like `m`, not `$n`")
     quote
         $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
+            $f($(argnames...), (Symbol.(s, $range))::Vector{Symbol}; kv...)
     end
 end
 

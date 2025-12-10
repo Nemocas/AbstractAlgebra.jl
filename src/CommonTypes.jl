@@ -57,7 +57,7 @@ mutable struct Perm{T<:Integer} <: AbstractPerm
    cycles::CycleDec{T}
 
    function Perm(n::T) where T<:Integer
-      return new{T}(collect(T, 1:n), false)
+      return new{T}(collect(Base.OneTo(n)), false)
    end
 
    function Perm(v::AbstractVector{T}, check::Bool=true) where T<:Integer

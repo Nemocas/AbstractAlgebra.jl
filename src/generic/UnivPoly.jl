@@ -11,9 +11,9 @@
 ###############################################################################
 
 base_ring_type(::Type{<:UniversalPolyRing{T}}) where T = parent_type(T)
+base_ring(S::UniversalPolyRing) = base_ring(mpoly_ring(S))::base_ring_type(S)
 
-base_ring(S::UniversalPolyRing) = S.base_ring::base_ring_type(S)
-
+coefficient_ring_type(T::Type{<:UniversalPolyRing}) = base_ring_type(T)
 coefficient_ring(S::UniversalPolyRing) = base_ring(S)
 
 function is_domain_type(::Type{<:UnivPoly{S}}) where {S <: RingElement}
@@ -34,17 +34,11 @@ function mpoly_ring(S::UniversalPolyRing{T}) where {T<:RingElement}
   return S.mpoly_ring::mpoly_ring_type(T)
 end
 
-number_of_variables(S::UniversalPolyRing) = length(S.S)
+number_of_variables(S::UniversalPolyRing) = number_of_variables(mpoly_ring(S))
 
-number_of_generators(S::UniversalPolyRing) = length(S.S)
+number_of_generators(S::UniversalPolyRing) = number_of_generators(mpoly_ring(S))
 
-symbols(S::UniversalPolyRing) = S.S
-
-function vars(p::UnivPoly{T}) where {T}
-   S = parent(p)
-   V = vars(data(p))
-   return [UnivPoly{T}(v, S) for v in V]
-end
+symbols(S::UniversalPolyRing) = symbols(mpoly_ring(S))
 
 internal_ordering(p::UniversalPolyRing) = internal_ordering(mpoly_ring(p))
 
@@ -68,11 +62,9 @@ end
 function set_exponent_vector!(p::UnivPoly, i::Int, exps::Vector{Int})
    S = parent(p)
    len = length(exps)
-   if len != nvars(parent(data(p)))
-      p.p = upgrade(S, data(p))
-      if len < nvars(S)
-         exps = vcat(exps, zeros(Int, nvars(S) - len))
-      end
+   upgrade!(p)
+   if len < nvars(S)
+      exps = vcat(exps, zeros(Int, nvars(S) - len))
    end
    p.p = set_exponent_vector!(data(p), i, exps)
    return p
@@ -99,11 +91,9 @@ function setcoeff!(p::UnivPoly, exps::Vector{Int}, c::T) where T <: RingElement
    c = base_ring(data(p))(c)
    S = parent(p)
    len = length(exps)
-   if len != nvars(parent(data(p)))
-      p.p = upgrade(S, data(p))
-      if len < nvars(S)
-         exps = vcat(exps, zeros(Int, nvars(S) - len))
-      end
+   upgrade!(p)
+   if len < nvars(S)
+      exps = vcat(exps, zeros(Int, nvars(S) - len))
    end
    p.p = setcoeff!(data(p), exps, c)
    return p
@@ -150,28 +140,8 @@ is_term(p::UnivPoly) = is_term(data(p))
 coeff(p::UnivPoly, i::Int) = coeff(data(p), i)
 
 function coeff(p::UnivPoly{T}, m::UnivPoly{T}) where {T}
-   !is_monomial(m) && error("Not a monomial")
-   check_parent(p, m)
-   v1 = first(exponent_vectors(m))
-   len = length(v1)
-   n = nvars(parent(data(p)))
-   R = base_ring(p)
-   if len > n
-      if !iszero(v1[n + 1:len])
-         return zero(R)
-      end
-      v1 = v1[1:n]
-   end
-   if len < n
-      v1 = vcat(v1, zeros(Int, n - len))
-   end
-   cvzip = zip(coefficients(data(p)), exponent_vectors(data(p)))
-   for (c, v) in cvzip
-      if v == v1
-         return c
-      end
-   end
-   return zero(R)
+   p, m = univ_promote(p, m)
+   return coeff(data(p), data(m))
 end
 
 function monomial(p::UnivPoly{T}, i::Int) where {T}
@@ -246,27 +216,35 @@ length(p::UnivPoly) = length(data(p))
 
 function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
    idx = Int[]
+   current_symbols = symbols(S)
+   n = length(current_symbols)
+   added_symbols = Symbol[]
    for s_ in v
       s = Symbol(s_)
-      i = findfirst(==(s), S.S)
+      i = findfirst(==(s), current_symbols)
       if i === nothing
-         push!(S.S, s)
-         push!(idx, length(S.S))
+         push!(added_symbols, s)
+         push!(idx, n+length(added_symbols))
       else
          push!(idx, i)
       end
    end
-   if length(S.S) > ngens(S.mpoly_ring)
-      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), S.S; internal_ordering=S.ord, cached=false)
+   if !isempty(added_symbols)
+      new_symbols = vcat(current_symbols, added_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
    end
    return idx
 end
 
-gen(S::UniversalPolyRing, s::VarName) = gens(S, [s])[1]
-
-function gens(S::UniversalPolyRing{T}, v::Vector{<:VarName}) where {T <: RingElement}
-   idx = _ensure_variables(S, v)
-   return tuple((UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx)...)
+function gen(S::UniversalPolyRing, s::VarName)
+   i = findfirst(==(Symbol(s)), symbols(S))
+   if i === nothing
+      new_symbols = copy(symbols(S))
+      push!(new_symbols, Symbol(s))
+      i = length(new_symbols)
+      S.mpoly_ring = AbstractAlgebra.polynomial_ring_only(base_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+   end
+   return @inbounds gen(S, i)
 end
 
 function gen(S::UniversalPolyRing{T}, i::Int) where {T}
@@ -279,7 +257,26 @@ function gens(S::UniversalPolyRing{T}) where {T}
    return UnivPoly{T}[gen(S, i) for i in 1:n]
 end
 
+# HACK: we abuse the @varnames_interface macro to teach gens for UniversalPolyRing
+# some superpowers
+function _univ_poly_gens(S::UniversalPolyRing{T}, vars::Vector{Symbol}) where {T}
+   idx = _ensure_variables(S, vars)
+   # TRICK: @varnames_interface expects two return values, but we only care
+   # for the second; so just return literally nothing for the first
+   return nothing, [UnivPoly{T}(gen(mpoly_ring(S), i), S) for i in idx]
+end
+
+AbstractAlgebra.@varnames_interface _univ_poly_gens(R::UniversalPolyRing{T}, s) where {T}
+
+function gens(S::UniversalPolyRing{T}, a::AbstractAlgebra.VarNames, as::AbstractAlgebra.VarNames...) where {T}
+   res = _univ_poly_gens(S, a, as...)
+   length(res) == 2 && return res[2] # special case for improved backwards compatibility
+   return res[2:end]
+end
+
 var_index(x::UnivPoly) = var_index(data(x))
+
+var_indices(p::UnivPoly) = var_indices(data(p))
 
 function vars(p::UnivPoly{T}) where {T <: RingElement}
    V = vars(data(p))
@@ -308,6 +305,8 @@ end
 function deepcopy_internal(p::UnivPoly{T}, dict::IdDict) where {T}
    return UnivPoly{T}(deepcopy_internal(data(p), dict), parent(p))
 end
+
+Base.copy(f::UnivPoly{T}) where {T} = UnivPoly{T}(copy(data(f)), parent(f))
 
 ###############################################################################
 #
@@ -519,7 +518,7 @@ end
 
 for op in (:+, :-, :*)
   @eval begin
-    function $op(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}) where {T}
+    function $op(p::UnivPoly{T}, n::JuliaRingElement) where {T}
        S = parent(p)
        return UnivPoly{T}($op(data(p),n), S)
     end
@@ -529,7 +528,7 @@ for op in (:+, :-, :*)
        return UnivPoly{T}($op(data(p),n), S)
     end
 
-    function $op(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly{T}) where {T}
+    function $op(n::JuliaRingElement, p::UnivPoly{T}) where {T}
        S = parent(p)
        return UnivPoly{T}($op(n,data(p)), S)
     end
@@ -541,7 +540,7 @@ for op in (:+, :-, :*)
   end
 end
 
-function divexact(p::UnivPoly{T}, n::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where {T}
+function divexact(p::UnivPoly{T}, n::JuliaRingElement; check::Bool=true) where {T}
    S = parent(p)
    return UnivPoly{T}(divexact(data(p), n; check=check), S)
 end
@@ -608,20 +607,7 @@ end
 
 function isless(a::UnivPoly{T}, b::UnivPoly{T}) where {T}
    check_parent(a, b)
-   if parent(data(a)) === parent(data(b))
-      return isless(data(a), data(b))
-   end
-   S = parent(a)
-   num = nvars(S)
-   s = data(a)
-   t = data(b)
-   if nvars(parent(s)) != num
-      s = upgrade(S, s)
-   end
-   if nvars(parent(t)) != num
-      t = upgrade(S, t)
-   end
-   return isless(s, t)
+   return isless(data(upgrade!(a)), data(upgrade!(b)))
 end
 
 ###############################################################################
@@ -630,9 +616,9 @@ end
 #
 ###############################################################################
 
-==(p::UnivPoly, n::Union{Integer, Rational, AbstractFloat}) = data(p) == n
+==(p::UnivPoly, n::JuliaRingElement) = data(p) == n
 
-==(n::Union{Integer, Rational, AbstractFloat}, p::UnivPoly) = data(p) == n
+==(n::JuliaRingElement, p::UnivPoly) = data(p) == n
 
 ==(p::UnivPoly{T}, n::T) where {T <: RingElem} = data(p) == n
 
@@ -659,22 +645,15 @@ deflation(p::UnivPoly{T}) where {T} = deflation(data(p))
 
 function deflate(p::UnivPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where {T}
    S = parent(p)
+   num = nvars(S)
    vlen = length(shift)
    vlen != length(defl) && error("Vector lengths do not match")
-   num = nvars(parent(data(p)))
-   pp = data(p)
-   if vlen == num
-      return UnivPoly{T}(deflate(pp, shift, defl), S)
-   end
-   if vlen > num
-      pp = upgrade(S, pp)
-      num = nvars(parent(pp))
-   end
+   upgrade!(p)
    if vlen < num
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UnivPoly{T}(deflate(pp, shift, defl), S)
+   return UnivPoly{T}(deflate(data(p), shift, defl), S)
 end
 
 function deflate(p::UnivPoly{T}, defl::Vector{Int}) where {T}
@@ -683,22 +662,15 @@ end
 
 function inflate(p::UnivPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where {T}
    S = parent(p)
+   num = nvars(S)
    vlen = length(shift)
    vlen != length(defl) && error("Vector lengths do not match")
-   num = nvars(parent(data(p)))
-   pp = data(p)
-   if vlen == num
-      return UnivPoly{T}(inflate(pp, shift, defl), S)
-   end
-   if vlen > num
-      pp = upgrade(S, pp)
-      num = nvars(parent(pp))
-   end
+   upgrade!(p)
    if vlen < num
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UnivPoly{T}(inflate(pp, shift, defl), S)
+   return UnivPoly{T}(inflate(data(p), shift, defl), S)
 end
 
 function inflate(p::UnivPoly{T}, defl::Vector{Int}) where {T}
@@ -797,7 +769,7 @@ function evaluate(a::UnivPoly{T}, A::Vector{T}) where {T <: RingElem}
    return evaluate(data(a), A)
 end
 
-function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: Union{Integer, Rational, AbstractFloat}}
+function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: JuliaRingElement}
    n = length(A)
    num = nvars(parent(data(a)))
    if n > num
@@ -826,10 +798,10 @@ function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: Ri
    if n < num
       if n == 0
          R = base_ring(a)
-         return evaluate(data(a), zeros(R, num))
+         return evaluate(data(a), [zero(R) for _ in 1:num])
       else
          R = parent(A[1])
-         A = vcat(A, zeros(R, num - n))
+         A = vcat(A, [zero(R) for _ in 1:num-n])
          return evaluate(data(a), A)
      end
    end
@@ -844,11 +816,11 @@ function (a::UnivPoly{T})(vals::T...) where {T <: RingElement}
    return evaluate(a, [vals...])
 end
 
-function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: Union{Integer, Rational, AbstractFloat}}
+function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: JuliaRingElement}
    return evaluate(a, [val, vals...])
 end
 
-function (a::UnivPoly{T})(vals::Union{NCRingElem, RingElement}...) where {T <: RingElement}
+function (a::UnivPoly{T})(vals::NCRingElement...) where {T <: RingElement}
    A = [vals...]
    n = length(vals)
    num = nvars(parent(data(a)))
@@ -892,11 +864,11 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T
 end
 
 function (a::Union{MPolyRingElem, UniversalPolyRingElem})(;kwargs...)
-   S = parent(a)
+   ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
    vals = Array{RingElement}(undef, length(kwargs))
    for (i, (var, val)) in enumerate(kwargs)
-     vari = findfirst(isequal(var), S.S)
+     vari = findfirst(isequal(var), ss)
      vari === nothing && error("Given polynomial has no variable $var")
      vars[i] = vari
      vals[i] = val
@@ -930,7 +902,11 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UnivPoly{T}) where {T 
    return to_univariate(R, data(p))
 end
 
+to_univariate(p::UnivPoly) = to_univariate(data(p))
+
 is_univariate(p::UnivPoly) = is_univariate(data(p))
+
+is_univariate_with_data(p::UnivPoly) = is_univariate_with_data(data(p))
 
 is_univariate(R::UniversalPolyRing) = is_univariate(mpoly_ring(R))
 
@@ -944,17 +920,11 @@ end
 #
 ################################################################################
 
-function _change_univ_poly_ring(R, Rx, cached::Bool)
-   P = AbstractAlgebra.polynomial_ring_only(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)
-   S = universal_polynomial_ring(R; internal_ordering=internal_ordering(Rx), cached)
-   S.S = deepcopy(symbols(Rx))
-   S.mpoly_ring = P
-   return S
-end
+_change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
 function change_base_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
-   base_ring(parent) != R && error("Base rings do not match.")
-   return _map(R, p, parent)
+   upgrade!(p)
+   return UnivPoly(change_base_ring(R, data(p); parent = mpoly_ring(parent)), parent)
 end
 
 function change_coefficient_ring(R::Ring, p::UnivPoly{T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
@@ -968,17 +938,8 @@ end
 ################################################################################
 
 function map_coefficients(f::T, p::UnivPoly; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(base_ring(p)))), parent(p), cached)) where T
-   return _map(f, p, parent)
-end
-
-function _map(g::T, p::UnivPoly, Rx) where T
-   cvzip = zip(coefficients(p), exponent_vectors(p))
-   M = MPolyBuildCtx(Rx)
-   for (c, v) in cvzip
-      push_term!(M, g(c), v)
-   end
-
-   return finish(M)
+   upgrade!(p)
+   return UnivPoly(map_coefficients(f, data(p); parent = mpoly_ring(parent)), parent)
 end
 
 ###############################################################################
@@ -1165,27 +1126,23 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UniversalPolyRing{T}, pp::MPoly{T}) where {T}
-   alloc = length(pp.coeffs)
-   n = nvars(S) - nvars(parent(pp))
-   ctx = MPolyBuildCtx(mpoly_ring(S))
-   v0 = zeros(Int, n)
-   for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-      push_term!(ctx, c, vcat(v, v0))
-   end
-   p = finish(ctx)
-   fit!(p, alloc)
-   return p
-end
-
 function upgrade(S::UniversalPolyRing{T}, pp::MPolyRingElem{T}) where {T}
    n = nvars(S) - nvars(parent(pp))
-   ctx = MPolyBuildCtx(mpoly_ring(S))
-   v0 = zeros(Int, n)
-   for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-      push_term!(ctx, c, vcat(v, v0))
+   if n > 0
+      ctx = MPolyBuildCtx(mpoly_ring(S))
+      v0 = zeros(Int, n)
+      for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
+         push_term!(ctx, c, vcat(v, v0))
+      end
+      return finish(ctx)
+   else
+      return pp
    end
-   return finish(ctx)
+end
+
+function upgrade!(p::UnivPoly)
+   p.p = upgrade(parent(p), data(p))
+   return p
 end
 
 function (a::UniversalPolyRing{T})(b::RingElement) where {T <: RingElement}
@@ -1196,7 +1153,7 @@ function (a::UniversalPolyRing{T})() where {T <: RingElement}
    return UnivPoly{T}(mpoly_ring(a)(), a)
 end
 
-function (a::UniversalPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::UniversalPolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    return UnivPoly{T}(mpoly_ring(a)(b), a)
 end
 
@@ -1206,11 +1163,7 @@ end
 
 function (S::UniversalPolyRing{T})(p::UnivPoly{T}) where {T <: RingElement}
    parent(p) !== S && error("Unable to coerce")
-   n = nvars(S) - nvars(parent(data(p)))
-   if n != 0
-      p = UnivPoly{T}(upgrade(S, data(p)), S)
-   end
-   return p
+   return upgrade!(p)
 end
 
 function (a::UniversalPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}

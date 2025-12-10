@@ -74,7 +74,7 @@ base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_t
 
 parent(a::SparsePoly) = a.parent
 
-function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
+function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
    Re = Base.deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
@@ -257,7 +257,7 @@ end
 #
 ###############################################################################
 
-function *(a::SparsePoly, n::Union{Integer, Rational, AbstractFloat})
+function *(a::SparsePoly, n::JuliaRingElement)
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -291,7 +291,7 @@ end
 
 *(n::T, a::SparsePoly{T}) where {T <: RingElem} = a*n
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::SparsePoly) = a*n
+*(n::JuliaRingElement, a::SparsePoly) = a*n
 
 ###############################################################################
 #
@@ -317,12 +317,12 @@ end
 #
 ###############################################################################
 
-function ==(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::SparsePoly, b::JuliaRingElement)
    return length(a) == 0 ? b == 0 : a.length == 1 &&
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::Union{Integer, Rational, AbstractFloat}, b::SparsePoly) = b == a
+==(a::JuliaRingElement, b::SparsePoly) = b == a
 
 function ==(a::SparsePoly{T}, b::T) where T <: RingElem
    return length(a) == 0 ? iszero(b) : a.length == 1 &
@@ -435,7 +435,7 @@ function divexact(a::SparsePoly{T}, b::T; check::Bool=true) where {T <: RingElem
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::SparsePoly, b::JuliaRingElement; check::Bool=true)
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
@@ -682,22 +682,10 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    end
 end
 
-function content(a::SparsePoly{T}) where {T <: RingElem}
-   for i = 1:length(a)
-      if a.coeffs[i].length == 1
-         z = term_content(a.coeffs[1])
-         for j = 2:length(a)
-            if isone(z)
-               return z
-            end
-            z = gcd(z, term_content(a.coeffs[j]))
-         end
-         return z
-      end
-   end
+function content(a::SparsePoly{T}) where {T <: RingElement}
    z = base_ring(a)()
-   for i = 1:length(a)
-      z = gcd(coeff(a, i - 1), z)
+   for x in a.coeffs
+      z = gcd!(z, x)
    end
    return z
 end
@@ -785,7 +773,7 @@ function (a::SparsePolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::SparsePolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    z = SparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z

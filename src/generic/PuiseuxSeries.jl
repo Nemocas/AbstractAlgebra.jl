@@ -57,6 +57,14 @@ base_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = base_ring(laurent_ri
 
 base_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = base_ring(laurent_ring(R))
 
+coefficient_ring_type(T::Type{<:PuiseuxSeriesRing}) = base_ring_type(T)
+
+coefficient_ring_type(T::Type{<:PuiseuxSeriesField}) = base_ring_type(T)
+
+coefficient_ring(R::PuiseuxSeriesRing) = base_ring(R)
+
+coefficient_ring(R::PuiseuxSeriesField) = base_ring(R)
+
 @doc raw"""
     max_precision(R::PuiseuxSeriesRing{T}) where T <: RingElement
 
@@ -438,7 +446,7 @@ function *(a::PuiseuxSeriesElem{T}, b::T) where T <: RingElem
    return z
 end
 
-function *(a::PuiseuxSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::PuiseuxSeriesElem, b::JuliaRingElement)
    z = parent(a)(a.data*b, a.scale)
    z = rescale!(z)
    return z
@@ -446,7 +454,7 @@ end
 
 *(a::T, b::PuiseuxSeriesElem{T}) where T <: RingElem = b*a
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::PuiseuxSeriesElem) = b*a
+*(a::JuliaRingElement, b::PuiseuxSeriesElem) = b*a
 
 ###############################################################################
 #
@@ -484,7 +492,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::PuiseuxSeriesElem, y::JuliaRingElement; check::Bool=true)
    return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
@@ -578,9 +586,9 @@ end
 
 ==(x::T, y::PuiseuxSeriesElem{T}) where T <: RingElem = y == x
 
-==(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = x.data == y
+==(x::PuiseuxSeriesElem, y::JuliaRingElement) = x.data == y
 
-==(x::Union{Integer, Rational, AbstractFloat}, y::PuiseuxSeriesElem) = y == x
+==(x::JuliaRingElement, y::PuiseuxSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -613,13 +621,6 @@ function sqrt_classical(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: Ri
    return true, S(s, sscale)
 end
 
-@doc raw"""
-    sqrt(a::Generic.PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
-
-Return the square root of the given Puiseux series $a$. By default the function
-will throw an exception if the input is not square. If `check=false` this test
-is omitted.
-"""
 function Base.sqrt(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    flag, s = sqrt_classical(a; check=check)
    check && !flag && error("Not a square in sqrt")
@@ -831,7 +832,7 @@ function (R::PuiseuxSeriesField{T})(b::LaurentSeriesFieldElem{T}, scale::Int) wh
    return z
 end
 
-function (R::PuiseuxSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::PuiseuxSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z

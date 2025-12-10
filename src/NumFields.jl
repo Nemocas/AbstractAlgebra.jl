@@ -17,8 +17,6 @@ end
 
 number_of_generators(L::SimpleNumField{T}) where {T} = 1
 
-canonical_unit(a::NumFieldElem) = a
-
 characteristic(F::NumField) = 0
 
 promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S

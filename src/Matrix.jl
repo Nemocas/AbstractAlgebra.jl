@@ -140,6 +140,8 @@ Return the number of columns of the given matrix space.
 """
 number_of_columns(a::MatSpace) = a.ncols
 
+vector_space_dim(a::MatSpace{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.nrows * a.ncols
+
 function Base.hash(a::MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:nrows(a)
@@ -464,30 +466,31 @@ function getindex(M::MatElem, rows::AbstractVector{Int}, j::Int)
    return A
  end
 
-getindex(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}}) = M[_to_indices(M, rows, cols)...]
+getindex(M::MatElem, ::Colon, cols) = getindex(M, 1:nrows(M), cols)
 
-function _to_indices(x, rows, cols)
-   if rows isa Integer
-      rows = rows
-   elseif rows isa Colon
-      rows = 1:nrows(x)
-   end
-   if cols isa Integer
-      cols = cols
-   elseif cols isa Colon
-      cols = 1:ncols(x)
-   end
-   (rows, cols)
-end
+getindex(M::MatElem, rows, ::Colon) = getindex(M, rows, 1:ncols(M))
+
+getindex(M::MatElem, ::Colon, ::Colon) = getindex(M, 1:nrows(M), 1:ncols(M))
+
 
 sub(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = M[r, c]
 
-function Base.view(M::MatElem,
-         rows::Union{Int,Colon,AbstractVector{Int}},
-         cols::Union{Int,Colon,AbstractVector{Int}})
-   return view(M, _to_indices(M, rows, cols)...)
+# fallback method that converts Colons to UnitRanges
+function Base.view(M::MatElem, rows, cols)
+   # indirection to avoid ambiguities
+   return _view(M, rows, cols)
+end
+
+function _view(M::MatElem, ::Colon, cols)
+   return view(M, 1:nrows(M), cols)
+end
+
+function _view(M::MatElem, rows, ::Colon)
+   return view(M, rows, 1:ncols(M))
+end
+
+function _view(M::MatElem, ::Colon, ::Colon)
+   return view(M, 1:nrows(M), 1:ncols(M))
 end
 
 Base.firstindex(M::MatrixElem{T}, i::Int) where T <: NCRingElement = 1
@@ -675,13 +678,8 @@ axes(t::MatrixElem{T}, d::Integer) where T <: NCRingElement = Base.OneTo(size(t,
 #
 ###############################################################################
 
-@static if VERSION < v"1.9"
-  Base.eachrow(a::MatrixElem) = (view(a, i, :) for i in 1:nrows(a))
-  Base.eachcol(a::MatrixElem) = (view(a, :, i) for i in 1:ncols(a))
-else
-  Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
-  Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
-end
+Base.eachrow(a::MatrixElem) = Slices(a, (1, :), (axes(a, 1),))
+Base.eachcol(a::MatrixElem) = Slices(a, (:, 1), (axes(a, 2),))
 
 ###############################################################################
 #
@@ -739,16 +737,7 @@ function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElemen
    return mat
 end
 
-function Base.show(io::IO, a::MatrixElem{T}) where T <: NCRingElement
-   show_via_expressify(io, a)
-end
-
-function Base.show(io::IO, mi::MIME"text/html", a::MatrixElem{T}) where T <: NCRingElement
-   if isdefined(Main, :IJulia) && Main.IJulia.inited && !get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
-   show_via_expressify(io, mi, a)
-end
+@enable_all_show_via_expressify MatrixElem
 
 function Base.show(io::IO, ::MIME"text/plain", a::MatrixElem{T}) where T <: NCRingElement
    r = nrows(a)
@@ -849,6 +838,7 @@ end
 
 function *(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+   base_ring(x) !== base_ring(y) && error("Base rings do not match")
    A = similar(x, nrows(x), ncols(y))
    C = base_ring(x)()
    for i = 1:nrows(x)
@@ -929,7 +919,7 @@ end
 #
 ###############################################################################
 
-function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function *(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -949,7 +939,7 @@ function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function *(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function *(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -969,12 +959,7 @@ function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-@doc raw"""
-    +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
-
-Return $S(x) + y$ where $S$ is the parent of $y$.
-"""
-function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -989,15 +974,10 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc raw"""
-    +(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return $x + S(y)$ where $S$ is the parent of $x$.
-"""
-+(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement = y + x
++(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement = y + x
 
 @doc raw"""
-    +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    +(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
@@ -1016,18 +996,13 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    +(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
-Return $x + S(y)$ where $S$ is the parent of $x$.
+Return $x + S(y)$, where $S$ is the parent of $a$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
 
-@doc raw"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-
-Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
-function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
+function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -1042,12 +1017,7 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T
    return z
 end
 
-@doc raw"""
-    -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return $x - S(y)$, where $S$ is the parent of $x$.
-"""
-function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -1063,7 +1033,7 @@ function -(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T
 end
 
 @doc raw"""
-    -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    -(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
@@ -1083,7 +1053,7 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    -(x::MatrixElem{<:NCRingElem}, y::NCRingElement)
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
@@ -1348,13 +1318,7 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
-
-Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
-otherwise return `false`.
-"""
-function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where T <: NCRingElement
+function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1370,16 +1334,10 @@ function ==(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}) where 
    return true
 end
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement
-
-Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
-otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem{T}) where T <: NCRingElement = y == x
+==(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement = y == x
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+    ==(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
@@ -1401,7 +1359,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    ==(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+    ==(x::NCRingElement, y::MatrixElem{<:NCRingElement})
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
@@ -1414,7 +1372,7 @@ otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::MatrixElem{T}, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true) where T <: NCRingElement
+function divexact(x::MatrixElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -2687,6 +2645,21 @@ end
 ###############################################################################
 
 """
+    is_alternating(M::MatrixElem)
+
+Return whether the form corresponding to the matrix `M` is alternating,
+i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
+Return `false` if `M` is not a square matrix.
+"""
+function is_alternating(M::MatrixElem)
+  is_skew_symmetric(M) || return false
+  for i in 1:nrows(M)
+    is_zero_entry(M, i, i) || return false
+  end
+  return true
+end
+
+"""
     is_skew_symmetric(M::MatrixElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
@@ -3538,8 +3511,8 @@ end
     _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $U$ over a field which is upper
-triangular, and an $m\times n$ matrix $b$ over the same ring, return an
-$m\times n$ matrix $x$ such that $xU = b$. If this is not possible, an error
+triangular, and an $n\times m$ matrix $b$ over the same ring, return an
+$n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
 See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
@@ -3701,7 +3674,7 @@ end
 
 function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, A = _can_solve_with_solution_lu(M, identity_matrix(M))
+   flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
 end
@@ -6775,6 +6748,7 @@ function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
+   Base.require_one_based_indexing(arr)
    r, c = size(arr)
    (r < 0 || c < 0) && error("Array must be non-empty")
    R = parent(arr[1, 1])
@@ -6786,11 +6760,11 @@ function matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
    return matrix(reshape(arr, length(arr), 1))
 end
 
-function matrix(arr::Vector{Vector{T}}) where {T<:NCRingElement}
+function matrix(arr::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
     return matrix(permutedims(reduce(hcat, arr)))
 end
 
-function matrix(R::NCRing, arr::Vector{<:Vector})
+function matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
    return matrix(R, permutedims(reduce(hcat, arr)))
 end
 
@@ -6942,8 +6916,8 @@ diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 @doc raw"""
     diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(x::Vector{T}) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(R::NCRing, x::Vector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
 
 Returns a diagonal matrix whose diagonal entries are the elements of $x$.
 If a ring $R$ is given then it is used a parent for the entries of the created
@@ -6965,7 +6939,8 @@ julia> diagonal_matrix(ZZ, [5, 6])
 [0   6]
 ```
 """
-function diagonal_matrix(R::NCRing, x::Vector{<:NCRingElement})
+function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
+    Base.require_one_based_indexing(x)
     x = R.(x)
     M = zero_matrix(R, length(x), length(x))
     for i = 1:length(x)
@@ -6978,9 +6953,9 @@ function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(x::Vector{<:NCRingElement})
+function diagonal_matrix(x::AbstractVector{<:NCRingElement})
    @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
-   return diagonal_matrix(parent(x[1]), x)
+   return diagonal_matrix(parent(first(x)), x)
 end
 
 @doc raw"""
@@ -7189,7 +7164,7 @@ end
 #
 ################################################################################
 
-VERSION >= v"1.7" && (Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...)))
+Base.typed_hvncat(R::NCRing, args...) = _matrix(R, hvncat(args...))
 Base.typed_hvcat(R::NCRing, args...) = _matrix(R, hvcat(args...))
 Base.typed_hcat(R::NCRing, args...) = _matrix(R, hcat(args...))
 Base.typed_vcat(R::NCRing, args...) = _matrix(R, vcat(args...))

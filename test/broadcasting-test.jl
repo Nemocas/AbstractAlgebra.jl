@@ -12,6 +12,13 @@
 
   @test_throws ErrorException [1, 2] .* A
   @test_throws ErrorException A .* 2 .* 2 .* [1, 2]
+
+  let # fix assignment bug with views #2151
+    R, (x, y) = polynomial_ring(QQ,[:x,:y])
+    mr = ones_matrix(R,2,2)
+    mr[1,:] .= x
+    @test mr == matrix(R, [x x; 1 1])
+  end
 end
 
 @testset "broadcasting evaluate" begin
@@ -19,4 +26,3 @@ end
   A = matrix(Qa, [k1 k2; k3 k4])
   @test evaluate.(A, Ref([1, 2, 3, 4])) == QQ[1 2; 3 4]
 end
-

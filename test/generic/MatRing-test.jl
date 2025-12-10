@@ -10,7 +10,7 @@
    @test elem_type(Generic.MatRing{elem_type(R)}) == Generic.MatRingElem{elem_type(R)}
    @test parent_type(Generic.MatRingElem{elem_type(R)}) == Generic.MatRing{elem_type(R)}
 
-   @test typeof(S) <: Generic.MatRing
+   @test S isa Generic.MatRing
 
    f = S(t^2 + 1)
 
@@ -70,6 +70,25 @@
    @test isa(S([1, 2, 3, 4]), MatRingElem)
 
    @test parent(S()) == S
+end
+
+@testset "Generic.MatAlg.finitiess" begin
+   S = matrix_ring(QQ, 3)
+   @test !is_finite(S)
+   @test !is_trivial(S)
+
+   S = matrix_ring(QQ, 0)
+   @test is_finite(S)
+   @test is_trivial(S)
+
+   S = matrix_ring(GF(5), 3)
+   @test is_finite(S)
+   @test !is_trivial(S)
+
+   S = matrix_ring(GF(5), 0)
+   @test is_finite(S)
+   @test is_trivial(S)
+
 end
 
 @testset "Generic.MatAlg.printing" begin
@@ -189,7 +208,6 @@ end
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    
-   @test is_square(A)
    @test size(A) == (3, 3)
    @test size(A, 1) == 3
    @test size(A, 2) == 3
@@ -215,7 +233,6 @@ end
    @test size(M, 1) == 2
    @test axes(M) == (1:2, 1:2)
    @test axes(M, 1) == 1:2
-   @test is_square(M)
 end
 
 @testset "Generic.MatAlg.unary_ops" begin

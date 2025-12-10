@@ -42,3 +42,8 @@ function factor(x::FieldElement)
   @req !is_zero(x) "Element must be non-zero"
   return Fac(x, Dict{typeof(x), Int}())
 end
+
+function canonical_unit(x::FieldElement)
+  iszero(x) && return one(x)
+  return x
+end

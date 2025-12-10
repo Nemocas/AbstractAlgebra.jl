@@ -26,16 +26,29 @@ function check_composable(a::Map, b::Map)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", M::Map)
-   # the "header" printed for most map types is identical: the terse output
-   # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
-   # generically here. If desired, map types can provide a custom
-   # show_map_data method to add additional data after this initial "header".
-   println(terse(io), M)
+   # the "header" printed for most map types is identical: a descriptive name
+   # for the map followed by "from DOMAIN" and "to CODOMAIN" lines. We
+   # implement this generically here. If desired, map types can provide a
+   # custom show_map_data method to add additional data after this initial
+   # "header".
+   #
+   # The output will be
+   #
+   # show_map_head(io, M)
+   #   from DOMAIN
+   #   to CODOMAIN
+   # show_map_data(io, M)
+   #
+   show_map_head(io, M)
+   println(io)
    io = pretty(io)
    println(io, Indent(), "from ", Lowercase(), domain(M))
    print(io, "to ", Lowercase(), codomain(M), Dedent())
    show_map_data(io, M)
 end
+
+# for backwards compatibility, but all maps using `@show_name` should overload it
+show_map_head(io::IO, M::Map) = print(terse(io), M)
 
 function show_map_data(io::IO, M::Map)
    # no extra data by default; Map subtypes may overload this
@@ -145,17 +158,6 @@ end
 
 ################################################################################
 #
-#  FunctionalCompositeMap
-#
-################################################################################
-
-function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
-   check_composable(f, g)
-   return Generic.FunctionalCompositeMap(f, g)
-end
-
-################################################################################
-#
 #  Comparison of objects as maps
 #
 #  Rationale: Often objects are implicitly used as maps. For instance, a `Ring` 
@@ -186,12 +188,3 @@ function is_equal_as_morphism(a::Any, b::Any)
   a === b && return true
   error("no method implemented to compare $a and $b as morphisms beyond `===`")
 end
-
-function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
-  a === b && return true
-  domain(a) === domain(b) || return false
-  codomain(a) === codomain(b) || return false
-  a.image_fn === b.image_fn && return true
-  error("all legal methods for comparison of $a and $b are exhausted; further comparison not implemented")
-end
-

@@ -73,7 +73,7 @@ end
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
@@ -129,7 +129,7 @@ function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {U <: FieldEl
    return z
 end
 
-function (a::FracField{T})(b::T, c::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::T, c::JuliaRingElement) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(b, base_ring(a)(c))
    z.parent = a
@@ -144,7 +144,7 @@ function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyRi
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}, c::T) where {T <: RingElement}
+function (a::FracField{T})(b::JuliaRingElement, c::T) where {T <: RingElement}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(base_ring(a)(b), c)
    z.parent = a
@@ -301,4 +301,13 @@ function fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    T = elem_type(R)
 
    return FracField{T}(R, cached)
+end
+
+function ConformanceTests.generate_element(R::FracField{T}) where {T <: RingElem}
+  num = ConformanceTests.generate_element(base_ring(R))
+  den = ConformanceTests.generate_element(base_ring(R))
+  if iszero(den)
+    den = one!(den)
+  end
+  return R(num, den)
 end

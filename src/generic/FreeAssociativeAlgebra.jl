@@ -44,7 +44,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
     return FreeAssociativeAlgebraElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),
@@ -133,12 +133,12 @@ function (a::FreeAssociativeAlgebra{T})(b::T) where T
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::Union{Integer, Rational, AbstractFloat}) where T
+function (a::FreeAssociativeAlgebra{T})(b::JuliaRingElement) where T
     R = base_ring(a)
     return a(R(b))
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: JuliaRingElement}
     iszero(b) && return zero(a)
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
@@ -202,7 +202,8 @@ function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
 end
 
 function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
-    return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
+    @req !is_zero(a) "Zero polynomial does not have a leading monomial"
+    return coeff(a, 1)
 end
 
 function leading_monomial(a::FreeAssociativeAlgebraElem{T}) where T
@@ -244,6 +245,7 @@ end
 ###############################################################################
 
 function canonical_unit(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(a) && return one(base_ring(a))
     return canonical_unit(leading_coefficient(a))
 end
 
@@ -637,7 +639,7 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
+function *(a::FreeAssociativeAlgebraElem, n::JuliaRingElement)
     z = zero(a)
     return mul!(z, a, n)
 end
@@ -647,7 +649,7 @@ function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
     return mul!(z, a, n)
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
+*(n::JuliaRingElement, a::FreeAssociativeAlgebraElem) = a*n
 
 *(n::T, a::FreeAssociativeAlgebraElem{T}) where {T <: RingElem} = a*n
 

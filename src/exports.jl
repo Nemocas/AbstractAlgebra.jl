@@ -33,7 +33,6 @@ export EuclideanRingResidueFieldElem
 export EuclideanRingResidueRing
 export EuclideanRingResidueRingElem
 export Fac
-export FactoredFractionField
 export Field
 export FieldElem
 export FieldElement
@@ -51,7 +50,9 @@ export GroupElem
 export Ideal
 export IdealSet
 export IdentityMap
+export InfiniteDimensionError
 export InfiniteOrderError
+export IntExt
 export ItemQuantity
 export LaurentMPolyRing
 export LaurentMPolyRingElem
@@ -75,6 +76,7 @@ export NCPolyRingElem
 export NCRing
 export NCRingElem
 export NCRingElement
+export NegInf
 export NotImplementedError
 export NotInvertibleError
 export NumField
@@ -86,6 +88,7 @@ export PolyCoeffs
 export PolyRing
 export PolyRingElem
 export PolynomialElem
+export PosInf
 export QQ
 export RDF
 export RealField
@@ -151,7 +154,9 @@ export check_composable
 export check_parent
 export codomain
 export coeff
+export coeff!
 export coefficient_ring
+export coefficient_ring_type
 export coefficients
 export coefficients_of_univariate
 export collength
@@ -162,6 +167,7 @@ export compose
 export conj!
 export constant_coefficient
 export content
+export coordinates
 export coprime_base
 export coprime_base_push!
 export crt
@@ -175,8 +181,6 @@ export degree
 export degrees
 export denest
 export dense_matrix_type
-export dense_poly_ring_type
-export dense_poly_type
 export derivative
 export det
 export det_popov
@@ -208,6 +212,7 @@ export evaluate
 export exp_gcd
 export exponent
 export exponent_vector
+export exponent_vector!
 export exponent_vectors
 export exponent_word
 export exponent_words
@@ -216,12 +221,15 @@ export extended_weak_popov_with_transform
 export exterior_power
 export factor
 export factor_squarefree
+export factored_fraction_field
+export falling_factorial
 export fflu
 export fflu!
 export find_pivot_popov
 export finish
 export fit!
 export fraction_field
+export fraction_field_type
 export free_associative_algebra
 export free_associative_algebra_type
 export free_module
@@ -240,6 +248,7 @@ export has_attribute
 export has_bottom_neighbor
 export has_gens
 export has_left_neighbor
+export has_preimage_with_preimage
 export hash
 export hermite_form
 export hermite_form_with_transformation
@@ -269,6 +278,7 @@ export identity_matrix
 export image
 export image_fn
 export image_map
+export inf
 export inflate
 export integral
 export internal_ordering
@@ -281,7 +291,10 @@ export inverse_mat
 export invmod
 export iroot
 export is_abelian
+export is_alternating
 export is_associated
+export is_attribute_storing
+export is_attribute_storing_type
 export is_compatible
 export is_constant
 export is_degree
@@ -294,6 +307,7 @@ export is_even
 export is_exact_type
 export is_finite
 export is_finite_order
+export is_finitely_generated
 export is_free
 export is_gen
 export is_hermitian
@@ -301,6 +315,7 @@ export is_hessenberg
 export is_hnf
 export is_homogeneous
 export is_inf
+export is_infinite
 export is_integer
 export is_invertible
 export is_invertible_with_inverse
@@ -314,6 +329,7 @@ export is_monomial_recursive
 export is_negative
 export is_negative_entry
 export is_nilpotent
+export is_noetherian
 export is_odd
 export is_one
 export is_perfect
@@ -342,6 +358,7 @@ export is_trivial
 export is_unicode_allowed
 export is_unit
 export is_univariate
+export is_univariate_with_data
 export is_upper_triangular
 export is_valid
 export is_weak_popov
@@ -354,6 +371,7 @@ export is_zero_row
 export isomorphism
 export kernel
 export kronecker_product
+export krull_dim
 export laurent_polynomial_ring
 export laurent_ring
 export laurent_series
@@ -452,7 +470,8 @@ export pluralize
 export pol_length
 export polcoeff
 export poly
-export poly_ring
+export poly_ring_type
+export poly_type
 export polynomial
 export polynomial_ring
 export polynomial_to_power_sums
@@ -530,7 +549,9 @@ export set_valuation!
 export setcoeff!
 export setpermstyle
 export shift_left
+export shift_left!
 export shift_right
+export shift_right!
 export similarity!
 export size
 export snf
@@ -559,6 +580,7 @@ export symbols
 export tail
 export term
 export terms
+export term!
 export to_univariate
 export total_degree
 export total_ring_of_fractions
@@ -575,8 +597,10 @@ export use_karamul
 export valuation
 export var
 export var_index
+export var_indices
 export vars
 export vector_space
+export vector_space_dim
 export weak_popov
 export weak_popov_with_transform
 export weights

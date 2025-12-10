@@ -47,8 +47,10 @@ struct F2Elem <: AbstractAlgebra.FieldElem
 end
 
 (::F2)(x::F2Elem) = x
+(::F2)(x::Integer) = F2Elem(x % Bool)
 Base.:-(x::F2Elem) = x
 Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.:-(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
 Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
 Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 
@@ -60,6 +62,7 @@ AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.add!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.sub!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
@@ -130,7 +133,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test typeof(S) <: MatSpace
+   @test S isa MatSpace
 
    f = S(t^2 + 1)
 
@@ -206,16 +209,15 @@ end
       @test T[[];] == matrix(T, 0, 0, [])
       @test T[[] ()...] == matrix(T, 0, 1, [])
       @test T[[] []] == matrix(T, 0, 2, [])
-      if VERSION >= v"1.7"
-         # @test T[;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         # @test T[;;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         @test T[1;;] == matrix(T, 1, 1, [1])
-         @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
-         @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
-         @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
-         # @test_throws MethodError T[;;;] # stalls Julia 1.6 parser
-         @test_throws MethodError T[1;;;]
-      end
+      @test T[;] == matrix(T, 0, 0, [])
+      @test T[;;] == matrix(T, 0, 0, [])
+      @test T[1;;] == matrix(T, 1, 1, [1])
+      @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
+      @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
+      @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
+      @test T[1 2; 3 4] == matrix(T, [1:2, 3:4])
+      @test_throws MethodError T[;;;]
+      @test_throws MethodError T[1;;;]
 
       if VERSION < v"1.11.2"
          @test_throws ArgumentError T[1; 2 3]
@@ -299,6 +301,12 @@ end
          end
       end
    end
+
+   D4 = diagonal_matrix(R, 1:5)
+   @test size(D4) == (5, 5)
+   @test D4[1, 1] == R(1)
+   @test D4[5, 5] == R(5)
+   @test D4 isa Generic.MatSpaceElem{elem_type(R)}
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
@@ -1192,6 +1200,11 @@ end
    @test M + N == N + M
    @test M - N == M + (-N)
    @test M*(N + P) == M*N + M*P
+
+   # Issue Nemocas/Nemo.jl#2143
+   R, _ = residue_ring(ZZ, 2)
+   S, _ = residue_ring(ZZ, 3)
+   @test_throws ErrorException identity_matrix(R, 2) * identity_matrix(S, 2)
 end
 
 # add x to all the elements of the main diagonal of a copy of M
@@ -1639,6 +1652,23 @@ end
    M = rand(S, -10:10)
 
    @test is_symmetric(M + transpose(M))
+end
+
+@testset "Generic.Mat.is_alternating" begin
+
+  @testset "Test is_alternating for $R" for R in [GF(2), GF(3), ZZ, QQ]
+     @test is_alternating(matrix(R, [0 1 ; -1 0]))
+     @test !is_alternating(matrix(R, [1 1 ; -1 1]))
+     @test !is_alternating(matrix(R, [1 0 ; 1 1]))
+     @test !is_alternating(matrix(R, [0 1 0 ; -1 0 0]))
+  end
+
+  # Tests over noncommutative ring
+  R = matrix_ring(ZZ, 2)
+  S = matrix_space(R, 2, 2)
+  M = rand(S, -10:10)
+
+  @test is_alternating(M - transpose(M))
 end
 
 @testset "Generic.Mat.is_skew_symmetric" begin
@@ -4049,6 +4079,28 @@ end
    @test M3 == [3, 4, 5]
    M3[1] = 10
    @test M2 == ZZ[1 2 10; 2 3 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[[1, 2], [1, 3]]
+   @test size(M3) == (2, 2)
+   @test M3 == ZZ[1 3; 2 4]
+   M3[[1, 2], 1] = [8, 9]
+   @test M2 == ZZ[8 2 3; 9 3 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[1, 2]
+   @test size(M3) == ()
+   @test length(M3) == 1
+   # NOTE: The following cases are to cover all types of [gs]etindex functions.
+   M3[] = ZZ(9)
+   @test M3[] == 9
+   M3[1] = ZZ(10)
+   @test M3[1] == 10
+   M3[] = 11
+   @test M3[] == 11
+   M3[1] = 12
+   @test M3[1] == 12
+   @test M2 == ZZ[1 12 3; 2 3 4; 3 4 5]
 
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)

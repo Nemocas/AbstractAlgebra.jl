@@ -106,19 +106,6 @@ deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(d
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-function canonical_unit(x::ResFieldElem{<:Union{Integer, RingElem}})
-  if iszero(x)
-    return one(parent(x))
-  end
-  return x
-end
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -179,27 +166,27 @@ end
 #
 ###############################################################################
 
-*(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) * b)
 
 *(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a * data(b))
+*(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a * data(b))
 
 *(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
-+(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) + b)
 
 +(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a + data(b))
++(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a + data(b))
 
 +(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
--(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) - b)
 
 -(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
--(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a - data(b))
+-(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a - data(b))
 
 -(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
@@ -251,41 +238,21 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::ResFieldElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
+function ==(a::JuliaRingElement, b::ResFieldElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc raw"""
-    ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
@@ -353,11 +320,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::ResFieldElem{T}) where T <: Integer
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
@@ -367,12 +329,6 @@ function is_square(a::ResFieldElem{T}) where T <: Integer
    return isone(a^pm1div2)
 end
 
-@doc raw"""
-    sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)
@@ -490,7 +446,9 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$.
 """
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
+   @req !is_trivial(R) "Base ring must not be the zero ring."
    iszero(a) && throw(DivideError())
+   @req !is_unit(a) "Cannot create a field with one element"
    T = elem_type(R)
    S = EuclideanRingResidueField{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)

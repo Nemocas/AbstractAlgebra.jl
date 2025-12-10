@@ -10,6 +10,7 @@
 #
 ###############################################################################
 
+coefficient_ring_type(T::Type{<:FreeAssociativeAlgebra}) = base_ring_type(T)
 coefficient_ring(R::FreeAssociativeAlgebra{T}) where T <: RingElement = base_ring(R)
 
 function is_domain_type(::Type{S}) where {T <: RingElement, S <: FreeAssociativeAlgebraElem{T}}
@@ -124,7 +125,9 @@ function exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
 end
 
 function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
-   if is_constant(a)
+   if is_zero(a)
+      return false
+   elseif is_constant(a)
       return is_unit(leading_coefficient(a))
    elseif is_domain_type(T)
       return false

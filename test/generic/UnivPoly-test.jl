@@ -31,8 +31,9 @@
 
          @test base_ring(S) === R
          @test coefficient_ring(S) === R
+         @test coefficient_ring_type(S) === typeof(R)
 
-         @test typeof(S) <: Generic.UniversalPolyRing
+         @test S isa Generic.UniversalPolyRing
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)
@@ -146,9 +147,13 @@ end
          @test symbols(S) == [:x, :y, :z]
 
          @test length(vars(S())) == 0
+         @test length(var_indices(S())) == 0
          @test vars(x^2 + 2x + 1) == [x]
+         @test var_indices(x^2 + 2x + 1) == [1]
          @test vars(x*y + 1) == [x, y]
+         @test var_indices(x*y + 1) == [1, 2]
          @test vars(x*y + z) == [x, y, z]
+         @test var_indices(x*y + z) == [1, 2, 3]
 
          @test internal_ordering(S) == ord
       end
@@ -250,8 +255,8 @@ end
       @test !is_monomial(S())
       @test is_constant(S())
       @test !is_term(S())
-      @test trailing_coefficient(S()) == 0
-      @test leading_coefficient(S()) == 0
+      @test_throws ArgumentError trailing_coefficient(S())
+      @test_throws ArgumentError leading_coefficient(S())
       @test constant_coefficient(S()) == 0
       @test total_degree(S()) == -1
       @test length(gens(S)) == 0
@@ -334,7 +339,7 @@ end
       @test length(2x2^2 + 3x2 + 1) == 3
 
       @test gen(S, :x) == x
-      @test gens(S, ['x', 'y']) == (x, y)
+      @test gens(S, ['x', 'y']) == [x, y]
       @test gen(S, 1) == x
       @test gen(S, 2) == y
       @test gen(S, 3) == z
@@ -348,6 +353,12 @@ end
       @test vars(2x2^2 + 3x2 + 1) == [x]
 
       @test characteristic(S) == 0
+
+      xs, ys = gens(S, :x => (1:4), :y =>(1:2, 1:3))
+      @test xs isa Vector{elem_type(S)}
+      @test length(xs) == 4
+      @test ys isa Matrix{elem_type(S)}
+      @test size(ys) == (2, 3)
    end
 end
 
@@ -982,7 +993,6 @@ end
 
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [R(V[1])])
          @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [ZZ(V[1])])
-         @test evaluate(f, [1], [V[1]]) == evaluate(f, [1], [U(V[1])])
          @test evaluate(f, [1], [V[1]]) == f(x=V[1])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])
@@ -1066,11 +1076,19 @@ end
       @test !is_univariate(g)
       @test is_univariate(h)
 
+      @test is_univariate_with_data(y) == (true, 2)
+      @test is_univariate_with_data(S()) == (true, 0)
+      @test is_univariate_with_data(x + y) == (false, 0)
+
       f1 = to_univariate(U, f)
       h1 = to_univariate(U, h)
 
       @test length(f) == length(f1)
       @test length(h) == length(h1)
+
+      p = to_univariate(x)
+      Rp = parent(p)
+      @test symbols(Rp)[1] == :x
 
       @test coefficients_of_univariate(f) == [R(4), R(1), R(2), R(3)]
       @test coefficients_of_univariate(h) == [R(1), R(2), R(3)]
@@ -1129,26 +1147,38 @@ end
       f1 = add!(f1, g, h)
       
       @test f1 == g + h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f2 = deepcopy(f)
       f2 = add!(f2, g)
 
       @test f2 == f + g
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f3 = deepcopy(f)
       f3 = mul!(f3, g, h)
 
       @test f3 == g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f4 = deepcopy(f)
       f4 = addmul!(f4, g, h)
 
       @test f4 == f + g*h
+      @test f == 3x^3 + 2x^2 + x + 4
 
       f5 = deepcopy(f)
       f5 = zero!(f5)
 
       @test f5 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
+
+      # also verify `copy` works as intended
+      f6 = copy(f)
+      f6 = zero!(f6)
+
+      @test f6 == 0
+      @test f == 3x^3 + 2x^2 + x + 4
    end
 end
 

@@ -476,7 +476,7 @@ function hlift_have_lcs(
   @assert n > 0
   @assert r > 1
 
-  lc_evals = zeros(R, n + 1, r)
+  lc_evals = Matrix{elem_type(R)}(undef, n + 1, r)
   for j in 1:r
     lc_evals[n + 1, j] = lcs[j]
     for i in n:-1:1
@@ -484,13 +484,13 @@ function hlift_have_lcs(
     end
   end
 
-  A_evals = zeros(R, n + 1)
+  A_evals = Vector{elem_type(R)}(undef, n + 1)
   A_evals[n + 1] = A
   for i in n:-1:1
     A_evals[i] = eval_one(A_evals[i + 1], minorvars[i], alphas[i])
   end
 
-  fac = zeros(R, r)
+  fac = Vector{elem_type(R)}(undef, r)
   for j in 1:r
     @assert is_constant(lc_evals[1, j])
     fac[j] = Auf[j]*divexact(lc_evals[1, j], get_lc(Auf[j], mainvar))
@@ -574,7 +574,7 @@ function hliftstep_quartic2(
   a, t = divrem(a, xalpha)
   @assert t == B[1][1] * B[2][1]
 
-  M = zeros(R, liftdegs[m] + 1)
+  M = Vector{elem_type(R)}(undef, liftdegs[m] + 1)
 
   for j in 1:liftdegs[m]
     a, t = divrem(a, xalpha)
@@ -994,15 +994,15 @@ function lcc_kaltofen_step!(
   @assert r == length(divs)
   Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
 
-  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx)).fac) for i in 1:r]
+  Auf = [collect(factor_squarefree(to_univar(Au[i], v, Kx))) for i in 1:r]
 
   Afdegv = 0
   Afp = one(R)
-  for i in Af.fac
-    thisdeg = degree(i.first, v)
+  for (i, _) in Af
+    thisdeg = degree(i, v)
     Afdegv += thisdeg
     if thisdeg != 0
-      Afp *= i.first
+      Afp *= i
     end
   end
 
@@ -1083,7 +1083,7 @@ function lcc_kaltofen(
   ulcs = E[R() for i in 1:r]
 
   for vi in 1:length(minorvars)
-    if isempty(lcAf.fac)
+    if length(lcAf) == 0
       break
     end
 
@@ -1122,7 +1122,7 @@ function lcc_kaltofen(
                                                  other_minorvars, other_alphas)
   end
 
-  return isempty(lcAf.fac), divs
+  return (length(lcAf) == 0), divs
 end
 
 
@@ -1156,8 +1156,8 @@ function mfactor_irred_mvar_char_zero(
   K = base_ring(R)
   @assert length(A) > 0
 
-  evals = zeros(R, n + 1)
-  alphas = zeros(K, n)
+  evals = Vector{elem_type(R)}(undef, n + 1)
+  alphas = [zero(K) for _ in 1:n]
   alpha_modulus = 0
   lcc_fails_remaining = 3
 
@@ -1365,7 +1365,7 @@ function mfactor_char_zero(a::E) where E <: MPolyRingElem
   res = Fac{E}()
   res.unit = tres.unit
   empty!(res.fac)
-  for i in tres.fac
+  for i in tres
     mulpow!(res, mfactor_irred_char_zero(i[1]), i[2])
   end
   return res

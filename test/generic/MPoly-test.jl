@@ -17,10 +17,11 @@
       @test parent_type(Generic.MPoly{elem_type(R)}) == Generic.MPolyRing{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
-      @test typeof(S) <: Generic.MPolyRing
+      @test S isa Generic.MPolyRing
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test isa(varlist[j], MPolyRingElem)
@@ -183,7 +184,7 @@
    @test_logs (:warn, """The variable name "x-1" sadly is no Julia identifier. You can still access it as `var"x-1"`."""
       ) @macroexpand @polynomial_ring(QQ, :x => -1:1)
    @test_logs (:error, "Inconveniently, you may only use literals and variables from the global scope of the current module (`Main`) when using variable name constructor macros"
-      ) @test_throws (VERSION < v"1.7" ? LoadError : UndefVarError) let local_name = 3
+      ) @test_throws UndefVarError let local_name = 3
          @macroexpand @polynomial_ring(QQ, :x => 1:local_name)
       end
 end
@@ -452,6 +453,10 @@ end
    @test !is_univariate(x^3 + 3x + y + 1)
    @test !is_univariate(x^3 + 3x + y)
    @test !is_univariate(y^4 + 3x + 1)
+
+   @test is_univariate_with_data(y) == (true, 2)
+   @test is_univariate_with_data(R()) == (true, 0)
+   @test is_univariate_with_data(x + y) == (false, 0)
 end
 
 
@@ -510,15 +515,16 @@ end
          f = rand(S, 0:4, 0:5, -10:10)
          g = rand(S, 0:4, 0:5, -10:10)
 
-         @test leading_coefficient(f*g) ==
-               leading_coefficient(f)*leading_coefficient(g)
+         if !is_zero(f) && !is_zero(g)
+            @test parent(leading_coefficient(f)) == base_ring(f)
+            @test leading_coefficient(f*g) == leading_coefficient(f)*leading_coefficient(g)
+         end
          @test leading_coefficient(one(S)) == one(base_ring(S))
 
          for v in varlist
             @test leading_coefficient(v) == one(base_ring(S))
          end
 
-         @test parent(leading_coefficient(f)) == base_ring(f)
       end
    end
 
@@ -562,7 +568,7 @@ end
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y + 5) == 5
    @test trailing_coefficient(x^2*y + 7x*y + 3x + 2y) == 2
    @test trailing_coefficient(R(2)) == 2
-   @test trailing_coefficient(R()) == 0
+   @test_throws ArgumentError trailing_coefficient(R())
 
    @test tail(2x^2 + 2x*y + 3) == 2x*y + 3
    @test tail(R(1)) == 0
@@ -1318,6 +1324,10 @@ end
    P,(x,y) = polynomial_ring(F, [:x, :y])
    @test x(t,y) == t
    @test x == gen(P, 1) # evaluation used to modify the polynomial
+
+   # Issue #1219
+   Qx, (x, y) = QQ["x", "y"];
+   @test typeof(zero(Qx)(x, y)) == typeof(one(Qx)(x, y)) == typeof((x+y)(x, y))
 end
 
 @testset "Generic.MPoly.valuation" begin
@@ -1552,6 +1562,11 @@ end
 
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
+
+      p = to_univariate(vars_R[1])
+      Rp = parent(p)
+
+      @test string(symbols(Rp)[1]) == var_names[1]
 
       for iter in 1:10
          f = zero(R)
@@ -1861,4 +1876,21 @@ end
   R1, (y1, z1) = polynomial_ring(QQ, [:y, :z])
   R2, (x2, y2) = polynomial_ring(QQ, [:x, :y])
   @test_throws ErrorException z1 + y2
+end
+
+@testset "Generic.MPoly.Iterators" begin
+  R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
+  f = x * y + 2 * x - 3 * z
+
+  @test (@inferred collect(exponent_vectors(f))) == [[1, 1, 0], [1, 0, 0], [0, 0, 1]]
+  @test (@inferred collect(exponent_vectors(Vector{UInt}, f))) == [UInt[1, 1, 0], UInt[1, 0, 0], UInt[0, 0, 1]]
+  @test (@inferred collect(coefficients(f))) == [QQ(1), QQ(2), QQ(-3)]
+  @test (@inferred collect(terms(f))) == [x * y, 2 * x, -3 * z]
+  @test (@inferred collect(monomials(f))) == [x * y, x, z]
+
+  @test (@inferred first(exponent_vectors(f, inplace = true))) == [1, 1, 0]
+  @test (@inferred first(exponent_vectors(Vector{UInt}, f, inplace = true))) == UInt[1, 1, 0]
+  @test (@inferred first(coefficients(f, inplace = true))) == QQ(1)
+  @test (@inferred first(monomials(f, inplace = true))) == x * y
+  @test (@inferred first(terms(f, inplace = true))) == x * y
 end

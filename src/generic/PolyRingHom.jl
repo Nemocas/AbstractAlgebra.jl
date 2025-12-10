@@ -71,7 +71,7 @@ end
 
 function temp_ring(f::PolyRingAnyMap{<:Any, <: Any, <: Map})
   if isdefined(f, :temp_ring)
-    return f.temp_ring::dense_poly_ring_type(codomain(_coefficient_map(f)))
+    return f.temp_ring::poly_ring_type(codomain(_coefficient_map(f)))
   end
 
   S, = polynomial_ring(codomain(_coefficient_map(f)), cached = false)

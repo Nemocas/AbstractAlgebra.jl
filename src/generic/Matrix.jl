@@ -91,12 +91,22 @@ function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int
    return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
 end
 
+function Base.view(M::Mat{T}, rows::Int, cols::Int) where T <: NCRingElement
+   return MatSpacePointView(view(M.entries, rows, cols), M.base_ring)
+end
+
 ################################################################################
 #
 #   Size, axes and is_square
 #
 ################################################################################
 
+@doc raw"""
+    is_square(M::MatElem)
+
+Return `true` iff the matrix `M` has square shape.
+See also `is_square(a::T)  where {T <: NCRingElement}` which tests whether the given value `a` is a square in its own ring.
+"""
 is_square(a::MatElem) = (nrows(a) == ncols(a))
 
 ###############################################################################
@@ -142,9 +152,20 @@ Base.getindex(V::MatSpaceVecView, i::Int) = V.entries[i]
 
 Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = z)
 
-Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
+Base.setindex!(V::MatSpaceVecView, z::NCRingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
+
+
+Base.length(V::MatSpacePointView) = 1
+
+Base.getindex(V::MatSpacePointView) = V.entries[]
+
+Base.setindex!(V::MatSpacePointView{T}, z::T) where {T <: NCRingElement} = (V.entries[] = z)
+
+Base.setindex!(V::MatSpacePointView, z::NCRingElement) = setindex!(V.entries, V.base_ring(z))
+
+Base.size(V::MatSpacePointView) = ()
 
 ###############################################################################
 #
@@ -182,6 +203,10 @@ function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
   nrows(K) >= ncols(K) && i - K.s + 1 == j && return one(base_ring(K))::T
   nrows(K) <= ncols(K) && i == j - K.s + 1 && return one(base_ring(K))::T
   return zero(base_ring(K))::T
+end
+
+function Base.setindex!(K::InjProjMat, i::Any, j::Any, val::Any)
+  error("InjProjMat is read-only")
 end
 
 function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}

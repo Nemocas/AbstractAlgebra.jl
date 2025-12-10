@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -504,7 +505,7 @@ evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Integer}
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
 
 ```julia
-(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+(a::MyMPoly{T})(vals::NCRingElement...) where T <: RingElement
 ```
 
 Evaluate the polynomial at the given arguments. This provides functional

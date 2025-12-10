@@ -12,9 +12,10 @@
 
 base_ring_type(::Type{<:PolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:PolyRing}) = base_ring_type(T)
 coefficient_ring(R::PolyRing) = base_ring(R)
 
-dense_poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
+poly_type(::Type{T}) where T<:RingElement = Generic.Poly{T}
 
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}}
    return is_domain_type(S)
@@ -222,6 +223,29 @@ function is_monic(a::PolynomialElem)
     return isone(leading_coefficient(a))
 end
 
+@doc raw"""
+    is_unit(f::T) where {T <: PolyRingElem}
+
+Return `true` if the given polynomial over a commutative ring is invertible, otherwise `false`.
+
+# Examples
+```jldoctest
+julia> Z, x = ZZ[:x]
+(Univariate polynomial ring in x over integers, x)
+
+julia> t = x^2+1
+x^2 + 1
+
+julia> is_unit(t)
+false
+
+julia> f = Z(1)
+1
+
+julia> is_unit(f)
+true
+```
+"""
 function is_unit(f::T) where {T <: PolyRingElem}
   # A polynomial over a commutative ring is a unit iff its
   # constant term is a unit and all other coefficients are nilpotent:
@@ -396,11 +420,11 @@ end
 struct PolyCoeffs{T <: RingElement}
    f::T
 end
- 
+
 function coefficients(f::PolyRingElem)
    return PolyCoeffs(f)
 end
- 
+
 function Base.iterate(PC::PolyCoeffs{<:PolyRingElem}, st::Int = -1)
    st += 1
    if st > degree(PC.f)
@@ -419,17 +443,17 @@ function Base.iterate(PCR::Iterators.Reverse{<:PolyCoeffs{<:PolyRingElem}},
       return coeff(PCR.itr.f, st), st
    end
 end
- 
+
 Base.eltype(::Type{<:PolyRingElem{T}}) where {T} = T
 
 Base.eltype(::Type{PolyCoeffs{T}}) where {T} = Base.eltype(T)
- 
+
 Base.length(M::PolyCoeffs{<:PolyRingElem}) = length(M.f)
- 
+
 function Base.lastindex(a::PolyCoeffs{<:PolyRingElem})
    return degree(a.f)
 end
- 
+
 function Base.getindex(a::PolyCoeffs{<:PolyRingElem}, i::Int)
    return coeff(a.f, i)
 end
@@ -470,6 +494,17 @@ function expressify(@nospecialize(a::Union{PolynomialElem, NCPolyRingElem}),
 end
 
 @enable_all_show_via_expressify Union{PolynomialElem, NCPolyRingElem}
+
+pretty_eq(x::PolyRingElem, y::PolyRingElem) = x == y
+function pretty_lt(x::PolyRingElem, y::PolyRingElem)
+  if length(x) < length(y)
+    return true
+  end
+  if length(x) > length(y)
+    return false
+  end
+  return pretty_lt_lex(coefficients(x), coefficients(y))
+end
 
 ###############################################################################
 #
@@ -731,7 +766,7 @@ function *(a::T, b::PolyRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
+function *(a::JuliaRingElement, b::PolynomialElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -744,7 +779,7 @@ end
 
 *(a::PolyRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::PolynomialElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -889,35 +924,15 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::PolyRingElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$.
-"""
 ==(x::PolyRingElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && iszero(base_ring(x)(y)))
+==(x::PolynomialElem, y::JuliaRingElement) = ((length(x) == 0 && iszero(base_ring(x)(y)))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
-
-Return `true` if $x = y$.
-"""
 ==(x::T, y::PolyRingElem{T}) where T <: RingElem = y == x
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::PolyRingElem) = y == x
+==(x::JuliaRingElement, y::PolyRingElem) = y == x
 
 ###############################################################################
 #
@@ -1181,20 +1196,30 @@ Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
 """
 function shift_left(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   if n == 0
-      return f
-   end
-   flen = length(f)
-   r = parent(f)()
-   fit!(r, flen + n)
-   for i = 1:n
-      r = setcoeff!(r, i - 1, zero(base_ring(f)))
-   end
-   for i = 1:flen
-      r = setcoeff!(r, i + n - 1, coeff(f, i - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  shift_left!(parent(f)(), f, n)
+end
+
+function shift_left!(x::PolynomialElem, n::Int)
+  return shift_left!(x, x, n)
+end
+
+function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {T}
+  if iszero(x)
+    z = zero!(z)
+    return z
+  end
+
+  len = length(x) + n
+  fit!(z, len)
+  for i in (length(x) - 1):-1:0
+    z = setcoeff!(z, i + n, deepcopy(coeff(x, i)))
+  end
+  for i in 0:(n - 1)
+    z = setcoeff!(z, i, zero(coefficient_ring(z)))
+  end
+  set_length!(z, len)
+  return z
 end
 
 @doc raw"""
@@ -1204,20 +1229,22 @@ Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
 """
 function shift_right(f::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError(n, "n must be >= 0"))
-   flen = length(f)
-   if n >= flen
-      return zero(parent(f))
-   end
-   if n == 0
-      return f
-   end
-   r = parent(f)()
-   fit!(r, flen - n)
-   for i = 1:flen - n
-      r = setcoeff!(r, i - 1, coeff(f, i + n - 1))
-   end
-   return r
+  n < 0 && throw(DomainError(n, "n must be >= 0"))
+  return shift_right!(parent(f)(), f, n)
+end
+
+function shift_right!(x::PolynomialElem, n::Int)
+  return shift_right!(x, x, n)
+end
+
+function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where T
+  len = max(0, length(x) - n)
+  fit!(z, len)
+  for i in 0:(len - 1)
+    z = setcoeff!(z, i, deepcopy(coeff(x, i + n)))
+  end
+  set_length!(z, len)
+  return z
 end
 
 ###############################################################################
@@ -1387,6 +1414,7 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
+   @assert lenq >= 0
    d = Vector{T}(undef, lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
@@ -1426,7 +1454,7 @@ function divexact(a::PolyRingElem{T}, b::T; check::Bool=true) where {T <: RingEl
    return z
 end
 
-function divexact(a::PolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::PolyRingElem, b::JuliaRingElement; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -1765,23 +1793,12 @@ function sqrt_classical(f::PolyRingElem{T}; check::Bool=true) where T <: RingEle
    return true, q
 end
 
-@doc raw"""
-    Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
-
-Return the square root of $f$. By default the function checks the input is
-square and raises an exception if not. If `check=false` this check is omitted.
-"""
 function Base.sqrt(f::PolyRingElem{T}; check::Bool=true) where T <: RingElement
    flag, q = sqrt_classical(f; check=check)
    check && !flag && error("Not a square in sqrt")
    return q
 end
 
-@doc raw"""
-    is_square(f::PolyRingElem{T}) where T <: RingElement
-
-Return `true` if $f$ is a perfect square.
-"""
 function is_square(f::PolyRingElem{T}) where T <: RingElement
    flag, q = sqrt_classical(f)
    return flag
@@ -2287,7 +2304,7 @@ function compose(f::PolyRingElem, g::PolyRingElem; inner = nothing)
             Alternatively, use directly f(g) or g(f)
              """)
   end
-            
+
   if inner == :second
     return _compose_right(f, g)
   elseif inner == :first
@@ -2976,10 +2993,10 @@ function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T 
     d = degree(f)
     R = base_ring(f)
     # Beware: converting to power series and derivative do not commute
-    dfc = collect(Iterators.take(Iterators.reverse(coefficients(derivative(f))), n + 1))
+    dfc = collect(T, Iterators.take(Iterators.reverse(coefficients(derivative(f))), n + 1))
     A = abs_series(R, dfc, length(dfc), n + 1; cached=false)
     S = parent(A)
-    fc = collect(Iterators.take(Iterators.reverse(coefficients(f)), n + 1))
+    fc = collect(T, Iterators.take(Iterators.reverse(coefficients(f)), n + 1))
     B = S(fc, length(fc), n + 1)
     L = A*inv(B)
     s = T[coeff(L, i) for i = 1:n]
@@ -3030,7 +3047,7 @@ with given sums of powers of roots. The list must be nonempty and contain
 `degree(f)` entries where $f$ is the polynomial to be recovered. The list
 must start with the sum of first powers of the roots.
 """
-function power_sums_to_polynomial(P::Vector{T}; 
+function power_sums_to_polynomial(P::Vector{T};
                            parent::PolyRing{T}=PolyRing(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
@@ -3255,7 +3272,7 @@ via the `cached` keyword argument.
 """
 function map_coefficients(g::T, p::PolyRingElem{<:RingElement};
                     cached::Bool = true,
-                    parent::PolyRing = _make_parent(g, p, cached)) where T
+                    parent = _make_parent(g, p, cached)) where T
    return _map(g, p, parent)
 end
 

@@ -17,8 +17,8 @@
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
 @testset "Generic.Poly.types" begin
-   @test dense_poly_type(BigInt) == Generic.Poly{BigInt}
-   @test dense_poly_type(Rational{BigInt}) == Generic.Poly{Rational{BigInt}}
+   @test poly_type(BigInt) == Generic.Poly{BigInt}
+   @test poly_type(Rational{BigInt}) == Generic.Poly{Rational{BigInt}}
 end
 
 @testset "Generic.Poly.constructors" begin
@@ -38,13 +38,14 @@ end
    for (S, y) in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
       @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
-      @test typeof(R) <: AbstractAlgebra.Ring
-      @test typeof(S) <: Generic.PolyRing
+      @test R isa AbstractAlgebra.Ring
+      @test S isa Generic.PolyRing
 
       @test isa(y, PolyRingElem)
    end
@@ -52,13 +53,13 @@ end
    R, x = polynomial_ring(ZZ, "x")
    S, y = polynomial_ring(R, "y")
 
-   @test typeof(S) <: Generic.PolyRing
+   @test S isa Generic.PolyRing
 
    @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
-   @test typeof(T) <: Generic.PolyRing
+   @test T isa Generic.PolyRing
 
    @testset "Generic.Poly.constructors.elements" begin
       @test isa(z, PolyRingElem)
@@ -2991,6 +2992,15 @@ end
    F = GF(11)
    P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+
+   let
+      Q = matrix_ring(QQ, 2) 
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c * (2*one(Q)), x; parent = Qz)
+      @test f == 2*z
+      @test parent(f) === Qz
+   end
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin

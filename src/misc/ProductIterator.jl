@@ -89,9 +89,10 @@ function Base.iterate(p::ProductIterator, (xs, states))
          # all previous entries had reached end-of-iteration, which therefore need
          # to be restarted; we don't do it in the `x_st === nothing` branch to not do
          # useless work when p's iteration is over
-         xs[j], states[j] = iterate(iters[j])
-                            # !== nothing, otherwise first iteration of p would have
-                            # yielded nothing (if p.iters are "well" behaved...)
+         xj_st = iterate(iters[j])
+         @assert !isnothing(xj_st) # otherwise first iteration of p would have
+                                   # yielded nothing (if p.iters are "well" behaved...)
+         xs[j], states[j] = xj_st
       end
       xs[i], states[i] = x_st
       break

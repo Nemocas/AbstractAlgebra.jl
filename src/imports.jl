@@ -1,10 +1,6 @@
 using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 
-if !isdefined(Base, :get_extension)
-  using Requires: @require
-end
-
 import LinearAlgebra
 
 import LinearAlgebra: det

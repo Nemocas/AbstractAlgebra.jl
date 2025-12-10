@@ -15,6 +15,8 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Group,
+                  :InfiniteDimensionError, # remove in next breaking release, see #2135
+                  :identity_map, # see #5188 in Oscar.jl
                  ]
 
 
@@ -89,6 +91,7 @@ include("Assertions.jl")
 
 include("Attributes.jl")
 include("PrintHelper.jl")
+include("PrettyOrdering.jl")
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -170,13 +173,20 @@ include("AbstractTypes.jl")
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
 const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
+pretty_lt(x::Number, y::Number) = isless(x, y)
+pretty_eq(x::Number, y::Number) = (x == y)
+
 include("julia/JuliaTypes.jl")
 
 # Unions of AbstactAlgebra abstract types and Julia types
-const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
-const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
+const JuliaRingElement = Union{Integer, Rational, AbstractFloat}
+const JuliaFieldElement = Union{Rational, AbstractFloat}
+const JuliaExactRingElement = Union{Integer, Rational}
 
-const FieldElement = Union{FieldElem, Rational, AbstractFloat}
+const RingElement = Union{RingElem, JuliaRingElement}
+const NCRingElement = Union{NCRingElem, JuliaRingElement}
+
+const FieldElement = Union{FieldElem, JuliaFieldElement}
 
 include("ConcreteTypes.jl")
 
@@ -188,6 +198,7 @@ include("ConcreteTypes.jl")
 
 include("fundamental_interface.jl")
 include("misc/VarNames.jl")
+include("Infinity.jl")
 
 ################################################################################
 #
@@ -219,6 +230,12 @@ include("ConformanceTests.jl")
 function check_parent(a, b, throw::Bool = true)
    flag = parent(a) === parent(b)
    flag || !throw || error("parents do not match")
+   return flag
+end
+
+function check_base_ring(a, b, throw::Bool = true)
+   flag = base_ring(a) === base_ring(b)
+   flag || !throw || error("base rings do not match")
    return flag
 end
 
@@ -433,29 +450,13 @@ function test_module(x, y)
    pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
-   test_function_name = "test_"
-
-   x == "generic"
-   if y == "RelSeries"
-      test_function_name *= "gen_rel_series"
-   elseif y == "AbsSeries"
-      test_function_name *= "gen_abs_series"
-   elseif y == "Matrix"
-      test_function_name *= "gen_mat"
-   elseif y == "Fraction"
-      test_function_name *= "gen_frac"
-   elseif y == "Residue"
-      test_function_name *= "gen_res"
-   else
-      test_function_name *= "gen_$(lowercase(y))"
-   end
+   rand_file = joinpath(pkgdir, "test/rand.jl")
 
    cmd = """
          using Test
          using AbstractAlgebra
-         include("test/rand.jl")
+         include("$rand_file")
          include("$test_file")
-         $test_function_name()
          """
    @info("spawning ", `$julia_exe --project=$(Base.active_project()) -e $cmd`)
    run(`$julia_exe -e $cmd`)
@@ -472,18 +473,5 @@ end
 ###############################################################################
 include("utils.jl")
 
-###############################################################################
-#
-#   Pre-1.9-compatibility for package extensions
-#
-###############################################################################
-
-# Remove once all supported julia versions support package extensions, i.e. 1.9 or later.
-# Same for all other places that use `isdefined(Base, :get_extension)`.
-@static if !isdefined(Base, :get_extension)
-  function __init__()
-      @require Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40" include("../ext/TestExt/TestExt.jl")
-  end
-end
 
 end # module

@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Field Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it

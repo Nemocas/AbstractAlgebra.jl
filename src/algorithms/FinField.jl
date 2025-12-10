@@ -33,36 +33,37 @@ struct FinFieldIterator{F}
       deg = length(basis)
       BigInt(characteristic(f))^deg == order(f) ||
          throw(ArgumentError("iteration only supported for extension fields over a prime field"))
-      new{elem_type(f)}(basis, Int64[])
+      new{elem_type(f)}(basis, zeros(Int64, deg))
    end
 end
 
-function Base.iterate(f::FinField, st=FinFieldIterator(f))
+function Base.iterate(f::FinField)
+   return zero(f), FinFieldIterator(f)
+end
+
+function Base.iterate(f::FinField, st::FinFieldIterator)
    basis, coeffs = st.basis, st.coeffs
    deg = length(basis)
    char = characteristic(f)
    elt = zero(f)
-   if isempty(coeffs) # "flag" indicating that this is the first iteration
-      resize!(coeffs, deg)
-      fill!(coeffs, 0)
-   else
-      allzero = true
-      for d=1:deg
-         if allzero
-            coeffs[d] += 1
-            if coeffs[d] == char
-               coeffs[d] = 0
-            else
-               allzero = false
-            end
-         end
-         if !iszero(coeffs[d]) # add! only when necessary
-            elt = add!(elt, elt, coeffs[d]*basis[d])
+
+   allzero = true
+   for d in 1:deg
+      if allzero
+         coeffs[d] += 1
+         if coeffs[d] == char
+            coeffs[d] = 0
+         else
+            allzero = false
          end
       end
-      allzero && return nothing
+      if !iszero(coeffs[d]) # add! only when necessary
+         elt = add!(elt, elt, coeffs[d]*basis[d])
+      end
    end
-   elt, st
+   allzero && return nothing
+
+   return elt, st
 end
 
 Base.length(f::FinField) = BigInt(order(f))

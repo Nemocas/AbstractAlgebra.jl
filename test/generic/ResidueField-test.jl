@@ -67,6 +67,12 @@
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   # trivial rings can not be fields
+   @test_throws ArgumentError residue_field(ZZ, 1)
+   R = residue_ring(ZZ, 1)[1]
+   @test is_trivial(R)
+   @test_throws ArgumentError residue_field(R, R(2))
 end
 
 @testset "EuclideanRingResidueFieldElem.printing" begin

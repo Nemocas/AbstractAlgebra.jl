@@ -26,6 +26,30 @@ function check_parent(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 end
 
 is_finite(M::FPModule{<:FinFieldElem}) = true
+is_finitely_generated(M::FPModule) = true
+is_finitely_generated(M::Module) = isfinite(ngens(M)) || throw(NotImplementedError(:is_finitely_generated, M))
+
+@doc raw"""
+    is_noetherian(M::Module)
+
+Check if the module $M$ is Noetherian.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> M = free_module(R, 2)
+Free module of rank 2 over R
+
+julia> is_noetherian(M)
+true
+```
+"""
+function is_noetherian(M::Module)
+  is_finitely_generated(M) || return false
+  is_noetherian(base_ring(M)) && return true
+  throw(NotImplementedError(:is_noetherian, M))
+end
 
 function is_sub_with_data(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
   fl = is_submodule(N, M)
@@ -196,6 +220,7 @@ each method of constructing modules (submodules, quotient modules, products,
 etc.) must extend this notion of equality to the modules they create.
 """
 function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
+   M === N && return true  #object equality is sufficient
    check_parent(M, N)
    # Compute the common supermodule P of M and N
    flag, P = is_compatible(M, N)
@@ -254,6 +279,9 @@ function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    return true
 end
 
+# Equal `FPModule`s must have the same `hash` value.
+Base.hash(M::FPModule, h::UInt) = h # FIXME
+
 ###############################################################################
 #
 #   Isomorphism
@@ -282,6 +310,15 @@ Return the $i$-th coefficient of the module element $v$.
 """
 function getindex(v::FPModuleElem{T}, i::Int) where T <: RingElement
    return Generic._matrix(v)[1, i]
+end
+
+@doc raw"""
+    coordinates(v::FPModuleElem{T}, i::Int) where T <: RingElement
+
+Return the coordinates of the module element $v$ as a `Vector{T}`.
+"""
+function coordinates(v::FPModuleElem{T}) where T <: RingElement
+   return collect(Generic._matrix(v)[1, :])
 end
 
 ###############################################################################

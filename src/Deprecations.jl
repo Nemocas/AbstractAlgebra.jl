@@ -9,7 +9,12 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently nothing here =#
+# renamed in 0.45.1
+@alias FactoredFractionField factored_fraction_field
+
+#renamed in 0.47.4
+@alias dense_poly_type poly_type
+@alias dense_poly_ring_type poly_ring_type
 
 ###############################################################################
 #
@@ -59,15 +64,22 @@ end
 @deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
 
-# to be deprecated in next breaking release
-test_iterate = ConformanceTests.test_iterate
+# deprecated in 0.45.0
+@deprecate test_iterate ConformanceTests.test_iterate
 
-# to be removed in next breaking release
-function var"@attr"(__source__::LineNumberNode, __module__::Base.Module, rettype, options, expr::Expr)
-  @assert options.head == :(=)
-  @assert length(options.args) == 2
-  @assert options.args[1] == :ignore_kwargs
-  @assert options.args[2].head == :vect
-  Base.depwarn("The `ignore_kwargs` option is deprecated. It is no longer needed as `@attr` ignores all kwargs by default.", Symbol("@attr"))
-  return var"@attr"(__source__, __module__, rettype, expr)
+# deprecated in 0.45.2
+import Base: contains
+@deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
+
+# to be deprecated in the next breaking release
+zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
+Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
+function zeros(R::NCRing, r::Int...)
+    #Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
+    T = elem_type(R)
+    A = Array{T}(undef, r)
+    for i in eachindex(A)
+        A[i] = R()
+    end
+    return A
 end

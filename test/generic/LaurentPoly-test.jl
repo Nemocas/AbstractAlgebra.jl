@@ -37,6 +37,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
          @test base_ring(L) == R
          @test base_ring(L) == base_ring(P)
+         @test coefficient_ring(L) == R
+         @test coefficient_ring_type(L) === typeof(R)
 
          @test var(L) == :y
          @test symbols(L) == [:y]

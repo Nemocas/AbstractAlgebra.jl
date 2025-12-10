@@ -20,9 +20,15 @@ base_ring_type(::Type{QuotientModule{T}}) where T <: RingElement = parent_type(T
 
 base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:QuotientModule}) = base_ring_type(T)
+
+coefficient_ring(N::QuotientModule) = base_ring(N)
+
 number_of_generators(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
+
+rank(M::QuotientModule{T}) where T <: FieldElement = dim(M)
 
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
@@ -38,6 +44,7 @@ end
 Return the dimension of the given vector quotient space.
 """
 dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
+vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 
 @doc raw"""
     supermodule(M::QuotientModule{T}) where T <: RingElement
@@ -138,7 +145,7 @@ function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    return QuotientModuleElem{T}(N, mat)
 end
 
-function (M::QuotientModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
+function (M::QuotientModule{T})(a::Vector{Any}) where T <: NCRingElement
    length(a) != 0 && error("Incompatible element")
    return M(T[])
 end

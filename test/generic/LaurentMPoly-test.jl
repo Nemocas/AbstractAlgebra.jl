@@ -14,8 +14,10 @@ end
 
     @test base_ring(L) == GF(5)
     @test coefficient_ring(L) == GF(5)
+    @test coefficient_ring_type(L) === typeof(GF(5))
     @test base_ring(x) == GF(5)
     @test coefficient_ring(x) == GF(5)
+    @test coefficient_ring_type(x) === typeof(GF(5))
 
     L, (x, y) = laurent_polynomial_ring(GF(5), ["x", "y"])
     @test L == laurent_polynomial_ring(GF(5), ['x', 'y'])[1]
@@ -27,6 +29,11 @@ end
     @test x == L(X)
     @test y == L(Y)
     @test X + x == 2*x
+end
+
+@testset "Generic.LaurentMPoly.characteristic" for R in (GF(5), ZZ, residue_ring(ZZ, 6)[1])
+   L, (x, y) = laurent_polynomial_ring(R, 2, "x", cached = true)
+   @test characteristic(L) == characteristic(R)
 end
 
 @testset "Generic.LaurentMPoly.printing" begin
@@ -82,6 +89,9 @@ end
     @test a == sum(coefficients(a) .* monomials(a))
     @test a == L(collect(coefficients(a)), collect(exponent_vectors(a)))
     @test iszero((@inferred constant_coefficient(a)))
+    @test coeff(a, [-2, 1]) == 2
+    @test coeff(a, [1, -3]) == 3
+    @test coeff(a, [1, 1]) == 0
 
     b = MPolyBuildCtx(L)
     for (c, e) in zip(coefficients(a), exponent_vectors(a))

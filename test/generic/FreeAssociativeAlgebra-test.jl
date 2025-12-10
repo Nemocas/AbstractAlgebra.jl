@@ -20,11 +20,12 @@
       @test parent_type(Generic.FreeAssociativeAlgebraElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
       @test ngens(S) == length(gens(S))
 
-      @test typeof(S) <: Generic.FreeAssociativeAlgebra
+      @test S isa Generic.FreeAssociativeAlgebra
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test coefficient_ring(varlist[j]) === R
@@ -96,13 +97,14 @@
       if !iszero(f1)
          @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
          @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
+         @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
       else
+         @test_throws ArgumentError leading_coefficient(f1)
          @test_throws ArgumentError leading_term(f1)
          @test_throws ArgumentError leading_monomial(f1)
          @test_throws ArgumentError leading_exponent_word(f1)
+         @test canonical_unit(f1) == one(R)
       end
-
-      @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
 
       @test !is_gen(zero(S))
       @test !is_gen(one(S))

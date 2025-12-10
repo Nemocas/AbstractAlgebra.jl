@@ -104,10 +104,13 @@ import ..AbstractAlgebra: base_ring_type
 import ..AbstractAlgebra: canonical_unit
 import ..AbstractAlgebra: change_base_ring
 import ..AbstractAlgebra: characteristic
+import ..AbstractAlgebra: check_base_ring
 import ..AbstractAlgebra: check_parent
 import ..AbstractAlgebra: codomain
 import ..AbstractAlgebra: coeff
+import ..AbstractAlgebra: coeff!
 import ..AbstractAlgebra: coefficient_ring
+import ..AbstractAlgebra: coefficient_ring_type
 import ..AbstractAlgebra: coefficients
 import ..AbstractAlgebra: coefficients_of_univariate
 import ..AbstractAlgebra: compose
@@ -129,7 +132,9 @@ import ..AbstractAlgebra: domain
 import ..AbstractAlgebra: elem_type
 import ..AbstractAlgebra: evaluate
 import ..AbstractAlgebra: exp
+import ..AbstractAlgebra: exponent_vector
 import ..AbstractAlgebra: exponent_vectors
+import ..AbstractAlgebra: exponent_vector!
 import ..AbstractAlgebra: expressify
 import ..AbstractAlgebra: factor
 import ..AbstractAlgebra: factor_squarefree
@@ -138,6 +143,7 @@ import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
 import ..AbstractAlgebra: hom
 import ..AbstractAlgebra: identity_matrix
+import ..AbstractAlgebra: image
 import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
 import ..AbstractAlgebra: integral
@@ -151,6 +157,7 @@ import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
 import ..AbstractAlgebra: is_squarefree
@@ -160,19 +167,23 @@ import ..AbstractAlgebra: is_terse
 import ..AbstractAlgebra: is_trivial
 import ..AbstractAlgebra: is_unit
 import ..AbstractAlgebra: is_univariate
+import ..AbstractAlgebra: is_univariate_with_data
 import ..AbstractAlgebra: is_zero_divisor
 import ..AbstractAlgebra: is_zero_divisor_with_annihilator
 import ..AbstractAlgebra: isreduced_form
+import ..AbstractAlgebra: JuliaRingElement
 import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial
 import ..AbstractAlgebra: leading_term
 import ..AbstractAlgebra: log
 import ..AbstractAlgebra: map_coefficients
+import ..AbstractAlgebra: matrix
 import ..AbstractAlgebra: max_precision
 import ..AbstractAlgebra: minpoly
 import ..AbstractAlgebra: modulus
 import ..AbstractAlgebra: monomials
+import ..AbstractAlgebra: monomial!
 import ..AbstractAlgebra: mul!
 import ..AbstractAlgebra: mul_classical
 import ..AbstractAlgebra: mul_karatsuba
@@ -190,6 +201,7 @@ import ..AbstractAlgebra: pol_length
 import ..AbstractAlgebra: pow!
 import ..AbstractAlgebra: preimage
 import ..AbstractAlgebra: pretty
+import ..AbstractAlgebra: pretty_sort
 import ..AbstractAlgebra: primpart
 import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudorem
@@ -211,6 +223,7 @@ import ..AbstractAlgebra: symbols
 import ..AbstractAlgebra: tail
 import ..AbstractAlgebra: term_degree
 import ..AbstractAlgebra: terms
+import ..AbstractAlgebra: term!
 import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
@@ -220,5 +233,7 @@ import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
 import ..AbstractAlgebra: var
 import ..AbstractAlgebra: var_index
+import ..AbstractAlgebra: var_indices
 import ..AbstractAlgebra: vars
+import ..AbstractAlgebra: vector_space_dim
 import ..AbstractAlgebra: zero!
