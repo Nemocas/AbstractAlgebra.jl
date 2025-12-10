@@ -9,10 +9,10 @@ function is_power(a::PolyRingElem, n::Int)
     # probably a equal-degree-factorisation would be good + some more gcd's
     # implement some Newton-type algo?
     degree(a) % n == 0 || return false, a
-    fl, x = is_power(leading_coefficient(a), n)
-    fl || return false, a
     f = factor(a)
     all(i % n == 0 for (_, i) in f) || return false, a
+    fl, x = is_power(constant_coefficient(f.unit), n)
+    fl || return false, a
     return true, x*prod(p^div(k, n) for (p, k) = f)
 end
 
