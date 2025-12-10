@@ -756,6 +756,7 @@ function evaluate(a::UnivPoly, A::Vector{<:NCRingElement})
    isempty(A) && error("Evaluating at an empty list of values is not allowed")
    a2 = data(a)
    varidx = var_indices(a2)
+   isempty(varidx) && return constant_coefficient(a2) # TODO: this is weird
    vals = zeros(parent(A[1]), nvars(parent(a2)))
    n = length(A)
    for i in varidx
@@ -779,7 +780,8 @@ function evaluate(a::UnivPoly{T}, vars::Vector{Int}, vals::Vector{V}) where {T <
    vals2 = Vector{mpoly_type(T)}(undef, 0)
    num = nvars(parent(data(a)))
    S = parent(a)
-   a2 = data(S(a))
+   upgrade!(a)
+   a2 = data(a)
    for i = 1:length(vars)
       if vars[i] <= num
          push!(vars2, vars[i])
