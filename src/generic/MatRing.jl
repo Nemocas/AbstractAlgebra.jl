@@ -123,8 +123,7 @@ end
 ###############################################################################
 
 function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
-   #=A.data ==# add!(matrix(A), matrix(B))  ### !!struct is NOT mutable!!
-   return A
+   return MatRingElem(add!(matrix(A), matrix(B)))
 end
 
 ###############################################################################
