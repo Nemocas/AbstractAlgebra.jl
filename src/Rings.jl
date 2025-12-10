@@ -111,10 +111,10 @@ is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
 # implementors should only implement this trait for RingElem subtypes, but for
 # convenience we support calling this also on Ring subtypes as well as Ring
 # and RingElem instances
-is_domain_type(R::Type{T}) where T <: RingElem = false
+is_domain_type(R::Type{T}) where T <: NCRingElem = false
 
 is_domain_type(x) = is_domain_type(typeof(x))
-is_domain_type(x::Type{<:Ring}) = is_domain_type(elem_type(x))
+is_domain_type(x::Type{<:NCRing}) = is_domain_type(elem_type(x))
 is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
 
 ###############################################################################
