@@ -82,7 +82,7 @@ end
 
    @test isa(g, EuclideanRingResidueRingElem)
 
-   @test T(1//(x+1)) == inv(x+1)
+   @test T(1//(x+1)) == inv(T(x+1))
 
    # Poly modulus, invertible lc
    S, x = polynomial_ring(ZZ, "x")
