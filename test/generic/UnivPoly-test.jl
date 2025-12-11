@@ -974,6 +974,7 @@ end
          @test evaluate(f, V) == f(V...)
          @test evaluate(f, V) == f([ZZ(v) for v in V]...)
          @test evaluate(f, V) == f([U(v) for v in V]...)
+         @test evaluate(f, V) == evaluate(f, collect(1:n), V)
 
          @test evaluate(g, V) == evaluate(g, [R(v) for v in V])
          @test evaluate(g, V) == evaluate(g, [ZZ(v) for v in V])
@@ -981,13 +982,11 @@ end
          @test evaluate(g, V) == g(V...)
          @test evaluate(g, V) == g([ZZ(v) for v in V]...)
          @test evaluate(g, V) == g([U(v) for v in V]...)
+         @test evaluate(g, V) == evaluate(g, collect(1:n), V)
 
-         @test evaluate(h, V) == evaluate(h, [R(v) for v in V])
-         @test evaluate(h, V) == evaluate(h, [ZZ(v) for v in V])
-         @test evaluate(h, V) == evaluate(h, [U(v) for v in V])
-         @test evaluate(h, V) == h(V...)
-         @test evaluate(h, V) == h([ZZ(v) for v in V]...)
-         @test evaluate(h, V) == h([U(v) for v in V]...)
+         @test parent(evaluate(g, V)) == R
+         @test parent(evaluate(g, collect(1:n), V)) == S
+         @test evaluate(h, [1,2,3,4]) == evaluate(h, [1,2,3,5])
 
          V = [rand(-10:10) for v in 1:2]
 
@@ -998,16 +997,20 @@ end
          @test evaluate(f, [1, 3], [V[1], V[2]]) == evaluate(f, [1, 3], [ZZ(v) for v in V[1:2]])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == f(x=V[1], z=V[2])
          @test evaluate(f, [1, 3], [V[1], V[2]]) == f(z=V[2], x=V[1])
+         @test evaluate(f, [1, 3], [V[1], V[2]]) == f(x=V[1], z=V[2], w=0)
+         @test parent(evaluate(f, [1, 3], [V[1], V[2]])) == S
 
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [R(V[1])])
          @test evaluate(g, [1], [V[1]]) == evaluate(g, [1], [ZZ(V[1])])
          @test evaluate(g, [1, 3], [V[1], V[2]]) == evaluate(g, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(g, [1, 3], [V[1], V[2]]) == evaluate(g, [1, 3], [ZZ(v) for v in V[1:2]])
+         @test parent(evaluate(g, [1, 3], [V[1], V[2]])) == S
 
          @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [R(V[1])])
          @test evaluate(h, [1], [V[1]]) == evaluate(h, [1], [ZZ(V[1])])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [R(v) for v in V[1:2]])
          @test evaluate(h, [1, 3], [V[1], V[2]]) == evaluate(h, [1, 3], [ZZ(v) for v in V[1:2]])
+         @test parent(evaluate(h, [1, 3], [V[1], V[2]])) == S
 
          @test evaluate(x, [1], [y]) == evaluate(z, [3], [y])
       end
