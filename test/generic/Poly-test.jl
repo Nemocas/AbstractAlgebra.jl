@@ -123,6 +123,19 @@ end
    end
 end
 
+@testset "Generic.Poly.coercion" begin
+   R, x1 = polynomial_ring(QQ, :x)
+   S, x2 = polynomial_ring(ZZ, :x)
+   T, x3 = polynomial_ring(residue_ring(ZZ, 4)[1], :x)
+
+   @test S(x1^2+2*x1) == x2^2+x2
+   @test R(x2^2+x2) == x1^2+2*x1
+   @test T(4*x2^2+6*x2) == 2*x3
+   @test T(x2^2+x2) == x3^2+x3
+
+   @test_throws InexactError S(1//2*x1)
+end
+
 @testset "Generic.Poly.iterators" begin
    R, x = polynomial_ring(ZZ, "x")
 

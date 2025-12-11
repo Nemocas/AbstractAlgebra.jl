@@ -3547,6 +3547,23 @@ end
 
 ###############################################################################
 #
+#   Polynomial coercion
+#
+###############################################################################
+
+function (R::PolyRing)(a::RingElement)
+  return R(coefficient_ring(R)(a))
+end
+
+function (R::PolyRing)(p::PolyRingElem)
+  S = parent(p)
+  R == S && return p
+  @req var(R) == var(S) "Variable names do not match"
+  return map_coefficients(identity, p; parent = R)
+end
+
+###############################################################################
+#
 #   Polynomial Ring S, x = R[:x] syntax
 #
 ###############################################################################

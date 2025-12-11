@@ -371,10 +371,6 @@ end
 #
 ###############################################################################
 
-function (a::PolyRing{T})(b::RingElement) where T <: RingElement
-   return a(base_ring(a)(b))
-end
-
 function (a::PolyRing{T})() where T <: RingElement
    z = Poly{T}()
    z.parent = a
@@ -392,11 +388,6 @@ function (a::PolyRing{T})(b::T) where T <: RingElement
    z = Poly{T}(b)
    z.parent = a
    return z
-end
-
-function (a::PolyRing{T})(b::AbstractAlgebra.PolyRingElem{T}) where T <: RingElement
-   parent(b) != a && error("Unable to coerce polynomial")
-   return b
 end
 
 function (a::PolyRing{T})(b::Vector{T}) where T <: RingElement
