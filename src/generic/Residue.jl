@@ -48,6 +48,10 @@ function (a::EuclideanRingResidueRing{T})(b::Integer) where {T <: RingElement}
    return z
 end
 
+function (a::EuclideanRingResidueRing)(b::T) where {T <: Union{Rational, FracElem}}
+   return inv(a(denominator(b))) * a(numerator(b))
+end
+
 function (a::EuclideanRingResidueRing{T})(b::T) where {T <: RingElem}
    base_ring(a) !== parent(b) && error("Operation on incompatible objects")
    z = EuclideanRingResidueRingElem{T}(mod(b, modulus(a)))
