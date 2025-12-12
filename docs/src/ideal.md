@@ -85,7 +85,7 @@ AbstractAlgebra.Generic.Ideal{BigInt}(Integers, BigInt[1])
 ### Basic functionality
 
 ```@docs
-gens(::Generic.Ideal{T}) where T <: RingElement
+gens(::Generic.Ideal)
 ```
 
 **Examples**
@@ -117,7 +117,7 @@ ideals.
 ### Containment
 
 ```@docs
-is_subset(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
+is_subset(I::T, J::T) where {T <: Generic.Ideal}
 ```
 
 ```@docs

@@ -28,6 +28,10 @@ is_domain_type(::Type{T}) where T <: Integer = true
 
 base_ring(::Vector{T}) where T <: Integer = T
 
+# ideal interface
+ideal_type(::Type{Integers{T}}) where T <: Integer = Generic.Ideal{T}
+ideal(R::Integers, V::Vector) = Generic.Ideal(R, V)
+
 ###############################################################################
 #
 #   Basic manipulation
