@@ -67,6 +67,8 @@ end
 
    @test isa(d, EuclideanRingResidueRingElem)
 
+   @test R(2//3) * R(3) == R(2)
+
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
 
@@ -80,7 +82,9 @@ end
 
    @test isa(g, EuclideanRingResidueRingElem)
 
-   # Poly modulus, invertible lc 
+   @test T(1//(x+1)) == inv(T(x+1))
+
+   # Poly modulus, invertible lc
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 1)
 
