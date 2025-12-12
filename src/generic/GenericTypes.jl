@@ -1164,23 +1164,20 @@ struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
 end
 
 struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
-   base_ring::NCRing
-   entries::Matrix{T}
+   data::MatElem{T}
 
-   function MatRingElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
-      @assert elem_type(R) === T
-      return new{T}(R, A)
+  function MatRingElem(A::MatElem{TT}) where TT <: NCRingElement
+    nrows(A) == ncols(A) || error("Matrix must be square")
+    return new{TT}(A)
    end
 end
 
-function MatRingElem{T}(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
-   @assert elem_type(R) === T
-   t = Matrix{T}(undef, n, n)
-   for i = 1:n, j = 1:n
-      t[i, j] = A[(i - 1) * n + j]
-   end
-   return MatRingElem{T}(R, t)
+function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
+   t = matrix(R, n, n, A)
+   return MatRingElem(t)
 end
+
+matrix(A::MatRingElem{T}) where {T <: NCRingElement} = A.data::dense_matrix_type(T)
 
 ###############################################################################
 #

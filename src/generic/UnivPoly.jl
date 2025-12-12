@@ -752,93 +752,26 @@ end
 #
 ###############################################################################
 
-function evaluate(a::UnivPoly{T}, A::Vector{T}) where {T <: RingElem}
-   R = base_ring(a)
+function evaluate(a::UnivPoly, A::Vector{<:NCRingElement})
+   isempty(A) && error("Evaluating at an empty list of values is not allowed")
+   a2 = data(a)
+   varidx = var_indices(a2)
+   isempty(varidx) && return constant_coefficient(a2) # TODO: this is weird
+   vals = zeros(parent(A[1]), nvars(parent(a2)))
    n = length(A)
-   num = nvars(parent(data(a)))
-   if n > num
-      n > nvars(parent(a)) && error("Too many values")
-      if nvars(parent(data(a))) == 0
-         return constant_coefficient(data(a))*one(parent(A[1]))
-      end
-      return evaluate(data(a), A[1:num])
+   for i in varidx
+      i <= n || error("Number of variables does not match number of values")
+      vals[i] = A[i]
    end
-   if n < num
-      A = vcat(A, [zero(R) for i = 1:num - n])
-   end
-   return evaluate(data(a), A)
+   return evaluate(a2, vals)
 end
 
-function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: JuliaRingElement}
-   n = length(A)
-   num = nvars(parent(data(a)))
-   if n > num
-      n > nvars(parent(a)) && error("Too many values")
-      if nvars(parent(data(a))) == 0
-         return constant_coefficient(data(a))*one(parent(A[1]))
-      end
-      return evaluate(data(a), A[1:num])
-   end
-   if n < num
-      A = vcat(A, zeros(V, num - n))
-   end
-   return evaluate(data(a), A)
-end
-
-function evaluate(a::UnivPoly{T}, A::Vector{V}) where {T <: RingElement, V <: RingElement}
-   n = length(A)
-   num = nvars(parent(data(a)))
-   if n > num
-      n > nvars(parent(a)) && error("Too many values")
-      if nvars(parent(data(a))) == 0
-         return constant_coefficient(data(a))*one(parent(A[1]))
-      end
-      return evaluate(data(a), A[1:num])
-   end
-   if n < num
-      if n == 0
-         R = base_ring(a)
-         return evaluate(data(a), [zero(R) for _ in 1:num])
-      else
-         R = parent(A[1])
-         A = vcat(A, [zero(R) for _ in 1:num-n])
-         return evaluate(data(a), A)
-     end
-   end
-   return evaluate(data(a), A)
-end
-
-function (a::UnivPoly{T})() where {T <: RingElement}
-   return evaluate(a, T[])
-end
-
-function (a::UnivPoly{T})(vals::T...) where {T <: RingElement}
-   return evaluate(a, [vals...])
-end
-
-function (a::UnivPoly{T})(val::V, vals::V...) where {T <: RingElement, V <: JuliaRingElement}
+function (a::UnivPoly)(val::T, vals::T...) where T <: NCRingElement
    return evaluate(a, [val, vals...])
 end
 
-function (a::UnivPoly{T})(vals::NCRingElement...) where {T <: RingElement}
-   A = [vals...]
-   n = length(vals)
-   num = nvars(parent(data(a)))
-   if n > num
-      n > nvars(parent(a)) && error("Too many values")
-      if nvars(parent(data(a))) == 0
-         return constant_coefficient(data(a))*one(parent(A[1]))
-      end
-      return data(a)(vals[1:num]...)
-   end
-   if n < num
-      A = vcat(A, zeros(Int, num - n))
-   end
-   return data(a)(A...)
-end
-
-function evaluate(a::UnivPoly{T}, vals::Vector{V}) where {T <: RingElement, V <: NCRingElem}
-   return a(vals...)
+function (a::UnivPoly)()
+   return evaluate(a, Int[])
 end
 
 function evaluate(a::UnivPoly{T}, vars::Vector{Int}, vals::Vector{V}) where {T <: RingElement, V <: RingElement}
@@ -847,33 +780,20 @@ function evaluate(a::UnivPoly{T}, vars::Vector{Int}, vals::Vector{V}) where {T <
    vals2 = Vector{mpoly_type(T)}(undef, 0)
    num = nvars(parent(data(a)))
    S = parent(a)
-   n = nvars(S)
+   upgrade!(a)
+   a2 = data(a)
    for i = 1:length(vars)
-      vars[i] > n && error("Unknown variable")
       if vars[i] <= num
          push!(vars2, vars[i])
          push!(vals2, data(S(vals[i])))
       end
    end
-   return UnivPoly(evaluate(data(S(a)), vars2, vals2), S)
+   return UnivPoly(evaluate(a2, vars2, vals2), S)
 end
 
 function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UnivPoly{T}, V <: RingElement} where {T <: RingElement}
    varidx = Int[var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
-end
-
-function (a::Union{MPolyRingElem, UniversalPolyRingElem})(;kwargs...)
-   ss = symbols(parent(a))
-   vars = Array{Int}(undef, length(kwargs))
-   vals = Array{RingElement}(undef, length(kwargs))
-   for (i, (var, val)) in enumerate(kwargs)
-     vari = findfirst(isequal(var), ss)
-     vari === nothing && error("Given polynomial has no variable $var")
-     vars[i] = vari
-     vals[i] = val
-   end
-   return evaluate(a, vars, vals)
 end
 
 ########S,(a,b)=QQ[:a,:b]#######################################################################

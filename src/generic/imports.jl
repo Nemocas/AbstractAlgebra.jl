@@ -142,6 +142,7 @@ import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
 import ..AbstractAlgebra: hom
+import ..AbstractAlgebra: ideal_type
 import ..AbstractAlgebra: identity_matrix
 import ..AbstractAlgebra: image
 import ..AbstractAlgebra: image_fn

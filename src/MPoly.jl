@@ -1130,6 +1130,19 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
    return a(vals...)
 end
 
+function (a::MPolyRingElem)(;kwargs...)
+   ss = symbols(parent(a))
+   vars = Array{Int}(undef, length(kwargs))
+   vals = Array{RingElement}(undef, length(kwargs))
+   for (i, (var, val)) in enumerate(kwargs)
+     vari = findfirst(isequal(var), ss)
+     vari === nothing && error("Given polynomial has no variable $var")
+     vars[i] = vari
+     vals[i] = val
+   end
+   return evaluate(a, vars, vals)
+end
+
 ################################################################################
 #
 #  Derivative
