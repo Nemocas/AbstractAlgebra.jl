@@ -29,7 +29,7 @@
          @test elem_type(Generic.UniversalPolyRing{elem_type(R)}) == Generic.UnivPoly{elem_type(R)}
          @test parent_type(Generic.UnivPoly{elem_type(R)}) == Generic.UniversalPolyRing{elem_type(R)}
 
-         @test base_ring(S) === R
+         @test coefficient_ring(S) === R
          @test coefficient_ring(S) === R
          @test coefficient_ring_type(S) === typeof(R)
 
@@ -137,10 +137,10 @@ end
          @test parent(f2) === S
          @test parent(f3) === S
 
-         @test base_ring(S) === R
-         @test base_ring(f1) === R
-         @test base_ring(f2) === R
-         @test base_ring(f3) === R
+         @test coefficient_ring(S) === R
+         @test coefficient_ring(f1) === R
+         @test coefficient_ring(f2) === R
+         @test coefficient_ring(f3) === R
 
          @test nvars(S) == 3
 
@@ -1119,9 +1119,9 @@ end
       @test length(g) == length(g1)
       @test length(h) == length(h1)
 
-      @test base_ring(f1) === U
-      @test base_ring(g1) === U
-      @test base_ring(h1) === U
+      @test coefficient_ring(f1) === U
+      @test coefficient_ring(g1) === U
+      @test coefficient_ring(h1) === U
 
       f2 = map_coefficients(x->x^2, f)
       g2 = map_coefficients(x->x^2, g)
