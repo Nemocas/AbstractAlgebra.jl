@@ -89,9 +89,9 @@ Create an uninitialized matrix ring element over the given ring and dimension,
 with defaults based upon the given source matrix ring element `x`.
 """
 function similar(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x))
-   TT = elem_type(R)
-   M = Matrix{TT}(undef, (n, n))
-   return Generic.MatRingElem{TT}(R, M)
+   @req (n >= 0)  "Matrix dimension must be non-negative"
+   @req (n < 2^30)  "Matrix dimension is excessively large"
+   return Generic.MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
 end
 
 similar(x::MatRingElem, n::Int) = similar(x, base_ring(x), n)
@@ -182,28 +182,6 @@ end
 
 ###############################################################################
 #
-#   Binary operations
-#
-###############################################################################
-
-function *(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
-   degree(x) != degree(y) && error("Incompatible matrix degrees")
-   A = similar(x)
-   C = base_ring(x)()
-   for i = 1:nrows(x)
-      for j = 1:ncols(y)
-         A[i, j] = base_ring(x)()
-         for k = 1:ncols(x)
-            C = mul!(C, x[i, k], y[k, j])
-            A[i, j] = add!(A[i, j], C)
-         end
-      end
-   end
-   return A
-end
-
-###############################################################################
-#
 #   Ad hoc comparisons
 #
 ###############################################################################
@@ -248,9 +226,30 @@ end
 
 ###############################################################################
 #
+#   Basic arithmetic -- delegate to MatElem
+#
+###############################################################################
+
+*(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) * matrix(y))
+
++(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) + matrix(y))
+
+-(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) - matrix(y))
+
+==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
+
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
+
+# TO DO: using pseudo_inv is not ideal
+#   consider case M = matrix(ZZmod4, 2,2, [2,1,0,1])
+#   pseudo_inv(M) gives error, but copuld give matrix(ZZ4, 2,2, [1,-1,0,2]) with denom=2
+# HINT: Consider using solve(f,g;side=:right)  or side=:left
+# The unused kwargs in the field cases are necessary for generic code to compile.
 
 function divexact_left(f::MatRingElem{T},
                        g::MatRingElem{T}; check::Bool=true) where T <: RingElement
@@ -259,7 +258,7 @@ function divexact_left(f::MatRingElem{T},
 end
 
 function divexact_right(f::MatRingElem{T},
-                       g::MatRingElem{T}; check::Bool=true) where T <: RingElement
+                        g::MatRingElem{T}; check::Bool=true) where T <: RingElement
    ginv, d = pseudo_inv(g)
    return divexact(f*ginv, d; check=check)
 end
@@ -319,6 +318,9 @@ function RandomExtensions.make(S::MatRing, vs...)
    end
 end
 
+# Sampler for a MatRing not needing arguments (passed via make)
+# this allows to obtain the Sampler in simple cases without having to know about make
+# (when one can do `rand(M)`, one can expect to be able to do `rand(Sampler(rng, M))`)
 Random.Sampler(::Type{RNG}, S::MatRing, n::Random.Repetition
                ) where {RNG<:AbstractRNG} =
    Random.Sampler(RNG, make(S), n)
@@ -424,15 +426,10 @@ end
 ###############################################################################
 
 function identity_matrix(M::MatRingElem{T}, n::Int) where T <: NCRingElement
-   R = base_ring(M)
-   arr = Matrix{T}(undef, n, n)
-   for i in 1:n
-      for j in 1:n
-         arr[i, j] = i == j ? one(R) : zero(R)
-      end
-   end
-   z = Generic.MatRingElem{T}(R, arr)
-   return z
+  @req (n >= 0)  "Matrix dimension must be non-negative"
+  @req (n < 2^30)  "Matrix dimension is excessively large"
+  R = base_ring(M)
+  return Generic.MatRingElem(identity_matrix(R,n))
 end
 
 @doc raw"""

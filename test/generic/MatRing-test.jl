@@ -72,7 +72,7 @@
    @test parent(S()) == S
 end
 
-@testset "Generic.MatAlg.finitiess" begin
+@testset "Generic.MatAlg.finiteness" begin
    S = matrix_ring(QQ, 3)
    @test !is_finite(S)
    @test !is_trivial(S)
