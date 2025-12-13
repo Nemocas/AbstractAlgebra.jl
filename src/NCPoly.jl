@@ -756,8 +756,10 @@ end
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   poly_ring_type(T)(R, s, cached)
+function polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
+   return poly_ring_type(T)(R, s, cached)
+end
 
 # Simplified constructor
 
