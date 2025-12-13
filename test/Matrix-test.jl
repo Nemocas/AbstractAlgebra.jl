@@ -214,3 +214,46 @@ end
   @test M * QQ(1) == QQ(1) * M == QQ.(M)
   @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
 end
+
+@testset "Rank Interpolation" begin
+  Fx, x = polynomial_ring(GF(25), :x)
+  Qy, y = polynomial_ring(QQ, 3, :y)
+  Qz, z = rational_function_field(QQ, :z)
+  
+  A = rand(matrix_space(Fx, 2, 2), 0:5, 1:5)
+  B = rand(matrix_space(Qy, 2, 2), 1:3, 1:4, 1:2)
+  C = rand(matrix_space(Qz, 2, 2), 0:5, 1:5)
+
+  @test rank(A) == rank_interpolation(A)
+  @test rank(A) >= rank_interpolation_mc(A)
+  @test rank(B) == rank_interpolation(B)
+  @test rank(B) >= rank_interpolation_mc(B)
+  @test rank(C) == rank_interpolation(C)
+  @test rank(C) >= rank_interpolation_mc(C)
+
+  multiply_row!(A, 0, 1)
+  multiply_row!(B, 0, 1)
+  multiply_row!(C, 0, 1)
+
+  @test rank(A) == rank_interpolation(A)
+  @test rank(A) >= rank_interpolation_mc(A)
+  @test rank(B) == rank_interpolation(B)
+  @test rank(B) >= rank_interpolation_mc(B)
+  @test rank(C) == rank_interpolation(C)
+  @test rank(C) >= rank_interpolation_mc(C)
+
+  A = rand(matrix_space(Fx, 0, 2), 0:5, 1:5)
+  B = rand(matrix_space(Qy, 0, 2), 1:3, 1:4, 1:2)
+  C = rand(matrix_space(Qz, 2, 0), 0:5, 1:5)
+
+  @test rank(A) == rank_interpolation(A)
+  @test rank(A) >= rank_interpolation_mc(A)
+  @test rank(B) == rank_interpolation(B)
+  @test rank(B) >= rank_interpolation_mc(B)
+  @test rank(C) == rank_interpolation(C)
+  @test rank(C) >= rank_interpolation_mc(C)
+
+  A = rand(matrix_space(Fx, 10, 10), 0:5, 1:5)
+  @test_throws rank_interpolation(A)
+  @test_throws rank_interpolation_mc(A)
+end
