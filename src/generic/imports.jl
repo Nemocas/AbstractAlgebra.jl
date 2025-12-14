@@ -218,6 +218,8 @@ import ..AbstractAlgebra: shift_left
 import ..AbstractAlgebra: shift_right
 import ..AbstractAlgebra: snf
 import ..AbstractAlgebra: sqrt
+import ..AbstractAlgebra: sqrt_classical
+import ..AbstractAlgebra: sqrt_classical_char2
 import ..AbstractAlgebra: sub!
 import ..AbstractAlgebra: submul!
 import ..AbstractAlgebra: symbols
