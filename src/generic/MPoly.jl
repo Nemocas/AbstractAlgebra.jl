@@ -1631,7 +1631,7 @@ function sqrt_classical_char2(a::MPoly{T}; check::Bool=true) where {T <: RingEle
       if check
          d2 = is_square(a.coeffs[i])
       end
-      if check && !d1 || !d2
+      if check && (!d1 || !d2)
          return false, par()
       end
       Qc[i] = sqrt(a.coeffs[i]; check=check)
@@ -1689,7 +1689,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    # get leading coeff of sqrt
    d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
    d2 = check ? is_square(a.coeffs[1]) : true
-   if check && !d1 || !d2
+   if check && (!d1 || !d2)
       return false, par()
    end
    Qc[1] = sqrt(a.coeffs[1]; check=check)
@@ -1803,7 +1803,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
          else
             d2, Qc[k] = true, divexact(qc, mb; check=check)
          end
-         if check && !d1 || !d2 # if accumulation term is not divisible, return false
+         if check && (!d1 || !d2) # if accumulation term is not divisible, return false
             return false, par()
          end
          viewalloc += 1
