@@ -1629,10 +1629,9 @@ function sqrt_classical_char2(a::MPoly{T}; check::Bool=true) where {T <: RingEle
    for i = 1:m
       d1 = monomial_halves!(Qe, i, a.exps, i, mask, N)
       if check
+         d1 || return false, par()
          d2 = is_square(a.coeffs[i])
-      end
-      if check && (!d1 || !d2)
-         return false, par()
+         d2 || return false, par()
       end
       Qc[i] = sqrt(a.coeffs[i]; check=check)
    end
@@ -1688,9 +1687,10 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
    reuse = zeros(Int, 0)
    # get leading coeff of sqrt
    d1 = monomial_halves!(Qe, 1, a.exps, 1, mask, N)
-   d2 = check ? is_square(a.coeffs[1]) : true
-   if check && (!d1 || !d2)
-      return false, par()
+   if check
+      d1 || return false, par()
+      d2 = is_square(a.coeffs[1])
+      d2 || return false, par()
    end
    Qc[1] = sqrt(a.coeffs[1]; check=check)
    mb = -2*Qc[1]
@@ -1799,12 +1799,12 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
       else
          # if not, check the accumulation is divisible by leading coeff
          if check
+            # if accumulation term is not divisible, return false
+            d1 || return false, par()
             d2, Qc[k] = divides(qc, mb)
+            d2 || return false, par()
          else
-            d2, Qc[k] = true, divexact(qc, mb; check=check)
-         end
-         if check && (!d1 || !d2) # if accumulation term is not divisible, return false
-            return false, par()
+            Qc[k] = divexact(qc, mb; check=check)
          end
          viewalloc += 1
          push!(Viewn, viewalloc)
