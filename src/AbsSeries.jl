@@ -850,18 +850,20 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    asqrt = parent(a)()
    fit!(asqrt, prec)
    asqrt = _set_precision_raw!(asqrt, prec)
+   if prec <= aval2
+      asqrt = set_length!(asqrt, normalise(asqrt, prec))
+      return true, asqrt
+   end
    for n = 1:aval2
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
-   if prec > aval2
-      c = coeff(a, aval)
-      if check && !is_square(c)
-         return false, zero(S)
-      end
-      g = sqrt(c; check=check)
-      asqrt = setcoeff!(asqrt, aval2, g)
-      g2 = g + g
+   c = coeff(a, aval)
+   if check && !is_square(c)
+      return false, zero(S)
    end
+   g = sqrt(c; check=check)
+   asqrt = setcoeff!(asqrt, aval2, g)
+   g2 = g + g
    p = R()
    for n = 1:prec - aval2 - 1
       c = R()
