@@ -88,7 +88,7 @@ end
 # return the degree of the unique term, throw if not a term
 function term_degree(p::LaurentPolyRingElem)
    isnull = true
-   local deg
+   deg = -1
    mds = terms_degrees(p)
    isempty(mds) && throw(DomainError(p, "not a term"))
    for d in mds
@@ -98,7 +98,7 @@ function term_degree(p::LaurentPolyRingElem)
          isnull = false
       end
    end
-   deg
+   return deg
 end
 
 function leading_coefficient(p::LaurentPolyRingElem)
