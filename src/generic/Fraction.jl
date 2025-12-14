@@ -64,7 +64,6 @@ gens(F::FracField) = F.(gens(base_ring(F)))
 #
 ###############################################################################
 
-promote_rule(::Type{FracFieldElem{T}}, ::Type{FracFieldElem{T}}) where T <: RingElement = FracFieldElem{T}
 promote_rule(::Type{FracFieldElem{T}}, ::Type{FracFieldElem{T}}) where T <: RingElem = FracFieldElem{T}
 
 function promote_rule(::Type{FracFieldElem{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
@@ -77,17 +76,17 @@ end
 #
 ###############################################################################
 
-function (a::FracField{T})(b::RingElement) where {T <: RingElement}
+function (a::FracField{T})(b::RingElement) where {T <: RingElem}
    return a(base_ring(a)(b))
 end
 
-function (a::FracField{T})() where {T <: RingElement}
+function (a::FracField{T})() where {T <: RingElem}
    z = FracFieldElem{T}(zero(base_ring(a)), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::T) where {T <: RingElement}
+function (a::FracField{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(b, one(base_ring(a)))
    z.parent = a
@@ -100,7 +99,7 @@ function _reduce_fraction(x, y)
    return divexact(x, g), divexact(y, g)
 end
 
-function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {T <: RingElement}
+function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    if reduce
@@ -129,7 +128,7 @@ function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {U <: FieldEl
    return z
 end
 
-function (a::FracField{T})(b::T, c::JuliaRingElement) where {T <: RingElement}
+function (a::FracField{T})(b::T, c::JuliaRingElement) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(b, base_ring(a)(c))
    z.parent = a
@@ -144,7 +143,7 @@ function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyRi
    return z
 end
 
-function (a::FracField{T})(b::JuliaRingElement, c::T) where {T <: RingElement}
+function (a::FracField{T})(b::JuliaRingElement, c::T) where {T <: RingElem}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(base_ring(a)(b), c)
    z.parent = a
@@ -164,26 +163,26 @@ function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldE
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::Rational) where {T <: RingElement}
+function (a::FracField{T})(b::Rational) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(numerator(b, false)),
                base_ring(a)(denominator(b, false)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::Integer, c::Integer) where {T <: RingElement}
+function (a::FracField{T})(b::Integer, c::Integer) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(b), base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::FracFieldElem{T}) where {T <: RingElement}
+function (a::FracField{T})(b::FracFieldElem{T}) where {T <: RingElem}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end
