@@ -1330,28 +1330,25 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    end
    aval2 = div(aval, 2)
    prec = precision(a) - aval
-   if prec == 0
-      asqrt = parent(a)()
+   asqrt = parent(a)()
+   if prec <= 0
       asqrt = set_precision!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
       asqrt = set_scale!(asqrt, 1)
       return true, asqrt
    end
-   asqrt = parent(a)()
    s = scale(a)
    zlen = div(prec + s - 1, s)
    fit!(asqrt, zlen)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
-   if prec > 0
-      c = polcoeff(a, 0)
-      if check && !is_square(c)
-         return false, zero(S)
-      end
-      g = sqrt(c; check=check)
-      asqrt = setcoeff!(asqrt, 0, g)
-      g2 = g + g
+   c = polcoeff(a, 0)
+   if check && !is_square(c)
+      return false, zero(S)
    end
+   g = sqrt(c; check=check)
+   asqrt = setcoeff!(asqrt, 0, g)
+   g2 = g + g
    p = R()
    for n = 1:zlen - 1
       c = R()

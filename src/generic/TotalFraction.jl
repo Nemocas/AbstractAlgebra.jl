@@ -26,11 +26,11 @@ base_ring(a::TotFracRing{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 parent(a::TotFrac) = a.parent
 
-function is_domain_type(::Type{T}) where {S <: RingElement, T <: TotFrac{S}}
+function is_domain_type(::Type{T}) where {S <: RingElem, T <: TotFrac{S}}
    return is_domain_type(S)
 end
 
-function is_exact_type(a::Type{T}) where {S <: RingElement, T <: TotFrac{S}}
+function is_exact_type(a::Type{T}) where {S <: RingElem, T <: TotFrac{S}}
    return is_exact_type(S)
 end
 
@@ -530,7 +530,6 @@ rand(S::TotFracRing, v...) = rand(Random.default_rng(), S, v...)
 #
 ###############################################################################
 
-promote_rule(::Type{TotFrac{T}}, ::Type{TotFrac{T}}) where T <: RingElement = TotFrac{T}
 promote_rule(::Type{TotFrac{T}}, ::Type{TotFrac{T}}) where T <: RingElem = TotFrac{T}
 
 function promote_rule(::Type{TotFrac{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
@@ -543,18 +542,18 @@ end
 #
 ###############################################################################
 
-function (a::TotFracRing{T})(b::RingElement) where {T <: RingElement}
+function (a::TotFracRing{T})(b::RingElement) where {T <: RingElem}
    return a(base_ring(a)(b))
 end
 
-function (a::TotFracRing{T})() where {T <: RingElement}
+function (a::TotFracRing{T})() where {T <: RingElem}
    R = base_ring(a)
    z = TotFrac{T}(zero(R), one(R))
    z.parent = a
    return z
 end
 
-function (a::TotFracRing{T})(b::T) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T) where {T <: RingElem}
    R = base_ring(a)
    parent(b) != R && error("Could not coerce to fraction")
    z = TotFrac{T}(b, one(R))
@@ -562,7 +561,7 @@ function (a::TotFracRing{T})(b::T) where {T <: RingElement}
    return z
 end
 
-function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingElem}
    R = base_ring(a)
    parent(b) != R && error("Could not coerce to fraction")
    parent(c) != R && error("Could not coerce to fraction")
@@ -575,23 +574,23 @@ function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingEleme
    return z
 end
 
-function (a::TotFracRing{T})(b::T, c::Union{Integer, Rational}, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T, c::Union{Integer, Rational}, check::Bool=true) where {T <: RingElem}
    a(b, base_ring(a)(c), check)
 end
 
-function (a::TotFracRing{T})(b::Union{Integer, Rational}, c::T, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Union{Integer, Rational}, c::T, check::Bool=true) where {T <: RingElem}
    a(base_ring(a)(b), c, check)
 end
 
-function (a::TotFracRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Union{Integer, Rational}) where {T <: RingElem}
    a(base_ring(a)(b))
 end
 
-function (a::TotFracRing{T})(b::Integer, c::Integer, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Integer, c::Integer, check::Bool=true) where {T <: RingElem}
    a(base_ring(a)(b), base_ring(a)(c), check)
 end
 
-function (a::TotFracRing{T})(b::TotFrac{T}) where {T <: RingElement}
+function (a::TotFracRing{T})(b::TotFrac{T}) where {T <: RingElem}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end

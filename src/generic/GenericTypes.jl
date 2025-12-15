@@ -93,7 +93,10 @@ struct Partition{T} <: AbstractVector{T}
    Partition(part::AbstractVector{<:Integer}, check::Bool=true) =
       Partition(sum(part), part, check)
 
-   function Partition(n::Integer, part::AbstractVector{T}, check::Bool=true) where T
+   Partition(n::Integer, part::AbstractVector, check::Bool=true) =
+      Partition(n, collect(part), check)
+
+   function Partition(n::Integer, part::Vector{T}, check::Bool=true) where T
       if check
          issorted(part, rev=true) || sort!(part, rev=true)
          if length(part) > 0
