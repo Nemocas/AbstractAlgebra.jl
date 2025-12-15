@@ -308,13 +308,27 @@ end
    @test D4[5, 5] == R(5)
    @test D4 isa Generic.MatSpaceElem{elem_type(R)}
 
+   # test comparison of matrices over different ring, and of different sizes
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 
+   @test x != y
    @test x in [x, y]
    @test x in [y, x]
    @test !(x in [y])
- 
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
+   # test comparison of matrices over same ring, but of different sizes
+   x = zero_matrix(ZZ, 2, 2)
+   y = zero_matrix(ZZ, 2, 3)
+
+   @test x != y
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
 
