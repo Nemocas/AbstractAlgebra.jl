@@ -2,6 +2,11 @@
 
   Qx, x = QQ["x"]
 
+   @testset "Conformance" begin
+      L = localization(Qx, x^2 + 1)
+      ConformanceTests.test_Ring_interface(L)
+   end
+
   @testset "Constructor" begin
 
     @test parent_type(LocalizedEuclideanRingElem{elem_type(Qx)}) == LocalizedEuclideanRing{elem_type(Qx)}

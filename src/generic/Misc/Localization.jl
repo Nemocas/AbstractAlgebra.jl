@@ -340,6 +340,17 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::LocalizedEuclideanRing)
+  # TODO: should sometimes create something with a denominator
+  return R(ConformanceTests.generate_element(base_ring(R)))
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################
