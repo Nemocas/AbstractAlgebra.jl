@@ -2954,7 +2954,7 @@ julia> rank_interpolation(matrix(Qy, 2,2, [1//y -y^2; 3 2-y])
 2
 ```
 """
-function rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
+function rank_interpolation(M::MatrixElem{<: PolyRingElem{<: FieldElem}})
    Kx = parent(M[1,1])
    K = base_ring(Kx)
    n = nrows(M)
