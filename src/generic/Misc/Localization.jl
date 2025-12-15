@@ -113,7 +113,6 @@ base_ring(L::LocalizedEuclideanRing) = L.base_ring::base_ring_type(L)
 
 parent(a::LocalizedEuclideanRingElem) = a.parent
 
-characteristic(::LocalizedEuclideanRing) = characteristic(base_ring(L))
 
 ###############################################################################
 #
