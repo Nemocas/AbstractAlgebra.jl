@@ -138,7 +138,8 @@ iszero(a::LocalizedEuclideanRingElem) = iszero(data(a))
 isone(a::LocalizedEuclideanRingElem) = isone(data(a))
 
 function is_unit(a::LocalizedEuclideanRingElem{T})  where {T <: RingElem}
-  return isin(inv(a.data), parent(a))
+  is_unit(data(a)) || return false
+  return isin(inv(data(a)), parent(a))
 end
 
 deepcopy_internal(a::LocalizedEuclideanRingElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
