@@ -49,7 +49,7 @@ function canonical_unit(x::FieldElement)
 end
 
 @doc raw"""
-   evaluation_points(K::Field, n::Int) -> Vector{FieldElem}
+    evaluation_points(K::Field, n::Int) -> Vector{FieldElem}
 
 If $K$ contains at least $n$ elements, this function returns a vector $v$ with $n$ distinct elements from $K$. Otherwise it returns an empty vector. 
 """
