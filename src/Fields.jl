@@ -50,29 +50,22 @@ end
 
 @doc raw"""
    evaluation_points(K::Field, n::Int) -> Vector{FieldElem}
-   evaluation_points(K::AbstractAlgebra.Generic.RationalFunctionField, n::Int) -> Vector{RationalFunctionFieldElem}
 
-If $K$ contains at least $n$ elements, this function returns an $n$-element vector $v$ with pairwise different entries from the given field $K$. Otherwise it returns an empty vector. 
+If $K$ contains at least $n$ elements, this function returns a vector $v$ with $n$ distinct elements from $K$. Otherwise it returns an empty vector. 
 """
 function evaluation_points(K::Field, n::Int)
-   if n <= 0
-      error("n must be positive!")
-   end
+   @req n > 0 "n must be positive."
    if is_finite(K)
       v = elem_type(K)[]
-      if (order(K) < n)
+      if order(K) < n
          return v
       else
-         for a in K
-            push!(v, a)
-            if length(v) == n
-               break
-            end
-         end
+         append!(v, Iterators.take(K, n))
       end
    else
+      @assert is_zero(characteristic(K)) "This should not happen. Please open a bug report."
       v = Vector{elem_type(K)}(undef, n)
-      v[1] = K(div(-n,2))
+      v[1] = K(div(-n, 2))
       for i = 2:n
          v[i] = v[i-1] + 1
       end
@@ -80,18 +73,17 @@ function evaluation_points(K::Field, n::Int)
    return v
 end
 
-function evaluation_points(K::AbstractAlgebra.Generic.RationalFunctionField, n::Int)
-   if n <= 0
-      error("n must be positive!")
-   end
+function evaluation_points(K::Generic.RationalFunctionField, n::Int)
+   @req n > 0 "n must be positive."
    F = base_ring(K)
    v = evaluation_points(F, n)
    if is_empty(v)
       v = elem_type(K)[]
       base_v = evaluation_points(F, Int(order(F)))
-      d = ceil(Int, log(order(F), ZZ(n)))
-      for coeffs in AbstractAlgebra.ProductIterator(base_v, d; inplace=true)
-         push!(v, sum(coeffs[j] * gen(K)^(j-1) for j in 1:d))
+      d = clog(order(F), ZZ(n))
+      genKpowers = powers(gen(K), d - 1)
+      for coeffs in ProductIterator(base_v, d; inplace=true)
+         push!(v, sum(coeffs[j] * genKpowers[j] for j in 1:d))
          if length(v) == n
             break
          end
@@ -101,5 +93,5 @@ function evaluation_points(K::AbstractAlgebra.Generic.RationalFunctionField, n::
 end
 
 function ext_of_degree(K::Field, n::Int)
-   error("cannot extend finite field")
+   error("Cannot extend field")
 end
