@@ -73,25 +73,6 @@ function evaluation_points(K::Field, n::Int)
    return v
 end
 
-function evaluation_points(K::Generic.RationalFunctionField, n::Int)
-   @req n > 0 "n must be positive."
-   F = base_ring(K)
-   v = evaluation_points(F, n)
-   if is_empty(v)
-      v = elem_type(K)[]
-      base_v = evaluation_points(F, Int(order(F)))
-      d = clog(order(F), ZZ(n))
-      genKpowers = powers(gen(K), d - 1)
-      for coeffs in ProductIterator(base_v, d; inplace=true)
-         push!(v, sum(coeffs[j] * genKpowers[j] for j in 1:d))
-         if length(v) == n
-            break
-         end
-      end
-   end
-   return v
-end
-
 function ext_of_degree(K::Field, n::Int)
    error("Cannot extend field")
 end

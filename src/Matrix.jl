@@ -2933,9 +2933,9 @@ function rank(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-   rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem} -> Int
-   rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem} -> Int
-   rank_interpolation(M::MatrixElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem} -> Int
+    rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem} -> Int
+    rank_interpolation(M::MatrixElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ using an interpolation-like method. 
 
@@ -2956,7 +2956,7 @@ julia> rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y])
 function rank_interpolation(M::MatrixElem{<: PolyRingElem{<: FieldElem}})
    n = nrows(M)
    m = ncols(M)
-   if is_zero(n) | is_zero(m)
+   if is_zero(n) || is_zero(m)
       return 0
    end
    Kx = base_ring(M)
@@ -2975,7 +2975,7 @@ function rank_interpolation(M::MatrixElem{<: PolyRingElem{<: FieldElem}})
       for elem in eval_set
          M_eval = map_entries(p -> evaluate(p, elem), M)
          r = max(rank_interpolation(M_eval), r)
-         if (r == min_)
+         if r == min_
             break
          end
       end
@@ -2996,7 +2996,7 @@ end
 function rank_interpolation(M::MatrixElem{<: MPolyRingElem{<: FieldElem}})
    n = nrows(M)
    m = ncols(M)
-   if is_zero(n) | is_zero(m)
+   if is_zero(n) || is_zero(m)
       return 0
    end
    Kx = base_ring(M)
@@ -3004,7 +3004,7 @@ function rank_interpolation(M::MatrixElem{<: MPolyRingElem{<: FieldElem}})
    num_vars = number_of_variables(Kx)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    min_ = min(n, m)
-   if (min_ == n)
+   if min_ == n
       maxdetdeg = [sum(maximum(degree(M[i, j], k) for j in 1:m) for i in 1:n) for k in 1:num_vars]
    else
       maxdetdeg = [sum(maximum(degree(M[i, j], k) for i in 1:n) for j in 1:m) for k in 1:num_vars] 
@@ -3029,35 +3029,11 @@ function rank_interpolation(M::MatrixElem{<: MPolyRingElem{<: FieldElem}})
    for tup in ProductIterator(eval_set)
       M_eval = map_entries(p -> evaluate(p, tup), M)
       r = max(rank_interpolation(M_eval), r)
-      if (r == min_)
+      if r == min_
          break
       end
    end
    return r
-end
-
-function rank_interpolation(M::MatrixElem{<: Generic.RationalFunctionFieldElem})
-   n = nrows(M)
-   m = ncols(M)
-   if is_zero(n) | is_zero(m)
-      return 0
-   end
-   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
-   A = deepcopy(M)
-   #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
-   #Then M can be considered as a matrix over a polynomial ring. 
-   for i = 1:n
-      for j = 1:m
-         if !is_one(denominator(A[i, j]))
-            if n < m
-               multiply_column!(A, denominator(A[i, j]), j)
-            else
-               multiply_row!(A, denominator(A[i, j]), i)
-            end
-         end
-      end
-   end
-   return rank_interpolation(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]))
 end
 
 function rank_interpolation(M::MatrixElem{<: RingElem})
@@ -3065,9 +3041,9 @@ function rank_interpolation(M::MatrixElem{<: RingElem})
 end
 
 @doc raw"""
-   rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
-   rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
-   rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-like method.
 
@@ -3088,7 +3064,7 @@ julia> rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y], 0.00001)
 function rank_interpolation_mc(M::MatrixElem{<: PolyRingElem{<: FieldElem}}, err::Float64)
    n = nrows(M)
    m = ncols(M)
-   if is_zero(n) | is_zero(m)
+   if is_zero(n) || is_zero(m)
       return 0
    end
    Kx = base_ring(M)
@@ -3107,7 +3083,7 @@ function rank_interpolation_mc(M::MatrixElem{<: PolyRingElem{<: FieldElem}}, err
          M_eval = map_entries(p -> evaluate(p, a), M)
          r = max(rank(M_eval), r)
          if r == min_
-               return r
+            return r
          end
       end
    else
@@ -3127,7 +3103,7 @@ end
 function rank_interpolation_mc(M::MatrixElem{<: MPolyRingElem{<: FieldElem}}, err::Float64)
    n = nrows(M)
    m = ncols(M)
-   if is_zero(n) | is_zero(m)
+   if is_zero(n) || is_zero(m)
       return 0
    end
    Kx = base_ring(M)
@@ -3145,12 +3121,12 @@ function rank_interpolation_mc(M::MatrixElem{<: MPolyRingElem{<: FieldElem}}, er
       for _ = 1:k
          a = Vector{elem_type(K)}(undef, num_vars)
          for i = 1:num_vars
-               a[i] = rand(S)
+            a[i] = rand(S)
          end
          M_eval = map_entries(p -> evaluate(p, a), M)
          r = max(rank(M_eval), r)
          if r == min_
-               return r
+            return r
          end
       end
       return r
@@ -3167,29 +3143,7 @@ function rank_interpolation_mc(M::MatrixElem{<: MPolyRingElem{<: FieldElem}}, er
    end
 end
 
-function rank_interpolation_mc(M::MatrixElem{<: Generic.RationalFunctionFieldElem}, err::Float64)
-   n = nrows(M)
-   m = ncols(M)
-   if is_zero(n) | is_zero(m)
-      return 0
-   end
-   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
-   A = deepcopy(M)
-   #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
-   #Then M can be considered as a matrix over some polynomial ring.
-   for i = 1:n
-      for j = 1:m
-         if is_one(denominator(A[i, j]))
-               if n < m
-                  multiply_column!(A, denominator(A[i, j]), j)
-               else
-                  multiply_row!(A, denominator(A[i, j]), i)
-               end
-         end
-      end
-   end
-   return rank_interpolation_mc(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]), err)
-end
+
 
 ###############################################################################
 #
