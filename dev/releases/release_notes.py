@@ -19,13 +19,32 @@ import subprocess
 import sys
 from datetime import datetime
 from typing import Any, Dict, List
-
+import tomli
+import tomli_w
 
 ownpath = os.path.abspath(sys.argv[0])
 dirpath = os.path.dirname(ownpath)
 repopath = os.path.dirname(os.path.dirname(os.path.dirname(ownpath)))
 newfile = f"{dirpath}/new.md"
 finalfile = f"{repopath}/CHANGELOG.md"
+
+# read config file
+with open('config.toml', 'rb') as conffile:
+    conf = tomli.load(conffile)
+
+MAJORVERSION = conf['majorversion']
+REPONAME = conf['reponame']
+PROJECTNAME = REPONAME.split('/')[-1]
+
+# the following is a list of pairs [LABEL, DESCRIPTION]; the first entry is the name of a GitHub label
+# (be careful to match them precisely), the second is a headline for a section the release notes; any PR with
+# the given label is put into the corresponding section; each PR is put into only one section, the first one
+# one from this list it fits in.
+# See also <https://github.com/gap-system/gap/issues/4257>.
+
+TOPICS = conf['topics']
+PRTYPES = conf['prtypes']
+
 
 def usage(name: str) -> None:
     print(f"Usage: `{name} [NEWVERSION]`")
@@ -52,8 +71,8 @@ def is_existing_tag(tag: str) -> bool:
 
 def find_previous_version(version: str) -> str:
     major, minor, patchlevel = map(int, version.split("."))
-    if major != 1:
-        error("unexpected OSCAR version, not starting with '1.'")
+    if major != MAJORVERSION:
+        error(f"unexpected {PROJECTNAME} version, not starting with '{MAJORVERSION}.'")
     if patchlevel != 0:
         patchlevel -= 1
         return f"{major}.{minor}.{patchlevel}"
@@ -81,43 +100,6 @@ def warning(s):
     print(s)
     print('===================================================')
 
-# the following is a list of pairs [LABEL, DESCRIPTION]; the first entry is the name of a GitHub label
-# (be careful to match them precisely), the second is a headline for a section the release notes; any PR with
-# the given label is put into the corresponding section; each PR is put into only one section, the first one
-# one from this list it fits in.
-# See also <https://github.com/gap-system/gap/issues/4257>.
-topics = {
-    "release notes: highlight":    "Highlights",
-    "topic: algebraic geometry":   "Algebraic Geometry",
-    "topic: combinatorics":        "Combinatorics",
-    "topic: commutative algebra":  "Commutative Algebra",
-    "topic: FTheoryTools":         "F-Theory Tools",
-    "topic: groups":               "Groups",
-    "topic: lie theory":           "Lie Theory",
-    "topic: number theory":        "Number Theory",
-    "topic: polyhedral geometry":  "Polyhedral Geometry",
-    "topic: toric geometry":       "Toric Geometry",
-    "topic: tropical geometry":    "Tropical Geometry",
-    "package: AbstractAlgebra":    "Changes related to the package AbstractAlgebra",
-    "package: AlgebraicSolving":   "Changes related to the package AlgebraicSolving",
-    "package: GAP":                "Changes related to the package GAP",
-    "package: Hecke":              "Changes related to the package Hecke",
-    "package: Nemo":               "Changes related to the package Nemo",
-    "package: Polymake":           "Changes related to the package Polymake",
-    "package: Singular":           "Changes related to the package Singular",
-}
-prtypes = {
-    "renaming":                    "Renamings",
-    "serialization":               "Changes related to serializing data in the MRDI file format",
-    "enhancement":                 "New features or extended functionality",
-    "experimental":                "Only changes experimental parts of OSCAR",
-    "optimization":                "Performance improvements or improved testing",
-    "bug: wrong result":           "Fixed bugs that returned incorrect results",
-    "bug: crash":                  "Fixed bugs that could lead to crashes",
-    "bug: unexpected error":       "Fixed bugs that resulted in unexpected errors",
-    "bug":                         "Other fixed bugs",
-    "documentation":               "Improvements or additions to documentation",
-}
 
 
 def get_tag_date(tag: str) -> str:
@@ -168,10 +150,13 @@ def pr_to_md(pr: Dict[str, Any]) -> str:
     """Returns markdown string for the PR entry"""
     k = pr["number"]
     if has_label(pr, 'release notes: use body'):
-        mdstring = re.sub(r'^- ', f"- [#{k}](https://github.com/oscar-system/Oscar.jl/pull/{k}) ", pr["body"])
+        mdstring = re.sub(
+            r'^- ', f"- [#{k}](https://github.com/{REPONAME}/pull/{k}) ",
+            pr["body"]
+        )
     else:
         title = pr["title"]
-        mdstring = f"- [#{k}](https://github.com/oscar-system/Oscar.jl/pull/{k}) {title}\n"        
+        mdstring = f"- [#{k}](https://github.com/{REPONAME}/pull/{k}) {title}\n"        
     return mdstring
 
 def body_to_release_notes(pr):
@@ -208,7 +193,7 @@ def changes_overview(
     """Writes files with information for release notes."""
 
     date = datetime.now().strftime("%Y-%m-%d")
-    release_url = f"https://github.com/oscar-system/Oscar.jl/releases/tag/v{new_version}"
+    release_url = f"https://github.com/{REPONAME}/releases/tag/v{new_version}"
 
     # Could also introduce some consistency checks here for wrong combinations of labels
     notice("Writing release notes into file " + newfile)
@@ -223,7 +208,7 @@ def changes_overview(
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
-tries to adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [{new_version}]({release_url}) - {date}
 
@@ -236,21 +221,22 @@ which we think might affect some users directly.
         totalPRs = len(prs)
         print(f"Total number of PRs: {totalPRs}")
         countedPRs = 0
-        for priorityobject in topics:
+        for priorityobject in TOPICS:
             matches = [
                 pr for pr in prs_with_use_title if has_label(pr, priorityobject)
             ]
             original_length = len(matches)
             print("PRs with label '" + priorityobject + "': ", len(matches))
-            print(matches)
             countedPRs = countedPRs + len(matches)
             if len(matches) == 0:
                 continue
-            relnotes_file.write("### " + topics[priorityobject] + "\n\n")
-            if topics[priorityobject] == 'Highlights':
-                itervar = topics
+            relnotes_file.write("### " + TOPICS[priorityobject] + "\n\n")
+            if TOPICS[priorityobject] == "Breaking Changes":
+                relnotes_file.write("> !These changes break compatibility from previous versions!\n\n")
+            if TOPICS[priorityobject] == 'Highlights' or TOPICS[priorityobject] == "Breaking Changes":
+                itervar = TOPICS
             else:
-                itervar = prtypes
+                itervar = PRTYPES
             for typeobject in itervar:
                 if typeobject == priorityobject:
                     continue
@@ -281,7 +267,7 @@ which we think might affect some users directly.
         # Check their list in the release notes, and adjust labels if appropriate.
         if len(prs_with_use_title) > 0:
             relnotes_file.write("### Other changes\n\n")
-            for typeobject in prtypes:
+            for typeobject in PRTYPES:
                 matches_type = [
                     pr for pr in prs_with_use_title if has_label(pr, typeobject)
                 ]
@@ -289,7 +275,7 @@ which we think might affect some users directly.
                 print("PRs with type '" + typeobject + "': ", len(matches_type))
                 if len(matches_type) == 0:
                     continue
-                relnotes_file.write("#### " + prtypes[typeobject] + "\n\n")
+                relnotes_file.write("#### " + PRTYPES[typeobject] + "\n\n")
 
                 for pr in matches_type:
                     relnotes_file.write(pr_to_md(pr))
@@ -361,10 +347,12 @@ def split_pr_into_changelog(prs: List):
                     label_list = mans.group().strip('{').strip('}').split(',')
                     for label in label_list:
                         label = label.strip()
-                        if not (label in prtypes or label in topics):
-                            warning(f"PR number #{pr['number']}'s changelog body has label {label}, "
-                                    "which is not a label we recognize ! We are ignoring this label. "
-                                    "This might result in a TODO changelog item!")
+                        if not (label in PRTYPES or label in TOPICS):
+                            warning(
+                                f"PR number #{pr['number']}'s changelog body has label {label}, "
+                                "which is not a label we recognize ! We are ignoring this label. "
+                                "This might result in a TODO changelog item!"
+                            )
                             continue
                         cpr['labels'].append({'name': label})
                     mindex = mans.span()[0]
@@ -385,22 +373,22 @@ def main(new_version: str) -> None:
     major, minor, patchlevel = map(int, new_version.split("."))
     extra = ""
     release_type = 0 # 0 by default, 1 for point release, 2 for patch release
-    if major != 1:
-        error("unexpected OSCAR version, not starting with '1.'")
+    if major != MAJORVERSION:
+        error(f"unexpected {PROJECTNAME} version, not starting with '{MAJORVERSION}.'")
     if patchlevel == 0:
         # "major" OSCAR release which changes just the minor version
         release_type = 1
         previous_minor = minor - 1
         basetag = f"v{major}.{minor}dev"
         # *exclude* PRs backported to previous stable-1.X branch
-        extra = f'-label:"backport {major}.{previous_minor}.x done"'
+        #extra = f'-label:"backport {major}.{previous_minor}.x done"'
     else:
         # "minor" OSCAR release which changes just the patchlevel
         release_type = 2
         previous_patchlevel = patchlevel - 1
         basetag = f"v{major}.{minor}.{previous_patchlevel}"
         # *include* PRs backported to current stable-4.X branch
-        extra = f'label:"backport {major}.{minor}.x done"'
+        #extra = f'label:"backport {major}.{minor}.x done"'
 
     if release_type == 2:
         timestamp = get_tag_date(basetag)

@@ -1,0 +1,21 @@
+majorversion = 0
+reponame = "Nemocas/AbstractAlgebra.jl"
+
+[topics]
+"release notes: highlight" = "Highlights"
+breaking = "Breaking Changes"
+ideals = "Changes related to the functionality of Ideals"
+"polynomial ring" = "Changes related to Polynomial Rings"
+
+[prtypes]
+breaking = "Breaking changes"
+renaming = "Renamings"
+serialization = "Changes related to serializing data in the MRDI file format"
+enhancement = "New features or extended functionality"
+experimental = "Only changes experimental parts of OSCAR"
+optimization = "Performance improvements or improved testing"
+"bug: wrong result" = "Fixed bugs that returned incorrect results"
+"bug: crash" = "Fixed bugs that could lead to crashes"
+"bug: unexpected error" = "Fixed bugs that resulted in unexpected errors"
+bug = "Other fixed bugs"
+doc = "Improvements or additions to documentation"
