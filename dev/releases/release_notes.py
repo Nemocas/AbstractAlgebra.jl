@@ -24,8 +24,8 @@ import tomli
 ownpath = os.path.abspath(sys.argv[0])
 dirpath = os.path.dirname(ownpath)
 repopath = os.path.dirname(os.path.dirname(os.path.dirname(ownpath)))
-newfile = f"{dirpath}/new.md"
-finalfile = f"{repopath}/CHANGELOG.md"
+NEWFILE = f"{dirpath}/new.md"
+FINALFILE = f"{repopath}/CHANGELOG.md"
 
 # read config file
 with open('config.toml', 'rb') as conffile:
@@ -35,10 +35,10 @@ MAJORVERSION = conf['majorversion']
 REPONAME = conf['reponame']
 PROJECTNAME = REPONAME.split('/')[-1]
 
-# the following is a list of pairs [LABEL, DESCRIPTION]; the first entry is the name of a GitHub label
-# (be careful to match them precisely), the second is a headline for a section the release notes; any PR with
-# the given label is put into the corresponding section; each PR is put into only one section, the first one
-# one from this list it fits in.
+# the following loads a dict of {LABEL: DESCRIPTION}; the first entry is the name of a GitHub label
+# (be careful to match them precisely), the second is a headline for a section the release notes;
+# any PR with the given label is put into the corresponding section; each PR is put into only one
+# section, the first one one from this list it fits in.
 # See also <https://github.com/gap-system/gap/issues/4257>.
 
 TOPICS = conf['topics']
@@ -92,7 +92,7 @@ def notice(s):
 
 def error(s):
     print(s)
-    exit()
+    sys.exit(1)
 
 def warning(s):
     print('===================================================')
@@ -122,7 +122,10 @@ def get_tag_date(tag: str) -> str:
 
 
 def get_pr_list(date: str, extra: str) -> List[Dict[str, Any]]:
-    query = f'merged:>={date} -label:"release notes: not needed" -label:"release notes: added" base:master {extra}'
+    query = (
+        f'merged:>={date} -label:"release notes: not needed" -label:"release notes: added"'
+        f'base:master {extra}'
+    )
     print("query: ", query)
     res = subprocess.run(
         [
@@ -140,9 +143,9 @@ def get_pr_list(date: str, extra: str) -> List[Dict[str, Any]]:
         capture_output=True,
         text=True,
     )
-    jsonList = json.loads(res.stdout.strip())
-    jsonList = sorted(jsonList, key=lambda d: d['number']) # sort by ascending PR number
-    return jsonList
+    json_list = json.loads(res.stdout.strip())
+    json_list = sorted(json_list, key=lambda d: d['number']) # sort by ascending PR number
+    return json_list
 
 
 def pr_to_md(pr: Dict[str, Any]) -> str:
@@ -155,7 +158,7 @@ def pr_to_md(pr: Dict[str, Any]) -> str:
         )
     else:
         title = pr["title"]
-        mdstring = f"- [#{k}](https://github.com/{REPONAME}/pull/{k}) {title}\n"        
+        mdstring = f"- [#{k}](https://github.com/{REPONAME}/pull/{k}) {title}\n"
     return mdstring
 
 def body_to_release_notes(pr):
@@ -173,7 +176,7 @@ def body_to_release_notes(pr):
         line = line.rstrip()
         if not line:
             continue
-        elif line.startswith('- '):
+        if line.startswith('- '):
             mdstring = f"{mdstring}\n{line}"
         else:
             break
@@ -195,10 +198,12 @@ def changes_overview(
     release_url = f"https://github.com/{REPONAME}/releases/tag/v{new_version}"
 
     # Could also introduce some consistency checks here for wrong combinations of labels
-    notice("Writing release notes into file " + newfile)
-    with open(newfile, "w", encoding="utf-8") as relnotes_file:
+    notice("Writing release notes into file " + NEWFILE)
+    with open(NEWFILE, "w", encoding="utf-8") as relnotes_file:
         prs_with_use_title = [
-            pr for pr in prs if has_label(pr, "release notes: use title") or has_label(pr, "release notes: use body")
+            pr for pr in prs if
+            has_label(pr, "release notes: use title") or
+            has_label(pr, "release notes: use body")
         ]
         # Write out all PRs with 'use title'
         relnotes_file.write(
@@ -230,9 +235,10 @@ which we think might affect some users directly.
             if len(matches) == 0:
                 continue
             relnotes_file.write("### " + TOPICS[priorityobject] + "\n\n")
-            if TOPICS[priorityobject] == "Breaking Changes":
-                relnotes_file.write("> !These changes break compatibility from previous versions!\n\n")
-            if TOPICS[priorityobject] == 'Highlights' or TOPICS[priorityobject] == "Breaking Changes":
+            if priorityobject == "Breaking Changes":
+                relnotes_file.write("> !These changes break compatibility from previous versions!")
+                relnotes_file.write("\n\n")
+            if priorityobject in ['release notes: highlight', 'breaking']:
                 itervar = TOPICS
             else:
                 itervar = PRTYPES
@@ -242,7 +248,10 @@ which we think might affect some users directly.
                 matches_type = [
                     pr for pr in matches if has_label(pr, typeobject)
                 ]
-                print("PRs with label '" + priorityobject + "' and type '" + typeobject + "': ", len(matches_type))
+                print(
+                    f"PRs with label '{priorityobject}' and type '{typeobject}': "
+                    f"{len(matches_type)}"
+                )
                 if len(matches_type) == 0:
                     continue
                 relnotes_file.write(f"#### {itervar[typeobject]}\n\n")
@@ -259,7 +268,7 @@ which we think might affect some users directly.
                     relnotes_file.write(pr_to_md(pr))
                     prs_with_use_title.remove(pr)
                 relnotes_file.write('\n')
-                
+
         print(f"Remaining PRs: {totalPRs - countedPRs}")
         # The remaining PRs have no "kind" or "topic" label from the priority list
         # (may have other "kind" or "topic" label outside the priority list).
@@ -324,12 +333,12 @@ which we think might affect some users directly.
             relnotes_file.write('\n')
 
         # now read back the rest of changelog.md into newfile
-        with open(finalfile, 'r') as oldchangelog:
+        with open(FINALFILE, 'r', encoding='ascii') as oldchangelog:
             oldchangelog.seek(262)
             for line in oldchangelog.readlines():
                 relnotes_file.write(line)
         # finally copy over this new file to changelog.md
-        os.rename(newfile, finalfile)
+        os.rename(NEWFILE, FINALFILE)
 
 def split_pr_into_changelog(prs: List):
     childprlist = []
@@ -356,7 +365,6 @@ def split_pr_into_changelog(prs: List):
                         cpr['labels'].append({'name': label})
                     mindex = mans.span()[0]
                     line = line[0:mindex]
-                    pass
                 else:
                     warning(f"PR number #{pr['number']} is tagged as \"Use Body\", but the body "
                             "does not provide tags! This will result in TODO changelog items!")
@@ -415,8 +423,8 @@ def main(new_version: str) -> None:
     # print(json.dumps(prs, sort_keys=True, indent=4))
 
     # reset changelog file to state tracked in git
-    
-    subprocess.run(f'git checkout -- {finalfile}'.split(), check=True)
+
+    subprocess.run(f'git checkout -- {FINALFILE}'.split(), check=True)
 
     changes_overview(prs, new_version)
 
