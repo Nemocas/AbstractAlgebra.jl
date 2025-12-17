@@ -226,8 +226,7 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
       end
    end
    if !isempty(added_symbols)
-      new_symbols = vcat(current_symbols, added_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra._add_gens(base_ring(S), added_symbols)
    end
    return idx
 end
@@ -235,10 +234,8 @@ end
 function gen(S::UniversalPolyRing, s::VarName)
    i = findfirst(==(Symbol(s)), symbols(S))
    if i === nothing
-      new_symbols = copy(symbols(S))
-      push!(new_symbols, Symbol(s))
-      i = length(new_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra._add_gens(base_ring(S), [Symbol(s)])
+      i = length(symbols(S))
    end
    return @inbounds gen(S, i)
 end
@@ -1042,22 +1039,11 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UniversalPolyRing{T}, pp::MPolyRingElem{T}) where {T}
-   n = nvars(S) - nvars(parent(pp))
-   if n > 0
-      ctx = MPolyBuildCtx(base_ring(S))
-      v0 = zeros(Int, n)
-      for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-         push_term!(ctx, c, vcat(v, v0))
-      end
-      return finish(ctx)
-   else
-      return pp
-   end
-end
-
 function upgrade!(p::UnivPoly)
-   p.p = upgrade(parent(p), data(p))
+   R = base_ring(parent(p))
+   if R != parent(p.p)
+      p.p = AbstractAlgebra._upgrade(p.p, R)
+   end
    return p
 end
 
