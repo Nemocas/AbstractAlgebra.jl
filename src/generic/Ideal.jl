@@ -2081,18 +2081,18 @@ end
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
 function normal_form(p::U, I::Ideal{U}) where {U}
-   is_zero(p) && return copy(p)
-   is_zero(I) && return copy(p)
+   is_zero(p) && return deepcopy(p)
+   is_zero(I) && return deepcopy(p)
    return normal_form(p, gens(I))
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: FieldElem}
-   iszero(I) && return copy(p)
+   iszero(I) && return deepcopy(p)
    return zero(p)
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: Integer}
-   iszero(I) && return copy(p)
+   iszero(I) && return deepcopy(p)
    m = only(gens(I))
    return rem(p, m, RoundDown)
 end

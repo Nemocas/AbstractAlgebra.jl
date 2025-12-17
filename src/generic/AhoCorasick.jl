@@ -47,6 +47,10 @@ mutable struct AhoCorasickAutomaton
     the one with the smallest index is stored
     """
     output::Vector{Tuple{Int,Word}}
+
+    function AhoCorasickAutomaton()
+      return new(Dict{Int,Int}[], Int[], Tuple{Int,Word}[])
+    end
 end
 
 @doc """
@@ -118,7 +122,7 @@ function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
 end
 
 function AhoCorasickAutomaton(keywords::Vector{Word})
-    automaton = AhoCorasickAutomaton([], [], [])
+    automaton = AhoCorasickAutomaton()
     construct_goto!(automaton, keywords)
     construct_fail!(automaton)
     return automaton

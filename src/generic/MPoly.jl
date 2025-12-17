@@ -1699,6 +1699,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
       Fe = zeros(UInt, N, 1)
       monomial_halves!(Fe, 1, a.exps, m, mask, N)
       monomial_add!(Fe, 1, Fe, 1, Qe, 1, N)
+   else
+      Fe = nothing  # to make JET happy
    end
    # while the heap is not empty
    @inbounds while !isempty(H)
@@ -1774,7 +1776,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1784,7 +1786,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, v.i, Qe, v.j + 1, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1814,7 +1816,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(k, 2, 0) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1823,7 +1825,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             push!(I, heap_t(k, 2, 0)) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                   viewc += 1
               end

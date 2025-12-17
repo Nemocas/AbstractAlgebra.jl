@@ -544,6 +544,8 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       c = gcd(c1, c2)
       a = divexact(a, c1)
       b = divexact(b, c2)
+   else
+      c = nothing
    end
    # check if we are in the univariate case
    constant_coeffs = true
@@ -589,7 +591,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          end
       end
       r = parent(a)(Ac, Ae)
-      if !ignore_content
+      if c !== nothing  # !ignore_content
          return c*r
       else
          return r
@@ -638,7 +640,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       end
    end
    # sometimes don't care about content, e.g. when computing likely gcd degree
-   if !ignore_content
+   if c !== nothing  # !ignore_content
       # remove content from b as cheaply as possible, as per Bernard Parisse
       if leading_coefficient(b).length != 1 &&
          trailing_coefficient(b).length != 1

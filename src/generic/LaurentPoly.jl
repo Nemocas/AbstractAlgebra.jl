@@ -273,7 +273,7 @@ function factor(a::LaurentPolyWrap)
    for (p, e) in f
       d[LaurentPolyWrap(R, p, 0)] = e
    end
-   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+   return Fac(LaurentPolyWrap(R, unit(f)::typeof(a.poly), a.mindeg + va), d)
 end
 
 function factor_squarefree(a::LaurentPolyWrap)
@@ -284,7 +284,7 @@ function factor_squarefree(a::LaurentPolyWrap)
    for (p, e) in f
       d[LaurentPolyWrap(R, p, 0)] = e
    end
-   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+   return Fac(LaurentPolyWrap(R, unit(f)::typeof(a.poly), a.mindeg + va), d)
 end
 
 ###############################################################################
