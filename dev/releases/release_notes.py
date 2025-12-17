@@ -34,6 +34,10 @@ with open('config.toml', 'rb') as conffile:
 MAJORVERSION = conf['majorversion']
 REPONAME = conf['reponame']
 PROJECTNAME = REPONAME.split('/')[-1]
+ENABLE_TWOLEVEL = conf["enabletwolevel"]
+REQUIRE_TWOLEVEL = False
+if ENABLE_TWOLEVEL:
+    REQUIRE_TWOLEVEL = conf['requiretwolevel']
 
 # the following loads a dict of {LABEL: DESCRIPTION}; the first entry is the name of a GitHub label
 # (be careful to match them precisely), the second is a headline for a section the release notes;
@@ -42,7 +46,9 @@ PROJECTNAME = REPONAME.split('/')[-1]
 # See also <https://github.com/gap-system/gap/issues/4257>.
 
 TOPICS = conf['topics']
-PRTYPES = conf['prtypes']
+PRTYPES = {}
+if ENABLE_TWOLEVEL:
+    PRTYPES = conf['prtypes']
 
 
 def usage(name: str) -> None:
@@ -235,7 +241,7 @@ which we think might affect some users directly.
             if len(matches) == 0:
                 continue
             relnotes_file.write("### " + TOPICS[priorityobject] + "\n\n")
-            if priorityobject == "Breaking Changes":
+            if priorityobject == "breaking":
                 relnotes_file.write("> !These changes break compatibility from previous versions!")
                 relnotes_file.write("\n\n")
             if priorityobject in ['release notes: highlight', 'breaking']:
@@ -273,7 +279,7 @@ which we think might affect some users directly.
         # The remaining PRs have no "kind" or "topic" label from the priority list
         # (may have other "kind" or "topic" label outside the priority list).
         # Check their list in the release notes, and adjust labels if appropriate.
-        if len(prs_with_use_title) > 0:
+        if len(prs_with_use_title) > 0 and ENABLE_TWOLEVEL:
             relnotes_file.write("### Other changes\n\n")
             for typeobject in PRTYPES:
                 matches_type = [
