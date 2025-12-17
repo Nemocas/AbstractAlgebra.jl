@@ -20,7 +20,6 @@ import sys
 from datetime import datetime
 from typing import Any, Dict, List
 import tomli
-import tomli_w
 
 ownpath = os.path.abspath(sys.argv[0])
 dirpath = os.path.dirname(ownpath)
