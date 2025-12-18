@@ -2944,16 +2944,16 @@ Returns the rank of $A$ using an interpolation-like method.
 ```jldoctest
 julia> Qx, x = polynomial_ring(QQ, :x);
 
-julia> rank_interpolation(matrix(Qx, 2, 2, [x 2x; x^2 1])
+julia> AbstractAlgebra.rank_interpolation(matrix(Qx, 2, 2, [x 2x; x^2 1]))
 2
 
 julia> Qy, y = rational_function_field(QQ, :y);
 
-julia> rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y])
+julia> AbstractAlgebra.rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]))
 2
 ```
 """
-function rank_interpolation(M::MatrixElem{<: PolyRingElem{<: FieldElem}})
+function rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -2993,7 +2993,7 @@ function rank_interpolation(M::MatrixElem{<: PolyRingElem{<: FieldElem}})
    end
 end
 
-function rank_interpolation(M::MatrixElem{<: MPolyRingElem{<: FieldElem}})
+function rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3052,16 +3052,16 @@ Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-lik
 ```jldoctest
 julia> Qx, x = polynomial_ring(QQ, :x);
 
-julia> rank_interpolation_mc(matrix(Qx, 2, 2, [x 2x; x^2 1], 0.01)
+julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qx, 2, 2, [x 2x; x^2 1]), 0.01)
 2
 
 julia> Qy, y = rational_function_field(QQ, :y);
 
-julia> rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y], 0.00001)
+julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]), 0.00001)
 2
 ```
 """
-function rank_interpolation_mc(M::MatrixElem{<: PolyRingElem{<: FieldElem}}, err::Float64)
+function rank_interpolation_mc(M::MatrixElem{T}, err::Float64) where {T <: PolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3072,9 +3072,9 @@ function rank_interpolation_mc(M::MatrixElem{<: PolyRingElem{<: FieldElem}}, err
    min_ = min(n, m)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    maxdetdeg = min_*maximum(degree(M[i, j]) for i in 1:n, j in 1:n)
-   S = get_eval_set(K, 10*maxdetdeg)
+   S = evaluation_points(K, 10*maxdetdeg)
    #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
-   k = clog(10, 1/err)
+   k = ceil(Base.log(10, 1/err))
    r = 0
    if !is_empty(S)
       #rank(M) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
@@ -3100,7 +3100,7 @@ function rank_interpolation_mc(M::MatrixElem{<: PolyRingElem{<: FieldElem}}, err
    return r
 end
 
-function rank_interpolation_mc(M::MatrixElem{<: MPolyRingElem{<: FieldElem}}, err::Float64)
+function rank_interpolation_mc(M::MatrixElem{T}, err::Float64) where {T <: MPolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3112,9 +3112,9 @@ function rank_interpolation_mc(M::MatrixElem{<: MPolyRingElem{<: FieldElem}}, er
    min_ = min(n, m)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    maxdetdeg = min_*maximum(degree(M[i, j], k) for i in 1:n, j in 1:m, k in 1:num_vars)
-   S = get_eval_set(K, 10*maxdetdeg)
+   S = evaluation_points(K, 10*maxdetdeg)
    #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
-   k = clog(10, 1/err)
+   k = ceil(Base.log(10, 1/err))
    r = 0
    if !is_empty(S)
       #rank(M) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
