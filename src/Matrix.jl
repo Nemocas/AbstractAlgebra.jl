@@ -2953,7 +2953,7 @@ julia> AbstractAlgebra.rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]))
 2
 ```
 """
-function rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
+function rank_interpolation(M::MatElem{T}) where {T <: PolyRing}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -2993,7 +2993,7 @@ function rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem}
    end
 end
 
-function rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem}
+function rank_interpolation(M::MatElem{T}) where {T <: MPolyRing}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3036,7 +3036,7 @@ function rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem}
    return r
 end
 
-function rank_interpolation(M::MatrixElem{<: RingElem})
+function rank_interpolation(M::MatElem{<: RingElem})
    return rank(M)
 end
 
@@ -3061,7 +3061,7 @@ julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]
 2
 ```
 """
-function rank_interpolation_mc(M::MatrixElem{T}, err::Float64) where {T <: PolyRingElem}
+function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3100,7 +3100,7 @@ function rank_interpolation_mc(M::MatrixElem{T}, err::Float64) where {T <: PolyR
    return r
 end
 
-function rank_interpolation_mc(M::MatrixElem{T}, err::Float64) where {T <: MPolyRingElem}
+function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)

@@ -216,7 +216,7 @@ end
 end
 
 @testset "Rank Interpolation" begin
-  Fx, x = polynomial_ring(GF(25), :x)
+  Fx, x = polynomial_ring(GF(29), :x)
   Qy, y = polynomial_ring(QQ, 3, :y)
   Qz, z = rational_function_field(QQ, :z)
   
