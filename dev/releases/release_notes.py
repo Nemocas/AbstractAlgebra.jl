@@ -42,7 +42,7 @@ if ENABLE_TWOLEVEL:
 # the following loads a dict of {LABEL: DESCRIPTION}; the first entry is the name of a GitHub label
 # (be careful to match them precisely), the second is a headline for a section the release notes;
 # any PR with the given label is put into the corresponding section; each PR is put into only one
-# section, the first one one from this list it fits in.
+# section, the first one from this list it fits in.
 # See also <https://github.com/gap-system/gap/issues/4257>.
 
 TOPICS = conf['topics']
@@ -389,14 +389,14 @@ def main(new_version: str) -> None:
     if major != MAJORVERSION:
         error(f"unexpected {PROJECTNAME} version, not starting with '{MAJORVERSION}.'")
     if patchlevel == 0:
-        # "major" OSCAR release which changes just the minor version
+        # "major" release which changes just the minor version
         release_type = 1
         previous_minor = minor - 1
         basetag = f"v{major}.{minor}dev"
         # *exclude* PRs backported to previous stable-1.X branch
         #extra = f'-label:"backport {major}.{previous_minor}.x done"'
     else:
-        # "minor" OSCAR release which changes just the patchlevel
+        # "minor" release which changes just the patchlevel
         release_type = 2
         previous_patchlevel = patchlevel - 1
         basetag = f"v{major}.{minor}.{previous_patchlevel}"
