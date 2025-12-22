@@ -824,10 +824,14 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
    Rxy, _ = polynomial_ring(R, [:x, :y])
    test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
-   S = matrix_ring(R, rand(0:3))
-   test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
-   S = matrix_space(R, rand(0:3), rand(0:3))
-   test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
+   for d in 0:3
+     S = matrix_ring(R, d)
+     test_MatAlgebra_interface(S, reps = 2 + fld(reps, 8))
+   end
+   for (r,c) in ( (0,0), (1,0), (2,2), (2,3), (3,2) )
+     S = matrix_space(R, r,c)
+     test_MatSpace_interface(S, reps = 2 + fld(reps, 10))
+   end
 end
 
 function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
