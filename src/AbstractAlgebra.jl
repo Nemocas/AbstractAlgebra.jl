@@ -178,7 +178,7 @@ pretty_eq(x::Number, y::Number) = (x == y)
 
 include("julia/JuliaTypes.jl")
 
-# Unions of AbstactAlgebra abstract types and Julia types
+# Unions of AbstractAlgebra abstract types and Julia types
 const JuliaRingElement = Union{Integer, Rational, AbstractFloat}
 const JuliaFieldElement = Union{Rational, AbstractFloat}
 const JuliaExactRingElement = Union{Integer, Rational}
