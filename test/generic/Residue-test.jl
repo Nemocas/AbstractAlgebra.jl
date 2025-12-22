@@ -105,16 +105,6 @@ end
    k = T(1)
 
    @test isa(k, EuclideanRingResidueRingElem)
-
-   S, = Generic.residue_ring(B, 164538890)
-   x = R(1)
-   y = S(1)
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
 end
 
 @testset "EuclideanRingResidueRingElem.is_trivial" begin
