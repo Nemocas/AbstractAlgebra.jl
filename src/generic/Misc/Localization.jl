@@ -113,6 +113,8 @@ base_ring(L::LocalizedEuclideanRing) = L.base_ring::base_ring_type(L)
 
 parent(a::LocalizedEuclideanRingElem) = a.parent
 
+characteristic(L::LocalizedEuclideanRing) = characteristic(base_ring(L))
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -136,7 +138,8 @@ iszero(a::LocalizedEuclideanRingElem) = iszero(data(a))
 isone(a::LocalizedEuclideanRingElem) = isone(data(a))
 
 function is_unit(a::LocalizedEuclideanRingElem{T})  where {T <: RingElem}
-  return isin(inv(a.data), parent(a))
+  is_unit(data(a)) || return false
+  return isin(inv(data(a)), parent(a))
 end
 
 deepcopy_internal(a::LocalizedEuclideanRingElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
@@ -221,7 +224,7 @@ If 'checked = false' the invertibility of $a$ is not checked and the correspondi
 of the Fraction Field is returned.
 """
 function Base.inv(a::LocalizedEuclideanRingElem{T}, checked::Bool = true)  where {T}
-   b = inv(a.data)
+   b = inv(data(a))
    checked && (isin(b, parent(a)) || error("no unit"))
    return LocalizedEuclideanRingElem{T}(b, parent(a), false)
 end
@@ -255,8 +258,8 @@ function Base.divrem(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRing
   check_parent(a, b)
   L = parent(a)
   if L.comp
-    a1, s1 = ppio(numerator(a.data), L.prime)
-    a2, s2 = ppio(numerator(b.data), L.prime)
+    a1, s1 = ppio(numerator(data(a)), L.prime)
+    a2, s2 = ppio(numerator(data(b)), L.prime)
     b1 = denominator(a)
     b2 = denominator(b)
     q, r = divrem(a1 * s1 * b2, s2)
@@ -274,9 +277,9 @@ end
 function euclid(a::LocalizedEuclideanRingElem{T}) where {T <: RingElem}
   L = parent(a)
   if L.comp
-    return ppio(numerator(a.data), L.prime)[1]
+    return ppio(numerator(data(a)), L.prime)[1]
   else
-    return ppio(numerator(a.data), L.prime)[2]
+    return ppio(numerator(data(a)), L.prime)[2]
   end
 end
 
@@ -292,9 +295,9 @@ function gcd(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T})
    iszero(b) && return inv(canonical_unit(a)) * a
    par = parent(a)
    if par.comp
-     elem = ppio(gcd(numerator(a.data), numerator(b.data)), parent(a).prime)[2]
+     elem = ppio(gcd(numerator(data(a)), numerator(data(b))), parent(a).prime)[2]
    else
-     elem = ppio(gcd(numerator(a.data), numerator(b.data)), parent(a).prime)[1]
+     elem = ppio(gcd(numerator(data(a)), numerator(data(b))), parent(a).prime)[1]
    end
    return par(elem)
 end
@@ -304,9 +307,9 @@ function lcm(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T})
    par = parent(a)
    (iszero(a) || iszero(b)) && return par()
    if par.comp
-     elem = ppio(lcm(numerator(a.data), numerator(b.data)), parent(a).prime)[2]
+     elem = ppio(lcm(numerator(data(a)), numerator(data(b))), parent(a).prime)[2]
    else
-     elem = ppio(lcm(numerator(a.data), numerator(b.data)), parent(a).prime)[1]
+     elem = ppio(lcm(numerator(data(a)), numerator(data(b))), parent(a).prime)[1]
    end
    return par(elem)
 end
@@ -320,9 +323,9 @@ end
 function gcdx(a::LocalizedEuclideanRingElem{T}, b::LocalizedEuclideanRingElem{T}) where {T <: RingElement}
    check_parent(a,b)
    L = parent(a)
-   g, u, v = gcdx(numerator(a.data), numerator(b.data))
+   g, u, v = gcdx(numerator(data(a)), numerator(data(b)))
    c = inv(canonical_unit(L(g)))
-   return c*L(g), c*L(u*denominator(a.data)), c*L(v*denominator(b.data))
+   return c*L(g), c*L(u*denominator(data(a))), c*L(v*denominator(data(b)))
 end
 
 ###############################################################################
@@ -333,6 +336,17 @@ end
 
 function ^(a::LocalizedEuclideanRingElem, b::Int)
    return parent(a)(data(a)^b)
+end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::LocalizedEuclideanRing)
+  # TODO: should sometimes create something with a denominator
+  return R(ConformanceTests.generate_element(base_ring(R)))
 end
 
 ###############################################################################
@@ -398,11 +412,11 @@ Returns unit `b`::LocalizedEuclideanRingElem{T} s.th. $a$ * `b` only consists of
 """
 function canonical_unit(a::LocalizedEuclideanRingElem{T}) where {T <: RingElem}
    if parent(a).comp
-     b = ppio(numerator(a.data), parent(a).prime)[1]
+     b = ppio(numerator(data(a)), parent(a).prime)[1]
    else
-     b = ppio(numerator(a.data), parent(a).prime)[2]
+     b = ppio(numerator(data(a)), parent(a).prime)[2]
    end
-   return parent(a)(b//denominator(a.data))
+   return parent(a)(b//denominator(data(a)))
 end
 
 ###############################################################################
