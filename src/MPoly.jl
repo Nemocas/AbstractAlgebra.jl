@@ -1666,7 +1666,11 @@ true
     poly_ring(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
-multivariate polynomial ring.
+multivariate polynomial ring. Moreover, the default value for `cached` is `false`,
+not `true`.
+
+This function is part of the internal interface for polynomial rings.
+User code should normally not need to invoke it.
 """
 poly_ring(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)
