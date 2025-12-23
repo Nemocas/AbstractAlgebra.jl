@@ -81,13 +81,17 @@ end
 
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
+# general fallback for comparison of elements via promotion.
+# This is different from Julia's existing promotion logic because
+# it takes parents into account
 function ==(x::NCRingElem, y::NCRingElem)
-   fl, u, v = try_promote(x, y)
-   if fl
-     return u == v
-   else
-     return false
-   end
+  # avoid infinite recursion: we only get here if a ring type "forgot" to
+  # implement ==, so only do something if x and y have different type
+  if typeof(x) !== typeof(y)
+    fl, u, v = try_promote(x, y)
+    fl && return u == v
+  end
+  throw(NotImplementedError(:(==), x, y))
  end
  
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)

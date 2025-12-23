@@ -437,16 +437,7 @@ Instead of a vector, `rows` and `cols` can also be:
 * an integer `i`, which is  interpreted as `i:i`, or
 * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
-function getindex(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
-   _checkbounds(M, rows, cols)
-   A = similar(M, length(rows), length(cols))
-   for i in 1:length(rows)
-      for j in 1:length(cols)
-         A[i, j] = deepcopy(M[rows[i], cols[j]])
-      end
-   end
-   return A
-end
+getindex(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = sub(M, r, c)
 
 function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
    _checkbounds(M, i, cols)
@@ -472,8 +463,16 @@ getindex(M::MatElem, rows, ::Colon) = getindex(M, rows, 1:ncols(M))
 
 getindex(M::MatElem, ::Colon, ::Colon) = getindex(M, 1:nrows(M), 1:ncols(M))
 
-
-sub(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = M[r, c]
+function sub(M::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
+   _checkbounds(M, rows, cols)
+   A = similar(M, length(rows), length(cols))
+   for i in 1:length(rows)
+      for j in 1:length(cols)
+         A[i, j] = deepcopy(M[rows[i], cols[j]])
+      end
+   end
+   return A
+end
 
 # fallback method that converts Colons to UnitRanges
 function Base.view(M::MatElem, rows, cols)
@@ -5056,7 +5055,7 @@ function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, w
    return nothing
 end
 
-function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
+function hnf_kb!(H::MatrixElem{T}, U::MatrixElem{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i

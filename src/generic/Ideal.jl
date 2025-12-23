@@ -34,7 +34,11 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
 """
-gens(I::Ideal{T}) where T <: RingElement = I.gens
+gens(I::Ideal) = I.gens
+
+number_of_generators(I::Ideal) = length(I.gens)
+
+gen(I::Ideal, i::Int) = I.gens[i]
 
 function deepcopy_internal(I::Ideal, dict::IdDict)
    elms = [deepcopy_internal(x, dict) for x in I.gens]
@@ -2081,51 +2085,30 @@ end
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
 """
 function normal_form(p::U, I::Ideal{U}) where {U}
-   is_zero(p) && return copy(p)
-   is_zero(I) && return copy(p)
+   is_zero(p) && return deepcopy(p)
+   is_zero(I) && return deepcopy(p)
    return normal_form(p, gens(I))
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: FieldElem}
-   iszero(I) && return copy(p)
+   iszero(I) && return deepcopy(p)
    return zero(p)
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: Integer}
-   iszero(I) && return copy(p)
+   iszero(I) && return deepcopy(p)
    m = only(gens(I))
    return rem(p, m, RoundDown)
 end
 
 ###############################################################################
 #
-#   Comparison
-#
-###############################################################################
-
-function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   check_base_ring(I, J)
-   return gens(I) == gens(J)
-end
-
-###############################################################################
-#
-#   Containment
+#   Membership
 #
 ###############################################################################
 
 function Base.in(v::T, I::Ideal{T}) where T <: RingElement
   return is_zero(normal_form(v, I))
-end
-
-@doc raw"""
-    Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-
-Return `true` if the ideal `I` is a subset of the ideal `J`.
-"""
-function Base.issubset(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   check_base_ring(I, J)
-   return all(in(J), gens(I))
 end
 
 ###############################################################################

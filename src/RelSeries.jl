@@ -1108,25 +1108,22 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    end
    aval2 = div(aval, 2)
    prec = precision(a) - aval
-   if prec == 0
-      asqrt = parent(a)()
+   asqrt = parent(a)()
+   if prec <= 0
       asqrt = _set_precision_raw!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
       return true, asqrt
    end
-   asqrt = parent(a)()
    fit!(asqrt, prec)
    asqrt = _set_precision_raw!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
-   if prec > 0
-      c = polcoeff(a, 0)
-      if check && !is_square(c)
-         return false, zero(S)
-      end
-      g = sqrt(c; check=check)
-      asqrt = setcoeff!(asqrt, 0, g)
-      g2 = g + g
+   c = polcoeff(a, 0)
+   if check && !is_square(c)
+      return false, zero(S)
    end
+   g = sqrt(c; check=check)
+   asqrt = setcoeff!(asqrt, 0, g)
+   g2 = g + g
    p = R()
    for n = 1:prec - 1
       c = R()

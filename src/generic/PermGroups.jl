@@ -817,6 +817,10 @@ end
 ###############################################################################
 
 function parse_cycles(str::AbstractString)
+  return parse_cycles(string(str))
+end
+
+function parse_cycles(str::Union{String, SubString})
    ccycles = Int[]
    cptrs = Int[1]
    if startswith(str, "Cycle Decomposition: ")

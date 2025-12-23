@@ -1442,6 +1442,40 @@ end
 
 ###############################################################################
 #
+#  Universal polynomial ring methods
+#
+###############################################################################
+
+@doc raw"""
+    _upgrade(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+
+Return an element of `R` which is obtained from `p` by mapping the $i$-th variable
+of `parent(p)` to the $i$-th variable of `R`.
+For this to work, `R` needs to have at least as many variables as `parent(p)`.
+"""
+function _upgrade(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+   n = nvars(R) - nvars(parent(p))
+   n < 0 && error("Too few variables")
+   ctx = MPolyBuildCtx(R)
+   v0 = zeros(Int, n)
+   for (c, v) in zip(coefficients(p), exponent_vectors(p))
+      push_term!(ctx, c, vcat(v, v0))
+   end
+   return finish(ctx)
+end
+
+@doc raw"""
+    _add_gens(R::MPolyRing, varnames::Vector{Symbol})
+
+Return a new uncached multivariate polynomial ring which has the same properties
+as `R` but `varnames` as additional generators.
+"""
+function _add_gens(R::MPolyRing, varnames::Vector{Symbol})
+   return poly_ring(base_ring(R), vcat(symbols(R), varnames); internal_ordering=internal_ordering(R))
+end
+
+###############################################################################
+#
 #  Factorization
 #
 ###############################################################################

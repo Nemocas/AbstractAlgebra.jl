@@ -1879,6 +1879,8 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
       a = divexact(a, c1)
       b = divexact(b, c2)
       c = gcd(c1, c2)
+   else
+      c = nothing
    end
    lead_monomial = is_term_recursive(leading_coefficient(a)) ||
                    is_term_recursive(leading_coefficient(b))
@@ -1906,7 +1908,7 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
          h = h^(1 - d)*g^d
       end
    end
-   if !ignore_content
+   if c !== nothing  # !ignore_content
       if !is_term_recursive(leading_coefficient(b)) &&
          !is_term_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest

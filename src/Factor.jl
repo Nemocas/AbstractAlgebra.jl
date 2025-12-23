@@ -23,15 +23,15 @@ mutable struct Fac{T <: RingElement}
    unit::T
    arr::Vector{Pair{T, Int}}
 
-   function Fac{T}() where {T}
+   function Fac{T}() where {T <: RingElement}
      return new{T}(Dict{T, Int}())
    end
 
-   function Fac{T}(u::T, d::Dict{T, Int}) where {T}
+   function Fac{T}(u::T, d::Dict{T, Int}) where {T <: RingElement}
      return new{T}(d, u)
    end
 
-   function Fac{T}(u::T, a::Vector{Pair{T, Int}}) where {T}
+   function Fac{T}(u::T, a::Vector{Pair{T, Int}}) where {T <: RingElement}
      z = new{T}()
      z.unit = u
      z.arr = a

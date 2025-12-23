@@ -229,7 +229,7 @@ function factor(a::LaurentMPolyWrap)
    for (p, e) in f
       d[LaurentMPolyWrap(R, p)] = e
    end
-   return Fac(LaurentMPolyWrap(R, unit(f), ad), d)
+   return Fac(LaurentMPolyWrap(R, unit(f)::typeof(a.mpoly), ad), d)
 end
 
 function factor_squarefree(a::LaurentMPolyWrap)
@@ -240,7 +240,7 @@ function factor_squarefree(a::LaurentMPolyWrap)
    for (p, e) in f
       d[LaurentMPolyWrap(R, p)] = e
    end
-   return Fac(LaurentMPolyWrap(R, unit(f), ad), d)
+   return Fac(LaurentMPolyWrap(R, unit(f)::typeof(a.mpoly), ad), d)
 end
 
 ###############################################################################

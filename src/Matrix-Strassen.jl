@@ -235,7 +235,7 @@ function apply!(Q::Perm{Int}, P::Perm{Int}; offset::Int = 0)
   end
 end
 
-function lu!(P::Perm{Int}, A; cutoff::Int = 300)
+function lu!(P::Perm{Int}, A::MatElem; cutoff::Int = 300)
   m = nrows(A)
 
   @assert length(P.d) == m

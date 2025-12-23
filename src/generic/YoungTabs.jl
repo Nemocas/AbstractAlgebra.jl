@@ -72,11 +72,11 @@ function _numpart(n::Integer)
    elseif n < 395
       return _numpart(Int(n), _numPartsTable)
    else
-      return _numpart(BigInt(n), _numPartsTableBig)
+      return _numpart(Int(n), _numPartsTableBig)
    end
 end
 
-function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
+function _numpart(n::Int, lookuptable::Dict{Int, T}) where T<:Integer
    s = zero(T)
    if !haskey(lookuptable, n)
       for j in 1:floor(T, (1 + Base.sqrt(1 + 24n))/6)

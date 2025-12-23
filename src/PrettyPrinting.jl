@@ -568,12 +568,12 @@ mutable struct printer{IOT <: IO}
    terse_level::Int
    size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
                                   # < 0 for unrestricted output
-end
-
-function printer(io::IO)
-   terse_level = get(io, :terse_level, 0)
-   size_limit = get(io, :size_limit, -1)
-   return printer{typeof(io)}(io, String[], terse_level, Int[size_limit])
+   
+   function printer(io::IO)
+      terse_level = get(io, :terse_level, 0)
+      size_limit = get(io, :size_limit, -1)
+      return new{typeof(io)}(io, String[], terse_level, Int[size_limit])
+   end
 end
 
 # TODO since the subexpressions are not changing much, cache the leaf_count

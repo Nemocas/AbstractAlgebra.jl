@@ -142,6 +142,7 @@ import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
 import ..AbstractAlgebra: hom
+import ..AbstractAlgebra: ideal
 import ..AbstractAlgebra: ideal_type
 import ..AbstractAlgebra: identity_matrix
 import ..AbstractAlgebra: image
@@ -218,6 +219,8 @@ import ..AbstractAlgebra: shift_left
 import ..AbstractAlgebra: shift_right
 import ..AbstractAlgebra: snf
 import ..AbstractAlgebra: sqrt
+import ..AbstractAlgebra: sqrt_classical
+import ..AbstractAlgebra: sqrt_classical_char2
 import ..AbstractAlgebra: sub!
 import ..AbstractAlgebra: submul!
 import ..AbstractAlgebra: symbols

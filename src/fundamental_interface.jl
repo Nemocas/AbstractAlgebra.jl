@@ -49,6 +49,7 @@ true
 """
 elem_type(x) = elem_type(typeof(x))
 elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
+elem_type(T::Type{Union{}}) = throw(MethodError(elem_type, (T,)))
 
 @doc raw"""
     parent_type(element)
@@ -73,6 +74,7 @@ true
 """
 parent_type(x) = parent_type(typeof(x))
 parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
+parent_type(T::Type{Union{}}) = throw(MethodError(parent_type, (T,)))
 
 @doc raw"""
     base_ring(a)
@@ -132,6 +134,7 @@ base_ring_type(x::Type{<:NCRingElement}) = base_ring_type(parent_type(x))
 base_ring_type(x::Type{<:ModuleElem}) = base_ring_type(parent_type(x))
 base_ring_type(x::Type{<:Ideal}) = base_ring_type(parent_type(x))
 base_ring_type(T::DataType) = throw(MethodError(base_ring_type, (T,)))
+base_ring_type(T::Type{Union{}}) = throw(MethodError(base_ring_type, (T,)))
 
 @doc raw"""
     coefficient_ring(a)
@@ -184,6 +187,7 @@ coefficient_ring_type(x::Type{<:NCRingElement}) = coefficient_ring_type(parent_t
 coefficient_ring_type(x::Type{<:ModuleElem}) = coefficient_ring_type(parent_type(x))
 coefficient_ring_type(x::Type{<:Ideal}) = coefficient_ring_type(parent_type(x))
 coefficient_ring_type(T::DataType) = throw(MethodError(coefficient_ring_type, (T,)))
+coefficient_ring_type(T::Type{Union{}}) = throw(MethodError(coefficient_ring_type, (T,)))
 
 ###############################################################################
 #
