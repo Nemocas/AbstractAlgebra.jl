@@ -31,7 +31,6 @@ FINALFILE = f"{repopath}/CHANGELOG.md"
 with open('config.toml', 'rb') as conffile:
     conf = tomli.load(conffile)
 
-MAJORVERSION = conf['majorversion']
 REPONAME = conf['reponame']
 PROJECTNAME = REPONAME.split('/')[-1]
 ENABLE_TWOLEVEL = conf["enabletwolevel"]
@@ -76,8 +75,6 @@ def is_existing_tag(tag: str) -> bool:
 
 def find_previous_version(version: str) -> str:
     major, minor, patchlevel = map(int, version.split("."))
-    if major != MAJORVERSION:
-        error(f"unexpected {PROJECTNAME} version, not starting with '{MAJORVERSION}.'")
     if patchlevel != 0:
         patchlevel -= 1
         return f"{major}.{minor}.{patchlevel}"
@@ -386,8 +383,6 @@ def main(new_version: str) -> None:
     major, minor, patchlevel = map(int, new_version.split("."))
     extra = ""
     release_type = 0 # 0 by default, 1 for point release, 2 for patch release
-    if major != MAJORVERSION:
-        error(f"unexpected {PROJECTNAME} version, not starting with '{MAJORVERSION}.'")
     if patchlevel == 0:
         # "major" release which changes just the minor version
         release_type = 1
