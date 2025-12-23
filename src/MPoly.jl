@@ -1655,7 +1655,5 @@ true
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
 multivariate polynomial ring.
 """
-function polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring
-   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   return mpoly_ring_type(T)(R, s, internal_ordering, cached)
-end
+polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+   mpoly_ring_type(T)(R, s, internal_ordering, cached)
