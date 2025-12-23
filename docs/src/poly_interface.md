@@ -158,7 +158,7 @@ MyPolyRing{T}(R, s, cached)
 ```
 
 Accordingly, a `poly_ring` method only needs to be defined if such a
-constructor does not exist for `dense_poly_type(T)` or if other behaviour is wanted.
+constructor does not exist for `poly_type(T)` or if other behaviour is wanted.
 
 ### Basic manipulation of rings and elements
 
