@@ -828,7 +828,7 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
      S = matrix_ring(R, d)
      test_MatAlgebra_interface(S, reps = 2 + fld(reps, 8))
    end
-   for (r,c) in ( (0,0), (1,0), (2,2), (2,3), (3,2) )
+   for (r,c) in ( (0,0), (1,0), (0,2), (2,2), (2,3), (3,2) )
      S = matrix_space(R, r,c)
      test_MatSpace_interface(S, reps = 2 + fld(reps, 10))
    end
