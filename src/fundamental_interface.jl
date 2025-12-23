@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-function Base.:(==)(::AbstractAlgebra.SetElem, ::AbstractAlgebra.SetElem)
+function Base.:(==)(x::AbstractAlgebra.SetElem, y::AbstractAlgebra.SetElem)
+  x === y && return true
   error("== is not implemented for the given types")
 end
 
