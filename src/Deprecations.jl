@@ -84,7 +84,7 @@ function zeros(R::NCRing, r::Int...)
     return A
 end
 
-# deprecated during 0.47.*
+# to be deprecated in a future minor release
 PolyRing(R::NCRing) = poly_ring(R, :x)
 #@deprecate PolyRing(R::NCRing) poly_ring(R)
 
