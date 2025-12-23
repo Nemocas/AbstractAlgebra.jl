@@ -446,8 +446,6 @@ of zero is not supported and throws an exception.
 """
 function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
    @req !is_trivial(R) "Zero rings are currently not supported as base ring."
-   # Modulus of zero cannot be supported. E.g. A C library could not be expected to
-   # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
    S = EuclideanRingResidueRing{T}(R(a), cached)
