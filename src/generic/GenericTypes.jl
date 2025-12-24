@@ -476,9 +476,7 @@ end
       return get_cached!(
          UnivPolyID, (R, s, internal_ordering), cached
       ) do
-         new{T}(
-            AbstractAlgebra.polynomial_ring_only(R, s; internal_ordering, cached=false)
-         )
+         new{T}(AbstractAlgebra.poly_ring(R, s; internal_ordering))
       end::UniversalPolyRing{T}
    end
 end
