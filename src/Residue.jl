@@ -445,8 +445,7 @@ to the constructor with the same base ring $R$ and element $a$. A modulus
 of zero is not supported and throws an exception.
 """
 function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
-   # Modulus of zero cannot be supported. E.g. A C library could not be expected to
-   # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
    S = EuclideanRingResidueRing{T}(R(a), cached)
@@ -454,6 +453,7 @@ function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
 end
 
 function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
