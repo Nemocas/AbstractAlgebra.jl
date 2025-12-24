@@ -721,9 +721,25 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
 
             t = transpose(a)
             @test t isa ST
+            @test base_ring(t) == base_ring(a)
             @test nrows(t) == ncols(S)
             @test ncols(t) == nrows(S)
             @test transpose(t) == a
+            @test a == A
+
+            if nrows(S) == ncols(S)
+              # in-place transpose! only supported for square matrices
+              t = transpose!(deepcopy(a))
+              @test t isa ST
+              @test base_ring(t) == base_ring(a)
+              @test t == transpose(a)
+            end
+
+            z = zero_matrix(R, ncols(a), nrows(a))
+            t = transpose!(z, a)
+            @test t isa ST
+            @test base_ring(t) == base_ring(a)
+            @test t == transpose(a)
             @test a == A
          end
       end
@@ -808,10 +824,14 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
    Rxy, _ = polynomial_ring(R, [:x, :y])
    test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
-   S = matrix_ring(R, rand(0:3))
-   test_MatAlgebra_interface(S, reps = 2 + fld(reps, 2))
-   S = matrix_space(R, rand(0:3), rand(0:3))
-   test_MatSpace_interface(S, reps = 2 + fld(reps, 2))
+   for d in 0:3
+     S = matrix_ring(R, d)
+     test_MatAlgebra_interface(S, reps = 2 + fld(reps, 8))
+   end
+   for (r,c) in ( (0,0), (1,0), (0,2), (2,2), (2,3), (3,2) )
+     S = matrix_space(R, r,c)
+     test_MatSpace_interface(S, reps = 2 + fld(reps, 10))
+   end
 end
 
 function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
