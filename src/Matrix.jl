@@ -1313,7 +1313,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
-   check_parent(x, y)
+   parent(x) == parent(y) || return false
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          if x[i, j] != y[i, j]
