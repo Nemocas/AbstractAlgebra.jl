@@ -498,11 +498,11 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
 end
 
 function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
