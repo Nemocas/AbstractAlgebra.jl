@@ -45,6 +45,7 @@ mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
 
 @doc raw"""
     mpoly_ring_type(::Type{T}) where T<:RingElement

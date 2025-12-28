@@ -49,6 +49,7 @@ poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
 poly_type(::Type{S}) where S<:NCRing = poly_type(elem_type(S))
 poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
+poly_type(T::Type{Union{}}) = throw(MethodError(poly_type, (T,)))
 
 @doc raw"""
     poly_ring_type(::Type{T}) where T<:NCRingElement
