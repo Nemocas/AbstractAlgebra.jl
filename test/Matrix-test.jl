@@ -216,7 +216,7 @@ end
 end
 
 @testset "Rank Interpolation" begin
-  Fx, x = polynomial_ring(GF(29), :x)
+  Fx, x = polynomial_ring(GF(257), :x)
   Qy, y = polynomial_ring(QQ, 3, :y)
   Qz, z = rational_function_field(QQ, :z)
   
@@ -235,12 +235,12 @@ end
   multiply_row!(B, 0, 1)
   multiply_row!(C, 0, 1)
 
-  @test rank(A) == AbstractAlgebra.rank_interpolation(A, 0.01)
-  @test rank(A) >= AbstractAlgebra.rank_interpolation_mc(A)
-  @test rank(B) == AbstractAlgebra.rank_interpolation(B, 0.01)
-  @test rank(B) >= AbstractAlgebra.rank_interpolation_mc(B)
-  @test rank(C) == AbstractAlgebra.rank_interpolation(C, 0.01)
-  @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C)
+  @test rank(A) == AbstractAlgebra.rank_interpolation(A)
+  @test rank(A) >= AbstractAlgebra.rank_interpolation_mc(A, 0.01)
+  @test rank(B) == AbstractAlgebra.rank_interpolation(B)
+  @test rank(B) >= AbstractAlgebra.rank_interpolation_mc(B, 0.01)
+  @test rank(C) == AbstractAlgebra.rank_interpolation(C)
+  @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C, 0.01)
 
   A = rand(matrix_space(Fx, 0, 2), 0:5)
   B = rand(matrix_space(Qy, 0, 2), 1:3, 1:4, 1:2)
