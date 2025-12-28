@@ -43,9 +43,12 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #
 ###############################################################################
 
-number_of_rows(a::Mat) = size(a.entries, 1)
+number_of_rows(a::MatSpaceElem) = size(a.entries, 1)
+number_of_columns(a::MatSpaceElem) = size(a.entries, 2)
 
-number_of_columns(a::Mat) = size(a.entries, 2)
+number_of_rows(a::MatSpaceView) = size(a.entries, 1)
+number_of_columns(a::MatSpaceView) = size(a.entries, 2)
+
 
 Base.@propagate_inbounds getindex(a::Mat, r::Int, c::Int) = a.entries[r, c]
 

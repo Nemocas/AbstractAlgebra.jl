@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-number_of_rows(A::Matrix{T}) where {T} = size(A)[1]
-number_of_columns(A::Matrix{T}) where {T} = size(A)[2]
+number_of_rows(A::Matrix{T}) where {T} = size(A, 1)
+number_of_columns(A::Matrix{T}) where {T} = size(A, 2)
 
 ###############################################################################
 #
