@@ -32,7 +32,7 @@ end
 # evaluation at x = alpha should use divrem. Don't use evaluate for this!!!
 
 # set t to the coefficients of q when expanded in powers of (x - alpha)
-function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyRingElem
+function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where {E <: MPolyRingElem}
   R = parent(xalpha)
   empty!(t)
   while !iszero(q)
@@ -42,7 +42,7 @@ function taylor_get_coeffs!(t::Vector{E}, q::E, xalpha::E) where E <: MPolyRingE
 end
 
 # opposite of taylor_get_coeffs
-function taylor_from_coeffs(B::Vector{E}, xalpha::E) where E
+function taylor_from_coeffs(B::Vector{E}, xalpha::E) where {E <: MPolyRingElem}
   R = parent(xalpha)
   a = zero(R)
   for i in length(B):-1:1
@@ -51,7 +51,7 @@ function taylor_from_coeffs(B::Vector{E}, xalpha::E) where E
   return a
 end
 
-function taylor_set_coeff!(t::Vector{E}, i::Int, c::E) where E
+function taylor_set_coeff!(t::Vector{E}, i::Int, c::E) where {E <: MPolyRingElem}
   R = parent(c)
   while 1 + i > length(t)
     push!(t, zero(R))
@@ -117,7 +117,7 @@ function from_univar(a, var::Int, Kxyz)
 end
 
 # remove the content with respect to variable v
-function primitive_part(a::E, v::Int) where E
+function primitive_part(a::E, v::Int) where {E <: MPolyRingElem}
   R = parent(a)
   d = degree(a, v)
   g = zero(R)
@@ -136,13 +136,13 @@ function primitive_part(a::E, v::Int) where E
   end
 end
 
-function get_lc(a::E, v::Int) where E
+function get_lc(a::E, v::Int) where {E <: MPolyRingElem}
   d = degree(a, v)
   @assert d >= 0
   return coeff(a, Int[v], Int[d])
 end
 
-function set_lc(a::E, v::Int, b::E) where E
+function set_lc(a::E, v::Int, b::E) where {E <: MPolyRingElem}
   R = parent(a)
   d = degree(a, v)
   @assert d >= 0
@@ -154,7 +154,7 @@ function set_lc(a::E, v::Int, b::E) where E
   end
 end
 
-function make_monic(a::E) where E
+function make_monic(a::E) where {E <: MPolyRingElem}
   if length(a) < 1
     return a
   end
@@ -166,7 +166,7 @@ function make_monic(a::E) where E
   end
 end
 
-function eval_one(a::E, v, alpha) where E
+function eval_one(a::E, v, alpha) where {E <: MPolyRingElem}
   R = parent(a)
   return divrem(a, gen(R, v) - alpha)[2]
 end
@@ -204,7 +204,7 @@ function pfracinit(
   mainvar,
   minorvars::Vector{Int},
   alphas::Vector
-) where E
+) where {E <: MPolyRingElem}
 
   r = length(B)       # number of factors
   l = length(minorvars)   # number of evaluated variables
@@ -299,7 +299,7 @@ end
   The second return of pfrac (the array delta) is owned by I.
   So, at least its length should not be mutated.
 =#
-function pfrac(I::pfracinfo{E}, t::E, degs::Vector{Int}, check::Bool) where E
+function pfrac(I::pfracinfo{E}, t::E, degs::Vector{Int}, check::Bool) where {E <: MPolyRingElem}
   return pfrac_recursive(I, t, degs, length(I.xalphas), check)
 end
 
@@ -309,7 +309,7 @@ function pfrac_recursive(
   degs::Vector{Int},
   lev::Int,
   check::Bool
-) where E
+) where {E <: MPolyRingElem}
 
   @assert 0 <= lev <= length(I.xalphas)
   @assert lev <= length(degs)
@@ -383,7 +383,7 @@ function hlift_without_lcc(
   mainvar::Int,
   minorvars::Vector{Int},   # length n
   alphas::Vector
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(A)
   n = length(minorvars)
@@ -423,7 +423,7 @@ function hlift_with_lcc(
   mainvar::Int,
   minorvars::Vector{Int},   # length n
   alphas::Vector,
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(A)
   K = base_ring(R)
@@ -467,7 +467,7 @@ function hlift_have_lcs(
   mainvar::Int,
   minorvars::Vector{Int},   # length n
   alphas::Vector
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(A)
   K = base_ring(R)
@@ -520,7 +520,7 @@ function hliftstep(
   alphas::Vector,
   a::E,
   check::Bool
-) where E
+) where {E <: MPolyRingElem}
 
   r = length(fac)
   @assert r >= 2
@@ -543,7 +543,7 @@ function hliftstep_quartic2(
   alphas::Vector,
   a::E,
   check::Bool
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(a)
   m = length(minorvars)
@@ -631,7 +631,7 @@ function hliftstep_quartic(
   alphas::Vector,
   a::E,
   check::Bool
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(a)
   r = length(fac)
@@ -748,7 +748,7 @@ function hliftstep_quintic(
   alphas::Vector,
   a::E,
   check::Bool
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(a)
   r = length(fac)
@@ -794,7 +794,7 @@ end
   Return (true, monic factors of a) if a is squarefree
          (false, junk)              if a is not squarefree
 =#
-function mfactor_irred_univar(a::E, var::Int) where E
+function mfactor_irred_univar(a::E, var::Int) where {E <: MPolyRingElem}
   R = parent(a)
   K = base_ring(R)
   Kx, _ = polynomial_ring(K, :x)
@@ -814,7 +814,7 @@ end
     a is squarefree and primitive wrt xvar
   Return monic squarefree factors of a
 =#
-function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where E
+function mfactor_irred_bivar_char_zero(a::E, xvar::Int, yvar::Int) where {E <: MPolyRingElem}
 
   xdeg = degree(a, xvar)
 
@@ -864,7 +864,7 @@ function hlift_bivar_combine(
   yvar::Int,
   alpha,
   ufacs::Vector{E}  # factorization of a(x, y = alpha)
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(a)
   K = base_ring(R)
@@ -917,7 +917,7 @@ end
   a and b are both factorizations. Make the bases coprime without changing
   the values of factorizations. TODO this is probably done somewhere else.
 =#
-function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where E
+function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where {E <: MPolyRingElem}
   lena = length(a)
   lenb = length(b)
   for i in 1:lena
@@ -938,7 +938,7 @@ function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) w
 end
 
 # Return A/b^bexp
-function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where E
+function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where {E <: MPolyRingElem}
 
   R = parent(A.unit)
   a = collect(A.fac)
@@ -987,7 +987,7 @@ function lcc_kaltofen_step!(
   v::Int,           # the main variable for this step
   minorvars::Vector{Int},
   alphas::Vector
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(Af.unit)
   r = length(Au)
@@ -1072,7 +1072,7 @@ function lcc_kaltofen(
   minorvars::Vector{Int},
   alphas::Vector,
   ufacs::Vector{E}    # univariate factors of (A evaluated at minor vars)
-) where E
+) where {E <: MPolyRingElem}
 
   R = parent(A)
   r = length(ufacs)
@@ -1133,7 +1133,7 @@ function mfactor_choose_eval_points!(
   A::E,
   mainvar::Int,
   minorvars::Vector{Int},
-  size::Int) where E
+  size::Int) where {E <: MPolyRingElem}
 
   n = length(minorvars)
   R = parent(A)
@@ -1149,7 +1149,7 @@ function mfactor_irred_mvar_char_zero(
   A::E,             # squarefree, primitive wrt mainvar, monic
   mainvar::Int,
   minorvars::Vector{Int}
-) where E
+) where {E <: MPolyRingElem}
 
   n = length(minorvars)
   R = parent(A)
@@ -1207,7 +1207,7 @@ end
 ########## factorization in three steps #######################################
 
 # take out the content and lowest power wrt variable v
-function mfactor_primitive(f::E, v::Int) where E
+function mfactor_primitive(f::E, v::Int) where {E <: MPolyRingElem}
   R = parent(f)
   d = degree(f, v)
   g = zero(R)
@@ -1225,7 +1225,7 @@ end
 
 # assume a is primitive wrt each variable appearing in it
 # return squarefree factors
-function mfactor_sqrfree_char_zero(a::E) where E
+function mfactor_sqrfree_char_zero(a::E) where {E <: MPolyRingElem}
   R = parent(a)
   @assert length(a) >= 1
   res = Fac{E}()
@@ -1251,7 +1251,7 @@ end
 
 # assume a is primitive wrt each variable appearing in it and squarefree
 # return irreducible factors
-function mfactor_irred_char_zero(a::E) where E
+function mfactor_irred_char_zero(a::E) where {E <: MPolyRingElem}
   R = parent(a)
   K = base_ring(R)
   @assert length(a) > 0
@@ -1304,7 +1304,7 @@ function mfactor_irred_char_zero(a::E) where E
 end
 
 
-function mfactor_squarefree_char_zero(a::E) where E
+function mfactor_squarefree_char_zero(a::E) where {E <: MPolyRingElem}
   R = parent(a)
   K = base_ring(R)
 
@@ -1359,7 +1359,7 @@ function mfactor_squarefree_char_zero(a::E) where E
 end
 
 # factor a multivariate over an exact field of characteristic 0
-function mfactor_char_zero(a::E) where E <: MPolyRingElem
+function mfactor_char_zero(a::E) where {E <: MPolyRingElem}
   tres = mfactor_squarefree_char_zero(a)
   # ensure factors are irreducible
   res = Fac{E}()
