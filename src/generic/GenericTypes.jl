@@ -1383,7 +1383,7 @@ julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 ```
 """
 struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
-   R
+   R::NCRing
    n::Int #Rows
    m::Int #Cols
    s::Int
