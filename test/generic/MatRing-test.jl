@@ -677,7 +677,7 @@ end
 
       M = rand(R, -1:5, -100:100)
 
-      @test det(M) == AbstractAlgebra.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(matrix(M))
    end
 
    S, z = polynomial_ring(ZZ, "z")
@@ -687,7 +687,7 @@ end
 
       M = rand(R, -1:3, -20:20)
 
-      @test det(M) == AbstractAlgebra.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(matrix(M))
    end
 
    R, x = polynomial_ring(QQ, "x")
@@ -699,7 +699,7 @@ end
 
       M = rand(S, -100:100)
 
-      @test det(M) == AbstractAlgebra.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(matrix(M))
    end
 
    R, x = polynomial_ring(ZZ, "x")
@@ -709,7 +709,7 @@ end
       T = matrix_ring(S, dim)
       M = rand(T, -1:2, -1:2, -10:10)
 
-      @test det(M) == AbstractAlgebra.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(matrix(M))
    end
 end
 
