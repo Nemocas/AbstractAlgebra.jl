@@ -464,6 +464,8 @@ true
 is_symmetric(::MatElem)
 
 is_skew_symmetric(::MatElem)
+
+is_alternating(::MatElem)
 ```
 
 ### Powering
