@@ -18,7 +18,6 @@ export combine_like_terms!
 export cycles
 export defining_polynomial
 export degrees
-export dense_matrix_type
 export dim
 export disable_cache!
 export downscale

@@ -84,9 +84,9 @@ lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-is_lower_triangular(::MatrixElem)
-is_upper_triangular(::MatrixElem)
-is_diagonal(::MatrixElem)
+is_lower_triangular(::MatElem)
+is_upper_triangular(::MatElem)
+is_diagonal(::MatElem)
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 Base.map(f, ::MatrixElem{T}) where T <: RingElement
 Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
@@ -461,9 +461,11 @@ true
 ### Symmetry testing
 
 ```@docs
-is_symmetric(::MatrixElem)
+is_symmetric(::MatElem)
 
-is_skew_symmetric(::MatrixElem)
+is_skew_symmetric(::MatElem)
+
+is_alternating(::MatElem)
 ```
 
 ### Powering
@@ -493,7 +495,7 @@ content(::MatElem{T}) where T <: RingElement
 ### Nilpotency
 
 ```@docs
-is_nilpotent(::MatrixElem{T}) where {T <: RingElement}
+is_nilpotent(::MatElem{T}) where {T <: RingElement}
 ```
 
 ### Minors

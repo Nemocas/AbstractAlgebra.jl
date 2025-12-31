@@ -123,6 +123,7 @@ import ..AbstractAlgebra: degree
 import ..AbstractAlgebra: degrees
 import ..AbstractAlgebra: degrees_range
 import ..AbstractAlgebra: denominator
+import ..AbstractAlgebra: dense_matrix_type
 import ..AbstractAlgebra: derivative
 import ..AbstractAlgebra: div
 import ..AbstractAlgebra: divexact
