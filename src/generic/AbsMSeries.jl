@@ -735,11 +735,10 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Vector{Int},
     U = elem_type(R)
 
     S, _ = AbstractAlgebra.polynomial_ring(R, s)
-    V = elem_type(S)
 
     model === :capped_absolute || error("Unknown model")
 
-    parent_obj = AbsMSeriesRing{U, V}(S, prec, s, cached)
+    parent_obj = AbsMSeriesRing(S, prec, s, cached)
 
     return parent_obj, gens(parent_obj)
 end
@@ -757,9 +756,9 @@ function power_series_ring(R::AbstractAlgebra.Ring, prec::Int,
     model === :capped_absolute || error("Unknown model")
 
     if weights === nothing
-        parent_obj = AbsMSeriesRing{U, V}(S, [prec for _ in s], s, cached)
+        parent_obj = AbsMSeriesRing(S, [prec for _ in s], s, cached)
     else
-        parent_obj = AbsMSeriesRing{U, V}(S, weights, prec, s, cached)
+        parent_obj = AbsMSeriesRing(S, weights, prec, s, cached)
     end
 
     return parent_obj, gens(parent_obj)

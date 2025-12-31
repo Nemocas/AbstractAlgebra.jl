@@ -45,6 +45,7 @@ mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
 
 @doc raw"""
     mpoly_ring_type(::Type{T}) where T<:RingElement
@@ -497,11 +498,11 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
 end
 
 function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}

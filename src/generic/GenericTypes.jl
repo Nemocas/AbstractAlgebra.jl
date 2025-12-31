@@ -909,22 +909,22 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
    sym::Vector{Symbol}
    weighted_prec::Int # -1 if not weighted
 
-   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+   function AbsMSeriesRing(poly_ring::AbstractAlgebra.MPolyRing{T},
             prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
-                          {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
+                          {T <: RingElement}
       U = elem_type(poly_ring)
       return get_cached!(AbsMSeriesID, (poly_ring, prec, s, -1), cached) do
          new{T, U}(poly_ring, prec, s, -1)
-      end::AbsMSeriesRing{T, S}
+      end::AbsMSeriesRing{T, U}
    end
 
-   function AbsMSeriesRing{T, S}(poly_ring::AbstractAlgebra.MPolyRing{T},
+   function AbsMSeriesRing(poly_ring::AbstractAlgebra.MPolyRing{T},
       weights::Vector{Int}, prec::Int, s::Vector{Symbol}, cached::Bool = true) where
-                    {T <: RingElement, S <: AbstractAlgebra.MPolyRingElem{T}}
+                    {T <: RingElement}
       U = elem_type(poly_ring)
       return get_cached!(AbsMSeriesID, (poly_ring, weights, s, prec), cached) do
          new{T, U}(poly_ring, weights, s, prec)
-      end::AbsMSeriesRing{T, S}
+      end::AbsMSeriesRing{T, U}
    end
 end
  
@@ -1383,7 +1383,7 @@ julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 ```
 """
 struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
-   R
+   R::NCRing
    n::Int #Rows
    m::Int #Cols
    s::Int
