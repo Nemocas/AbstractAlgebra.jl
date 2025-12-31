@@ -29,9 +29,7 @@ function Base.hash(a::MatRingElem, h::UInt)
    return b
 end
 
-number_of_rows(a::MatRing) = a.n
-number_of_columns(a::MatRing) = number_of_rows(a)
-vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.n * a.n
+vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(a)^2
 
 @doc raw"""
     degree(a::MatRing)

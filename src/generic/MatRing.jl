@@ -35,6 +35,10 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 #
 ###############################################################################
 
+number_of_rows(a::MatRing) = a.n
+
+number_of_columns(a::MatRing) = number_of_rows(a)
+
 number_of_rows(a::MatRingElem) = nrows(matrix(a))
 
 number_of_columns(a::MatRingElem) = ncols(matrix(a))
