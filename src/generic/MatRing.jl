@@ -58,9 +58,9 @@ Base.isassigned(a::MatRingElem, i, j) = isassigned(matrix(a), i, j)
 #
 ###############################################################################
 
-function transpose(x::MatRingElem)
-   return MatRingElem(transpose(matrix(x)))
-end
+transpose(x::MatRingElem) = MatRingElem(transpose(matrix(x)))
+transpose!(x::MatRingElem) = MatRingElem(transpose!(matrix(x)))
+transpose!(z::T, x::T) where T <: MatRingElem = MatRingElem(transpose!(matrix(z), matrix(x)))
 
 ###############################################################################
 #

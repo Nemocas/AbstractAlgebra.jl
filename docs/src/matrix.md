@@ -76,7 +76,8 @@ scalar_matrix(R::Ring, n::Int, a::RingElement)
 diagonal_matrix(::RingElement, ::Int, ::Int)
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
-transpose(::MatrixElem{T}) where T <: RingElement
+transpose(::MatElem)
+transpose!(::MatElem)
 tr(::MatElem{T}) where T <: RingElement
 det(::MatElem{T}) where T <: RingElem
 rank(::MatElem{T}) where T <: RingElem
