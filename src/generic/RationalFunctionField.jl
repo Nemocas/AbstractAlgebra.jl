@@ -683,3 +683,76 @@ end
 function is_squarefree(f::Union{PolyRingElem{T}, MPolyRingElem{T}}) where {T <: RationalFunctionFieldElem}
   is_squarefree(map_coefficients(data, f; cached = false))
 end
+
+################################################################################
+#
+#  Generation of finite subset and rank interpolation
+#
+################################################################################
+
+function evaluation_points(K::RationalFunctionField, n::Int)
+   @req n > 0 "n must be positive."
+   F = base_ring(K)
+   v = evaluation_points(F, n)
+   if is_empty(v)
+      v = elem_type(K)[]
+      base_v = evaluation_points(F, Int(order(F)))
+      d = clog(order(F), ZZ(n))
+      genKpowers = powers(gen(K), d - 1)
+      for coeffs in ProductIterator(base_v, d; inplace=true)
+         push!(v, sum(coeffs[j] * genKpowers[j] for j in 1:d))
+         if length(v) == n
+            break
+         end
+      end
+   end
+   return v
+end
+
+function rank_interpolation(M::MatrixElem{<: RationalFunctionFieldElem})
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
+   A = deepcopy(M)
+   #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
+   #Then M can be considered as a matrix over a polynomial ring. 
+   for i = 1:n
+      for j = 1:m
+         if !is_one(denominator(A[i, j]))
+            if n < m
+               multiply_column!(A, denominator(A[i, j]), j)
+            else
+               multiply_row!(A, denominator(A[i, j]), i)
+            end
+         end
+      end
+   end
+   return rank_interpolation(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]))
+end
+
+function rank_interpolation_mc(M::MatrixElem{<: RationalFunctionFieldElem}, err::Float64)
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
+   A = deepcopy(M)
+   #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
+   #Then M can be considered as a matrix over some polynomial ring.
+   for i = 1:n
+      for j = 1:m
+         if is_one(denominator(A[i, j]))
+            if n < m
+               multiply_column!(A, denominator(A[i, j]), j)
+            else
+               multiply_row!(A, denominator(A[i, j]), i)
+            end
+         end
+      end
+   end
+   return rank_interpolation_mc(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]), err)
+end
