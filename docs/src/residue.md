@@ -240,7 +240,7 @@ julia> g = inv(f)
 ### Greatest common divisor
 
 ```@docs
-gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
+gcd(::ResElem{T}, ::ResElem{T}) where T <: RingElem
 ```
 
 **Examples**

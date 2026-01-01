@@ -376,7 +376,7 @@ printing polynomials in that ring.
 In addition, the following basic functions are provided.
 
 ```@docs
-modulus{T <: ResElem}(::PolyRingElem{T})
+modulus(::PolyRingElem{T}) where T <: ResElem
 ```
 
 ```@docs
@@ -572,7 +572,7 @@ truncate(::PolyRingElem, ::Int)
 ```
 
 ```@docs
-mullow{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int)
+mullow(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int) where T <: RingElem
 ```
 
 **Examples**
@@ -712,11 +712,11 @@ of $b$.
 We call $q$ the pseudoquotient and $r$ the pseudoremainder.
 
 ```@docs
-pseudorem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+pseudorem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-pseudodivrem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+pseudodivrem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -775,7 +775,7 @@ compose(::PolyRingElem, ::PolyRingElem)
 ```
 
 ```@docs
-subst{T <: RingElem}(::PolyRingElem{T}, ::Any)
+subst(::PolyRingElem{T}, ::Any) where T <: RingElem
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
@@ -866,15 +866,15 @@ julia> k = integral(g)
 ### Resultant and discriminant
 
 ```@docs
-sylvester_matrix{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+sylvester_matrix(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-resultant{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+resultant(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-resx{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+resx(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
@@ -912,11 +912,11 @@ x^2 - 34*x + 1
 ### Newton representation
 
 ```@docs
-monomial_to_newton!{T <: RingElem}(::Vector{T}, ::Vector{T})
+monomial_to_newton!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 ```@docs
-newton_to_monomial!{T <: RingElem}(::Vector{T}, ::Vector{T})
+newton_to_monomial!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -955,7 +955,7 @@ roots(R::Field, f::PolyRingElem)
 ### Interpolation
 
 ```@docs
-interpolate{T <: RingElem}(::PolyRing, ::Vector{T}, ::Vector{T})
+interpolate(::PolyRing, ::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 **Examples**

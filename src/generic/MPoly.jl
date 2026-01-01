@@ -161,7 +161,7 @@ function exponent_vector!(e::Vector{S}, a::MPoly{T}, i::Int) where {T <: RingEle
 end
 
 @doc raw"""
-    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+    exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElem
 
 Return exponent of the j-th variable in the i-th term of the polynomial.
 Term and variable numbering begins at $1$ and variables are ordered as
