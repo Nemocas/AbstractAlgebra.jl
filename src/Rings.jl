@@ -241,6 +241,7 @@ is_perfect(F::FinField) = true
 is_known(::typeof(is_perfect), F::FinField) = true
 
 is_finite(F::FinField) = true
+is_known(::typeof(is_finite), F::FinField) = true
 
 function is_finite(R::NCRing)
   c = characteristic(R)
@@ -248,6 +249,7 @@ function is_finite(R::NCRing)
   c == 1 && return true
   throw(NotImplementedError(:is_finite, R))
 end
+is_known(::typeof(is_finite), R::NCRing) = is_known(characteristic, R) && characteristic(R) <= 1
 
 @doc raw"""
     is_noetherian(R::Ring)
