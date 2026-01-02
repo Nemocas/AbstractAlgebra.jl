@@ -195,6 +195,7 @@ of a single element, or equivalently if its characteristic is 1. Such
 rings are also called zero rings.
 """
 is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
+is_known(::typeof(is_trivial), R::NCRing) = is_domain_type(elem_type(R))
 
 @doc raw"""
     is_zero(R::NCRing)
