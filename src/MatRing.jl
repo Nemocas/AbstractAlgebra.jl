@@ -65,11 +65,8 @@ function is_zero_divisor_with_annihilator(a::MatRingElem{T}) where T <: RingElem
    throw(NotImplementedError(:adj, a)) #return f, b*adj(A)
 end
 
-
-function characteristic(a::MatRing)
-   iszero(nrows(a)) && return 1
-   return characteristic(base_ring(a))
-end
+characteristic(R::MatRing) = iszero(nrows(R)) ? 1 : characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::MatRing) = iszero(nrows(R)) || is_known(characteristic, base_ring(R))
 
 is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 

@@ -40,9 +40,8 @@ $R$.
 """
 symbols(R::MSeriesRing)
 
-function characteristic(a::MSeriesRing)
-    return characteristic(base_ring(a))
-end
+characteristic(R::MSeriesRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::MSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

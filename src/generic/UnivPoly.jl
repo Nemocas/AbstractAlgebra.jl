@@ -280,6 +280,7 @@ end
 canonical_unit(p::UnivPoly) = canonical_unit(data(p))
 
 characteristic(R::UniversalPolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::UniversalPolyRing) = is_known(characteristic, coefficient_ring(R))
 
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt

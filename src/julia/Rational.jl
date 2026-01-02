@@ -52,7 +52,8 @@ function denominator(a::Rational, canonicalise::Bool=true)
    return Base.denominator(a) # all other types ignore canonicalise
 end
 
-characteristic(a::Rationals{T}) where T <: Integer = 0
+characteristic(::Rationals) = 0
+is_known(::typeof(characteristic), ::Rationals) = true
 
 ###############################################################################
 #

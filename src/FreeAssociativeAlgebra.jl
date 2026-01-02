@@ -22,6 +22,7 @@ function is_exact_type(a::Type{S}) where {T <: RingElement, S <: FreeAssociative
 end
 
 characteristic(R::FreeAssociativeAlgebra) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::FreeAssociativeAlgebra) = is_known(characteristic, base_ring(R))
 
 is_finite(R::FreeAssociativeAlgebra) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
 

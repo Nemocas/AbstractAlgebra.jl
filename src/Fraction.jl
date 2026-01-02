@@ -20,9 +20,8 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
    return is_exact_type(S)
 end
 
-function characteristic(R::FracField{T}) where T <: RingElem
-   return characteristic(base_ring(R))
-end
+characteristic(R::FracField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::FracField) = is_known(characteristic, base_ring(R))
 
 @doc raw"""
     vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
