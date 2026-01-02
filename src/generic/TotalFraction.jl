@@ -34,9 +34,8 @@ function is_exact_type(a::Type{T}) where {S <: RingElem, T <: TotFrac{S}}
    return is_exact_type(S)
 end
 
-function characteristic(R::TotFracRing{T}) where T <: RingElem
-   return characteristic(base_ring(R))
-end
+characteristic(R::TotFracRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::TotFracRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

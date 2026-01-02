@@ -102,9 +102,11 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::NCPolyRing) = 1
 
-characteristic(a::NCPolyRing) = characteristic(base_ring(a))
+characteristic(R::NCPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::NCPolyRing) = is_known(characteristic, base_ring(R))
 
-is_finite(a::NCPolyRing) = is_trivial(a)
+is_finite(R::NCPolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::NCPolyRing) = is_known(is_trivial, R)
 
 ###############################################################################
 #
