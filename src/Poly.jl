@@ -48,8 +48,8 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::PolyRing) = 1
 
-characteristic(R::PolyRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, base_ring(R))
+characteristic(R::PolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, coefficient_ring(R))
 
 is_finite(R::PolyRing) = is_trivial(R)
 is_known(::typeof(is_finite), R::PolyRing) = is_known(is_trivial, R)

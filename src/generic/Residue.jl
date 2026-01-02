@@ -113,8 +113,10 @@ function gens(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}
    return r
 end
 
-characteristic(R::Union{EuclideanRingResidueRing, EuclideanRingResidueField}) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::Union{EuclideanRingResidueRing, EuclideanRingResidueField}) = is_known(characteristic, base_ring(R))
+function characteristic(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
+   return characteristic(base_ring(R))
+end
+is_known(::typeof(characteristic), R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem} = is_known(characteristic, base_ring(R))
 
 function size(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
    return size(base_ring(base_ring(R)))^degree(modulus(R))
