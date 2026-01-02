@@ -224,8 +224,11 @@ is_zero(R::NCRing) = is_trivial(R)
 Test whether the field $F$ is perfect, that is, whether the characteristic is zero or
 else whether every element of $F$ admits a $p$-th root, where $p > 0$ is the characteristic of $F$.
 """
-is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
-                                                 throw(NotImplementedError(:is_perfect, F))
+is_perfect(F::Field) = characteristic(F) == 0 || throw(NotImplementedError(:is_perfect, F))
+is_known(::typeof(is_perfect), F::Field) = is_known(characteristic, F) && characteristic(F) == 0
+
+is_perfect(F::FinField) = true
+is_known(::typeof(is_perfect), F::FinField) = true
 
 is_finite(F::FinField) = true
 
