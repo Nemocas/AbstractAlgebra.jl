@@ -11,8 +11,10 @@
 ###############################################################################
 
 characteristic(R::LaurentPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::LaurentPolyRing) = is_known(characteristic, base_ring(R))
 
 is_finite(R::LaurentPolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::LaurentPolyRing) = is_known(is_trivial, R)
 
 ###############################################################################
 #

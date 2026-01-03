@@ -206,13 +206,6 @@ parent(a::MPolyRingElem)
 
 Return the polynomial ring of the given polynomial.
 
-```julia
-characteristic(R::MPolyRing)
-```
-
-Return the characteristic of the given polynomial ring. If the characteristic
-is not known, an exception is raised.
-
 ## Polynomial functions
 
 ### Basic manipulation

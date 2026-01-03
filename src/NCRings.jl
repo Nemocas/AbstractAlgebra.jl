@@ -203,6 +203,11 @@ sqrt(::NCRingElem)
 #
 ###############################################################################
 
+@doc raw"""
+    characteristic(R::NCRing)
+
+Return the characteristic of the ring `R`.
+"""
 function characteristic(R::NCRing)
    error("Characteristic not known")
 end

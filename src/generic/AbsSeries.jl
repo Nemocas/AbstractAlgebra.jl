@@ -70,9 +70,8 @@ function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs, length(a), precision(a))
 end
 
-function characteristic(a::AbsPowerSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::AbsPowerSeriesRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::AbsPowerSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
