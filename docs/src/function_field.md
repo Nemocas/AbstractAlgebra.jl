@@ -315,10 +315,6 @@ var(::Generic.FunctionField)
 ```
 
 ```@docs
-characteristic(S::Generic.FunctionField)
-```
-
-```@docs
 defining_polynomial(R::Generic.FunctionField)
 ```
 

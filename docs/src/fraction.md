@@ -173,13 +173,6 @@ parent(a::FracElem)
 
 Return the fraction field of the given fraction.
 
-```julia
-characteristic(R::FracField)
-```
-
-Return the characteristic of the base ring of the fraction field. If the
-characteristic is not known an exception is raised.
-
 
 **Examples**
 

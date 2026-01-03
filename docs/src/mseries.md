@@ -241,10 +241,6 @@ coeff(::Generic.AbsMSeries, ::Int)
 ```
 
 ```@docs
-characteristic(::Generic.AbsMSeries)
-```
-
-```@docs
 gen(::Generic.AbsMSeriesRing, ::Int)
 ```
 
