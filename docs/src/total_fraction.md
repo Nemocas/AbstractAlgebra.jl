@@ -152,13 +152,6 @@ parent(a::TotFrac)
 
 Return the total ring of fractions that the given fraction belongs to.
 
-```julia
-characteristic(R::TotFracRing)
-```
-
-Return the characteristic of the base ring of the total ring of fractions. If
-the characteristic is not known an exception is raised.
-
 
 **Examples**
 

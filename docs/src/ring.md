@@ -68,7 +68,7 @@ elements are represented exactly in the system without approximation.)
 The following function is implemented where mathematically and algorithmically
 possible.
 
-```julia
+```@docs
 characteristic(R::NCRing)
 ```
 

@@ -20,11 +20,6 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
    return is_exact_type(S)
 end
 
-@doc raw"""
-    characteristic(R::FracField{T}) where T <: RingElem
-
-Return the characteristic of the given field.
-"""
 function characteristic(R::FracField{T}) where T <: RingElem
    return characteristic(base_ring(R))
 end
