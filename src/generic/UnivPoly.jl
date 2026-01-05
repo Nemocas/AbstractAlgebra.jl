@@ -877,42 +877,24 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::AbstractAlgebra.UniversalPolyRing, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::AbstractAlgebra.UniversalPolyRing, _...) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.UniversalPolyRing, term_range::AbstractUnitRange{Int},
-                               exp_bound::AbstractUnitRange{Int}, vs...)
-   R = coefficient_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, term_range, exp_bound, vs[1])
-   else
-      Make(S, term_range, exp_bound, make(R, vs...))
-   end
+function RandomExtensions.make(S::AbstractAlgebra.UniversalPolyRing, vs...)
+   return Make(S, make(base_ring(S), vs...))
 end
 
-function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:RingElement, <:AbstractAlgebra.UniversalPolyRing, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
-   S, term_range, exp_bound, v = sp[][1:end]
-   f = S()
-   g = gens(S)
-   R = coefficient_ring(S)
-   for i = 1:rand(rng, term_range)
-      term = S(1)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, exp_bound)
-      end
-      term *= rand(rng, v)
-      f += term
-   end
-   return f
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{
+                 <:RingElement, <:AbstractAlgebra.UniversalPolyRing}})
+   S, v = sp[][1:end]
+   return UnivPoly(rand(rng, v), S)
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing,
-              term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
-   rand(rng, make(S, term_range, exp_bound, v...))
+function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing, v...)
+   return rand(rng, make(S, v...))
 end
 
-function rand(S::AbstractAlgebra.UniversalPolyRing, term_range, exp_bound, v...)
-   rand(Random.default_rng(), S, term_range, exp_bound, v...)
+function rand(S::AbstractAlgebra.UniversalPolyRing, v...)
+   return rand(Random.default_rng(), S, v...)
 end
 
 ###############################################################################
