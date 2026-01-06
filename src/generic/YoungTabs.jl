@@ -411,7 +411,7 @@ const _border = Dict{Symbol,String}(
 
 :cross => "┼")
 
-function boxed_str(Y::YoungTableau, fill=Y.fill)
+function boxed_str(Y::YoungTableau, fill::Vector{<:Integer}=Y.fill)
    r,c = size(Y)
    w = max(length(string(maximum(fill))), 3)
    horizontal = repeat(_border[:horizontal], w)

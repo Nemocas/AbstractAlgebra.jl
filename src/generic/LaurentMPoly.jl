@@ -549,6 +549,13 @@ mutable struct LaurentMPolyBuildCtx{T, S}
     coeffs::Vector{T}
     exps::Vector{Vector{Int}}
     parent::S
+
+   function LaurentMPolyBuildCtx{T, S}(
+         coeffs::Vector{T},
+         exps::Vector{Vector{Int}},
+         parent::S) where {T, S}
+      return new{T, S}(coeffs, exps, parent)
+   end
 end
 
 function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing{T}) where T

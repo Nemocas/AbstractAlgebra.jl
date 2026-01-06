@@ -36,8 +36,8 @@ Base.:-(a::ModuleHomomorphism) = hom(domain(a), codomain(a), -matrix(a))
 #
 ###############################################################################
 
-Base.:*(a::T, b::ModuleHomomorphism{T}) where {T} = hom(domain(b), codomain(b), a * matrix(b))
-Base.:*(a::T, b::ModuleIsomorphism{T}) where {T} = hom(domain(b), codomain(b), a * matrix(b))
+Base.:*(a::T, b::ModuleHomomorphism{T}) where {T <: RingElement} = hom(domain(b), codomain(b), a * matrix(b))
+Base.:*(a::T, b::ModuleIsomorphism{T}) where {T <: RingElement} = hom(domain(b), codomain(b), a * matrix(b))
 Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
 Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
 

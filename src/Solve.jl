@@ -29,7 +29,7 @@ export can_solve_with_solution_and_kernel
 #
 ################################################################################
 
-mutable struct LazyTransposeMatElem{T, MatT} <: MatElem{T} where {MatT <: MatElem{T}}
+mutable struct LazyTransposeMatElem{T, MatT <: MatElem{T}} <: MatElem{T}
   M::MatT
 end
 
