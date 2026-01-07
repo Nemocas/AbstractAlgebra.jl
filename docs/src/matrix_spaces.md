@@ -141,10 +141,10 @@ julia> c = M[1, 1]
 ## Inverses
 
 ```@docs
-Base.inv{T <: RingElement}(::MatrixElem{T})
-is_invertible{T <: RingElement}(::MatrixElem{T})
-is_invertible_with_inverse{T <: RingElement}(::MatrixElem{T})
-pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+Base.inv(::MatrixElem{T}) where T <: RingElement
+is_invertible(::MatrixElem{T}) where T <: RingElement
+is_invertible_with_inverse(::MatrixElem{T}) where T <: RingElement
+pseudo_inv(M::MatrixElem{T}) where T <: RingElement
 ```
 
 ```jldoctest
@@ -192,9 +192,9 @@ julia> X, d = pseudo_inv(A)
 ## LU factorisation
 
 ```@docs
-lu{T <: FieldElem}(::MatElem{T}, ::SymmetricGroup)
+lu(::MatElem{T}, ::SymmetricGroup) where T <: FieldElem
 
-fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
+fflu(::MatElem{T}, ::SymmetricGroup) where T <: RingElem
 ```
 
 **Examples**
@@ -224,11 +224,11 @@ julia> r, d, P, L, U = fflu(A)
 ## Reduced row-echelon form
 
 ```@docs
-rref_rational{T <: RingElem}(::MatElem{T})
-rref{T <: FieldElem}(::MatElem{T})
+rref_rational(::MatElem{T}) where T <: RingElem
+rref(::MatElem{T}) where T <: FieldElem
 
-is_rref{T <: RingElem}(::MatElem{T})
-is_rref{T <: FieldElem}(::MatElem{T})
+is_rref(::MatElem{T}) where T <: RingElem
+is_rref(::MatElem{T}) where T <: FieldElem
 ```
 
 **Examples**
@@ -370,9 +370,9 @@ julia> P = R[1; 2; t] # create a column vector
 ### Hessenberg form
 
 ```@docs
-hessenberg{T <: RingElem}(::MatElem{T})
+hessenberg(::MatElem{T}) where T <: RingElem
 
-is_hessenberg{T <: RingElem}(::MatElem{T})
+is_hessenberg(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**

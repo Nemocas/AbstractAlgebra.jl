@@ -279,7 +279,7 @@ x^3 + 3*x + 1
 ### Greatest common divisor
 
 ```@docs
-gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
+gcd(::FracElem{T}, ::FracElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -329,11 +329,11 @@ When working over a Euclidean domain, it is convenient to extend valuations to t
 fraction field. To facilitate this, we define the following functions.
 
 ```@docs
-remove{T <: RingElem}(::FracElem{T}, ::T)
+remove(::FracElem{T}, ::T) where T <: RingElem
 ```
 
 ```@docs
-valuation{T <: RingElem}(::FracElem{T}, ::T)
+valuation(::FracElem{T}, ::T) where T <: RingElem
 ```
 
 **Examples**

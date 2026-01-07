@@ -297,7 +297,7 @@ function gcd(
    return _nested_gcd(a, b)
 end
 
-function _convert_iter_fac(R, fac::Fac)
+function _convert_iter_fac(R, fac::Fac{T}) where {T <: RingElem}
   Rfac = Fac{elem_type(R)}()
   Rfac.unit = renest(R, fac.unit)
   for (f, e) in fac

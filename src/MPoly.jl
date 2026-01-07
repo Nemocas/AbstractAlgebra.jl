@@ -45,6 +45,7 @@ mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
 
 @doc raw"""
     mpoly_ring_type(::Type{T}) where T<:RingElement
@@ -497,11 +498,11 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
 end
 
 function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
-   return S.(exponent_vector(a, i))
+   return [S(x) for x in exponent_vector(a, i)]
 end
 
 function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
@@ -1471,7 +1472,7 @@ Return a new uncached multivariate polynomial ring which has the same properties
 as `R` but `varnames` as additional generators.
 """
 function _add_gens(R::MPolyRing, varnames::Vector{Symbol})
-   return polynomial_ring_only(base_ring(R), vcat(symbols(R), varnames); internal_ordering=internal_ordering(R), cached=false)
+   return poly_ring(base_ring(R), vcat(symbols(R), varnames); internal_ordering=internal_ordering(R))
 end
 
 ###############################################################################
@@ -1610,8 +1611,8 @@ julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 ```
 """
-function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
-   S = polynomial_ring_only(R, s; kw...)
+function polynomial_ring(R::Ring, s::Vector{Symbol}; cached::Bool=true, kw...)
+   S = poly_ring(R, s; cached, kw...)
    (S, gens(S))
 end
 
@@ -1697,10 +1698,14 @@ true
 :(@polynomial_ring)
 
 """
-    polynomial_ring_only(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true)
+    poly_ring(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
-multivariate polynomial ring.
+multivariate polynomial ring. Moreover, the default value for `cached` is `false`,
+not `true`.
+
+This function is part of the internal interface for polynomial rings.
+User code should normally not need to invoke it.
 """
-polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+poly_ring(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)

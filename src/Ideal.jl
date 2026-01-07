@@ -147,7 +147,7 @@ function *(p::T, I::Ideal{T}) where T <: RingElement
   return I*p
 end
 
-function *(I::Ideal{<:RingElement}, p::RingElement)
+function *(I::Ideal{T}, p::RingElement) where T <: RingElement
   R = base_ring(I)
   iszero(p*one(R)) && return ideal(R, T[])
   return ideal(R, [v*p for v in gens(I)])

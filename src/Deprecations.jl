@@ -83,3 +83,11 @@ function zeros(R::NCRing, r::Int...)
     end
     return A
 end
+
+# to be deprecated in a future release
+PolyRing(R::NCRing) = poly_ring(R, :x)
+
+polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+   poly_ring(R, s; cached)
+polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+   poly_ring(R, s; internal_ordering, cached)

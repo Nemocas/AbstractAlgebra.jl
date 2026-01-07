@@ -19,8 +19,6 @@
 # The AbstractAlgebra promotion system is used to define catch all functions for
 # arithmetic between arbitrary ring elements.
 #
-# TODO: move this to NCRing.jl
-#
 ################################################################################
 
 promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T

@@ -12,6 +12,8 @@
 
 base_ring_type(::Type{<:MatRing{T}}) where T <: NCRingElement = parent_type(T)
 
+base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(T)
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -29,9 +31,7 @@ function Base.hash(a::MatRingElem, h::UInt)
    return b
 end
 
-number_of_rows(a::MatRing) = a.n
-number_of_columns(a::MatRing) = number_of_rows(a)
-vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.n * a.n
+vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(a)^2
 
 @doc raw"""
     degree(a::MatRing)
@@ -302,10 +302,27 @@ end
 
 ###############################################################################
 #
-#   Random generation
+#   Delegations to underlying matrix
 #
 ###############################################################################
 
+det(M::MatRingElem) = det(matrix(M))
+rank(M::MatRingElem) = rank(matrix(M))
+
+is_symmetric(M::MatRingElem) = is_symmetric(matrix(M))
+is_alternating(M::MatRingElem) = is_alternating(matrix(M))
+is_skew_symmetric(M::MatRingElem) = is_skew_symmetric(matrix(M))
+
+is_upper_triangular(M::MatRingElem) = is_upper_triangular(matrix(M))
+is_lower_triangular(M::MatRingElem) = is_lower_triangular(matrix(M))
+is_diagonal(M::MatRingElem) = is_diagonal(matrix(M))
+
+
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
 
 RandomExtensions.maketype(S::MatRing, _) = elem_type(S)
 

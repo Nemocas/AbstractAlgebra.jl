@@ -10,32 +10,9 @@
 #
 ###############################################################################
 
-@doc raw"""
-    parent(a::AbstractAlgebra.MatElem)
+base_ring(a::MatSpaceElem{T}) where T = a.base_ring::parent_type(T)
 
-Return the parent object of the given matrix.
-"""
-parent(a::MatElem) = matrix_space(base_ring(a), nrows(a), ncols(a))
-
-@doc raw"""
-    dense_matrix_type(::Type{T}) where T<:NCRingElement
-    dense_matrix_type(::T) where T<:NCRingElement
-    dense_matrix_type(::Type{S}) where S<:NCRing
-    dense_matrix_type(::S) where S<:NCRing
-
-Return the type of matrices with coefficients of type `T` respectively
-`elem_type(S)`.
-
-Implementations of the ring interface only need to provide a method
-for the argument a subtype of `NCRingElement`; the other variants are
-implemented by calling that method.
-"""
-dense_matrix_type(::T) where T <: NCRing = dense_matrix_type(elem_type(T))
-dense_matrix_type(::T) where T <: NCRingElement = dense_matrix_type(T)
-dense_matrix_type(::Type{T}) where T <: NCRing = dense_matrix_type(elem_type(T))
-
-# default: MatSpaceElem
-dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
+base_ring(a::MatSpaceView{T}) where T = a.base_ring::parent_type(T)
 
 ###############################################################################
 #
@@ -43,9 +20,12 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #
 ###############################################################################
 
-number_of_rows(a::Mat) = size(a.entries, 1)
+number_of_rows(a::MatSpaceElem) = size(a.entries, 1)
+number_of_columns(a::MatSpaceElem) = size(a.entries, 2)
 
-number_of_columns(a::Mat) = size(a.entries, 2)
+number_of_rows(a::MatSpaceView) = size(a.entries, 1)
+number_of_columns(a::MatSpaceView) = size(a.entries, 2)
+
 
 Base.@propagate_inbounds getindex(a::Mat, r::Int, c::Int) = a.entries[r, c]
 

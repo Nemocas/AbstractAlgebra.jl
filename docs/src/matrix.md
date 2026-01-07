@@ -76,17 +76,18 @@ scalar_matrix(R::Ring, n::Int, a::RingElement)
 diagonal_matrix(::RingElement, ::Int, ::Int)
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
-transpose(::MatrixElem{T}) where T <: RingElement
+transpose(::MatElem)
+transpose!(::MatElem)
 tr(::MatElem{T}) where T <: RingElement
-det{T <: RingElem}(::MatElem{T})
-rank{T <: RingElem}(::MatElem{T})
+det(::MatElem{T}) where T <: RingElem
+rank(::MatElem{T}) where T <: RingElem
 lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-is_lower_triangular(::MatrixElem)
-is_upper_triangular(::MatrixElem)
-is_diagonal(::MatrixElem)
+is_lower_triangular(::MatElem)
+is_upper_triangular(::MatElem)
+is_diagonal(::MatElem)
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 Base.map(f, ::MatrixElem{T}) where T <: RingElement
 Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
@@ -95,10 +96,10 @@ Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: Rin
 ## Inverse
 
 ```@docs; canonical=false
-Base.inv{T <: RingElement}(::MatrixElem{T})
-is_invertible{T <: RingElement}(::MatrixElem{T})
-is_invertible_with_inverse{T <: RingElement}(::MatrixElem{T})
-pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+Base.inv(::MatrixElem{T}) where T <: RingElement
+is_invertible(::MatrixElem{T}) where T <: RingElement
+is_invertible_with_inverse(::MatrixElem{T}) where T <: RingElement
+pseudo_inv(M::MatrixElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -400,9 +401,9 @@ Rationals
 ## LU factorisation
 
 ```@docs; canonical=false
-lu{T <: FieldElem}(::MatElem{T}, ::SymmetricGroup)
+lu(::MatElem{T}, ::SymmetricGroup) where T <: FieldElem
 
-fflu{T <: RingElem}(::MatElem{T}, ::SymmetricGroup)
+fflu(::MatElem{T}, ::SymmetricGroup) where T <: RingElem
 ```
 
 **Examples**
@@ -423,11 +424,11 @@ julia> r, d, P, L, U = fflu(M)
 ## Reduced row-echelon form
 
 ```@docs; canonical=false
-rref_rational{T <: RingElem}(::MatElem{T})
-rref{T <: FieldElem}(::MatElem{T})
+rref_rational(::MatElem{T}) where T <: RingElem
+rref(::MatElem{T}) where T <: FieldElem
 
-is_rref{T <: RingElem}(::MatElem{T})
-is_rref{T <: FieldElem}(::MatElem{T})
+is_rref(::MatElem{T}) where T <: RingElem
+is_rref(::MatElem{T}) where T <: FieldElem
 ```
 
 **Examples**
@@ -461,9 +462,11 @@ true
 ### Symmetry testing
 
 ```@docs
-is_symmetric(::MatrixElem)
+is_symmetric(::MatElem)
 
-is_skew_symmetric(::MatrixElem)
+is_skew_symmetric(::MatElem)
+
+is_alternating(::MatElem)
 ```
 
 ### Powering
@@ -493,7 +496,7 @@ content(::MatElem{T}) where T <: RingElement
 ### Nilpotency
 
 ```@docs
-is_nilpotent(::MatrixElem{T}) where {T <: RingElement}
+is_nilpotent(::MatElem{T}) where {T <: RingElement}
 ```
 
 ### Minors
@@ -544,15 +547,15 @@ julia> pfaffians(M, 2)
 ### Nullspace
 
 ```@docs
-nullspace{T <: FieldElem}(::MatElem{T})
+nullspace(::MatElem{T}) where T <: FieldElem
 ```
 
 ### Hessenberg form
 
 ```@docs; canonical=false
-hessenberg{T <: RingElem}(::MatElem{T})
+hessenberg(::MatElem{T}) where T <: RingElem
 
-is_hessenberg{T <: RingElem}(::MatElem{T})
+is_hessenberg(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -579,28 +582,28 @@ true
 ### Characteristic polynomial
 
 ```@docs
-charpoly{T <: RingElem}(::PolyRing{T}, ::MatrixElem{T})
+charpoly(::PolyRing{T}, ::MatrixElem{T}) where T <: RingElem
 ```
 
 ### Minimal polynomial
 
 ```@docs
-minpoly{T <: RingElem}(::PolyRing{T}, ::MatElem{T}, ::Bool)
+minpoly(::PolyRing{T}, ::MatElem{T}, ::Bool) where T <: RingElem
 ```
 
 ### Transforms
 
 ```@docs
-similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)
+similarity!(::MatElem{T}, ::Int, ::T) where T <: RingElem
 ```
 
 ### Hermite normal form
 
 ```@docs
-hnf{T <: RingElem}(::MatElem{T})
-hnf_with_transform{T <: RingElem}(::MatElem{T})
+hnf(::MatElem{T}) where T <: RingElem
+hnf_with_transform(::MatElem{T}) where T <: RingElem
 
-is_hnf{T <: RingElem}(::MatElem{T})
+is_hnf(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -633,8 +636,8 @@ julia> U*A
 ```@docs
 is_snf(::MatrixElem{T}) where T <: RingElement
 
-snf{T <: RingElem}(::MatElem{T})
-snf_with_transform{T <: RingElem}(::MatElem{T})
+snf(::MatElem{T}) where T <: RingElem
+snf_with_transform(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -667,10 +670,10 @@ entries in a univariate polynomial ring over a field.
 ```@docs
 is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
 
-weak_popov{T <: PolyRingElem}(::MatElem{T})
-weak_popov_with_transform{T <: PolyRingElem}(::MatElem{T})
-popov{T <: PolyRingElem}(::MatElem{T})
-popov_with_transform{T <: PolyRingElem}(::MatElem{T})
+weak_popov(::MatElem{T}) where T <: PolyRingElem
+weak_popov_with_transform(::MatElem{T}) where T <: PolyRingElem
+popov(::MatElem{T}) where T <: PolyRingElem
+popov_with_transform(::MatElem{T}) where T <: PolyRingElem
 ```
 
 **Examples**

@@ -35,6 +35,10 @@ is_domain_type(::Type{MatRingElem{T}}) where T <: NCRingElement = false
 #
 ###############################################################################
 
+number_of_rows(a::MatRing) = a.n
+
+number_of_columns(a::MatRing) = number_of_rows(a)
+
 number_of_rows(a::MatRingElem) = nrows(matrix(a))
 
 number_of_columns(a::MatRingElem) = ncols(matrix(a))
@@ -54,9 +58,9 @@ Base.isassigned(a::MatRingElem, i, j) = isassigned(matrix(a), i, j)
 #
 ###############################################################################
 
-function transpose(x::MatRingElem)
-   return MatRingElem(transpose(matrix(x)))
-end
+transpose(x::MatRingElem) = MatRingElem(transpose(matrix(x)))
+transpose!(x::MatRingElem) = MatRingElem(transpose!(matrix(x)))
+transpose!(z::T, x::T) where T <: MatRingElem = MatRingElem(transpose!(matrix(z), matrix(x)))
 
 ###############################################################################
 #
