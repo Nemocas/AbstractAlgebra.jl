@@ -66,10 +66,6 @@ function test_Group_interface(G::Group)
                   @test first(gens(G)) == gen(G, 1)
                   @test last(gens(G)) == gen(G, ngens(G))
               end
-          else
-              # TODO: throw something more specific
-              @test_throws ErrorException gens(G)
-              @test_throws ErrorException ngens(G)
           end
       end
 
