@@ -25,6 +25,10 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: PolyRingElem{S}
    return is_exact_type(S)
 end
 
+# ideal interface
+ideal_type(::Type{T}) where T <: PolyRing = Generic.Ideal{elem_type(T)}
+ideal(R::PolyRing{<:FieldElement}, V::Vector) = Generic.Ideal(R, V)
+
 @doc raw"""
     var(a::PolyRing)
 
