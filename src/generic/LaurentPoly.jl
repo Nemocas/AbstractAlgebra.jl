@@ -31,6 +31,7 @@ number_of_variables(R::LaurentPolyWrapRing) = 1
 number_of_generators(R::LaurentPolyWrapRing) = number_of_variables(R)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
+is_known(::typeof(characteristic), R::LaurentPolyWrapRing) = is_known(characteristic, base_ring(R))
 
 
 ###############################################################################

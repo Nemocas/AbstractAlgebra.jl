@@ -83,9 +83,8 @@ function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingEleme
    return parent(a)(Rc, Re)
 end
 
-function characteristic(a::SparsePolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::SparsePolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::SparsePolyRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

@@ -8,6 +8,7 @@ end
 number_of_generators(L::SimpleNumField{T}) where {T} = 1
 
 characteristic(F::NumField) = 0
+is_known(::typeof(characteristic), F::NumField) = true
 
 promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
 

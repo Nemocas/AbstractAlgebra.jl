@@ -556,6 +556,7 @@ symbol.
 var(R::FunctionField) = R.S
 
 characteristic(R::FunctionField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::FunctionField) = is_known(characteristic, base_ring(R))
 
 is_perfect(R::FunctionField) = characteristic(R) == 0
 

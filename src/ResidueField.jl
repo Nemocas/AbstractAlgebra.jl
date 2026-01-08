@@ -64,13 +64,8 @@ function modulus(r::ResFieldElem)
    return modulus(parent(r))
 end
 
-function characteristic(R::ResidueField)
-   return characteristic(base_ring(R))
-end
-
-function characteristic(r::ResidueField{T}) where T <: Integer
-   return modulus(r)
-end
+characteristic(r::ResidueField{T}) where T <: Integer = modulus(r)
+is_known(::typeof(characteristic), R::ResidueField{T}) where T <: Integer = true
 
 data(a::ResFieldElem) = a.data
 

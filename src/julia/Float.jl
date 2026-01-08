@@ -40,7 +40,8 @@ is_unit(a::AbstractFloat) = !is_zero(a)
 
 canonical_unit(a::AbstractFloat) = iszero(a) ? copysign(one(a), a) : a
 
-characteristic(a::Floats{T}) where T <: AbstractFloat = 0
+characteristic(::Floats) = 0
+is_known(::typeof(characteristic), ::Floats) = true
 
 if VERSION < v"1.13.0-DEV.534" # https://github.com/JuliaLang/julia/pull/53677
   is_negative(n::T) where T<:Real = n < zero(T)
