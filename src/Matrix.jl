@@ -244,14 +244,19 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc raw"""
-    one(a::MatrixElem{T}) where T <: NCRingElement
+    one(a::MatElem{T}) where T <: NCRingElement
+    one(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the identity matrix in the same matrix space as $a$. If the space does
-not contain square matrices, an error is thrown.
+Return the identity matrix in the same matrix space or matrix ring as $a$.
+If the matrix space does not comprise square matrices, an error is thrown.
 """
-one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
+one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a) # ??? one(parent(a)) ???
 
-function iszero(a::MatrixElem{T}) where T <: NCRingElement
+one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
+
+iszero(a::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(a))
+
+function iszero(a::MatElem{T}) where T <: NCRingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !is_zero_entry(a, i, j)
@@ -262,7 +267,9 @@ function iszero(a::MatrixElem{T}) where T <: NCRingElement
   return true
 end
 
-function isone(a::MatrixElem{T}) where T <: NCRingElement
+isone(a::MatrixElem{T}) where T <: NCRingElement = isone(matrix(a))
+
+function isone(a::MatElem{T}) where T <: NCRingElement
    is_square(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -451,7 +458,12 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::MatrixElem{T}) where T <: NCRingElement = canonical_unit(a[1, 1])
+function canonical_unit(a::MatElem{T}) where T <: NCRingElement
+  @req (nrows(a) > 0 && ncols(a) > 0)  "Matrix must contain at least one entry"
+  return canonical_unit(a[1, 1])
+end
+  
+canonical_unit(a::MatRingElem{T}) where T <: NCRingElement = canonical_unit(matrix(a))
 
 ###############################################################################
 #
@@ -752,7 +764,7 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElement
    r = nrows(a)
    c = ncols(a)
-   isempty(a) && return "$r by $c empty matrix"
+   isempty(a) && return "$r by $c empty matrix"  # JAA preference is "$r-by-$c empty matrix"
    mat = Expr(:vcat)
    for i in 1:r
       row = Expr(:row)
@@ -898,7 +910,10 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    return x
 end
 
-function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+add!(c::MatRingElem{T}, a::MatRingElem{T}, b::MatRingElem{T}) where T <: NCRingElement = add!(matrix(c), matrix(a), matrix(b))
+
+function add!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+#function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -933,7 +948,10 @@ function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElem
    return c
 end
 
-function sub!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+sub!(c::MatRingElem{T}, a::MatRingElem{T}, b::MatRingElem{T}) where T <: NCRingElement = sub!(matrix(c), matrix(a), matrix(b))
+
+function sub!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+#function sub!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -1147,7 +1165,9 @@ function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
 
-function mul!(c::MatrixElem{T}, a::MatrixElem{T}, b::T) where T <: NCRingElement
+mul!(c::MatRingElem{T}, a::MatRingElem{T}, b::T) where T <: NCRingElement = mul!(matrix(c), matrix(a), b)
+
+function mul!(c::MatElem{T}, a::MatElem{T}, b::T) where T <: NCRingElement
    @assert base_ring(a) === parent(b) && base_ring(a) === base_ring(c)
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
    ncols(c) != ncols(a) && error("Incompatible matrix dimensions")
@@ -1172,9 +1192,15 @@ end
 #
 ################################################################################
 
-function Base.promote(x::MatrixElem{S},
-                      y::MatrixElem{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+function Base.promote(x::MatRingElem{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+  return Base.promote(matrix(x), matrix(y))
+end
+
+function Base.promote(x::MatElem{S},
+                      y::MatElem{T}) where {S <: NCRingElement,
+                                            T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, change_base_ring(base_ring(x), y)
@@ -1194,9 +1220,15 @@ end
 ==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
 # matrix * vec and vec * matrx
+# function Base.promote(x::MatRingElem{S},
+#                       y::Vector{T}) where {S <: NCRingElement,
+#                                            T <: NCRingElement}
+# ???
+# end
+
 function Base.promote(x::MatrixElem{S},
                       y::Vector{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+                                           T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
@@ -1206,6 +1238,7 @@ function Base.promote(x::MatrixElem{S},
       error("Cannot promote to common type")
    end
 end
+
 
 function Base.promote(x::Vector{S},
                       y::MatrixElem{T}) where {S <: NCRingElement,
@@ -1218,6 +1251,7 @@ end
 
 *(x::Vector, y::MatrixElem) = *(promote(x, y)...)
 
+## ?? Why is this fn only for MatElem when the ones above were for MatrixElem ??
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
@@ -1264,11 +1298,12 @@ divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
 @doc raw"""
-    ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+    ^(a::MatElem{T}, b::Int) where T <: NCRingElement
+    ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    !is_square(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)
@@ -1296,6 +1331,8 @@ function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
    end
 end
 
+^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = MatRingElem(matrix(a)^b)
+
 ###############################################################################
 #
 #   Comparisons
@@ -1303,13 +1340,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+    ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)
@@ -1322,13 +1360,16 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    return true
 end
 
-@doc raw"""
-    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
 
-Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-useful in cases where the entries of the matrices are inexact, e.g. power
-series. Only if the power series are precisely the same, to the same precision,
-are they declared equal by this function.
+@doc raw"""
+    isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+
+Return `true` if $x == y$ exactly, otherwise return `false` (incl. if the
+dimensions do not match). This function is useful in cases where the entries
+of the matrices are inexact, e.g. power series. Only if the power series are
+precisely the same, to the same precision, are they declared equal by this function.
 """
 function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
@@ -1342,6 +1383,8 @@ function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
    end
    return true
 end
+
+isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = isequal(matrix(x), matrix(y))
 
 ###############################################################################
 #
@@ -1450,7 +1493,8 @@ end
 ###############################################################################
 
 """
-    is_symmetric(M::MatrixElem)
+    is_symmetric(M::MatElem)
+    is_symmetric(M::MatRingElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -1477,7 +1521,7 @@ julia> is_symmetric(N)
 false
 ```
 """
-function is_symmetric(M::MatrixElem)
+function is_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 2:n, j in 1:i-1
@@ -1486,6 +1530,7 @@ function is_symmetric(M::MatrixElem)
    return true
 end
 
+is_symmetric(M::MatRingElem) = is_symmetric(matrix(M))
 
 @doc raw"""
     transpose(x::MatElem)
