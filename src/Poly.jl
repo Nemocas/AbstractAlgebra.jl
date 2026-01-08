@@ -48,7 +48,8 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::PolyRing) = 1
 
-characteristic(a::PolyRing) = characteristic(base_ring(a))
+characteristic(R::PolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, coefficient_ring(R))
 
 is_finite(a::PolyRing) = is_trivial(a)
 
@@ -1879,6 +1880,8 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
       a = divexact(a, c1)
       b = divexact(b, c2)
       c = gcd(c1, c2)
+   else
+      c = nothing
    end
    lead_monomial = is_term_recursive(leading_coefficient(a)) ||
                    is_term_recursive(leading_coefficient(b))
@@ -1906,7 +1909,7 @@ function gcd(a::PolyRingElem{T}, b::PolyRingElem{T}, ignore_content::Bool = fals
          h = h^(1 - d)*g^d
       end
    end
-   if !ignore_content
+   if c !== nothing  # !ignore_content
       if !is_term_recursive(leading_coefficient(b)) &&
          !is_term_recursive(trailing_coefficient(b))
          if lead_monomial # lead term monomial, so content contains rest
@@ -3052,7 +3055,7 @@ end
 
 @doc raw"""
     power_sums_to_polynomial(P::Vector{T};
-                     parent::PolyRing{T}=PolyRing(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
+                     parent::PolyRing{T}=poly_ring(parent(P[1])) where T <: RingElement -> PolyRingElem{T}
 
 Uses the Newton (or Newton-Girard) identities to obtain the polynomial
 with given sums of powers of roots. The list must be nonempty and contain
@@ -3060,7 +3063,7 @@ with given sums of powers of roots. The list must be nonempty and contain
 must start with the sum of first powers of the roots.
 """
 function power_sums_to_polynomial(P::Vector{T};
-                           parent::PolyRing{T}=PolyRing(parent(P[1]))) where T <: RingElement
+                           parent::PolyRing{T}=poly_ring(parent(P[1]))) where T <: RingElement
    return power_sums_to_polynomial(P, parent)
 end
 

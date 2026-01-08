@@ -218,12 +218,6 @@ end
     TT = factored_fraction_field(polynomial_ring(QQ, "x")[1])
     a = TT(1)
     b = T(2)
-
-    @test a in [a, b]
-    @test a in [b, a]
-    @test !(a in [b])
-    @test a in keys(Dict(a => 1))
-    @test !(b in keys(Dict(a => 1)))
 end
 
 @testset "Generic.FactoredFracFieldElem.printing" begin

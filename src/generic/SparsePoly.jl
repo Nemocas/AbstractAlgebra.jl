@@ -83,9 +83,8 @@ function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingEleme
    return parent(a)(Rc, Re)
 end
 
-function characteristic(a::SparsePolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::SparsePolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::SparsePolyRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -544,6 +543,8 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       c = gcd(c1, c2)
       a = divexact(a, c1)
       b = divexact(b, c2)
+   else
+      c = nothing
    end
    # check if we are in the univariate case
    constant_coeffs = true
@@ -564,7 +565,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
-      R = AbstractAlgebra.PolyRing(base_ring(base_ring(a)))
+      R = AbstractAlgebra.poly_ring(base_ring(base_ring(a)))
       f = R()
       g = R()
       fit!(f, reinterpret(Int, a.exps[a.length] + 1))
@@ -589,7 +590,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          end
       end
       r = parent(a)(Ac, Ae)
-      if !ignore_content
+      if c !== nothing  # !ignore_content
          return c*r
       else
          return r
@@ -638,7 +639,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       end
    end
    # sometimes don't care about content, e.g. when computing likely gcd degree
-   if !ignore_content
+   if c !== nothing  # !ignore_content
       # remove content from b as cheaply as possible, as per Bernard Parisse
       if leading_coefficient(b).length != 1 &&
          trailing_coefficient(b).length != 1

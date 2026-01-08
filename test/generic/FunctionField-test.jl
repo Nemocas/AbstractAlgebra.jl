@@ -74,13 +74,6 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
    @test !is_perfect(S2)
 
    @test var(S1) == :y1
-
-   @test y1 in [y1, y2]
-   @test y1 in [y2, y1]
-   @test !(y1 in [y2])
-
-   @test y1 in keys(Dict(y1 => 1))
-   @test !(y2 in keys(Dict(y1 => 1)))
 end
 
 @testset "Generic.FunctionField.printing" begin

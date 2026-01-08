@@ -90,13 +90,6 @@ end
 
    @test isa(l, Generic.AbsSeries)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
-
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
    S, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
    @test R === S

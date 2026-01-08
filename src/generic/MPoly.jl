@@ -161,7 +161,7 @@ function exponent_vector!(e::Vector{S}, a::MPoly{T}, i::Int) where {T <: RingEle
 end
 
 @doc raw"""
-    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+    exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElem
 
 Return exponent of the j-th variable in the i-th term of the polynomial.
 Term and variable numbering begins at $1$ and variables are ordered as
@@ -1699,6 +1699,8 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
       Fe = zeros(UInt, N, 1)
       monomial_halves!(Fe, 1, a.exps, m, mask, N)
       monomial_add!(Fe, 1, Fe, 1, Qe, 1, N)
+   else
+      Fe = nothing  # to make JET happy
    end
    # while the heap is not empty
    @inbounds while !isempty(H)
@@ -1774,7 +1776,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1784,7 +1786,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, v.i, Qe, v.j + 1, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1814,7 +1816,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             I[xn] = heap_t(k, 2, 0) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc += 1
                end
@@ -1823,7 +1825,7 @@ function sqrt_heap(a::MPoly{T}, bits::Int; check::Bool=true) where {T <: RingEle
             push!(I, heap_t(k, 2, 0)) # put (k, 2) on heap
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, Qe, k, Qe, 2, N)
-            if check || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
+            if Fe === nothing || monomial_cmp(Exps, vw, Fe, 1, N, par, drmask) >= 0
                if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                   viewc += 1
               end
@@ -3223,12 +3225,7 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
-   q = [zero(a) for i in 1:len]
-   eq = [zeros(UInt, N, 0) for i in 1:len]
-   r = zero(a)
-   er = zeros(UInt, N, 0)
-   flag = false
-   while flag == false
+   while true
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
@@ -3255,15 +3252,16 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
             end
             er = zeros(UInt, N, length(r))
             unpack_monomials(er, r.exps, k, exp_bits, length(r))
+            return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
          flag == false && error("Exponent overflow in divrem_monagan_pearce")
          eq = [q[i].exps for i in 1:len]
          er = r.exps
+         return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
       end
    end
-   return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
 end
 
 ###############################################################################

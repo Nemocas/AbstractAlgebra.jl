@@ -26,7 +26,6 @@ The following basic functions are implemented.
 base_ring(R::FreeAssociativeAlgebra)
 base_ring(a::FreeAssociativeAlgebraElem)
 parent(a::FreeAssociativeAlgebraElem)
-characteristic(R::FreeAssociativeAlgebra)
 ```
 
 ## Free algebra constructors

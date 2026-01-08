@@ -308,9 +308,23 @@ end
    @test D4[5, 5] == R(5)
    @test D4 isa Generic.MatSpaceElem{elem_type(R)}
 
+   # test comparison of matrices over different ring, and of different sizes
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 
+   @test x != y
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
+   # test comparison of matrices over same ring, but of different sizes
+   x = zero_matrix(ZZ, 2, 2)
+   y = zero_matrix(ZZ, 2, 3)
+
+   @test x != y
    @test x in [x, y]
    @test x in [y, x]
    @test !(x in [y])
@@ -4454,6 +4468,15 @@ end
   c = mul!(c, a, QQ(2))
   @test c == a * QQ(2)
 
+  # test 2-arg transpose! with destination != source
   b = transpose(a)
-  @test AbstractAlgebra.transpose!(a) == b
+  c = zero_matrix(QQ, 3, 2)
+  @test AbstractAlgebra.transpose!(c, a) == b
+
+  # test 2-arg transpose! with destination == source
+  x = QQ[1 2; 3 4]
+  @test AbstractAlgebra.transpose!(x, x) == QQ[1 3; 2 4]
+
+  # in-place transpose of non-square matrix does not work
+  @test_throws ArgumentError AbstractAlgebra.transpose!(a)
 end

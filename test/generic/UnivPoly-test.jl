@@ -75,15 +75,6 @@
 
          @test f1 == f3
 
-         @test x in [x, y]
-         @test x in [y, x]
-         @test y in [y, z]
-         @test !(x in [y])
-         @test !(y in [x])
-         @test x in keys(Dict(x => 1))
-         @test !(y in keys(Dict(x => 1)))
-         @test !(y in keys(Dict(z => 1)))
-
          S2, x = universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord)
 
          @test length(x) == 3

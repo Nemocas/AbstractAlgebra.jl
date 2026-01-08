@@ -49,6 +49,7 @@ poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
 poly_type(::Type{S}) where S<:NCRing = poly_type(elem_type(S))
 poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
+poly_type(T::Type{Union{}}) = throw(MethodError(poly_type, (T,)))
 
 @doc raw"""
     poly_ring_type(::Type{T}) where T<:NCRingElement
@@ -101,7 +102,8 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::NCPolyRing) = 1
 
-characteristic(a::NCPolyRing) = characteristic(base_ring(a))
+characteristic(R::NCPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::NCPolyRing) = is_known(characteristic, base_ring(R))
 
 is_finite(a::NCPolyRing) = is_trivial(a)
 
@@ -726,7 +728,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true)
 
 Given a base ring `R` and symbol/string `s` specifying how the generator
 (variable) should be printed, return a tuple `S, x` representing the new
@@ -745,21 +747,16 @@ julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over R, y)
 ```
 """
-function polynomial_ring(R::NCRing, s::VarName =:x; kw...)
-   S = polynomial_ring_only(R, Symbol(s); kw...)
+function polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true, kw...)
+   S = poly_ring(R, Symbol(s); cached, kw...)
    (S, gen(S))
 end
 
 @doc raw"""
-    polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
+    poly_ring(R::NCRing, s::Symbol; cached::Bool=false)
 
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
+poly_ring(R::T, s::Symbol = :x; cached::Bool=false) where T<:NCRing =
    poly_ring_type(T)(R, s, cached)
-
-# Simplified constructor
-
-PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
-

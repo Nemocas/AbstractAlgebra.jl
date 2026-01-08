@@ -555,12 +555,8 @@ symbol.
 """
 var(R::FunctionField) = R.S
 
-@doc raw"""
-    characteristic(R::FunctionField)
-
-Return the characteristic of the underlying rational function field.
-"""
 characteristic(R::FunctionField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::FunctionField) = is_known(characteristic, base_ring(R))
 
 is_perfect(R::FunctionField) = characteristic(R) == 0
 

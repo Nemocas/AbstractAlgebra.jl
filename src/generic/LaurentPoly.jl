@@ -31,6 +31,7 @@ number_of_variables(R::LaurentPolyWrapRing) = 1
 number_of_generators(R::LaurentPolyWrapRing) = number_of_variables(R)
 
 characteristic(R::LaurentPolyWrapRing) = characteristic(R.polyring)
+is_known(::typeof(characteristic), R::LaurentPolyWrapRing) = is_known(characteristic, base_ring(R))
 
 
 ###############################################################################
@@ -273,7 +274,7 @@ function factor(a::LaurentPolyWrap)
    for (p, e) in f
       d[LaurentPolyWrap(R, p, 0)] = e
    end
-   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+   return Fac(LaurentPolyWrap(R, unit(f)::typeof(a.poly), a.mindeg + va), d)
 end
 
 function factor_squarefree(a::LaurentPolyWrap)
@@ -284,7 +285,7 @@ function factor_squarefree(a::LaurentPolyWrap)
    for (p, e) in f
       d[LaurentPolyWrap(R, p, 0)] = e
    end
-   return Fac(LaurentPolyWrap(R, unit(f), a.mindeg + va), d)
+   return Fac(LaurentPolyWrap(R, unit(f)::typeof(a.poly), a.mindeg + va), d)
 end
 
 ###############################################################################

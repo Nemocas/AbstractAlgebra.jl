@@ -345,12 +345,6 @@ parent(a::SeriesElem)
 
 Return the parent of the given series.
 
-```julia
-characteristic(R::SeriesRing)
-```
-
-Return the characteristic of the given series ring. If the characteristic is
-not known, an exception is raised.
 
 ## Series functions
 
@@ -414,7 +408,7 @@ For power series types, $n$ must be non-negative. Laurent series do not have thi
 restriction.
 
 ```@docs
-modulus{T <: ResElem}(::SeriesElem{T})
+modulus(::SeriesElem{T}) where T <: ResElem
 ```
 
 ```@docs
@@ -546,11 +540,11 @@ julia> change_base_ring(QQ, f)
 ### Shifting
 
 ```@docs
-shift_left{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
+shift_left(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 ```@docs
-shift_right{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
+shift_right(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 **Examples**
@@ -591,7 +585,7 @@ julia> k = shift_right(d, 3)
 ### Truncation
 
 ```@docs
-truncate{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
+truncate(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 **Examples**

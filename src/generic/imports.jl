@@ -123,6 +123,7 @@ import ..AbstractAlgebra: degree
 import ..AbstractAlgebra: degrees
 import ..AbstractAlgebra: degrees_range
 import ..AbstractAlgebra: denominator
+import ..AbstractAlgebra: dense_matrix_type
 import ..AbstractAlgebra: derivative
 import ..AbstractAlgebra: div
 import ..AbstractAlgebra: divexact
@@ -142,6 +143,7 @@ import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
 import ..AbstractAlgebra: hom
+import ..AbstractAlgebra: ideal
 import ..AbstractAlgebra: ideal_type
 import ..AbstractAlgebra: identity_matrix
 import ..AbstractAlgebra: image
@@ -208,6 +210,8 @@ import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudorem
 import ..AbstractAlgebra: reduce!
 import ..AbstractAlgebra: reduced_form
+import ..AbstractAlgebra: relations
+import ..AbstractAlgebra: rels
 import ..AbstractAlgebra: remove
 import ..AbstractAlgebra: renormalize!
 import ..AbstractAlgebra: set_coefficient!

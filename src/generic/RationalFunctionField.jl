@@ -132,9 +132,8 @@ function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    return R(deepcopy_internal(data(a), dict))
 end
 
-function characteristic(R::RationalFunctionField)
-   return characteristic(base_ring(R))
-end
+characteristic(R::RationalFunctionField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::RationalFunctionField) = is_known(characteristic, base_ring(R))
 
 is_finite(R::RationalFunctionField) = is_finite(base_ring(underlying_fraction_field(R)))
 

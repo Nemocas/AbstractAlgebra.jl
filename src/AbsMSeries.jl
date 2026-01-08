@@ -40,15 +40,8 @@ $R$.
 """
 symbols(R::MSeriesRing)
 
-@doc raw"""
-    characteristic(a::MSeriesRing)
-
-Return the characteristic of the base ring of the series `a`. If the
-characteristic is not known, an exception is raised.
-"""
-function characteristic(a::MSeriesRing)
-    return characteristic(base_ring(a))
-end
+characteristic(R::MSeriesRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::MSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

@@ -123,13 +123,6 @@ parent(a::ResElem)
 
 Return the parent of the given residue.
 
-```julia
-characteristic(R::ResidueRing)
-```
-
-Return the characteristic of the given residue ring. If the characteristic is
-not known, an exception is raised.
-
 ## Residue ring functions
 
 ### Basic functionality
@@ -240,7 +233,7 @@ julia> g = inv(f)
 ### Greatest common divisor
 
 ```@docs
-gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
+gcd(::ResElem{T}, ::ResElem{T}) where T <: RingElem
 ```
 
 **Examples**

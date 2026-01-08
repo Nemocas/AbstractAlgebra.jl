@@ -19,8 +19,6 @@
 # The AbstractAlgebra promotion system is used to define catch all functions for
 # arithmetic between arbitrary ring elements.
 #
-# TODO: move this to NCRing.jl
-#
 ################################################################################
 
 promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
@@ -83,13 +81,17 @@ end
 
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
+# general fallback for comparison of elements via promotion.
+# This is different from Julia's existing promotion logic because
+# it takes parents into account
 function ==(x::NCRingElem, y::NCRingElem)
-   fl, u, v = try_promote(x, y)
-   if fl
-     return u == v
-   else
-     return false
-   end
+  # avoid infinite recursion: we only get here if a ring type "forgot" to
+  # implement ==, so only do something if x and y have different type
+  if typeof(x) !== typeof(y)
+    fl, u, v = try_promote(x, y)
+    fl && return u == v
+  end
+  throw(NotImplementedError(:(==), x, y))
  end
  
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
@@ -201,6 +203,12 @@ sqrt(::NCRingElem)
 #
 ###############################################################################
 
+@doc raw"""
+    characteristic(R::NCRing)
+
+Return the characteristic of the ring `R`. If the characteristic
+is not known, an exception is raised.
+"""
 function characteristic(R::NCRing)
    error("Characteristic not known")
 end

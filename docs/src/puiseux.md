@@ -233,7 +233,7 @@ exceeds the current precision of the power series or does not correspond to a no
 term of the Puiseux series, the function returns a zero coefficient.
 
 ```@docs
-modulus{T <: ResElem}(::Generic.PuiseuxSeriesElem{T})
+modulus(::Generic.PuiseuxSeriesElem{T}) where T <: ResElem
 ```
 
 ```@docs

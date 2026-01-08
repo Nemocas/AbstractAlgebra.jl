@@ -226,8 +226,7 @@ function _ensure_variables(S::UniversalPolyRing, v::Vector{<:VarName})
       end
    end
    if !isempty(added_symbols)
-      new_symbols = vcat(current_symbols, added_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra._add_gens(base_ring(S), added_symbols)
    end
    return idx
 end
@@ -235,10 +234,8 @@ end
 function gen(S::UniversalPolyRing, s::VarName)
    i = findfirst(==(Symbol(s)), symbols(S))
    if i === nothing
-      new_symbols = copy(symbols(S))
-      push!(new_symbols, Symbol(s))
-      i = length(new_symbols)
-      S.base_ring = AbstractAlgebra.polynomial_ring_only(coefficient_ring(S), new_symbols; internal_ordering=internal_ordering(S), cached=false)
+      S.base_ring = AbstractAlgebra._add_gens(base_ring(S), [Symbol(s)])
+      i = length(symbols(S))
    end
    return @inbounds gen(S, i)
 end
@@ -283,6 +280,7 @@ end
 canonical_unit(p::UnivPoly) = canonical_unit(data(p))
 
 characteristic(R::UniversalPolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::UniversalPolyRing) = is_known(characteristic, coefficient_ring(R))
 
 function Base.hash(p::UnivPoly, h::UInt)
    b = 0xcf418d4529109236%UInt
@@ -753,7 +751,7 @@ function evaluate(a::UnivPoly, A::Vector{<:NCRingElement})
    a2 = data(a)
    varidx = var_indices(a2)
    isempty(varidx) && return constant_coefficient(a2) # TODO: this is weird
-   vals = zeros(parent(A[1]), nvars(parent(a2)))
+   vals = [zero(parent(A[1])) for _ in 1:nvars(parent(a2))]
    n = length(A)
    for i in varidx
       i <= n || error("Number of variables does not match number of values")
@@ -880,42 +878,24 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(S::AbstractAlgebra.UniversalPolyRing, _, _, _) = elem_type(S)
+RandomExtensions.maketype(S::AbstractAlgebra.UniversalPolyRing, _...) = elem_type(S)
 
-function RandomExtensions.make(S::AbstractAlgebra.UniversalPolyRing, term_range::AbstractUnitRange{Int},
-                               exp_bound::AbstractUnitRange{Int}, vs...)
-   R = coefficient_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, term_range, exp_bound, vs[1])
-   else
-      Make(S, term_range, exp_bound, make(R, vs...))
-   end
+function RandomExtensions.make(S::AbstractAlgebra.UniversalPolyRing, vs...)
+   return Make(S, make(base_ring(S), vs...))
 end
 
-function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make4{
-                 <:RingElement, <:AbstractAlgebra.UniversalPolyRing, <:AbstractUnitRange{Int}, <:AbstractUnitRange{Int}}})
-   S, term_range, exp_bound, v = sp[][1:end]
-   f = S()
-   g = gens(S)
-   R = coefficient_ring(S)
-   for i = 1:rand(rng, term_range)
-      term = S(1)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, exp_bound)
-      end
-      term *= rand(rng, v)
-      f += term
-   end
-   return f
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{
+                 <:RingElement, <:AbstractAlgebra.UniversalPolyRing}})
+   S, v = sp[][1:end]
+   return UnivPoly(rand(rng, v), S)
 end
 
-function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing,
-              term_range::AbstractUnitRange{Int}, exp_bound::AbstractUnitRange{Int}, v...)
-   rand(rng, make(S, term_range, exp_bound, v...))
+function rand(rng::AbstractRNG, S::AbstractAlgebra.UniversalPolyRing, v...)
+   return rand(rng, make(S, v...))
 end
 
-function rand(S::AbstractAlgebra.UniversalPolyRing, term_range, exp_bound, v...)
-   rand(Random.default_rng(), S, term_range, exp_bound, v...)
+function rand(S::AbstractAlgebra.UniversalPolyRing, v...)
+   return rand(Random.default_rng(), S, v...)
 end
 
 ###############################################################################
@@ -1042,22 +1022,11 @@ end
 #
 ###############################################################################
 
-function upgrade(S::UniversalPolyRing{T}, pp::MPolyRingElem{T}) where {T}
-   n = nvars(S) - nvars(parent(pp))
-   if n > 0
-      ctx = MPolyBuildCtx(base_ring(S))
-      v0 = zeros(Int, n)
-      for (c, v) in zip(coefficients(pp), exponent_vectors(pp))
-         push_term!(ctx, c, vcat(v, v0))
-      end
-      return finish(ctx)
-   else
-      return pp
-   end
-end
-
 function upgrade!(p::UnivPoly)
-   p.p = upgrade(parent(p), data(p))
+   R = base_ring(parent(p))
+   if R != parent(p.p)
+      p.p = AbstractAlgebra._upgrade(p.p, R)
+   end
    return p
 end
 
