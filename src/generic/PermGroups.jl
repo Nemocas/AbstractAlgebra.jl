@@ -704,7 +704,7 @@ julia> Array(ans)
  1  0  0
 ```
 """
-matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+matrix_repr(a::Perm{T}) where {T<:Integer} = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
 @doc raw"""
     emb!(result::Perm, p::Perm, V)

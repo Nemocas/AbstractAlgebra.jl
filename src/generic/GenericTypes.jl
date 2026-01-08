@@ -1212,6 +1212,13 @@ mutable struct FreeAssociativeAlgebraElem{T <: RingElement} <: AbstractAlgebra.F
    coeffs::Vector{T}
    exps::Vector{Vector{Int}}  # TODO: Int -> UInt8 for nvars < 256, etc
    length::Int
+
+   function FreeAssociativeAlgebraElem{T}(parent::FreeAssociativeAlgebra{T},
+         coeffs::Vector{T},
+         exps::Vector{Vector{Int}},
+         length::Int) where T
+      return new{T}(parent, coeffs, exps, length)
+   end
 end
 
 # the iterators for coeffs, terms, etc. are shared with MPoly. Just this remains
