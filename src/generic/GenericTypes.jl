@@ -471,7 +471,7 @@ end
 
    function UniversalRing{T}(R::Ring; cached::Bool=true) where {T<:RingElement}
       @assert elem_type(R) == T
-      return get_cached!(UniversalRingID, R, cached) do
+      return get_cached!(UniversalRingID, base_ring(R), cached) do
          new{T}(R)
       end::UniversalRing{T}
    end
