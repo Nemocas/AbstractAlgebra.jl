@@ -324,11 +324,15 @@ end
 #
 ###############################################################################
 
+universal_ring_name(R::UniversalRing) = "Ring"
+
+universal_ring_name(R::UniversalRing{<:MPoly}) = "Polynomial Ring"
+
 function show(io::IO, R::UniversalRing)
    @show_name(io, R)
    @show_special(io, R)
-   print(io, "Universal Ring over ")
-   show(io, base_ring(R))
+   print(io, "Universal $(universal_ring_name(R)) over ")
+   show(io, base_ring(base_ring(R)))
 end
 
 function expressify(a::UniversalRingElem; context = nothing)
