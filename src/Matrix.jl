@@ -1516,8 +1516,6 @@ function transpose(x::MatElem)
   return transpose!(z, x)
 end
 
-transpose(x::MatRingElem) = transpose(matrix(x))
-
 @doc raw"""
     transpose!(x::MatElem)
     transpose!(x::MatRingElem)
