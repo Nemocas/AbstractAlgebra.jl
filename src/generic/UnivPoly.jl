@@ -275,6 +275,7 @@ end
 canonical_unit(p::UniversalRingElem) = canonical_unit(data(p))
 
 characteristic(R::UniversalRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::UniversalRing) = is_known(characteristic, base_ring(R))
 
 function Base.hash(p::UniversalRingElem, h::UInt)  # TODO
    b = 0xcf418d4529109236%UInt
@@ -741,7 +742,7 @@ function evaluate(a::UnivPoly, A::Vector{<:NCRingElement})
    a2 = data(a)
    varidx = var_indices(a2)
    isempty(varidx) && return constant_coefficient(a2) # TODO: this is weird
-   vals = zeros(parent(A[1]), nvars(parent(a2)))
+   vals = [zero(parent(A[1])) for _ in 1:nvars(parent(a2))]
    n = length(A)
    for i in varidx
       i <= n || error("Number of variables does not match number of values")

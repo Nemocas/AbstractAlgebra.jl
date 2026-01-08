@@ -71,11 +71,11 @@ end
 import Base: contains
 @deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
 
-# to be deprecated in the next breaking release
-zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
-Array(R::NCRing, r::Int...) = Array{elem_type(R)}(undef, r)
+# deprecated in 0.48.0
+@deprecate zero_matrix(::Type{Int}, r, c) zeros(Int, r, c)
+@deprecate Array(R::NCRing, r::Int...) Array{elem_type(R)}(undef, r)
 function zeros(R::NCRing, r::Int...)
-    #Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
+    Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
     T = elem_type(R)
     A = Array{T}(undef, r)
     for i in eachindex(A)
@@ -84,10 +84,9 @@ function zeros(R::NCRing, r::Int...)
     return A
 end
 
-# to be deprecated in a future release
-PolyRing(R::NCRing) = poly_ring(R, :x)
+@deprecate PolyRing(R::NCRing) poly_ring(R, :x)
 
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   poly_ring(R, s; cached)
-polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
-   poly_ring(R, s; internal_ordering, cached)
+@deprecate polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing poly_ring(R, s; cached)
+@deprecate polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring poly_ring(R, s; internal_ordering, cached)
+
+# to be deprecated in a future release
