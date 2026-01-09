@@ -12,14 +12,14 @@ julia&gt; Matrix(A)
 julia&gt; Matrix{Int}(A)
 2×3 Matrix{Int64}:
  1  2  3
- 4  5  6</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/dc7efa8e2be316f28227613fdff1b0f3aae3276e/src/julia/Matrix.jl#L16-L39">source</a></section></details></article><article><details class="docstring"><summary id="Core.Array-Union{Tuple{MatrixElem{T}}, Tuple{T}} where T&lt;:RingElement"><a class="docstring-binding" href="#Core.Array-Union{Tuple{MatrixElem{T}}, Tuple{T}} where T&lt;:RingElement"><code>Core.Array</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">Array(A::MatrixElem{T}) where T &lt;: NCRingElement</code></pre><p>Convert <code>A</code> to a Julia <code>Matrix</code> of the same dimensions with the same elements.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = ZZ[:x]; A = R[x^0 x^1; x^2 x^3]
+ 4  5  6</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/e0083efd6a99fa097429ccd642103e5d93b722f2/src/julia/Matrix.jl#L16-L39">source</a></section></details></article><article><details class="docstring"><summary id="Core.Array-Union{Tuple{MatrixElem{T}}, Tuple{T}} where T&lt;:RingElement"><a class="docstring-binding" href="#Core.Array-Union{Tuple{MatrixElem{T}}, Tuple{T}} where T&lt;:RingElement"><code>Core.Array</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">Array(A::MatrixElem{T}) where T &lt;: NCRingElement</code></pre><p>Convert <code>A</code> to a Julia <code>Matrix</code> of the same dimensions with the same elements.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = ZZ[:x]; A = R[x^0 x^1; x^2 x^3]
 [  1     x]
 [x^2   x^3]
 
 julia&gt; Array(A)
 2×2 Matrix{AbstractAlgebra.Generic.Poly{BigInt}}:
  1    x
- x^2  x^3</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/dc7efa8e2be316f28227613fdff1b0f3aae3276e/src/julia/Matrix.jl#L44-L60">source</a></section></details></article><p>Matrices also support iteration, and therefore functions accepting an iterator can be called on them, e.g.:</p><pre><code class="language-julia-repl hljs">julia&gt; M = matrix_space(ZZ, 2, 3); x = M(1:6)
+ x^2  x^3</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/e0083efd6a99fa097429ccd642103e5d93b722f2/src/julia/Matrix.jl#L44-L60">source</a></section></details></article><p>Matrices also support iteration, and therefore functions accepting an iterator can be called on them, e.g.:</p><pre><code class="language-julia-repl hljs">julia&gt; M = matrix_space(ZZ, 2, 3); x = M(1:6)
 [1   2   3]
 [4   5   6]
 
@@ -54,7 +54,7 @@ julia&gt; ((x, y) -&gt; x^2 + y^2).(A, B)
 [34   52]</code></pre><article><details class="docstring"><summary id="AbstractAlgebra.dense_matrix_type-Tuple{Ring}"><a class="docstring-binding" href="#AbstractAlgebra.dense_matrix_type-Tuple{Ring}"><code>AbstractAlgebra.dense_matrix_type</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">dense_matrix_type(::Type{T}) where T&lt;:NCRingElement
 dense_matrix_type(::T) where T&lt;:NCRingElement
 dense_matrix_type(::Type{S}) where S&lt;:NCRing
-dense_matrix_type(::S) where S&lt;:NCRing</code></pre><p>Return the type of matrices with coefficients of type <code>T</code> respectively <code>elem_type(S)</code>.</p><p>Implementations of the ring interface only need to provide a method for the argument a subtype of <code>NCRingElement</code>; the other variants are implemented by calling that method.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/dc7efa8e2be316f28227613fdff1b0f3aae3276e/src/Matrix.jl#L30-L42">source</a></section></details></article><pre><code class="language-julia-repl hljs">julia&gt; R, t = polynomial_ring(QQ, :t)
+dense_matrix_type(::S) where S&lt;:NCRing</code></pre><p>Return the type of matrices with coefficients of type <code>T</code> respectively <code>elem_type(S)</code>.</p><p>Implementations of the ring interface only need to provide a method for the argument a subtype of <code>NCRingElement</code>; the other variants are implemented by calling that method.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/e0083efd6a99fa097429ccd642103e5d93b722f2/src/Matrix.jl#L30-L42">source</a></section></details></article><pre><code class="language-julia-repl hljs">julia&gt; R, t = polynomial_ring(QQ, :t)
 (Univariate polynomial ring in t over rationals, t)
 
 julia&gt; T = dense_matrix_type(R)
