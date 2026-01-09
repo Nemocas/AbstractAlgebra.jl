@@ -1353,8 +1353,6 @@ function isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    return true
 end
 
-isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = isequal(matrix(x), matrix(y))
-
 ###############################################################################
 #
 #   Ad hoc comparisons
