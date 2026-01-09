@@ -13,8 +13,8 @@
 base_ring_type(::Type{UniversalRing{T}}) where T = parent_type(T)
 base_ring(S::UniversalRing) = S.base_ring::base_ring_type(S)
 
-coefficient_ring_type(::Type{UniversalRing{MPoly{T}}}) where T = parent_type(T)
-coefficient_ring(S::UniversalRing{<:MPoly}) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
+coefficient_ring_type(::Type{UniversalRing{<:MPolyRingElem{T}}}) where T = parent_type(T)
+coefficient_ring(S::UniversalRing{<:MPolyRingElem}) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
 
 is_domain_type(::Type{UniversalRingElem{T}}) where T = is_domain_type(T)
 
@@ -42,16 +42,16 @@ data(p::UniversalRingElem) = p.p
 #
 ###############################################################################
 
-exponent_vector(p::UniversalRingElem{<:MPoly}, i::Int) = exponent_vector(data(p), i)
+exponent_vector(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = exponent_vector(data(p), i)
 
-function exponent(p::UniversalRingElem{<:MPoly}, i::Int, j::Int)
+function exponent(p::UniversalRingElem{<:MPolyRingElem}, i::Int, j::Int)
    if j > nvars(parent(data(p))) && j <= nvars(parent(p))
       return 0
    end
    return exponent(data(p), i, j)
 end
 
-function set_exponent_vector!(p::UniversalRingElem{<:MPoly}, i::Int, exps::Vector{Int})
+function set_exponent_vector!(p::UniversalRingElem{<:MPolyRingElem}, i::Int, exps::Vector{Int})
    S = parent(p)
    len = length(exps)
    upgrade!(p)
@@ -62,7 +62,7 @@ function set_exponent_vector!(p::UniversalRingElem{<:MPoly}, i::Int, exps::Vecto
    return p
 end
 
-function coeff(p::UniversalRingElem{<:MPoly}, exps::Vector{Int})
+function coeff(p::UniversalRingElem{<:MPolyRingElem}, exps::Vector{Int})
    S = parent(p)
    len = length(exps)
    n = nvars(parent(data(p)))
@@ -79,7 +79,7 @@ function coeff(p::UniversalRingElem{<:MPoly}, exps::Vector{Int})
    return coeff(data(p), exps)
 end
 
-function setcoeff!(p::UniversalRingElem{<:MPoly}, exps::Vector{Int}, c::RingElement)
+function setcoeff!(p::UniversalRingElem{<:MPolyRingElem}, exps::Vector{Int}, c::RingElement)
    c = coefficient_ring(data(p))(c)
    S = parent(p)
    len = length(exps)
@@ -91,7 +91,7 @@ function setcoeff!(p::UniversalRingElem{<:MPoly}, exps::Vector{Int}, c::RingElem
    return p
 end
 
-function setcoeff!(a::UniversalRingElem{<:MPoly}, i::Int, c::RingElement)
+function setcoeff!(a::UniversalRingElem{<:MPolyRingElem}, i::Int, c::RingElement)
    setcoeff!(data(a), i, c)
    return a
 end
@@ -121,28 +121,28 @@ end
 
 is_gen(p::UniversalRingElem) = is_gen(data(p))
 
-is_homogeneous(p::UniversalRingElem{<:MPoly}) = is_homogeneous(data(p))
+is_homogeneous(p::UniversalRingElem{<:MPolyRingElem}) = is_homogeneous(data(p))
 
-is_monomial(p::UniversalRingElem{<:MPoly}) = is_monomial(data(p))
+is_monomial(p::UniversalRingElem{<:MPolyRingElem}) = is_monomial(data(p))
 
-is_constant(p::UniversalRingElem{<:MPoly}) = is_constant(data(p))
+is_constant(p::UniversalRingElem{<:MPolyRingElem}) = is_constant(data(p))
 
-is_term(p::UniversalRingElem{<:MPoly}) = is_term(data(p))
+is_term(p::UniversalRingElem{<:MPolyRingElem}) = is_term(data(p))
 
-coeff(p::UniversalRingElem{<:MPoly}, i::Int) = coeff(data(p), i)
+coeff(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = coeff(data(p), i)
 
-function coeff(p::UniversalRingElem{MPoly{T}}, m::UniversalRingElem{MPoly{T}}) where T
+function coeff(p::UniversalRingElem{<:MPolyRingElem{T}}, m::UniversalRingElem{<:MPolyRingElem{T}}) where T
    p, m = univ_promote(p, m)
    return coeff(data(p), data(m))
 end
 
-function monomial(p::UniversalRingElem{MPoly{T}}, i::Int) where T
+function monomial(p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
    S = parent(p)
    m = monomial(data(p), i)
-   return UniversalRingElem{MPoly{T}}(m, S)
+   return UniversalRingElem(m, S)
 end
 
-function monomial!(m::UniversalRingElem{MPoly{T}}, p::UniversalRingElem{MPoly{T}}, i::Int) where T
+function monomial!(m::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
    parent(m) != parent(p) && error("Incompatible monomial")
    if parent(data(m)) != parent(data(p))
       m.p = parent(data(p))()
@@ -151,48 +151,48 @@ function monomial!(m::UniversalRingElem{MPoly{T}}, p::UniversalRingElem{MPoly{T}
    return m
 end
 
-function term(p::UniversalRingElem{MPoly{T}}, i::Int) where T
+function term(p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
    S = parent(p)
    t = term(data(p), i)
-   return UniversalRingElem{MPoly{T}}(t, S)
+   return UniversalRingElem(t, S)
 end
 
-leading_coefficient(p::UniversalRingElem{<:MPoly}) = leading_coefficient(data(p))
+leading_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = leading_coefficient(data(p))
 
-trailing_coefficient(p::UniversalRingElem{<:MPoly}) = trailing_coefficient(data(p))
+trailing_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = trailing_coefficient(data(p))
 
-function tail(p::UniversalRingElem{MPoly{T}}) where T
+function tail(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
    S = parent(p)
-   return UniversalRingElem{MPoly{T}}(tail(data(p)), S)
+   return UniversalRingElem(tail(data(p)), S)
 end
 
-constant_coefficient(p::UniversalRingElem{<:MPoly}) = constant_coefficient(data(p))
+constant_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = constant_coefficient(data(p))
 
-function leading_monomial(p::UniversalRingElem{MPoly{T}}) where T
+function leading_monomial(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
    S = parent(p)
-   return UniversalRingElem{MPoly{T}}(leading_monomial(data(p)), S)
+   return UniversalRingElem(leading_monomial(data(p)), S)
 end
 
-function leading_term(p::UniversalRingElem{MPoly{T}}) where T
+function leading_term(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
    S = parent(p)
-   return UniversalRingElem{MPoly{T}}(leading_term(data(p)), S)
+   return UniversalRingElem(leading_term(data(p)), S)
 end
 
-max_fields(p::UniversalRingElem{<:MPoly}) = max_fields(data(p))
+max_fields(p::UniversalRingElem{<:MPolyRingElem}) = max_fields(data(p))
 
-function degree(p::UniversalRingElem{<:MPoly}, i::Int)
+function degree(p::UniversalRingElem{<:MPolyRingElem}, i::Int)
    if i <= nvars(parent(p)) && i > nvars(parent(data(p)))
       return 0
    end
    return degree(data(p), i)
 end
 
-function degree(f::UniversalRingElem{MPoly{T}}, x::UniversalRingElem{MPoly{T}}) where T
+function degree(f::UniversalRingElem{<:MPolyRingElem{T}}, x::UniversalRingElem{<:MPolyRingElem{T}}) where T
    check_parent(f, x)
    return degree(f, var_index(x))
 end
 
-function degrees(p::UniversalRingElem{<:MPoly})
+function degrees(p::UniversalRingElem{<:MPolyRingElem})
    v = degrees(data(p))
    len = length(v)
    num = nvars(parent(p))
@@ -202,9 +202,9 @@ function degrees(p::UniversalRingElem{<:MPoly})
    return v
 end
 
-total_degree(p::UniversalRingElem{<:MPoly}) = total_degree(data(p))
+total_degree(p::UniversalRingElem{<:MPolyRingElem}) = total_degree(data(p))
 
-length(p::UniversalRingElem{<:MPoly}) = length(data(p))
+length(p::UniversalRingElem{<:MPolyRingElem}) = length(data(p))
 
 function _ensure_variables(S::UniversalRing, v::Vector{<:VarName})
    idx = Int[]
@@ -262,14 +262,14 @@ function gens(S::UniversalRing{T}, a::AbstractAlgebra.VarNames, as::AbstractAlge
    return res[2:end]
 end
 
-var_index(x::UniversalRingElem{<:MPoly}) = var_index(data(x))
+var_index(x::UniversalRingElem{<:MPolyRingElem}) = var_index(data(x))
 
 var_indices(p::UnivPoly) = var_indices(data(p))
 
-function vars(p::UniversalRingElem{MPoly{T}}) where {T <: RingElement}
+function vars(p::UniversalRingElem{<:MPolyRingElem{T}}) where {T <: RingElement}
    V = vars(data(p))
    S = parent(p)
-   return [UniversalRingElem{MPoly{T}}(v, S) for v in V]
+   return [UniversalRingElem(v, S) for v in V]
 end
 
 canonical_unit(p::UniversalRingElem) = canonical_unit(data(p))
@@ -294,7 +294,7 @@ Base.copy(f::UniversalRingElem{T}) where T = UniversalRingElem{T}(copy(data(f)),
 #
 ###############################################################################
 
-function coeff(p::UniversalRingElem{MPoly{T}}, vars::Vector{Int}, exps::Vector{Int}) where {T}
+function coeff(p::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, exps::Vector{Int}) where {T}
    len = length(vars)
    @req len == length(exps) "Number of variables does not match number of exponents"
    S = parent(p)
@@ -311,10 +311,10 @@ function coeff(p::UniversalRingElem{MPoly{T}}, vars::Vector{Int}, exps::Vector{I
          return zero(S)
       end
    end
-   return UniversalRingElem{MPoly{T}}(coeff(data(p), vars2, exps2), S)
+   return UniversalRingElem(coeff(data(p), vars2, exps2), S)
 end
 
-function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where {U, T <: UniversalRingElem{MPoly{U}}}
+function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where {U, T <: UniversalRingElem{<:MPolyRingElem{U}}}
    varidx = [var_index(x) for x in vars]
    return coeff(a, varidx, exps)
 end
@@ -327,7 +327,7 @@ end
 
 universal_ring_name(R::UniversalRing) = "Ring"
 
-universal_ring_name(R::UniversalRing{<:MPoly}) = "Polynomial Ring"
+universal_ring_name(R::UniversalRing{<:MPolyRingElem}) = "Polynomial Ring"
 
 function show(io::IO, R::UniversalRing)
    @show_name(io, R)
@@ -545,7 +545,7 @@ function ==(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where {T}
    return data(a) == data(b)
 end
 
-function ==(a::UniversalRingElem{MPoly{T}}, b::UniversalRingElem{MPoly{T}}) where {T}
+function ==(a::UniversalRingElem{<:MPolyRingElem{T}}, b::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
    check_parent(a, b)
 
    # quick check if underlying parents agree
@@ -594,7 +594,7 @@ function ==(a::UniversalRingElem{MPoly{T}}, b::UniversalRingElem{MPoly{T}}) wher
    return true
 end
 
-function isless(a::UniversalRingElem{MPoly{T}}, b::UniversalRingElem{MPoly{T}}) where {T}
+function isless(a::UniversalRingElem{<:MPolyRingElem{T}}, b::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
    check_parent(a, b)
    return isless(data(upgrade!(a)), data(upgrade!(b)))
 end
@@ -626,9 +626,9 @@ end
 #
 ###############################################################################
 
-deflation(p::UniversalRingElem{MPoly{T}}) where T = deflation(data(p))
+deflation(p::UniversalRingElem{<:MPolyRingElem{T}}) where T = deflation(data(p))
 
-function deflate(p::UniversalRingElem{MPoly{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
+function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
    S = parent(p)
    num = nvars(S)
    vlen = length(shift)
@@ -638,14 +638,14 @@ function deflate(p::UniversalRingElem{MPoly{T}}, shift::Vector{Int}, defl::Vecto
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem{MPoly{T}}(deflate(pp, shift, defl), S)
+   return UniversalRingElem(deflate(pp, shift, defl), S)
 end
 
-function deflate(p::UniversalRingElem{MPoly{T}}, defl::Vector{Int}) where T
+function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
    return deflate(p, zeros(Int, length(defl)), defl)
 end
 
-function inflate(p::UniversalRingElem{MPoly{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
+function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
    S = parent(p)
    num = nvars(S)
    vlen = length(shift)
@@ -655,10 +655,10 @@ function inflate(p::UniversalRingElem{MPoly{T}}, shift::Vector{Int}, defl::Vecto
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem{MPoly{T}}(inflate(pp, shift, defl), S)
+   return UniversalRingElem(inflate(pp, shift, defl), S)
 end
 
-function inflate(p::UniversalRingElem{MPoly{T}}, defl::Vector{Int}) where T
+function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
    return inflate(p, zeros(Int, length(defl)), defl)
 end
 
@@ -693,7 +693,7 @@ end
 function Base.divrem(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
    a, b = univ_promote(a, b)
    q, r = divrem(data(a), data(b))
-   return UniversalRingElem{T}(q, parent(a)), UniversalRingElem{MPoly{T}}(r, parent(a))
+   return UniversalRingElem{T}(q, parent(a)), UniversalRingElem{T}(r, parent(a))
 end
 
 ###############################################################################
@@ -702,15 +702,15 @@ end
 #
 ###############################################################################
 
-function derivative(p::UniversalRingElem{MPoly{T}}, j::Int) where {T}
+function derivative(p::UniversalRingElem{<:MPolyRingElem{T}}, j::Int) where {T}
    j > nvars(parent(p)) && error("No such variable")
    if j > nvars(parent(data(p)))
       return zero(parent(p))
    end
-   return UniversalRingElem{MPoly{T}}(derivative(data(p), j), parent(p))
+   return UniversalRingElem(derivative(data(p), j), parent(p))
 end
 
-function derivative(p::UniversalRingElem{MPoly{T}}, x::UniversalRingElem{MPoly{T}}) where {T}
+function derivative(p::UniversalRingElem{<:MPolyRingElem{T}}, x::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
    return derivative(p, var_index(x))
 end
 
@@ -720,13 +720,13 @@ end
 #
 ###############################################################################
 
-function remove(z::UniversalRingElem{MPoly{T}}, p::UniversalRingElem{MPoly{T}}) where {T}
+function remove(z::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
    z, p = univ_promote(z, p)
    val, q = remove(data(z), data(p))
-   return val, UniversalRingElem{MPoly{T}}(q, parent(z))
+   return val, UniversalRingElem(q, parent(z))
 end
 
-function valuation(z::UniversalRingElem{MPoly{T}}, p::UniversalRingElem{MPoly{T}}) where {T}
+function valuation(z::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
   v, _ = remove(z, p)
   return v
 end
@@ -759,7 +759,7 @@ function (a::UnivPoly)()
    return evaluate(a, Int[])
 end
 
-function evaluate(a::UniversalRingElem{MPoly{T}}, vars::Vector{Int}, vals::Vector{V}) where {T <: RingElement, V <: RingElement}
+function evaluate(a::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, vals::Vector{V}) where {T <: RingElement, V <: RingElement}
    length(vars) != length(vals) && error("Numbers of variables and values do not match")
    vars2 = Vector{Int}(undef, 0)
    vals2 = Vector{mpoly_type(T)}(undef, 0)
@@ -773,10 +773,10 @@ function evaluate(a::UniversalRingElem{MPoly{T}}, vars::Vector{Int}, vals::Vecto
          push!(vals2, data(S(vals[i])))
       end
    end
-   return UniversalRingElem{MPoly{T}}(evaluate(a2, vars2, vals2), S)
+   return UniversalRingElem(evaluate(a2, vars2, vals2), S)
 end
 
-function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UniversalRingElem{MPoly{T}}, V <: RingElement} where {T <: RingElement}
+function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UniversalRingElem{<:MPolyRingElem{T}}, V <: RingElement} where {T <: RingElement}
    varidx = Int[var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
@@ -803,19 +803,19 @@ end
 #
 ###############################################################################
 
-function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UniversalRingElem{MPoly{T}}) where {T <: RingElement}
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T <: RingElement}
    return to_univariate(R, data(p))
 end
 
-to_univariate(p::UniversalRingElem{<:MPoly}) = to_univariate(data(p))
+to_univariate(p::UniversalRingElem{<:MPolyRingElem}) = to_univariate(data(p))
 
-is_univariate(p::UniversalRingElem{<:MPoly}) = is_univariate(data(p))
+is_univariate(p::UniversalRingElem{<:MPolyRingElem}) = is_univariate(data(p))
 
-is_univariate_with_data(p::UniversalRingElem{<:MPoly}) = is_univariate_with_data(data(p))
+is_univariate_with_data(p::UniversalRingElem{<:MPolyRingElem}) = is_univariate_with_data(data(p))
 
-is_univariate(R::UniversalRing{<:MPoly}) = is_univariate(base_ring(R))
+is_univariate(R::UniversalRing{<:MPolyRingElem}) = is_univariate(base_ring(R))
 
-function coefficients_of_univariate(p::UniversalRingElem{<:MPoly}, check_univariate::Bool=true)
+function coefficients_of_univariate(p::UniversalRingElem{<:MPolyRingElem}, check_univariate::Bool=true)
    return coefficients_of_univariate(data(p), check_univariate)
 end
 
@@ -827,12 +827,12 @@ end
 
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
-function change_base_ring(R::Ring, p::UniversalRingElem{MPoly{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
    upgrade!(p)
-   return UniversalRingElem{MPoly{T}}(change_base_ring(R, data(p); parent = base_ring(parent)), parent)
+   return UniversalRingElem(change_base_ring(R, data(p); parent = base_ring(parent)), parent)
 end
 
-function change_coefficient_ring(R::Ring, p::UniversalRingElem{MPoly{T}}; cached::Bool=true, parent::UniversalRing{<:MPoly} = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_coefficient_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -842,9 +842,9 @@ end
 #
 ################################################################################
 
-function map_coefficients(f::Any, p::UniversalRingElem{MPoly{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached)) where T <: RingElement
+function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached)) where T <: RingElement
    upgrade!(p)
-   return UniversalRingElem{MPoly{T}}(map_coefficients(f, data(p); parent = base_ring(parent)), parent)
+   return UniversalRingElem(map_coefficients(f, data(p); parent = base_ring(parent)), parent)
 end
 
 ###############################################################################
@@ -853,12 +853,12 @@ end
 #
 ###############################################################################
 
-function sort_terms!(p::UniversalRingElem{<:MPoly})
+function sort_terms!(p::UniversalRingElem{<:MPolyRingElem})
    p.p = sort_terms!(data(p))
    return p
 end
 
-function combine_like_terms!(p::UniversalRingElem{<:MPoly})
+function combine_like_terms!(p::UniversalRingElem{<:MPolyRingElem})
    p.p = combine_like_terms!(data(p))
    return p
 end
@@ -924,7 +924,7 @@ function neg!(z::UniversalRingElem{T}, a::UniversalRingElem{T}) where {T <: Ring
   return z
 end
 
-function fit!(a::UniversalRingElem{<:MPoly}, n::Int)
+function fit!(a::UniversalRingElem{<:MPolyRingElem}, n::Int)
   fit!(data(a), n)
 end
 
@@ -1038,7 +1038,7 @@ function (S::UniversalRing{T})(p::UniversalRingElem{T}) where {T <: RingElement}
    return upgrade!(p)
 end
 
-function (a::UniversalRing{MPoly{T}})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+function (a::UniversalRing{<:MPolyRingElem{T}})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
    if length(m) != 0
       len = length(m[1])
       num = nvars(base_ring(a))
@@ -1048,5 +1048,5 @@ function (a::UniversalRing{MPoly{T}})(b::Vector{T}, m::Vector{Vector{Int}}) wher
          end
       end
    end
-   return UniversalRingElem{MPoly{T}}(base_ring(a)(b, m), a)
+   return UniversalRingElem(base_ring(a)(b, m), a)
 end
