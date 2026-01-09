@@ -17,6 +17,7 @@ import LinearAlgebra: norm
 import LinearAlgebra: nullspace
 import LinearAlgebra: rank
 import LinearAlgebra: tr
+import LinearAlgebra: transpose!
 
 
 # Do not import elements of `Base_import_exclude` as we have our own
