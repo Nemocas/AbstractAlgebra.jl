@@ -1,4 +1,3 @@
-majorversion = 0
 reponame = "Nemocas/AbstractAlgebra.jl"
 enabletwolevel = false
 requiretwolevel = false
