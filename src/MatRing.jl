@@ -332,7 +332,7 @@ is_lower_triangular(M::MatRingElem) = is_lower_triangular(matrix(M))
 is_diagonal(M::MatRingElem) = is_diagonal(matrix(M))
 
 function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: RingElement}
-  return MatRingElem(kronecker_product(matrix(x), matrix(y)))
+  return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
 end
 
 function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
@@ -341,7 +341,7 @@ function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, 
 end
 
 function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
-  return MatRingElem(map_entries(f, matrix(a)))
+  return Generic.MatRingElem(map_entries(f, matrix(a)))
 end
 
 ###############################################################################
