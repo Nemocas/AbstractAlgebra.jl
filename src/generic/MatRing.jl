@@ -173,7 +173,7 @@ end
 function Base.promote(x::MatRingElem{S},
                       y::MatRingElem{T}) where {S <: NCRingElement,
                                                 T <: NCRingElement}
-  return Base.promote(matrix(x), matrix(y))
+  return MatRingElem.(Base.promote(matrix(x), matrix(y)))
 end
 
 # matrix * vec and vec * matrix
