@@ -131,8 +131,7 @@ function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
 end
 
 function add!(c::MatRingElem{T}, a::MatRingElem{T}, b::MatRingElem{T}) where T <: NCRingElement
-  add!(matrix(c), matrix(a), matrix(b))
-  return c
+  return MatRingElem(add!(matrix(c), matrix(a), matrix(b)))
 end
 
 function sub!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
@@ -140,8 +139,7 @@ function sub!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
 end
 
 function sub!(c::MatRingElem{T}, a::MatRingElem{T}, b::MatRingElem{T}) where T <: NCRingElement
-  sub!(matrix(c), matrix(a), matrix(b))
-  return c
+  return MatRingElem(sub!(matrix(c), matrix(a), matrix(b)))
 end
 
 function mul!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
@@ -149,13 +147,11 @@ function mul!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
 end
 
 function mul!(c::MatRingElem{T}, a::MatRingElem{T}, b::MatRingElem{T}) where T <: NCRingElement
-  mul!(matrix(c), matrix(a), matrix(b))
-  return c
+  return MatRingElem(mul!(matrix(c), matrix(a), matrix(b)))
 end
 
 function mul!(c::MatRingElem{T}, a::MatRingElem{T}, b::T) where T <: NCRingElement
-  mul!(matrix(c), matrix(a), b)
-  return c
+  return MatRingElem(mul!(matrix(c), matrix(a), b))
 end
 
 ###############################################################################
