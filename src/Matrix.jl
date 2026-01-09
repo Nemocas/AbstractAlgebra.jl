@@ -1304,6 +1304,8 @@ function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    end
 end
 
+^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = MatRingElem(matrix(a)^b)
+
 ###############################################################################
 #
 #   Comparisons
@@ -1352,6 +1354,8 @@ function isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    end
    return true
 end
+
+isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = isequal(matrix(x), matrix(y))
 
 ###############################################################################
 #
