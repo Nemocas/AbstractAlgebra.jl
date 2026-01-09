@@ -73,7 +73,7 @@ variable_names(as::VarNames...) = variable_names(as)
 variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
     Symbol[x for a in as for x in _variable_names(a, brackets)]
 
-_variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
+_variable_names(a::AbstractArray{<:VarName}, ::Any) = [Symbol(x) for x in a]
 
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))

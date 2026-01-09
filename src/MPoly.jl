@@ -916,7 +916,7 @@ end
 
 function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
    @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
-   newvals = parent(a).(vals)
+   newvals = map(parent(a), vals)
    if typeof(vals) == typeof(newvals)
      throw(NotImplementedError(:evaluate, a, vals))
    end

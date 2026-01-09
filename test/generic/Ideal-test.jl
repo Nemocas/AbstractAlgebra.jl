@@ -684,3 +684,52 @@ end
       @test is_subset(K, J)
    end
 end
+
+@testset "Generic.Ideal.power" begin
+   # QQ[x]
+   R, x = polynomial_ring(QQ, "x")
+
+   for i = 1:30
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, one(R))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = polynomial_ring(Fp, "x")
+
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, one(R))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
+   end
+
+   # integer
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, one(ZZ))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
+   end
+end

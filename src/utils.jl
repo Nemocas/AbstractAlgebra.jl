@@ -36,7 +36,7 @@ function is_loaded_directly()
       @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_st) times in backtrace; expected 1"
       sf = only(st)
       line_call = sf.line
-      line_funcbegin = sf.linfo.def.line
+      line_funcbegin = (sf.linfo::Core.MethodInstance).def.line
       line_difference = line_call - line_funcbegin
       @debug "is_loaded_directly: `_require_search_from_serialized` called at line $line_call, function begins at line $line_funcbegin, difference $(line_difference)"
       # difference for `using Package` / `using OtherPackage`
