@@ -452,10 +452,7 @@ end
 #
 ###############################################################################
 
-function canonical_unit(a::MatElem{T}) where T <: NCRingElement
-  @req (nrows(a) > 0 && ncols(a) > 0)  "Matrix must contain at least one entry"
-  return canonical_unit(a[1, 1])
-end
+canonical_unit(a::MatElem) = canonical_unit(matrix(a))
   
 ###############################################################################
 #
