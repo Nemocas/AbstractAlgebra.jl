@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.48.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.0) - 2026-01-09
+
+The following gives an overview of the changes compared to the previous release. This list is not
+complete, many more internal or minor changes were made, but we tried to only list those changes
+which we think might affect some users directly.
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+- [#1857](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1857) Forbid `residue_ring` for zero rings for technical reasons
+- [#2108](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2108) Expand the common code for ideal implementations
+- [#2182](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2182) Change behavior of `base_ring` for `UniversalPolyRing`
+- [#2191](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2191) Add more syntactic sugar for polynomial ring constructors
+- [#2212](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2212) Restrict generic `==(x::NCRingElem, y::NCRingElem)` fallback
+- [#2214](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2214) Make `evaluate` for universal polynomials more universal
+- [#2251](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2251) Type param for `FracField` is `RingElem`, not `RingElement`
+- [#2252](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2252) Switch delegation order of `sub` and `getindex` for submatrices
+- [#2261](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2261) Enable prepared deprecations
+- [#2262](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2262) Remove `getindex(::SimpleNumField, ::Int)`, rely on generic `getindex(::Set,::Int)` instead (hence `L[0]` won't return `one(L)` anymore) 
+
+### New or extended functionality
+
+- [#2168](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2168) Add alias for `rels` and `relations`
+- [#2270](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2270) Add several `is_known` methods for `characteristic` and `is_perfect`
+- [#2279](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2279) Add `^(I::Ideal, k::Integer)` fallback method
+
+### Performance improvements or improved testing
+
+- [#1937](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1937) Enhance performance of generic `transpose` and `transpose!` methods, restrict in-place `transpose!` to square matrices
+- [#2207](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2207) Rewrite `MatRing` to wrap a native matrix
+
+### Other fixed bugs
+
+- [#2241](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2241) Fix `is_power` for e.g. `ZZPolyRing`
+- [#2275](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2275) Remove dubious group interface conformance test for `gens`
+
+### Improvements or additions to documentation
+
+- [#2179](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2179) Improved doc for polynomial ring element constructors
 
 ## [0.47.0] - 2025-09-06
 
