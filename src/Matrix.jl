@@ -1304,8 +1304,6 @@ function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    end
 end
 
-^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = MatRingElem(matrix(a)^b)
-
 ###############################################################################
 #
 #   Comparisons
