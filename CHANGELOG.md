@@ -28,14 +28,14 @@ which we think might affect some users directly.
 
 ### New or extended functionality
 
-- [#2168](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2168) Add alias for rels and relations
+- [#2168](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2168) Add alias for `rels` and `relations`
 - [#2270](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2270) Add several `is_known` methods for `characteristic` and `is_perfect`
 - [#2279](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2279) Add `^(I::Ideal, k::Integer)` fallback method
 
 ### Performance improvements or improved testing
 
 - [#1937](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1937) Enhance performance of generic `transpose` and `transpose!` methods, restrict in-place `transpose!` to square matrices
-- [#2207](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2207) Rewrite MatRing to wrap a native matrix
+- [#2207](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2207) Rewrite `MatRing` to wrap a native matrix
 
 ### Other fixed bugs
 
