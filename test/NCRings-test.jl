@@ -12,7 +12,7 @@ include("generic/FreeAssociativeAlgebraGroebner-test.jl")
 end
 
 @testset "NCRings.powers" begin
-   
+
    # non-commutative rings
    A = matrix_ring(ZZ, rand(1:9))
    a = rand(A, 1:9)
@@ -24,7 +24,7 @@ end
    n = rand(1:9)
    C = matrix_space(ZZ, n, n)
    c = rand(C, 1:9)
-   
+
    # commutative rings
    d = rand() * rand(-9:9)
    e = rand(big.(-9:9))
@@ -38,8 +38,8 @@ end
 
       S = powers(x, 0)
       @test length(S) == 1
-      @test isone(S[1]) 
-      
+      @test isone(S[1])
+
       P = powers(x, 1)
       @test length(P) == 2
       @test isone(P[1])

@@ -31,7 +31,7 @@ end
 function map_with_section_from_func(image_fn::Function, domain, codomain)
    return Generic.MapWithSection(Generic.FunctionalMap(domain, codomain, image_fn))
 end
- 
+
 ################################################################################
 #
 #  MapWithRetraction

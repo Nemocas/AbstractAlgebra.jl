@@ -133,7 +133,7 @@ function _rat_mul(n1::PolyRingElem{T}, d1::PolyRingElem{T},
       end
       n = n1*n2
       d = d1*d2
-   end   
+   end
    return n, d
 end
 
@@ -162,7 +162,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
                         poly2::Poly{S}, den2::S) where
                         {T <: FieldElement, S <: PolyRingElem{T}}
    R = base_ring(poly1)
-   
+
    if den1 == den2
       rpoly = poly1 + poly2
 
@@ -182,7 +182,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
             rden = divexact(den1, d)
          end
       end
-   
+
       return rpoly, rden
    end
 
@@ -226,7 +226,7 @@ function _rat_poly_sub(poly1::Poly{S}, den1::S,
                         poly2::Poly{S}, den2::S) where
                         {T <: FieldElement, S <: PolyRingElem{T}}
    R = base_ring(poly1)
-   
+
    if den1 == den2
       rpoly = poly1 - poly2
 
@@ -246,7 +246,7 @@ function _rat_poly_sub(poly1::Poly{S}, den1::S,
             rden = divexact(den1, d)
          end
       end
-   
+
       return rpoly, rden
    end
 
@@ -293,7 +293,7 @@ function _rat_poly_mul(poly1::Poly{S}, den1::S,
    else
       gcd1 = one(R)
    end
-   
+
    if !isone(den1)
       gcd2 = content(poly2)
       gcd2 = gcd(gcd2, den1)
@@ -352,7 +352,7 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
       rden = deepcopy(den1)
       return rpoly, rden
    end
-   
+
    if len2 == 1
       rpoly = zero(parent(poly1))
       rden = one(R)
@@ -445,7 +445,7 @@ function _rat_poly_gcdx(a::Poly{U}, den_a::U,
    s, den_s = _rat_poly_canonicalise(s, den_s)
    t, den_t = _rat_poly_canonicalise(t, den_t)
 
-   return g, leading_coefficient(g), s, den_s, t, den_t   
+   return g, leading_coefficient(g), s, den_s, t, den_t
 end
 
 function _rat_poly_resultant(a::Poly{U}, den_a::U,
@@ -473,7 +473,7 @@ function _rat_poly_resultant(a::Poly{U}, den_a::U,
       rnum *= cb^(lena - 1)
    end
    rden = den_a^(lenb - 1)*den_b^(lena - 1)
-   return _rat_canonicalise(rnum, rden) 
+   return _rat_canonicalise(rnum, rden)
 end
 
 # convert a polynomial over a rational function field to
@@ -607,13 +607,13 @@ function Base.numerator(R::FunctionField{T},
                                canonicalise::Bool=true) where T <: FieldElement
    # only used for type assert, so no need to canonicalise
    return R.num::Poly{poly_type(T)}
-end                 
+end
 
 function Base.denominator(R::FunctionField{T},
                                canonicalise::Bool=true) where T <: FieldElement
    # only used for type assert, so no need to canonicalise
    return R.den::poly_type(T)
-end                 
+end
 
 @doc raw"""
     Base.numerator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T <: FieldElement
@@ -950,7 +950,7 @@ end
 ###############################################################################
 
 function Base.inv(a::FunctionFieldElem)
-   R = parent(a)   
+   R = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
 

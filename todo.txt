@@ -47,7 +47,7 @@ nmod_poly.jl
 fmpz_mod_poly.jl
 ----------------
 
-* Add constructor for array of ints 
+* Add constructor for array of ints
 
 Poly.jl/fmpz_poly.jl
 --------------------
@@ -75,7 +75,7 @@ ArbPolyRingElem function from_roots.
 
 * implement Sylvester matrix version of generic resultant
 
-* add the tricks used in SparsePoly for gcd (subresultant algorithm) to Poly.jl.These include finding obvious content and removing it using exact divisions, 
+* add the tricks used in SparsePoly for gcd (subresultant algorithm) to Poly.jl.These include finding obvious content and removing it using exact divisions,
 and evaluating at random points at the start to determine the likely degree of
 the gcd, then replacing the last pseudorem with divides.
 
@@ -126,7 +126,7 @@ can still be performed
 possible
 
 * store relative power series in valuation/unit (i.e. relative) form instead of
-current absolute form 
+current absolute form
 
 Fraction.jl
 -----------

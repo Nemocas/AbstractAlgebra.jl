@@ -361,7 +361,7 @@ function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where
    heap[i] = node
    return nothing
 end
-   
+
 function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    s = length(heap)
    x = heap[1]
@@ -419,7 +419,7 @@ function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: Abstract
                   n -= 1
                   break
                end
-            end        
+            end
          end
       end
       n += 1
@@ -531,7 +531,7 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElem
       c = coeff(f.poly, i)
       # larger coefficients are also somewhat punished
       s += Base.log(ndigits(c; base=2))*j*j
-      j -= 1      
+      j -= 1
    end
    return s
 end
@@ -1130,7 +1130,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             s = compute_spoly(n, d)
             push!(S, s)
             break
-         end 
+         end
       end
       n = n.equal
       nend = b
@@ -1192,7 +1192,7 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyRingElem{<:Ri
             b2 = b2.next
             if lm_divides_lcm(b2.up, d) && !b2.up.path
                insert_links(d, b2.up)
-            end   
+            end
          end
       end
    end
@@ -1618,7 +1618,7 @@ function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
             h = leading_coefficient(V[i]) # should be non-negative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
-            p -= q*u       
+            p -= q*u
          end
          n = min(n - 1, length(p))
       end
@@ -1900,18 +1900,18 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          if !iszero(p)
             if length(p) >= length(v)
               push!(D, r)
-            else 
+            else
                push!(H, p)
                p = r
             end
          else
-            p = r 
+            p = r
          end
          # p still needs reduction
       end
    end
 end
-      
+
 function remove_constant_multiples(V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    len = length(V)
    for i = 1:len

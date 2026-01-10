@@ -157,7 +157,7 @@ end
    a = S(3, 7)
 
    @test a == S(3, 7)
-   @test S(10, 5) == S(2, 7)   
+   @test S(10, 5) == S(2, 7)
 
    @test isequal(a, S(3, 7))
 end

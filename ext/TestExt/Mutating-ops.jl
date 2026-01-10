@@ -75,7 +75,7 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; onl
      a = f!(a, b, b)
      @test equality(a, f(B, B))
      @test b == B
-  
+
      b = deepcopy(B)
      b = f!(b, b, b)
      @test equality(b, f(B, B))

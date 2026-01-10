@@ -36,5 +36,5 @@ end
    ff = Fac(-1, [2 => 3, 3 => 1])
 
    @test_throws  ErrorException  f == f
-   @test_throws  ErrorException  (f == ff) 
+   @test_throws  ErrorException  (f == ff)
 end

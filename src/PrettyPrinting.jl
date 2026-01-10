@@ -299,10 +299,10 @@ end
 #   a*-b*c  => -a*b*c   unary minus can move freely through products
 #   (-a)/b  => -(a/b)   unary minus can move through the numerator of a quotient
 #   a-b     => a + -b   subtraction is turned into addition with unary minus
-#   --a     => a        
+#   --a     => a
 #   0*a     => 0
 #   0+a     => a
-#   1*a     => a 
+#   1*a     => a
 
 # since unary minus has a higher precedence than * and /, we maintain
 # -a*b*c as (-a)*b*c and not as -(a*b*c) because the former prints without ()
@@ -568,7 +568,7 @@ mutable struct printer{IOT <: IO}
    terse_level::Int
    size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
                                   # < 0 for unrestricted output
-   
+
    function printer(io::IO)
       terse_level = get(io, :terse_level, 0)
       size_limit = get(io, :size_limit, -1)
@@ -860,7 +860,7 @@ function printPlusArg(S::printer, mi::MIME, obj::Expr, i::Int,
    end
 end
 
-# special override for plus which seeks the sign of its arguments 
+# special override for plus which seeks the sign of its arguments
 function printPlus(S::printer, mi::MIME, obj::Expr,
                    left::Int, right::Int)
    n = length(obj.args)
@@ -1435,7 +1435,7 @@ end
 
 ###############################################################################
 #
-#  Macros for fancy printing. 
+#  Macros for fancy printing.
 #
 ###############################################################################
 
@@ -1500,7 +1500,7 @@ If `all` is `true`, private and non-exported variables are also searched.
     but a name returned once is kept until the variable no longer contains this object.
 
 For this to work in doctests, one should call
-`AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of 
+`AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of
 `Documenter.DocMeta.setdocmeta!` and keep the default value of `M = Main` here.
 
 !!! warning

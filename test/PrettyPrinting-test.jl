@@ -86,7 +86,7 @@ import AbstractAlgebra.PrettyPrinting
    @test canonical_string(:((-a)^b)) == "(-a)^b"
    @test canonical_string(:(sqrt(-a)*-b)) == "-sqrt(-a)*b"
    @test canonical_string(:(a^(-b/c) - ((-a)*b)*c - ((a*b)*(-c*d)))) ==
-                                                "a^(-b/c) + a*b*c + a*b*c*d"                             
+                                                "a^(-b/c) + a*b*c + a*b*c*d"
    @test canonical_string(:((-a/b)*c+d*(e/f)*g^h + (-i)*j/k^l)) ==
                                               "-a/b*c + d*(e/f)*g^h - i*j/k^l"
 
@@ -161,7 +161,7 @@ import AbstractAlgebra.PrettyPrinting
    @test latex_string(:((a//b)^c)) == "\\left(\\frac{a}{b}\\right)^{c}"
    @test latex_string(:(ff(-a)*-b)) == "-\\mathop{\\mathrm{ff}}\\left(-a\\right) b"
    @test latex_string(:(a^(-b//c) - ((-a)*b)*c - ((a*b)*(-c*d)))) ==
-                                         "a^{-\\frac{b}{c}} + a b c + a b c d"                             
+                                         "a^{-\\frac{b}{c}} + a b c + a b c d"
    @test latex_string(:((-a//b)*c+d*(e//f)*g^h + ((-i)*j)//k^l)) ==
                   "-\\frac{a}{b} c + d \\frac{e}{f} g^{h} - \\frac{i j}{k^{l}}"
 
@@ -317,7 +317,7 @@ end
 
 end
 
-  
+
 @testset "PrettyPrinting: Unicode preferences" begin
   # TODO
 
@@ -460,7 +460,7 @@ end
   print(io, AbstractAlgebra.Indent())
   print(io, "aa", "t"^c)
   @test String(take!(io)) == "  " * "t"^(c - 2) * "\n" *
-                             "  tt\n" * 
+                             "  tt\n" *
                              "  aa" * "t"^(c - 4) * "\n" *
                              "  tttt\n" *
                              "    aa" * "t"^(c - 6) * "\n" *
@@ -579,7 +579,7 @@ end
                              "    " * family^38 * "\n" *
                              "    " * family^12 * "\n" *
                              "    " * iacute^(c-4) * "\n" *
-                             "    " * iacute^4 *"\n" * 
+                             "    " * iacute^4 *"\n" *
                              "    " * evil_a^(c-4) * "\n" *
                              "    " * evil_a^(4) * "\n" *
                              "    " * evil_a^(c-4) * "\n" *

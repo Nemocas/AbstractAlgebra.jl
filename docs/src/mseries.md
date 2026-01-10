@@ -157,7 +157,7 @@ arithmetic, as described in the Ring interface.
 
 The power series rings in AbstractAlgebra.jl implement the full Ring interface.
 
-We give some examples of such functionality. 
+We give some examples of such functionality.
 
 !!! note
 

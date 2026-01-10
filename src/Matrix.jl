@@ -333,7 +333,7 @@ end
 
 ###############################################################################
 #
-#   Block diagonal matrices    
+#   Block diagonal matrices
 #
 ###############################################################################
 
@@ -416,7 +416,7 @@ Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
 similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
-  
+
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
 similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
@@ -2694,7 +2694,7 @@ function exterior_power(A::MatElem, k::Int)
        res[i, j] = det(A[ri[i], ri[j]])
      end
    end
-   return res 
+   return res
 end
 
 ###############################################################################
@@ -3519,8 +3519,8 @@ _solve_triu_right(M, b; unipotent = false) = _solve_triu(M, b; unipotent, side =
 @doc raw"""
     _solve_triu(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false, side::Symbol = :left) where {T <: RingElement}
 
-Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
-`side = :right`, let $b$ 
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If
+`side = :right`, let $b$
 be an $n\times m$ matrix $b$ over the same field, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
@@ -3574,7 +3574,7 @@ triangular, and an $n\times m$ matrix $b$ over the same ring, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast
   versions.
 """
 function _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}

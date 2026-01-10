@@ -104,7 +104,7 @@ end
    l = T(t)
 
    @test isa(l, Generic.LaurentSeriesElem)
-   
+
    R, x = laurent_series_ring(ZZ, 30, "x")
    RR, x = laurent_series_ring(ZZ, 30, "x")
    @test R === RR
@@ -304,7 +304,7 @@ end
    @test isa(r, Generic.LaurentSeriesFieldElem)
 
    s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 1; max_precision=10)
-   
+
    @test max_precision(parent(s)) == 10
 end
 

@@ -925,7 +925,7 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
       end::AbsMSeriesRing{T, U}
    end
 end
- 
+
 const AbsMSeriesID = CacheDictType{Tuple{Ring,
                                        Vector{Int}, Vector{Symbol}, Int}, Ring}()
 

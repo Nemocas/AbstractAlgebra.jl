@@ -16,7 +16,7 @@ It is possible to create matrices directly, without first
 creating a corresponding matrix space. The following constructors are necessary,
 because unfortunately, Julia's matrices and linear algebra cannot be made to work in
 our context due to two independent problems:
-- In empty matrices (0 rows or columns) all that is known is the type of the matrix entries, 
+- In empty matrices (0 rows or columns) all that is known is the type of the matrix entries,
 however for the complex types used in AbstractAlgebra, this information is not sufficient to create elements,
 hence `zero(T)` or friends cannot work
 - Many functions (e.g. `det`) assume that all types used embed into the real or complex numbers,
@@ -157,7 +157,7 @@ julia> N3 = M[2:3, 2:3]
 [4   5]
 ```
 
-As per Julia, AbstractAlgebra supports the construction of matrix views. 
+As per Julia, AbstractAlgebra supports the construction of matrix views.
 These allow one to work with a submatrix of a given
 matrix. Modifying the submatrix also modifies the original matrix.
 
@@ -541,7 +541,7 @@ julia> pfaffians(M, 2)
  x3
  x5
  x6
- 
+
 ```
 
 ### Nullspace

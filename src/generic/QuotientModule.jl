@@ -135,7 +135,7 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
       end
       i += 1
    end
-   return v 
+   return v
 end
 
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
@@ -264,7 +264,7 @@ function make_direct_sub(m::Submodule{T}, subm::Submodule{T}) where T <: RingEle
 end
 
 function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: RingElement
-   if !is_submodule(m, subm) 
+   if !is_submodule(m, subm)
      subm = make_direct_sub(m, subm)[1]
      @assert is_submodule(m, subm)
    end
@@ -312,5 +312,5 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) 
    R = base_ring(m)
    f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))
    M.map = f
-   return M, f   
+   return M, f
 end

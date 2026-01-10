@@ -178,12 +178,12 @@ morphism_type(::D, ::C, ::F) where {D <: AbstractAlgebra.PolyRing, C <: NCRing, 
 
 @doc raw"""
     hom(R::AbstractAlgebra.PolyRing, S::NCRing, [coeff_map,] image)
-    
-Given a homomorphism `coeff_map` from `C` to `S`, where `C` is the 
+
+Given a homomorphism `coeff_map` from `C` to `S`, where `C` is the
 coefficient ring of `R`, and given an element `image` of `S`, return the
-homomorphism from `R` to `S` whose restriction 
+homomorphism from `R` to `S` whose restriction
 to `C` is `coeff_map`, and which sends the generator of `R` to `image`.
- 
+
 If no coefficient map is entered, invoke a canonical homomorphism of `C`
 to `S`, if such a homomorphism exists, and throw an error, otherwise.
 
@@ -241,7 +241,7 @@ end
 function (F::PolyRingAnyMap)(g)
   if g isa elem_type(domain(F))
     _evaluate_help(F, g)
-  else 
+  else
     gg = domain(F)(g)
     @assert parent(gg) === domain(F)
     return F(gg)

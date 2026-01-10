@@ -9,7 +9,7 @@ end
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars])
-   
+
       f = rand(R, 0:10, -10:10)
 
       @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt},
@@ -39,7 +39,7 @@ end
       @test R(p, prec) isa Generic.AbsMSeries
 
       R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
-     
+
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
       @test R(x) isa Generic.AbsMSeries
@@ -56,7 +56,7 @@ end
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:40)
       R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
-   
+
       f = rand(R, 0:10, -10:10)
 
       @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt},
@@ -81,7 +81,7 @@ end
       @test R(p, [0 for i in 1:nvars]) isa Generic.AbsMSeries
 
       R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
-     
+
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
       @test R(x) isa Generic.AbsMSeries
@@ -97,7 +97,7 @@ end
    @test string(y) == "y + O(y^3) + O(x^5)"
    @test string(x^2 - y) == "-y + x^2 + O(y^3) + O(x^5)"
 
-   # weighted 
+   # weighted
 
    R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 
@@ -299,7 +299,7 @@ end
          f = rand(R, 0:12, -10:10)
          g = rand(R, 0:12, -10:10)
          h = rand(R, 0:12, -10:10)
-      
+
          @test isequal(f + g, g + f)
          @test isequal(f + (g + h), (f + g) + h)
          @test isequal(f*g, g*f)
@@ -322,7 +322,7 @@ end
          f = rand(R, 0:12, -10:10)
          g = rand(R, 0:12, -10:10)
          h = rand(R, 0:12, -10:10)
-      
+
          @test isequal(f + g, g + f)
          @test isequal(f + (g + h), (f + g) + h)
          @test isequal(f*g, g*f)
@@ -359,7 +359,7 @@ end
          @test isequal(f*d1 - f*d2, f*(d1 - d2))
          @test isequal(f*d1 + f*d2, f*(d1 + d2))
       end
-   
+
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
 
@@ -403,7 +403,7 @@ end
          @test isequal(f*d1 - f*d2, f*(d1 - d2))
          @test isequal(f*d1 + f*d2, f*(d1 + d2))
       end
-   
+
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
       R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
@@ -429,7 +429,7 @@ end
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
-      
+
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
          r2 = R(1)
@@ -450,7 +450,7 @@ end
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
       R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
-      
+
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
          r2 = R(1)

@@ -93,7 +93,7 @@ function ==(x::NCRingElem, y::NCRingElem)
   end
   throw(NotImplementedError(:(==), x, y))
  end
- 
+
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
 
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y

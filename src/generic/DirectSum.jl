@@ -222,7 +222,7 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
    n = sum(degs)
    new_rels = Vector{dense_matrix_type(T)}(undef,
        sum(length(rels(m[i])) for i in 1:length(m)))
-   if length(new_rels) > 0      
+   if length(new_rels) > 0
      rel = 1
      start = 0
      for i = 1:length(m)
@@ -261,7 +261,7 @@ end
 function ModuleHomomorphism(D::DirectSumModule{T}, A::AbstractAlgebra.FPModule{T}, m::Vector{<:ModuleHomomorphism{T}}) where T <: RingElement
    S = summands(D)
    length(S) == length(m) || error("map array has wrong length")
-   all(i->domain(m[i]) == S[i] && codomain(m[i]) == A, 1:length(S)) || 
+   all(i->domain(m[i]) == S[i] && codomain(m[i]) == A, 1:length(S)) ||
                             error("modules and maps are not compatible")
    return ModuleHomomorphism(D, A, vcat([x.matrix for x = m]...))
 end
@@ -276,7 +276,7 @@ function ModuleHomomorphism(D::DirectSumModule{T}, A::DirectSumModule{T}, m::Mat
             m[i, j] = ModuleHomomorphism(SD[i], SA[j], [zero(SA[j]) for x = 1:ngens(SD[i])])
          else
             isa(m[i, j], ModuleHomomorphism{T}) || error("matrix must contain only 0 and homs")
-            domain(m[i, j]) === SD[i] && codomain(m[i, j]) === SA[j] || 
+            domain(m[i, j]) === SD[i] && codomain(m[i, j]) === SA[j] ||
                                     error("modules and maps are not compatible")
          end
       end

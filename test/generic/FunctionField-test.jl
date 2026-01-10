@@ -17,13 +17,13 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 #   ConformanceTests.test_Ring_interface(S)
 #end
 
-@testset "Generic.FunctionField.constructors" begin 
+@testset "Generic.FunctionField.constructors" begin
    @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
    @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
 
    for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
       R = base_ring(base_ring(S))
-      
+
       @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
       @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
       @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
@@ -101,7 +101,7 @@ end
       # TODO: test more than just the result type
       test_rand(S, 1:10, -10:10)
    end
-   
+
    for f in P2
       S, y = function_field(f, "y")
 
@@ -421,7 +421,7 @@ end
          end
 
          c1 = rand(-10:10)
- 
+
          @test S(c1) == c1
          @test c1 == S(c1)
 
@@ -429,7 +429,7 @@ end
          @test c1 != S(c1) + f
 
          c1 = rand(-10:10)//rand(1:10)
- 
+
          @test S(c1) == c1
          @test c1 == S(c1)
 
@@ -437,7 +437,7 @@ end
          @test c1 != S(c1) + f
 
          c1 = rand(ZZ, -10:10)
- 
+
          @test S(c1) == c1
          @test c1 == S(c1)
 
@@ -471,7 +471,7 @@ end
          end
 
          c1 = rand(-10:10)
- 
+
          @test S(c1) == c1
          @test c1 == S(c1)
 
@@ -479,7 +479,7 @@ end
          @test c1 != S(c1) + f
 
          c1 = rand(ZZ, -10:10)
- 
+
          @test S(c1) == c1
          @test c1 == S(c1)
 
@@ -847,8 +847,8 @@ end
          h = zero!(h)
          @test isequal(h, S())
       end
-   end  
-end      
+   end
+end
 
 @testset "Generic.FunctionField.polynomial_ring" begin
    for i = 1:length(P1)

@@ -801,7 +801,7 @@ import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
 end
 
 const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
-   
+
 mutable struct ConstPoly{T <: RingElement} <: RingElem
    c::T
    parent::ConstPolyRing{T}

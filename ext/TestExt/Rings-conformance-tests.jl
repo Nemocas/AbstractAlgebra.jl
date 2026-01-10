@@ -480,13 +480,13 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
             @test is_monic(a) == isone(leading_coefficient(a))
          end
       end
-      
+
       @testset "reverse" begin
         p = x^2 + 2*x + 3
         @test reverse(p) !== p
         @test reverse(p) == 3*x^2 + 2*x + 1
         @test reverse(p, 2) == 3*x + 2
-        
+
         p = x^2 + 2*x
         reverse!(p)
         @test p == 2*x + 1
@@ -495,12 +495,12 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
         reverse!(p, 2)
         @test p == 2
       end
-      
+
       @testset "shifting" begin
         p = x^2 + 2*x + 3
         @test shift_left!(p, 1) == x^3 + 2*x^2 + 3*x
         @test shift_left!(p, 3) == x^6 + 2*x^5 + 3*x^4
-        
+
         p = x^2 + 2*x + 3
         @test shift_right!(p, 1) == x + 2
         @test shift_right!(p, 2) == zero(Rx)

@@ -44,7 +44,7 @@ end
 poly(a::AbsMSeries{T, S}) where {T <: RingElement, S} = a.poly::S
 
 function underlying_poly_ring(R::AbsMSeriesRing{T, S}) where {T <: RingElement, S}
-   return R.poly_ring::parent_type(S) 
+   return R.poly_ring::parent_type(S)
 end
 
 @doc raw"""
@@ -310,7 +310,7 @@ function truncate_poly(a::MPolyRingElem, prec::Vector{Int}, weighted_prec::Int=-
             if exponents_lt(v, prec, weighted_prec)
                 push_term!(ctx, c, v)
             end
-        end  
+        end
     end
     return finish(ctx)
 end
@@ -418,16 +418,16 @@ end
 
 function *(a::T, b::AbsMSeries{T}) where {T <: RingElem}
     R = parent(b)
-    return R(a*poly(b), b.prec) 
+    return R(a*poly(b), b.prec)
 end
 
 function *(a::JuliaRingElement, b::AbsMSeries)
     R = parent(b)
-    return R(a*poly(b), b.prec) 
+    return R(a*poly(b), b.prec)
 end
 
 *(a::AbsMSeries{T}, b::T) where T <: RingElem = b*a
- 
+
 *(a::AbsMSeries, b::JuliaRingElement) = b*a
 
 ###############################################################################
@@ -584,11 +584,11 @@ function evaluate(a::U, vars::Vector{Int}, vals::Vector{U}) where
         @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
         @req parent(vals[i]) === R "Element not in series ring"
     end
- 
+
     if length(vars) == 0
         return a
     end
- 
+
     S = parent(a)
     R = base_ring(a)
     return AbstractAlgebra._evaluate(a, S, R, vars, vals)
@@ -649,7 +649,7 @@ function mul!(c::AbsMSeries{T}, a::AbsMSeries{T}, b::AbsMSeries{T}) where
     else
         c.poly = mul!(c.poly, a.poly, b.poly)
         c.poly = truncate_poly(c.poly, weights(R), R.weighted_prec)
-    end 
+    end
     return c
 end
 

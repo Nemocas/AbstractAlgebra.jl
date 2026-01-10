@@ -803,7 +803,7 @@ end
 
       @test isequal(integral(derivative(f)) + const_coeff, f)
    end
- 
+
    # Inexact field
    S, x = puiseux_series_field(RealField, 10, "x")
 

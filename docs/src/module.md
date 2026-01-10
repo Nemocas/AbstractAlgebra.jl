@@ -240,7 +240,7 @@ true
 
 For modules over a euclidean domain one can take the invariant factor
 decomposition to determine the structure of the module. The invariant factors
-are unique up to multiplication by a unit, and even unique if a 
+are unique up to multiplication by a unit, and even unique if a
 `canonical_unit` is available for the ring that canonicalises elements.
 
 ```@docs

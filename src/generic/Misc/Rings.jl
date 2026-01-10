@@ -21,7 +21,7 @@ function is_power(a::RingElem, n::Int)
         return true, r[1]
     end
 end
-  
+
 function root(a::RingElem, n::Int)
     fl, b = is_power(a, n)
     fl || error("element does not have a $n-th root")

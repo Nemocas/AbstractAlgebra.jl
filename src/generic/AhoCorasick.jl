@@ -37,7 +37,7 @@ julia> aut = Generic.aho_corasick_automaton(keywords);
 julia> Generic.search(aut, [10, 4, 1, 2, 3, 4])
 AbstractAlgebra.Generic.AhoCorasickMatch(6, 1, [1, 2, 3, 4])
 ```
-""" 
+"""
 mutable struct AhoCorasickAutomaton
     goto::Vector{Dict{Int,Int}}
     fail::Vector{Int}
@@ -81,7 +81,7 @@ julia> Generic.keyword(result)
  3
  4
 ```
-""" 
+"""
 struct AhoCorasickMatch
     last_position::Int
     keyword_index::Int
@@ -113,7 +113,7 @@ function aho_corasick_match(last_position::Int, keyword_index::Int, keyword::Wor
     return AhoCorasickMatch(last_position, keyword_index, keyword)
 end
 
-Base.hash(m::AhoCorasickMatch, h::UInt) = hash(m.last_position, hash(m.keyword_index, 
+Base.hash(m::AhoCorasickMatch, h::UInt) = hash(m.last_position, hash(m.keyword_index,
                                                             hash(m.keyword, h)))
 function ==(m1::AhoCorasickMatch, m2::AhoCorasickMatch)
     return m1.last_position == m2.last_position &&
@@ -187,7 +187,7 @@ function construct_fail!(automaton::AhoCorasickAutomaton)
             automaton.fail[new_state] = s
             if automaton.output[new_state][1] >
                automaton.output[automaton.fail[new_state]][1]
-               automaton.output[new_state] = automaton.output[automaton.fail[new_state]] 
+               automaton.output[new_state] = automaton.output[automaton.fail[new_state]]
             end
 
         end
@@ -199,7 +199,7 @@ end
 
 Insert a new keyword into a given Aho-Corasick automaton to avoid having to rebuild the entire
 automaton.
-""" 
+"""
 function insert_keyword!(aut::AhoCorasickAutomaton, keyword::Word, index::Int)
     enter!(aut, keyword, index)
     aut.fail = ones(Int, length(aut.goto))
@@ -210,7 +210,7 @@ end
     search(automaton::AhoCorasickAutomaton, word::Word)
 
 Search for the first occurrence of a keyword that is stored in `automaton` in the given `word`.
-""" 
+"""
 function search(automaton::AhoCorasickAutomaton, word::Word)
     current_state = 1
     result = AhoCorasickMatch(typemax(Int), typemax(Int), [])

@@ -246,7 +246,7 @@ end
 
 Insert the a key `k` into a priority queue `pq` with priority `v`.
 
-# Examples 
+# Examples
 
 ```jldoctest
 julia> a = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3, "e" => 5)
@@ -349,7 +349,7 @@ function Base.delete!(pq::PriorityQueue, key)
 end
 
 """
-    empty!(pq::PriorityQueue)  
+    empty!(pq::PriorityQueue)
 
 Reset priority queue `pq`.
 """

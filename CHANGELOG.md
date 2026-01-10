@@ -24,7 +24,7 @@ which we think might affect some users directly.
 - [#2251](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2251) Type param for `FracField` is `RingElem`, not `RingElement`
 - [#2252](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2252) Switch delegation order of `sub` and `getindex` for submatrices
 - [#2261](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2261) Enable prepared deprecations
-- [#2262](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2262) Remove `getindex(::SimpleNumField, ::Int)`, rely on generic `getindex(::Set,::Int)` instead (hence `L[0]` won't return `one(L)` anymore) 
+- [#2262](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2262) Remove `getindex(::SimpleNumField, ::Int)`, rely on generic `getindex(::Set,::Int)` instead (hence `L[0]` won't return `one(L)` anymore)
 
 ### New or extended functionality
 

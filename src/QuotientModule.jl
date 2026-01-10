@@ -18,5 +18,5 @@ have been (transitively) constructed as a submodule of `m` or be `m` itself)
 along with the canonical quotient map from `m` to `M`.
 """
 function quo(m::FPModule{T}, subm::FPModule{T}) where T <: RingElement
-   return Generic.quo(m, subm)  
+   return Generic.quo(m, subm)
 end

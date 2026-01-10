@@ -52,9 +52,9 @@ end
    @test powermod(123, 1, 5) == 3
 
    @test powermod(123, -1, 5) == 2
-   
+
    n = -rand(2:100)
-   
+
    @test powermod(123, n, 5) == invmod(powermod(123, -n, 5), 5)
 end
 
@@ -94,7 +94,7 @@ end
          @test flagT
          @test qT == b1
       end
-      
+
       @test is_divisible_by(a1*a2, a1)
 
       if b1 != 0

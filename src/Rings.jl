@@ -172,7 +172,7 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   error("Element $a does not have a square root")
 end
 
-# assumes the existence of is_square and sqrt for input  
+# assumes the existence of is_square and sqrt for input
 function is_square_with_sqrt(a::RingElem)
   if is_square(a)
      return true, sqrt(a)

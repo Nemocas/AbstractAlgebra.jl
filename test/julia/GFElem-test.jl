@@ -311,7 +311,7 @@ end
              @test !is_square(z*a^2)
 
              @test_throws ErrorException sqrt(z*a^2)
-          end 
+          end
        end
    end
 end

@@ -251,7 +251,7 @@ end
 
    S, (x,y) = free_associative_algebra(QQ, [:x, :y])
    f = x^2 + x*y^2*x + QQ(5)*y - QQ(1//2)*y*x
-   
+
    @test 2 + f == QQ(2) + f
    @test f + 2 == f + QQ(2)
    @test 1//2 + f == QQ(1//2) + f

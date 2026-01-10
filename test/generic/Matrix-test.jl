@@ -372,7 +372,7 @@ end
 
    # Test constructors over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    @test isa(S, MatSpace)
@@ -501,7 +501,7 @@ end
 
    # test over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -640,7 +640,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -655,7 +655,7 @@ end
    @test iszero(zero(M, 3, 3))
    @test iszero(zero(M, QQ, 3, 3))
    @test iszero(zero(M, QQ))
-   
+
    M = zero!(M)
    @test iszero(M)
 
@@ -720,7 +720,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -1204,13 +1204,13 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = rand(S, -10:10)
    P = rand(S, -10:10)
-   
+
    @test M + N == N + M
    @test M - N == M + (-N)
    @test M*(N + P) == M*N + M*P
@@ -1373,12 +1373,12 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = rand(S, -10:10)
-   
+
    t1 = rand(ZZ, -10:10)
    t2 = rand(R, -10:10)
 
@@ -1416,7 +1416,7 @@ end
    @test typeof(B * A) == typeof(A)
    @test A * B == A^2
    @test B * A == A^2
-   
+
    @test typeof(A + B) == typeof(A)
    @test typeof(B + A) == typeof(A)
    @test A + B == A + A
@@ -1522,12 +1522,12 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = deepcopy(M)
-   
+
    @test M == M
    @test M == N
    @test M == copy(M)
@@ -1555,9 +1555,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    @test S(5) == 5
    @test 5 == S(5)
    @test S(BigInt(5)) == 5
@@ -1587,9 +1587,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    @test M^0 == one(S)
@@ -1660,9 +1660,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    @test is_symmetric(M + transpose(M))
@@ -2004,7 +2004,7 @@ end
    M = rand(R, -5:5)
    M = transpose(M) - M
    @test det(M) == pfaffian(M)^2
-   
+
    S, z = polynomial_ring(ZZ, "z")
    n = 5
    for dim = 0:n
@@ -3613,7 +3613,7 @@ end
 
    # Test constructors over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -4118,9 +4118,9 @@ end
 
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 4, 4)
-   
+
    M = rand(S, -10:10)
 
    for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
@@ -4171,7 +4171,7 @@ end
    R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    N = change_base_ring(U, M)

@@ -258,7 +258,7 @@ end
    # Poly modulus, invertible lc
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 2x + 1)
-   
+
    @test gcd(T(x + 1), T(x + 1)) == T(x + 1)
 
    T, = residue_ring(S, x^2 + 1)

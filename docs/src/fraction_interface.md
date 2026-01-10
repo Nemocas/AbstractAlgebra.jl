@@ -17,7 +17,7 @@ AbstractAlgebra provides two abstract types for fraction fields and their elemen
   * `FracField{T}` is the abstract type for fraction field parent types
   * `FracElem{T}` is the abstract type for types of fractions
 
-We have that `FracField{T} <: Field` and 
+We have that `FracField{T} <: Field` and
 `FracElem{T} <: FieldElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
@@ -35,8 +35,8 @@ usually makes use of a dictionary).
 In addition to the required functionality for the Field interface the Fraction Field
 interface has the following required functions.
 
-We suppose that `R` is a fictitious base ring, and that `S` is the fraction field with 
-parent object `S` of type `MyFracField{T}`. We also assume the fractions in the field 
+We suppose that `R` is a fictitious base ring, and that `S` is the fraction field with
+parent object `S` of type `MyFracField{T}`. We also assume the fractions in the field
 have type `MyFrac{T}`, where `T` is the type of elements of the base ring.
 
 Of course, in practice these types may not be parameterised, but we use parameterised

@@ -23,7 +23,7 @@ AbstractAlgebra provides four abstract types for residue rings and their element
   * `ResElem{T}` is the abstract type for types of elements of residue rings (residues)
   * `ResFieldElem{T}` is the abstract type for types of elements of residue fields
 
-We have that `ResidueRing{T} <: AbstractAlgebra.Ring` and 
+We have that `ResidueRing{T} <: AbstractAlgebra.Ring` and
 `ResElem{T} <: AbstractAlgebra.RingElem`.
 
 Note that these abstract types are parameterised. The type `T` should usually be the type

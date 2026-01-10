@@ -441,7 +441,7 @@ end
 
 @testset "Generic.NCPoly.map_coefficients" begin
    let
-      Q = matrix_ring(QQ, 2) 
+      Q = matrix_ring(QQ, 2)
       Qz, z = Q[:z]
       Qx, x = QQ[:x]
       f = map_coefficients(c -> c[1, 1], 2*z; parent = Qx)

@@ -40,11 +40,11 @@ As for the Ring interface, the NCRing interface provides a union type
 `NCRingElement` in `src/julia/JuliaTypes.jl` which is a union
 of `NCRingElem` and the Julia types `Integer`, `Rational`
 and `AbstractFloat`.
-                                                                                                    
+
 Most of the generic code in AbstractAlgebra for general rings makes use of the
 union type `NCRingElement` instead of `NCRingElem`
 so that the generic functions also accept the Julia Base ring types.
-              
+
 As per usual, one may need to implement one ad hoc binary operation for each
 concrete type belonging to `NCRingElement` to avoid ambiguity
 warnings.
