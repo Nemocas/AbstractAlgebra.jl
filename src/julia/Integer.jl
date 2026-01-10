@@ -433,7 +433,7 @@ function is_power(a::T, n::Int) where T <: Integer
    elseif !ispower_moduli(a, n)
       return (false, zero(T))
    end
-      
+
    q = BigInt()
    r = BigInt()
    ccall((:__gmpz_rootrem, :libgmp), Nothing,

@@ -608,7 +608,7 @@ end
 function evaluate(f::FracElem, V::Vector{<:RingElement})
     return evaluate(numerator(f), V)//evaluate(denominator(f), V)
 end
-  
+
 function evaluate(f::FracElem, v::RingElement)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
@@ -653,7 +653,7 @@ end
 function derivative(f::FracElem{T}, x::T) where {T <: MPolyRingElem}
     return derivative(f, var_index(x))
 end
-  
+
 # Return the derivative with respect to the `i`-th variable.
 function derivative(f::FracElem{T}, i::Int) where {T <: MPolyRingElem}
     n = numerator(f)

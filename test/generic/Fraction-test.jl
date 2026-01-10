@@ -375,7 +375,7 @@ end
 
    f2, s2 = is_square_with_sqrt(f)
 
-   @test !f2   
+   @test !f2
 end
 
 @testset "Generic.FracFieldElem.gcd" begin

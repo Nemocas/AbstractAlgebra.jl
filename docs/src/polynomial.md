@@ -172,7 +172,7 @@ julia> f = polynomial(ZZ, [1, 2, 3], :y)
 ## Similar and zero
 
 Another way of constructing polynomials is to construct one similar to an
-existing polynomial using either similar or zero. 
+existing polynomial using either similar or zero.
 
 ```julia
 similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem

@@ -722,5 +722,5 @@ end
 
 function factored_fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    return FactoredFracField{AbstractAlgebra.elem_type(R)}(R, cached)
-end 
+end
 

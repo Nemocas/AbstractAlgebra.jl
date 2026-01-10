@@ -79,7 +79,7 @@ julia> h = ZZ(BigInt(1234))
 
 ## Basic ring functionality
 
-The integer ring in AbstractAlgebra.jl implements the full Ring interface and the 
+The integer ring in AbstractAlgebra.jl implements the full Ring interface and the
 Euclidean Ring interface.
 
 We give some examples of such functionality.

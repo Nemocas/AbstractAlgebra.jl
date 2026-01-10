@@ -16,8 +16,8 @@ Most fields must supply two types:
   - a type for the parent object (representing the field itself)
   - a type for elements of that field
 
-For example, the generic fraction field type in AbstractAlgebra.jl provides two 
-types in `generic/GenericTypes.jl`: 
+For example, the generic fraction field type in AbstractAlgebra.jl provides two
+types in `generic/GenericTypes.jl`:
 
   - `Generic.FracField{T}` for the parent objects
   - `Generic.FracFieldElem{T}` for the actual fractions
@@ -44,13 +44,13 @@ union type `FieldElement` in `src/julia/JuliaTypes`.
 So far, in addition to `FieldElem` the  union type
 `FieldElement` includes the Julia types `Rational`
 and `AbstractFloat`.
-                                                                                                   
+
 Most of the generic code in AbstractAlgebra makes use of the union type
 `FieldElement` instead of `FieldElem` so that the
 generic functions also accept the Julia Base field types.
-                                                                
+
 !!! note
-    
+
     One must be careful when defining ad hoc binary operations for field element
     types. It is often necessary to define separate versions of the functions for
     `FieldElem` then for each of the Julia types separately in

@@ -60,7 +60,7 @@ skinparam RoundCorner 15
 "SetElem" -down-> "IdealElem{T}"
 
 ' Maps
-' NOTE: Identity is 
+' NOTE: Identity is
 "SetElem" -down----> "Map{D, C, S, T}"
 "Map{D, C, S, T}" .right. "SetMap"
 "SetMap" -down-> "IdentityMap"

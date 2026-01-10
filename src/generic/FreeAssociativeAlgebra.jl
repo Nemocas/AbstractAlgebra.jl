@@ -365,10 +365,10 @@ end
 Implements the degree lexicographic ordering on terms, i.e.
 first, the degrees of the largest monomials are compared, and if they
 are the same, they are compared lexicographically and if they are still the same,
-the coefficients are compared. 
+the coefficients are compared.
 If everything is still the same, the next largest monomial is compared
 and lastly the number of monomials is compared.
-Since the coefficients are also compared, this only works when the 
+Since the coefficients are also compared, this only works when the
 coefficient Ring implements isless.
 
 The order of letters is the reverse of the order given when initialising the algebra.
