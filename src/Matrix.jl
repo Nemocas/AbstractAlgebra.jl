@@ -2376,9 +2376,7 @@ end
 function det_clow(M::MatElem{T}) where {T <: RingElement}
    R = base_ring(M)
    n = nrows(M)
-   if n == 0
-      return one(R)
-   end
+   n == 0 && return one(R)
    A = Matrix{T}(undef, n, n)
    B = Matrix{T}(undef, n, n)
    C = R()
@@ -2426,9 +2424,10 @@ function det_clow(M::MatElem{T}) where {T <: RingElement}
 end
 
 function det_df(M::MatElem{T}) where {T <: RingElement}
-   R = base_ring(M)
-   S = poly_ring(R)
    n = nrows(M)
+   R = base_ring(M)
+   n == 0 && return one(R)
+   S = poly_ring(R)
    p = charpoly(S, M)
    d = coeff(p, 0)
    return isodd(n) ? -d : d
@@ -2436,9 +2435,7 @@ end
 
 function det_fflu(M::MatElem{T}) where {T <: RingElement}
    n = nrows(M)
-   if n == 0
-      return base_ring(M)()
-   end
+   n == 0 && return one(base_ring(M))
    A = deepcopy(M)
    P = one(SymmetricGroup(n))
    r, d = fflu!(P, A)
@@ -2447,9 +2444,6 @@ end
 
 function det(M::MatElem{T}) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
    return det_fflu(M)
 end
 
@@ -2472,9 +2466,7 @@ x^3 - 1
 """
 function det(M::MatElem{T}) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    try
       return det_fflu(M)
    catch
@@ -2484,12 +2476,10 @@ end
 
 function det_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
-   !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
-          error("Generic interpolation requires a domain type")
    R = base_ring(M)
-   if n == 0
-      return R()
-   end
+   n == 0 && return one(R)
+   !is_domain_type(elem_type(base_ring(R))) &&
+          error("Generic interpolation requires a domain type")
    maxlen = 0
    for i = 1:n
       for j = 1:n
@@ -2520,17 +2510,13 @@ end
 
 function det(M::MatElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    return det_popov(M)
 end
 
 function det(M::MatElem{T}) where {T <: PolyRingElem}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    try
       return det_interpolation(M)
    catch
