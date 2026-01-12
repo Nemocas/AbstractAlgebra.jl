@@ -2953,7 +2953,7 @@ julia> AbstractAlgebra.rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]))
 2
 ```
 """
-function rank_interpolation(M::MatElem{T}) where {T <: PolyRing}
+function rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -2984,7 +2984,9 @@ function rank_interpolation(M::MatElem{T}) where {T <: PolyRing}
       #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
       #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
       #d is the smallest natural number such that order(K)^d >= det_deg+1.
-      d = clog(order(K), ZZ(maxdetdeg+1))
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg + 1, )))
+      @assert order(K)^d >= maxdetdeg + 1
+      #d = clog(order(K), ZZ(maxdetdeg+1))
       L, l = ext_of_degree(K, d)
       Lx, _ = polynomial_ring(L, var(Kx)) 
       #The given matrix M is embedded into the space of matrices over Lx
@@ -2993,7 +2995,7 @@ function rank_interpolation(M::MatElem{T}) where {T <: PolyRing}
    end
 end
 
-function rank_interpolation(M::MatElem{T}) where {T <: MPolyRing}
+function rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem}
    n = nrows(M)
    m = ncols(M)
    if is_zero(n) || is_zero(m)
@@ -3017,7 +3019,9 @@ function rank_interpolation(M::MatElem{T}) where {T <: MPolyRing}
          #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
          #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
          #d is the smallest natural number such that order(K)^d >= det_deg+1.
-         d = clog(order(K), ZZ(maximum(maxdetdeg)+1))
+         d = Int(ceil(Base.log(BigInt(order(K)), maximum(maxdetdeg)+1)))
+         @assert order(K)^d >= maximum(maxdetdeg) + 1
+         #d = clog(order(K), ZZ(maximum(maxdetdeg)+1))
          L, l = ext_of_degree(K, d)
          Lx, _ = polynomial_ring(L, symbols(Kx)) 
          #The given matrix M is embedded into the space of matrices over Lx
@@ -3090,7 +3094,9 @@ function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRing
       #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
       #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
       #d is the smallest natural number such that order(K)^d >= det_deg+1.
-      d = clog(order(K), ZZ(maxdetdeg*10))
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg*10)))
+      #d = clog(order(K), ZZ(maxdetdeg*10))
+      @assert order(K)^d >= maxdetdeg*10
       L, l = ext_of_degree(K, d)
       Lx, _ = polynomial_ring(L, var(Kx)) 
       #The given matrix M is embedded into the space of matrices over Lx
@@ -3134,7 +3140,9 @@ function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRin
       #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg*s holds. 
       #In this case a field extension L of K is constructed such that order(L) >= det_deg*s.
       #d is the smallest natural number such that order(K)^d >= det_deg*s.
-      d = clog(order(K), ZZ(maxdetdeg*10))
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg*10)))
+      #d = clog(order(K), ZZ(maxdetdeg*10))
+      @assert order(K)^d >= maxdetdeg*10
       L, l = ext_of_degree(K, d)
       Lx, _ = polynomial_ring(L, symbols(Kx)) 
       #The given matrix M is embedded into the space of matrices over Lx
