@@ -289,8 +289,8 @@ Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatRing{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
