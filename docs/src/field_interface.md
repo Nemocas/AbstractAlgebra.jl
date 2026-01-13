@@ -50,7 +50,6 @@ Most of the generic code in AbstractAlgebra makes use of the union type
 generic functions also accept the Julia Base field types.
 
 !!! note
-
     One must be careful when defining ad hoc binary operations for field element
     types. It is often necessary to define separate versions of the functions for
     `FieldElem` then for each of the Julia types separately in

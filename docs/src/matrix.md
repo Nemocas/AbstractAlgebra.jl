@@ -541,7 +541,6 @@ julia> pfaffians(M, 2)
  x3
  x5
  x6
-
 ```
 
 ### Nullspace
