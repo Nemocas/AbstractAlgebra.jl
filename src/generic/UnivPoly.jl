@@ -357,7 +357,7 @@ end
 #   Unary operations
 #
 ###############################################################################
-   
+
 function -(p::UnivPoly{T}) where {T}
    return UnivPoly{T}(-data(p), parent(p))
 end

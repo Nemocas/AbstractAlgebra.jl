@@ -91,10 +91,10 @@ function sturm_sequence(f::PolyRingElem{<:FieldElem})
         if r != 0
             push!(seq, -r)
             g, h = h, -r
-        else 
+        else
             break
         end
     end
     return seq
 end
- 
+

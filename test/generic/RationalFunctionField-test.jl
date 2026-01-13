@@ -580,9 +580,9 @@ end
 @testset "Generic.RationalFunctionField.promotion" begin
    # Univariate
    K, x = rational_function_field(QQ, "x")
-   
+
    T = elem_type(K)
-   
+
    @test AbstractAlgebra.promote_rule(T, T) == T
 
    # Multivariate

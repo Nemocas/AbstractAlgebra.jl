@@ -59,7 +59,7 @@ is_attribute_storing_type
 
 ### Self-given names
 
-We provide macros `@show_name`, `@show_special` and `@show_special_elem` to 
+We provide macros `@show_name`, `@show_special` and `@show_special_elem` to
 change the way certain objects are printed.
 
 In compact and terse printing mode, `@show_name` tries to determine

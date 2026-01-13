@@ -170,7 +170,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
          for j = 1:ncols(Mi)
             Mi[1, j] = g[1, j]
          end
-      end 
+      end
    end
    # Remove zero rows
    num = r

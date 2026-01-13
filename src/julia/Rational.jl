@@ -157,7 +157,7 @@ end
 
 function root(a::Rational{T}, n::Int; check::Bool=true) where T <: Integer
    num = root(numerator(a, false), n; check=check)
-   den = root(denominator(a, false), n; check=check)   
+   den = root(denominator(a, false), n; check=check)
    return num//den
 end
 

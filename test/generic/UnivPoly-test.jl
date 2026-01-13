@@ -49,7 +49,7 @@
          V = [R(rand(-10:10)) for i in 1:5]
          nused = rand(0:3)
          W = [[rand(0:100) for i in 1:nused] for i = 1:5]
-         
+
          f1 = S(V, W)
 
          @test isa(f1, UniversalPolyRingElem)
@@ -419,11 +419,11 @@ end
          @test f + g == g + f
          @test f + h == h + f
          @test g + h == h + g
-         
+
          @test f - g == -(g - f)
          @test f - h == -(h - f)
          @test g - h == -(h - g)
-         
+
          @test f*g == g*f
          @test f*h == h*f
          @test g*h == h*g
@@ -669,10 +669,10 @@ end
          n = rand(0:3)
          shift = [rand(0:5) for i in 1:n]
          defl = [rand(1:5) for i in 1:n]
-         
+
          fi = inflate(f, shift, defl)
 
-         @test deflate(fi, shift, defl) == f        
+         @test deflate(fi, shift, defl) == f
          @test deflate(inflate(f, defl), defl) == f
 
          shift2, defl2 = deflation(fi)
@@ -800,7 +800,7 @@ end
             @test div(h, h) == 1
             @test div(h*f, h) == f
             @test div(h*g, h) == g
-            
+
             q, r = divrem(h, h)
             @test q == 1 && r == 0
             q, r = divrem(h*f, h)
@@ -1139,7 +1139,7 @@ end
 
       f1 = deepcopy(f)
       f1 = add!(f1, g, h)
-      
+
       @test f1 == g + h
       @test f == 3x^3 + 2x^2 + x + 4
 

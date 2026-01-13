@@ -1,26 +1,26 @@
 include("AhoCorasick-test.jl")
 
 @testset "Generic.FreeAssociativeAlgebra.groebner" begin
- 
+
     R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
     g = AbstractAlgebra.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v,
                                        (y*x)^3*t + (y*x)^2*t + t + s])
     @test length(g) >= 5
- 
+
     # Example 6.1 Kreuzer & Xiu
     R, (a, b) = free_associative_algebra(QQ, ["a", "b"])
 
     g = AbstractAlgebra.groebner_basis([a^2 - 1, b^3 - 1, (a*b*a*b^2)^2 - 1])
     AbstractAlgebra.interreduce!(g)
     @test length(g) == 5
- 
+
     g = AbstractAlgebra.groebner_basis([a^2 - 1, b^3 - 1, (a*b*a*b*a*b^2)^2 - 1])
     AbstractAlgebra.interreduce!(g)
     @test length(g) == 15
 
     g2 = AbstractAlgebra.groebner_basis([a^2 - 1, b^3 - 1, (a*b*a*b*a*b^2)^2 - 1], typemax(Int), true)
     @test all(u ->iszero(normal_form(u, g2)), g) # make sure removing redundant obstructions in the computation does not change the groebner basis
-    @test all(u ->iszero(normal_form(u, g)), g2) 
+    @test all(u ->iszero(normal_form(u, g)), g2)
 
     f1 = a^2 -1;
     f2 = b^3 -1;
