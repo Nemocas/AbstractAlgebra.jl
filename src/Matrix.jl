@@ -3040,7 +3040,7 @@ function rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem}
    return r
 end
 
-function rank_interpolation(M::MatElem{<: RingElem})
+function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
    return rank(M)
 end
 
