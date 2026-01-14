@@ -1303,13 +1303,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+    ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)
@@ -1323,14 +1324,15 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 end
 
 @doc raw"""
-    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+    isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
 
-Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-useful in cases where the entries of the matrices are inexact, e.g. power
-series. Only if the power series are precisely the same, to the same precision,
-are they declared equal by this function.
+Return `true` if $x == y$ exactly, otherwise return `false` (incl. if the
+dimensions do not match). This function is useful in cases where the entries
+of the matrices are inexact, e.g. power series. Only if the power series are
+precisely the same, to the same precision, are they declared equal by this function.
 """
-function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)

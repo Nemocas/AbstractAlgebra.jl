@@ -233,8 +233,30 @@ end
 
 -(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) - matrix(y))
 
-==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
 
+==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
+
+isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
+
+function ==(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+#  error("Equality comparison of MatElem with MatRingElem unsupported")
+  return x == matrix(y)
+end
+
+function ==(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+#  error("Equality comparison of MatElem with MatRingElem unsupported")
+  return matrix(x) == y
+end
+
+function ==(x::MatElem{S}, y::MatRingElem{T}) where {S <: NCRingElement, T <: NCRingElement}
+#  error("Equality comparison of MatElem with MatRingElem unsupported")
+  return x == matrix(y)
+end
+
+function ==(x::MatRingElem{S}, y::MatElem{T}) where {S <: NCRingElement, T <: NCRingElement}
+#  error("Equality comparison of MatElem with MatRingElem unsupported")
+  return matrix(x) == y
+end
 
 ###############################################################################
 #
