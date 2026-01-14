@@ -469,15 +469,11 @@ end
 @attributes mutable struct UniversalRing{T <: RingElement} <: AbstractAlgebra.UniversalRing{T}
    base_ring::Ring
 
-   function UniversalRing{T}(R::Ring; cached::Bool=true) where {T<:RingElement}
+   function UniversalRing{T}(R::Ring) where {T<:RingElement}
       @assert elem_type(R) == T
-      return get_cached!(UniversalRingID, (base_ring(R), typeof(R)), cached) do
-         new{T}(R)
-      end::UniversalRing{T}
+      return new{T}(R)
    end
 end
-
-const UniversalRingID = CacheDictType{Tuple{Ring, DataType}, Ring}()
 
 mutable struct UniversalRingElem{T <: RingElement} <: AbstractAlgebra.UniversalRingElem{T}
    p::T
