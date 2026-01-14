@@ -1639,3 +1639,21 @@ end
    @test v isa Vector{elem_type(M)}
    @test all(x -> parent(x) == M, v)
 end
+
+@testset "Generic.MatAlg.equality" begin
+   # Test equality comparison between MatRingElem & MatElem
+   R = matrix_ring(ZZ, 2)
+   M = R(matrix(ZZ, 2,2, [1,2,3,4]))
+   @test M == matrix(M)
+   @test matrix(M) == M
+   @test M == matrix(QQ, M)
+   @test matrix(QQ, M) == M
+
+   # Sundry extra tests -- to achieve better source code coverage
+   @test !is_lower_triangular(M)
+   @test is_lower_triangular(0*M)
+   @test !is_diagonal(M)
+   @test is_diagonal(0*M)
+   MM = kronecker_product(M,M)
+   @test matrix(MM) == matrix(ZZ, 4,4, [1,2,2,4,3,4,6,8,3,6,4,8,9,12,12,16])
+end

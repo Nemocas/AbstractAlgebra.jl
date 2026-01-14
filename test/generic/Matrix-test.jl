@@ -1536,39 +1536,6 @@ end
    @test isequal(M, copy(M))
 end
 
-@testset "Generic.Mat.adhoc_comparison" begin
-   R, t = polynomial_ring(QQ, "t")
-   S = matrix_space(R, 3, 3)
-
-   A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-
-   @test S(12) == 12
-   @test S(5) == BigInt(5)
-   @test S(5) == Rational{BigInt}(5)
-   @test S(t + 1) == t + 1
-   @test 12 == S(12)
-   @test BigInt(5) == S(5)
-   @test Rational{BigInt}(5) == S(5)
-   @test t + 1 == S(t + 1)
-   @test A != one(S)
-   @test one(S) == one(S)
-
-   # Tests over noncommutative ring
-   R = matrix_ring(ZZ, 2)
-
-   S = matrix_space(R, 2, 2)
-
-   @test S(5) == 5
-   @test 5 == S(5)
-   @test S(BigInt(5)) == 5
-   @test 5 == S(BigInt(5))
-
-   m = rand(R, -10:10)
-
-   @test S(m) == m
-   @test m == S(m)
-end
-
 @testset "Generic.Mat.powering" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_space(R, 3, 3)

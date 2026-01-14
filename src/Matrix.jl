@@ -244,14 +244,15 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc raw"""
-    one(a::MatrixElem{T}) where T <: NCRingElement
+    one(a::MatElem{T}) where T <: NCRingElement
+    one(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the identity matrix in the same matrix space as $a$. If the space does
-not contain square matrices, an error is thrown.
+Return the identity matrix in the same matrix space or matrix ring as $a$.
+If the matrix space does not comprise square matrices, an error is thrown.
 """
-one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
+one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a) # ??? one(parent(a)) ???
 
-function iszero(a::MatrixElem{T}) where T <: NCRingElement
+function iszero(a::MatElem{T}) where T <: NCRingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !is_zero_entry(a, i, j)
@@ -262,7 +263,7 @@ function iszero(a::MatrixElem{T}) where T <: NCRingElement
   return true
 end
 
-function isone(a::MatrixElem{T}) where T <: NCRingElement
+function isone(a::MatElem{T}) where T <: NCRingElement
    is_square(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -283,28 +284,28 @@ end
 @doc raw"""
     is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `true` if $M_{i,j}$ is zero.
+Return `is_zero(M[i,j])$, but often more efficiently.
 """
 @inline is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(M[i,j])
 
 @doc raw"""
     is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `is_positive(M[i,j])`, but with a possibly more efficient implementation.
+Return `is_positive(M[i,j])`, but often more efficiently.
 """
 @inline is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_positive(M[i,j])
 
 @doc raw"""
     is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `is_negative(M[i,j])`, but with a possibly more efficient implementation.
+Return `is_negative(M[i,j])`, but often more efficiently.
 """
 @inline is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_negative(M[i,j])
 
 @doc raw"""
     is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
-Return `true` if the $i$-th row of the matrix $M$ is zero.
+Return `true` iff the $i$-th row of the matrix $M$ is zero.
 """
 function is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
   @boundscheck 1 <= i <= nrows(M) || Base.throw_boundserror(M, (i, 1:ncols(M)))
@@ -319,7 +320,7 @@ end
 @doc raw"""
     is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
 
-Return `true` if the $j$-th column of the matrix $M$ is zero.
+Return `true` iff the $j$-th column of the matrix $M$ is zero.
 """
 function is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
   @boundscheck 1 <= j <= ncols(M) || Base.throw_boundserror(M, (1:nrows(M), j))
@@ -451,7 +452,12 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::MatrixElem{T}) where T <: NCRingElement = canonical_unit(a[1, 1])
+function canonical_unit(a::MatElem)
+  for a_ij in a
+    !is_zero(a_ij) && return canonical_unit(a_ij)
+  end
+  error("Matrix must be non-zero")
+end
 
 ###############################################################################
 #
@@ -752,7 +758,7 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElement
    r = nrows(a)
    c = ncols(a)
-   isempty(a) && return "$r by $c empty matrix"
+   isempty(a) && return "$r by $c empty matrix"  # JAA preference is "$r-by-$c empty matrix"
    mat = Expr(:vcat)
    for i in 1:r
       row = Expr(:row)
@@ -898,7 +904,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    return x
 end
 
-function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+function add!(c::T, a::T, b::T) where T <: MatElem
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -909,7 +915,7 @@ function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: N
    return c
 end
 
-function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+function mul!(c::T, a::T, b::T) where T <: MatElem
    @assert base_ring(a) === base_ring(b) && base_ring(a) === base_ring(c)
    ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
@@ -933,7 +939,7 @@ function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElem
    return c
 end
 
-function sub!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+function sub!(c::T, a::T, b::T) where T <: MatElem
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -1147,7 +1153,7 @@ function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
 
-function mul!(c::MatrixElem{T}, a::MatrixElem{T}, b::T) where T <: NCRingElement
+function mul!(c::MatElem{T}, a::MatElem{T}, b::T) where T <: NCRingElement
    @assert base_ring(a) === parent(b) && base_ring(a) === base_ring(c)
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
    ncols(c) != ncols(a) && error("Incompatible matrix dimensions")
@@ -1172,9 +1178,9 @@ end
 #
 ################################################################################
 
-function Base.promote(x::MatrixElem{S},
-                      y::MatrixElem{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+function Base.promote(x::MatElem{S},
+                      y::MatElem{T}) where {S <: NCRingElement,
+                                            T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, change_base_ring(base_ring(x), y)
@@ -1193,10 +1199,9 @@ end
 
 ==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
-# matrix * vec and vec * matrx
 function Base.promote(x::MatrixElem{S},
                       y::Vector{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+                                           T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
@@ -1206,6 +1211,7 @@ function Base.promote(x::MatrixElem{S},
       error("Cannot promote to common type")
    end
 end
+
 
 function Base.promote(x::Vector{S},
                       y::MatrixElem{T}) where {S <: NCRingElement,
@@ -1218,6 +1224,7 @@ end
 
 *(x::Vector, y::MatrixElem) = *(promote(x, y)...)
 
+## ?? Why is this fn only for MatElem when the ones above were for MatrixElem ??
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
@@ -1264,11 +1271,12 @@ divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
 @doc raw"""
-    ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+    ^(a::MatElem{T}, b::Int) where T <: NCRingElement
+    ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    !is_square(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)
@@ -1452,7 +1460,8 @@ end
 ###############################################################################
 
 """
-    is_symmetric(M::MatrixElem)
+    is_symmetric(M::MatElem)
+    is_symmetric(M::MatRingElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -1479,7 +1488,7 @@ julia> is_symmetric(N)
 false
 ```
 """
-function is_symmetric(M::MatrixElem)
+function is_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 2:n, j in 1:i-1
@@ -1487,7 +1496,6 @@ function is_symmetric(M::MatrixElem)
    end
    return true
 end
-
 
 @doc raw"""
     transpose(x::MatElem)
@@ -1554,7 +1562,7 @@ end
 #
 ###############################################################################
 
-function kronecker_product(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement}
     base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
     z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
     for ix in 1:nrows(x)
@@ -2709,7 +2717,7 @@ end
     is_alternating(M::MatrixElem)
 
 Return whether the form corresponding to the matrix `M` is alternating,
-i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
+i.e. `M == -transpose(M)` and `M` has zeros on the diagonal.
 Return `false` if `M` is not a square matrix.
 """
 function is_alternating(M::MatElem)
@@ -6819,7 +6827,7 @@ end
 
 Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
-function map_entries!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
+function map_entries!(f::S, dst::MatElem{T}, src::MatElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
    for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
@@ -6835,11 +6843,12 @@ This is equivalent to `map_entries!(f, dst, src)`.
 Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc raw"""
-    map_entries(f, a::MatrixElem{T}) where T <: NCRingElement
+    map_entries(f, a::MatElem{T}) where T <: NCRingElement
+    map_entries(f, a::MatRingElem{T}) where T <: NCRingElement
 
-Transform matrix `a` by applying `f` on each element.
+Transform matrix `a` by applying `f` to each element.
 """
-function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
+function map_entries(f::S, a::MatElem{T}) where {S, T <: NCRingElement}
    isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
    b11 = f(a[1, 1])
    b = _change_base_ring(parent(b11), a)
@@ -6854,7 +6863,7 @@ end
 @doc raw"""
     map(f, a::MatrixElem{T}) where T <: NCRingElement
 
-Transform matrix `a` by applying `f` on each element.
+Transform matrix `a` by applying `f` to each element.
 This is equivalent to `map_entries(f, a)`.
 """
 Base.map(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, a)
