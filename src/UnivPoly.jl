@@ -113,12 +113,15 @@ x*y - z
 """
 function universal_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bool=true, internal_ordering::Symbol=:lex)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   P = poly_ring(R, varnames; internal_ordering)
-   T = elem_type(P)
-
-   S = Generic.UniversalRing{T}(P; cached)
-   return (S, gens(S))
+   S = get_cached!(UniversalPolyRingID, (R, internal_ordering), cached) do
+      P = poly_ring(R, varnames; internal_ordering)
+      T = elem_type(P)
+      Generic.UniversalRing{T}(P)
+   end
+   return (S, gens(S, varnames))
 end
+
+const UniversalPolyRingID = CacheDictType{Tuple{Ring, Symbol}, Ring}()
 
 function universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering::Symbol=:lex)
    return universal_polynomial_ring(R, Symbol[]; internal_ordering, cached)[1]
