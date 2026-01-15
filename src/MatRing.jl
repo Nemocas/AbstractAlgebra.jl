@@ -263,16 +263,6 @@ function ==(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
   return matrix(x) == y
 end
 
-function ==(x::MatElem{S}, y::MatRingElem{T}) where {S <: NCRingElement, T <: NCRingElement}
-#  error("Equality comparison of MatElem with MatRingElem unsupported")
-  return x == matrix(y)
-end
-
-function ==(x::MatRingElem{S}, y::MatElem{T}) where {S <: NCRingElement, T <: NCRingElement}
-#  error("Equality comparison of MatElem with MatRingElem unsupported")
-  return matrix(x) == y
-end
-
 ###############################################################################
 #
 #   Exact division
