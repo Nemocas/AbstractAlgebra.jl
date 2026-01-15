@@ -25,9 +25,10 @@
          y, z = gens(S, ["y", "z"])
          @test y == S[2]
 
-         @test elem_type(S) == Generic.UnivPoly{elem_type(R)}
-         @test elem_type(Generic.UniversalPolyRing{elem_type(R)}) == Generic.UnivPoly{elem_type(R)}
-         @test parent_type(Generic.UnivPoly{elem_type(R)}) == Generic.UniversalPolyRing{elem_type(R)}
+         @test elem_type(S) == Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}
+
+         @test elem_type(Generic.UniversalRing{Generic.MPoly{elem_type(R)}}) == Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}
+         @test parent_type(Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}) == Generic.UniversalRing{Generic.MPoly{elem_type(R)}}
 
          @test elem_type(S) == universal_poly_type(elem_type(R))
          @test typeof(S) == universal_poly_ring_type(elem_type(R))
@@ -37,6 +38,7 @@
          @test coefficient_ring_type(S) === typeof(R)
 
          @test S isa Generic.UniversalPolyRing
+         @test S isa Generic.UniversalRing{Generic.MPoly{elem_type(R)}}
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)
