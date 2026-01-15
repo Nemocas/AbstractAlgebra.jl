@@ -23,7 +23,7 @@ function mix_ideal(I::Generic.Ideal{T}) where T <: RingElement
          end
       end
    end
-   return Generic.Ideal(R, G)   
+   return Generic.Ideal(R, G)
 end
 
 function spoly(f::T, g::T) where T <: MPolyRingElem
@@ -624,7 +624,7 @@ end
 
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
-      
+
       K = intersect(I, J)
 
       @test is_subset(K, I)
@@ -658,7 +658,7 @@ end
       m = rand(0:10)
       V = elem_type(R)[rand(R, 0:5) for i in 1:n]
       W = elem_type(R)[rand(R, 0:5) for i in 1:m]
-      
+
       I = Generic.Ideal(R, V)
       J = Generic.Ideal(R, W)
 
@@ -674,13 +674,62 @@ end
       m = rand(0:10)
       V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
       W = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:m]
-      
+
       I = Generic.Ideal(ZZ, V)
       J = Generic.Ideal(ZZ, W)
-      
+
       K = intersect(I, J)
 
       @test is_subset(K, I)
       @test is_subset(K, J)
+   end
+end
+
+@testset "Generic.Ideal.power" begin
+   # QQ[x]
+   R, x = polynomial_ring(QQ, "x")
+
+   for i = 1:30
+      n = rand(0:5)
+      V = elem_type(R)[rand(R, 0:5, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, one(R))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
+   end
+
+   # Fp[x]
+   Fp = GF(31)
+   R, x = polynomial_ring(Fp, "x")
+
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(R)[rand(R, 0:5) for i in 1:n]
+
+      I = Generic.Ideal(R, V)
+      J = Generic.Ideal(R, one(R))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
+   end
+
+   # integer
+   for i = 1:30
+      n = rand(0:10)
+      V = elem_type(ZZ)[rand(ZZ, -10:10) for i in 1:n]
+
+      I = Generic.Ideal(ZZ, V)
+      J = Generic.Ideal(ZZ, one(ZZ))
+
+      for k in 0:5
+        @test I^k == J
+        J *= I
+      end
    end
 end

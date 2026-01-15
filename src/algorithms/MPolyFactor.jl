@@ -856,7 +856,7 @@ end
          (false, junk, junk) if the ufacs don't lift straight to bivariate ones
 
   TODO: allow this function to do a bit of zassenhaus and add a parameter to
-        limit the size of the subsets. 
+        limit the size of the subsets.
 =#
 function hlift_bivar_combine(
   a::E,

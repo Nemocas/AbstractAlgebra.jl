@@ -123,6 +123,25 @@ function Base.:*(I::T, J::T) where {T <: Ideal{<:RingElement}}
   return ideal(base_ring(I), [x*y for x in gens(I) for y in gens(J)])
 end
 
+function Base.:^(I::Ideal, k::Integer)
+  k >= 0 || error("exponent must be non-negative")
+  k == 1 && return I
+
+  # exponentiate by square-and-multiply
+  R = base_ring(I)
+  J = ideal(R, one(R))
+  while k > 0
+    while iseven(k)
+      I *= I
+      k >>= 1
+    end
+    J *= I
+    k -= 1
+  end
+
+  return J
+end
+
 ###############################################################################
 #
 #   Ad hoc binary operations

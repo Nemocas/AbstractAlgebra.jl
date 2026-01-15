@@ -3005,7 +3005,7 @@ end
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
 
    let
-      Q = matrix_ring(QQ, 2) 
+      Q = matrix_ring(QQ, 2)
       Qz, z = Q[:z]
       Qx, x = QQ[:x]
       f = map_coefficients(c -> c * (2*one(Q)), x; parent = Qz)
@@ -3054,7 +3054,7 @@ end
       d = min(num, degree(f))
       @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
-end 
+end
 
 @testset "Generic.Poly.zero_rings" begin
   R, = residue_ring(ZZ, 1)

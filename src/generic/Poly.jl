@@ -43,7 +43,7 @@ end
 function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: RingElement
    c = setcoeff!(c, n, a)
    c = set_length!(c, normalise(c, length(c)))
-   return c  
+   return c
 end
 
 function set_coefficient!(c::Poly{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}

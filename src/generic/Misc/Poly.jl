@@ -59,7 +59,8 @@ function roots(f::PolyRingElem)
     rts = Vector{elem_type(base_ring(f))}()
     for (p, e) in lf
         if degree(p) == 1
-            push!(rts, -divexact(constant_coefficient(p), leading_coefficient(p)))
+            fl, q = divides(constant_coefficient(p), leading_coefficient(p))
+            fl && push!(rts, -q)
         end
     end
     return rts
@@ -90,10 +91,10 @@ function sturm_sequence(f::PolyRingElem{<:FieldElem})
         if r != 0
             push!(seq, -r)
             g, h = h, -r
-        else 
+        else
             break
         end
     end
     return seq
 end
- 
+

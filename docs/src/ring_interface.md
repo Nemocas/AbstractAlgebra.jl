@@ -315,9 +315,11 @@ In AbstractAlgebra.jl, the denominator would be made positive by dividing both t
 numerator and denominator by the canonical unit of the denominator. For a negative
 denominator, this would be $-1$.
 
-For elements of a field, `canonical_unit` simply returns the element itself. In general,
-`canonical_unit` of an invertible element should be that element. Finally, if $a = ub$
-we should have the identity `canonical_unit(a) = canonical_unit(u)*canonical_unit(b)`.
+For non-zero elements of a field, `canonical_unit` simply returns the element itself.
+In general, `canonical_unit` of an invertible element should be that element.
+Finally, if $a = bc$, then `canonical_unit(a)*a = canonical_unit(b)*canonical_unit(c)*a`
+holds. Thus if $a$ is not a zero-divisor, then we even have
+`canonical_unit(a) = canonical_unit(b)*canonical_unit(c)`.
 
 For some rings, it is completely impractical to implement this function, in which case
 it may return $1$ in the given ring. The function must however always exist, and always
@@ -799,7 +801,7 @@ import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
 end
 
 const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
-   
+
 mutable struct ConstPoly{T <: RingElement} <: RingElem
    c::T
    parent::ConstPolyRing{T}
