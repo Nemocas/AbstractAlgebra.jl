@@ -638,7 +638,7 @@ function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, d
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem(deflate(pp, shift, defl), S)
+   return UniversalRingElem(deflate(data(p), shift, defl), S)
 end
 
 function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
@@ -655,7 +655,7 @@ function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, d
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem(inflate(pp, shift, defl), S)
+   return UniversalRingElem(inflate(data(p), shift, defl), S)
 end
 
 function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
