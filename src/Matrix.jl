@@ -1524,11 +1524,11 @@ end
 
 Return the transpose of `x`, possibly modifying the object `z` in the process.
 Aliasing between `z` and `x` is permitted.  The caller must ensure that
-`ncols(z) >= nrows(x)` and `nrows(z) >= ncols(x)`.
+`ncols(z) == nrows(x)` and `nrows(z) == ncols(x)`.
 
 The unary version gives error if `x` is not a square matrix.
 The binary version does not check dimensions -- the caller must ensure this!
-If the dimensions are not compatible then the behaviour is undefined!
+If the dimensions of `z` are wrong then the behaviour is undefined!
 """
 function transpose!(x::MatElem)
   @req is_square(x) "Matrix must be a square matrix"
