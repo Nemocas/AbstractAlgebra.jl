@@ -283,28 +283,29 @@ end
 @doc raw"""
     is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `true` if $M_{i,j}$ is zero.
+Return `is_zero(M[i,j])$, but often more efficiently.
 """
 @inline is_zero_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(M[i,j])
 
 @doc raw"""
     is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `is_positive(M[i,j])`, but with a possibly more efficient implementation.
+Return `is_positive(M[i,j])`, but often more efficiently.
 """
 @inline is_positive_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_positive(M[i,j])
 
 @doc raw"""
     is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int)
 
-Return `is_negative(M[i,j])`, but with a possibly more efficient implementation.
+Return `is_negative(M[i,j])`, but often more efficiently.
 """
 @inline is_negative_entry(M::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_negative(M[i,j])
 
 @doc raw"""
     is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
-Return `true` if the $i$-th row of the matrix $M$ is zero.
+Return `true` if the $i$-th row of the matrix $M$ is zero,
+but often more efficiently than checking all entries individually.
 """
 function is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
   @boundscheck 1 <= i <= nrows(M) || Base.throw_boundserror(M, (i, 1:ncols(M)))
@@ -319,7 +320,8 @@ end
 @doc raw"""
     is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
 
-Return `true` if the $j$-th column of the matrix $M$ is zero.
+Return `true` if the $j$-th column of the matrix $M$ is zero,
+but often more efficiently than checking all entries individually.
 """
 function is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
   @boundscheck 1 <= j <= ncols(M) || Base.throw_boundserror(M, (1:nrows(M), j))
