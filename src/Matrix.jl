@@ -903,7 +903,7 @@ function zero!(x::MatrixElem{T}) where T <: NCRingElement
    return x
 end
 
-function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+function add!(c::T, a::T, b::T) where T <: MatElem
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -914,7 +914,7 @@ function add!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: N
    return c
 end
 
-function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElement
+function mul!(c::T, a::T, b::T) where T <: MatElem
    @assert base_ring(a) === base_ring(b) && base_ring(a) === base_ring(c)
    ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
@@ -938,7 +938,7 @@ function mul!(c::MatElem{T}, a::MatElem{T}, b::MatElem{T}) where T <: NCRingElem
    return c
 end
 
-function sub!(c::MatrixElem{T}, a::MatrixElem{T}, b::MatrixElem{T}) where T <: NCRingElement
+function sub!(c::T, a::T, b::T) where T <: MatElem
    check_parent(a, b)
    check_parent(a, c)
    for i = 1:nrows(c)
@@ -1152,7 +1152,7 @@ function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end
 
-function mul!(c::MatrixElem{T}, a::MatrixElem{T}, b::T) where T <: NCRingElement
+function mul!(c::MatElem{T}, a::MatElem{T}, b::T) where T <: NCRingElement
    @assert base_ring(a) === parent(b) && base_ring(a) === base_ring(c)
    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
    ncols(c) != ncols(a) && error("Incompatible matrix dimensions")
@@ -1269,11 +1269,11 @@ divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
 @doc raw"""
-    ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+    ^(a::MatElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatrixElem{T}, b::Int) where T <: NCRingElement
+function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    !is_square(a) && error("Incompatible matrix dimensions in power")
    if b < 0
       return inv(a)^(-b)

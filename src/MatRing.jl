@@ -241,11 +241,13 @@ end
 #
 ###############################################################################
 
-*(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) * matrix(y))
+*(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) * matrix(y))
 
-+(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) + matrix(y))
++(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) + matrix(y))
 
--(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) - matrix(y))
+-(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) - matrix(y))
+
+^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
 
 ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
 
