@@ -123,6 +123,14 @@ one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
 
 isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
 
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+canonical_unit(a::MatRingElem{T}) where T <: NCRingElement = canonical_unit(matrix(a))
+
 ################################################################################
 #
 #  Copy and deepcopy

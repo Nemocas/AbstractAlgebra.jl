@@ -451,7 +451,12 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::MatrixElem{T}) where T <: NCRingElement = canonical_unit(a[1, 1])
+function canonical_unit(a::MatElem)
+  for a_ij in a
+    !is_zero(a_ij) && return canonical_unit(a_ij)
+  end
+  return one(coefficient_ring(a))
+end
 
 ###############################################################################
 #
