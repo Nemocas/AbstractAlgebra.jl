@@ -1522,7 +1522,7 @@ end
     transpose!(z::T, x::T) where T <: MatElem
     transpose!(z::T, x::T) where T <: MatRingElem
 
-Return the transpose of `x`, possibly modifying the object `z` in the process.
+Return the transpose of `x`; the unary version may modify `x`, the binary version may modify `z`.
 **The binary version does not check dimensions -- the caller must ensure that**
 `ncols(z) == nrows(x)` and `nrows(z) == ncols(x)`.
 
