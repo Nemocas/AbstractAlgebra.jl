@@ -330,6 +330,9 @@ is_upper_triangular(M::MatRingElem) = is_upper_triangular(matrix(M))
 is_lower_triangular(M::MatRingElem) = is_lower_triangular(matrix(M))
 is_diagonal(M::MatRingElem) = is_diagonal(matrix(M))
 
+function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
+end
 
 ###############################################################################
 #

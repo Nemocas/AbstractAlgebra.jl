@@ -1557,7 +1557,7 @@ end
 #
 ###############################################################################
 
-function kronecker_product(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement}
     base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
     z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
     for ix in 1:nrows(x)
