@@ -696,9 +696,11 @@ function evaluation_points(K::RationalFunctionField, n::Int)
    if is_empty(v)
       v = elem_type(K)[]
       base_v = evaluation_points(F, Int(order(F)))
-      d = clog(order(F), ZZ(n))
+      #d = clog(order(F), ZZ(n))
+      d = Int(ceil(Base.log(BigInt(order(F)), n)))
+      @assert order(F)^d >= n
       genKpowers = powers(gen(K), d - 1)
-      for coeffs in ProductIterator(base_v, d; inplace=true)
+      for coeffs in AbstractAlgebra.ProductIterator(base_v, d; inplace=true)
          push!(v, sum(coeffs[j] * genKpowers[j] for j in 1:d))
          if length(v) == n
             break
