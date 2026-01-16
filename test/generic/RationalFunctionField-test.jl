@@ -593,7 +593,7 @@ end
    @test AbstractAlgebra.promote_rule(T, T) == T
 end
 
-@testset "Generic.RationalFunctionField.evaluation_set" begin
+@testset "Generic.RationalFunctionField.evaluation_points" begin
   let
     K, x = rational_function_field(QQ, "x")
     S = AbstractAlgebra.evaluation_points(K, 10)
