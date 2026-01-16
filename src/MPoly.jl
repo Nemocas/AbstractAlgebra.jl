@@ -146,6 +146,9 @@ end
 characteristic(R::MPolyRing) = characteristic(base_ring(R))
 
 is_finite(R::MPolyRing) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+is_known(::typeof(is_finite), R::MPolyRing) =
+  is_known(is_trivial, base_ring(R)) &&
+    (is_trivial(base_ring(R)) || nvars(R) > 0 || is_known(is_finite, base_ring(R)))
 
 
 ###############################################################################
