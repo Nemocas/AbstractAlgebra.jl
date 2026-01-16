@@ -1482,7 +1482,7 @@ julia> is_symmetric(N)
 false
 ```
 """
-function is_symmetric(M::MatrixElem)
+function is_symmetric(M::MatElem)
    n = nrows(M)
    n == ncols(M) || return false
    for i in 2:n, j in 1:i-1
