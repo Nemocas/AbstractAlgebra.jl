@@ -72,7 +72,7 @@ is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 
 ###############################################################################
 #
-#   Similar and zero
+#   Similar, zero and iszero, one and isone
 #
 ###############################################################################
 
@@ -116,6 +116,12 @@ zero(x::MatRingElem, n::Int) = zero!(similar(x, n))
 # TODO: deprecate these
 zero(x::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(x, R, r, c))
 zero(x::MatRingElem, r::Int, c::Int) = zero!(similar(x, r, c))
+
+iszero(a::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(a))
+
+one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
+
+isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
 
 ################################################################################
 #

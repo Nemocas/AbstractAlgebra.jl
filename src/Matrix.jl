@@ -246,12 +246,12 @@ one(a::MatSpace) = check_square(a)(1)
 @doc raw"""
     one(a::MatrixElem{T}) where T <: NCRingElement
 
-Return the identity matrix in the same matrix space as $a$. If the space does
-not contain square matrices, an error is thrown.
+Return the identity matrix in the same matrix space as $a$.
+If the matrix space does not comprise square matrices, an error is thrown.
 """
-one(a::MatrixElem{T}) where T <: NCRingElement = identity_matrix(a)
+one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a)
 
-function iszero(a::MatrixElem{T}) where T <: NCRingElement
+function iszero(a::MatElem{T}) where T <: NCRingElement
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !is_zero_entry(a, i, j)
@@ -262,7 +262,7 @@ function iszero(a::MatrixElem{T}) where T <: NCRingElement
   return true
 end
 
-function isone(a::MatrixElem{T}) where T <: NCRingElement
+function isone(a::MatElem{T}) where T <: NCRingElement
    is_square(a) || return false
    for i = 1:nrows(a)
       for j = 1:ncols(a)
