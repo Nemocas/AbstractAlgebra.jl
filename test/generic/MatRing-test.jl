@@ -1640,7 +1640,7 @@ end
    @test all(x -> parent(x) == M, v)
 end
 
-@testset "Generic.MatAlg.equality" begin
+@testset "Generic.MatRing.equality" begin
    # Test equality comparison between MatRingElem & MatElem
    R = matrix_ring(ZZ, 2)
    M = R(matrix(ZZ, 2,2, [1,2,3,4]))
