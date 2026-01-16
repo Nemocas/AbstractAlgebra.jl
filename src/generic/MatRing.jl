@@ -126,8 +126,32 @@ end
 #
 ###############################################################################
 
-function add!(A::MatRingElem{T}, B::MatRingElem{T}) where T <: NCRingElement
+function add!(A::T, B::T) where T <: MatRingElem
    return MatRingElem(add!(matrix(A), matrix(B)))
+end
+
+function add!(c::T, a::T, b::T) where T <: MatRingElem
+  return MatRingElem(add!(matrix(c), matrix(a), matrix(b)))
+end
+
+function sub!(A::T, B::T) where T <: MatRingElem
+   return MatRingElem(sub!(matrix(A), matrix(B)))
+end
+
+function sub!(c::T, a::T, b::T) where T <: MatRingElem
+  return MatRingElem(sub!(matrix(c), matrix(a), matrix(b)))
+end
+
+function mul!(A::T, B::T) where T <: MatRingElem
+   return MatRingElem(mul!(matrix(A), matrix(B)))
+end
+
+function mul!(c::T, a::T, b::T) where T <: MatRingElem
+  return MatRingElem(mul!(matrix(c), matrix(a), matrix(b)))
+end
+
+function mul!(c::MatRingElem{T}, a::MatRingElem{T}, b::T) where T <: NCRingElement
+  return MatRingElem(mul!(matrix(c), matrix(a), b))
 end
 
 ###############################################################################
@@ -141,6 +165,19 @@ promote_rule(::Type{S}, ::Type{S}) where {T <: NCRingElement, S <: MatRingElem{T
 function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: MatRingElem{T}, U <: NCRingElement}
    promote_rule(T, U) == T ? MatRingElem{T} : Union{}
 end
+
+function Base.promote(x::MatRingElem{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+  return MatRingElem.(Base.promote(matrix(x), matrix(y)))
+end
+
+# matrix * vec and vec * matrix
+# function Base.promote(x::MatRingElem{S},
+#                       y::Vector{T}) where {S <: NCRingElement,
+#                                            T <: NCRingElement}
+# ???
+# end
 
 ###############################################################################
 #

@@ -215,6 +215,16 @@ end
   @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
 end
 
+@testset "Unsafe functions" begin
+  M = matrix(ZZ, 2,2, [1,2,3,4])
+  M = add!(M, M, M)
+  @test M == matrix(ZZ, 2,2, [2, 4, 6, 8])
+  M = mul!(M, M, M)
+  @test M == matrix(ZZ, 2,2, [28, 40, 60, 88])
+  M = sub!(M, M, M)
+  @test is_zero(M)
+end
+          
 @testset "Rank Interpolation" begin
   Fx, x = polynomial_ring(GF(257), :x)
   Qy, y = polynomial_ring(QQ, 3, :y)
