@@ -25,15 +25,17 @@
          y, z = gens(S, ["y", "z"])
          @test y == S[2]
 
-         @test elem_type(S) == Generic.UnivPoly{elem_type(R)}
-         @test elem_type(Generic.UniversalPolyRing{elem_type(R)}) == Generic.UnivPoly{elem_type(R)}
-         @test parent_type(Generic.UnivPoly{elem_type(R)}) == Generic.UniversalPolyRing{elem_type(R)}
+         @test elem_type(S) == Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}
+
+         @test elem_type(Generic.UniversalRing{Generic.MPoly{elem_type(R)}}) == Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}
+         @test parent_type(Generic.UniversalRingElem{Generic.MPoly{elem_type(R)}}) == Generic.UniversalRing{Generic.MPoly{elem_type(R)}}
 
          @test coefficient_ring(S) === R
          @test coefficient_ring(S) === R
          @test coefficient_ring_type(S) === typeof(R)
 
          @test S isa Generic.UniversalPolyRing
+         @test S isa Generic.UniversalRing{Generic.MPoly{elem_type(R)}}
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)
@@ -75,7 +77,7 @@
 
          @test f1 == f3
 
-         S2, x = universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord)
+         S2, x = universal_polynomial_ring(R, :x => 1:3; internal_ordering=ord, cached = false)
 
          @test length(x) == 3
          @test isa(x[1], UniversalPolyRingElem)
@@ -154,13 +156,13 @@ end
 
 
 @testset "Generic.UnivPoly.conformance" begin
-   S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1])
+   S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1]; cached = false)
    gen(S, "x")
    ConformanceTests.test_Ring_interface(S)
 end
 
 @testset "Generic.UnivPoly.printing" begin
-   R = universal_polynomial_ring(QQ)
+   R = universal_polynomial_ring(QQ; cached = false)
    x = gen(R, "x")
    @test sprint(show, x+1) == "x + 1"
    @test sprint(show, -1 + x^2 - 2x + 1) == "x^2 - 2*x"
