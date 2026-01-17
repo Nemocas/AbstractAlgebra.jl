@@ -196,6 +196,16 @@ include("ConcreteTypes.jl")
 #
 ###############################################################################
 
+# prevent the default Julia methods for iszero and isone from being invoked on
+# one of our parent objects: the default implementations are
+#   iszero(x) = x == zero(x)    and    isone(x) = x == one(x)
+# which for a parent object will always return false, which usually is not
+# what the user hoped for. So let's rather throw an error and leave it to
+# subtypes to implement better methods (e.g. `iszero(::Ring)` or potentially
+# isone(::Group) come to mind).
+iszero(S::Set) = throw(NotImplementedError(:iszero, S))
+isone(S::Set) = throw(NotImplementedError(:isone, S))
+
 include("fundamental_interface.jl")
 include("misc/VarNames.jl")
 include("Infinity.jl")
