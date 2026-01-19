@@ -1,6 +1,7 @@
 using Revise
 using JET
 
+# can be dropped once https://github.com/aviatesk/JET.jl/pull/798 is available
 struct AnyFrameMethod <: ReportMatcher
     m::Union{Function,Method,Symbol}
 end
@@ -18,4 +19,6 @@ function JET.match_report(matcher::AnyFrameMethod, @nospecialize(report::JET.Inf
 end
 
 using AbstractAlgebra
-report_package(AbstractAlgebra; ignored_modules=[AnyFrameMethod(:show_spec_linfo)])
+report_package(AbstractAlgebra; ignored_modules=[
+    AnyFrameMethod(:show_spec_linfo), # fixed in https://github.com/JuliaLang/julia/pull/60645
+])
