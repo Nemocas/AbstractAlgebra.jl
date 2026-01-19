@@ -247,17 +247,17 @@ end
 
 # HACK: we abuse the @varnames_interface macro to teach gens for UniversalRing
 # some superpowers
-function _univ_poly_gens(S::UniversalRing{T}, vars::Vector{Symbol}) where T
+function _univ_gens(S::UniversalRing{T}, vars::Vector{Symbol}) where T
    idx = _ensure_variables(S, vars)
    # TRICK: @varnames_interface expects two return values, but we only care
    # for the second; so just return literally nothing for the first
    return nothing, [UniversalRingElem{T}(gen(base_ring(S), i), S) for i in idx]
 end
 
-AbstractAlgebra.@varnames_interface _univ_poly_gens(R::UniversalRing{T}, s) where T
+AbstractAlgebra.@varnames_interface _univ_gens(R::UniversalRing{T}, s) where T
 
 function gens(S::UniversalRing{T}, a::AbstractAlgebra.VarNames, as::AbstractAlgebra.VarNames...) where T
-   res = _univ_poly_gens(S, a, as...)
+   res = _univ_gens(S, a, as...)
    length(res) == 2 && return res[2] # special case for improved backwards compatibility
    return res[2:end]
 end
