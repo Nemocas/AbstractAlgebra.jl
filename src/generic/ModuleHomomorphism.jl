@@ -92,6 +92,20 @@ end
 
 ###############################################################################
 #
+#   Preimage
+#
+###############################################################################
+
+function AbstractAlgebra.solve_ctx(f::ModuleHomomorphism)
+  # cache solver context
+  if !isdefined(f, :solve_ctx)
+    f.solve_ctx = AbstractAlgebra.compute_solve_ctx(f)
+  end
+  return f.solve_ctx::AbstractAlgebra.Solve.solve_context_type(base_ring(codomain(f)))
+end
+
+###############################################################################
+#
 #   Inverse
 #
 ###############################################################################
