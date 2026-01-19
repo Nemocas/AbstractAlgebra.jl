@@ -57,7 +57,7 @@ gens(S::UniversalPolyRing, vars::Vector{VarName})
 
 ```jldoctest
 julia> S = universal_polynomial_ring(ZZ)
-Universal Polynomial Ring over Integers
+Universal polynomial ring over Integers
 
 julia> x = gen(S, :x)
 x
