@@ -55,18 +55,18 @@ end
 #
 ###############################################################################
 
-function _wrap_factorization(f::Fac{<:MPolyRingElem}, S::UniversalRing{<:MPolyRingElem})
-   res = Fac{elem_type(S)}()
-   res.unit = Generic.UnivPoly(f.unit, S)
+function _wrap_factorization(f::Fac{T}, S::UniversalRing{T}) where T
+   res = Fac{Generic.UniversalRingElem{T}}()
+   res.unit = Generic.UniversalRingElem{T}(f.unit, S)
    for (fact, expo) in f
-      mulpow!(res, Generic.UnivPoly(fact, S), expo)
+      mulpow!(res, Generic.UniversalRingElem{T}(fact, S), expo)
    end
    return res
 end
 
-factor_squarefree(f::UniversalRingElem{<:MPolyRingElem}) = _wrap_factorization(factor_squarefree(data(f)), parent(f))
+factor_squarefree(f::UniversalRingElem) = _wrap_factorization(factor_squarefree(data(f)), parent(f))
 
-factor(f::UniversalRingElem{<:MPolyRingElem}) = _wrap_factorization(factor(data(f)), parent(f))
+factor(f::UniversalRingElem) = _wrap_factorization(factor(data(f)), parent(f))
 
 ###############################################################################
 #
