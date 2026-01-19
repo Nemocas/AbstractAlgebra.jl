@@ -358,7 +358,7 @@ end
 #
 ###############################################################################
 
-function univ_promote(x::UniversalRingElem{T}, y::UniversalRingElem{T}) where {T <: RingElement}
+function univ_promote(x::T, y::T) where {T <: UniversalRingElem}
    check_parent(x, y)
    nx = nvars(parent(data(x)))
    ny = nvars(parent(data(y)))
@@ -369,19 +369,19 @@ function univ_promote(x::UniversalRingElem{T}, y::UniversalRingElem{T}) where {T
    return S(x), S(y)
 end
 
-function +(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function +(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(data(a) + data(b), parent(a))
+   return T(data(a) + data(b), parent(a))
 end
 
-function -(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function -(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(data(a) - data(b), parent(a))
+   return T(data(a) - data(b), parent(a))
 end
 
-function *(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function *(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(data(a)*data(b), parent(a))
+   return T(data(a)*data(b), parent(a))
 end
 
 ###############################################################################
