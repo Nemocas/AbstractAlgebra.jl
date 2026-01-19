@@ -88,24 +88,19 @@ jobs:
           version: '1.10'
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
-      - name: Install LaTeX
+      - name: Install LaTeX + fonts
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            latexmk \
-            texlive-luatex \
-            texlive-fonts-recommended \
-            texlive-latex-extra
-            texlive-fonts-recommended \
-            texlive-pictures \
-            texlive-science
-      - name: Install fonts for LuaLaTeX
-        run: |
-         sudo apt-get update
-         sudo apt-get install -y --no-install-recommends \
-          fontconfig \
-          fonts-dejavu-core \
-          fonts-dejavu-extra
+              sudo apt-get update
+              sudo apt-get install -y --no-install-recommends \
+               latexmk \
+               texlive-luatex \
+               texlive-latex-extra \
+               texlive-fonts-recommended \
+               texlive-pictures \
+               texlive-science \
+               fontconfig \
+               fonts-dejavu-core \
+               fonts-dejavu-extra
       - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
