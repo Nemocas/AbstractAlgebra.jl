@@ -325,9 +325,9 @@ end
 #
 ###############################################################################
 
-universal_ring_name(R::UniversalRing) = "Ring"
+universal_ring_name(R::UniversalRing) = "ring"
 
-universal_ring_name(R::UniversalRing{<:MPolyRingElem}) = "Polynomial Ring"
+universal_ring_name(R::UniversalRing{<:MPolyRingElem}) = "Polynomial ring"
 
 function show(io::IO, R::UniversalRing)
    @show_name(io, R)
