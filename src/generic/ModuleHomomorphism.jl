@@ -13,14 +13,14 @@
 domain(f::ModuleHomomorphism) = f.domain
 codomain(f::ModuleHomomorphism) = f.codomain
 image_fn(f::ModuleHomomorphism) = f.image_fn
+matrix(f::ModuleHomomorphism) = f.matrix
 
 domain(f::ModuleIsomorphism) = f.domain
 codomain(f::ModuleIsomorphism) = f.codomain
 image_fn(f::ModuleIsomorphism) = f.image_fn
-
-inverse_mat(f::Map(ModuleIsomorphism)) = f.inverse_matrix
-
-inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
+inverse_image_fn(f::ModuleIsomorphism) = f.inverse_image_fn
+matrix(f::ModuleIsomorphism) = f.matrix
+inverse_mat(f::ModuleIsomorphism) = f.inverse_matrix
 
 ###############################################################################
 #

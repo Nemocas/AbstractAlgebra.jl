@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-matrix(f::Map(FPModuleHomomorphism)) = f.matrix
+matrix(f::Map(FPModuleHomomorphism)) = throw(NotImplementedError(:matrix, f))
 
 ###############################################################################
 #
@@ -37,7 +37,7 @@ end
 
 function compose(f::Map(FPModuleHomomorphism), g::Map(FPModuleHomomorphism))
    check_composable(f, g)
-   return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix)
+   return ModuleHomomorphism(domain(f), codomain(g), matrix(f)*matrix(g))
 end
 
 ###############################################################################
