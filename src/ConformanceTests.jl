@@ -74,6 +74,6 @@ function test_Ring_interface_recursive end
 function test_Field_interface_recursive end
 
 # deprecated during 0.48.*
-@deprecate test_MatAlgebra_interface(S::MatRing; reps = 20) test_MatRing_interface(S; reps)
+@deprecate test_MatAlgebra_interface test_MatRing_interface
 
 end # module
