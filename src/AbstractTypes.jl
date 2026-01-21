@@ -77,8 +77,6 @@ abstract type NCPolyRing{T} <: NCRing end
 
 abstract type MPolyRing{T} <: Ring end
 
-abstract type UniversalRing{T} <: Ring end
-
 abstract type LaurentPolyRing{T} <: Ring end
 
 abstract type LaurentMPolyRing{T} <: Ring end
@@ -115,8 +113,6 @@ abstract type PolyRingElem{T} <: RingElem end
 abstract type NCPolyRingElem{T} <: NCRingElem end
 
 abstract type MPolyRingElem{T} <: RingElem end
-
-abstract type UniversalRingElem{T} <: RingElem end
 
 abstract type LaurentPolyRingElem{T} <: RingElem end
 
@@ -157,16 +153,6 @@ abstract type FinField <: Field end    # for FqPolyRepFieldElem, fqPolyRepFieldE
 # collections of types as needed by applications
 
 abstract type FinFieldElem <: FieldElem end # for FqPolyRepFieldElem, fqPolyRepFieldElem, etc
-
-################################################################################
-#
-#   Aliases
-#
-################################################################################
-
-const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem{T}}
-
-const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem{T}}
 
 ################################################################################
 #

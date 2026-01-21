@@ -462,52 +462,6 @@ end
 
 ###############################################################################
 #
-#   UniversalRing / UniversalRingElem
-#
-###############################################################################
-
-@attributes mutable struct UniversalRing{T <: RingElement} <: AbstractAlgebra.UniversalRing{T}
-   base_ring::Ring
-
-   function UniversalRing{T}(R::Ring) where {T<:RingElement}
-      @assert elem_type(R) == T
-      return new{T}(R)
-   end
-end
-
-mutable struct UniversalRingElem{T <: RingElement} <: AbstractAlgebra.UniversalRingElem{T}
-   p::T
-   parent::UniversalRing{T}
-end
-
-###############################################################################
-#
-#   UniversalPolyRing / UnivPoly
-#
-###############################################################################
-
-const UniversalPolyRing{T} = UniversalRing{<:AbstractAlgebra.MPolyRingElem{T}}
-
-const UnivPoly{T} = UniversalRingElem{<:AbstractAlgebra.MPolyRingElem{T}}
-
-struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyExponentVectors{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyTerms{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyMonomials{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-###############################################################################
-#
 #   SparsePolyRing / SparsePoly
 #
 ###############################################################################
