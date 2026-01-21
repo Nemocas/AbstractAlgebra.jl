@@ -49,7 +49,7 @@
 
    # Test constructors over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
 
    @test isa(S, MatRing)
@@ -173,7 +173,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
 
    M = rand(S, -10:10)
@@ -188,7 +188,7 @@ end
    @test iszero(zero(M, 3, 3))
    @test iszero(zero(M, QQ, 3, 3))
    @test iszero(zero(M, QQ))
-   
+
    M = zero!(M)
    @test iszero(M)
 
@@ -207,7 +207,7 @@ end
    S = matrix_ring(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-   
+
    @test size(A) == (3, 3)
    @test size(A, 1) == 3
    @test size(A, 2) == 3
@@ -222,7 +222,7 @@ end
 
    # test over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
 
    M = rand(S, -10:10)
@@ -246,7 +246,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
 
    M = rand(S, -10:10)
@@ -269,7 +269,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
 
    M = rand(S, -10:10)
@@ -302,12 +302,12 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
-   
+
    M = rand(S, -10:10)
    N = rand(S, -10:10)
-   
+
    t1 = rand(ZZ, -10:10)
    t2 = rand(R, -10:10)
 
@@ -345,7 +345,7 @@ end
    @test typeof(B * A) == typeof(A)
    @test A * B == A^2
    @test B * A == A^2
-   
+
    @test typeof(A + B) == typeof(A)
    @test typeof(B + A) == typeof(A)
    @test A + B == A + A
@@ -408,12 +408,12 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
-   
+
    M = rand(S, -10:10)
    N = deepcopy(M)
-   
+
    @test M == M
    @test M == N
    @test M == copy(M)
@@ -441,9 +441,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
-   
+
    @test S(5) == 5
    @test 5 == S(5)
    @test S(BigInt(5)) == 5
@@ -467,9 +467,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
-   
+
    M = rand(S, -10:10)
 
    @test M^0 == one(S)
@@ -540,9 +540,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_ring(R, 2)
-   
+
    M = rand(S, -10:10)
 
    @test is_symmetric(M + transpose(M))
@@ -1600,7 +1600,7 @@ end
    R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
    S = matrix_ring(R, 2)
-   
+
    M = rand(S, -10:10)
 
    N = change_base_ring(U, M)

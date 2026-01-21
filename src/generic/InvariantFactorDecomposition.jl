@@ -46,7 +46,7 @@ function rels(N::SNFModule{T}) where T <: RingElement
    end
    n = length(invs)
    r = T1[matrix(R, 1, n, T[i == j ? invs[i] : zero(R) for j in 1:n]) for i in 1:num]
-   return r 
+   return r
 end
 
 ###############################################################################
@@ -195,7 +195,7 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
         T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
    M = SNFModule{T}(m, gens, invariant_factors)
    f = ModuleIsomorphism{T}(M, m, mat, mat_inv)
-   M.map = f 
+   M.map = f
    return M, f
 end
 

@@ -251,7 +251,7 @@ function lu!(P::Perm{Int}, A::MatElem; cutoff::Int = 300)
   A0 = view(A, 1:m, 1:n1)
   r1 = lu!(P1, A0; cutoff)
   @assert r1 == n1
-  if r1 > 0 
+  if r1 > 0
     apply!(A, P1)
     apply!(P, P1)
   end
@@ -312,8 +312,8 @@ function _solve_triu(T::MatElem, b::MatElem; cutoff::Int = cutoff, side::Symbol 
 
     [A B] [SS; S] = A SS + B S = U => A SS = U - BS
     [A B] [RR; R] = A RR + B R = U => A RR = X - BR
-    
- =#   
+
+ =#
 
   U = view(b, 1:n2, 1:m2)
   X = view(b, 1:n2, m2+1:m)
@@ -345,7 +345,7 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, unipoten
     R = AbstractAlgebra._solve_triu_left(T, b; unipotent)
     return R
   end
-  
+
   @assert ncols(b) == nrows(T) == n
 
   n2 = div(n, 2) + n % 2
@@ -361,7 +361,7 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, unipoten
     [S SS] [B; C] = SB + SS C = X => SS C = Y - SB
     [R RR] [B; C] = RB + RR C = Y => RR C = Y - RB
 
- =#   
+ =#
 
   U = view(b, 1:m2, 1:n2)
   V = view(b, 1:m2, n2+1:n)
@@ -382,7 +382,7 @@ function _solve_triu_left(T::MatElem, b::MatElem; cutoff::Int = cutoff, unipoten
   RR = mul(R, B; cutoff)
   RR = sub!(RR, Y, RR)
   RR = _solve_triu_left(C, RR; cutoff, unipotent)
-  #THINK: both pairs of solving could be combined: 
+  #THINK: both pairs of solving could be combined:
   # solve [U; X], A to get S and R...
 
   return [S SS; R RR]
@@ -397,11 +397,11 @@ function mul_tt!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
 
   @assert nrows(A) == n
   @assert size(A) == size(B) == size(C)
-  
+
   #A = [a1 a2; 0 a4]
   #B = [b1 b2; 0 b4]
   #C = [c1 c2; 0 c4]
-  
+
   n2 = div(n, 2)
 
   a1 = view(A, 1:n2, 1:n2)
@@ -434,11 +434,11 @@ function mul_tu!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
   m = ncols(A)
   k = ncols(B)
   @assert nrows(C) == k
-  
+
   #A = [a1 a2; a3 a4]
   #B = [b1 b2; 0 b4]
   #C = [c1 c2; c3 c4]
-  
+
   n2 = div(n, 2)
   m2 = div(m, 2)
   k2 = div(k, 2)
@@ -482,11 +482,11 @@ function mul_ut!(A::MatElem, B::MatElem, C::MatElem; cutoff::Int = cutoff)
   m = ncols(A)
   k = ncols(B)
   @assert nrows(C) == k
-  
+
   #A = [a1 a2; a3 a4]
   #B = [b1 b2; b3 b4]
   #C = [c1 c2;  0 c4]
-  
+
   n2 = div(n, 2)
   m2 = div(k, 2)
   k2 = div(k, 2)
