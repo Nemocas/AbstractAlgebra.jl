@@ -72,7 +72,7 @@ is_finite(R::MatRing) = iszero(nrows(R)) || is_finite(base_ring(R))
 
 ###############################################################################
 #
-#   Similar and zero
+#   Similar, zero and iszero, one and isone
 #
 ###############################################################################
 
@@ -116,6 +116,20 @@ zero(x::MatRingElem, n::Int) = zero!(similar(x, n))
 # TODO: deprecate these
 zero(x::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(x, R, r, c))
 zero(x::MatRingElem, r::Int, c::Int) = zero!(similar(x, r, c))
+
+iszero(a::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(a))
+
+one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
+
+isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
+
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+canonical_unit(a::MatRingElem{T}) where T <: NCRingElement = canonical_unit(matrix(a))
 
 ################################################################################
 #
@@ -227,11 +241,13 @@ end
 #
 ###############################################################################
 
-*(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) * matrix(y))
+*(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) * matrix(y))
 
-+(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) + matrix(y))
++(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) + matrix(y))
 
--(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = Generic.MatRingElem(matrix(x) - matrix(y))
+-(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) - matrix(y))
+
+^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
 
 ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
 
@@ -314,6 +330,18 @@ is_upper_triangular(M::MatRingElem) = is_upper_triangular(matrix(M))
 is_lower_triangular(M::MatRingElem) = is_lower_triangular(matrix(M))
 is_diagonal(M::MatRingElem) = is_diagonal(matrix(M))
 
+function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
+end
+
+function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
+  map_entries!(f, matrix(dst), matrix(src))
+  return dst
+end
+
+function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
+  return Generic.MatRingElem(map_entries(f, matrix(a)))
+end
 
 ###############################################################################
 #
