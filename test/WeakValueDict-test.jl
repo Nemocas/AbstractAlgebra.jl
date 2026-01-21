@@ -17,7 +17,7 @@ function test_weak_cache(T, kreps, ireps)
             @test d[x] == y
             @test ddef[x] == y
          end
-         x = BigInt(rand(1:999))      
+         x = BigInt(rand(1:999))
          delete!(ddef, x)
          delete!(d, x)
          @test !haskey(d, x)
@@ -59,7 +59,7 @@ function test_weak_cache(T, kreps, ireps)
             @test d[x] == y
             @test ddef[x] == y
          end
-         x = BigInt(rand(1:999))      
+         x = BigInt(rand(1:999))
          delete!(ddef, x)
          delete!(d, x)
          @test !haskey(d, x)

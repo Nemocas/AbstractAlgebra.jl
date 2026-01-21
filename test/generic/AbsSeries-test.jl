@@ -145,7 +145,7 @@ end
 
    @test coefficients(a) == (cs = fill(0, 30); cs[2] = 2; cs[4] = 1; cs)
    @test coefficients(b) == fill(0, 4)
-   
+
    @test characteristic(R) == 0
 
    T, = residue_ring(ZZ, 7)
@@ -242,7 +242,7 @@ end
    @test isa(r, AbsPowerSeriesRingElem)
 
    s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
-   
+
    @test max_precision(parent(s)) == 10
 end
 
@@ -634,7 +634,7 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-   
+
    f = rand(R, 0:12, -10:10)
    @test_throws DomainError shift_left(f, -1)
    @test_throws DomainError shift_left(f, -rand(2:100))
@@ -654,7 +654,7 @@ end
       @test isapprox(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-   
+
    f = rand(R, 0:12, -1:1)
    @test_throws DomainError shift_left(f, -1)
    @test_throws DomainError shift_left(f, -rand(2:100))
@@ -675,7 +675,7 @@ end
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-   
+
    f = rand(R, 0:12, 0:5)
    @test_throws DomainError shift_left(f, -1)
    @test_throws DomainError shift_left(f, -rand(2:100))
@@ -694,7 +694,7 @@ end
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-   
+
    f = rand(R, 0:12, -10:10)
    @test_throws DomainError truncate(f, -1)
    @test_throws DomainError truncate(f, -rand(2:100))
@@ -711,7 +711,7 @@ end
       @test isapprox(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-   
+
    f = rand(R, 0:12, -1:1)
    @test_throws DomainError truncate(f, -1)
    @test_throws DomainError truncate(f, -rand(2:100))
@@ -729,12 +729,12 @@ end
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-   
+
    f = rand(R, 0:12, 0:5)
    @test_throws DomainError truncate(f, -1)
    @test_throws DomainError truncate(f, -rand(2:100))
    @test_throws DomainError truncate(f, -1)
-   @test_throws DomainError truncate(f, -rand(2:100))   
+   @test_throws DomainError truncate(f, -rand(2:100))
 end
 
 @testset "Generic.AbsSeries.inversion" begin
@@ -793,7 +793,7 @@ end
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
-     
+
         g = rand(R, 1:10, -10:10)
 
         @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
@@ -1116,9 +1116,9 @@ end
       g *= x
 
       @test isequal(exp(f)*exp(g), exp(f + g))
-      
+
       @test isequal(log(exp(f)), f)
-      
+
       while !isone(coeff(f, 0))
          f = rand(S, 0:0, -10:10)
       end
@@ -1210,7 +1210,7 @@ end
 @testset "Generic.AbsSeries.unsafe_operators" begin
    # Exact ring
    R, x = power_series_ring(ZZ, 10, "x", model=:capped_absolute)
-   
+
    for iter = 1:300
       f = rand(R, 0:9, -10:10)
       g = rand(R, 0:9, -10:10)
@@ -1244,8 +1244,8 @@ end
       h = mul!(h, f, g)
       @test isequal(h, k)
       @test isequal(f, f0)
-      @test isequal(g, g0)      
-     
+      @test isequal(g, g0)
+
       f1 = deepcopy(f)
       f1 = mul!(f1, f1, g)
       @test isequal(f1, k)

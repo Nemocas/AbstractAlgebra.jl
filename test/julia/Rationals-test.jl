@@ -104,7 +104,7 @@ end
       @test AbstractAlgebra.sqrt(g)^2 == g
       @test is_square(f)
       @test is_square(g)
-   
+
       @test is_square_with_sqrt(f) == (true, abs(r))
       @test is_square_with_sqrt(g) == (true, abs(s))
    end

@@ -154,7 +154,7 @@ function set_lc(a::E, v::Int, b::E) where {E <: MPolyRingElem}
   end
 end
 
-function make_monic(a::E) where {E <: MPolyRingElem}
+function make_monic(a::E) where {E <: Union{PolyRingElem, MPolyRingElem}}
   if length(a) < 1
     return a
   end
@@ -856,7 +856,7 @@ end
          (false, junk, junk) if the ufacs don't lift straight to bivariate ones
 
   TODO: allow this function to do a bit of zassenhaus and add a parameter to
-        limit the size of the subsets. 
+        limit the size of the subsets.
 =#
 function hlift_bivar_combine(
   a::E,
@@ -917,7 +917,7 @@ end
   a and b are both factorizations. Make the bases coprime without changing
   the values of factorizations. TODO this is probably done somewhere else.
 =#
-function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where {E <: MPolyRingElem}
+function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where {E <: Union{PolyRingElem, MPolyRingElem}}
   lena = length(a)
   lenb = length(b)
   for i in 1:lena

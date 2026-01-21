@@ -333,7 +333,7 @@ end
 
 ###############################################################################
 #
-#   Block diagonal matrices    
+#   Block diagonal matrices
 #
 ###############################################################################
 
@@ -416,7 +416,7 @@ Create an uninitialized matrix over the given ring and dimensions,
 with defaults based upon the given source matrix `x`.
 """
 similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
-  
+
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
 similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
@@ -2680,7 +2680,7 @@ function exterior_power(A::MatElem, k::Int)
        res[i, j] = det(A[ri[i], ri[j]])
      end
    end
-   return res 
+   return res
 end
 
 ###############################################################################
@@ -2917,6 +2917,227 @@ function rank(M::MatElem{T}) where {T <: FieldElement}
    P = one(SymmetricGroup(n))
    return lu!(P, A)
 end
+
+@doc raw"""
+    rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem} -> Int
+    rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem} -> Int
+    rank_interpolation(M::MatrixElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+
+Returns the rank of $A$ using an interpolation-like method. 
+
+# Examples
+
+```jldoctest
+julia> Qx, x = polynomial_ring(QQ, :x);
+
+julia> AbstractAlgebra.rank_interpolation(matrix(Qx, 2, 2, [x 2x; x^2 1]))
+2
+
+julia> Qy, y = rational_function_field(QQ, :y);
+
+julia> AbstractAlgebra.rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]))
+2
+```
+"""
+function rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(M)
+   K = base_ring(Kx)
+   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
+   min_ = min(n, m)
+   if (min_ == n)
+      maxdetdeg = sum(maximum(degree(M[i, j]) for j in 1:m) for i in 1:n)
+   else 
+      maxdetdeg = sum(maximum(degree(M[i, j]) for i in 1:n) for j in 1:m)
+   end
+   r = 0
+   eval_set = evaluation_points(K, maxdetdeg+1)
+   if !is_empty(eval_set)
+      #rank(M) is calculated by computing the rank of det_deg+1 matrices, evaluated in an element of eval_set, respectively.
+      for elem in eval_set
+         M_eval = map_entries(p -> evaluate(p, elem), M)
+         r = max(rank_interpolation(M_eval), r)
+         if r == min_
+            break
+         end
+      end
+      return r
+   else
+      #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
+      #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
+      #d is the smallest natural number such that order(K)^d >= det_deg+1.
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg + 1, )))
+      @assert order(K)^d >= maxdetdeg + 1
+      #d = clog(order(K), ZZ(maxdetdeg+1))
+      L, l = ext_of_degree(K, d)
+      Lx, _ = polynomial_ring(L, var(Kx)) 
+      #The given matrix M is embedded into the space of matrices over Lx
+      A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+      return rank_interpolation(A)
+   end
+end
+
+function rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem}
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(M)
+   K = base_ring(Kx)
+   num_vars = number_of_variables(Kx)
+   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
+   min_ = min(n, m)
+   if min_ == n
+      maxdetdeg = [sum(maximum(degree(M[i, j], k) for j in 1:m) for i in 1:n) for k in 1:num_vars]
+   else
+      maxdetdeg = [sum(maximum(degree(M[i, j], k) for i in 1:n) for j in 1:m) for k in 1:num_vars] 
+   end
+   r = 0
+   eval_set = Vector{Vector{elem_type(K)}}(undef, num_vars)
+   for i = 1:num_vars
+      eval_set[i] = evaluation_points(K, maxdetdeg[i]+1)
+      if is_empty(eval_set[i])
+         #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
+         #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
+         #d is the smallest natural number such that order(K)^d >= det_deg+1.
+         d = Int(ceil(Base.log(BigInt(order(K)), maximum(maxdetdeg)+1)))
+         @assert order(K)^d >= maximum(maxdetdeg) + 1
+         #d = clog(order(K), ZZ(maximum(maxdetdeg)+1))
+         L, l = ext_of_degree(K, d)
+         Lx, _ = polynomial_ring(L, symbols(Kx)) 
+         #The given matrix M is embedded into the space of matrices over Lx
+         A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+         return rank_interpolation(A)
+      end
+   end
+   #rank(M) is calculated by computing the rank of (det_deg+1)^number_of_variables(Kx) matrices, evaluated in elements of eval_set.
+   for tup in ProductIterator(eval_set)
+      M_eval = map_entries(p -> evaluate(p, tup), M)
+      r = max(rank_interpolation(M_eval), r)
+      if r == min_
+         break
+      end
+   end
+   return r
+end
+
+function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
+   return rank(M)
+end
+
+@doc raw"""
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+
+Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-like method.
+
+# Examples
+
+```jldoctest
+julia> Qx, x = polynomial_ring(QQ, :x);
+
+julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qx, 2, 2, [x 2x; x^2 1]), 0.01)
+2
+
+julia> Qy, y = rational_function_field(QQ, :y);
+
+julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]), 0.00001)
+2
+```
+"""
+function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem}
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(M)
+   K = base_ring(Kx)
+   min_ = min(n, m)
+   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
+   maxdetdeg = min_*maximum(degree(M[i, j]) for i in 1:n, j in 1:n)
+   S = evaluation_points(K, 10*maxdetdeg)
+   #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
+   k = ceil(Base.log(10, 1/err))
+   r = 0
+   if !is_empty(S)
+      #rank(M) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
+      for _ = 1:k
+         a = rand(S)
+         M_eval = map_entries(p -> evaluate(p, a), M)
+         r = max(rank(M_eval), r)
+         if r == min_
+            return r
+         end
+      end
+   else
+      #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg+1 holds. 
+      #In this case a field extension L of K such that order(L) >= det_deg+1 is constructed.
+      #d is the smallest natural number such that order(K)^d >= det_deg+1.
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg*10)))
+      #d = clog(order(K), ZZ(maxdetdeg*10))
+      @assert order(K)^d >= maxdetdeg*10
+      L, l = ext_of_degree(K, d)
+      Lx, _ = polynomial_ring(L, var(Kx)) 
+      #The given matrix M is embedded into the space of matrices over Lx
+      A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+      return rank_interpolation_mc(A, err)
+   end
+   return r
+end
+
+function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem}
+   n = nrows(M)
+   m = ncols(M)
+   if is_zero(n) || is_zero(m)
+      return 0
+   end
+   Kx = base_ring(M)
+   K = base_ring(Kx)
+   num_vars = number_of_variables(Kx)
+   min_ = min(n, m)
+   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
+   maxdetdeg = min_*maximum(degree(M[i, j], k) for i in 1:n, j in 1:m, k in 1:num_vars)
+   S = evaluation_points(K, 10*maxdetdeg)
+   #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
+   k = ceil(Base.log(10, 1/err))
+   r = 0
+   if !is_empty(S)
+      #rank(M) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
+      for _ = 1:k
+         a = Vector{elem_type(K)}(undef, num_vars)
+         for i = 1:num_vars
+            a[i] = rand(S)
+         end
+         M_eval = map_entries(p -> evaluate(p, a), M)
+         r = max(rank(M_eval), r)
+         if r == min_
+            return r
+         end
+      end
+      return r
+   else
+      #function get_eval_set returns an empty set if and only if K is a finite field and order(K) < det_deg*s holds. 
+      #In this case a field extension L of K is constructed such that order(L) >= det_deg*s.
+      #d is the smallest natural number such that order(K)^d >= det_deg*s.
+      d = Int(ceil(Base.log(BigInt(order(K)), maxdetdeg*10)))
+      #d = clog(order(K), ZZ(maxdetdeg*10))
+      @assert order(K)^d >= maxdetdeg*10
+      L, l = ext_of_degree(K, d)
+      Lx, _ = polynomial_ring(L, symbols(Kx)) 
+      #The given matrix M is embedded into the space of matrices over Lx
+      A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+      return rank_interpolation_mc(A, err)
+   end
+end
+
+
 
 ###############################################################################
 #
@@ -3505,8 +3726,8 @@ _solve_triu_right(M, b; unipotent = false) = _solve_triu(M, b; unipotent, side =
 @doc raw"""
     _solve_triu(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false, side::Symbol = :left) where {T <: RingElement}
 
-Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If 
-`side = :right`, let $b$ 
+Let $U$ be a non-singular $n\times n$ upper triangular matrix $U$ over a field. If
+`side = :right`, let $b$
 be an $n\times m$ matrix $b$ over the same field, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
@@ -3560,7 +3781,7 @@ triangular, and an $n\times m$ matrix $b$ over the same ring, return an
 $n\times m$ matrix $x$ such that $Ux = b$. If this is not possible, an error
 will be raised.
 
-See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast 
+See also [`_solve_triu`](@ref) and [`Strassen`](@ref) for asymptotically fast
   versions.
 """
 function _solve_triu_left(U::MatElem{T}, b::MatElem{T}; unipotent::Bool = false) where {T <: RingElement}

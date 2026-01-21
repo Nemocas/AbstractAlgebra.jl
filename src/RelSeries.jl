@@ -954,7 +954,7 @@ function Base.inv(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
-    end 
+    end
     two = R(2)
     two = _set_precision_raw!(two, prec)
     n = length(la) - 1
@@ -967,7 +967,7 @@ function Base.inv(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
         y = mul!(y, minus_a, x)
         y = add!(y, two)
         x = mul!(x, x, y)
-        n -= 1 
+        n -= 1
     end
     return x
 end
@@ -1012,7 +1012,7 @@ function compose(f::RelPowerSeriesRingElem, g::RelPowerSeriesRingElem; inner = n
              Alternatively, use directly f(g) or g(f)
              """)
   end
-            
+
   if inner == :second
     return _compose_right(f, g)
   else
@@ -1207,7 +1207,7 @@ function derivative(f::RelPowerSeriesRingElem{T}) where T <: RingElement
          g = setcoeff!(g, i, (i + v)*polcoeff(f, i))
       end
       g = set_valuation!(g, v - 1)
-   end  
+   end
    g = set_length!(g, normalise(g, pol_length(f)))
    renormalize!(g)
    return g
@@ -1258,7 +1258,7 @@ end
 Return the logarithm of the power series $a$.
 """
 function Base.log(a::SeriesElem{T}) where T <: FieldElement
-   @assert valuation(a) == 0 
+   @assert valuation(a) == 0
    if isone(coeff(a, 0))
       return integral(derivative(a)*inv(a))
    else
@@ -1337,7 +1337,7 @@ function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
       t = add!(t, one1)
       t = add!(t, a)
       x = mul!(x, x, t)
-      n -= 1 
+      n -= 1
    end
    if !isone(c)
       x *= c

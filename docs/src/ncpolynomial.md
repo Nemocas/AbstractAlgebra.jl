@@ -35,7 +35,7 @@ accept any AbstractAlgebra polynomial type.
 !!! note
 
     Note that both the generic polynomial ring type `Generic.NCPolyRing{T}` and the abstract
-    type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The 
+    type it belongs to, `NCPolyRing{T}` are both called `NCPolyRing`. The
     former is a (parameterised) concrete type for a polynomial ring over a given base ring
     whose elements have type `T`. The latter is an abstract type representing all
     polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
@@ -104,7 +104,7 @@ polynomials in that ring.
 
 The easiest way is simply using the generator returned by the `polynomial_ring`
 constructor and build up the polynomial using basic arithmetic, as described in
-the Ring interface. 
+the Ring interface.
 
 The Julia language also has special syntax for the construction of polynomials in terms
 of a generator, e.g. we can write `2x` instead of `2*x`.
@@ -355,7 +355,7 @@ evaluate(::NCPolyRingElem, ::NCRingElem)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
-evaluated at $a$ by writing $f(a)$. 
+evaluated at $a$ by writing $f(a)$.
 
 **Examples**
 

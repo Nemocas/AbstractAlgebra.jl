@@ -123,7 +123,7 @@ function preimage(
 end
 
 @doc raw"""
-    has_preimage_with_preimage(f::Map(FPModuleHomomorphism), 
+    has_preimage_with_preimage(f::Map(FPModuleHomomorphism),
       v::FPModuleElem{T}) where T <: RingElement
 
 Check if $v$ has a preimage under the homomorphism $f$.
@@ -153,7 +153,7 @@ function has_preimage_with_preimage(
   q = length(trels)
   m = nrows(M)
   n = ncols(M)
-  if n == 0 #target module is trivial, so v is all zero 
+  if n == 0 #target module is trivial, so v is all zero
     return true, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
   elseif m == 0 #source module is trivial
     return all(iszero, v), elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]

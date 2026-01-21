@@ -37,7 +37,7 @@ over a noncommutative ring:
 
 We have that `PolyRing{T} <: Ring` and
 `PolyRingElem{T} <: RingElem`. Similarly we have that
-`NCPolyRing{T} <: NCRing` and 
+`NCPolyRing{T} <: NCRing` and
 `NCPolyRingElem{T} <: NCRingElem`.
 
 Note that the abstract types are parameterised. The type `T` should usually be the type
@@ -186,7 +186,7 @@ coeff(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the coefficient of the polynomial `f` of degree `n`. If `n` is larger than the
-degree of the polynomial, it should return zero in the coefficient ring. 
+degree of the polynomial, it should return zero in the coefficient ring.
 
 ```julia
 setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: RingElem
@@ -229,7 +229,7 @@ can also be defined to do nothing.
 Sometimes parts of the Euclidean Ring interface can and should be implemented for
 polynomials over a ring that is not necessarily a field.
 
-When divisibility testing can be implemented for a polynomial ring over a field, it 
+When divisibility testing can be implemented for a polynomial ring over a field, it
 should be possible to implement the following functions from the Euclidean Ring
 interface:
 
@@ -244,7 +244,7 @@ may be possible to implement the following functions:
   * lcm
 
 Polynomial rings can optionally implement any part of the generic univariate polynomial
-functionality provided by AbstractAlgebra.jl, using the same interface. 
+functionality provided by AbstractAlgebra.jl, using the same interface.
 
 Obviously additional functionality can also be added to that provided by
 AbstractAlgebra.jl on an ad hoc basis.

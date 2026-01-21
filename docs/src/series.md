@@ -366,7 +366,7 @@ isone(a::SeriesElem)
 
 ```julia
 divexact(a::T, b::T) where T <: SeriesElem
-inv(a::SeriesElem) 
+inv(a::SeriesElem)
 ```
 
 Series also implement the Series Interface, the most important basic

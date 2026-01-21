@@ -132,6 +132,7 @@ import ..AbstractAlgebra: divrem
 import ..AbstractAlgebra: domain
 import ..AbstractAlgebra: elem_type
 import ..AbstractAlgebra: evaluate
+import ..AbstractAlgebra: evaluation_points
 import ..AbstractAlgebra: exp
 import ..AbstractAlgebra: exponent_vector
 import ..AbstractAlgebra: exponent_vectors
@@ -208,6 +209,8 @@ import ..AbstractAlgebra: pretty_sort
 import ..AbstractAlgebra: primpart
 import ..AbstractAlgebra: promote_rule
 import ..AbstractAlgebra: pseudorem
+import ..AbstractAlgebra: rank_interpolation
+import ..AbstractAlgebra: rank_interpolation_mc
 import ..AbstractAlgebra: reduce!
 import ..AbstractAlgebra: reduced_form
 import ..AbstractAlgebra: relations
@@ -235,6 +238,8 @@ import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
+import ..AbstractAlgebra: transpose
+import ..AbstractAlgebra: transpose!
 import ..AbstractAlgebra: unit
 import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
