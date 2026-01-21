@@ -101,7 +101,23 @@ jobs:
                fontconfig \
                fonts-dejavu-core \
                fonts-dejavu-extra
-      - uses: julia-actions/julia-docdeploy@v1
+      - name: Build docs (HTML + PDF)
+        run: |
+             julia --project=docs --color=yes -e 'using Pkg; Pkg.instantiate()'
+             julia --project=docs --color=yes docs/make.jl
+      - name: Dump LaTeX logs on failure
+        if: failure()
+        run: |
+             echo "=== Recent /tmp/jl_* dirs ==="
+             ls -dt /tmp/jl_* 2>/dev/null | head -n 20 || true
+             echo "=== Tail AbstractAlgebra logs (best effort) ==="
+             for d in $(ls -dt /tmp/jl_* 2>/dev/null | head -n 10); do
+             f="$d/AbstractAlgebra.jl.log"
+             if [ -f "$f" ]; then
+              echo "===== $f ====="
+              tail -n 200 "$f"
+             fi
+             done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
