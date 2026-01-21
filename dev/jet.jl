@@ -1,0 +1,24 @@
+using Revise
+using JET
+
+# can be dropped once https://github.com/aviatesk/JET.jl/pull/798 is available
+struct AnyFrameMethod <: ReportMatcher
+    m::Union{Function,Method,Symbol}
+end
+
+function JET.match_report(matcher::AnyFrameMethod, @nospecialize(report::JET.InferenceErrorReport))
+    # check all VirtualFrames in the VirtualStackTrace for a match to the specified method
+    m = matcher.m
+    if m isa Symbol
+        return any(vf -> vf.linfo.def.name === m, report.vst)
+    elseif m isa Method
+        return any(vf -> vf.linfo.def === m, report.vst)
+    else # if m isa Function
+        return any(vf -> vf.linfo.def in methods(m), report.vst)
+    end
+end
+
+using AbstractAlgebra
+report_package(AbstractAlgebra; ignored_modules=[
+    AnyFrameMethod(:show_spec_linfo), # fixed in https://github.com/JuliaLang/julia/pull/60645
+])
