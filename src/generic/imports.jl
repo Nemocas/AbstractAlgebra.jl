@@ -238,6 +238,8 @@ import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: trailing_coefficient
+import ..AbstractAlgebra: transpose
+import ..AbstractAlgebra: transpose!
 import ..AbstractAlgebra: unit
 import ..AbstractAlgebra: use_karamul
 import ..AbstractAlgebra: valuation
