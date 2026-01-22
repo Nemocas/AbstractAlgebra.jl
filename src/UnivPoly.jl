@@ -1151,7 +1151,7 @@ the universal polynomial ring `S = R[\ldots]` with no variables in it initially.
 
 ```jldoctest
 julia> S, (x,y) = universal_polynomial_ring(ZZ, [:x,:y])
-(Universal polynomial ring over Integers, AbstractAlgebra.UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}[x, y])
+(Universal polynomial ring over Integers, UniversalPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x, y])
 
 julia> z = gen(S, :z)
 z
@@ -1166,7 +1166,7 @@ julia> x = gen(S, :x)
 x
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{AbstractAlgebra.UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}}:
+2-element Vector{UniversalPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}}:
  y
  z
 
