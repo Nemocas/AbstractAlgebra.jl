@@ -2,13 +2,22 @@ using Documenter, AbstractAlgebra
 
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
+let dir = joinpath(@__DIR__, "src", "assets")
+    for n in ("parents_diagram", "elements_diagram")
+        svg = joinpath(dir, n * ".svg"); pdf = joinpath(dir, n * ".pdf")
+        isfile(svg) || (@warn "SVG missing, skipping" svg; continue)
+        (!isfile(pdf) || stat(svg).mtime > stat(pdf).mtime) &&
+            (run(`rsvg-convert -f pdf -o $pdf $svg`))
+    end
+end
+
 makedocs(
          format = [
             Documenter.HTML(;
             size_threshold_warn = 204800,
             size_threshold = 409600,
          ),
-         Documenter.LaTeX(),
+         Documenter.LaTeX(platform="tectonic"),
          ],
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
