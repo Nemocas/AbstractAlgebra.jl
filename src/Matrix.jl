@@ -1214,7 +1214,6 @@ function Base.promote(x::MatrixElem{S},
    end
 end
 
-
 function Base.promote(x::Vector{S},
                       y::MatrixElem{T}) where {S <: NCRingElement,
                                                T <: NCRingElement}
@@ -1498,6 +1497,7 @@ function is_symmetric(M::MatElem)
    end
    return true
 end
+
 
 @doc raw"""
     transpose(x::MatElem)

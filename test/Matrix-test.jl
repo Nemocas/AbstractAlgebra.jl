@@ -224,7 +224,7 @@ end
   M = sub!(M, M, M)
   @test is_zero(M)
 end
-          
+
 @testset "Rank Interpolation" begin
   Fx, x = polynomial_ring(GF(257), :x)
   Qy, y = polynomial_ring(QQ, 3, :y)
