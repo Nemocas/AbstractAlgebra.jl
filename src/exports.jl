@@ -110,6 +110,9 @@ export Strassen
 export SymmetricGroup
 export UniversalPolyRing
 export UniversalPolyRingElem
+export UniversalRing
+export UniversalRingElem
+export UnivPoly
 export VarName
 export YoungTableau
 export ZZ
