@@ -2012,8 +2012,8 @@ _isbuffer(io::IO) = false
 _isbuffer(io::IOContext) = _isbuffer(io.io)
 _isbuffer(io::IOCustom) = _isbuffer(io.io)
 
-function _write_line(io::IOCustom, str::AbstractString)
-  written = 0
+function _write_line(io::IOCustom, str::Union{String,SubString{String}})
+  written::Int = 0
 
   # We handle io.indent_level == 0 differently for the following reason
   # $(s) will call print(io, s)
@@ -2126,7 +2126,7 @@ function _write_line(io::IOCustom, str::AbstractString)
 end
 
 function write(io::IOCustom, str::String)
-  written = 0
+  written::Int = 0
   if str == "\n"
     written = write(io.io, str)
     io.indented_line = false

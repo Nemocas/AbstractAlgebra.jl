@@ -13,14 +13,14 @@
 domain(f::ModuleHomomorphism) = f.domain
 codomain(f::ModuleHomomorphism) = f.codomain
 image_fn(f::ModuleHomomorphism) = f.image_fn
+matrix(f::ModuleHomomorphism) = f.matrix
 
 domain(f::ModuleIsomorphism) = f.domain
 codomain(f::ModuleIsomorphism) = f.codomain
 image_fn(f::ModuleIsomorphism) = f.image_fn
-
-inverse_mat(f::Map(ModuleIsomorphism)) = f.inverse_matrix
-
-inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
+inverse_image_fn(f::ModuleIsomorphism) = f.inverse_image_fn
+matrix(f::ModuleIsomorphism) = f.matrix
+inverse_mat(f::ModuleIsomorphism) = f.inverse_matrix
 
 ###############################################################################
 #
@@ -66,7 +66,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, f::Map(ModuleIsomorphism))
+function show(io::IO, f::ModuleIsomorphism)
   if is_terse(io)
     print(io, "Module isomorphism")
   else
@@ -83,11 +83,25 @@ end
 #
 ###############################################################################
 
-function compose(f::Map(ModuleIsomorphism), g::Map(ModuleIsomorphism))
+function compose(f::ModuleIsomorphism, g::ModuleIsomorphism)
    check_composable(f, g)
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(domain(f), codomain(g), f.matrix*g.matrix,
                                              g.inverse_matrix*f.inverse_matrix)
+end
+
+###############################################################################
+#
+#   Preimage
+#
+###############################################################################
+
+function AbstractAlgebra.solve_ctx(f::ModuleHomomorphism)
+  # cache solver context
+  if !isdefined(f, :solve_ctx)
+    f.solve_ctx = AbstractAlgebra.compute_solve_ctx(f)
+  end
+  return f.solve_ctx::AbstractAlgebra.Solve.solve_context_type(base_ring(codomain(f)))
 end
 
 ###############################################################################
@@ -97,12 +111,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    Base.inv(f::Map(ModuleIsomorphism))
+    Base.inv(f::ModuleIsomorphism)
 
 Return the inverse map of the given module isomorphism. This is computed
 cheaply.
 """
-function Base.inv(f::Map(ModuleIsomorphism))
+function Base.inv(f::ModuleIsomorphism)
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), matrix(f))
 end

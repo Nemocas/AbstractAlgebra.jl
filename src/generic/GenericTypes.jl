@@ -1408,7 +1408,7 @@ mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{Abstr
    codomain::AbstractAlgebra.FPModule{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
-   solve_ctx
+   solve_ctx::Any # really: SolveCtx
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
