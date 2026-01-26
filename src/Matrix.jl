@@ -186,18 +186,18 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_rows(a::MatElem)
 
 Return the number of rows of the given matrix.
 """
-number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(a::MatElem)
 
 @doc raw"""
-    number_of_columns(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_columns(a::MatElem)
 
 Return the number of columns of the given matrix.
 """
-number_of_columns(a::MatrixElem{T}) where {T<:NCRingElement}
+number_of_columns(a::MatElem)
 
 @doc raw"""
     length(a::MatrixElem{T}) where T <: NCRingElement
