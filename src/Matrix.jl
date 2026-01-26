@@ -244,7 +244,7 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc raw"""
-    one(a::MatrixElem{T}) where T <: NCRingElement
+    one(a::MatElem{T}) where T <: NCRingElement
 
 Return the identity matrix in the same matrix space as $a$.
 If the matrix space does not comprise square matrices, an error is thrown.
@@ -1179,9 +1179,9 @@ end
 #
 ################################################################################
 
-function Base.promote(x::MatrixElem{S},
-                      y::MatrixElem{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+function Base.promote(x::MatElem{S},
+                      y::MatElem{T}) where {S <: NCRingElement,
+                                            T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, change_base_ring(base_ring(x), y)
@@ -1200,10 +1200,9 @@ end
 
 ==(x::MatElem, y::MatElem) = ==(promote(x, y)...)
 
-# matrix * vec and vec * matrx
 function Base.promote(x::MatrixElem{S},
                       y::Vector{T}) where {S <: NCRingElement,
-                                               T <: NCRingElement}
+                                           T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
       return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
@@ -1225,6 +1224,7 @@ end
 
 *(x::Vector, y::MatrixElem) = *(promote(x, y)...)
 
+## ?? Why is this fn only for MatElem when the ones above were for MatrixElem ??
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
    U = promote_rule_sym(S, T)
    if U === S
@@ -1310,13 +1310,13 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+    ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)
@@ -1330,14 +1330,14 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
 end
 
 @doc raw"""
-    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+    isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
 
-Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-useful in cases where the entries of the matrices are inexact, e.g. power
-series. Only if the power series are precisely the same, to the same precision,
-are they declared equal by this function.
+Return `true` if $x == y$ exactly, otherwise return `false` (incl. if the
+dimensions do not match). This function is useful in cases where the entries
+of the matrices are inexact, e.g. power series. Only if the power series are
+precisely the same, to the same precision, are they declared equal by this function.
 """
-function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: NCRingElement}
+function isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
    b = check_parent(x, y, false)
    !b && return false
    for i = 1:nrows(x)
@@ -1457,7 +1457,7 @@ end
 ###############################################################################
 
 """
-    is_symmetric(M::MatrixElem)
+    is_symmetric(M::MatElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -2717,7 +2717,7 @@ end
     is_alternating(M::MatrixElem)
 
 Return whether the form corresponding to the matrix `M` is alternating,
-i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
+i.e. `M == -transpose(M)` and `M` has zeros on the diagonal.
 Return `false` if `M` is not a square matrix.
 """
 function is_alternating(M::MatElem)
