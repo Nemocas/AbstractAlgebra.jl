@@ -1529,10 +1529,13 @@ end
     transpose!(z::T, x::T) where T <: MatElem
     transpose!(z::T, x::T) where T <: MatRingElem
 
-Return the transpose of `x`, possibly modifying the object `z` in the process.
-Aliasing is permitted.
+Return the transpose of `x`; the unary version may modify `x`, the binary version may modify `z`.
+**The binary version does not check dimensions -- the caller must ensure that**
+`ncols(z) == nrows(x)` and `nrows(z) == ncols(x)`.
 
-The unary version only is supported if `x` is a square matrix.
+If the dimensions of `z` are wrong then the behaviour is undefined!
+Aliasing between `z` and `x` is permitted.
+The unary version reports an error if `x` is not a square matrix.
 """
 function transpose!(x::MatElem)
   @req is_square(x) "Matrix must be a square matrix"
