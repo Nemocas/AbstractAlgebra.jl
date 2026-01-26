@@ -760,7 +760,7 @@ Base.length(M::MatSpace) = BigInt(length(base_ring(M)))^(nrows(M)*ncols(M))
 function expressify(a::MatrixElem{T}; context = nothing) where T <: NCRingElement
    r = nrows(a)
    c = ncols(a)
-   isempty(a) && return "$r by $c empty matrix"  # JAA preference is "$r-by-$c empty matrix"
+   isempty(a) && return "$r by $c empty matrix"
    mat = Expr(:vcat)
    for i in 1:r
       row = Expr(:row)
