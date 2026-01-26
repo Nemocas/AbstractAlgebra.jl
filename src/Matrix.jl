@@ -245,9 +245,8 @@ one(a::MatSpace) = check_square(a)(1)
 
 @doc raw"""
     one(a::MatElem{T}) where T <: NCRingElement
-    one(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the identity matrix in the same matrix space or matrix ring as $a$.
+Return the identity matrix in the same matrix space as $a$.
 If the matrix space does not comprise square matrices, an error is thrown.
 """
 one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a)
@@ -1273,7 +1272,6 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <:
 
 @doc raw"""
     ^(a::MatElem{T}, b::Int) where T <: NCRingElement
-    ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
@@ -1313,7 +1311,6 @@ end
 
 @doc raw"""
     ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-    ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
@@ -1334,7 +1331,6 @@ end
 
 @doc raw"""
     isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-    isequal(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ exactly, otherwise return `false` (incl. if the
 dimensions do not match). This function is useful in cases where the entries
@@ -1462,7 +1458,6 @@ end
 
 """
     is_symmetric(M::MatElem)
-    is_symmetric(M::MatRingElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -6846,7 +6841,6 @@ Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingEle
 
 @doc raw"""
     map_entries(f, a::MatElem{T}) where T <: NCRingElement
-    map_entries(f, a::MatRingElem{T}) where T <: NCRingElement
 
 Transform matrix `a` by applying `f` to each element.
 """
