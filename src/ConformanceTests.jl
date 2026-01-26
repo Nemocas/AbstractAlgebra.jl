@@ -69,9 +69,11 @@ function test_EuclideanRing_interface end
 function test_Poly_interface end
 function test_MPoly_interface end
 function test_MatSpace_interface end
-function test_MatAlgebra_interface end
+function test_MatRing_interface end
 function test_Ring_interface_recursive end
 function test_Field_interface_recursive end
 
+# deprecated during 0.48.*
+@deprecate test_MatAlgebra_interface test_MatRing_interface
 
 end # module

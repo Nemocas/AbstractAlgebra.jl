@@ -58,8 +58,8 @@ In addition to the required (relevant) functionality for the Ring interface (see
 the following functionality is required for the Matrix interface.
 
 We suppose that `R` is a fictitious base ring (coefficient ring) and that `S` is a
-space of $m\times n$ matrices over `R`, or algebra of $m\times m$ matrices with parent
-object `S` of type `MyMatSpace{T}` or `MyMatAlgebra{T}`, respectively. We also assume
+space of $m\times n$ matrices over `R`, or ring of $m\times m$ matrices with parent
+object `S` of type `MatSpace{T}` or `MyMatRing{T}`, respectively. We also assume
 the matrices in the space have type `MyMat{T}`, where `T` is the type of elements of
 the base (element) ring.
 
@@ -76,23 +76,23 @@ In addition to the standard constructors, the following constructors, taking an 
 elements, must be available.
 
 ```julia
-(S::MyMatSpace{T})(A::Matrix{T}) where T <: RingElem
-(S::MyMatAlgebra{T})(A::Matrix{T}) where T <: RingElem
+(S::MatSpace{T})(A::Matrix{T}) where T <: RingElem
+(S::MyMatRing{T})(A::Matrix{T}) where T <: RingElem
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`.
 
 ```julia
-(S::MyMatSpace{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
+(S::MatSpace{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatRing{T})(A::Matrix{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
 where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
-(S::MyMatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
-(S::MyMatAlgebra{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MatSpace{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
+(S::MyMatRing{T})(A::Vector{S}) where {S <: RingElem, T <: RingElem}
 ```
 
 Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
@@ -170,15 +170,15 @@ E.g. in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix`.
 
 ```julia
-number_of_rows(M::MyMatSpace{T}) where T <: RingElem
-number_of_rows(M::MyMatAlgebra{T}) where T <: RingElem
+number_of_rows(M::MatSpace{T}) where T <: RingElem
+number_of_rows(M::MyMatRing{T}) where T <: RingElem
 ```
 
 Return the number of rows of matrices in the matrix space.
 
 ```julia
-number_of_columns(M:MyMatSpace{T}) where T <: RingElem
-number_of_columns(M:MyMatAlgebra{T}) where T <: RingElem
+number_of_columns(M:MatSpace{T}) where T <: RingElem
+number_of_columns(M:MyMatRing{T}) where T <: RingElem
 ```
 
 Return the number of columns of matrices in the matrix space.

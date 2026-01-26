@@ -121,7 +121,7 @@ iszero(a::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(a))
 
 one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
 
-isone(a::MatrixElem{T}) where T <: NCRingElement = isone(matrix(a))
+isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
 
 ###############################################################################
 #
