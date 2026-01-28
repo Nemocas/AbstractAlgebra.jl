@@ -505,6 +505,7 @@ export rational_function_field
 export reduce!
 export rel_series
 export rel_series_type
+export relations
 export rels
 export rem!
 export remove
