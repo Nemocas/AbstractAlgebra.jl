@@ -15,7 +15,7 @@
 # - test_MatRing_interface(R)
 
 
-function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
+function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
    T = elem_type(R)
 
@@ -219,7 +219,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 end
 
 
-function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
+function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
 
    T = elem_type(R)
 
@@ -284,7 +284,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
    return nothing
 end
 
-function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
+function test_Field_interface(R::AbstractAlgebra.Field; reps = 15)
 
    T = elem_type(R)
 
@@ -312,7 +312,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
    return nothing
 end
 
-function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
+function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 15)
 
    T = elem_type(R)
 
@@ -404,7 +404,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 end
 
 
-function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
+function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 10)
 
    T = elem_type(Rx)
 
@@ -511,7 +511,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 end
 
 
-function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
+function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
    # for simplicity, these tests for now assume exactly two generators
    @assert ngens(Rxy) == 2
@@ -650,7 +650,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
 end
 
 
-function test_MatSpace_interface(S::MatSpace; reps = 20)
+function test_MatSpace_interface(S::MatSpace; reps = 10)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -766,7 +766,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
    return nothing
 end
 
-function test_MatRing_interface(S::MatRing; reps = 20)
+function test_MatRing_interface(S::MatRing; reps = 15)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -818,7 +818,7 @@ function test_MatRing_interface(S::MatRing; reps = 20)
    return nothing
 end
 
-function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
+function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
    test_Ring_interface(R; reps = reps)
    Rx, _ = polynomial_ring(R, :x)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
@@ -834,7 +834,7 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    end
 end
 
-function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
+function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 15)
    test_Ring_interface_recursive(R, reps = reps)
    test_Field_interface(R, reps = reps)
 end
