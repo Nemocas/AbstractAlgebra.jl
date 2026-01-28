@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 tries to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+The following gives an overview of the changes compared to the previous releases. This list is not
+complete, many more internal or minor changes were made, but we tried to only list those changes
+which we think might affect some users directly.
+
+## [0.48.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.3) - 2026-01-28
+
+### Fixed bugs that returned incorrect results
+
+- [#2305](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2305) Disable Julia fallbacks for `iszero`/`isone` for our parent objects
+
+### **TODO** Uncategorized PR
+
+If there are any PRs listed below, either apply the same steps
+as above, or change their label to "release notes: not needed".
+
+- [#2300](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2300) Use TagBot config to paste changelog into GitHub release description
+- [#2308](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2308) Add script for running JET with options
+
 ## [0.48.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.0) - 2026-01-09
 
 The following gives an overview of the changes compared to the previous release. This list is not
