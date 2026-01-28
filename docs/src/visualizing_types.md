@@ -12,14 +12,14 @@ AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 The following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
 
-![Diagram of parent types](./assets/parents_diagram)
+![Diagram of parent types](./assets/parents_diagram.svg)
 
 ## Abstract elements
 
 Similarly the following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
 
-![Diagram of element types](./assets/elements_diagram)
+![Diagram of element types](./assets/elements_diagram.svg)
 
 ## Concrete types in AbstractAlgebra.jl
 

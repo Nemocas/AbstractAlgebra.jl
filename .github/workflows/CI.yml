@@ -88,11 +88,17 @@ jobs:
           version: '1.10'
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
-      - name: Install TeX
+      - name: Install TeX 
         run: |
               sudo apt-get update
               sudo apt-get install -y --no-install-recommends \
-              tectonic \
+              latexmk \
+              texlive-latex-base \
+              texlive-latex-recommended \
+              texlive-latex-extra \
+              texlive-fonts-recommended \
+              texlive-luatex \
+              texlive-xetex \
               python3-pygments \
               fontconfig \
               fonts-dejavu-core \
