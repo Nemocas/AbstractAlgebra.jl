@@ -14,6 +14,7 @@
 # - test_MatSpace_interface(R)
 # - test_MatRing_interface(R)
 
+@nospecialize
 
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
@@ -838,3 +839,5 @@ function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 15)
    test_Ring_interface_recursive(R, reps = reps)
    test_Field_interface(R, reps = reps)
 end
+
+@specialize

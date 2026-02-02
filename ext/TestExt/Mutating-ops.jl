@@ -1,6 +1,8 @@
 # The following functions should not expect that their input is a `NCRingElem` or similar.
 # They should be usable in more general types, that don't even have a `parent/elem` correspondence
 
+@nospecialize
+
 function test_mutating_op_like_zero(f::Function, f!::Function, A)
   a = deepcopy(A)
   a = f!(a)
@@ -145,3 +147,5 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = A
      end
   end
 end
+
+@specialize

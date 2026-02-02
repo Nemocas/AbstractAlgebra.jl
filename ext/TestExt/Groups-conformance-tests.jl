@@ -16,6 +16,8 @@
 ###############################################################################
 
 
+@nospecialize
+
 function test_Group_interface(G::Group)
   @testset "Group interface" begin
 #        @testset "Iteration protocol" begin
@@ -322,3 +324,5 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
       end
   end
 end
+
+@specialize
