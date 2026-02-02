@@ -65,8 +65,8 @@ julia> P = zero_matrix(ZZ, 3, 2)
 ```
 
 ```@docs
-number_of_rows(::MatrixElem{T}) where T <: RingElement
-number_of_columns(::MatrixElem{T}) where T <: RingElement
+number_of_rows(::MatElem{T}) where T <: RingElement
+number_of_columns(::MatElem{T}) where T <: RingElement
 length(::MatrixElem{T}) where T <: RingElement
 isempty(::MatrixElem{T}) where T <: RingElement
 identity_matrix(::Ring, ::Int)
