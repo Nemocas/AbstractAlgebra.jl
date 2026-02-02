@@ -1,7 +1,9 @@
 @doc raw"""
- AbstractAlgebra is a pure Julia package for computational abstract algebra.
+AbstractAlgebra is a pure Julia package for computational abstract algebra.
 
- For more information see https://github.com/Nemocas/AbstractAlgebra.jl
+Repository: <https://github.com/Nemocas/AbstractAlgebra.jl>
+
+Documentation: <https://nemocas.github.io/AbstractAlgebra.jl>
 """
 module AbstractAlgebra
 
