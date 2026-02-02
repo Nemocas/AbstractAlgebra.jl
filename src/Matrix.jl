@@ -3052,11 +3052,11 @@ function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    rank_interpolation_mc(M::MatElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
-    rank_interpolation_mc(M::MatElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
-    rank_interpolation_mc(M::MatElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
-Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-like method.
+Returns the rank of $A$ with error probability < $err$ using an interpolation-like method.
 
 # Examples
 
