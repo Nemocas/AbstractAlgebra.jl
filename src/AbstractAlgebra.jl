@@ -485,5 +485,30 @@ end
 ###############################################################################
 include("utils.jl")
 
+using PrecompileTools: @setup_workload, @compile_workload    # this is a small dependency
+
+@setup_workload begin
+  # Putting some things in `@setup_workload` instead of `@compile_workload` can reduce the size of the
+  # precompile file and potentially make loading faster.
+  @compile_workload begin
+    R, = residue_ring(ZZ, 1)
+    ConformanceTests.exercise_Ring_interface(R)   # is_gen fails on polys
+
+    R, = residue_ring(ZZ, -4)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    R, = residue_ring(ZZ, 16453889)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    S, x = polynomial_ring(R, "x")
+    R, = residue_ring(S, x^3 + 3x + 1)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    S, x = polynomial_ring(QQ, "x")
+    R, = residue_ring(S, x^2 + 1)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+  end
+end
+
 
 end # module
