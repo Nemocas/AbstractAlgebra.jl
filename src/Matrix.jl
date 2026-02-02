@@ -7132,7 +7132,7 @@ This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
    is_square(M) || throw(DomainError(M, "matrix must be square"))
-   identity_matrix(M, nrows(M))
+   return identity_matrix(M, nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
