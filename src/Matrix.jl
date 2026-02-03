@@ -55,16 +55,16 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = Generic.MatSpaceElem{T}
 ###############################################################################
 
 """
-    is_zero_initialized(T::Type{<:MatrixElem})
-    is_zero_initialized(mat::T) where {T<:MatrixElem}
+    is_zero_initialized(T::Type{<:MatElem})
+    is_zero_initialized(mat::T) where {T<:MatElem}
 
 Specify whether the default-constructed matrices of type `T`, via the
 `T(R::Ring, ::UndefInitializer, r::Int, c::Int)` constructor, are
 zero-initialized. The default is `false`, and new matrix types should
 specialize this method to return `true` if suitable, to enable optimizations.
 """
-is_zero_initialized(::Type{<:MatrixElem}) = false
-is_zero_initialized(::T) where {T<:MatrixElem} = is_zero_initialized(T)
+is_zero_initialized(::Type{<:MatElem}) = false
+is_zero_initialized(::T) where {T<:MatElem} = is_zero_initialized(T)
 
 function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -186,18 +186,18 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_rows(a::MatElem)
 
 Return the number of rows of the given matrix.
 """
-number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(a::MatElem)
 
 @doc raw"""
-    number_of_columns(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_columns(a::MatElem)
 
 Return the number of columns of the given matrix.
 """
-number_of_columns(a::MatrixElem{T}) where {T<:NCRingElement}
+number_of_columns(a::MatElem)
 
 @doc raw"""
     length(a::MatrixElem{T}) where T <: NCRingElement
@@ -244,7 +244,7 @@ square matrices or else an error is thrown.
 one(a::MatSpace) = check_square(a)(1)
 
 @doc raw"""
-    one(a::MatrixElem{T}) where T <: NCRingElement
+    one(a::MatElem{T}) where T <: NCRingElement
 
 Return the identity matrix in the same matrix space as $a$.
 If the matrix space does not comprise square matrices, an error is thrown.
@@ -1457,7 +1457,7 @@ end
 ###############################################################################
 
 """
-    is_symmetric(M::MatrixElem)
+    is_symmetric(M::MatElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -1496,7 +1496,6 @@ end
 
 @doc raw"""
     transpose(x::MatElem)
-    transpose(x::MatRingElem)
 
 Return the transpose of `x`.
 
@@ -1525,9 +1524,7 @@ end
 
 @doc raw"""
     transpose!(x::MatElem)
-    transpose!(x::MatRingElem)
     transpose!(z::T, x::T) where T <: MatElem
-    transpose!(z::T, x::T) where T <: MatRingElem
 
 Return the transpose of `x`; the unary version may modify `x`, the binary version may modify `z`.
 **The binary version does not check dimensions -- the caller must ensure that**
@@ -2464,7 +2461,7 @@ function det(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    det(M::MatrixElem{T}) where {T <: RingElement}
+    det(M::MatElem{T}) where {T <: RingElement}
 
 Return the determinant of the matrix $M$. We assume $M$ is square.
 
@@ -2714,7 +2711,7 @@ end
 ###############################################################################
 
 """
-    is_alternating(M::MatrixElem)
+    is_alternating(M::MatElem)
 
 Return whether the form corresponding to the matrix `M` is alternating,
 i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
@@ -2729,7 +2726,7 @@ function is_alternating(M::MatElem)
 end
 
 """
-    is_skew_symmetric(M::MatrixElem)
+    is_skew_symmetric(M::MatElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
@@ -2908,7 +2905,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    rank(M::MatrixElem{T}) where {T <: RingElement}
+    rank(M::MatElem{T}) where {T <: RingElement}
 
 Return the rank of the matrix $M$.
 
@@ -2943,9 +2940,9 @@ function rank(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem} -> Int
-    rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem} -> Int
-    rank_interpolation(M::MatrixElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ using an interpolation-like method. 
 
@@ -3055,11 +3052,11 @@ function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
-Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-like method.
+Returns the rank of $A$ with error probability < $err$ using an interpolation-like method.
 
 # Examples
 
@@ -3709,7 +3706,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_upper_triangular(A::MatrixElem)
+    is_upper_triangular(A::MatElem)
 
 Return `true` if $A$ is an upper triangular matrix, that is,
 all entries below the main diagonal are zero. Note that this
@@ -3874,7 +3871,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_lower_triangular(A::MatrixElem)
+    is_lower_triangular(A::MatElem)
 
 Return `true` if $A$ is an lower triangular matrix, that is,
 all entries above the main diagonal are zero. Note that this
@@ -3909,7 +3906,7 @@ function is_lower_triangular(M::MatElem)
 end
 
 @doc raw"""
-    is_diagonal(A::MatrixElem)
+    is_diagonal(A::MatElem)
 
 Return `true` if $A$ is a diagonal matrix, that is,
 all entries off the main diagonal are zero. Note that this
