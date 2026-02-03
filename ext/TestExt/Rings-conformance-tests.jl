@@ -761,6 +761,45 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
           # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
       end
 
+      if nrows(S) == ncols(S)
+         @testset "Determinant" begin
+            @test isone(det(one(S))) # should always hold, even for 0x0
+            @test nrows(S) == 0 || iszero(det(zero(S)))
+
+            @test isone(AbstractAlgebra.det_df(one(S))) # should always hold, even for 0x0
+            @test nrows(S) == 0 || iszero(AbstractAlgebra.det_df(zero(S)))
+
+            if base_ring_type(S) <: Field
+               @test isone(AbstractAlgebra.det_fflu(one(S))) # should always hold, even for 0x0
+               @test nrows(S) == 0 || iszero(AbstractAlgebra.det_fflu(zero(S)))
+            end
+            if base_ring_type(S) <: PolyRingElem && is_domain_type(base_ring_type(S))
+               @test isone(AbstractAlgebra.det_interpolation(one(S))) # should always hold, even for 0x0
+               @test nrows(S) == 0 || iszero(AbstractAlgebra.det_interpolation(zero(S)))
+            end
+
+            for k in 1:reps
+               a = generate_element(S)::ST
+               b = generate_element(S)::ST
+               A = deepcopy(a)
+               B = deepcopy(b)
+
+               da = det(a)
+               db = det(b)
+               @test det(a*b) == da*db
+               @test da == AbstractAlgebra.det_df(a)
+               if base_ring_type(S) <: Field
+                  @test da == AbstractAlgebra.det_fflu(a)
+               end
+               if base_ring_type(S) <: PolyRingElem && is_domain_type(base_ring_type(S))
+                  @test da == AbstractAlgebra.det_interpolation(a)
+               end
+
+               @test a == A
+               @test b == B
+             end
+         end
+      end
    end
 
    return nothing
@@ -803,6 +842,9 @@ function test_MatRing_interface(S::MatRing; reps = 15)
       end
 
       @testset "Determinant" begin
+         @test isone(det(one(S))) # should always hold, even for 0x0
+         @test degree(S) == 0 || iszero(det(zero(S)))
+
          for k in 1:reps
             a = generate_element(S)::ST
             b = generate_element(S)::ST
