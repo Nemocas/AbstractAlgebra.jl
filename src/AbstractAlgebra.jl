@@ -491,6 +491,19 @@ using PrecompileTools: @setup_workload, @compile_workload    # this is a small d
   # Putting some things in `@setup_workload` instead of `@compile_workload` can reduce the size of the
   # precompile file and potentially make loading faster.
   @compile_workload begin
+    # Julia.Integers.conformance_tests
+    ConformanceTests.exercise_Ring_interface_recursive(ZZ)
+    ConformanceTests.exercise_EuclideanRing_interface(ZZ)
+
+    # Generic.Poly.conformance
+    R, x = polynomial_ring(ZZ, "x")
+    ConformanceTests.exercise_Poly_interface(R)
+    R, x = polynomial_ring(QQ, "x")
+    ConformanceTests.exercise_Poly_interface(R)
+    R, x = polynomial_ring(GF(5), "x")
+    ConformanceTests.exercise_Poly_interface(R)
+
+    # EuclideanRingResidueRingElem.conformance_tests
     R, = residue_ring(ZZ, 1)
     ConformanceTests.exercise_Ring_interface(R)   # is_gen fails on polys
 
