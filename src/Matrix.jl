@@ -110,17 +110,10 @@ function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
       throw(BoundsError(A, cols))
 end
 
-function check_square(A::MatrixElem{T}) where T <: NCRingElement
-   is_square(A) || throw(DomainError(A, "matrix must be square"))
-   A
-end
-
 function check_square(S::MatSpace)
    nrows(S) == ncols(S) || throw(DomainError(S, "matrices must be square"))
    S
 end
-
-check_square(S::MatRing) = S
 
 ###############################################################################
 #
@@ -241,7 +234,10 @@ zero(a::MatSpace) = a()
 Return the identity matrix of given matrix space. The matrix space must contain
 square matrices or else an error is thrown.
 """
-one(a::MatSpace) = check_square(a)(1)
+function one(a::MatSpace)
+   check_square(a)
+   return a(1)
+end
 
 @doc raw"""
     one(a::MatElem{T}) where T <: NCRingElement
@@ -7132,7 +7128,8 @@ with ones down the diagonal and zeroes elsewhere. `M` must be square.
 This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
-   identity_matrix(check_square(M), nrows(M))
+   is_square(M) || throw(DomainError(M, "matrix must be square"))
+   return identity_matrix(M, nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
