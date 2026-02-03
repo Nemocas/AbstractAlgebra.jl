@@ -5,16 +5,16 @@ DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup
 makedocs(
          format = [
             Documenter.HTML(;
-            size_threshold_warn = 204800,
-            size_threshold = 409600,
-         ),
-         Documenter.LaTeX(),
+             size_threshold_warn = 204800,
+             size_threshold = 409600,
+          ),
+          Documenter.LaTeX(),
          ],
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
          doctest = true,
-         checkdocs = :none, 
+         checkdocs = :none,
          pages    = [
              "index.md",
              "Fundamental interface of AbstractAlgebra.jl" => [
