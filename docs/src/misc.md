@@ -322,5 +322,5 @@ kernel(::NewTrait, C::Solve.SolveCtx{T, NewTrait}; side::Symbol = :left)
 ## Miscellaneous
 
 ```@docs
-is_pairwsie
+is_pairwise
 ```
