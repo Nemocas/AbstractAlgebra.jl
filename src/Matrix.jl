@@ -1876,7 +1876,7 @@ $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1903,6 +1903,12 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
       end
    end
    return rank, p, L, U
+end
+
+function lu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+  S = parent(A)
+  r, p, L, U = lu(matrix(A))
+  return r, p, S(L), S(U)
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
