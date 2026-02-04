@@ -108,8 +108,8 @@ function evaluate_horner_lex(B::MPolyRingElem, C::Vector{<:RingElement})
   end
   p = sortperm(Bexps, rev=true)
   if p != 1:n
-    Bcoeffs = [Bcoeffs[p[i]] for i in 1:n]
-    Bexps   = [Bexps[p[i]] for i in 1:n]
+    Bcoeffs = Bcoeffs[p]
+    Bexps   = Bexps[p]
   end
   res = elem_type(ctxA)[ctxA() for i in 1:nvars(parent(B))+2]
   _horner_lex_rec(res, ctxA, Bcoeffs, Bexps, 1, n, 1, C, ctxC, ctxA(), ctxC())
