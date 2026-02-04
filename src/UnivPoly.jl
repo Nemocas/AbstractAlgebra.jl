@@ -286,6 +286,20 @@ function Base.hash(p::UniversalRingElem, h::UInt)  # TODO
    return xor(b, hash(data(p), h))
 end
 
+function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)  # TODO
+   b = 0xcf418d4529109236%UInt
+   for (c, v) in zip(coefficients(data(p)), exponent_vectors(data(p)))
+      l = length(v)
+      while l > 0 && iszero(v[l])
+         l -= 1
+      end
+      b = xor(b, xor(Base.hash(v[1:l], h), h))
+      b = xor(b, xor(hash(c, h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
 function deepcopy_internal(p::UniversalRingElem{T}, dict::IdDict) where T
    return UniversalRingElem{T}(deepcopy_internal(data(p), dict), parent(p))
 end
@@ -752,7 +766,7 @@ Falls back to `Generic.UnivPoly{T}`.
 
 See also [`universal_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 """
-universal_poly_type(::Type{T}) where T<:RingElement = Generic.UnivPoly{T}
+universal_poly_type(::Type{T}) where T<:RingElement = UniversalRingElem{mpoly_type(T)}
 universal_poly_type(::Type{S}) where S<:Ring = universal_poly_type(elem_type(S))
 universal_poly_type(x) = universal_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 universal_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
