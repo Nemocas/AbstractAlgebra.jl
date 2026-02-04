@@ -131,7 +131,7 @@ is_term(p::UniversalRingElem{<:MPolyRingElem}) = is_term(data(p))
 
 coeff(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = coeff(data(p), i)
 
-function coeff(p::UniversalRingElem{<:MPolyRingElem{T}}, m::UniversalRingElem{<:MPolyRingElem{T}}) where T
+function coeff(p::T, m::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    p, m = univ_promote(p, m)
    return coeff(data(p), data(m))
 end
@@ -146,7 +146,7 @@ function monomial(p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
    return UniversalRingElem(m, S)
 end
 
-function monomial!(m::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
+function monomial!(m::T, p::T, i::Int) where {T <: UniversalRingElem{<:MPolyRingElem}}
    parent(m) != parent(p) && error("Incompatible monomial")
    if parent(data(m)) != parent(data(p))
       m.p = parent(data(p))()
@@ -191,7 +191,7 @@ function degree(p::UniversalRingElem{<:MPolyRingElem}, i::Int)
    return degree(data(p), i)
 end
 
-function degree(f::UniversalRingElem{<:MPolyRingElem{T}}, x::UniversalRingElem{<:MPolyRingElem{T}}) where T
+function degree(f::T, x::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    check_parent(f, x)
    return degree(f, var_index(x))
 end
@@ -542,14 +542,14 @@ end
 #
 ###############################################################################
 
-function ==(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where {T}
+function ==(a::T, b::T) where {T <: UniversalRingElem}
    check_parent(a, b)
    upgrade!(a)
    upgrade!(b)
    return data(a) == data(b)
 end
 
-function ==(a::UniversalRingElem{<:MPolyRingElem{T}}, b::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
+function ==(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    check_parent(a, b)
 
    # quick check if underlying parents agree
@@ -598,7 +598,7 @@ function ==(a::UniversalRingElem{<:MPolyRingElem{T}}, b::UniversalRingElem{<:MPo
    return true
 end
 
-function isless(a::UniversalRingElem{<:MPolyRingElem{T}}, b::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
+function isless(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    check_parent(a, b)
    return isless(data(upgrade!(a)), data(upgrade!(b)))
 end
@@ -672,15 +672,15 @@ end
 #
 ###############################################################################
 
-function divexact(a::UniversalRingElem{T}, b::UniversalRingElem{T}; check::Bool=true) where T
+function divexact(a::T, b::T; check::Bool=true) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(divexact(data(a), data(b); check=check), parent(a))
+   return T(divexact(data(a), data(b); check=check), parent(a))
 end
 
-function divides(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function divides(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
    flag, q = divides(data(a), data(b))
-   return flag, UniversalRingElem{T}(q, parent(a))
+   return flag, T(q, parent(a))
 end
 
 ###############################################################################
@@ -689,15 +689,15 @@ end
 #
 ###############################################################################
 
-function Base.div(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function Base.div(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(div(data(a), data(b)), parent(a))
+   return T(div(data(a), data(b)), parent(a))
 end
 
-function Base.divrem(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where T
+function Base.divrem(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
    q, r = divrem(data(a), data(b))
-   return UniversalRingElem{T}(q, parent(a)), UniversalRingElem{T}(r, parent(a))
+   return T(q, parent(a)), T(r, parent(a))
 end
 
 ###############################################################################
@@ -714,7 +714,7 @@ function derivative(p::UniversalRingElem{<:MPolyRingElem{T}}, j::Int) where {T}
    return UniversalRingElem(derivative(data(p), j), parent(p))
 end
 
-function derivative(p::UniversalRingElem{<:MPolyRingElem{T}}, x::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
+function derivative(p::T, x::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    return derivative(p, var_index(x))
 end
 
@@ -724,13 +724,13 @@ end
 #
 ###############################################################################
 
-function remove(z::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
+function remove(z::T, p::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    z, p = univ_promote(z, p)
    val, q = remove(data(z), data(p))
    return val, UniversalRingElem(q, parent(z))
 end
 
-function valuation(z::UniversalRingElem{<:MPolyRingElem{T}}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T}
+function valuation(z::T, p::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
   v, _ = remove(z, p)
   return v
 end
@@ -836,14 +836,14 @@ end
 #
 ###############################################################################
 
-function gcd(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where {T <: RingElement}
+function gcd(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(gcd(data(a), data(b)), parent(a))
+   return T(gcd(data(a), data(b)), parent(a))
 end
 
-function lcm(a::UniversalRingElem{T}, b::UniversalRingElem{T}) where {T <: RingElement}
+function lcm(a::T, b::T) where {T <: UniversalRingElem}
    a, b = univ_promote(a, b)
-   return UniversalRingElem{T}(lcm(data(a), data(b)), parent(a))
+   return T(lcm(data(a), data(b)), parent(a))
 end
 
 ###############################################################################
@@ -954,7 +954,7 @@ function one!(a::UniversalRingElem{T}) where {T <: RingElement}
   return a
 end
 
-function neg!(z::UniversalRingElem{T}, a::UniversalRingElem{T}) where {T <: RingElement}
+function neg!(z::T, a::T) where {T <: UniversalRingElem}
   if parent(data(z)) == parent(data(a))
     z.p = neg!(z.p, a.p)
   else
@@ -967,7 +967,7 @@ function fit!(a::UniversalRingElem{<:MPolyRingElem}, n::Int)
   fit!(data(a), n)
 end
 
-function add!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRingElem{T}) where {T <: RingElement}
+function add!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
     a.p = add!(data(a), data(b), data(c))
   else
@@ -976,7 +976,7 @@ function add!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRing
   return a
 end
 
-function add!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) where {T <: RingElement}
+function add!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
     a.p = add!(data(a), data(b), c)
   else
@@ -985,9 +985,9 @@ function add!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) 
   return a
 end
 
-add!(a::UniversalRingElem{T}, b::RingElement, c::UniversalRingElem{T}) where {T <: RingElement} = add!(a, c, b)
+add!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem} = add!(a, c, b)
 
-function sub!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRingElem{T}) where {T <: RingElement}
+function sub!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
     a.p = sub!(data(a), data(b), data(c))
   else
@@ -996,7 +996,7 @@ function sub!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRing
   return a
 end
 
-function sub!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) where {T <: RingElement}
+function sub!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
     a.p = sub!(data(a), data(b), c)
   else
@@ -1005,7 +1005,7 @@ function sub!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) 
   return a
 end
 
-function sub!(a::UniversalRingElem{T}, b::RingElement, c::UniversalRingElem{T}) where {T <: RingElement}
+function sub!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(c))
     a.p = sub!(data(a), b, data(c))
   else
@@ -1014,7 +1014,7 @@ function sub!(a::UniversalRingElem{T}, b::RingElement, c::UniversalRingElem{T}) 
   return a
 end
 
-function mul!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRingElem{T}) where {T <: RingElement}
+function mul!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
     a.p = mul!(data(a), data(b), data(c))
   else
@@ -1023,7 +1023,7 @@ function mul!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::UniversalRing
   return a
 end
 
-function mul!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) where {T <: RingElement}
+function mul!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
     a.p = mul!(data(a), data(b), c)
   else
@@ -1032,7 +1032,7 @@ function mul!(a::UniversalRingElem{T}, b::UniversalRingElem{T}, c::RingElement) 
   return a
 end
 
-mul!(a::UniversalRingElem{T}, b::RingElement, c::UniversalRingElem{T}) where {T <: RingElement} = mul!(a, c, b)
+mul!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem} = mul!(a, c, b)
 
 ###############################################################################
 #
@@ -1040,7 +1040,7 @@ mul!(a::UniversalRingElem{T}, b::RingElement, c::UniversalRingElem{T}) where {T 
 #
 ###############################################################################
 
-promote_rule(::Type{UniversalRingElem{T}}, ::Type{UniversalRingElem{T}}) where {T <: RingElement} = UniversalRingElem{T}
+promote_rule(::Type{T}, ::Type{T}) where {T <: UniversalRingElem} = T
 
 function promote_rule(::Type{UniversalRingElem{T}}, ::Type{V}) where {T <: RingElement, V <: RingElement}
    promote_rule(T, V) == T ? UniversalRingElem{T} : Union{}
