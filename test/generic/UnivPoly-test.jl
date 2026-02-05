@@ -29,6 +29,9 @@
          @test elem_type(Generic.UniversalPolyRing{elem_type(R)}) == Generic.UnivPoly{elem_type(R)}
          @test parent_type(Generic.UnivPoly{elem_type(R)}) == Generic.UniversalPolyRing{elem_type(R)}
 
+         @test elem_type(S) == universal_poly_type(elem_type(R))
+         @test typeof(S) == universal_poly_ring_type(elem_type(R))
+
          @test coefficient_ring(S) === R
          @test coefficient_ring(S) === R
          @test coefficient_ring_type(S) === typeof(R)

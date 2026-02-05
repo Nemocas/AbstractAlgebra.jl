@@ -10,6 +10,42 @@ end
 
 ###############################################################################
 #
+#   Data type and parent object methods
+#
+###############################################################################
+
+@doc raw"""
+    universal_poly_type(::Type{T}) where T<:RingElement
+    universal_poly_type(::T) where T<:RingElement
+    universal_poly_type(::Type{S}) where S<:Ring
+    universal_poly_type(::S) where S<:Ring
+
+The type of universal polynomials with coefficients of type `T` respectively `elem_type(S)`.
+Falls back to `Generic.UnivPoly{T}`.
+
+See also [`universal_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+"""
+universal_poly_type(::Type{T}) where T<:RingElement = Generic.UnivPoly{T}
+universal_poly_type(::Type{S}) where S<:Ring = universal_poly_type(elem_type(S))
+universal_poly_type(x) = universal_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+universal_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+universal_poly_type(T::Type{Union{}}) = throw(MethodError(universal_poly_type, (T,)))
+
+@doc raw"""
+    mpoly_ring_type(::Type{T}) where T<:RingElement
+    mpoly_ring_type(::T) where T<:RingElement
+    mpoly_ring_type(::Type{S}) where S<:Ring
+    mpoly_ring_type(::S) where S<:Ring
+
+The type of universal polynomial rings with coefficients of type `T`
+respectively `elem_type(S)`. Implemented via [`universal_poly_type`](@ref).
+
+See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+"""
+universal_poly_ring_type(x) = parent_type(universal_poly_type(x))
+
+###############################################################################
+#
 #   Evaluation
 #
 ###############################################################################
