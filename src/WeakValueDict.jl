@@ -661,13 +661,13 @@ function Base.iterate(t::WeakValueDict{K,V}, state...) where {K, V}
         while true
             y = iterate(t.ht, state...)
             y === nothing && return nothing
-            wkv, state = y
+            wkv, new_state = y
             k = wkv[1]
             v = wkv[2].value
             GC.safepoint() # ensure `v` is now gc-rooted
             k === nothing && continue # indicates `k` is scheduled for deletion
             kv = Pair{K,V}(k::K, v)
-            return (kv, state)
+            return (kv, new_state)
         end
     end
 end
