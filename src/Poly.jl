@@ -55,7 +55,8 @@ number_of_variables(a::PolyRing) = 1
 characteristic(R::PolyRing) = characteristic(coefficient_ring(R))
 is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, coefficient_ring(R))
 
-is_finite(a::PolyRing) = is_trivial(a)
+is_finite(R::PolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::PolyRing) = is_known(is_trivial, R)
 
 Base.copy(a::PolyRingElem) = deepcopy(a)
 
