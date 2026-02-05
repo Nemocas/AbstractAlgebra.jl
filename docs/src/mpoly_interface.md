@@ -57,6 +57,25 @@ variables/generators) and ordering, they should certainly have the same parent o
 See `src/generic/GenericTypes.jl` for an example of how to implement such a cache (which
 usually makes use of a dictionary).
 
+```julia
+mpoly_type(::Type{T}) where T <: RingElement
+```
+
+Return the type of a (multivariate) polynomial whose coefficients have type `T`.
+
+This function is defined for generic polynomials and needs to be defined only for
+special polynomial rings, e.g. those defined by a C implementation.
+
+```julia
+mpoly_ring_type(::Type{T})
+```
+Return the type of the parent of a (multivariate) polynomial whose coefficients
+have type `T`.
+
+This function is defined for generic (multivariate) polynomials, and needs to be
+defined only for special polynomial rings, e.g. those defined by a C implementation.
+
+
 ## Required functionality for multivariate polynomials
 
 In addition to the required functionality for the Ring interface, the Multivariate
