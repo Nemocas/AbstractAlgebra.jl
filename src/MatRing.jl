@@ -157,14 +157,6 @@ function deepcopy_internal(d::MatRingElem{T}, dict::IdDict) where T <: NCRingEle
    return z
 end
 
-################################################################################
-#
-#   is_square
-#
-################################################################################
-
-is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
-
 ###############################################################################
 #
 #   String I/O
