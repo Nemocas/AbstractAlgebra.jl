@@ -68,3 +68,8 @@ module VarNamesTest
     end
   end
 end
+
+@testset "is_pairwise" begin
+  @test is_pairwise(!is_associated, [2, -3, 5])
+  @test !is_pairwise(!is_associated, [2, -3, -2])
+end

@@ -385,6 +385,34 @@ end
 include("misc/ProductIterator.jl")
 include("misc/Evaluate.jl")
 
+@doc raw"""
+    is_pairwise(f, a::AbstractVector)
+
+Return whether `f(a[i], a[j])` is true for all `i != j`. It is assumed that `f`
+is symmetric.
+
+# Examples
+
+```jldoctest
+julia> is_pairwise(!is_associated, [2, -3, 5])
+true
+
+julia> is_pairwise(!is_associated, [2, -3, -2])
+false
+```
+"""
+function is_pairwise(fun, arr::AbstractVector)
+  for i in 1:length(arr)
+    for j in 1:(i - 1)
+      if !fun(arr[i], arr[j])
+        return false
+      end
+    end
+  end
+  return true
+end
+
+
 ###############################################################################
 #
 #   methods to inquire about known properties of objects

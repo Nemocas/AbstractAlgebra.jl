@@ -332,6 +332,7 @@ export is_nilpotent
 export is_noetherian
 export is_odd
 export is_one
+export is_pairwise
 export is_perfect
 export is_popov
 export is_positive
