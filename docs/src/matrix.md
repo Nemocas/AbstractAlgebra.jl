@@ -74,6 +74,7 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ones_matrix(::Ring, ::Int, ::Int)
 scalar_matrix(R::Ring, n::Int, a::RingElement)
 diagonal_matrix(::RingElement, ::Int, ::Int)
+diagonal_matrix(::NCRing, ::AbstractVector{<:NCRingElement})
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
 transpose(::MatElem)
