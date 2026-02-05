@@ -1,10 +1,12 @@
 using REPL # needed due to https://github.com/JuliaLang/julia/issues/53349
 
 module Tmp
-    using AbstractAlgebra
+    # Import under a different module name to verify the macro does
+    # not try to access AbstractAlgebra "by name"
+    import AbstractAlgebra as AA
 
     # test @attributes applied to a struct definition, using internal storage
-    @attributes mutable struct Foo
+    AA.@attributes mutable struct Foo
         x::Int
         Foo() = new(0)
     end
@@ -14,7 +16,7 @@ module Tmp
         x::Int
         Bar() = new(0)
     end
-    @attributes Bar
+    AA.@attributes Bar
 
     mutable struct Quux
         x::Int
@@ -25,7 +27,7 @@ module Tmp
     end
 
     # applying @attributes to a singleton type definition is supported but does nothing
-    @attributes struct AnotherSingleton
+    AA.@attributes struct AnotherSingleton
     end
 
     struct NotSupported
@@ -38,10 +40,10 @@ module Tmp
         x::Int
         FooBar{T}() where T = new(0)
     end
-    @attributes Tmp.FooBar{Bar}
+    AA.@attributes Tmp.FooBar{Bar}
 
 
-    @attributes mutable struct Container{T}
+    AA.@attributes mutable struct Container{T}
         x::T
         Container(x::T) where T = new{T}(x)
     end

@@ -91,13 +91,13 @@ macro attributes(expr)
       #    @attributes [Module[.Submodule].]Type{T}
       return esc(quote
          # do nothing if the type already has storage for attributes
-         if !AbstractAlgebra.is_attribute_storing_type($expr)
-           isstructtype($expr) && AbstractAlgebra.ismutabletype($expr) || error("attributes can only be attached to mutable structs")
+         if !$(@__MODULE__).is_attribute_storing_type($expr)
+           Base.isstructtype($expr) && $(@__MODULE__).ismutabletype($expr) || error("attributes can only be attached to mutable structs")
            let attr = Base.WeakKeyDict{$expr, Dict{Symbol, Any}}()
-             AbstractAlgebra._get_attributes(G::$expr) = Base.get(attr, G, nothing)
-             AbstractAlgebra._get_attributes!(G::$expr) = Base.get!(() -> Dict{Symbol, Any}(), attr, G)
-             AbstractAlgebra._get_attributes(::Type{$expr}) = attr
-             AbstractAlgebra.is_attribute_storing_type(::Type{$expr}) = true
+             $(@__MODULE__)._get_attributes(G::$expr) = Base.get(attr, G, nothing)
+             $(@__MODULE__)._get_attributes!(G::$expr) = Base.get!(() -> Dict{Symbol, Any}(), attr, G)
+             $(@__MODULE__)._get_attributes(::Type{$expr}) = attr
+             $(@__MODULE__).is_attribute_storing_type(::Type{$expr}) = true
            end
          end
       end)
