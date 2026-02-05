@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function isequal(a::RingElem, b::RingElem)
-   return parent(a) == parent(b) && a == b
-end
-
 # Implement `isapprox` for ring elements via equality by default. On the one
 # hand, we need isapprox methods to be able to conformance test series rings.
 # On the other hand this is essentially the only sensible thing to do in
