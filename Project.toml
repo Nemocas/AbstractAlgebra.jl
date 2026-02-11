@@ -1,6 +1,6 @@
 name = "AbstractAlgebra"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.48.2"
+version = "0.48.3"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
