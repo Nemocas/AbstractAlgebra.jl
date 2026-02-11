@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Rational function fields · AbstractAlgebra.jl</title><meta name="title" content="Rational function fields · AbstractAlgebra.jl"/><meta property="og:title" content="Rational function fields · AbstractAlgebra.jl"/><meta property="twitter:title" content="Rational function fields · AbstractAlgebra.jl"/><meta name="description" content="Documentation for AbstractAlgebra.jl."/><meta property="og:description" content="Documentation for AbstractAlgebra.jl."/><meta property="twitter:description" content="Documentation for AbstractAlgebra.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">AbstractAlgebra.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">AbstractAlgebra.jl</a></li><li><span class="tocitem">Fundamental interface of AbstractAlgebra.jl</span><ul><li><a class="tocitem" href="../types/">Type interface of AbstractAlgebra.jl</a></li><li><a class="tocitem" href="../visualizing_types/">Visualization of the types of AbstractAlgebra.jl</a></li><li><a class="tocitem" href="../extending_abstractalgebra/">Extending the interface of AbstractAlgebra.jl</a></li></ul></li><li><a class="tocitem" href="../constructors/">Constructing mathematical objects in AbstractAlgebra.jl</a></li><li><span class="tocitem">Rings</span><ul><li><a class="tocitem" href="../ring_introduction/">Introduction</a></li><li><a class="tocitem" href="../ring/">Ring functionality</a></li><li><a class="tocitem" href="../integer/">Integer ring</a></li><li><a class="tocitem" href="../total_fraction/">Total ring of fractions</a></li><li><a class="tocitem" href="../polynomial/">Univariate polynomial functionality</a></li><li><a class="tocitem" href="../ncpolynomial/">Univariate polynomials over a noncommutative ring</a></li><li><a class="tocitem" href="../mpolynomial/">Sparse distributed multivariate polynomials</a></li><li><a class="tocitem" href="../univpolynomial/">Universal polynomial</a></li><li><a class="tocitem" href="../laurent_polynomial/">Generic Laurent polynomials</a></li><li><a class="tocitem" href="../laurent_mpolynomial/">Sparse distributed multivariate Laurent polynomials</a></li><li><a class="tocitem" href="../series/">Power series</a></li><li><a class="tocitem" href="../puiseux/">Generic Puiseux series</a></li><li><a class="tocitem" href="../mseries/">Multivariate series</a></li><li><a class="tocitem" href="../residue/">Generic residue rings</a></li><li><a class="tocitem" href="../free_associative_algebra/">Free algebras</a></li></ul></li><li><span class="tocitem">Fields</span><ul><li><a class="tocitem" href="../field_introduction/">Introduction</a></li><li><a class="tocitem" href="../field/">Field functionality</a></li><li><a class="tocitem" href="../fraction/">Generic fraction fields</a></li><li><a class="tocitem" href="../rational/">Rational field</a></li><li class="is-active"><a class="tocitem" href>Rational function fields</a><ul class="internal"><li><a class="tocitem" href="#Generic-rational-function-field-type"><span>Generic rational function field type</span></a></li><li><a class="tocitem" href="#Abstract-types"><span>Abstract types</span></a></li><li><a class="tocitem" href="#Rational-function-field-constructors"><span>Rational function field constructors</span></a></li><li><a class="tocitem" href="#Basic-rational-function-field-functionality"><span>Basic rational function field functionality</span></a></li><li><a class="tocitem" href="#Rational-function-field-functionality-provided-by-AbstractAlgebra.jl"><span>Rational function field functionality provided by AbstractAlgebra.jl</span></a></li><li class="toplevel"><a class="tocitem" href="#Univariate-function-fields"><span>Univariate function fields</span></a></li><li><a class="tocitem" href="#Generic-function-field-types"><span>Generic function field types</span></a></li><li><a class="tocitem" href="#Abstract-types-2"><span>Abstract types</span></a></li><li><a class="tocitem" href="#Function-field-constructors"><span>Function field constructors</span></a></li><li><a class="tocitem" href="#Basic-function-field-functionality"><span>Basic function field functionality</span></a></li><li><a class="tocitem" href="#Function-field-functionality-provided-by-AbstractAlgebra.jl"><span>Function field functionality provided by AbstractAlgebra.jl</span></a></li></ul></li><li><a class="tocitem" href="../finfield/">Finite fields</a></li><li><a class="tocitem" href="../real/">Real field</a></li></ul></li><li><span class="tocitem">Groups</span><ul><li><a class="tocitem" href="../perm/">Permutations and Symmetric groups</a></li><li><a class="tocitem" href="../ytabs/">Partitions and Young tableaux</a></li></ul></li><li><span class="tocitem">Modules</span><ul><li><a class="tocitem" href="../module_introduction/">Introduction</a></li><li><a class="tocitem" href="../module/">Finitely presented modules</a></li><li><a class="tocitem" href="../free_module/">Free Modules and Vector Spaces</a></li><li><a class="tocitem" href="../submodule/">Submodules</a></li><li><a class="tocitem" href="../quotient_module/">Quotient modules</a></li><li><a class="tocitem" href="../direct_sum/">Direct Sums</a></li><li><a class="tocitem" href="../module_homomorphism/">Module Homomorphisms</a></li></ul></li><li><span class="tocitem">Ideals</span><ul><li><a class="tocitem" href="../ideal/">Ideal functionality</a></li></ul></li><li><span class="tocitem">Matrices</span><ul><li><a class="tocitem" href="../matrix_introduction/">Introduction</a></li><li><a class="tocitem" href="../matrix/">Matrix functionality</a></li><li><a class="tocitem" href="../matrix_spaces/">Matrix Spaces</a></li><li><a class="tocitem" href="../matrix_implementation/">Matrix implementation</a></li><li><a class="tocitem" href="../matrix_algebras/">Generic matrix algebras</a></li></ul></li><li><span class="tocitem">Maps</span><ul><li><a class="tocitem" href="../map_introduction/">Introduction</a></li><li><a class="tocitem" href="../functional_map/">Functional maps</a></li><li><a class="tocitem" href="../map_cache/">Cached maps</a></li><li><a class="tocitem" href="../map_with_inverse/">Map with inverse</a></li></ul></li><li><span class="tocitem">Miscellaneous</span><ul><li><a class="tocitem" href="../misc/">Miscellaneous</a></li><li><a class="tocitem" href="../assertions/">Assertion and Verbosity Macros</a></li></ul></li><li><span class="tocitem">Interfaces</span><ul><li><a class="tocitem" href="../interface_introduction/">Introduction</a></li><li><a class="tocitem" href="../ring_interface/">Ring Interface</a></li><li><a class="tocitem" href="../euclidean_interface/">Euclidean Ring Interface</a></li><li><a class="tocitem" href="../poly_interface/">Univariate Polynomial Ring Interface</a></li><li><a class="tocitem" href="../mpoly_interface/">Multivariate Polynomial Ring Interface</a></li><li><a class="tocitem" href="../series_interface/">Series Ring Interface</a></li><li><a class="tocitem" href="../residue_interface/">Residue Ring Interface</a></li><li><a class="tocitem" href="../field_interface/">Field Interface</a></li><li><a class="tocitem" href="../fraction_interface/">Fraction Field Interface</a></li><li><a class="tocitem" href="../module_interface/">Module Interface</a></li><li><a class="tocitem" href="../ideal_interface/">Ideal Interface</a></li><li><a class="tocitem" href="../matrix_interface/">Matrix Interface</a></li><li><a class="tocitem" href="../map_interface/">Map Interface</a></li><li><a class="tocitem" href="../rand/">Random interface</a></li><li><a class="tocitem" href="../linear_solving/">Linear solving</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Fields</a></li><li class="is-active"><a href>Rational function fields</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Rational function fields</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Nemocas/AbstractAlgebra.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/master/docs/src/function_field.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Rational-function-fields"><a class="docs-heading-anchor" href="#Rational-function-fields">Rational function fields</a><a id="Rational-function-fields-1"></a><a class="docs-heading-anchor-permalink" href="#Rational-function-fields" title="Permalink"></a></h1><p>AbstractAlgebra.jl provides a module, implemented in <code>src/generic/RationalFunctionField.jl</code> for rational function fields <span>$k(x)$</span> or <code>k[x_1, x_2, \ldots, x_n]</code> over a field <span>$k$</span>.</p><h2 id="Generic-rational-function-field-type"><a class="docs-heading-anchor" href="#Generic-rational-function-field-type">Generic rational function field type</a><a id="Generic-rational-function-field-type-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-rational-function-field-type" title="Permalink"></a></h2><p>Rational functions have type <code>Generic.RationalFunctionFieldElem{T, U}</code> where <code>T</code> is the type of elements of the coefficient field <span>$k$</span> and <code>U</code> is the type of polynomials (either univariate or multivariate) over that field. See the file <code>src/generic/GenericTypes.jl</code> for details.</p><p>Parent objects corresponding to the rational function field <span>$k$</span> have type <code>Generic.RationalFunctionField{T, U}</code>.</p><h2 id="Abstract-types"><a class="docs-heading-anchor" href="#Abstract-types">Abstract types</a><a id="Abstract-types-1"></a><a class="docs-heading-anchor-permalink" href="#Abstract-types" title="Permalink"></a></h2><p>The rational function types belong to the abstract type <code>Field</code> and the rational function field types belong to the abstract type <code>FieldElem</code>.</p><h2 id="Rational-function-field-constructors"><a class="docs-heading-anchor" href="#Rational-function-field-constructors">Rational function field constructors</a><a id="Rational-function-field-constructors-1"></a><a class="docs-heading-anchor-permalink" href="#Rational-function-field-constructors" title="Permalink"></a></h2><p>In order to construct rational functions in AbstractAlgebra.jl, one can first construct the function field itself. This is accomplished with one of the following constructors.</p><pre><code class="language-julia hljs">rational_function_field(k::Field, s::VarName; cached::Bool = true)
+rational_function_field(k::Field, s::Vector{&lt;:VarName}; cached::Bool = true)</code></pre><p>Given a coefficient field <code>k</code> return a tuple <code>(S, x)</code> consisting of the parent object of the rational function field over <span>$k$</span> and the generator(s) <code>x</code>. By default the parent object <code>S</code> will depend only on <code>R</code> and <code>s</code> and will be cached. Setting the optional argument <code>cached</code> to <code>false</code> will prevent the parent object <code>S</code> from being cached.</p><p>Here are some examples of creating rational function fields and making use of the resulting parent objects to coerce various elements into the function field.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; S, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; f = S()
+0
+
+julia&gt; g = S(123)
+123
+
+julia&gt; h = S(BigInt(1234))
+1234
+
+julia&gt; k = S(x + 1)
+x + 1
+
+julia&gt; m = S(numerator(x + 1, false), numerator(x + 2, false))
+(x + 1)//(x + 2)
+
+julia&gt; R, (x, y) = rational_function_field(QQ, [:x, :y])
+(Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
+
+julia&gt; (x + y)//y^2
+(x + y)//y^2</code></pre><h2 id="Basic-rational-function-field-functionality"><a class="docs-heading-anchor" href="#Basic-rational-function-field-functionality">Basic rational function field functionality</a><a id="Basic-rational-function-field-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-rational-function-field-functionality" title="Permalink"></a></h2><p>Fraction fields in AbstractAlgebra.jl implement the full Field interface and the entire fraction field interface.</p><p>We give some examples of such functionality.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; S, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; f = S(x + 1)
+x + 1
+
+julia&gt; g = (x^2 + x + 1)//(x^3 + 3x + 1)
+(x^2 + x + 1)//(x^3 + 3*x + 1)
+
+julia&gt; h = zero(S)
+0
+
+julia&gt; k = one(S)
+1
+
+julia&gt; isone(k)
+true
+
+julia&gt; iszero(f)
+false
+
+julia&gt; m = characteristic(S)
+0
+
+julia&gt; U = base_ring(S)
+Rationals
+
+julia&gt; V = base_ring(f)
+Rationals
+
+julia&gt; T = parent(f)
+Rational function field
+  over rationals
+
+julia&gt; r = deepcopy(f)
+x + 1
+
+julia&gt; n = numerator(g)
+x^2 + x + 1
+
+julia&gt; d = denominator(g)
+x^3 + 3*x + 1
+</code></pre><p>Note that numerator and denominator are returned as elements of a polynomial ring whose variable is printed the same way as that of the generator of the rational function field.</p><h2 id="Rational-function-field-functionality-provided-by-AbstractAlgebra.jl"><a class="docs-heading-anchor" href="#Rational-function-field-functionality-provided-by-AbstractAlgebra.jl">Rational function field functionality provided by AbstractAlgebra.jl</a><a id="Rational-function-field-functionality-provided-by-AbstractAlgebra.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Rational-function-field-functionality-provided-by-AbstractAlgebra.jl" title="Permalink"></a></h2><p>The following functionality is provided for rational function fields.</p><h3 id="Greatest-common-divisor"><a class="docs-heading-anchor" href="#Greatest-common-divisor">Greatest common divisor</a><a id="Greatest-common-divisor-1"></a><a class="docs-heading-anchor-permalink" href="#Greatest-common-divisor" title="Permalink"></a></h3><article><details class="docstring"><summary id="Base.gcd-Union{Tuple{U}, Tuple{T}, Tuple{AbstractAlgebra.Generic.RationalFunctionFieldElem{T, U}, AbstractAlgebra.Generic.RationalFunctionFieldElem{T, U}}} where {T&lt;:FieldElement, U&lt;:Union{MPolyRingElem, PolyRingElem}}"><a class="docstring-binding" href="#Base.gcd-Union{Tuple{U}, Tuple{T}, Tuple{AbstractAlgebra.Generic.RationalFunctionFieldElem{T, U}, AbstractAlgebra.Generic.RationalFunctionFieldElem{T, U}}} where {T&lt;:FieldElement, U&lt;:Union{MPolyRingElem, PolyRingElem}}"><code>Base.gcd</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">gcd(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T &lt;: FieldElement, U &lt;: Union{PolyRingElem, MPolyRingElem}}</code></pre><p>Return a greatest common divisor of <span>$a$</span> and <span>$b$</span> if one exists. N.B: we define the GCD of <span>$a/b$</span> and <span>$c/d$</span> to be gcd<span>$(ad, bc)/bd$</span>, reduced to lowest terms.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/RationalFunctionField.jl#L468-L473">source</a></section></details></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia&gt; g = (x^2 + 2x + 1)//(x^2 + x + 1)
+(x^2 + 2*x + 1)//(x^2 + x + 1)
+
+julia&gt; h = gcd(f, g)
+(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
+</code></pre><h3 id="Square-root"><a class="docs-heading-anchor" href="#Square-root">Square root</a><a id="Square-root-1"></a><a class="docs-heading-anchor-permalink" href="#Square-root" title="Permalink"></a></h3><p>Methods for <code>is_square</code> and <code>sqrt</code> are provided for inputs of type <code>RationalFunctionFieldElem</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; a = (21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+
+julia&gt; sqrt(a^2)
+(21//4*x^6 - 15*x^5 + 27//14*x^4 + 9//20*x^3 + 3//7*x + 9//10)//(x + 3)
+
+julia&gt; is_square(a^2)
+true</code></pre><h1 id="Univariate-function-fields"><a class="docs-heading-anchor" href="#Univariate-function-fields">Univariate function fields</a><a id="Univariate-function-fields-1"></a><a class="docs-heading-anchor-permalink" href="#Univariate-function-fields" title="Permalink"></a></h1><p>Univariate function fields in AbstractAlgebra are algebraic extensions <span>$K/k(x)$</span> of a rational function field <span>$k(x)$</span> over a field <span>$k$</span>.</p><p>These are implemented in a module implemented in <code>src/generic/FunctionField.jl</code>.</p><h2 id="Generic-function-field-types"><a class="docs-heading-anchor" href="#Generic-function-field-types">Generic function field types</a><a id="Generic-function-field-types-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-function-field-types" title="Permalink"></a></h2><p>Function field objects <span>$K/k(x)$</span> in AbstractAlgebra have type <code>Generic.FunctionField{T}</code> where <code>T</code> is the type of elements of the field <code>k</code>.</p><p>Corresponding function field elements have type <code>Generic.FunctionFieldElement{T}</code>. See the file <code>src/generic/GenericTypes.jl</code> for details.</p><h2 id="Abstract-types-2"><a class="docs-heading-anchor" href="#Abstract-types-2">Abstract types</a><a class="docs-heading-anchor-permalink" href="#Abstract-types-2" title="Permalink"></a></h2><p>Function field types belong to the abstract type <code>Field</code> and their elements to the abstract type <code>FieldElem</code>.</p><h2 id="Function-field-constructors"><a class="docs-heading-anchor" href="#Function-field-constructors">Function field constructors</a><a id="Function-field-constructors-1"></a><a class="docs-heading-anchor-permalink" href="#Function-field-constructors" title="Permalink"></a></h2><p>In order to construct function fields in AbstractAlgebra.jl, one first constructs the rational function field they are an extension of, then supplies a polynomial over this field to the following constructor:</p><pre><code class="language-julia hljs">function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T &lt;: FieldElement, U &lt;: PolyRingElem{T}}</code></pre><p>Given an irreducible polynomial <code>p</code> over a rational function field return a tuple <code>(S, z)</code> consisting of the parent object of the function field defined by that polynomial over <span>$k(x)$</span> and the generator <code>z</code>. By default the parent object <code>S</code> will depend only on <code>p</code> and <code>s</code> and will be cached. Setting the optional argument <code>cached</code> to <code>false</code> will prevent the parent object <code>S</code> from being cached.</p><p>Here are some examples of creating function fields and making use of the resulting parent objects to coerce various elements into the function field.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R1, x1 = rational_function_field(QQ, &quot;x1&quot;) # characteristic 0
+(Rational function field over rationals, x1)
+
+julia&gt; U1, z1 = R1[&quot;z1&quot;]
+(Univariate polynomial ring in z1 over R1, z1)
+
+julia&gt; f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+
+julia&gt; S1, y1 = function_field(f, &quot;y1&quot;)
+(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
+
+julia&gt; a = S1()
+0
+
+julia&gt; b = S1((x1 + 1)//(x1 + 2))
+(x1 + 1)//(x1 + 2)
+
+julia&gt; c = S1(1//3)
+1//3
+
+julia&gt; R2, x2 = rational_function_field(GF(23), &quot;x1&quot;) # characteristic p
+(Rational function field over finite field F_23, x1)
+
+julia&gt; U2, z2 = R2[&quot;z2&quot;]
+(Univariate polynomial ring in z2 over R2, z2)
+
+julia&gt; g = z2^2 + 3z2 + 1
+z2^2 + 3*z2 + 1
+
+julia&gt; S2, y2 = function_field(g, &quot;y2&quot;)
+(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
+
+julia&gt; d = S2(R2(5))
+5
+
+julia&gt; e = S2(y2)
+y2</code></pre><h2 id="Basic-function-field-functionality"><a class="docs-heading-anchor" href="#Basic-function-field-functionality">Basic function field functionality</a><a id="Basic-function-field-functionality-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-function-field-functionality" title="Permalink"></a></h2><p>Function fields implement the full Ring and Field interfaces. We give some examples of such functionality.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = rational_function_field(GF(23), :x) # characteristic p
+(Rational function field over finite field F_23, x)
+
+julia&gt; U, z = R[:z]
+(Univariate polynomial ring in z over R, z)
+
+julia&gt; g = z^2 + 3z + 1
+z^2 + 3*z + 1
+
+julia&gt; S, y = function_field(g, :y)
+(Function Field over finite field F_23 with defining polynomial y^2 + 3*y + 1, y)
+
+julia&gt; f = (x + 1)*y + 1
+(x + 1)*y + 1
+
+julia&gt; base_ring(f)
+Rational function field
+  over finite field F_23
+
+julia&gt; f^2
+(20*x^2 + 19*x + 22)*y + 22*x^2 + 21*x
+
+julia&gt; f*inv(f)
+1</code></pre><h2 id="Function-field-functionality-provided-by-AbstractAlgebra.jl"><a class="docs-heading-anchor" href="#Function-field-functionality-provided-by-AbstractAlgebra.jl">Function field functionality provided by AbstractAlgebra.jl</a><a id="Function-field-functionality-provided-by-AbstractAlgebra.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Function-field-functionality-provided-by-AbstractAlgebra.jl" title="Permalink"></a></h2><p>The following functionality is provided for function fields.</p><h3 id="Basic-manipulation"><a class="docs-heading-anchor" href="#Basic-manipulation">Basic manipulation</a><a id="Basic-manipulation-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-manipulation" title="Permalink"></a></h3><article><details class="docstring"><summary id="AbstractAlgebra.Generic.base_field-Tuple{AbstractAlgebra.Generic.FunctionField}"><a class="docstring-binding" href="#AbstractAlgebra.Generic.base_field-Tuple{AbstractAlgebra.Generic.FunctionField}"><code>AbstractAlgebra.Generic.base_field</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">base_field(R::FunctionField)</code></pre><p>Return the rational function field that the field <code>R</code> is an extension of. Synonymous with <code>base_ring</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L536-L541">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.var-Tuple{AbstractAlgebra.Generic.FunctionField}"><a class="docstring-binding" href="#AbstractAlgebra.var-Tuple{AbstractAlgebra.Generic.FunctionField}"><code>AbstractAlgebra.var</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">var(R::FunctionField)</code></pre><p>Return the variable name of the generator of the function field <code>R</code> as a symbol.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L550-L555">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.Generic.defining_polynomial-Tuple{AbstractAlgebra.Generic.FunctionField}"><a class="docstring-binding" href="#AbstractAlgebra.Generic.defining_polynomial-Tuple{AbstractAlgebra.Generic.FunctionField}"><code>AbstractAlgebra.Generic.defining_polynomial</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">defining_polynomial(R::FunctionField)
+modulus(R::FunctionField)</code></pre><p>Return the original polynomial that was used to define the function field <code>R</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L569-L574">source</a></section></details></article><article><details class="docstring"><summary id="Base.numerator-Union{Tuple{AbstractAlgebra.Generic.FunctionField{T}}, Tuple{T}, Tuple{AbstractAlgebra.Generic.FunctionField{T}, Bool}} where T&lt;:FieldElement"><a class="docstring-binding" href="#Base.numerator-Union{Tuple{AbstractAlgebra.Generic.FunctionField{T}}, Tuple{T}, Tuple{AbstractAlgebra.Generic.FunctionField{T}, Bool}} where T&lt;:FieldElement"><code>Base.numerator</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">Base.numerator(R::FunctionField{T}, canonicalise::Bool=true) where T &lt;: FieldElement
+Base.denominator(R::FunctionField{T}, canonicalise::Bool=true) where T &lt;: FieldElement</code></pre><p>Thinking of elements of the rational function field as fractions, put the defining polynomial of the function field over a common denominator and return the numerator/denominator respectively. Note that the resulting polynomials belong to a different ring than the original defining polynomial. The <code>canonicalise</code> is ignored, but exists for compatibility with the Generic interface.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L595-L605">source</a></section></details></article><article><details class="docstring"><summary id="Base.numerator-Union{Tuple{AbstractAlgebra.Generic.FunctionFieldElem{T}}, Tuple{T}, Tuple{AbstractAlgebra.Generic.FunctionFieldElem{T}, Bool}} where T&lt;:FieldElement"><a class="docstring-binding" href="#Base.numerator-Union{Tuple{AbstractAlgebra.Generic.FunctionFieldElem{T}}, Tuple{T}, Tuple{AbstractAlgebra.Generic.FunctionFieldElem{T}, Bool}} where T&lt;:FieldElement"><code>Base.numerator</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">Base.numerator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T &lt;: FieldElement
+Base.denominator(a::FunctionFieldElem{T}, canonicalise::Bool=true) where T &lt;: FieldElement</code></pre><p>Return the numerator and denominator of the function field element <code>a</code>. Note that elements are stored in fraction free form so that the denominator is a common denominator for the coefficients of the element <code>a</code>. If <code>canonicalise</code> is set to <code>true</code> the fraction is first canonicalised.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L618-L626">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.degree-Tuple{AbstractAlgebra.Generic.FunctionField}"><a class="docstring-binding" href="#AbstractAlgebra.degree-Tuple{AbstractAlgebra.Generic.FunctionField}"><code>AbstractAlgebra.degree</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">degree(S::FunctionField)</code></pre><p>Return the degree of the defining polynomial of the function field, i.e. the degree of the extension that the function field makes of the underlying rational function field.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L650-L656">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.gen-Union{Tuple{AbstractAlgebra.Generic.FunctionField{T}}, Tuple{T}} where T&lt;:FieldElement"><a class="docstring-binding" href="#AbstractAlgebra.gen-Union{Tuple{AbstractAlgebra.Generic.FunctionField{T}}, Tuple{T}} where T&lt;:FieldElement"><code>AbstractAlgebra.gen</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">gen(S::FunctionField{T}) where T &lt;: FieldElement</code></pre><p>Return the generator of the function field returned by the function field constructor.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L663-L668">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.is_gen-Tuple{AbstractAlgebra.Generic.FunctionFieldElem}"><a class="docstring-binding" href="#AbstractAlgebra.is_gen-Tuple{AbstractAlgebra.Generic.FunctionFieldElem}"><code>AbstractAlgebra.is_gen</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">is_gen(a::FunctionFieldElem)</code></pre><p>Return <code>true</code> if <code>a</code> is the generator of the function field returned by the function field constructor.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L682-L687">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.coeff-Tuple{AbstractAlgebra.Generic.FunctionFieldElem, Int64}"><a class="docstring-binding" href="#AbstractAlgebra.coeff-Tuple{AbstractAlgebra.Generic.FunctionFieldElem, Int64}"><code>AbstractAlgebra.coeff</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">coeff(a::FunctionFieldElem, n::Int)</code></pre><p>Return the degree <code>n</code> coefficient of the element <code>a</code> in its polynomial representation in terms of the generator of the function field. The coefficient is returned as an element of the underlying rational function field.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L698-L705">source</a></section></details></article><article><details class="docstring"><summary id="AbstractAlgebra.Generic.num_coeff-Tuple{AbstractAlgebra.Generic.FunctionFieldElem, Int64}"><a class="docstring-binding" href="#AbstractAlgebra.Generic.num_coeff-Tuple{AbstractAlgebra.Generic.FunctionFieldElem, Int64}"><code>AbstractAlgebra.Generic.num_coeff</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">num_coeff(a::FunctionFieldElem, n::Int)</code></pre><p>Return the degree <code>n</code> coefficient of the numerator of the element <code>a</code> (in its polynomial representation in terms of the generator of the function field, rationalised as per <code>numerator/denominator</code> described above). The coefficient will be an polynomial over the <code>base_ring</code> of the underlying rational function field.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L713-L721">source</a></section></details></article><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; R, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; U, z = R[:z]
+(Univariate polynomial ring in z over R, z)
+
+julia&gt; g = z^2 + 3*(x + 1)//(x + 2)*z + 1
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia&gt; S, y = function_field(g, :y)
+(Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+
+julia&gt; base_field(S)
+Rational function field
+  over rationals
+
+julia&gt; var(S)
+:y
+
+julia&gt; characteristic(S)
+0
+
+julia&gt; defining_polynomial(S)
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia&gt; numerator(S)
+(x + 2)*y^2 + (3*x + 3)*y + x + 2
+
+julia&gt; denominator(S)
+x + 2
+
+julia&gt; a = (x + 1)//(x^2 + 1)*y + 3x + 2
+((x + 1)*y + 3*x^3 + 2*x^2 + 3*x + 2)//(x^2 + 1)
+
+julia&gt; numerator(a, false)
+(x + 1)*y + 3*x^3 + 2*x^2 + 3*x + 2
+
+julia&gt; denominator(a, false)
+x^2 + 1
+
+julia&gt; degree(S)
+2
+
+julia&gt; gen(S)
+y
+
+julia&gt; is_gen(y)
+true
+
+julia&gt; coeff(a, 1)
+(x + 1)//(x^2 + 1)
+
+julia&gt; num_coeff(a, 1)
+x + 1</code></pre><h3 id="Trace-and-norm"><a class="docs-heading-anchor" href="#Trace-and-norm">Trace and norm</a><a id="Trace-and-norm-1"></a><a class="docs-heading-anchor-permalink" href="#Trace-and-norm" title="Permalink"></a></h3><article><details class="docstring"><summary id="LinearAlgebra.norm-Tuple{AbstractAlgebra.Generic.FunctionFieldElem}"><a class="docstring-binding" href="#LinearAlgebra.norm-Tuple{AbstractAlgebra.Generic.FunctionFieldElem}"><code>LinearAlgebra.norm</code></a> — <span class="docstring-category">Method</span></summary><section><div><pre><code class="language-julia hljs">norm(a::FunctionFieldElem)</code></pre><p>Return the absolute norm of <code>a</code> as an element of the underlying rational function field.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/7fa5e0448a51bab356df749f13e3e35977ec9d43/src/generic/FunctionField.jl#L1045-L1050">source</a></section></details></article><pre><code class="language-julia-repl hljs">julia&gt; R, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia&gt; U, z = R[:z]
+(Univariate polynomial ring in z over R, z)
+
+julia&gt; g = z^2 + 3*(x + 1)//(x + 2)*z + 1
+z^2 + (3*x + 3)//(x + 2)*z + 1
+
+julia&gt; S, y = function_field(g, :y)
+(Function Field over rationals with defining polynomial (x + 2)*y^2 + (3*x + 3)*y + x + 2, y)
+
+julia&gt; f = (-3*x - 5//3)//(x - 2)*y + (x^3 + 1//9*x^2 + 5)//(x - 2)
+((-3*x - 5//3)*y + x^3 + 1//9*x^2 + 5)//(x - 2)
+
+julia&gt; norm(f)
+(x^7 + 20//9*x^6 + 766//81*x^5 + 2027//81*x^4 + 110//3*x^3 + 682//9*x^2 + 1060//9*x + 725//9)//(x^3 - 2*x^2 - 4*x + 8)
+
+julia&gt; tr(f)
+(2*x^4 + 38//9*x^3 + 85//9*x^2 + 24*x + 25)//(x^2 - 4)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../rational/">« Rational field</a><a class="docs-footer-nextpage" href="../finfield/">Finite fields »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Wednesday 11 February 2026 14:10">Wednesday 11 February 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body><div data-docstringscollapsed="true"></div></html>
