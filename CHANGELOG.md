@@ -9,6 +9,28 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.48.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.3) - 2026-02-11
+
+### New or extended functionality
+
+- [#2326](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2326) Add `is_pairwise` function
+- [#2333](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2333) Add `universal_poly_type` and `universal_poly_ring_type`
+
+### Fixed bugs that returned incorrect results
+
+- [#2288](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2288) Ensure `det` for 0x0 matrices always returns 1 (and not 0)
+- [#2305](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2305) Disable Julia fallbacks for `iszero`/`isone` for our parent objects
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2332](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2332) Fix `@attributes Foo` if `AbstractAlgebra` is not imported
+
+### Other fixed bugs
+
+- [#2320](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2320) Avoid stack overflow if `divexact` is not implemented
+- [#2335](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2335) Avoid stack overflow if `divexact_left` or `divexact_right` is not implemented
+- [#2338](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2338) Restrict `hcat`, `vcat`, `cat`, `hvcat` to `MatElem`; drop support for `MatRingElem` as this would in most cases result in an error anyway (for non-square results)
+
 ## [0.48.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.0) - 2026-01-09
 
 ### Breaking changes
