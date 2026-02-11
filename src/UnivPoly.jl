@@ -1088,7 +1088,7 @@ function (a::UniversalRing{T, U})(b::T) where {T, U}
    return UniversalRingElem{T, U}(base_ring(a)(b), a)
 end
 
-function (S::UniversalRing{T, U})(p::UniversalRingElem{T, U}) where {T, U}
+function (S::UniversalRing{T, U})(p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElement}
    parent(p) !== S && error("Unable to coerce")
    return upgrade!(p)
 end
