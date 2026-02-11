@@ -89,7 +89,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          end
 
          # test is_nilpotent if it is supported
-         try
+         if ConformanceTests._implements(R, is_nilpotent)
             f = is_nilpotent(R(1))
             @test is_nilpotent(R(0))
             if is_trivial(R)
@@ -106,7 +106,6 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                   end
                end
             end
-         catch
          end
       end
 
