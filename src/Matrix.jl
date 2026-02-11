@@ -4578,7 +4578,7 @@ end
 
 function charpoly(Y::MatrixElem)
    R = base_ring(Y)
-   Rx, x = polynomial_ring(R; cached=false)
+   Rx, x = polynomial_ring(R; cached=true)  # true: so that charpoly(M) == charpoly(M) works without triggering parent mismatch error
    return charpoly(Rx, Y)
 end
 
@@ -4828,7 +4828,7 @@ end
 
 function minpoly(M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    R = base_ring(M)
-   Rx, x = polynomial_ring(R; cached=false)
+   Rx, x = polynomial_ring(R; cached=true)  # true: so that minpoly(M) == minpoly(M) works without triggering parent mismatch error
    return minpoly(Rx, M, charpoly_only)
 end
 
