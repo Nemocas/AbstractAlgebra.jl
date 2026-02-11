@@ -766,7 +766,7 @@ Falls back to `Generic.UnivPoly{T}`.
 
 See also [`universal_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 """
-universal_poly_type(::Type{T}) where T<:RingElement = Generic.UnivPoly{T}
+universal_poly_type(::Type{T}) where T<:RingElement = UniversalRingElem{mpoly_type(T)}
 universal_poly_type(::Type{S}) where S<:Ring = universal_poly_type(elem_type(S))
 universal_poly_type(x) = universal_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 universal_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
