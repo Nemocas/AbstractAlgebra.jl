@@ -1076,16 +1076,12 @@ function upgrade!(p::UniversalRingElem)
    return p
 end
 
+function (a::UniversalRing)()
+   return UniversalRingElem(base_ring(a)(), a)
+end
+
 function (a::UniversalRing)(b::RingElement)
-   return a(base_ring(a)(b))
-end
-
-function (a::UniversalRing{T, U})() where {T, U}
-   return UniversalRingElem{T, U}(base_ring(a)(), a)
-end
-
-function (a::UniversalRing{T, U})(b::T) where {T, U}
-   return UniversalRingElem{T, U}(base_ring(a)(b), a)
+   return UniversalRingElem(base_ring(a)(b), a)
 end
 
 function (S::UniversalRing{T, U})(p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElement}
