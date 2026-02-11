@@ -230,10 +230,10 @@ julia> multiply_row(M, 2, 3)
 ## Swapping rows and columns
 
 ```@docs
-swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
+swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
 ```
 
 Swap the rows of `M` in place. The function returns the mutated matrix (since
@@ -634,7 +634,7 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
-is_snf(::MatrixElem{T}) where T <: RingElement
+is_snf(::MatElem{T}) where T <: RingElement
 
 snf(::MatElem{T}) where T <: RingElem
 snf_with_transform(::MatElem{T}) where T <: RingElem
