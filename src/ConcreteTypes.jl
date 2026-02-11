@@ -23,18 +23,19 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct UniversalRing{T <: RingElement} <: Ring
+@attributes mutable struct UniversalRing{T <: RingElem, U <: RingElement} <: Ring
   base_ring::Ring
 
-  function UniversalRing{T}(R::Ring) where {T<:RingElement}
+  function UniversalRing{T, U}(R::Ring) where {T <: RingElem, U <: RingElement}
     @assert elem_type(R) == T
-    return new{T}(R)
+    @assert elem_type(coefficient_ring(R)) == U
+    return new{T, U}(R)
   end
 end
 
-mutable struct UniversalRingElem{T <: RingElement} <: RingElem
+mutable struct UniversalRingElem{T <: RingElem, U <: RingElement} <: RingElem
   p::T
-  parent::UniversalRing{T}
+  parent::UniversalRing{T, U}
 end
 
 ###############################################################################
