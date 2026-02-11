@@ -2053,7 +2053,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       else
          res = divexact(res, canonical_unit(res))
          V = [S(res)]
-         B0 = [reduce_by_resultant(p, res) for p in D]
+         B0 = map(Base.Fix2(reduce_by_resultant, res), D)
          B0 = filter(!iszero, B0)
          B = sort(B0, by=mysize2, rev=true)
          H = T[]
