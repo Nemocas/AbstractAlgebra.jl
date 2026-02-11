@@ -16,9 +16,9 @@ base_ring(S::UniversalRing) = S.base_ring::base_ring_type(S)
 coefficient_ring_type(::Type{UniversalRing{T, U}}) where {T, U} = parent_type(U)
 coefficient_ring(S::UniversalRing) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
 
-is_domain_type(::Type{UniversalRingElem{T}}) where T = is_domain_type(T)
+is_domain_type(::Type{<:UniversalRingElem{T}}) where T = is_domain_type(T)
 
-is_exact_type(::Type{UniversalRingElem{T}}) where T = is_exact_type(T)
+is_exact_type(::Type{<:UniversalRingElem{T}}) where T = is_exact_type(T)
 
 parent(p::UniversalRingElem) = p.parent::parent_type(p)
 
