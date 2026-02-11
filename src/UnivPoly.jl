@@ -623,9 +623,11 @@ end
 #
 ###############################################################################
 
-==(p::UniversalRingElem, n::RingElement) = data(p) == n
+==(p::UniversalRingElem, n::JuliaRingElement) = data(p) == n
+==(p::UniversalRingElem{T, U}, n::U) where {T, U} = data(p) == n
 
-==(n::RingElement, p::UniversalRingElem) = data(p) == n
+==(n::JuliaRingElement, p::UniversalRingElem) = data(p) == n
+==(n::U, p::UniversalRingElem{T, U}) where {T, U} = data(p) == n
 
 ###############################################################################
 #
