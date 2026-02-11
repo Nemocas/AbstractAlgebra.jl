@@ -66,7 +66,7 @@ julia> number_of_generators(S)
 1
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}}:
+2-element Vector{UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}, BigInt}}:
  y
  z
 
