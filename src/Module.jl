@@ -159,14 +159,16 @@ function intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    G1 = gens(M)
    M1 = M
    while M1 !== P
-      G1 = [M1.map(v) for v in G1]
+      _map1 = M1.map
+      G1 = [_map1(v) for v in G1]
       M1 = supermodule(M1)
    end
    # Compute the generators of N as elements of P
    G2 = gens(N)
    M2 = N
    while M2 !== P
-      G2 = [M2.map(v) for v in G2]
+      _map2 = M2.map
+      G2 = [_map2(v) for v in G2]
       M2 = supermodule(M2)
    end
    # Make matrix containing all generators and relations as rows
@@ -229,14 +231,16 @@ function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    G1 = gens(M)
    M1 = M
    while M1 !== P
-      G1 = [M1.map(v) for v in G1]
+      _map1 = M1.map
+      G1 = [_map1(v) for v in G1]
       M1 = supermodule(M1)
    end
    # Compute the generators of N as elements of P
    G2 = gens(N)
    M2 = N
    while M2 !== P
-      G2 = [M2.map(v) for v in G2]
+      _map2 = M2.map
+      G2 = [_map2(v) for v in G2]
       M2 = supermodule(M2)
    end
    # Put (rewritten) gens of M and N into matrices with relations of P

@@ -3230,7 +3230,7 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
       if k != 1
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
-         e2 = [zeros(UInt, M, length(b[i])) for i in 1:len]
+         e2 = [zeros(UInt, M, length(bi)) for bi in b]
          pack_monomials(e1, a.exps, k, exp_bits, length(a))
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits, length(b[i]))
@@ -3238,7 +3238,7 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
-         b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
+         b1 = [par(bi.coeffs, e2i) for (bi, e2i) in zip(b, e2)]
          for i = 1:len
             b1[i].length = b[i].length
          end
@@ -3246,20 +3246,20 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
          if flag == false
             exp_bits *= 2
          else
-            eq = [zeros(UInt, N, length(q[i])) for i in 1:len]
+            eq = [zeros(UInt, N, length(qi)) for qi in q]
             for i = 1:len
                unpack_monomials(eq[i], q[i].exps, k, exp_bits, length(q[i]))
             end
             er = zeros(UInt, N, length(r))
             unpack_monomials(er, r.exps, k, exp_bits, length(r))
-            return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
+            return [parent(a)(qi.coeffs, eqi) for (qi, eqi) in zip(q, eq)], parent(a)(r.coeffs, er)
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
          flag == false && error("Exponent overflow in divrem_monagan_pearce")
-         eq = [q[i].exps for i in 1:len]
+         eq = [qi.exps for qi in q]
          er = r.exps
-         return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
+         return [parent(a)(qi.coeffs, eqi) for (qi, eqi) in zip(q, eq)], parent(a)(r.coeffs, er)
       end
    end
 end
