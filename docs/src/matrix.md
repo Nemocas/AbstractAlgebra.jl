@@ -634,7 +634,7 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
-is_snf(::MatElem{T}) where T <: RingElement
+is_snf(::MatrixElem{T}) where T <: RingElement
 
 snf(::MatElem{T}) where T <: RingElem
 snf_with_transform(::MatElem{T}) where T <: RingElem
