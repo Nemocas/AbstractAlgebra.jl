@@ -10,21 +10,21 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{UniversalRing{T}}) where T = parent_type(T)
+base_ring_type(::Type{UniversalRing{T, U}}) where {T, U} = parent_type(T)
 base_ring(S::UniversalRing) = S.base_ring::base_ring_type(S)
 
-coefficient_ring_type(::Type{<:UniversalRing{<:MPolyRingElem{T}}}) where T = parent_type(T)
-coefficient_ring(S::UniversalRing{<:MPolyRingElem}) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
+coefficient_ring_type(::Type{UniversalRing{T, U}}) where {T, U} = parent_type(U)
+coefficient_ring(S::UniversalRing) = coefficient_ring(base_ring(S))::coefficient_ring_type(S)
 
-is_domain_type(::Type{UniversalRingElem{T}}) where T = is_domain_type(T)
+is_domain_type(::Type{<:UniversalRingElem{T}}) where T = is_domain_type(T)
 
-is_exact_type(::Type{UniversalRingElem{T}}) where T = is_exact_type(T)
+is_exact_type(::Type{<:UniversalRingElem{T}}) where T = is_exact_type(T)
 
 parent(p::UniversalRingElem) = p.parent::parent_type(p)
 
-elem_type(::Type{UniversalRing{T}}) where T = UniversalRingElem{T}
+elem_type(::Type{UniversalRing{T, U}}) where {T, U} = UniversalRingElem{T, U}
 
-parent_type(::Type{UniversalRingElem{T}}) where T = UniversalRing{T}
+parent_type(::Type{UniversalRingElem{T, U}}) where {T, U} = UniversalRing{T, U}
 
 number_of_variables(S::UniversalRing) = number_of_variables(base_ring(S))
 
@@ -102,9 +102,9 @@ end
 #
 ###############################################################################
 
-zero(R::UniversalRing{T}) where T = UniversalRingElem{T}(zero(base_ring(R)), R)
+zero(R::UniversalRing{T, U}) where {T, U} = UniversalRingElem{T, U}(zero(base_ring(R)), R)
 
-one(R::UniversalRing{T}) where T = UniversalRingElem{T}(one(base_ring(R)), R)
+one(R::UniversalRing{T, U}) where {T, U} = UniversalRingElem{T, U}(one(base_ring(R)), R)
 
 iszero(p::UniversalRingElem) = iszero(data(p))
 
@@ -114,9 +114,9 @@ is_unit(p::UniversalRingElem) = is_unit(data(p))
 
 is_zero_divisor(p::UniversalRingElem) = is_zero_divisor(data(p))
 
-function is_zero_divisor_with_annihilator(p::UniversalRingElem{T}) where T
+function is_zero_divisor_with_annihilator(p::UniversalRingElem{T, U}) where {T, U}
    f, b = is_zero_divisor_with_annihilator(data(p))
-   return f, UniversalRingElem{T}(b, parent(p))
+   return f, UniversalRingElem{T, U}(b, parent(p))
 end
 
 is_gen(p::UniversalRingElem) = is_gen(data(p))
@@ -140,7 +140,7 @@ function content(a::UniversalRingElem{<:MPolyRingElem})
    return content(data(a))
 end
 
-function monomial(p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
+function monomial(p::UniversalRingElem{<:MPolyRingElem}, i::Int)
    S = parent(p)
    m = monomial(data(p), i)
    return UniversalRingElem(m, S)
@@ -155,7 +155,7 @@ function monomial!(m::T, p::T, i::Int) where {T <: UniversalRingElem{<:MPolyRing
    return m
 end
 
-function term(p::UniversalRingElem{<:MPolyRingElem{T}}, i::Int) where T
+function term(p::UniversalRingElem{<:MPolyRingElem}, i::Int)
    S = parent(p)
    t = term(data(p), i)
    return UniversalRingElem(t, S)
@@ -165,19 +165,19 @@ leading_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = leading_coefficient
 
 trailing_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = trailing_coefficient(data(p))
 
-function tail(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
+function tail(p::UniversalRingElem{<:MPolyRingElem})
    S = parent(p)
    return UniversalRingElem(tail(data(p)), S)
 end
 
 constant_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = constant_coefficient(data(p))
 
-function leading_monomial(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
+function leading_monomial(p::UniversalRingElem{<:MPolyRingElem})
    S = parent(p)
    return UniversalRingElem(leading_monomial(data(p)), S)
 end
 
-function leading_term(p::UniversalRingElem{<:MPolyRingElem{T}}) where T
+function leading_term(p::UniversalRingElem{<:MPolyRingElem})
    S = parent(p)
    return UniversalRingElem(leading_term(data(p)), S)
 end
@@ -240,27 +240,27 @@ function gen(S::UniversalRing, s::VarName)
    return @inbounds gen(S, i)
 end
 
-function gen(S::UniversalRing{T}, i::Int) where T
+function gen(S::UniversalRing{T, U}, i::Int) where {T, U}
    @boundscheck 1 <= i <= nvars(S) || throw(ArgumentError("generator index out of range"))
-   return UniversalRingElem{T}(gen(base_ring(S), i), S)
+   return UniversalRingElem{T, U}(gen(base_ring(S), i), S)
 end
 
-function gens(S::UniversalRing{T}) where T
-   return [UniversalRingElem{T}(g, S) for g in gens(base_ring(S))]
+function gens(S::UniversalRing{T, U}) where {T, U}
+   return [UniversalRingElem{T, U}(g, S) for g in gens(base_ring(S))]
 end
 
 # HACK: we abuse the @varnames_interface macro to teach gens for UniversalRing
 # some superpowers
-function _univ_gens(S::UniversalRing{T}, vars::Vector{Symbol}) where T
+function _univ_gens(S::UniversalRing{T, U}, vars::Vector{Symbol}) where {T, U}
    idx = _ensure_variables(S, vars)
    # TRICK: @varnames_interface expects two return values, but we only care
    # for the second; so just return literally nothing for the first
-   return nothing, [UniversalRingElem{T}(gen(base_ring(S), i), S) for i in idx]
+   return nothing, [UniversalRingElem{T, U}(gen(base_ring(S), i), S) for i in idx]
 end
 
-AbstractAlgebra.@varnames_interface _univ_gens(R::UniversalRing{T}, s) where T
+AbstractAlgebra.@varnames_interface _univ_gens(R::UniversalRing{T, U}, s) where {T, U}
 
-function gens(S::UniversalRing{T}, a::AbstractAlgebra.VarNames, as::AbstractAlgebra.VarNames...) where T
+function gens(S::UniversalRing, a::AbstractAlgebra.VarNames, as::AbstractAlgebra.VarNames...)
    res = _univ_gens(S, a, as...)
    length(res) == 2 && return res[2] # special case for improved backwards compatibility
    return res[2:end]
@@ -270,7 +270,7 @@ var_index(x::UniversalRingElem{<:MPolyRingElem}) = var_index(data(x))
 
 var_indices(p::UniversalPolyRingElem) = var_indices(data(p))
 
-function vars(p::UniversalRingElem{<:MPolyRingElem{T}}) where {T <: RingElement}
+function vars(p::UniversalRingElem{<:MPolyRingElem})
    V = vars(data(p))
    S = parent(p)
    return [UniversalRingElem(v, S) for v in V]
@@ -300,11 +300,11 @@ function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)  # TODO
    return b
 end
 
-function deepcopy_internal(p::UniversalRingElem{T}, dict::IdDict) where T
-   return UniversalRingElem{T}(deepcopy_internal(data(p), dict), parent(p))
+function deepcopy_internal(p::UniversalRingElem, dict::IdDict)
+   return UniversalRingElem(deepcopy_internal(data(p), dict), parent(p))
 end
 
-Base.copy(f::UniversalRingElem{T}) where T = UniversalRingElem{T}(copy(data(f)), parent(f))
+Base.copy(f::UniversalRingElem) = UniversalRingElem(copy(data(f)), parent(f))
 
 ###############################################################################
 #
@@ -312,7 +312,7 @@ Base.copy(f::UniversalRingElem{T}) where T = UniversalRingElem{T}(copy(data(f)),
 #
 ###############################################################################
 
-function coeff(p::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, exps::Vector{Int}) where {T}
+function coeff(p::UniversalRingElem{<:MPolyRingElem}, vars::Vector{Int}, exps::Vector{Int})
    len = length(vars)
    @req len == length(exps) "Number of variables does not match number of exponents"
    S = parent(p)
@@ -332,7 +332,7 @@ function coeff(p::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, exps
    return UniversalRingElem(coeff(data(p), vars2, exps2), S)
 end
 
-function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where {U, T <: UniversalRingElem{<:MPolyRingElem{U}}}
+function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where {T <: UniversalRingElem{<:MPolyRingElem}}
    varidx = [var_index(x) for x in vars]
    return coeff(a, varidx, exps)
 end
@@ -366,8 +366,8 @@ end
 #
 ###############################################################################
 
-function -(p::UniversalRingElem{T}) where T
-   return UniversalRingElem{T}(-data(p), parent(p))
+function -(p::UniversalRingElem)
+   return UniversalRingElem(-data(p), parent(p))
 end
 
 ###############################################################################
@@ -502,10 +502,10 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(p::UniversalRingElem{T}; check::Bool=true) where T
+function Base.sqrt(p::T; check::Bool=true) where {T <: UniversalRingElem}
    S = parent(p)
    s = sqrt(data(p); check=check)
-   return UniversalRingElem{T}(s, S)
+   return T(s, S)
 end
 
 is_square(p::UniversalRingElem) = is_square(data(p))
@@ -518,36 +518,36 @@ is_square(p::UniversalRingElem) = is_square(data(p))
 
 for op in (:+, :-, :*)
   @eval begin
-    function $op(p::UniversalRingElem{T}, n::JuliaRingElement) where {T}
+    function $op(p::T, n::JuliaRingElement) where {T <: UniversalRingElem}
        S = parent(p)
-       return UniversalRingElem{T}($op(data(p),n), S)
+       return T($op(data(p),n), S)
     end
 
-    function $op(p::UniversalRingElem{T}, n::T) where {T <: RingElem}
+    function $op(p::UniversalRingElem{T, U}, n::U) where {T<:RingElem, U<:RingElem}
        S = parent(p)
-       return UniversalRingElem{T}($op(data(p),n), S)
+       return UniversalRingElem{T, U}($op(data(p),n), S)
     end
 
-    function $op(n::JuliaRingElement, p::UniversalRingElem{T}) where {T}
+    function $op(n::JuliaRingElement, p::T) where {T <: UniversalRingElem}
        S = parent(p)
-       return UniversalRingElem{T}($op(n,data(p)), S)
+       return T($op(n,data(p)), S)
     end
 
-    function $op(n::T, p::UniversalRingElem{T}) where {T <: RingElem}
+    function $op(n::U, p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElem}
        S = parent(p)
-       return UniversalRingElem{T}($op(n,data(p)), S)
+       return UniversalRingElem{T, U}($op(n,data(p)), S)
     end
   end
 end
 
-function divexact(p::UniversalRingElem{T}, n::JuliaRingElement; check::Bool=true) where T
+function divexact(p::T, n::JuliaRingElement; check::Bool=true) where {T <: UniversalRingElem}
    S = parent(p)
-   return UniversalRingElem{T}(divexact(data(p), n; check=check), S)
+   return T(divexact(data(p), n; check=check), S)
 end
 
-function divexact(p::UniversalRingElem{T}, n::T; check::Bool=true) where {T <: RingElem}
+function divexact(p::UniversalRingElem{T, U}, n::U; check::Bool=true) where {T<:RingElem, U<:RingElem}
    S = parent(p)
-   return UniversalRingElem{T}(divexact(data(p), n; check=check), S)
+   return UniversalRingElem{T, U}(divexact(data(p), n; check=check), S)
 end
 
 ###############################################################################
@@ -623,9 +623,11 @@ end
 #
 ###############################################################################
 
-==(p::UniversalRingElem, n::RingElement) = data(p) == n
+==(p::UniversalRingElem, n::JuliaRingElement) = data(p) == n
+==(p::UniversalRingElem{T, U}, n::U) where {T<:RingElem, U<:RingElem} = data(p) == n
 
-==(n::RingElement, p::UniversalRingElem) = data(p) == n
+==(n::JuliaRingElement, p::UniversalRingElem) = data(p) == n
+==(n::U, p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElem} = data(p) == n
 
 ###############################################################################
 #
@@ -633,9 +635,9 @@ end
 #
 ###############################################################################
 
-function ^(p::UniversalRingElem{T}, b::Int) where T
+function ^(p::T, b::Int) where {T <: UniversalRingElem}
    S = parent(p)
-   return UniversalRingElem{T}(data(p)^b, S)
+   return T(data(p)^b, S)
 end
 
 ###############################################################################
@@ -644,9 +646,9 @@ end
 #
 ###############################################################################
 
-deflation(p::UniversalRingElem{<:MPolyRingElem{T}}) where T = deflation(data(p))
+deflation(p::UniversalRingElem{<:MPolyRingElem}) = deflation(data(p))
 
-function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
+function deflate(p::T, shift::Vector{Int}, defl::Vector{Int}) where {T <: UniversalRingElem{<:MPolyRingElem}}
    S = parent(p)
    num = nvars(S)
    vlen = length(shift)
@@ -656,14 +658,14 @@ function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, d
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem(deflate(data(p), shift, defl), S)
+   return T(deflate(data(p), shift, defl), S)
 end
 
-function deflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
+function deflate(p::UniversalRingElem{<:MPolyRingElem}, defl::Vector{Int})
    return deflate(p, zeros(Int, length(defl)), defl)
 end
 
-function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, defl::Vector{Int}) where T
+function inflate(p::T, shift::Vector{Int}, defl::Vector{Int}) where {T <: UniversalRingElem{<:MPolyRingElem}}
    S = parent(p)
    num = nvars(S)
    vlen = length(shift)
@@ -673,10 +675,10 @@ function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, shift::Vector{Int}, d
       shift = vcat(shift, zeros(Int, num - vlen))
       defl = vcat(defl, ones(Int, num - vlen))
    end
-   return UniversalRingElem(inflate(data(p), shift, defl), S)
+   return T(inflate(data(p), shift, defl), S)
 end
 
-function inflate(p::UniversalRingElem{<:MPolyRingElem{T}}, defl::Vector{Int}) where T
+function inflate(p::UniversalRingElem{<:MPolyRingElem}, defl::Vector{Int})
    return inflate(p, zeros(Int, length(defl)), defl)
 end
 
@@ -720,12 +722,12 @@ end
 #
 ###############################################################################
 
-function derivative(p::UniversalRingElem{<:MPolyRingElem{T}}, j::Int) where {T}
+function derivative(p::T, j::Int) where {T <: UniversalRingElem{<:MPolyRingElem}}
    j > nvars(parent(p)) && error("No such variable")
    if j > nvars(parent(data(p)))
       return zero(parent(p))
    end
-   return UniversalRingElem(derivative(data(p), j), parent(p))
+   return T(derivative(data(p), j), parent(p))
 end
 
 function derivative(p::T, x::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
@@ -766,7 +768,7 @@ Falls back to `Generic.UnivPoly{T}`.
 
 See also [`universal_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 """
-universal_poly_type(::Type{T}) where T<:RingElement = UniversalRingElem{mpoly_type(T)}
+universal_poly_type(::Type{T}) where T<:RingElement = UniversalRingElem{mpoly_type(T), T}
 universal_poly_type(::Type{S}) where S<:Ring = universal_poly_type(elem_type(S))
 universal_poly_type(x) = universal_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 universal_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
@@ -809,10 +811,10 @@ function (a::UniversalPolyRingElem)(val::T, vals::T...) where T <: NCRingElement
    return evaluate(a, [val, vals...])
 end
 
-function evaluate(a::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, vals::Vector{V}) where {T <: RingElement, V <: RingElement}
+function evaluate(a::UniversalRingElem{T, U}, vars::Vector{Int}, vals::Vector{<:RingElement}) where {T <: MPolyRingElem, U}
    length(vars) != length(vals) && error("Numbers of variables and values do not match")
    vars2 = Vector{Int}(undef, 0)
-   vals2 = Vector{mpoly_type(T)}(undef, 0)
+   vals2 = Vector{T}(undef, 0)
    num = nvars(parent(data(a)))
    S = parent(a)
    upgrade!(a)
@@ -823,10 +825,10 @@ function evaluate(a::UniversalRingElem{<:MPolyRingElem{T}}, vars::Vector{Int}, v
          push!(vals2, data(S(vals[i])))
       end
    end
-   return UniversalRingElem(evaluate(a2, vars2, vals2), S)
+   return UniversalRingElem{T, U}(evaluate(a2, vars2, vals2), S)
 end
 
-function evaluate(a::S, vars::Vector{S}, vals::Vector{V}) where {S <: UniversalRingElem{<:MPolyRingElem{T}}, V <: RingElement} where {T <: RingElement}
+function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where {T <: UniversalRingElem{<:MPolyRingElem}}
    varidx = Int[var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
@@ -866,7 +868,7 @@ end
 #
 ###############################################################################
 
-function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UniversalRingElem{<:MPolyRingElem{T}}) where {T <: RingElement}
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::UniversalRingElem{<:MPolyRingElem, T}) where T
    return to_univariate(R, data(p))
 end
 
@@ -890,12 +892,12 @@ end
 
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
-function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where T
    upgrade!(p)
    return UniversalRingElem(change_base_ring(R, data(p); parent = base_ring(parent)), parent)
 end
 
-function change_coefficient_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where {T <: RingElement}
+function change_coefficient_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where T
   return change_base_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -905,7 +907,7 @@ end
 #
 ################################################################################
 
-function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem{T}}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached)) where T <: RingElement
+function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached))
    upgrade!(p)
    return UniversalRingElem(map_coefficients(f, data(p); parent = base_ring(parent)), parent)
 end
@@ -958,12 +960,12 @@ end
 #
 ###############################################################################
 
-function zero!(a::UniversalRingElem{T}) where {T <: RingElement}
+function zero!(a::UniversalRingElem)
   a.p = zero!(a.p)
   return a
 end
 
-function one!(a::UniversalRingElem{T}) where {T <: RingElement}
+function one!(a::UniversalRingElem)
   a.p = one!(a.p)
   return a
 end
@@ -1056,8 +1058,8 @@ mul!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem} = mul!(a, c, b)
 
 promote_rule(::Type{T}, ::Type{T}) where {T <: UniversalRingElem} = T
 
-function promote_rule(::Type{UniversalRingElem{T}}, ::Type{V}) where {T <: RingElement, V <: RingElement}
-   promote_rule(T, V) == T ? UniversalRingElem{T} : Union{}
+function promote_rule(::Type{UniversalRingElem{T, U}}, ::Type{V}) where {T, U, V <: RingElement}
+   promote_rule(T, V) == T ? UniversalRingElem{T, U} : Union{}
 end
 
 ###############################################################################
@@ -1074,24 +1076,20 @@ function upgrade!(p::UniversalRingElem)
    return p
 end
 
+function (a::UniversalRing)()
+   return UniversalRingElem(base_ring(a)(), a)
+end
+
 function (a::UniversalRing)(b::RingElement)
-   return a(base_ring(a)(b))
+   return UniversalRingElem(base_ring(a)(b), a)
 end
 
-function (a::UniversalRing{T})() where {T <: RingElement}
-   return UniversalRingElem{T}(base_ring(a)(), a)
-end
-
-function (a::UniversalRing{T})(b::T) where {T <: RingElem}
-   return UniversalRingElem{T}(base_ring(a)(b), a)
-end
-
-function (S::UniversalRing{T})(p::UniversalRingElem{T}) where {T <: RingElement}
+function (S::UniversalRing{T, U})(p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElement}
    parent(p) !== S && error("Unable to coerce")
    return upgrade!(p)
 end
 
-function (a::UniversalRing{<:MPolyRingElem{T}})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+function (a::UniversalRing{<:MPolyRingElem, T})(b::Vector{T}, m::Vector{Vector{Int}}) where T
    if length(m) != 0
       len = length(m[1])
       num = nvars(base_ring(a))
@@ -1132,11 +1130,11 @@ end
 #
 ###############################################################################
 
-function _wrap_factorization(f::Fac{T}, S::UniversalRing{T}) where T
-   res = Fac{UniversalRingElem{T}}()
-   res.unit = UniversalRingElem{T}(f.unit, S)
+function _wrap_factorization(f::Fac{T}, S::UniversalRing{T, U}) where {T, U}
+   res = Fac{UniversalRingElem{T, U}}()
+   res.unit = UniversalRingElem{T, U}(f.unit, S)
    for (fact, expo) in f
-      mulpow!(res, UniversalRingElem{T}(fact, S), expo)
+      mulpow!(res, UniversalRingElem{T, U}(fact, S), expo)
    end
    return res
 end
@@ -1165,7 +1163,7 @@ the universal polynomial ring `S = R[\ldots]` with no variables in it initially.
 
 ```jldoctest
 julia> S, (x,y) = universal_polynomial_ring(ZZ, [:x,:y])
-(Universal polynomial ring over Integers, UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}[x, y])
+(Universal polynomial ring over Integers, UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}, BigInt}[x, y])
 
 julia> z = gen(S, :z)
 z
@@ -1180,7 +1178,7 @@ julia> x = gen(S, :x)
 x
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}}}:
+2-element Vector{UniversalRingElem{AbstractAlgebra.Generic.MPoly{BigInt}, BigInt}}:
  y
  z
 
@@ -1193,7 +1191,8 @@ function universal_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bo
    S = get_cached!(UniversalPolyRingID, (R, internal_ordering), cached) do
       P = poly_ring(R, varnames; internal_ordering)
       T = elem_type(P)
-      UniversalRing{T}(P)
+      U = elem_type(coefficient_ring(P))
+      UniversalRing{T, U}(P)
    end
    return (S, gens(S, varnames))
 end
