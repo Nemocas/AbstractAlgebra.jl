@@ -2,18 +2,21 @@ using Documenter, AbstractAlgebra
 
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
+const render_pdf = "pdf" in ARGS
+const run_doctests = !("nodoctests" in ARGS)
+
 makedocs(
-         format = [
-            Documenter.HTML(;
-             size_threshold_warn = 204800,
-             size_threshold = 409600,
+        format = [
+          Documenter.HTML(;
+          size_threshold_warn = 204800,
+          size_threshold = 409600,
           ),
-          Documenter.LaTeX(),
+          (render_pdf ? (Documenter.LaTeX(),) : ())...,
          ],
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
-         doctest = true,
+         doctest = run_doctests,
          checkdocs = :none,
          pages    = [
              "index.md",
