@@ -523,7 +523,7 @@ for op in (:+, :-, :*)
        return T($op(data(p),n), S)
     end
 
-    function $op(p::UniversalRingElem{T, U}, n::U) where {T, U}
+    function $op(p::UniversalRingElem{T, U}, n::U) where {T<:RingElem, U<:RingElem}
        S = parent(p)
        return UniversalRingElem{T, U}($op(data(p),n), S)
     end
@@ -533,7 +533,7 @@ for op in (:+, :-, :*)
        return T($op(n,data(p)), S)
     end
 
-    function $op(n::U, p::UniversalRingElem{T, U}) where {T, U}
+    function $op(n::U, p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElem}
        S = parent(p)
        return UniversalRingElem{T, U}($op(n,data(p)), S)
     end
@@ -545,7 +545,7 @@ function divexact(p::T, n::JuliaRingElement; check::Bool=true) where {T <: Unive
    return T(divexact(data(p), n; check=check), S)
 end
 
-function divexact(p::UniversalRingElem{T, U}, n::U; check::Bool=true) where {T, U}
+function divexact(p::UniversalRingElem{T, U}, n::U; check::Bool=true) where {T<:RingElem, U<:RingElem}
    S = parent(p)
    return UniversalRingElem{T, U}(divexact(data(p), n; check=check), S)
 end
@@ -624,10 +624,10 @@ end
 ###############################################################################
 
 ==(p::UniversalRingElem, n::JuliaRingElement) = data(p) == n
-==(p::UniversalRingElem{T, U}, n::U) where {T, U} = data(p) == n
+==(p::UniversalRingElem{T, U}, n::U) where {T<:RingElem, U<:RingElem} = data(p) == n
 
 ==(n::JuliaRingElement, p::UniversalRingElem) = data(p) == n
-==(n::U, p::UniversalRingElem{T, U}) where {T, U} = data(p) == n
+==(n::U, p::UniversalRingElem{T, U}) where {T<:RingElem, U<:RingElem} = data(p) == n
 
 ###############################################################################
 #
