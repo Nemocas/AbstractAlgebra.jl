@@ -25,10 +25,17 @@ end
     poly_type(::Type{S}) where S<:NCRing
     poly_type(::S) where S<:NCRing
 
-The type of univariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
+Return the type of a (univariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`poly_ring_type`](@ref).
 
-See also [`poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+For multivariate polynomials see [`mpoly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic univariate polynomials (namely `Generic.NCPoly{T}` or `Generic.Poly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest

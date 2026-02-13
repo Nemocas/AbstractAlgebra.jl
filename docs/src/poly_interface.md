@@ -135,25 +135,25 @@ Return the array `[s]` where `s` is a `Symbol` representing the variable of the 
 polynomial ring. This is provided for uniformity with the multivariate interface, where
 there is more than one variable and hence an array of symbols.
 
-```julia
-poly_type(::Type{T}) where T <: RingElement
+Given a type for the coefficients, we can obtain the corresponding type of a
+univariate polynomial having that type of coefficient:
+
+```@docs
+poly_type(::Type{T}) where T<:NCRingElement
+poly_type(::T) where T<:NCRingElement
+poly_type(::Type{S}) where S<:NCRing
+poly_type(::S) where S<:NCRing
 ```
 
-Return the type of a (univariate) polynomial whose coefficients have type `T`.
-In our example `MyPoly{T}`.
+Analogously, given a type for the coefficients, we can obtain the corresponding
+type of the ring of univariate polynomials having that type of coefficient:
 
-This function is defined for generic (univariate) polynomials and needs to be
-defined only for special polynomial rings, e.g. those defined by a C implementation.
-
-```julia
-poly_ring_type(::Type{T})
+```@docs
+poly_ring_type(::Type{T}) where T<:NCRingElement
+poly_ring_type(::T) where T<:NCRingElement
+poly_ring_type(::Type{S}) where S<:NCRing
+poly_ring_type(::S) where S<:NCRing
 ```
-Return the type of the parent of a (univariate) polynomial whose coefficients
-have type `T`.
-
-This function is defined for generic (univariate) polynomials and needs to be
-defined only for special polynomial rings, e.g. those defined by a C implementation.
-
 
 ```@docs
 poly_ring(R::Ring, s::Symbol; cached::Bool=false)
