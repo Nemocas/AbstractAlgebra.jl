@@ -1627,7 +1627,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    tr(x::MatrixElem{T}) where T <: NCRingElement
+    tr(x::MatElem{T}) where T <: NCRingElement
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
@@ -1652,13 +1652,17 @@ t^2 + 3*t + 2
 
 ```
 """
-function tr(x::MatrixElem{T}) where T <: NCRingElement
+function tr(x::MatElem{T}) where T <: NCRingElement
    !is_square(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:nrows(x)
       d = add!(d, x[i, i])
    end
    return d
+end
+
+function tr(x::MatRingElem{T}) where T <: NCRingElement
+  return tr(matrix(x))
 end
 
 ###############################################################################
@@ -3926,7 +3930,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+    pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $M$ over a ring return a tuple $X, d$
 consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
@@ -3934,33 +3938,46 @@ $MX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
 will be the determinant of $M$ up to sign. If $M$ is singular an exception
 is raised.
 """
-function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
    !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
 
-function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
+function pseudo_inv(M::MatRingElem{T}) where {T <: RingElement}
+  X,d = pseudo_inv(matrix(M))
+  return Generic.MatRingElem(X), d
+end
+
+function Base.inv(M::MatElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
 end
 
+function Base.inv(M::MatRingElem{T}) where {T <: FieldElement}
+  return Generic.MatRingElem(inv(matrix(M)))
+end
+
 @doc raw"""
-    inv(M::MatrixElem{T}) where {T <: RingElement}
+    inv(M::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix over a ring, return an
 $n\times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is the $n\times n$
 identity matrix. If $M$ is not invertible over the base ring an exception is
 raised.
 """
-function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+function Base.inv(M::MatElem{T}) where {T <: RingElement}
+   is_square(M) || throw(DomainError(M, "Cannot invert non-square Matrix"))
    X, d = pseudo_inv(M)
    is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
+end
+
+function Base.inv(M::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(inv(matrix(M)))
 end
 
 ###############################################################################
@@ -3970,7 +3987,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Given an $n \times m$ matrix $A$ over a ring, return a tuple `(flag, B)`. If
 `side` is `:right` and `flag` is `true`, $B$ is a right inverse of $A$ i.e.
@@ -3993,15 +4010,24 @@ function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) wher
    return can_solve_with_solution(A, I; side = side)
 end
 
+function is_invertible_with_inverse(A::MatRingElem{T}; side::Symbol = :left) where {T <: RingElement}
+  flag, inv = is_invertible_with_inverse(matrix(A); side = side)
+  return flag, Generic.MatRingElem(inv)
+end
+
 @doc raw"""
-    is_invertible(A::MatrixElem{T}) where {T <: RingElement}
+    is_invertible(A::MatElem{T}) where {T <: RingElement}
 
 Return true if a given square matrix is invertible, false otherwise. If
 the inverse should also be computed, use `is_invertible_with_inverse`.
 """
-is_invertible(A::MatrixElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
+is_invertible(A::MatElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
 
-is_invertible(A::MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
+is_invertible(A::MatRingElem{T}) where {T <: RingElement} = is_unit(det(A))
+
+is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
+
+is_invertible(A::MatRingElem{T}) where {T <: FieldElement} = ncols(A) == rank(A)
 
 ###############################################################################
 #
@@ -4136,12 +4162,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
+    is_nilpotent(A::MatElem{T}) where {T <: RingElement}
 
 Return if `A` is nilpotent, i.e. if there exists a natural number $k$
 such that $A^k = 0$. If `A` is not square an exception is raised.
 """
-function is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
+function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
   !is_square(A) && error("Dimensions don't match in is_nilpotent")
   is_zero(tr(A)) || return false
@@ -4157,13 +4183,17 @@ function is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
   return false
 end
 
+function is_nilpotent(A::MatRingElem{T}) where {T <: RingElement}
+  return is_nilpotent(matrix(A))
+end
+
 ###############################################################################
 #
 #   Hessenberg form
 #
 ###############################################################################
 
-function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
+function hessenberg!(A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in hessenberg")
    R = base_ring(A)
    n = nrows(A)
@@ -4206,27 +4236,35 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
    end
 end
 
+function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(hessenberg!(matrix(A)))
+end
+
 @doc raw"""
-    hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    hessenberg(A::MatElem{T}) where {T <: RingElement}
 
 Return the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 which is similar to $M$. The upper Hessenberg form has nonzero entries
 above and on the diagonal and in the diagonal line immediately below the
 diagonal.
 """
-function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+function hessenberg(A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in hessenberg")
    M = deepcopy(A)
    hessenberg!(M)
    return M
 end
 
+function hessenberg(A::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(hessenberg(matrix(A)))
+end
+
 @doc raw"""
-    is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    is_hessenberg(A::MatElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
    if !is_square(A)
       return false
    end
@@ -4241,13 +4279,17 @@ function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
    return true
 end
 
+function is_hessenberg(A::MatRingElem{T}) where {T <: RingElement}
+  return is_hessenberg(matrix(A))
+end
+
 ###############################################################################
 #
 #   Characteristic polynomial
 #
 ###############################################################################
 
-function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
+function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -4271,6 +4313,11 @@ function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       end
    end
    return P[n + 1]
+end
+
+function charpoly_hessenberg!(S::Ring, A::MatRingElem{T}) where {T <: RingElement}
+  a = matrix(A)
+  return charpoly_hessenberg!(S, a)  ## !!! WARNING !!!  may not be correct
 end
 
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
@@ -4490,8 +4537,8 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(Y::MatrixElem{T}) where {T <: RingElement}
-    charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(Y::MatElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
 
 Return the characteristic polynomial $p$ of the square matrix $Y$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
@@ -4523,7 +4570,7 @@ julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 ```
 """
-function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
+function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
    base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
@@ -4576,10 +4623,18 @@ function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
    return f
 end
 
-function charpoly(Y::MatrixElem)
+function charpoly(S::PolyRing{T}, Y::MatRingElem{T}) where {T <: RingElement}
+  return charpoly(S, matrix(Y))
+end
+
+function charpoly(Y::MatElem)
    R = base_ring(Y)
    Rx, x = polynomial_ring(R; cached=false)
    return charpoly(Rx, Y)
+end
+
+function charpoly(Y::MatRingElem)
+  return charpoly(matrix(Y))
 end
 
 ###############################################################################
