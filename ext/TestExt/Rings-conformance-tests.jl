@@ -44,6 +44,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
          # some rings don't support characteristic and raise an exception (see issue #993)
          try ch = characteristic(R)
+            @test is_known(characteristic, R)
             @test iszero(R(characteristic(R)))
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
