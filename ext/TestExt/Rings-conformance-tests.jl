@@ -44,13 +44,14 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
          # some rings don't support characteristic and raise an exception (see issue #993)
          try ch = characteristic(R)
+            @test AbstractAlgebra.is_known(characteristic, R)
             @test iszero(R(characteristic(R)))
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
          catch
             # could not compute characteristic, so verify that is_known
             # reflects this
-            @test is_known(characteristic, R) == false
+            @test AbstractAlgebra.is_known(characteristic, R) == false
          end
       end
 
@@ -309,7 +310,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 15)
       # test for that. We may relax this in the future if we have need for it.
       # But for now if the next tests fail this usually means someone forgot
       # to implement `characteristic` for their ring type properly.
-      @test is_known(characteristic, R) == true
+      @test AbstractAlgebra.is_known(characteristic, R) == true
 
       @test iszero(R(characteristic(R)))
       @test iszero(characteristic(R) * one(R))
