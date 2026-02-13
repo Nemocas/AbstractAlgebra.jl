@@ -52,20 +52,14 @@ Given a type for the coefficients, we can obtain the corresponding type of a
 multivariate polynomial having that type of coefficient:
 
 ```@docs
-mpoly_type(::Type{T}) where T <: RingElement
-mpoly_type(::T) where T <: RingElement
-mpoly_type(::Type{S}) where S <: Ring
-mpoly_type(::S) where S <: Ring
+mpoly_type
 ```
 
 Analogously, given a type for the coefficients, we can obtain the corresponding
 type of the ring of multivariate polynomials having that type of coefficient:
 
 ```@docs
-mpoly_ring_type(::Type{T}) where T <: RingElement
-mpoly_ring_type(::T) where T <: RingElement
-mpoly_ring_type(::Type{S}) where S <: Ring
-mpoly_ring_type(::S) where S <: Ring
+mpoly_ring_type
 ```
 
 ### Identical polynomial rings

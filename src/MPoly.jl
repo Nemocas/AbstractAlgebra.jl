@@ -48,6 +48,8 @@ julia> mpoly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
+mpoly_type
+
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
