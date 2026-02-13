@@ -4480,3 +4480,13 @@ end
   # in-place transpose of non-square matrix does not work
   @test_throws ArgumentError AbstractAlgebra.transpose!(a)
 end
+
+@testset "Generic.Mat.MatSpace_iteration" begin
+  a = matrix(QQ, [1 2; 3 4])
+  b = 2*a
+  c = zero_matrix(QQ, 2, 2)
+
+  @test canonical_unit(a) == 1
+  @test canonical_unit(b) == 2
+  @test canonical_unit(c) == 1
+end
