@@ -321,14 +321,6 @@ function constant_coefficient(p::MPolyRingElem{T}) where T <: RingElement
    return zero(base_ring(p))
 end
 
-function constant_coefficient(p::MPolyRingElem)
-   len = length(p)
-   if !iszero(p) && iszero(exponent_vector(p, len))
-      return coeff(p, len)
-   end
-   return zero(base_ring(p))
-end
-
 @doc raw"""
     leading_monomial(p::MPolyRingElem)
 

@@ -660,6 +660,14 @@ function coeff!(c::T, x::MPoly{T}, i::Int) where T <: RingElement
   return x.coeffs[i]
 end
 
+function constant_coefficient(p::MPoly{T}) where T <: RingElement
+   len = length(p)
+   if !iszero(p) && iszero(exponent_vector(p, len))
+      return coeff(p, len)
+   end
+   return zero(base_ring(p))
+end
+
 function trailing_coefficient(p::MPoly{T}) where T <: RingElement
    @req !iszero(p) "Zero polynomial does not have a leading monomial"
    return coeff(p, length(p))
