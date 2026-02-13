@@ -21,10 +21,17 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
     mpoly_type(::Type{S}) where S<:Ring
     mpoly_type(::S) where S<:Ring
 
-The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.MPoly{T}`.
+Return the type of a (multivariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`mpoly_ring_type`](@ref).
 
-See also [`mpoly_ring_type`](@ref), [`poly_type`](@ref) and [`poly_ring_type`](@ref).
+For univariate polynomials see [`poly_type`](@ref).
+
+# Implementation
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest
@@ -41,6 +48,8 @@ julia> mpoly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
+mpoly_type
+
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
@@ -53,10 +62,18 @@ mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
     mpoly_ring_type(::Type{S}) where S<:Ring
     mpoly_ring_type(::S) where S<:Ring
 
-The type of multivariate polynomial rings with coefficients of type `T`
-respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
+Return the type of the parent of a (multivariate) polynomial whose coefficients
+have type `T` or type `elem_type(S)`.
+The type of the polynomials themselves can be found via [`mpoly_type`](@ref).
 
-See also [`poly_type`](@ref) and [`poly_ring_type`](@ref).
+For univariate polynomials see [`poly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
+
 
 # Examples
 ```jldoctest
