@@ -149,10 +149,7 @@ Analogously, given a type for the coefficients, we can obtain the corresponding
 type of the ring of univariate polynomials having that type of coefficient:
 
 ```@docs
-poly_ring_type(::Type{T}) where T<:NCRingElement
-poly_ring_type(::T) where T<:NCRingElement
-poly_ring_type(::Type{S}) where S<:NCRing
-poly_ring_type(::S) where S<:NCRing
+poly_ring_type
 ```
 
 ```@docs
