@@ -280,6 +280,14 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
             @test B == b
          end
       end
+
+      @testset "Basic properties" begin
+         if is_domain_type(T)
+            @test !is_irreducible(zero(R))
+            @test !is_irreducible(one(R))
+          end
+      end
+
    end
 
    return nothing
