@@ -139,10 +139,7 @@ Given a type for the coefficients, we can obtain the corresponding type of a
 univariate polynomial having that type of coefficient:
 
 ```@docs
-poly_type(::Type{T}) where T<:NCRingElement
-poly_type(::T) where T<:NCRingElement
-poly_type(::Type{S}) where S<:NCRing
-poly_type(::S) where S<:NCRing
+poly_type
 ```
 
 Analogously, given a type for the coefficients, we can obtain the corresponding
