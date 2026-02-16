@@ -4265,9 +4265,7 @@ end
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
 function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
-   if !is_square(A)
-      return false
-   end
+   is_square(A) || return false
    n = nrows(A)
    for i = 3:n
       for j = 1:i - 2
