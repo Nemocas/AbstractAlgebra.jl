@@ -7,11 +7,11 @@ const run_doctests = !("nodoctests" in ARGS)
 
 makedocs(
         format = [
-          Documenter.HTML(;
-          size_threshold_warn = 204800,
-          size_threshold = 409600,
-          ),
-          (render_pdf ? (Documenter.LaTeX(),) : ())...,
+            Documenter.HTML(;
+                size_threshold_warn = 204800,
+                size_threshold = 409600,
+            ),
+            (render_pdf ? (Documenter.LaTeX(),) : ())...,
          ],
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
