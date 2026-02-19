@@ -42,6 +42,7 @@ It is supposed to be implemented in the src file of the respective type.
 """
 function generate_element end
 
+include("exercise.jl")
 
 ###############################################################################
 #
