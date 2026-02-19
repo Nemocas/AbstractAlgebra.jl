@@ -9,6 +9,16 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.48.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.4) - 2026-02-19
+
+### New or extended functionality
+
+- [#2276](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2276) Implement `is_known(is_finite, ::NCRing)`, at least for ring types defined in AbstractAlgebra
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2345](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2345) Fix `canonical_unit` for zero matrices
+
 ## [0.48.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.3) - 2026-02-11
 
 ### New or extended functionality
