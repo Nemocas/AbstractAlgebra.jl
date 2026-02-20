@@ -185,8 +185,8 @@ end
    @test isempty(M) == false
    @test isassigned(M, 1, 1) == true
 
-   @test iszero(zero(M, 3, 3))
-   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, 3))
+   @test iszero(zero(M, QQ, 3))
    @test iszero(zero(M, QQ))
 
    M = zero!(M)
@@ -1571,11 +1571,6 @@ end
       @test !test_zero || iszero(n)
       @test parent(n) == matrix_ring(R, r)
       @test size(n) == (r, r)
-      nn = sim_zero(m, r, r)
-      @test !test_zero || iszero(nn)
-      @test parent(nn) == matrix_ring(R, r)
-      @test size(nn) == (r, r)
-      @test_throws ErrorException sim_zero(m, r, r+1)
       for S = [QQ, ZZ, GF(2), GF(5)]
          n = sim_zero(m, S)
          @test !test_zero || iszero(n)
@@ -1586,11 +1581,6 @@ end
          @test !test_zero || iszero(n)
          @test parent(n) == matrix_ring(S, r)
          @test size(n) == (r, r)
-         n = sim_zero(m, S, r, r)
-         @test !test_zero || iszero(n)
-         @test parent(n) == matrix_ring(S, r)
-         @test size(n) == (r, r)
-         @test_throws ErrorException sim_zero(m, S, r, r+2)
       end
    end
 end
