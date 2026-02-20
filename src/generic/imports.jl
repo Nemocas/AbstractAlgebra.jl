@@ -113,6 +113,7 @@ import ..AbstractAlgebra: coefficient_ring
 import ..AbstractAlgebra: coefficient_ring_type
 import ..AbstractAlgebra: coefficients
 import ..AbstractAlgebra: coefficients_of_univariate
+import ..AbstractAlgebra: combine_like_terms!
 import ..AbstractAlgebra: compose
 import ..AbstractAlgebra: constant_coefficient
 import ..AbstractAlgebra: content
@@ -140,6 +141,7 @@ import ..AbstractAlgebra: exponent_vector!
 import ..AbstractAlgebra: expressify
 import ..AbstractAlgebra: factor
 import ..AbstractAlgebra: factor_squarefree
+import ..AbstractAlgebra: fit!
 import ..AbstractAlgebra: gen
 import ..AbstractAlgebra: gens
 import ..AbstractAlgebra: get_cached!
@@ -151,6 +153,7 @@ import ..AbstractAlgebra: image
 import ..AbstractAlgebra: image_fn
 import ..AbstractAlgebra: inflate
 import ..AbstractAlgebra: integral
+import ..AbstractAlgebra: internal_ordering
 import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: inv!
 import ..AbstractAlgebra: is_constant
@@ -159,6 +162,7 @@ import ..AbstractAlgebra: is_domain_type
 import ..AbstractAlgebra: is_exact_type
 import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
+import ..AbstractAlgebra: is_homogeneous
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
 import ..AbstractAlgebra: is_perfect
@@ -183,9 +187,11 @@ import ..AbstractAlgebra: leading_term
 import ..AbstractAlgebra: log
 import ..AbstractAlgebra: map_coefficients
 import ..AbstractAlgebra: matrix
+import ..AbstractAlgebra: max_fields
 import ..AbstractAlgebra: max_precision
 import ..AbstractAlgebra: minpoly
 import ..AbstractAlgebra: modulus
+import ..AbstractAlgebra: monomial
 import ..AbstractAlgebra: monomials
 import ..AbstractAlgebra: monomial!
 import ..AbstractAlgebra: mul!
@@ -218,12 +224,15 @@ import ..AbstractAlgebra: rels
 import ..AbstractAlgebra: remove
 import ..AbstractAlgebra: renormalize!
 import ..AbstractAlgebra: set_coefficient!
+import ..AbstractAlgebra: set_exponent_vector!
 import ..AbstractAlgebra: set_length!
 import ..AbstractAlgebra: set_precision!
 import ..AbstractAlgebra: set_valuation!
+import ..AbstractAlgebra: setcoeff!
 import ..AbstractAlgebra: shift_left
 import ..AbstractAlgebra: shift_right
 import ..AbstractAlgebra: snf
+import ..AbstractAlgebra: sort_terms!
 import ..AbstractAlgebra: sqrt
 import ..AbstractAlgebra: sqrt_classical
 import ..AbstractAlgebra: sqrt_classical_char2
@@ -231,12 +240,14 @@ import ..AbstractAlgebra: sub!
 import ..AbstractAlgebra: submul!
 import ..AbstractAlgebra: symbols
 import ..AbstractAlgebra: tail
+import ..AbstractAlgebra: term
 import ..AbstractAlgebra: term_degree
 import ..AbstractAlgebra: terms
 import ..AbstractAlgebra: term!
 import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
+import ..AbstractAlgebra: total_degree
 import ..AbstractAlgebra: trailing_coefficient
 import ..AbstractAlgebra: transpose
 import ..AbstractAlgebra: transpose!
