@@ -88,7 +88,7 @@ jobs:
           version: '1.10'
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
-      - name: Install TeX 
+      - name: Install TeX
         run: |
               sudo apt-get update
               sudo apt-get install -y --no-install-recommends \
@@ -103,7 +103,25 @@ jobs:
               fontconfig \
               fonts-dejavu-core \
               fonts-dejavu-extra
-      - uses: julia-actions/julia-docdeploy@v1
+      - name: Build docs (HTML + optional PDF)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        run: |
+          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
+          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+          julia --color=yes --project=docs/ -e '
+              @eval Module() begin
+                  push!(LOAD_PATH, "@docs-logger-env") # access GitHubActions.jl
+                  import Logging, GitHubActions
+                  Logging.global_logger(GitHubActions.GitHubActionsLogger())
+                  pop!(LOAD_PATH)
+              end
+              include("docs/make.jl")
+          ' pdf
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+      - name: AbstractAlgebra-docs-pdf
+        path: docs/build/AbstractAlgebra.jl.pdf
+        if-no-files-found: warn   

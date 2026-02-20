@@ -2,8 +2,8 @@ using Documenter, AbstractAlgebra
 
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
-const render_pdf = "pdf" in ARGS
-const run_doctests = !("nodoctests" in ARGS)
+const render_pdf = "--pdf" in ARGS
+const run_doctests = !("--nodoctests" in ARGS)
 
 makedocs(
         format = [
