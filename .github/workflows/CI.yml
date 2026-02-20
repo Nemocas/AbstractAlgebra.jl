@@ -103,7 +103,7 @@ jobs:
               fontconfig \
               fonts-dejavu-core \
               fonts-dejavu-extra
-      - name: Build docs (HTML + optional PDF)
+      - name: Build docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
@@ -122,6 +122,6 @@ jobs:
       - name: Upload PDF
         uses: actions/upload-artifact@v4
         with:
-      - name: AbstractAlgebra-docs-pdf
-        path: docs/build/AbstractAlgebra.jl.pdf
-        if-no-files-found: warn   
+          name: AbstractAlgebra-docs-pdf
+          path: docs/build/AbstractAlgebra.jl.pdf
+          if-no-files-found: warn 
