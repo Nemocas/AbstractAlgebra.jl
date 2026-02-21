@@ -103,13 +103,15 @@ jobs:
               fontconfig \
               fonts-dejavu-core \
               fonts-dejavu-extra
-      - name: Build docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+      - name: Prepare building docs
         run: |
           julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
           julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+      - name: Build docs
+env:
+GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        run: |
           julia --color=yes --project=docs/ -e '
               @eval Module() begin
                   push!(LOAD_PATH, "@docs-logger-env") # access GitHubActions.jl
