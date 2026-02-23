@@ -287,7 +287,7 @@ function isone end
 @doc raw"""
     iszero(a)
 
-Return true if $a$ is the additative identity, else return false.
+Return true if $a$ is the additive identity, else return false.
 
 # Examples
 ```jldoctest
