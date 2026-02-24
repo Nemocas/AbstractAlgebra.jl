@@ -597,6 +597,7 @@ export truncate
 export typed_hcat
 export typed_hvcat
 export unit
+export universal_laurent_polynomial_ring
 export universal_poly_ring_type
 export universal_poly_type
 export universal_polynomial_ring
