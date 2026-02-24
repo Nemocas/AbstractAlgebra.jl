@@ -1,4 +1,4 @@
-@testset "Generic.UnivPoly.constructors" begin
+@testset "UnivPoly.constructors" begin
    for R in [ZZ, QQ]
       for iters = 1:5
          ord = rand_ordering()
@@ -37,8 +37,8 @@
          @test coefficient_ring(S) === R
          @test coefficient_ring_type(S) === typeof(R)
 
-         @test S isa Generic.UniversalPolyRing
-         @test S isa Generic.UniversalRing{Generic.MPoly{elem_type(R)}}
+         @test S isa UniversalPolyRing
+         @test S isa UniversalRing{Generic.MPoly{elem_type(R)}}
 
          @test isa(x, UniversalPolyRingElem)
          @test isa(y, UniversalPolyRingElem)
@@ -105,7 +105,7 @@
    @test y != z
 end
 
-@testset "Generic.UnivPoly.parent_type" begin
+@testset "UnivPoly.parent_type" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          ord = rand_ordering()
@@ -156,15 +156,19 @@ end
    end
 end
 
+@testset "UniversalLaurentPolynomial.conformance" begin
+   S = universal_laurent_polynomial_ring(residue_ring(ZZ, ZZ(6))[1]; cached = false)
+   gen(S, "x")
+   ConformanceTests.test_Ring_interface(S)
+end
 
-
-@testset "Generic.UnivPoly.conformance" begin
+@testset "UnivPoly.conformance" begin
    S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1]; cached = false)
    gen(S, "x")
    ConformanceTests.test_Ring_interface(S)
 end
 
-@testset "Generic.UnivPoly.printing" begin
+@testset "UnivPoly.printing" begin
    R = universal_polynomial_ring(QQ; cached = false)
    x = gen(R, "x")
    @test sprint(show, x+1) == "x + 1"
@@ -177,7 +181,7 @@ end
    @test sprint(show, x*y*(z-1)) == "(x*z - x)*y"
 end
 
-@testset "Generic.UnivPoly.term_monomial" begin
+@testset "UnivPoly.term_monomial" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          ord = rand_ordering()
@@ -239,7 +243,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.basic_manipulation" begin
+@testset "UnivPoly.basic_manipulation" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -358,7 +362,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.multivariate_coefficients" begin
+@testset "UnivPoly.multivariate_coefficients" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -385,7 +389,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.unary_operations" begin
+@testset "UnivPoly.unary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -410,7 +414,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.binary_operations" begin
+@testset "UnivPoly.binary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -436,7 +440,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.iterators" begin
+@testset "UnivPoly.iterators" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -463,7 +467,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.square_root" begin
+@testset "UnivPoly.square_root" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -485,7 +489,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.adhoc_binary_operations" begin
+@testset "UnivPoly.adhoc_binary_operations" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -541,7 +545,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.comparison" begin
+@testset "UnivPoly.comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -581,7 +585,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.adhoc_comparison" begin
+@testset "UnivPoly.adhoc_comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -632,7 +636,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.powering" begin
+@testset "UnivPoly.powering" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -660,7 +664,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.inflation_deflation" begin
+@testset "UnivPoly.inflation_deflation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -705,7 +709,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.exact_division" begin
+@testset "UnivPoly.exact_division" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -764,7 +768,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.euclidean_division" begin
+@testset "UnivPoly.euclidean_division" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -817,7 +821,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.derivative" begin
+@testset "UnivPoly.derivative" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -844,7 +848,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.remove_valuation" begin
+@testset "UnivPoly.remove_valuation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -948,7 +952,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.evaluation" begin
+@testset "UnivPoly.evaluation" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -1013,7 +1017,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.gcd" begin
+@testset "UnivPoly.gcd" begin
    for R in [ZZ, QQ]
       for iters = 1:100
          S = universal_polynomial_ring(R; cached=false)
@@ -1053,7 +1057,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.univariate_polynomials" begin
+@testset "UnivPoly.univariate_polynomials" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -1094,7 +1098,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.map" begin
+@testset "UnivPoly.map" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
@@ -1129,7 +1133,7 @@ end
    end
 end
 
-@testset "Generic.UnivPoly.unsafe_operators" begin
+@testset "UnivPoly.unsafe_operators" begin
    for R in [ZZ, QQ]
       S = universal_polynomial_ring(R; cached=false)
 
