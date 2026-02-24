@@ -193,8 +193,8 @@ const FieldElement = Union{FieldElem, JuliaFieldElement}
 include("ConcreteTypes.jl")
 
 # Type aliases
-const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem{T}}
-const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem{T}}
+const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem, T}
+const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem, T}
 const UnivPoly{T} = UniversalPolyRingElem{T}
 
 ###############################################################################
