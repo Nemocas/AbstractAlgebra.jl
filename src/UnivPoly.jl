@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-internal_ordering(p::UniversalPolyRing) = internal_ordering(base_ring(p))
+internal_ordering(p::UniversalRing{<:MPolyRingElem}) = internal_ordering(base_ring(p))
 
 ###############################################################################
 #
@@ -163,7 +163,7 @@ length(p::UniversalRingElem{<:MPolyRingElem}) = length(data(p))
 
 var_index(x::UniversalRingElem{<:MPolyRingElem}) = var_index(data(x))
 
-var_indices(p::UniversalPolyRingElem) = var_indices(data(p))
+var_indices(p::UniversalRingElem{<:MPolyRingElem}) = var_indices(data(p))
 
 function vars(p::UniversalRingElem{<:MPolyRingElem})
    V = vars(data(p))
@@ -302,19 +302,19 @@ function Base.length(x::Union{UnivPolyCoeffs, UnivPolyExponentVectors, UnivPolyT
    return length(x.poly)
 end
 
-function Base.eltype(::Type{UnivPolyCoeffs{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
-   return S
-end
-
-function Base.eltype(::Type{UnivPolyExponentVectors{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
-   return Vector{Int}
-end
-
-function Base.eltype(::Type{UnivPolyMonomials{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyCoeffs{UniversalRingElem{<:MPolyRingElem, T}}}) where T <: RingElement
    return T
 end
 
-function Base.eltype(::Type{UnivPolyTerms{T}}) where T <: AbstractAlgebra.UniversalPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{UnivPolyExponentVectors{T}}) where T <: UniversalRingElem{<:MPolyRingElem}
+   return Vector{Int}
+end
+
+function Base.eltype(::Type{UnivPolyMonomials{T}}) where T <: UniversalRingElem{<:MPolyRingElem}
+   return T
+end
+
+function Base.eltype(::Type{UnivPolyTerms{T}}) where T <: UniversalRingElem{<:MPolyRingElem}
    return T
 end
 
@@ -484,7 +484,6 @@ end
     universal_poly_type(::S) where S<:Ring
 
 The type of universal polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.UnivPoly{T}`.
 
 See also [`universal_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 """
@@ -513,7 +512,7 @@ universal_poly_ring_type(x) = parent_type(universal_poly_type(x))
 #
 ###############################################################################
 
-function evaluate(a::UniversalPolyRingElem, A::Vector{<:NCRingElement})
+function evaluate(a::UniversalRingElem{<:MPolyRingElem}, A::Vector{<:NCRingElement})
    isempty(A) && error("Evaluating at an empty list of values is not allowed")
    a2 = data(a)
    varidx = var_indices(a2)
@@ -527,7 +526,7 @@ function evaluate(a::UniversalPolyRingElem, A::Vector{<:NCRingElement})
    return evaluate(a2, vals)
 end
 
-function (a::UniversalPolyRingElem)(val::T, vals::T...) where T <: NCRingElement
+function (a::UniversalRingElem{<:MPolyRingElem})(val::T, vals::T...) where T <: NCRingElement
    return evaluate(a, [val, vals...])
 end
 
@@ -553,7 +552,7 @@ function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where {T <
    return evaluate(a, varidx, vals)
 end
 
-function (a::UniversalPolyRingElem)(;kwargs...)
+function (a::UniversalRingElem{<:MPolyRingElem})(;kwargs...)
    ss = symbols(parent(a))
    vars = Int[]
    vals = RingElement[]
@@ -596,7 +595,7 @@ end
 
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
-function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(R, parent(p), cached)) where T
+function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where T
    upgrade!(p)
    return UniversalRingElem(change_base_ring(R, data(p); parent = base_ring(parent)), parent)
 end
@@ -611,7 +610,7 @@ end
 #
 ################################################################################
 
-function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem}; cached::Bool=true, parent::UniversalPolyRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached))
+function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached))
    upgrade!(p)
    return UniversalRingElem(map_coefficients(f, data(p); parent = base_ring(parent)), parent)
 end
