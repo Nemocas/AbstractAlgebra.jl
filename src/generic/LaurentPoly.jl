@@ -17,15 +17,15 @@ elem_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentPolyWrap) = p.parent
 
-base_ring_type(::Type{<:LaurentPolyWrapRing{T}}) where {T} = parent_type(T)
-base_ring(R::LaurentPolyWrapRing) = base_ring(R.polyring)::base_ring_type(R)
+base_ring_type(::Type{<:LaurentPolyWrapRing{T}}) where {T} = poly_ring_type(T)
+base_ring(R::LaurentPolyWrapRing) = R.polyring::base_ring_type(R)
 
 coefficient_ring_type(::Type{LaurentPolyWrapRing{T, PR}}) where {T, PR} = coefficient_ring_type(PR)
-coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(R.polyring)
+coefficient_ring(R::LaurentPolyWrapRing) = coefficient_ring(base_ring(R))
 
-var(R::LaurentPolyWrapRing) = var(R.polyring)
+var(R::LaurentPolyWrapRing) = var(base_ring(R))
 
-symbols(R::LaurentPolyWrapRing) = symbols(R.polyring)
+symbols(R::LaurentPolyWrapRing) = symbols(base_ring(R))
 
 number_of_variables(R::LaurentPolyWrapRing) = 1
 number_of_generators(R::LaurentPolyWrapRing) = number_of_variables(R)
@@ -59,7 +59,7 @@ The result is undefined when `p` is null.
 lead_degree(p::LaurentPolyWrap) = p.mindeg + degree(p.poly)
 
 coeff(p::LaurentPolyWrap, i::Int) =
-   i < p.mindeg ? zero(base_ring(p)) : coeff(p.poly, i - p.mindeg)
+   i < p.mindeg ? zero(coefficient_ring(p)) : coeff(p.poly, i - p.mindeg)
 
 function _enable_deg!(p::LaurentPolyWrap, i::Int)
    diff = p.mindeg - i
@@ -81,10 +81,10 @@ iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
 isone(p::LaurentPolyWrap) = is_monomial(p, 0)
 
-zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(R.polyring))
-one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(R.polyring))
+zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(base_ring(R)))
+one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(base_ring(R)))
 
-gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, gen(R.polyring))
+gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, gen(base_ring(R)))
 
 is_gen(p::LaurentPolyWrap) = is_monomial(p, 1)
 
@@ -413,7 +413,7 @@ end
 RandomExtensions.maketype(S::LaurentPolyWrapRing, _, _) = elem_type(S)
 
 function RandomExtensions.make(S::LaurentPolyWrapRing, v1, vs...)
-   R = S.polyring
+   R = base_ring(S)
    if length(vs) == 1 && vs[1] isa Integer && elem_type(R) == Random.gentype(v1)
       Make(S, v1, vs[1]) # forward to default Make constructor
    else
@@ -474,7 +474,7 @@ end
 
 function AbstractAlgebra._map(g::T, p::LaurentPolyWrap, Rx::LaurentPolyWrapRing) where T
    return LaurentPolyWrap(Rx,
-                        AbstractAlgebra._map(g, p.poly, Rx.polyring), p.mindeg)
+                        AbstractAlgebra._map(g, p.poly, base_ring(Rx)), p.mindeg)
 end
 
 function change_base_ring(R::Ring, p::LaurentPolyWrap; cached::Bool = true,
@@ -496,14 +496,14 @@ end
 #
 ###############################################################################
 
-(R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R, R.polyring(b))
+(R::LaurentPolyWrapRing)(b::RingElement) = LaurentPolyWrap(R, base_ring(R)(b))
 
-(R::LaurentPolyWrapRing)(b::RingElement, d::Int) = LaurentPolyWrap(R, R.polyring(b), d)
+(R::LaurentPolyWrapRing)(b::RingElement, d::Int) = LaurentPolyWrap(R, base_ring(R)(b), d)
 
-(R::LaurentPolyWrapRing)() = LaurentPolyWrap(R, R.polyring())
+(R::LaurentPolyWrapRing)() = LaurentPolyWrap(R, base_ring(R)())
 
 function (R::LaurentPolyWrapRing)(p::LaurentPolyWrap)
-   parent(p) == R ? p : LaurentPolyWrap(R, R.polyring(p.poly), p.mindeg)
+   parent(p) == R ? p : LaurentPolyWrap(R, base_ring(R)(p.poly), p.mindeg)
 end
 
 ###############################################################################
