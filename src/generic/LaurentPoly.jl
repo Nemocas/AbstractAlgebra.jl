@@ -406,6 +406,18 @@ end
 
 ###############################################################################
 #
+#   Inflation
+#
+###############################################################################
+
+function inflate(f::LaurentPolyWrap, shift::Int64, defl::Int64)
+   return LaurentPolyWrap(parent(f), inflate(f.poly, defl), f.mindeg*defl+shift)
+end
+
+inflate(f::LaurentPolyWrap, defl::Int64) = inflate(f, 0, defl)
+
+###############################################################################
+#
 #   Random elements
 #
 ###############################################################################

@@ -231,6 +231,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
    end
 
+   @testset "inflation" begin
+      L, y = laurent_polynomial_ring(ZZ, "y")
+
+      @test inflate(y+y^-1, 2) == y^2+y^-2
+      @test inflate(y+y^-1, 3, 2) == y^5+y
+   end
+
    @testset "coercion" begin
       R, x = polynomial_ring(ZZ, "x")
       L, x1 = laurent_polynomial_ring(ZZ, "x")

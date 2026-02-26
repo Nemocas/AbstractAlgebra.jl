@@ -121,6 +121,12 @@ end
     @test is_term(x^2*y^-2)
     @test is_term(2*x^2*y^-2)
     @test !is_term(x+y)
+
+    @test inflate(y+y^-1, [1, 2]) == y^2+y^-2
+    @test inflate(y+y^-1, [0, 3], [1, 2]) == y^5+y
+    @test inflate(y+y^-1, [2], [3], [2]) == y^5+y
+    @test inflate(x*y^2+y, [2, 2]) == x^2*y^4+y^2
+    @test inflate(x*y^2+y, [1, 2], [2, 2]) == x^3*y^6+x*y^4
 end
 
 

@@ -660,6 +660,30 @@ end
 
 ###############################################################################
 #
+#   Inflation
+#
+###############################################################################
+
+function inflate(f::LaurentMPolyWrap, shift::Vector{Int}, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl.+shift)
+end
+
+function inflate(f::LaurentMPolyWrap, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl)
+end
+
+function inflate(f::LaurentMPolyWrap, vars::Vector{Int}, shifts::Vector{Int}, defls::Vector{Int})
+   mindegs = copy(f.mindegs)
+   for (var, shift, defl) in zip(vars, shifts, defls)
+      mindegs[var] *= defl
+      mindegs[var] += shift
+   end
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, vars, zeros(Int, length(shifts)), defls), mindegs)
+end
+
+
+###############################################################################
+#
 #   laurent_polynomial_ring constructor
 #
 ###############################################################################
