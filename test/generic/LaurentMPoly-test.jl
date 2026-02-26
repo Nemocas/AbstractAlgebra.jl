@@ -114,6 +114,13 @@ end
 
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
+
+    @test is_monomial(x^2*y^-2)
+    @test !is_monomial(2*x^2*y^-2)
+    @test !is_monomial(x+y)
+    @test is_term(x^2*y^-2)
+    @test is_term(2*x^2*y^-2)
+    @test !is_term(x+y)
 end
 
 

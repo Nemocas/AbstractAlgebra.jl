@@ -102,6 +102,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
 
+      @test length(y^2+y) == 2
+      @test length(y) == 1
+
+      @test is_term(y)
+      @test is_term(y^-3)
+      @test is_term(2y)
+      @test !is_term(y^2+y)
       @test is_monomial(y)
       @test is_monomial(y^-3)
       @test !is_monomial(2y)

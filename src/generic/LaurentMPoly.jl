@@ -50,6 +50,14 @@ function length(a::LaurentMPolyWrap)
     return length(a.mpoly)
 end
 
+function is_term(a::LaurentMPolyWrap)
+    return is_term(a.mpoly)
+end
+
+function is_monomial(a::LaurentMPolyWrap)
+    return is_monomial(a.mpoly)
+end
+
 function zero(R::LaurentMPolyWrapRing)
     return LaurentMPolyWrap(R, zero(R.mpolyring))
 end
