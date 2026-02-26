@@ -115,18 +115,28 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
+function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+    if isdefined(Main, :IJulia) && Main.IJulia.inited
+        return false
+    else
+        return true
+    end
+end
+
 function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited
-      error("Dummy error for jupyter")
-   end
    show_via_expressify(io, mi, x)
 end
 
-function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
    if isdefined(Main, :IJulia) && Main.IJulia.inited &&
          !AbstractAlgebra.get_html_as_latex()
-      error("Dummy error for jupyter")
+      return false
+   else
+    return true
    end
+end
+
+function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
