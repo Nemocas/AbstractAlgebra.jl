@@ -116,11 +116,7 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
 end
 
 function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
-    if isdefined(Main, :IJulia) && Main.IJulia.inited
-        return false
-    else
-        return true
-    end
+    return !AbstractAlgebra.is_ijulia_inited()
 end
 
 function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
@@ -128,12 +124,7 @@ function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, 
 end
 
 function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
-      return false
-   else
-    return true
-   end
+   return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
 end
 
 function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
@@ -253,12 +244,16 @@ end
 #
 # The challenge for us is that we always want to define text/latex and
 # text/html methods for sprint and friends. This has the disadvantage that if
-# get_html_as_latex()== false, then our objects will print their ordinary
+# get_html_as_latex() == false, then our objects will print their ordinary
 # string presentation, but since it is coming from text/html, it will be
 # rendered using the "normal" font.
 #
-# Thus, inside IJulia we will throw an error for text/latex (always) and
-# text/html (unless get_html_as_latex()).
+# Thus, when IJulia is initialized we make `showable` return false for
+# text/latex (always) and text/html (unless get_html_as_latex()), so IJulia
+# falls back to text/plain.
+#
+# The IJulia state is queried via AbstractAlgebra.is_ijulia_inited(); by
+# default this is false, and the IJulia extension installs the real check.
 #
 # Super easy!
 
@@ -273,10 +268,7 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.showable(mi::MIME"text/latex", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited
-          return false
-       end
-       return true
+       return !AbstractAlgebra.is_ijulia_inited()
      end
 
     function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
@@ -284,11 +276,7 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.showable(mi::MIME"text/html", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-             !AbstractAlgebra.get_html_as_latex()
-          return false
-       end
-       return true
+       return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
     end
 
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
