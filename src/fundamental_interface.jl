@@ -4,6 +4,11 @@
 #
 ###############################################################################
 
+function Base.:(==)(x::AbstractAlgebra.SetElem, y::AbstractAlgebra.SetElem)
+  x === y && return true
+  throw(NotImplementedError(:(==), x, y))
+end
+
 ###############################################################################
 #
 #   Parents, elements and data type methods
