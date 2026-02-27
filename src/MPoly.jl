@@ -944,7 +944,7 @@ each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElement}
    @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
    if (U <: Integer && U !== BigInt) ||
