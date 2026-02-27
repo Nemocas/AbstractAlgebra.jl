@@ -102,6 +102,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
 
+      @test length(y^2+y) == 2
+      @test length(y) == 1
+
+      @test is_term(y)
+      @test is_term(y^-3)
+      @test is_term(2y)
+      @test !is_term(y^2+y)
       @test is_monomial(y)
       @test is_monomial(y^-3)
       @test !is_monomial(2y)
@@ -222,6 +229,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test is_divisible_by(2*y+3, 2+3*y^-1)
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
+   end
+
+   @testset "inflation" begin
+      L, y = laurent_polynomial_ring(ZZ, "y")
+
+      @test inflate(y+y^-1, 2) == y^2+y^-2
+      @test inflate(y+y^-1, 3, 2) == y^5+y
    end
 
    @testset "coercion" begin

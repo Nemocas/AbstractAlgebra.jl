@@ -115,27 +115,24 @@ gens(R::LaurentPolyRing) = [gen(R)]
 
 is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))
 
+length(p::LaurentPolyRingElem) = length(degrees_range(p))
+
+is_term(p::LaurentPolyRingElem) = isone(length(p))
+
 # whether p is a (monic) monomial of degree i, non-recursively:
 # return true iff `p` has only one non-null coefficient
 # (of degree i) at the outer layer, and this coefficient is one
 # (as an element of the base ring)
-function is_monomial(p::LaurentPolyRingElem, i::Integer)
-   dr = degrees_range(p)
-   length(dr) == 1 || return false
-   dr[] == i || return false
-   isone(coeff(p, i))
-end
+is_monomial(p::LaurentPolyRingElem, i::Integer) = is_term(p) && isone(coeff(p, i))
 
 function is_monomial(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   length(dr) == 1 || return false
-   isone(coeff(p, dr[]))
+   return isone(length(dr)) && isone(coeff(p, dr[]))
 end
 
 function is_monomial_recursive(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   length(dr) == 1 || return false
-   is_monomial_recursive(coeff(p, dr[]))
+   return isone(length(dr)) && is_monomial_recursive(coeff(p, dr[]))
 end
 
 function is_unit(f::T) where {T <: LaurentPolyRingElem}

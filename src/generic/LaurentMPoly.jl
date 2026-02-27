@@ -50,6 +50,14 @@ function length(a::LaurentMPolyWrap)
     return length(a.mpoly)
 end
 
+function is_term(a::LaurentMPolyWrap)
+    return is_term(a.mpoly)
+end
+
+function is_monomial(a::LaurentMPolyWrap)
+    return is_monomial(a.mpoly)
+end
+
 function zero(R::LaurentMPolyWrapRing)
     return LaurentMPolyWrap(R, zero(R.mpolyring))
 end
@@ -649,6 +657,30 @@ function map_coefficients(g::T, p::LaurentMPolyWrap; cached::Bool = true,
                             cached)) where T
    return AbstractAlgebra._map(g, p, parent)
 end
+
+###############################################################################
+#
+#   Inflation
+#
+###############################################################################
+
+function inflate(f::LaurentMPolyWrap, shift::Vector{Int}, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl.+shift)
+end
+
+function inflate(f::LaurentMPolyWrap, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl)
+end
+
+function inflate(f::LaurentMPolyWrap, vars::Vector{Int}, shifts::Vector{Int}, defls::Vector{Int})
+   mindegs = copy(f.mindegs)
+   for (var, shift, defl) in zip(vars, shifts, defls)
+      mindegs[var] *= defl
+      mindegs[var] += shift
+   end
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, vars, zeros(Int, length(shifts)), defls), mindegs)
+end
+
 
 ###############################################################################
 #
