@@ -927,15 +927,6 @@ end
 #
 ###############################################################################
 
-function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
-   newvals = map(parent(a), vals)
-   if typeof(vals) == typeof(newvals)
-     throw(NotImplementedError(:evaluate, a, vals))
-   end
-   return evaluate(a, newvals)
-end
-
 @doc raw"""
     evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 
