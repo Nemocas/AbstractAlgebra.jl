@@ -166,6 +166,19 @@ function promote_rule(::Type{S}, ::Type{U}) where {T <: NCRingElement, S <: MatR
    promote_rule(T, U) == T ? MatRingElem{T} : Union{}
 end
 
+function Base.promote(x::MatRingElem{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+  return MatRingElem.(Base.promote(matrix(x), matrix(y)))
+end
+
+# matrix * vec and vec * matrix
+# function Base.promote(x::MatRingElem{S},
+#                       y::Vector{T}) where {S <: NCRingElement,
+#                                            T <: NCRingElement}
+# ???
+# end
+
 ###############################################################################
 #
 #   Parent object call overload
