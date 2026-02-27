@@ -752,7 +752,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Generic.emb!(one(G), p, V)
+   return p -> emb!(one(G), p, V)
 end
 
 @doc raw"""

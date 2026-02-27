@@ -19,11 +19,11 @@ function (f::CompositeMap{D, C})(a) where {D, C}
   return image(f, a)::elem_type(C)
 end
 
-function image(f::Generic.CompositeMap{D, C}, a) where {D, C}
+function image(f::CompositeMap{D, C}, a) where {D, C}
   return f.map2(f.map1(a))::elem_type(C)
 end
 
-function preimage(f::Generic.CompositeMap{D, C}, a) where {D, C}
+function preimage(f::CompositeMap{D, C}, a) where {D, C}
    return preimage(f.map1, preimage(f.map2, a))
 end
 

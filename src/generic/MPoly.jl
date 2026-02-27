@@ -837,7 +837,7 @@ function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(Rc, Re)
 end
 
-Base.copy(f::Generic.MPoly) = deepcopy(f)
+Base.copy(f::MPoly) = deepcopy(f)
 
 ###############################################################################
 #
