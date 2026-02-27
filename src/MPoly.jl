@@ -928,7 +928,7 @@ end
 ###############################################################################
 
 function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    newvals = map(parent(a), vals)
    if typeof(vals) == typeof(newvals)
      throw(NotImplementedError(:evaluate, a, vals))
@@ -945,7 +945,7 @@ defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
 function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
    if (U <: Integer && U !== BigInt) ||
       (U <: Rational && U !== Rational{BigInt})
@@ -1132,16 +1132,19 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingE
 end
 
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
 
-Evaluate the polynomial expression at the supplied values, which may be any
-ring elements, commutative or non-commutative, but in the same ring. Evaluation
-always proceeds in the order of the variables as supplied when creating the
-polynomial ring to which $a$ belongs. The evaluation will succeed if a product
-of a coefficient of the polynomial by one of the values is defined.
+Evaluate the polynomial at the supplied values, which may be any ring elements,
+commutative or non-commutative, but in the same ring. Evaluation always proceeds
+in the order of the variables as supplied when creating the polynomial ring to
+which $a$ belongs. The evaluation will succeed if a product of a coefficient
+of the polynomial by one of the values is defined.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-   return a(vals...)
+(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
+
+function (a::MPolyRingElem)()
+   @req iszero(nvars(parent(a))) "Number of variables does not match number of values"
+   return constant_coefficient(a)
 end
 
 function (a::MPolyRingElem)(;kwargs...)
