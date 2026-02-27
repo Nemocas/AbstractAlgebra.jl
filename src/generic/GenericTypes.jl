@@ -54,6 +54,7 @@ struct AllPerms{T<:Integer}
    elts::Perm{T}
 
    function AllPerms(n::T) where T
+      @assert isconcretetype(T)
       new{T}(Int(factorial(n)), ones(Int, n), Perm(collect(T, 1:n), false))
    end
 end
@@ -97,6 +98,7 @@ struct Partition{T} <: AbstractVector{T}
       Partition(n, collect(part), check)
 
    function Partition(n::Integer, part::Vector{T}, check::Bool=true) where T
+      @assert isconcretetype(T)
       if check
          issorted(part, rev=true) || sort!(part, rev=true)
          if length(part) > 0
@@ -148,8 +150,10 @@ struct AllParts{T<:Integer}
    tmp::Vector{T}
    part::Vector{T}
 
-   AllParts{T}(n::Integer) where T =
-      new{T}(n, ones(T, n), ones(T, n))
+   function AllParts{T}(n::Integer) where T
+      @assert isconcretetype(T)
+      return new{T}(n, ones(T, n), ones(T, n))
+    end
    AllParts(n::T; copy=true) where T<:Integer = AllParts{T}(n)
 end
 
@@ -187,6 +191,7 @@ struct SkewDiagram{T<:Integer} <: AbstractMatrix{T}
    mu::Partition{T}
 
    function SkewDiagram(lambda::Partition{T}, mu::Partition{T}) where T
+      @assert isconcretetype(T)
       @boundscheck let
          lambda.n >= mu.n ||
             throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
@@ -249,6 +254,7 @@ struct YoungTableau{T<:Integer} <: AbstractMatrix{T}
    function YoungTableau(part::Partition{T},
       fill::AbstractVector{<:Integer}=collect(T(1):sum(part))) where T
       @boundscheck sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elements."))
+      @assert isconcretetype(T)
 
       return new{T}(part, fill)
    end
@@ -266,6 +272,7 @@ end
    istrivial::Bool
 
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(PolyID, (R, s), cached) do
          new{T}(R, s, is_trivial(R))
       end::PolyRing{T}
@@ -301,6 +308,7 @@ end
    S::Symbol
 
    function NCPolyRing{T}(R::NCRing, s::Symbol, cached::Bool = true) where T <: NCRingElem
+      @assert isconcretetype(T)
       return get_cached!(NCPolyID, (R, s), cached) do
          new{T}(R, s)
       end::NCPolyRing{T}
@@ -350,6 +358,7 @@ end
 
    function MPolyRing{T}(R::Ring, s::Vector{Symbol}, ord::Symbol, N::Int,
                          cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(MPolyID, (R, s, ord, N), cached) do
          new{T}(R, s, ord, length(s), N, is_trivial(R))
       end::MPolyRing{T}
@@ -472,6 +481,7 @@ end
    function UniversalPolyRing{T}(
       R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
    ) where {T<:RingElement}
+      @assert isconcretetype(T)
       @assert elem_type(R) == T
       return get_cached!(
          UnivPolyID, (R, s, internal_ordering), cached
@@ -518,6 +528,7 @@ end
    S::Symbol
 
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(SparsePolyID, (R, s), cached) do
          new{T}(R, s)
       end::SparsePolyRing{T}
@@ -558,6 +569,7 @@ abstract type LaurentPolyRing{T} <: AbstractAlgebra.LaurentPolyRing{T} end
                                              T <: RingElement,
                                              PR <: AbstractAlgebra.PolyRing{T}}
 
+      @assert isconcretetype(T)
       return get_cached!(LaurentPolyWrapRingID, pr, cached) do
          new{T, PR}(pr)
       end::LaurentPolyWrapRing{T, PR}
@@ -603,6 +615,7 @@ end
                                              T <: RingElement,
                                              PR <: AbstractAlgebra.MPolyRing{T}}
 
+      @assert isconcretetype(T)
       return get_cached!(LaurentMPolyWrapRingID, pr, cached) do
          new{T, PR}(pr)
       end::LaurentMPolyWrapRing{T, PR}
@@ -639,6 +652,7 @@ end
    modulus::T
 
    function EuclideanRingResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -671,6 +685,7 @@ end
    modulus::T
 
    function EuclideanRingResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       c = canonical_unit(modulus)
       if !isone(c)
         modulus = divexact(modulus, c)
@@ -718,6 +733,7 @@ end
    S::Symbol
 
    function RelPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(RelSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
       end::RelPowerSeriesRing{T}
@@ -752,6 +768,7 @@ end
    S::Symbol
 
    function AbsPowerSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(AbsSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
       end::AbsPowerSeriesRing{T}
@@ -782,6 +799,7 @@ end
    S::Symbol
 
    function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
       end::LaurentSeriesRing{T}
@@ -815,6 +833,7 @@ end
    S::Symbol
 
    function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
+      @assert isconcretetype(T)
       return get_cached!(LaurentSeriesID, (R, prec, s), cached) do
          new{T}(R, prec, s)
       end::LaurentSeriesField{T}
@@ -846,6 +865,7 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(PuiseuxSeriesID, R, cached) do
          new{T}(R)
       end::PuiseuxSeriesRing{T}
@@ -874,6 +894,7 @@ end
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
+      @assert isconcretetype(T)
       return get_cached!(PuiseuxSeriesFieldID, R, cached) do
          new{T}(R)
       end::PuiseuxSeriesField{T}
@@ -910,6 +931,7 @@ const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldE
    function AbsMSeriesRing(poly_ring::AbstractAlgebra.MPolyRing{T},
             prec::Vector{Int}, s::Vector{Symbol}, cached::Bool = true) where
                           {T <: RingElement}
+      @assert isconcretetype(T)
       U = elem_type(poly_ring)
       return get_cached!(AbsMSeriesID, (poly_ring, prec, s, -1), cached) do
          new{T, U}(poly_ring, prec, s, -1)
@@ -952,6 +974,7 @@ end
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
+      @assert isconcretetype(T)
       return get_cached!(FracDict, R, cached) do
          new{T}(R)
       end::FracField{T}
@@ -978,6 +1001,7 @@ end
    base_ring::Ring
 
    function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
+      @assert isconcretetype(T)
       return get_cached!(TotFracDict, R, cached) do
          new{T}(R)
       end::TotFracRing{T}
@@ -1004,6 +1028,7 @@ end
    base_ring::AbstractAlgebra.Ring
 
    function FactoredFracField{T}(R::Ring, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
       return get_cached!(FactoredFracDict, R, cached) do
          new{T}(R)
       end::FactoredFracField{T}
@@ -1039,6 +1064,7 @@ end
    base_ring::Field
 
    function RationalFunctionField{T, U}(k::Field, frac_field::FracField{U}, sym::Union{Symbol, Vector{Symbol}}, cached::Bool = true) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
+      @assert isconcretetype(T)
       return get_cached!(RationalFunctionFieldDict, (k, sym), cached) do
          T1 = elem_type(k)
          new{T1, U}(sym, frac_field, k)
@@ -1074,6 +1100,7 @@ end
    function FunctionField{T}(num::Poly{<:PolyRingElem{T}},
              den::PolyRingElem{T}, s::Symbol, cached::Bool = true) where
                                                           T <: FieldElement
+      @assert isconcretetype(T)
       return get_cached!(FunctionFieldDict, (num, den, s), cached) do
          new{T}(num, den, s)
       end::FunctionField{T}
@@ -1106,6 +1133,7 @@ struct MatSpaceElem{T <: NCRingElement} <: Mat{T}
    entries::Matrix{T}
 
    function MatSpaceElem{T}(R::NCRing, A::Matrix{T}) where T <: NCRingElement
+      @assert isconcretetype(T)
       @assert elem_type(R) === T
       return new{T}(R, A)
     end
@@ -1160,6 +1188,8 @@ struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
    base_ring::NCRing
 
    function MatRing{T}(R::NCRing, n::Int) where T <: NCRingElement
+      @assert isconcretetype(T)
+      @assert elem_type(R) === T
       new{T}(n, R)
    end
 end
@@ -1193,6 +1223,8 @@ matrix(A::MatRingElem{T}) where {T <: NCRingElement} = A.data::dense_matrix_type
    S::Vector{Symbol}
 
    function FreeAssociativeAlgebra{T}(R::Ring, s::Vector{Symbol}, cached::Bool = true) where T <: RingElement
+      @assert isconcretetype(T)
+      @assert elem_type(R) === T
       return get_cached!(FreeAssAlgID, (R, s), cached) do
          new{T}(R, s)
       end::FreeAssociativeAlgebra{T}
@@ -1356,6 +1388,8 @@ end
    base_ring::NCRing
 
    function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
+      @assert isconcretetype(T)
+      @assert elem_type(R) === T
       return get_cached!(FreeModuleDict, (R, rank), cached) do
          new{T}(rank, R)
       end::FreeModule{T}

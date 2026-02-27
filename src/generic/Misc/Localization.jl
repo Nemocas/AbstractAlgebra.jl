@@ -15,6 +15,7 @@
                # true:  den can ONLY use prime (and powers)
 
    function LocalizedEuclideanRing{T}(prime::T, primes::Vector{T}, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
+      @assert isconcretetype(T)
       length(primes) == 0 && error("No element to localize at since array of primes is empty")
       if cached && haskey(LocDict, (parent(prime), prime, comp))
          return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}
@@ -27,6 +28,7 @@
       end
    end
    function LocalizedEuclideanRing{T}(prime::T, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
+      @assert isconcretetype(T)
      is_unit(prime) && error("no-point")
      if cached && haskey(LocDict, (parent(prime), prime, comp))
        return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}

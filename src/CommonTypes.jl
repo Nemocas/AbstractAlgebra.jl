@@ -57,10 +57,12 @@ mutable struct Perm{T<:Integer} <: AbstractPerm
    cycles::CycleDec{T}
 
    function Perm(n::T) where T<:Integer
+      @assert isconcretetype(T)
       return new{T}(collect(Base.OneTo(n)), false)
    end
 
    function Perm(v::AbstractVector{T}, check::Bool=true) where T<:Integer
+      @assert isconcretetype(T)
       if check
          Base.Set(v) != Base.Set(1:length(v)) && error("Unable to coerce to permutation:
          non-unique elements in array")
