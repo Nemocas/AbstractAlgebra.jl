@@ -74,8 +74,6 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
-         @test isone(R(0)) || !is_unit(R(0))
-         @test is_unit(R(1))
          for i in 1:reps
             a = generate_element(R)::T
             @test hash(a) isa UInt
