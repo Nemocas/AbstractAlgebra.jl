@@ -85,7 +85,6 @@ function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
 
-
 include("exports.jl")
 include("AliasMacro.jl")
 include("Aliases.jl") # needs to be included after AliasMacro.jl
