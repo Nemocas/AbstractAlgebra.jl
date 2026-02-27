@@ -141,10 +141,10 @@ julia> c = M[1, 1]
 ## Inverses
 
 ```@docs
-Base.inv(::MatrixElem{T}) where T <: RingElement
-is_invertible(::MatrixElem{T}) where T <: RingElement
-is_invertible_with_inverse(::MatrixElem{T}) where T <: RingElement
-pseudo_inv(M::MatrixElem{T}) where T <: RingElement
+Base.inv(::MatElem{T}) where T <: RingElement
+is_invertible(::MatElem{T}) where T <: RingElement
+is_invertible_with_inverse(::MatElem{T}) where T <: RingElement
+pseudo_inv(M::MatElem{T}) where T <: RingElement
 ```
 
 ```jldoctest

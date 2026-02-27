@@ -97,10 +97,10 @@ Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: Rin
 ## Inverse
 
 ```@docs; canonical=false
-Base.inv(::MatrixElem{T}) where T <: RingElement
-is_invertible(::MatrixElem{T}) where T <: RingElement
-is_invertible_with_inverse(::MatrixElem{T}) where T <: RingElement
-pseudo_inv(M::MatrixElem{T}) where T <: RingElement
+Base.inv(::MatElem{T}) where T <: RingElement
+is_invertible(::MatElem{T}) where T <: RingElement
+is_invertible_with_inverse(::MatElem{T}) where T <: RingElement
+pseudo_inv(M::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -582,7 +582,7 @@ true
 ### Characteristic polynomial
 
 ```@docs
-charpoly(::PolyRing{T}, ::MatrixElem{T}) where T <: RingElem
+charpoly(::PolyRing{T}, ::MatElem{T}) where T <: RingElem
 ```
 
 ### Minimal polynomial
