@@ -91,8 +91,17 @@ function ==(x::NCRingElem, y::NCRingElem)
     fl, u, v = try_promote(x, y)
     fl && return u == v
   end
+  check_parent(a, b)
   throw(NotImplementedError(:(==), x, y))
  end
+ 
+# isequal treats ring elements with differing parent as simply being not equal
+# (instead of throwing an exception like == does) as it is used to compare set
+# elements or keys in dictionaries, and there it seems at least plausible to
+# allow mixed parents
+function isequal(a::NCRingElem, b::NCRingElem)
+   return parent(a) == parent(b) && a == b
+end
 
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
 

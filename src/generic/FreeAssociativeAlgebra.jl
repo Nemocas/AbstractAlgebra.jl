@@ -301,8 +301,7 @@ end
 ###############################################################################
 
 function ==(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T
-    fl = check_parent(a, b, false)
-    !fl && return false
+    check_parent(a, b)
     return a.length == b.length &&
            view(a.exps, 1:a.length) == view(b.exps, 1:b.length) &&
            view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)
