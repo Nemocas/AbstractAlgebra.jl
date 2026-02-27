@@ -35,9 +35,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
          @test parent(y) == L
 
-         @test base_ring(L) == R
-         @test base_ring(L) == base_ring(P)
          @test coefficient_ring(L) == R
+         @test coefficient_ring(L) == coefficient_ring(P)
          @test coefficient_ring_type(L) === typeof(R)
 
          @test var(L) == :y
@@ -122,7 +121,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test is_unit(y^e)
       end
 
-      if base_ring(L) isa AbstractAlgebra.Field
+      if coefficient_ring(L) isa AbstractAlgebra.Field
          for e = -5:5
             @test is_unit(2*y^e)
             @test is_unit(3*y^(2e))

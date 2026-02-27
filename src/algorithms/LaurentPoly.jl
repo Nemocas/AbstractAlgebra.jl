@@ -103,12 +103,12 @@ end
 
 function leading_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, last(dr))
 end
 
 function trailing_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, first(dr))
 end
 
 gens(R::LaurentPolyRing) = [gen(R)]
@@ -218,7 +218,7 @@ function show(io::IO, mime::MIME"text/plain", p::LaurentPolyRing)
   print(io, "Univariate Laurent polynomial ring in ", var(p))
   println(io)
   io = pretty(io)
-  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
 end
 
@@ -230,7 +230,7 @@ function show(io::IO, p::LaurentPolyRing)
   else
     io = pretty(io)
     print(io, "Univariate Laurent polynomial ring in ", var(p), " over ")
-    print(terse(io), Lowercase(), base_ring(p))
+    print(terse(io), Lowercase(), coefficient_ring(p))
   end
 end
 
