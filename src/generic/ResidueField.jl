@@ -66,7 +66,7 @@ end
 #
 ################################################################################
 
-function RandomExtensions.make(S::EuclideanRingResidueField{Generic.Poly{Rational{BigInt}}}, vs...)
+function RandomExtensions.make(S::EuclideanRingResidueField{Poly{Rational{BigInt}}}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, vs[1])

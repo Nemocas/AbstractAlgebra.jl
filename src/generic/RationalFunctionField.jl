@@ -716,7 +716,7 @@ function rank_interpolation(M::MatrixElem{<: RationalFunctionFieldElem})
    if is_zero(n) || is_zero(m)
       return 0
    end
-   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
+   Kx = base_ring(underlying_fraction_field(base_ring(M)))
    A = deepcopy(M)
    #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
    #Then M can be considered as a matrix over a polynomial ring. 
@@ -740,7 +740,7 @@ function rank_interpolation_mc(M::MatrixElem{<: RationalFunctionFieldElem}, err:
    if is_zero(n) || is_zero(m)
       return 0
    end
-   Kx = base_ring(Generic.underlying_fraction_field(base_ring(M)))
+   Kx = base_ring(underlying_fraction_field(base_ring(M)))
    A = deepcopy(M)
    #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
    #Then M can be considered as a matrix over some polynomial ring.

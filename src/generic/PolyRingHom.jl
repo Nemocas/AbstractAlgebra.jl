@@ -103,7 +103,7 @@ function compose(F::PolyRingAnyMap{D, C, S}, G::PolyRingAnyMap{C, E, U}) where {
     newcoeffmap = compose(f, g)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 
@@ -136,19 +136,19 @@ function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <
     newcoeffmap = compose(f, G)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 
 # Special case for composing with the identity
-function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: Generic.IdentityMap{C}}
+function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: IdentityMap{C}}
   codomain(F) === domain(G) || error("Incompatible (co)domain in composition")
   f = _coefficient_map(F)
   if typeof(codomain(f)) === C
     newcoeffmap = compose(f, G)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 

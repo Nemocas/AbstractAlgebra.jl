@@ -293,7 +293,7 @@ end
 ###############################################################################
 
 function free_associative_algebra(
-  R::AbstractAlgebra.Ring,
+  R::Ring,
   s::Vector{Symbol};
   cached::Bool = true,
 )

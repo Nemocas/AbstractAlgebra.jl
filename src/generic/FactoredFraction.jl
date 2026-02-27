@@ -54,7 +54,7 @@ function (F::FactoredFracField{T})(a::Rational) where T <: RingElem
     return F(numerator(a), denominator(a))
 end
 
-function (F::FactoredFracField{T})(a::Generic.FracFieldElem{T}) where T <: RingElement
+function (F::FactoredFracField{T})(a::FracFieldElem{T}) where T <: RingElement
     base_ring(F) == base_ring(a) || error("Could not coerce into $F")
     return _append_pow!(_make_base_elem(F, numerator(a)), denominator(a), -1)
 end
@@ -703,7 +703,7 @@ end
 #
 ###############################################################################
 
-function ConformanceTests.generate_element(FF::Generic.FactoredFracField{BigInt})
+function ConformanceTests.generate_element(FF::FactoredFracField{BigInt})
   limit = 10
   t = one(FF)
   for i in 1:abs(rand(Int)%limit)
