@@ -3914,8 +3914,11 @@ function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
 end
 
 function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = b * c
-   return add!(a, t)
+   return add!(a, b * c)
+end
+
+function submul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   return sub!(a, b * c)
 end
 
 function resize_exps!(a::Matrix{UInt}, n::Int)
