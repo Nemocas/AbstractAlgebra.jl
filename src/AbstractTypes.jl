@@ -37,9 +37,20 @@ abstract type RingElem <: NCRingElem end
 
 abstract type FieldElem <: RingElem end
 
+# unions of AbstractAlgebra abstract types and Julia types
+
+const JuliaRingElement = Union{Integer, Rational, AbstractFloat}
+const JuliaFieldElement = Union{Rational, AbstractFloat}
+const JuliaExactRingElement = Union{Integer, Rational}
+
+const RingElement = Union{RingElem, JuliaRingElement}
+const NCRingElement = Union{NCRingElem, JuliaRingElement}
+
+const FieldElement = Union{FieldElem, JuliaFieldElement}
+
 # parameterized domains
 
-abstract type Module{T} <: AdditiveGroup end
+abstract type Module{T<:NCRingElement} <: AdditiveGroup end
 
 abstract type FPModule{T} <: Module{T} end
 
@@ -49,7 +60,7 @@ abstract type IdealSet{T} <: Set end
 
 # elements of parameterised domains
 
-abstract type ModuleElem{T} <: AdditiveGroupElem end
+abstract type ModuleElem{T<:NCRingElement} <: AdditiveGroupElem end
 
 abstract type FPModuleElem{T} <: ModuleElem{T} end
 
@@ -71,35 +82,35 @@ abstract type FPModuleHomomorphism <: FunctionalMap end
 # and for which a generic implementation is possible
 # over that base ring
 
-abstract type PolyRing{T} <: Ring end
+abstract type PolyRing{T<:RingElement} <: Ring end
 
-abstract type NCPolyRing{T} <: NCRing end
+abstract type NCPolyRing{T<:NCRingElement} <: NCRing end
 
-abstract type MPolyRing{T} <: Ring end
+abstract type MPolyRing{T<:RingElement} <: Ring end
 
-abstract type UniversalPolyRing{T} <: Ring end
+abstract type UniversalPolyRing{T<:RingElement} <: Ring end
 
-abstract type LaurentPolyRing{T} <: Ring end
+abstract type LaurentPolyRing{T<:RingElement} <: Ring end
 
-abstract type LaurentMPolyRing{T} <: Ring end
+abstract type LaurentMPolyRing{T<:RingElement} <: Ring end
 
-abstract type SeriesRing{T} <: Ring end
+abstract type SeriesRing{T<:RingElement} <: Ring end
 
-abstract type MSeriesRing{T} <: Ring end
+abstract type MSeriesRing{T<:RingElement} <: Ring end
 
-abstract type ResidueRing{T} <: Ring end
+abstract type ResidueRing{T<:RingElement} <: Ring end
 
-abstract type ResidueField{T} <: Field end
+abstract type ResidueField{T<:RingElement} <: Field end
 
-abstract type FracField{T} <: Field end
+abstract type FracField{T<:RingElement} <: Field end
 
-abstract type MatRing{T} <: NCRing end
+abstract type MatRing{T<:NCRingElement} <: NCRing end
 
-abstract type FreeAssociativeAlgebra{T} <: NCRing end
+abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
 
 # Abstract types for number fields, parmeterised by the element type of
 # the base field.
-abstract type NumField{T} <: Field end
+abstract type NumField{T<:RingElement} <: Field end
 
 # A type for number fields, which are represented using a primitive element.
 # (simple number fields)
@@ -110,27 +121,27 @@ abstract type SimpleNumField{T} <: NumField{T} end
 # that have some kind of base ring, and a generic
 # implementation is meaningful over that base ring
 
-abstract type PolyRingElem{T} <: RingElem end
+abstract type PolyRingElem{T<:RingElement} <: RingElem end
 
-abstract type NCPolyRingElem{T} <: NCRingElem end
+abstract type NCPolyRingElem{T<:NCRingElement} <: NCRingElem end
 
-abstract type MPolyRingElem{T} <: RingElem end
+abstract type MPolyRingElem{T<:RingElement} <: RingElem end
 
-abstract type UniversalPolyRingElem{T} <: RingElem end
+abstract type UniversalPolyRingElem{T<:RingElement} <: RingElem end
 
-abstract type LaurentPolyRingElem{T} <: RingElem end
+abstract type LaurentPolyRingElem{T<:RingElement} <: RingElem end
 
-abstract type LaurentMPolyRingElem{T} <: RingElem end
+abstract type LaurentMPolyRingElem{T<:RingElement} <: RingElem end
 
-abstract type ResElem{T} <: RingElem end
+abstract type ResElem{T<:RingElement} <: RingElem end
 
-abstract type ResFieldElem{T} <: FieldElem end
+abstract type ResFieldElem{T<:RingElement} <: FieldElem end
 
-abstract type FracElem{T} <: FieldElem end
+abstract type FracElem{T<:RingElement} <: FieldElem end
 
-abstract type SeriesElem{T} <: RingElem end
+abstract type SeriesElem{T<:RingElement} <: RingElem end
 
-abstract type MSeriesElem{T} <: RingElem end
+abstract type MSeriesElem{T<:RingElement} <: RingElem end
 
 abstract type RelPowerSeriesRingElem{T} <: SeriesElem{T} end
 
@@ -140,11 +151,11 @@ abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
 abstract type MatElem{T} <: ModuleElem{T} end
 
-abstract type MatRingElem{T} <: NCRingElem end
+abstract type MatRingElem{T<:NCRingElement} <: NCRingElem end
 
-abstract type FreeAssociativeAlgebraElem{T} <: NCRingElem end
+abstract type FreeAssociativeAlgebraElem{T<:RingElement} <: NCRingElem end
 
-abstract type NumFieldElem{T} <: FieldElem end
+abstract type NumFieldElem{T<:RingElement} <: FieldElem end
 
 abstract type SimpleNumFieldElem{T} <: NumFieldElem{T} end
 
