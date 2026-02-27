@@ -928,14 +928,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElement}
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
    @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
    if (U <: Integer && U !== BigInt) ||
