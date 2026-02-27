@@ -1142,11 +1142,6 @@ of the polynomial by one of the values is defined.
 """
 (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
-function (a::MPolyRingElem)()
-   @req iszero(nvars(parent(a))) "Number of variables does not match number of values"
-   return constant_coefficient(a)
-end
-
 function (a::MPolyRingElem)(;kwargs...)
    ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
