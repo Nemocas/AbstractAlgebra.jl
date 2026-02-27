@@ -462,50 +462,6 @@ end
 
 ###############################################################################
 #
-#   UniversalPolyRing / UnivPoly
-#
-###############################################################################
-
-@attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
-   base_ring::AbstractAlgebra.MPolyRing{T}
-
-   function UniversalPolyRing{T}(
-      R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
-   ) where {T<:RingElement}
-      @assert elem_type(R) == T
-      return get_cached!(
-         UnivPolyID, (R, s, internal_ordering), cached
-      ) do
-         new{T}(AbstractAlgebra.poly_ring(R, s; internal_ordering))
-      end::UniversalPolyRing{T}
-   end
-end
-
-const UnivPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol}, Ring}()
-
-mutable struct UnivPoly{T <: RingElement} <: AbstractAlgebra.UniversalPolyRingElem{T}
-   p::MPolyRingElem{T}
-   parent::UniversalPolyRing{T}
-end
-
-struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyExponentVectors{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyTerms{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyMonomials{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-###############################################################################
-#
 #   SparsePolyRing / SparsePoly
 #
 ###############################################################################

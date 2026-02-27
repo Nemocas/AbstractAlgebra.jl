@@ -652,6 +652,35 @@ end
 
 ###############################################################################
 #
+#  Universal laurent polynomial ring methods
+#
+###############################################################################
+
+@doc raw"""
+    _upgrade(p::LaurentMPolyWrap{T}, R::LaurentMPolyRingWrap{T}) where {T}
+
+Return an element of `R` which is obtained from `p` by mapping the $i$-th variable
+of `parent(p)` to the $i$-th variable of `R`.
+For this to work, `R` needs to have at least as many variables as `parent(p)`.
+"""
+function _upgrade(p::LaurentMPolyWrap{T}, R::LaurentMPolyWrapRing{T}) where {T}
+   n = nvars(R) - nvars(parent(p))
+   n < 0 && error("Too few variables")
+   return LaurentMPolyWrap(R, _upgrade(p.mpoly, R.mpolyring), vcat(p.mindegs, zeros(Int, n)))
+end
+
+@doc raw"""
+    _add_gens(R::LaurentMPolyWrapRing, varnames::Vector{Symbol})
+
+Return a new uncached multivariate Laurent polynomial ring which has the same properties
+as `R` but `varnames` as additional generators.
+"""
+function _add_gens(R::LaurentMPolyWrapRing, varnames::Vector{Symbol})
+   return LaurentMPolyWrapRing(_add_gens(R.mpolyring, varnames), false)
+end
+
+###############################################################################
+#
 #   laurent_polynomial_ring constructor
 #
 ###############################################################################

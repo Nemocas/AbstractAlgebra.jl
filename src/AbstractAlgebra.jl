@@ -192,6 +192,11 @@ const FieldElement = Union{FieldElem, JuliaFieldElement}
 
 include("ConcreteTypes.jl")
 
+# Type aliases
+const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem, T}
+const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem, T}
+const UnivPoly{T} = UniversalPolyRingElem{T}
+
 ###############################################################################
 #
 #   Fundamental interface for AbstractAlgebra
@@ -293,6 +298,8 @@ include("ResidueField.jl")
 include("Fraction.jl")
 include("TotalFraction.jl")
 include("MPoly.jl")
+include("UniversalLaurentPoly.jl")
+include("UniversalRing.jl")
 include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
