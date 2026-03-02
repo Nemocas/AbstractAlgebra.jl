@@ -75,7 +75,7 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs)
 end
 
-Base.copy(f::Generic.Poly) = deepcopy(f)
+Base.copy(f::Poly) = deepcopy(f)
 
 ###############################################################################
 #
@@ -305,7 +305,7 @@ end
 #
 ###############################################################################
 
-function Base.iterate(a::Generic.MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyRingElem
+function Base.iterate(a::MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyRingElem
    st += 1
    if st > degree(a.poly)
        return nothing

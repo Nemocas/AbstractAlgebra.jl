@@ -454,7 +454,7 @@ rand(S::LaurentPolyWrapRing, degrees_range, v...) =
 #
 ###############################################################################
 
-function ConformanceTests.generate_element(R::Generic.LaurentPolyWrapRing)
+function ConformanceTests.generate_element(R::LaurentPolyWrapRing)
    n = rand(0:10)
    if n == 0
       return zero(R)

@@ -158,7 +158,7 @@ end
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
                  M2::AbstractAlgebra.FPModule{T}, v::Vector{S}) where
                          {T <: RingElement, S<:AbstractAlgebra.FPModuleElem{T}}
-   return ModuleHomomorphism(M1, M2, vcat([Generic._matrix(x) for x = v]...))
+   return ModuleHomomorphism(M1, M2, vcat([_matrix(x) for x = v]...))
 end
 
 function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
