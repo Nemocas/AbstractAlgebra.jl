@@ -108,9 +108,9 @@ jobs:
           julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
           julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.instantiate()'
       - name: Build docs
-env:
-GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
         run: |
           julia --color=yes --project=docs/ docs/make.jl --pdf
       - name: Upload PDF
