@@ -143,7 +143,7 @@ function is_unit(f::T) where {T <: LaurentPolyRingElem}
     return is_unit(coeff(f, Generic.lead_degree(f)))
   end
   is_domain_type(coefficient_ring(parent(f))) && return false
-  error("Not implemented yet: coefficient ring contains non-zero zero_divisors")
+  error("Not implemented yet: coefficient ring contains non-zero zero-divisors")
 end
 
 
