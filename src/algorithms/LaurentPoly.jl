@@ -140,11 +140,12 @@ function is_unit(f::T) where {T <: LaurentPolyRingElem}
   is_trivial(parent(f)) && return true  # coeffs in zero ring
   is_zero(f) && return false
   dr = degrees_range(f)
-  if length(dr) == 1
-    return is_unit(coeff(f, dr[]))
-  end
+  (length(dr) == 1)  &&  return is_unit(coeff(f, dr[]))
   is_domain_type(coefficient_ring(parent(f))) && return false
-  error("Not implemented yet: coefficient ring contains non-zero zero-divisors")
+  # For coefficient rings with zero divisors, things are more complex;
+  # if someone needs it we can implement some more, just ask for it
+  # see also <https://github.com/Nemocas/AbstractAlgebra.jl/issues/2359>
+  throw(NotImplementedError(is_unit, f))
 end
 
 
