@@ -139,8 +139,9 @@ function is_unit(f::T) where {T <: LaurentPolyRingElem}
   # **NOTE**  f.poly is not normalized so that the degree 0 coeff is non-zero
   is_trivial(parent(f)) && return true  # coeffs in zero ring
   is_zero(f) && return false
-  if is_monomial(f)
-    return is_unit(coeff(f, Generic.lead_degree(f)))
+  dr = degrees_range(f)
+  if length(dr) == 1
+    return is_unit(coeff(f, dr[]))
   end
   is_domain_type(coefficient_ring(parent(f))) && return false
   error("Not implemented yet: coefficient ring contains non-zero zero-divisors")
