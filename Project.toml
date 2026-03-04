@@ -12,12 +12,15 @@ RandomExtensions = "fb686558-2515-59ef-acaa-46db3789a887"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [weakdeps]
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [extensions]
+IJuliaExt = "IJulia"
 TestExt = "Test"
 
 [compat]
+IJulia = "1"
 LinearAlgebra = "1.10"
 MacroTools = "0.5"
 PrecompileTools = "1"
