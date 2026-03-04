@@ -9,6 +9,21 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.48.5](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.5) - 2026-03-04
+
+### New or extended functionality
+
+- [#2358](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2358) Add some missing methods for Laurent polynomials
+
+### Other fixed bugs
+
+- [#2361](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2361) Fix printing of `RingElem`s in Jupyter notebooks
+- [#2362](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2362) Drop `is_unit` tests from `test_NCRing_interface` to comply with interface definitions
+
+### Improvements or additions to documentation
+
+- [#2307](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2307) Allow building the documentation as a PDF
+
 ## [0.48.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.4) - 2026-02-19
 
 ### New or extended functionality
