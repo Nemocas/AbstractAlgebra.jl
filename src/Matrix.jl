@@ -1661,10 +1661,6 @@ function tr(x::MatElem{T}) where T <: NCRingElement
    return d
 end
 
-function tr(x::MatRingElem{T}) where T <: NCRingElement
-  return tr(matrix(x))
-end
-
 ###############################################################################
 #
 #   Content
@@ -3945,20 +3941,11 @@ function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
    return X, d
 end
 
-function pseudo_inv(M::MatRingElem{T}) where {T <: RingElement}
-  X,d = pseudo_inv(matrix(M))
-  return Generic.MatRingElem(X), d
-end
-
 function Base.inv(M::MatElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
-end
-
-function Base.inv(M::MatRingElem{T}) where {T <: FieldElement}
-  return Generic.MatRingElem(inv(matrix(M)))
 end
 
 @doc raw"""

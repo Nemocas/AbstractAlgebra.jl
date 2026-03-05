@@ -334,6 +334,10 @@ function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: Rin
   return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
 end
 
+function tr(x::MatRingElem{T}) where T <: NCRingElement
+  return tr(matrix(x))
+end
+
 function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
   map_entries!(f, matrix(dst), matrix(src))
   return dst
@@ -341,6 +345,15 @@ end
 
 function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
   return Generic.MatRingElem(map_entries(f, matrix(a)))
+end
+
+function pseudo_inv(M::MatRingElem{T}) where {T <: RingElement}
+  X,d = pseudo_inv(matrix(M))
+  return Generic.MatRingElem(X), d
+end
+
+function Base.inv(M::MatRingElem{T}) where {T <: FieldElement}
+  return Generic.MatRingElem(inv(matrix(M)))
 end
 
 ###############################################################################
