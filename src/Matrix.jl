@@ -5189,23 +5189,23 @@ end
 #  Kannan-Bachem algorithm
 
 @doc raw"""
-    hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
-function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_kb(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val(false))
 end
 
 @doc raw"""
-    hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
-function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val(true))
 end
 
@@ -5235,7 +5235,7 @@ function kb_search_first_pivot(H, start_element::Int = 1)
 end
 
 # Reduces the entries above H[pivot[c], c]
-function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+function kb_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
 
    # Let c = 4 and pivot[c] = 4. H could look like this:
    # ( 0 . * # * )
@@ -5289,7 +5289,7 @@ function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    return nothing
 end
 
-function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
+function kb_sort_rows!(H::MatElem{T}, U::MatElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot2 = zeros(Int, m)
@@ -5325,7 +5325,7 @@ function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, w
    return nothing
 end
 
-function hnf_kb!(H::MatrixElem{T}, U::MatrixElem{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
+function hnf_kb!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
@@ -5407,30 +5407,30 @@ function hnf_kb!(H::MatrixElem{T}, U::MatrixElem{T}, with_trafo::Bool = false, s
 end
 
 @doc raw"""
-    hnf(A::MatrixElem{T}) where {T <: RingElement}
+    hnf(A::MatElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$.
 """
-function hnf(A::MatrixElem{T}) where {T <: RingElement}
+function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
 @doc raw"""
-    hnf_with_transform(A)
+    hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Return the tuple $H, U$ consisting of the upper right row Hermite normal
 form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
 """
-function hnf_with_transform(A)
+function hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb_with_transform(A)
 end
 
 @doc raw"""
-    is_hnf(M::MatrixElem{T}) where T <: RingElement
+    is_hnf(M::MatElem{T}) where T <: RingElement
 
 Return `true` if the matrix is in Hermite normal form.
 """
-function is_hnf(M::MatrixElem{T}) where T <: RingElement
+function is_hnf(M::MatElem{T}) where T <: RingElement
    r = nrows(M)
    c = ncols(M)
    row = 1
@@ -5480,11 +5480,11 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_snf(A::MatrixElem{T}) where T <: RingElement
+    is_snf(A::MatElem{T}) where T <: RingElement
 
 Return `true` if $A$ is in Smith Normal Form.
 """
-function is_snf(A::MatrixElem{T}) where T <: RingElement
+function is_snf(A::MatElem{T}) where T <: RingElement
    m = nrows(A)
    n = ncols(A)
    a = A[1, 1]
@@ -5508,15 +5508,15 @@ function is_snf(A::MatrixElem{T}) where T <: RingElement
    return true
 end
 
-function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
+function snf_kb(A::MatElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val(false))
 end
 
-function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function snf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val(true))
 end
 
-function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
+function _snf_kb(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    S = deepcopy(A)
    m = nrows(S)
    n = ncols(S)
@@ -5533,7 +5533,7 @@ function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T 
    end
 end
 
-function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_clear_row!(S::MatElem{T}, K::MatElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
    m = nrows(S)
    n = ncols(S)
    t = base_ring(S)()
@@ -5570,7 +5570,7 @@ function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::B
    return nothing
 end
 
-function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_trafo::Bool = false) where {T <: RingElement}
+function snf_kb!(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, with_trafo::Bool = false) where {T <: RingElement}
    m = nrows(S)
    n = ncols(S)
    l = min(m, n)
@@ -5630,21 +5630,21 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
 end
 
 @doc raw"""
-    snf(A::MatrixElem{T}) where {T <: RingElement}
+    snf(A::MatElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$.
 """
-function snf(a::MatrixElem{T}) where {T <: RingElement}
-  return snf_kb(a)
+function snf(A::MatElem{T}) where {T <: RingElement}
+  return snf_kb(A)
 end
 
 @doc raw"""
-    snf_with_transform(A)
+    snf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Return the tuple $S, T, U$ consisting of the Smith normal form $S$ of $A$
 together with invertible matrices $T$ and $U$ such that $TAU = S$.
 """
-function snf_with_transform(a::MatrixElem{T}) where {T <: RingElement}
+function snf_with_transform(a::MatElem{T}) where {T <: RingElement}
   return snf_kb_with_transform(a)
 end
 
@@ -6352,10 +6352,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
-row are swapped.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
+rows are swapped.
 
 # Examples
 ```jldoctest
@@ -6375,7 +6375,7 @@ julia> M  # was not modified
 [0   0   1]
 ```
 """
-function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_rows!(b, i, j)
@@ -6383,10 +6383,11 @@ function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+Swap the $i$-th and $j$-th rows of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
+the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
 
 # Examples
 ```jldoctest
@@ -6406,7 +6407,7 @@ julia> M  # was modified
 [0   0   1]
 ```
 """
-function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:ncols(a)
          a[i, k], a[j, k] = a[j, k], a[i, k]
@@ -6416,12 +6417,12 @@ function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
-row are swapped.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
+columns are swapped.
 """
-function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_cols!(b, i, j)
@@ -6429,12 +6430,13 @@ function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$th and $j$th column of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+Swap the $i$-th and $j$-th columns of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
+the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
 """
-function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:nrows(a)
          a[k, i], a[k, j] = a[k, j], a[k, i]
@@ -6444,12 +6446,13 @@ function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_rows!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
-where $r$ is the number of rows of $a$.
+Swap the $i$-th and $(r - i)$-th rows of $a$ for each $1 \leq i \leq r/2$,
+where $r$ is the number of rows of $a$.  The swaps are performed in place.
+The return value is the modified matrix.
 """
-function reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_rows!(a::MatElem{T}) where T <: NCRingElement
    k = div(nrows(a), 2)
    for i in 1:k
       swap_rows!(a, i, nrows(a) - i + 1)
@@ -6458,24 +6461,25 @@ function reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_rows(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_rows(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
-row is swapped for $1 \leq i \leq r/2$. Here $r$ is the number of rows of
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
+rows are swapped for each $1 \leq i \leq r/2$, where $r$ is the number of rows of
 $a$.
 """
-function reverse_rows(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_rows(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
    return reverse_rows!(b)
 end
 
 @doc raw"""
-    reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_cols!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
-where $c$ is the number of columns of $a$.
+Swap the $i$-th and $(r - i)$-th columns of $a$ for each $1 \leq i \leq c/2$,
+where $c$ is the number of columns of $a$.  The swaps are performed in place.
+The return value is the modified matrix.
 """
-function reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_cols!(a::MatElem{T}) where T <: NCRingElement
    k = div(ncols(a), 2)
    for i in 1:k
       swap_cols!(a, i, ncols(a) - i + 1)
@@ -6484,13 +6488,12 @@ function reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_cols(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_cols(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
-column is swapped for $1 \leq i \leq c/2$. Here $c$ is the number of columns
-of$a$.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
+columns are swapped for each $1 \leq i \leq c/2$, where $c$ is the number of columns of $a$.
 """
-function reverse_cols(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_cols(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
    return reverse_cols!(b)
 end
@@ -6575,7 +6578,7 @@ end
 @doc raw"""
     multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Multiply the $i$th column of $a$ with $s$.
+Multiply the $i$-th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
@@ -6594,7 +6597,7 @@ end
 @doc raw"""
     multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
+Create a copy of $a$ and multiply the $i$-th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
@@ -6609,7 +6612,7 @@ end
 @doc raw"""
     multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Multiply the $i$th row of $a$ with $s$.
+Multiply the $i$-th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
@@ -6628,7 +6631,7 @@ end
 @doc raw"""
     multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
+Create a copy of $a$ and multiply  the $i$-th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
