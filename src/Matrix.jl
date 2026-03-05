@@ -3963,10 +3963,6 @@ function Base.inv(M::MatElem{T}) where {T <: RingElement}
    return divexact(X, d)
 end
 
-function Base.inv(M::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(inv(matrix(M)))
-end
-
 ###############################################################################
 #
 #   Is invertible
@@ -3997,11 +3993,6 @@ function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) wher
    return can_solve_with_solution(A, I; side = side)
 end
 
-function is_invertible_with_inverse(A::MatRingElem{T}; side::Symbol = :left) where {T <: RingElement}
-  flag, inv = is_invertible_with_inverse(matrix(A); side = side)
-  return flag, Generic.MatRingElem(inv)
-end
-
 @doc raw"""
     is_invertible(A::MatElem{T}) where {T <: RingElement}
 
@@ -4010,11 +4001,7 @@ the inverse should also be computed, use `is_invertible_with_inverse`.
 """
 is_invertible(A::MatElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
 
-is_invertible(A::MatRingElem{T}) where {T <: RingElement} = is_unit(det(A))
-
 is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
-
-is_invertible(A::MatRingElem{T}) where {T <: FieldElement} = ncols(A) == rank(A)
 
 ###############################################################################
 #
@@ -4170,10 +4157,6 @@ function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   return false
 end
 
-function is_nilpotent(A::MatRingElem{T}) where {T <: RingElement}
-  return is_nilpotent(matrix(A))
-end
-
 ###############################################################################
 #
 #   Hessenberg form
@@ -4223,10 +4206,6 @@ function hessenberg!(A::MatElem{T}) where {T <: RingElement}
    end
 end
 
-function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(hessenberg!(matrix(A)))
-end
-
 @doc raw"""
     hessenberg(A::MatElem{T}) where {T <: RingElement}
 
@@ -4240,10 +4219,6 @@ function hessenberg(A::MatElem{T}) where {T <: RingElement}
    M = deepcopy(A)
    hessenberg!(M)
    return M
-end
-
-function hessenberg(A::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(hessenberg(matrix(A)))
 end
 
 @doc raw"""
@@ -4262,10 +4237,6 @@ function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
       end
    end
    return true
-end
-
-function is_hessenberg(A::MatRingElem{T}) where {T <: RingElement}
-  return is_hessenberg(matrix(A))
 end
 
 ###############################################################################
@@ -4298,11 +4269,6 @@ function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
       end
    end
    return P[n + 1]
-end
-
-function charpoly_hessenberg!(S::Ring, A::MatRingElem{T}) where {T <: RingElement}
-  a = matrix(A)
-  return charpoly_hessenberg!(S, a)  ## !!! WARNING !!!  may not be correct
 end
 
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
@@ -4608,18 +4574,10 @@ function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
    return f
 end
 
-function charpoly(S::PolyRing{T}, Y::MatRingElem{T}) where {T <: RingElement}
-  return charpoly(S, matrix(Y))
-end
-
 function charpoly(Y::MatElem)
    R = base_ring(Y)
    Rx, x = polynomial_ring(R; cached=false)
    return charpoly(Rx, Y)
-end
-
-function charpoly(Y::MatRingElem)
-  return charpoly(matrix(Y))
 end
 
 ###############################################################################
