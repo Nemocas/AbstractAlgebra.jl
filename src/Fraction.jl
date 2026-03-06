@@ -412,8 +412,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   b  = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    return (denominator(x, false) == denominator(y, false) &&
            numerator(x, false) == numerator(y, false)) ||
@@ -432,9 +431,7 @@ inexact, e.g. power series. Only if the power series are precisely the same,
 to the same precision, are they declared equal by this function.
 """
 function isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   if parent(x) != parent(y)
-      return false
-   end
+   parent(x) == parent(y) || return false
    return isequal(numerator(x, false)*denominator(y, false),
                   denominator(x, false)*numerator(y, false))
 end
