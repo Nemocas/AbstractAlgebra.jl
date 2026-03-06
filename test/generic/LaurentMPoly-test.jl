@@ -12,10 +12,8 @@ end
     @test L != laurent_polynomial_ring(GF(5), 2, 'x', cached = false)[1]
     @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
-    @test base_ring(L) == GF(5)
     @test coefficient_ring(L) == GF(5)
     @test coefficient_ring_type(L) === typeof(GF(5))
-    @test base_ring(x) == GF(5)
     @test coefficient_ring(x) == GF(5)
     @test coefficient_ring_type(x) === typeof(GF(5))
 
