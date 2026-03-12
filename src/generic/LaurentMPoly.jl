@@ -42,7 +42,7 @@ end
 function Base.hash(a::LaurentMPolyWrap, h::UInt)
     (ap, ad) = _normalize(a)
     h = hash(ap, h)
-    h ^= 0x9c64b62806a3d51d%UInt
+    h = xor(h, 0x9c64b62806a3d51d%UInt)
     return hash(ad, h)
 end
 
