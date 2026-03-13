@@ -270,3 +270,9 @@ end
   @test !is_unit(30*x*y)
   @test !is_unit(30*x/y)
 end
+
+@testset "#2378" begin
+  L1, (a, b) = laurent_polynomial_ring(QQ, [:a, :b]);
+  R2, (k, l) = laurent_polynomial_ring(L1, [:k, :l]);
+  @test a * k == R2(a) * k
+end
