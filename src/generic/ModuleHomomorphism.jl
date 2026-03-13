@@ -41,6 +41,17 @@ Base.:*(a::T, b::ModuleIsomorphism{T}) where {T <: RingElement} = hom(domain(b),
 Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
 Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
 
+function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomorphism))
+   check_composable(f, g)
+   @assert f.is_left == g.is_left
+   if f.is_left
+     return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix; is_left = true)
+   else
+     return ModuleHomomorphism(domain(f), codomain(g), g.matrix*f.matrix; is_left = false)
+   end
+end
+
+
 ###############################################################################
 #
 #   Comparison
@@ -148,10 +159,24 @@ end
 ###############################################################################
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where
+     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where
+                                                               T <: NCRingElement
+   if is_left
+     (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
+                                                      error("dimension mismatch")
+   else
+     (nrows(m) == ngens(M2) && ncols(m) == ngens(M1)) ||
+                                                      error("dimension mismatch")
+   end
+   return ModuleHomomorphism{T}(M1, M2, m; is_left)
+end
+
+function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
+     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where
                                                                T <: RingElement
    (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
                                                     error("dimension mismatch")
+   @assert is_left
    return ModuleHomomorphism{T}(M1, M2, m)
 end
 
@@ -204,6 +229,6 @@ function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:M
   return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
 end
 
-function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true)
-  return ModuleHomomorphism(V, W, v)
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true)
+  return ModuleHomomorphism(V, W, v; is_left)
 end

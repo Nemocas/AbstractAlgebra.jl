@@ -268,6 +268,7 @@ function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
 end
 +(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = b+c
 +(c::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement} = matrix(b) + c
+-(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = matrix(c) - b
 
 function add_one!(a::MatElem, i::Int, j::Int)
   a[i, j] += 1

@@ -1354,15 +1354,16 @@ end
 @attributes mutable struct FreeModule{T <: NCRingElement} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
+   is_row::Bool
 
-   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(FreeModuleDict, (R, rank), cached) do
-         new{T}(rank, R)
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true; is_row::Bool = true) where T <: NCRingElement
+      return get_cached!(FreeModuleDict, (R, rank, is_row), cached) do
+         new{T}(rank, R, is_row)
       end::FreeModule{T}
    end
 end
 
-const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
+const FreeModuleDict = CacheDictType{Tuple{NCRing, Int, Bool}, FreeModule}()
 
 struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
    parent::FreeModule{T}
@@ -1402,16 +1403,25 @@ end
 #
 ###############################################################################
 
-mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
+mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
 
    domain::AbstractAlgebra.FPModule{T}
    codomain::AbstractAlgebra.FPModule{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
+   is_left::Bool #xA vs Ax
    solve_ctx::Any # really: SolveCtx
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
+      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), true)
+   end
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where T <: NCRingElement
+
+      if is_left
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), is_left)
+      else
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*x.v), is_left)
+      end
    end
 end
 
