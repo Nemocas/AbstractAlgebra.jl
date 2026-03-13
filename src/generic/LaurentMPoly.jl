@@ -196,7 +196,7 @@ function ^(a::LaurentMPolyWrap, b::Integer)
     end
 end
 
-function *(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+function *(a::LaurentMPolyWrap{T}, b::LaurentMPolyWrap{T}) where {T}
     check_parent(a, b)
     return LaurentMPolyWrap(parent(a), a.mpoly*b.mpoly, a.mindegs + b.mindegs)
 end
@@ -625,9 +625,14 @@ end
 #
 ###############################################################################
 
+# rule for R -> R[...]
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{T}) where {T <: NCRingElement, PE, LR}
+  return LaurentMPolyWrap{T, PE, LR}
+end
+
 # If U can be promoted to R[x,y], then U can be promoted to R[x,1/x,y,1/y].
 # Handles promotion from R[x,y] to R[x,1/x,y,1/y] as well.
-function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U}
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U <: NCRingElement}
    promote_rule(PE, U) == PE ? LaurentMPolyWrap{T, PE, LR} : Union{}
 end
 
