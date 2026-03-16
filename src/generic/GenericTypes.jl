@@ -1409,7 +1409,7 @@ mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{Abs
    codomain::AbstractAlgebra.FPModule{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
-   is_left::Bool #xA vs Ax
+   is_left::Bool  # x -> is_left ? #xA : Ax so is_left is the "normal" case
    solve_ctx::Any # really: SolveCtx
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
