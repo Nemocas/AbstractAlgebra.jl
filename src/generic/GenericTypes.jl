@@ -1411,17 +1411,30 @@ mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{Abs
    image_fn::Function
    is_left::Bool  # x -> is_left ? #xA : Ax so is_left is the "normal" case
    solve_ctx::Any # really: SolveCtx
+   map::Map # to change the ring. The morphism is
+   #1st apply map (coefficient wise, map_entries(map, x.v))
+   #2nd apply matrix
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), true)
    end
-   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where T <: NCRingElement
+
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where T <: NCRingElement
 
       if is_left
          z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(map_entries(map, x.v)*m)
+         end
       else
          z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*x.v), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(m*map_entries(map, x.v))
+         end
       end
+      return z
    end
 end
 

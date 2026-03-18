@@ -44,10 +44,24 @@ Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(
 function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomorphism))
    check_composable(f, g)
    @assert f.is_left == g.is_left
+   m1 = f.matrix
+   local mp::Union{Nothing, Map} = nothing
+   if isdefined(g, :map) 
+     m1 = map_entries(g.map, m1)
+     mp = g.map
+   end
+   if isdefined(f, :map)
+     if isa(mp, Nothing)
+       mp = f.map
+     else
+       mp = f.map*mp
+     end
+   end
+
    if f.is_left
-     return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix; is_left = true)
+     return ModuleHomomorphism(domain(f), codomain(g), m1*g.matrix; is_left = true, mp)
    else
-     return ModuleHomomorphism(domain(f), codomain(g), g.matrix*f.matrix; is_left = false)
+     return ModuleHomomorphism(domain(f), codomain(g), g.matrix*m1; is_left = false)
    end
 end
 
@@ -142,7 +156,7 @@ end
 #
 ###############################################################################
 
-function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: NCRingElement
    parent(a) !== domain(f) && error("Incompatible module element")
    return image_fn(f)(a)
 end
@@ -159,7 +173,7 @@ end
 ###############################################################################
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where
                                                                T <: NCRingElement
    if is_left
      (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
@@ -168,11 +182,11 @@ function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
      (nrows(m) == ngens(M2) && ncols(m) == ngens(M1)) ||
                                                       error("dimension mismatch")
    end
-   return ModuleHomomorphism{T}(M1, M2, m; is_left)
+   return ModuleHomomorphism{T}(M1, M2, m; is_left, map)
 end
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true) where
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where
                                                                T <: RingElement
    (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
                                                     error("dimension mismatch")
@@ -229,6 +243,6 @@ function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:M
   return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
 end
 
-function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true)
-  return ModuleHomomorphism(V, W, v; is_left)
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true, map::Union{Nothing, Map} = nothing)
+  return ModuleHomomorphism(V, W, v; is_left, map)
 end

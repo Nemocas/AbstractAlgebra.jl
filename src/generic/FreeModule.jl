@@ -55,8 +55,13 @@ end
 function gen(N::FreeModule{T}, i::Int) where T <: NCRingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
-   m = zero_matrix(R, 1, ngens(N))
-   add_one!(m, 1, i)
+   if N.is_row
+     m = zero_matrix(R, 1, ngens(N))
+     add_one!(m, 1, i)
+   else
+     m = zero_matrix(R, ngens(N), 1)
+     add_one!(m, i, 1)
+   end
    return N(m)
 end
 
