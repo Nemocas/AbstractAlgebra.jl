@@ -335,6 +335,10 @@ function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: Rin
   return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
 end
 
+function tr(x::MatRingElem{T}) where T <: NCRingElement
+  return tr(matrix(x))
+end
+
 function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
   map_entries!(f, matrix(dst), matrix(src))
   return dst
@@ -342,6 +346,49 @@ end
 
 function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
   return Generic.MatRingElem(map_entries(f, matrix(a)))
+end
+
+function pseudo_inv(M::MatRingElem{T}) where {T <: RingElement}
+  X,d = pseudo_inv(matrix(M))
+  return Generic.MatRingElem(X), d
+end
+
+function Base.inv(M::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(inv(matrix(M)))
+end
+
+function is_invertible_with_inverse(A::MatRingElem{T}; side::Symbol = :left) where {T <: RingElement}
+  flag, inv = is_invertible_with_inverse(matrix(A); side = side)
+  return flag, Generic.MatRingElem(inv)
+end
+
+is_invertible(A::MatRingElem{T}) where {T <: RingElement} = is_unit(det(A))
+
+is_invertible(A::MatRingElem{T}) where {T <: FieldElement} = ncols(A) == rank(A)
+
+function is_nilpotent(A::MatRingElem{T}) where {T <: RingElement}
+  return is_nilpotent(matrix(A))
+end
+
+function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(hessenberg!(matrix(A)))
+end
+
+function hessenberg(A::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(hessenberg(matrix(A)))
+end
+
+function is_hessenberg(A::MatRingElem{T}) where {T <: RingElement}
+  return is_hessenberg(matrix(A))
+end
+
+function charpoly_hessenberg!(S::Ring, A::MatRingElem{T}) where {T <: RingElement}
+  a = matrix(A)
+  return charpoly_hessenberg!(S, a)  ## !!! WARNING !!!  may not be correct
+end
+
+function charpoly(S::PolyRing{T}, Y::MatRingElem{T}) where {T <: RingElement}
+  return charpoly(S, matrix(Y))
 end
 
 ###############################################################################

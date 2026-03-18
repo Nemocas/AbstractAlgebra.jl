@@ -85,6 +85,16 @@ function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
 
+# hook for optional IJulia integration via package extension
+const _ijulia_inited_hook = Ref{Function}(() -> false)
+
+is_ijulia_inited() = _ijulia_inited_hook[]()
+
+function _set_ijulia_inited_hook!(f::Function)
+  _ijulia_inited_hook[] = f
+  return nothing
+end
+
 
 include("exports.jl")
 include("AliasMacro.jl")

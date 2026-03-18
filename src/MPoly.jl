@@ -964,8 +964,7 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
    # must be done in a certain order.
    # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = elem_type(S)[zero(S)]
-   i = UInt(1)
+   r = zero(S)
    cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
@@ -979,19 +978,9 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          end
          t = mul!(t, pe)
       end
-      push!(r, c*t)
-      j = i = i + 1
-      while iseven(j) && length(r) > 1
-          top = pop!(r)
-          r[end] = add!(r[end], top)
-          j >>= 1
-      end
+      r = add!(r, c*t)
    end
-   while length(r) > 1
-      top = pop!(r)
-      r[end] = add!(r[end], top)
-   end
-   return r[1]
+   return r
 end
 
 @doc raw"""
