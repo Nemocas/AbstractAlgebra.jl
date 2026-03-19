@@ -118,9 +118,9 @@ end
 
 function is_unit(f::T) where {T <: LaurentMPolyRingElem}
   # **NOTE** f.mpoly is not normalized in any way
-  is_trivial(parent(f))  &&  return true  # coeffs in zero ring
-  is_zero(f)  &&  return false
-  is_one(length(f.mpoly))  &&  return is_unit(coeff(f.mpoly,1))
+  is_trivial(parent(f)) && return true  # coeffs in zero ring
+  is_zero(f) && return false
+  is_one(length(f.mpoly)) && return is_unit(coeff(f.mpoly,1))
   is_domain_type(coefficient_ring(parent(f))) && return false
   # For coefficient rings with zero divisors, things are more complex;
   # if someone needs it we can implement some more, just ask for it
