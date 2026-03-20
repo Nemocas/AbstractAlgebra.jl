@@ -120,10 +120,7 @@ canonical_unit(p::UniversalRingElem) = canonical_unit(data(p))
 characteristic(R::UniversalRing) = characteristic(base_ring(R))
 is_known(::typeof(characteristic), R::UniversalRing) = is_known(characteristic, base_ring(R))
 
-function Base.hash(p::UniversalRingElem, h::UInt)  # TODO
-   b = 0xcf418d4529109236%UInt
-   return xor(b, hash(data(p), h))
-end
+Base.hash(p::UniversalRingElem, h::UInt) = h
 
 function deepcopy_internal(p::UniversalRingElem, dict::IdDict)
    return UniversalRingElem(deepcopy_internal(data(p), dict), parent(p))

@@ -114,3 +114,10 @@ variables.
 AbstractAlgebra._add_gens
 AbstractAlgebra._upgrade
 ```
+
+### Hashing
+
+To be able to use subtypes of `UniversalRingElem` efficiently as keys of a
+dictionary or similar applications, it is necessary to implement a custom `hash`
+function. The results should not depend on the number of variables currently in
+the parent. An example implementation can be found in `src/UnivPoly.jl`
