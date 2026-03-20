@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-universal_ring_name(R::UniversalRing{<:LaurentMPolyRingElem}) = "laurent polynomial ring"
+universal_ring_name(R::UniversalRing{<:LaurentMPolyRingElem}) = "Laurent polynomial ring"
 
 ###############################################################################
 #

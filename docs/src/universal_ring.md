@@ -10,7 +10,7 @@ AbstractAlgebra provides a module, implemented in `src/UniversalRing.jl` for
 universal rings. They "universalize" rings which have a notion of generators (or
 variables) and coefficients. The most important example of such a ring is a
 multivariate polynomial ring. In contrast to the usual multivariate polynomial
-ring its universal pendant allows for variables to be added at any time.
+ring, its universal pendant allows for variables to be added at any time.
 
 Another example is the ring of multivariate Laurent polynomials.
 
@@ -20,7 +20,7 @@ the case of multivariate polynomials `T` would be a subtype of `MPolyRingElem`
 and `U` would be the type of the coefficients of the polynomials, for example
 `BigInt`.
 
-# Universal polynomial ring
+## Universal polynomial ring
 
 To compensate for the fact that the number of variables may change, many of the
 functions relax their restrictions on exponent vectors. For example, if one
@@ -74,7 +74,7 @@ universal_laurent_polynomial_ring
 
 ## Adding variables
 
-There are two ways to add variables to a universal polynomial ring `S`.
+There are two ways to add variables to a universal ring `S`.
 
 ```julia
 gen(S::UniversalRing, var::VarName)
