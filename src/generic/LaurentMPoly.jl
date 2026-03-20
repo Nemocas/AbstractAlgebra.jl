@@ -119,17 +119,13 @@ end
 function is_unit(f::T) where {T <: LaurentMPolyRingElem}
   # **NOTE** f.mpoly is not normalized in any way
   is_trivial(parent(f)) && return true  # coeffs in zero ring
-  unit_seen = false
-  for i in 1:length(f.mpoly)
-    if is_nilpotent(coeff(f.mpoly, i))
-      continue
-    end
-    if unit_seen || !is_unit(coeff(f.mpoly, i))
-      return false
-    end
-    unit_seen = true
-  end
-  return unit_seen
+  is_zero(f) && return false
+  is_one(length(f.mpoly)) && return is_unit(coeff(f.mpoly,1))
+  is_domain_type(coefficient_ring(parent(f))) && return false
+  # For coefficient rings with zero divisors, things are more complex;
+  # if someone needs it we can implement some more, just ask for it
+  # see also <https://github.com/Nemocas/AbstractAlgebra.jl/issues/2359>
+  throw(NotImplementedError(is_unit, f))
 end
 
 
@@ -196,7 +192,7 @@ function ^(a::LaurentMPolyWrap, b::Integer)
     end
 end
 
-function *(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+function *(a::LaurentMPolyWrap{T}, b::LaurentMPolyWrap{T}) where {T}
     check_parent(a, b)
     return LaurentMPolyWrap(parent(a), a.mpoly*b.mpoly, a.mindegs + b.mindegs)
 end
@@ -625,9 +621,14 @@ end
 #
 ###############################################################################
 
+# rule for R -> R[...]
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{T}) where {T <: NCRingElement, PE, LR}
+  return LaurentMPolyWrap{T, PE, LR}
+end
+
 # If U can be promoted to R[x,y], then U can be promoted to R[x,1/x,y,1/y].
 # Handles promotion from R[x,y] to R[x,1/x,y,1/y] as well.
-function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U}
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U <: NCRingElement}
    promote_rule(PE, U) == PE ? LaurentMPolyWrap{T, PE, LR} : Union{}
 end
 
