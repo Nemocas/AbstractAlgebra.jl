@@ -64,9 +64,7 @@ function universal_laurent_polynomial_ring(R::Ring, varnames::Vector{Symbol}; ca
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
    S = get_cached!(UniversalLaurentPolyRingID, R, cached) do
       P, _ = laurent_polynomial_ring(R, varnames; cached = false)
-      T = elem_type(P)
-      U = elem_type(coefficient_ring(P))
-      UniversalRing{T, U}(P)
+      UniversalRing(P)
    end
    return (S, gens(S, varnames))
 end

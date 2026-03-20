@@ -26,10 +26,8 @@ end
 @attributes mutable struct UniversalRing{T <: RingElem, U <: RingElement} <: Ring
   base_ring::Ring
 
-  function UniversalRing{T, U}(R::Ring) where {T <: RingElem, U <: RingElement}
-    @assert elem_type(R) == T
-    @assert elem_type(coefficient_ring(R)) == U
-    return new{T, U}(R)
+  function UniversalRing(R::Ring)
+    return new{elem_type(R), elem_type(coefficient_ring(R))}(R)
   end
 end
 

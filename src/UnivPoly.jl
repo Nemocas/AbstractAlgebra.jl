@@ -713,9 +713,7 @@ function universal_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bo
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
    S = get_cached!(UniversalPolyRingID, (R, internal_ordering), cached) do
       P = poly_ring(R, varnames; internal_ordering)
-      T = elem_type(P)
-      U = elem_type(coefficient_ring(P))
-      UniversalRing{T, U}(P)
+      UniversalRing(P)
    end
    return (S, gens(S, varnames))
 end
