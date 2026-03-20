@@ -28,7 +28,7 @@ function set_exponent_vector!(p::UniversalRingElem{<:MPolyRingElem}, i::Int, exp
    if len < nvars(S)
       exps = vcat(exps, zeros(Int, nvars(S) - len))
    end
-   p.p = set_exponent_vector!(data(p), i, exps)
+   p.data = set_exponent_vector!(data(p), i, exps)
    return p
 end
 
@@ -57,7 +57,7 @@ function setcoeff!(p::UniversalRingElem{<:MPolyRingElem}, exps::Vector{Int}, c::
    if len < nvars(S)
       exps = vcat(exps, zeros(Int, nvars(S) - len))
    end
-   p.p = setcoeff!(data(p), exps, c)
+   p.data = setcoeff!(data(p), exps, c)
    return p
 end
 
@@ -100,9 +100,9 @@ end
 function monomial!(m::T, p::T, i::Int) where {T <: UniversalRingElem{<:MPolyRingElem}}
    parent(m) != parent(p) && error("Incompatible monomial")
    if parent(data(m)) != parent(data(p))
-      m.p = parent(data(p))()
+      m.data = parent(data(p))()
    end
-   m.p = monomial!(data(m), data(p), i)
+   m.data = monomial!(data(m), data(p), i)
    return m
 end
 
@@ -622,12 +622,12 @@ end
 ###############################################################################
 
 function sort_terms!(p::UniversalRingElem{<:MPolyRingElem})
-   p.p = sort_terms!(data(p))
+   p.data = sort_terms!(data(p))
    return p
 end
 
 function combine_like_terms!(p::UniversalRingElem{<:MPolyRingElem})
-   p.p = combine_like_terms!(data(p))
+   p.data = combine_like_terms!(data(p))
    return p
 end
 

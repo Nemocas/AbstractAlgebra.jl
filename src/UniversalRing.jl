@@ -32,7 +32,7 @@ number_of_generators(S::UniversalRing) = number_of_generators(base_ring(S))
 
 symbols(S::UniversalRing) = symbols(base_ring(S))
 
-data(p::UniversalRingElem) = p.p
+data(p::UniversalRingElem) = p.data
 
 ###############################################################################
 #
@@ -364,38 +364,38 @@ end
 ###############################################################################
 
 function zero!(a::UniversalRingElem)
-  a.p = zero!(a.p)
+  a.data = zero!(a.data)
   return a
 end
 
 function one!(a::UniversalRingElem)
-  a.p = one!(a.p)
+  a.data = one!(a.data)
   return a
 end
 
 function neg!(z::T, a::T) where {T <: UniversalRingElem}
   if parent(data(z)) == parent(data(a))
-    z.p = neg!(z.p, a.p)
+    z.data = neg!(z.data, a.data)
   else
-    z.p = -a.p
+    z.data = -a.data
   end
   return z
 end
 
 function add!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
-    a.p = add!(data(a), data(b), data(c))
+    a.data = add!(data(a), data(b), data(c))
   else
-    a.p = data(b + c)
+    a.data = data(b + c)
   end
   return a
 end
 
 function add!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
-    a.p = add!(data(a), data(b), c)
+    a.data = add!(data(a), data(b), c)
   else
-    a.p = data(b + c)
+    a.data = data(b + c)
   end
   return a
 end
@@ -404,45 +404,45 @@ add!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem} = add!(a, c, b)
 
 function sub!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
-    a.p = sub!(data(a), data(b), data(c))
+    a.data = sub!(data(a), data(b), data(c))
   else
-    a.p = data(b - c)
+    a.data = data(b - c)
   end
   return a
 end
 
 function sub!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
-    a.p = sub!(data(a), data(b), c)
+    a.data = sub!(data(a), data(b), c)
   else
-    a.p = data(b - c)
+    a.data = data(b - c)
   end
   return a
 end
 
 function sub!(a::T, b::RingElement, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(c))
-    a.p = sub!(data(a), b, data(c))
+    a.data = sub!(data(a), b, data(c))
   else
-    a.p = data(b - c)
+    a.data = data(b - c)
   end
   return a
 end
 
 function mul!(a::T, b::T, c::T) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b)) == parent(data(c))
-    a.p = mul!(data(a), data(b), data(c))
+    a.data = mul!(data(a), data(b), data(c))
   else
-    a.p = data(b * c)
+    a.data = data(b * c)
   end
   return a
 end
 
 function mul!(a::T, b::T, c::RingElement) where {T <: UniversalRingElem}
   if parent(data(a)) == parent(data(b))
-    a.p = mul!(data(a), data(b), c)
+    a.data = mul!(data(a), data(b), c)
   else
-    a.p = data(b * c)
+    a.data = data(b * c)
   end
   return a
 end
@@ -469,8 +469,8 @@ end
 
 function upgrade!(p::UniversalRingElem)
    R = base_ring(parent(p))
-   if R != parent(p.p)
-      p.p = AbstractAlgebra._upgrade(p.p, R)
+   if R != parent(p.data)
+      p.data = AbstractAlgebra._upgrade(p.data, R)
    end
    return p
 end

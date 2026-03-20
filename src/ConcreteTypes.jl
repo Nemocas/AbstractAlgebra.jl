@@ -34,7 +34,7 @@ end
 end
 
 mutable struct UniversalRingElem{T <: RingElem, U <: RingElement} <: RingElem
-  p::T
+  data::T
   parent::UniversalRing{T, U}
 end
 
