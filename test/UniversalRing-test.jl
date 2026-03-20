@@ -1050,9 +1050,9 @@ end
 
          @test lcm(h, h) == h*uh
 
-         @test content(f) == content(f.p)
-         @test content(g) == content(g.p)
-         @test content(h) == content(h.p)
+         @test content(f) == content(data(f))
+         @test content(g) == content(data(g))
+         @test content(h) == content(data(h))
       end
    end
 end
