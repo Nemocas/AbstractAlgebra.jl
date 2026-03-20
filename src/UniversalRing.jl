@@ -143,7 +143,7 @@ function show(io::IO, R::UniversalRing)
    @show_name(io, R)
    @show_special(io, R)
    print(io, "Universal $(universal_ring_name(R)) over ")
-   show(io, base_ring(base_ring(R)))
+   show(io, coefficient_ring(R))
 end
 
 function expressify(a::UniversalRingElem; context = nothing)
