@@ -83,7 +83,7 @@ is_term(p::UniversalRingElem{<:MPolyRingElem}) = is_term(data(p))
 coeff(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = coeff(data(p), i)
 
 function coeff(p::T, m::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
-   p, m = univ_promote(p, m)
+   univ_promote!(p, m)
    return coeff(data(p), data(m))
 end
 
@@ -390,8 +390,8 @@ function ==(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
 end
 
 function isless(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
-   check_parent(a, b)
-   return isless(data(upgrade!(a)), data(upgrade!(b)))
+   univ_promote!(a, b)
+   return isless(data(a), data(b))
 end
 
 ###############################################################################
@@ -461,7 +461,7 @@ end
 ###############################################################################
 
 function remove(z::T, p::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
-   z, p = univ_promote(z, p)
+   univ_promote!(z, p)
    val, q = remove(data(z), data(p))
    return val, UniversalRingElem(q, parent(z))
 end

@@ -168,29 +168,28 @@ end
 #
 ###############################################################################
 
-function univ_promote(x::T, y::T) where {T <: UniversalRingElem}
+function univ_promote!(x::T, y::T) where {T <: UniversalRingElem}
    check_parent(x, y)
    nx = nvars(parent(data(x)))
    ny = nvars(parent(data(y)))
    if nx == ny
       return x, y
    end
-   S = parent(x)
-   return S(x), S(y)
+   return upgrade!(x), upgrade!(y)
 end
 
 function +(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(data(a) + data(b), parent(a))
 end
 
 function -(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(data(a) - data(b), parent(a))
 end
 
 function *(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(data(a)*data(b), parent(a))
 end
 
@@ -255,9 +254,7 @@ end
 ###############################################################################
 
 function ==(a::T, b::T) where {T <: UniversalRingElem}
-   check_parent(a, b)
-   upgrade!(a)
-   upgrade!(b)
+   univ_promote!(a, b)
    return data(a) == data(b)
 end
 
@@ -291,12 +288,12 @@ end
 ###############################################################################
 
 function divexact(a::T, b::T; check::Bool=true) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(divexact(data(a), data(b); check=check), parent(a))
 end
 
 function divides(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    flag, q = divides(data(a), data(b))
    return flag, T(q, parent(a))
 end
@@ -308,12 +305,12 @@ end
 ###############################################################################
 
 function Base.div(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(div(data(a), data(b)), parent(a))
 end
 
 function Base.divrem(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    q, r = divrem(data(a), data(b))
    return T(q, parent(a)), T(r, parent(a))
 end
@@ -325,12 +322,12 @@ end
 ###############################################################################
 
 function gcd(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(gcd(data(a), data(b)), parent(a))
 end
 
 function lcm(a::T, b::T) where {T <: UniversalRingElem}
-   a, b = univ_promote(a, b)
+   univ_promote!(a, b)
    return T(lcm(data(a), data(b)), parent(a))
 end
 
