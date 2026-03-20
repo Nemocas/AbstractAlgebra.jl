@@ -28,6 +28,11 @@ a tuple `S, [x1, x2, ...]` of the universal laurent polynomial ring `S = R[x1, x
 If `varnames` is omitted, return an object representing
 the universal laurent polynomial ring `S = R[\ldots]` with no variables in it initially.
 
+By default (`cached=true`), the output `S` will be cached, i.e. if `universal_laurent_polynomial_ring`
+is invoked again with the same coefficient ring `R`, the same (*identical*) ring is returned. Keep in mind that
+this ring might already have more variables than supplied in `varnames`. Setting `cached` to `false`
+ensures a distinct new ring is returned, and will also prevent it from being cached.
+
 # Examples
 
 ```jldoctest
