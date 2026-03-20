@@ -23,10 +23,10 @@ universal_ring_name(R::UniversalRing{<:LaurentMPolyRingElem}) = "Laurent polynom
     universal_laurent_polynomial_ring(R::Ring; cached::Bool=true)
 
 Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`, return
-a tuple `S, [x1, x2, ...]` of the universal laurent polynomial ring `S = R[x1, x2, \dots]` and its generators `x1, x2, \dots`.
+a tuple `S, [x1, x2, ...]` of the universal Laurent polynomial ring `S = R[x1, x2, \dots]` and its generators `x1, x2, \dots`.
 
 If `varnames` is omitted, return an object representing
-the universal laurent polynomial ring `S = R[\ldots]` with no variables in it initially.
+the universal Laurent polynomial ring `S = R[\ldots]` with no variables in it initially.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if `universal_laurent_polynomial_ring`
 is invoked again with the same coefficient ring `R`, the same (*identical*) ring is returned. Keep in mind that
@@ -37,7 +37,7 @@ ensures a distinct new ring is returned, and will also prevent it from being cac
 
 ```jldoctest
 julia> S, (x,y) = universal_laurent_polynomial_ring(ZZ, [:x,:y])
-(Universal laurent polynomial ring over Integers, UniversalRingElem{AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}[x, y])
+(Universal Laurent polynomial ring over Integers, UniversalRingElem{AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}[x, y])
 
 julia> z = gen(S, :z)
 z
@@ -46,7 +46,7 @@ julia> x*y - z
 x*y - z
 
 julia> S = universal_laurent_polynomial_ring(ZZ)
-Universal laurent polynomial ring over Integers
+Universal Laurent polynomial ring over Integers
 
 julia> x = gen(S, :x)
 x
