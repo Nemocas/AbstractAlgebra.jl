@@ -59,7 +59,7 @@ function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomo
    end
 
    if f.is_left
-     return ModuleHomomorphism(domain(f), codomain(g), m1*g.matrix; is_left = true, mp)
+     return ModuleHomomorphism(domain(f), codomain(g), m1*g.matrix; is_left = true, map = mp)
    else
      return ModuleHomomorphism(domain(f), codomain(g), g.matrix*m1; is_left = false)
    end
