@@ -1513,7 +1513,7 @@ end
 
 function (S::MPolyRing)(b::Vector, m::Vector{Vector{T}}) where {T}
    R = base_ring(S)
-   return S(map(R, b)::Vector{elem_type(R)}, m)
+   return S(map(R, b)::Vector{elem_type(R)}, convert(Vector{Vector{Int}}, m))
 end
 
 ###############################################################################
