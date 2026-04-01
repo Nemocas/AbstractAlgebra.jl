@@ -1222,8 +1222,18 @@ mutable struct FreeAssociativeAlgebraElem{T <: RingElement} <: AbstractAlgebra.F
 end
 
 # the iterators for coeffs, terms, etc. are shared with MPoly. Just this remains
-struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
+mutable struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::Vector{Int} # only used if inplace == true
+
+   function FreeAssAlgExponentWords(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+      I = new{typeof(f)}(f, inplace)
+      if inplace
+         I.temp = Int[]
+      end
+      return I
+   end
 end
 
 ###############################################################################
