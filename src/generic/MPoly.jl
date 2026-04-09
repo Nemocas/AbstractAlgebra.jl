@@ -4116,6 +4116,10 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{UInt}}) where {T <: Ri
    return z
 end
 
-function (S::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{<:Integer}}) where {T <: RingElement}
+function (S::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+   return S(b, convert(Vector{Vector{UInt}}, m))
+end
+
+function (S::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{BigInt}}) where {T <: RingElement}
    return S(b, convert(Vector{Vector{UInt}}, m))
 end
