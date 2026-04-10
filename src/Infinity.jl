@@ -42,8 +42,8 @@ const inf = PosInf() # TODO: for backwards compatibility; deprecate?
 Base.hash(::PosInf, h::UInt) = hash(Inf, h)
 Base.hash(::NegInf, h::UInt) = hash(-Inf, h)
 
-Base.show(io::IO, ::PosInf) = print(io, "infinity") # FIXME: if we can't have `infinity` as a global, maybe better print as `inf`???
-Base.show(io::IO, ::NegInf) = print(io, "-infinity")
+Base.show(io::IO, ::PosInf) = is_unicode_allowed() ? print(io, "∞") : print(io, "infinity") # FIXME: if we can't have `infinity` as a global, maybe better print as `inf`???
+Base.show(io::IO, ::NegInf) = is_unicode_allowed() ? print(io, "-∞") : print(io, "-infinity")
 
 Base.one(::AnyInf) = 1
 Base.zero(::AnyInf) = 0
