@@ -769,7 +769,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
           # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
       end
 
-      if nrows(S) == ncols(S)
+      if nrows(S) == ncols(S) && R isa Ring
          @testset "Determinant" begin
             @test isone(det(one(S))) # should always hold, even for 0x0
             @test nrows(S) == 0 || iszero(det(zero(S)))
@@ -849,18 +849,20 @@ function test_MatRing_interface(S::MatRing; reps = 15)
          end
       end
 
-      @testset "Determinant" begin
-         @test isone(det(one(S))) # should always hold, even for 0x0
-         @test degree(S) == 0 || iszero(det(zero(S)))
+      if R isa Ring
+         @testset "Determinant" begin
+            @test isone(det(one(S))) # should always hold, even for 0x0
+            @test degree(S) == 0 || iszero(det(zero(S)))
 
-         for k in 1:reps
-            a = generate_element(S)::ST
-            b = generate_element(S)::ST
-            A = deepcopy(a)
-            B = deepcopy(b)
-            @test det(a*b) == det(a)*det(b)
-            @test a == A
-            @test b == B
+            for k in 1:reps
+               a = generate_element(S)::ST
+               b = generate_element(S)::ST
+               A = deepcopy(a)
+               B = deepcopy(b)
+               @test det(a*b) == det(a)*det(b)
+               @test a == A
+               @test b == B
+            end
          end
       end
    end
