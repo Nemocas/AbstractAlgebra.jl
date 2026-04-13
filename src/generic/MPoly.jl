@@ -3316,53 +3316,6 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    end
 end
 
-@doc raw"""
-    evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-
-Evaluate the polynomial at the supplied values, which may be any ring elements,
-commutative or non-commutative. Evaluation always proceeds in the order of the
-variables as supplied when creating the polynomial ring to which $a$ belongs.
-The evaluation will succeed if a product of a coefficient of the polynomial by
-all of the supplied values in order is defined. Note that this evaluation is
-more general than those provided by the evaluate function. The values do not
-need to be in the same ring, just in compatible rings.
-"""
-function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
-   R = base_ring(a)
-   # The best we can do here is to cache previously used powers of the values
-   # being substituted, as we cannot assume anything about the relative
-   # performance of powering vs multiplication. The function should not try
-   # to optimise computing new powers in any way.
-   # Note that this function accepts values in a non-commutative ring, so operations
-   # must be done in a certain order.
-   powers = [Dict{Int, Any}() for i in 1:length(vals)]
-   # First work out types of products
-   r = R()
-   for j = 1:length(vals)
-      W = typeof(vals[j])
-      if ((W <: Integer && W !== BigInt) ||
-          (W <: Rational && W !== Rational{BigInt}))
-         r = r*zero(W)
-      else
-         r = r*zero(parent(vals[j]))
-      end
-   end
-   cvzip = zip(coefficients(a), exponent_vectors(a))
-   for (c, v) in cvzip
-      t = deepcopy(c)
-      for j = 1:length(vals)
-         exp = v[j]
-         pe = get!(powers[j], exp) do
-            return vals[j]^exp
-         end
-         t = mul!(t, pe)
-      end
-      r = add!(r, t)
-   end
-   return r
-end
-
 ###############################################################################
 #
 #   GCD
