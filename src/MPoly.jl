@@ -961,10 +961,10 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
       t = one(S)
       for j = 1:length(vals)
          exp = v[j]
-         if iszero(exp)
-           continue
-         end
          pe = get!(powers[j], exp) do
+            if iszero(exp)
+               return one(vals[j])
+            end
             return vals[j]^exp
          end
          t = mul!(t, pe)
