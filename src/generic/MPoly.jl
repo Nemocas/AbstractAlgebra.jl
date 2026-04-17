@@ -3279,12 +3279,13 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
+    evaluate(a::MPoly{T}, vals::Vector{T}) where {T <: RingElement}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables.
 """
-function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
+function evaluate(a::MPoly{T}, vals::Vector{T}) where T <: RingElement
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    if iszero(a)
       return base_ring(a)()
    end
@@ -3300,13 +3301,13 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
          p = main_variable_extract(R, a, k)
-         a = evaluate(p, A[k])
+         a = evaluate(p, vals[k])
       end
   else
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
          p = main_variable_extract(R, a, k)
-         a = evaluate(p, A[start_var - k + 1])
+         a = evaluate(p, vals[start_var - k + 1])
       end
    end
    if a.length == 0
