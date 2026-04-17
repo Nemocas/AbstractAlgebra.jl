@@ -946,6 +946,7 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          return evaluate(a, [parent(c)(v) for v in vals])
       end
    end
+   @req !isempty(vals) "No values supplied"
    powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
