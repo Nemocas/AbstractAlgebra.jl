@@ -1123,6 +1123,7 @@ of the polynomial by one of the values is defined.
 (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
 function (a::MPolyRingElem)(;kwargs...)
+   @req !isempty(kwargs) "No values supplied"
    ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
    vals = Array{RingElement}(undef, length(kwargs))
