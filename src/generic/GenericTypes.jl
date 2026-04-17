@@ -1364,15 +1364,16 @@ end
 @attributes mutable struct FreeModule{T <: NCRingElement} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
+   is_row::Bool
 
-   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(FreeModuleDict, (R, rank), cached) do
-         new{T}(rank, R)
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true; is_row::Bool = true) where T <: NCRingElement
+      return get_cached!(FreeModuleDict, (R, rank, is_row), cached) do
+         new{T}(rank, R, is_row)
       end::FreeModule{T}
    end
 end
 
-const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
+const FreeModuleDict = CacheDictType{Tuple{NCRing, Int, Bool}, FreeModule}()
 
 struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
    parent::FreeModule{T}
@@ -1412,16 +1413,38 @@ end
 #
 ###############################################################################
 
-mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
+mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
 
    domain::AbstractAlgebra.FPModule{T}
    codomain::AbstractAlgebra.FPModule{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
+   is_left::Bool  # x -> is_left ? #xA : Ax so is_left is the "normal" case
    solve_ctx::Any # really: SolveCtx
+   map::Map # to change the ring. The morphism is
+   #1st apply map (coefficient wise, map_entries(map, x.v))
+   #2nd apply matrix
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
+      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), true)
+   end
+
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where T <: NCRingElement
+
+      if is_left
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(map_entries(map, x.v)*m)
+         end
+      else
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*x.v), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(m*map_entries(map, x.v))
+         end
+      end
+      return z
    end
 end
 
