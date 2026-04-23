@@ -856,7 +856,7 @@ function test_MatRing_interface(S::MatRing; reps = 15)
          end
          @test iszero(zero(S))
          @test isone(one(S))
-         if is_trivial(R)
+         if is_trivial(S)
             @test iszero(one(S))
             @test isone(zero(S))
          else
