@@ -54,11 +54,6 @@
 
 # Global stuff for the "probably correct" prototype.
 
-function current_method()
-  return stacktrace()[2].linfo.def;  # found on some Julia website (from 2019?)
-end
-
-
 # KISS: DodgyMode is just a simple boolean here; getter & setter functions
 GLOBAL_VARIABLE_DodgyMode::Bool = false;
 
@@ -80,16 +75,18 @@ end;
 # currently uses only some of them.
 struct DodgyStepInfo
   fn_name::Symbol
-  methodID::Method  # not sure how to specify a default "null" value for this
+  #  methodID::Union{Nothing,Method}
+  SourceLocation::Tuple{String,Int}
   argv::Vector{Any}
   resv::Any  # either simple value or a tuple
   stack::Vector{Union{Ptr{Nothing}, Base.InterpreterIP}}
 
-  function DodgyStepInfo(fn_name, methodID, argv, resv, stack)  #  CALLED BY macro RegisterDodgyStep (see below)
-    return new(fn_name, methodID, argv, resv, stack)
+  function DodgyStepInfo(fn_name, SourceLocation, argv, resv, stack)  #  CALLED BY macro RegisterDodgyStep (see below)
+    return new(fn_name, SourceLocation, argv, resv, stack)
   end
 end
 
+# KISS for now:
 function Base.show(io::IO, info::DodgyStepInfo)
   print(io, "DodgyStepInfo(fn_name=$(info.fn_name), argv=$(info.argv))");
 end
@@ -99,16 +96,10 @@ GLOBAL_VARIABLE_DodgySteps::Vector{DodgyStepInfo} = DodgyStepInfo[];
 GLOBAL_VARIABLE_DodgySteps_MaxSize::Int = 10;  #set this to 1 if you just want to know whether any (potentially) dodgy result was generated
 const GLOBAL_VARIABLE_EmptyStackTrace = Union{Ptr{Nothing}, Base.InterpreterIP}[];
 
-# function dodgy_steps_log(fn_name::String, arg::Vector{Any})
-#   global GLOBAL_VARIABLE_DodgySteps;
-#   push!(GLOBAL_VARIABLE_DodgySteps, (fn_name,arg));
-#   return nothing;
-# end;
-
 
 function dodgy_steps_clear()
   global GLOBAL_VARIABLE_DodgySteps;
-  GLOBAL_VARIABLE_DodgySteps = DodgyStepInfo[];
+  empty!(GLOBAL_VARIABLE_DodgySteps);
   return nothing;
 end;
 
@@ -125,14 +116,18 @@ end;
 #   AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps_MaxSize
 
 macro RegisterDodgyStep(fn_name, argv)  # fn_name::Symbol;  argv::Vector{Any}
-  if length(AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps) >= GLOBAL_VARIABLE_DodgySteps_MaxSize
-    return nothing;
-  end
-  return :( push!(AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps,
-                  AbstractAlgebra.DodgyStepInfo($(esc(fn_name)),
-                                                AbstractAlgebra.current_method(),
-                                                $(esc(argv)),
-                                                nothing,
-                                                AbstractAlgebra.GLOBAL_VARIABLE_EmptyStackTrace)) )
+  SourceLine = __source__.line;
+  SourceFile = String(__source__.file);
+  return :(
+    if length(AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps) < GLOBAL_VARIABLE_DodgySteps_MaxSize
+
+      push!(AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps,
+            AbstractAlgebra.DodgyStepInfo($(esc(fn_name)),
+                                          ($(esc(SourceFile)), $(esc(SourceLine))), 
+                                          $(esc(argv)),
+                                          nothing,
+                                          AbstractAlgebra.GLOBAL_VARIABLE_EmptyStackTrace));
+    end
+  )  # end of quoted part
 end
 
