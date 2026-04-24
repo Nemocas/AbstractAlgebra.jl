@@ -4075,7 +4075,7 @@ end
 # This is the main user interface for efficiently creating a polynomial. It accepts
 # an array of coefficients and an array of exponent vectors. Sorting, coalescing of
 # like terms and removal of zero terms is performed.
-function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{UInt}}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
        parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -4091,22 +4091,22 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    if ord == :lex
       for i = 1:length(m)
          for j = 1:N
-            Pe[j, i] = UInt(m[i][N - j + 1])
+            Pe[j, i] = m[i][N - j + 1]
          end
       end
    elseif ord == :deglex
       for i = 1:length(m)
          for j = 1:N - 1
-            Pe[j, i] = UInt(m[i][N - j])
+            Pe[j, i] = m[i][N - j]
          end
-         Pe[N, i] = UInt(sum(m[i]))
+         Pe[N, i] = sum(m[i])
       end
    else # degrevlex
       for i = 1:length(m)
          for j = 1:N - 1
-            Pe[j, i] = UInt(m[i][j])
+            Pe[j, i] = m[i][j]
          end
-         Pe[N, i] = UInt(sum(m[i]))
+         Pe[N, i] = sum(m[i])
       end
    end
 
@@ -4114,4 +4114,12 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
+end
+
+function (S::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+   return S(b, convert(Vector{Vector{UInt}}, m))
+end
+
+function (S::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{BigInt}}) where {T <: RingElement}
+   return S(b, convert(Vector{Vector{UInt}}, m))
 end
