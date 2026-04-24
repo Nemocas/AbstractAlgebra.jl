@@ -117,7 +117,7 @@ end;
 
 macro RegisterDodgyStep(fn_name, argv)  # fn_name::Symbol;  argv::Vector{Any}
   SourceLine = __source__.line;
-  SourceFile = String(__source__.file);
+  SourceFile = String(__source__.file);  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(
     if length(AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps) < GLOBAL_VARIABLE_DodgySteps_MaxSize
 
