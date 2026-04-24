@@ -77,11 +77,16 @@ struct DodgyStepInfo
   fn_name::Symbol
   #  methodID::Union{Nothing,Method}
   SourceLocation::Tuple{String,Int}
-  argv::Vector{Any}
+  argv::Tuple
   resv::Any  # either simple value or a tuple
   stack::Vector{Union{Ptr{Nothing}, Base.InterpreterIP}}
 
-  function DodgyStepInfo(fn_name, SourceLocation, argv, resv, stack)  #  CALLED BY macro RegisterDodgyStep (see below)
+  #  CALLED ONLY BY macro RegisterDodgyStep (see below)
+  function DodgyStepInfo(fn_name::Symbol,
+                         SourceLocation::Tuple{String,Int},
+                         argv::Tuple,
+                         resv::Any,
+                         stack)
     return new(fn_name, SourceLocation, argv, resv, stack)
   end
 end
