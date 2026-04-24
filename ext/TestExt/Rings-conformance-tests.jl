@@ -1,6 +1,7 @@
 # very generic testing: just define ConformanceTests.generate_element(R) to produce elements of R,
 # then invoke one of these functions, as appropriate:
 # - test_NCRing_interface(R)
+# - test_NCRing_interface_recursive(R)
 # - test_Ring_interface(R)
 # - test_Ring_interface_recursive(R)
 # - test_Field_interface(R)
@@ -768,7 +769,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
           # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
       end
 
-      if nrows(S) == ncols(S)
+      if nrows(S) == ncols(S) && R isa Ring
          @testset "Determinant" begin
             @test isone(det(one(S))) # should always hold, even for 0x0
             @test nrows(S) == 0 || iszero(det(zero(S)))
@@ -848,18 +849,20 @@ function test_MatRing_interface(S::MatRing; reps = 15)
          end
       end
 
-      @testset "Determinant" begin
-         @test isone(det(one(S))) # should always hold, even for 0x0
-         @test degree(S) == 0 || iszero(det(zero(S)))
+      if R isa Ring
+         @testset "Determinant" begin
+            @test isone(det(one(S))) # should always hold, even for 0x0
+            @test degree(S) == 0 || iszero(det(zero(S)))
 
-         for k in 1:reps
-            a = generate_element(S)::ST
-            b = generate_element(S)::ST
-            A = deepcopy(a)
-            B = deepcopy(b)
-            @test det(a*b) == det(a)*det(b)
-            @test a == A
-            @test b == B
+            for k in 1:reps
+               a = generate_element(S)::ST
+               b = generate_element(S)::ST
+               A = deepcopy(a)
+               B = deepcopy(b)
+               @test det(a*b) == det(a)*det(b)
+               @test a == A
+               @test b == B
+            end
          end
       end
    end
@@ -867,12 +870,8 @@ function test_MatRing_interface(S::MatRing; reps = 15)
    return nothing
 end
 
-function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
-   test_Ring_interface(R; reps = reps)
-   Rx, _ = polynomial_ring(R, :x)
-   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
-   Rxy, _ = polynomial_ring(R, [:x, :y])
-   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
+function test_NCRing_interface_recursive(R::AbstractAlgebra.NCRing; reps = 15)
+   test_NCRing_interface(R; reps = reps)
    for d in 0:3
      S = matrix_ring(R, d)
      test_MatRing_interface(S, reps = 2 + fld(reps, 8))
@@ -881,6 +880,15 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
      S = matrix_space(R, r,c)
      test_MatSpace_interface(S, reps = 2 + fld(reps, 10))
    end
+end
+
+function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
+   test_Ring_interface(R; reps = reps)
+   test_NCRing_interface_recursive(R; reps = reps)
+   Rx, _ = polynomial_ring(R, :x)
+   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   Rxy, _ = polynomial_ring(R, [:x, :y])
+   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
 end
 
 function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 15)

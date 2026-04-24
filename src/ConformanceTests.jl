@@ -71,6 +71,7 @@ function test_Poly_interface end
 function test_MPoly_interface end
 function test_MatSpace_interface end
 function test_MatRing_interface end
+function test_NCRing_interface_recursive end
 function test_Ring_interface_recursive end
 function test_Field_interface_recursive end
 
