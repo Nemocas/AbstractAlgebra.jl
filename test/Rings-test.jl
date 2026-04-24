@@ -36,6 +36,7 @@ include("algorithms/MPolyNested-test.jl")
 include("algorithms/DensePoly-test.jl")
 include("algorithms/coprime_base-test.jl")
 include("generic/PolyRingHom-test.jl")
+include("PuiseuxPolynomials-test.jl")
 
 @testset "Generic.Rings.broadcast" begin
    F = GF(3)
