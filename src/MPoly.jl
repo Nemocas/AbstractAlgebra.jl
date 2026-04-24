@@ -927,25 +927,16 @@ end
 #
 ###############################################################################
 
-function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
-   newvals = map(parent(a), vals)
-   if typeof(vals) == typeof(newvals)
-     throw(NotImplementedError(:evaluate, a, vals))
-   end
-   return evaluate(a, newvals)
-end
-
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
    if (U <: Integer && U !== BigInt) ||
       (U <: Rational && U !== Rational{BigInt})
@@ -955,6 +946,7 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          return evaluate(a, [parent(c)(v) for v in vals])
       end
    end
+   @req !isempty(vals) "No values supplied"
    powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
@@ -970,10 +962,10 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
       t = one(S)
       for j = 1:length(vals)
          exp = v[j]
-         if iszero(exp)
-           continue
-         end
          pe = get!(powers[j], exp) do
+            if iszero(exp)
+               return one(vals[j])
+            end
             return vals[j]^exp
          end
          t = mul!(t, pe)
@@ -1121,19 +1113,18 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingE
 end
 
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
 
-Evaluate the polynomial expression at the supplied values, which may be any
-ring elements, commutative or non-commutative, but in the same ring. Evaluation
-always proceeds in the order of the variables as supplied when creating the
-polynomial ring to which $a$ belongs. The evaluation will succeed if a product
-of a coefficient of the polynomial by one of the values is defined.
+Evaluate the polynomial at the supplied values, which may be any ring elements,
+commutative or non-commutative, but in the same ring. Evaluation always proceeds
+in the order of the variables as supplied when creating the polynomial ring to
+which $a$ belongs. The evaluation will succeed if a product of a coefficient
+of the polynomial by one of the values is defined.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-   return a(vals...)
-end
+(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
 function (a::MPolyRingElem)(;kwargs...)
+   @req !isempty(kwargs) "No values supplied"
    ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
    vals = Array{RingElement}(undef, length(kwargs))
