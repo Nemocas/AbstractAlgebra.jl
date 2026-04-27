@@ -11,6 +11,17 @@ which we think might affect some users directly.
 
 ## [0.48.6](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.6) - 2026-04-27
 
+### New or extended functionality
+
+- [#2380](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2380) "Inplace" iterators over the coefficients, monomials, terms and exponent words of a free associative algebra element
+- [#2390](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2390) Add `ConformanceTests.test_NCRing_interface_recursive`
+- [#2392](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2392) Use `∞` in printing `PosInf()`, `NegInf()` when unicode allowed
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2379](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2379) Fix promotion bug for LaurenMPoly
+- [#2385](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2385) Fix stack overflow in MPoly creation
+
 ## [0.48.5](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.5) - 2026-03-05
 
 ### New or extended functionality
