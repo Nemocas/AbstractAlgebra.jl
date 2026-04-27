@@ -1088,6 +1088,13 @@ mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    parent::FunctionField{T}
 
    function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyRingElem{T}}
+      if !iszero(num) #normalize the denominator
+         c = content(den)
+         if !is_one(c)
+            num = divexact(num, c)
+            den = divexact(den, c)
+         end
+      end
       return new{T}(num, den, R)
    end
 end
