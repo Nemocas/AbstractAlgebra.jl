@@ -46,10 +46,14 @@
       @test isa(S(V, W), MPolyRingElem)
 
       W1 = [[rand(0:100) for i in 1:num_vars] for j in 1:5]
+      W2 = [UInt.(w) for w in W1]
+      W3 = [map(ZZ, w) for w in W1]
 
       f1 = S(V, W1)
 
       @test isa(f1, MPolyRingElem)
+      @test S(V, W2) == f1
+      @test S(V, W3) == f1
 
       Va = [rand(-100:100) for i in 1:5]
       f1a = S(Va, W1)
