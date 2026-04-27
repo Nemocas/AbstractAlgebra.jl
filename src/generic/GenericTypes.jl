@@ -1044,6 +1044,13 @@ mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    parent::FunctionField{T}
 
    function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyRingElem{T}}
+      if !iszero(num) #normalize the denominator
+         c = content(den)
+         if !is_one(c)
+            num = divexact(num, c)
+            den = divexact(den, c)
+         end
+      end
       return new{T}(num, den, R)
    end
 end
@@ -1178,8 +1185,18 @@ mutable struct FreeAssociativeAlgebraElem{T <: RingElement} <: AbstractAlgebra.F
 end
 
 # the iterators for coeffs, terms, etc. are shared with MPoly. Just this remains
-struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
+mutable struct FreeAssAlgExponentWords{T <: AbstractAlgebra.NCRingElem}
    poly::T
+   inplace::Bool
+   temp::Vector{Int} # only used if inplace == true
+
+   function FreeAssAlgExponentWords(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
+      I = new{typeof(f)}(f, inplace)
+      if inplace
+         I.temp = Int[]
+      end
+      return I
+   end
 end
 
 ###############################################################################

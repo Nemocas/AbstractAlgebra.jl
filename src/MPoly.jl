@@ -1348,6 +1348,12 @@ end
 #the block is also not used here I think
 #functionality to view mpoly as upoly in variable `i`, so the
 #coefficients are mpoly's without variable `i`.
+@doc raw"""
+    leading_coefficient(f::MPolyRingElem, i::Int)
+
+Return the leading coefficient of `f` when viewed as a univariate polynomial in the `i`-th
+variable.
+"""
 function leading_coefficient(f::MPolyRingElem, i::Int)
    g = MPolyBuildCtx(parent(f))
    d = degree(f, i)

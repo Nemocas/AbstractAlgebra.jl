@@ -579,7 +579,7 @@ For ring element types `MyElem` that are neither parameterised nor built over a
 base ring, the promotion rules can be defined as follows:
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
 ```
 
 For ring element types `MyElem` that aren't parameterised, but which have a
@@ -587,23 +587,23 @@ base ring with concrete element type `T` the promotion rules can be defined as
 follows:
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
 ```
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
 ```
 
 For ring element types `MyElem{T}` that are parameterised by the type of
 elements of the base ring, the promotion rules can be defined as follows:
 
 ```julia
-promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
+AbstractAlgebra.promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
 ```
 
 ```julia
-function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? MyElem{T} : Union{}
+function AbstractAlgebra.promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   AbstractAlgebra.promote_rule(T, U) == T ? MyElem{T} : Union{}
 end
 ```
 
@@ -785,7 +785,8 @@ using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!,
        get_cached!, is_unit, characteristic, Ring, RingElem, expressify,
-       @show_name, @show_special, is_terse, pretty, terse, Lowercase
+       @show_name, @show_special, is_terse, pretty, terse, Lowercase,
+       promote_rule
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
