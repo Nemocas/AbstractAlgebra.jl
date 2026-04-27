@@ -9,6 +9,8 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.48.6](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.6) - 2026-04-27
+
 ## [0.48.5](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.5) - 2026-03-05
 
 ### New or extended functionality
