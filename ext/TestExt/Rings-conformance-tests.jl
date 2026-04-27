@@ -704,7 +704,29 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
             @test ncols(b) == ncols(S)+1
 
          end
-         @test iszero(zero_matrix(R, nrows(S), ncols(S)))
+
+         # zero matrices
+         a = zero_matrix(R, nrows(S), ncols(S))
+         @test parent(a) === S
+         @test iszero(a)
+         a = zero(S)
+         @test parent(a) === S
+         @test iszero(a)
+
+         # (truncated) identity matrices
+         if nrows(S) == ncols(S)
+            a = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(a) === S
+            @test isone(a)
+            a = one(S)
+            @test parent(a) === S
+            @test isone(a)
+         else
+            a = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(a) === S
+            @test !isone(a)
+            @test_throws DomainError one(S)
+         end
       end
 
       @testset "Views" begin
@@ -832,6 +854,15 @@ function test_MatRing_interface(S::MatRing; reps = 15)
             @test ncols(a) == ncols(S)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
             @test a == S(T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
+         end
+         @test iszero(zero(S))
+         @test isone(one(S))
+         if is_trivial(S)
+            @test iszero(one(S))
+            @test isone(zero(S))
+         else
+            @test !iszero(one(S))
+            @test !isone(zero(S))
          end
       end
 
