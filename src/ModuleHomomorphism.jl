@@ -221,6 +221,10 @@ function module_homomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleHomomorphism(M1, M2, m)
 end
 
+function zero_map(M::FPModule, N::FPModule)
+   return module_homomorphism(M, N, zero_matrix(base_ring(M), ngens(M), ngens(N)))
+end
+
 @doc raw"""
     ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, M::MatElem{T},
                       minv::MatElem{T}) where T <: RingElement

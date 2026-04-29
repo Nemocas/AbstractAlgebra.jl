@@ -293,7 +293,7 @@ end
 function hom_direct_sum(A::DirectSumModule{T}, B::DirectSumModule{T}, M::Matrix{<:Map{<:AbstractAlgebra.FPModule{T}, <:AbstractAlgebra.FPModule{T}}}) where {T}
   pro = canonical_projections(A)
   im = canonical_injections(B)
-  s = hom(A, B, [zero(B) for i = 1:dim(A)])
+  s = hom(A, B, [zero(B) for i = 1:ngens(A)])
   for i=1:length(pro)
     for j=1:length(im)
       s += pro[i]*M[i,j]*im[j]
