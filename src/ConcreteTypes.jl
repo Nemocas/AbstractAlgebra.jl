@@ -16,3 +16,44 @@ struct MatSpace{T <: NCRingElement} <: Module{T}
      return new{T}(R, r, c)
   end
 end
+
+###############################################################################
+#
+#   Universal ring
+#
+###############################################################################
+
+@attributes mutable struct UniversalRing{T <: RingElem, U <: RingElement} <: Ring
+  base_ring::Ring
+
+  function UniversalRing(R::Ring)
+    return new{elem_type(R), elem_type(coefficient_ring(R))}(R)
+  end
+end
+
+mutable struct UniversalRingElem{T <: RingElem, U <: RingElement} <: RingElem
+  data::T
+  parent::UniversalRing{T, U}
+end
+
+###############################################################################
+#
+#   Universal polynomial ring
+#
+###############################################################################
+
+struct UnivPolyCoeffs{T <: RingElem}
+  poly::T
+end
+
+struct UnivPolyExponentVectors{T <: RingElem}
+  poly::T
+end
+
+struct UnivPolyTerms{T <: RingElem}
+  poly::T
+end
+
+struct UnivPolyMonomials{T <: RingElem}
+  poly::T
+end

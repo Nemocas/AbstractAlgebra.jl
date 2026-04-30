@@ -34,7 +34,7 @@ makedocs(
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",
-                 "univpolynomial.md",
+                 "universal_ring.md",
                  "laurent_polynomial.md",
                  "laurent_mpolynomial.md",
                  "series.md",
