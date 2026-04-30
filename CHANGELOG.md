@@ -9,6 +9,22 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.49.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.49.0) - 2026-04-30
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+- [#2274](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2274) Introduce "universal ring" as a generalization of `UniversalPolyRing`
+- [#2286](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2286) Restrict static params of our types, so e.g. `PolyRing{T}` now always must satisfy `T<:RingElement`
+- [#2339](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2339) Restrict `swap_rows`, `hnf`, `snf` to `MatElem`; to apply to `MatRingElem` work with underlying matrix
+- [#2356](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2356) Change behavior of `base_ring` for Laurent polynomials
+- [#2364](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2364) Rework multivariate polynomial evaluation
+
+### Miscellaneous changes
+
+- [#2394](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2394) Add `!isone` test for truncated identity mats to conformance tests
+
 ## [0.48.6](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.6) - 2026-04-27
 
 ### New or extended functionality
