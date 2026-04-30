@@ -15,73 +15,15 @@ which we think might affect some users directly.
 
 > !These changes break compatibility from previous versions!
 
-#### New or extended functionality
-
 - [#2274](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2274) Introduce "universal ring" as a generalization of `UniversalPolyRing`
-
-#### Miscellaneous changes
-
 - [#2286](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2286) Restrict static params of our types, so e.g. `PolyRing{T}` now always must satisfy `T<:RingElement`
 - [#2339](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2339) Restrict `swap_rows`, `hnf`, `snf` to `MatElem`; to apply to `MatRingElem` work with underlying matrix
 - [#2356](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2356) Change behavior of `base_ring` for Laurent polynomials
 - [#2364](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2364) Rework multivariate polynomial evaluation
 
-### New or extended functionality
-
-- [#2276](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2276) Implement `is_known(is_finite, ::NCRing)`, at least for ring types defined in AbstractAlgebra
-- [#2326](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2326) Add `is_pairwise` function
-- [#2333](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2333) Add `universal_poly_type` and `universal_poly_ring_type`
-- [#2358](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2358) Add some missing methods for Laurent polynomials
-- [#2380](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2380) "Inplace" iterators over the coefficients, monomials, terms and exponent words of a free associative algebra element
-- [#2390](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2390) Add `ConformanceTests.test_NCRing_interface_recursive`
-- [#2392](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2392) Use `∞` in printing `PosInf()`, `NegInf()` when unicode allowed
-
-### Fixed bugs that returned incorrect results
-
-- [#2288](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2288) Ensure `det` for 0x0 matrices always returns 1 (and not 0)
-- [#2305](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2305) Disable Julia fallbacks for `iszero`/`isone` for our parent objects
-
-### Fixed bugs that resulted in unexpected errors
-
-- [#2292](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2292) Fix `roots(::PolyRingElem)` if coeffs are not in a field
-- [#2332](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2332) Fix `@attributes Foo` if `AbstractAlgebra` is not imported
-- [#2345](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2345) Fix `canonical_unit` for zero matrices
-- [#2379](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2379) Fix promotion bug for LaurenMPoly
-- [#2385](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2385) Fix stack overflow in MPoly creation
-
-### Other fixed bugs
-
-- [#2297](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2297) Fix bug in `evaluation_points` for `RationalFunctionField`
-- [#2320](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2320) Avoid stack overflow if `divexact` is not implemented
-- [#2335](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2335) Avoid stack overflow if `divexact_left` or `divexact_right` is not implemented
-- [#2338](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2338) Restrict `hcat`, `vcat`, `cat`, `hvcat` to `MatElem`; drop support for `MatRingElem` as this would in most cases result in an error anyway (for non-square results)
-- [#2361](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2361) Fix printing of `RingElem`s in Jupyter notebooks
-- [#2362](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2362) Drop `is_unit` tests from `test_NCRing_interface` to comply with interface definitions
-
-### Improvements or additions to documentation
-
-- [#2307](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2307) Allow building the documentation as a PDF
-
-### **TODO** insufficient labels for automatic classification
-
-The following PRs have neither a topic label assigned to them, nor a PR type. 
-**Manual intervention required.**
+### Miscellaneous changes
 
 - [#2394](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2394) Add `!isone` test for truncated identity mats to conformance tests
-
-
-### **TODO** Uncategorized PR
-
-If there are any PRs listed below, either apply the same steps
-as above, or change their label to "release notes: not needed".
-
-- [#2246](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2246) Adding new functions rank_interpolation, rank_interpolation_mc and evaluation_points.
-- [#2284](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2284) Merge `AA.transpose!` and `LinearAlgebra.transpose!`
-- [#2296](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2296) Merge `AA.transpose!` and `AA.Generic.transpose!`
-- [#2301](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2301) fix: multivariate factorization
-- [#2304](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2304) Bump version from 0.48.1 to 0.48.2
-- [#2319](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2319) Update changelog
-- [#2352](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2352) Update changelog
 
 ## [0.48.6](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.6) - 2026-04-27
 
