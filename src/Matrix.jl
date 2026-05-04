@@ -1178,6 +1178,9 @@ end
 function Base.promote(x::MatrixElem{S},
                       y::MatrixElem{T}) where {S <: NCRingElement,
                                                T <: NCRingElement}
+   if S === T
+      return x, y
+   end
    U = promote_rule_sym(S, T)
    if U === S
       return x, change_base_ring(base_ring(x), y)
@@ -1200,6 +1203,9 @@ end
 function Base.promote(x::MatrixElem{S},
                       y::Vector{T}) where {S <: NCRingElement,
                                                T <: NCRingElement}
+   if S === T
+      return x, y
+   end
    U = promote_rule_sym(S, T)
    if U === S
       return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
@@ -1222,6 +1228,9 @@ end
 *(x::Vector, y::MatrixElem) = *(promote(x, y)...)
 
 function Base.promote(x::MatElem{S}, y::T) where {S <: NCRingElement, T <: NCRingElement}
+   if S === T
+      return x, y
+   end
    U = promote_rule_sym(S, T)
    if U === S
       return x, base_ring(x)(y)
