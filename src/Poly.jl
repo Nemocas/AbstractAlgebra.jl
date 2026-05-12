@@ -3507,6 +3507,22 @@ end
 
 ###############################################################################
 #
+#   Graeffe-Dandelin transform
+#
+###############################################################################
+
+# see e.g. https://en.wikipedia.org/wiki/Graeffe%27s_method
+
+# Author: Claus Fieker (taken from Hecke/examples)
+function graeffe_transform(f::PolyRingElem)
+   f_e = parent(f)([coeff(f, 2*i)  for i=0:div(degree(f), 2)])
+   f_o = parent(f)([coeff(f, 2*i+1)  for i=0:div(degree(f), 2)])
+   return (-1)^degree(f)*(f_e^2-shift_left(f_o^2, 1))
+end
+
+
+###############################################################################
+#
 #   Polynomial substitution
 #
 ###############################################################################

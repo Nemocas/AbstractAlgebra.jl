@@ -1069,6 +1069,30 @@ U, z = polynomial_ring(R, :z)
 h = rand(U, 3:3, -1:2, -10:10)
 ```
 
+### Graeffe transform
+
+Also known as Dandelin-Graeffe transform.  Produce a polynomial whose roots
+are the squares of the roots of the given polynomial.
+
+```julia
+graeffe_transform(f::PolyRingElem)
+```
+
+**Examples**
+
+```jldoctest
+julia> ZZx, x = polynomial_ring(ZZ, "x");
+
+julia> graeffe_transform(x^2-1)
+x^2 - 2*x + 1
+
+julia> graeffe_transform(x^3-x-1)
+x^3 - 2*x^2 + x - 1
+
+```
+
+
+
 ### Ring homomorphisms
 
 ```@docs
