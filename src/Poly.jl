@@ -3512,8 +3512,14 @@ end
 ###############################################################################
 
 # see e.g. https://en.wikipedia.org/wiki/Graeffe%27s_method
-
 # Author: Claus Fieker (taken from Hecke/examples)
+
+@doc raw"""
+    graeffe_transform(f::PolyRingElem)
+
+Return a polynomial whose roots are the squares of the roots of
+the given polynomial.  Also known as Dandelin-Graeffe transform.
+"""
 function graeffe_transform(f::PolyRingElem)
    f_e = parent(f)([coeff(f, 2*i)  for i=0:div(degree(f), 2)])
    f_o = parent(f)([coeff(f, 2*i+1)  for i=0:div(degree(f), 2)])

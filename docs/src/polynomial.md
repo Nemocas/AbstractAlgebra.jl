@@ -1071,10 +1071,8 @@ h = rand(U, 3:3, -1:2, -10:10)
 
 ### Graeffe transform
 
-Also known as Dandelin-Graeffe transform.  Produce a polynomial whose roots
-are the squares of the roots of the given polynomial.
 
-```julia
+```@docs
 graeffe_transform(f::PolyRingElem)
 ```
 
