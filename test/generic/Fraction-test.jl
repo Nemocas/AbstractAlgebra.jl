@@ -285,7 +285,7 @@ end
    S, x = polynomial_ring(R, "x")
 
    f = (x^2 + 2)//(x + 1)
-   @test f isa Generic.FracFieldElem
+   @test f isa Generic.TotFrac
 
    @test evaluate(f, 1) == R(4)
    @test evaluate(f, R(1)) == R(4)
