@@ -1079,7 +1079,7 @@ graeffe_transform(f::PolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> ZZx, x = polynomial_ring(ZZ, "x");
+julia> ZZx, x = polynomial_ring(ZZ, :x);
 
 julia> graeffe_transform(x^2-1)
 x^2 - 2*x + 1
