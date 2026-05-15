@@ -930,7 +930,7 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+@attributes mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.TotFracRing{T}
    base_ring::Ring
 
    function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
@@ -942,7 +942,7 @@ end
 
 const TotFracDict = CacheDictType{Ring, Ring}()
 
-mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.RingElem
+mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.TotFrac{T}
    num::T
    den::T
    parent::TotFracRing{T}
