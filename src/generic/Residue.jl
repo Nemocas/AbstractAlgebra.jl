@@ -48,7 +48,7 @@ function (a::EuclideanRingResidueRing{T})(b::Integer) where {T <: RingElement}
    return z
 end
 
-function (a::EuclideanRingResidueRing)(b::T) where {T <: Union{Rational, FracElem}}
+function (a::EuclideanRingResidueRing)(b::T) where {T <: Union{Rational, FracElem, TotFrac}}
    return inv(a(denominator(b))) * a(numerator(b))
 end
 

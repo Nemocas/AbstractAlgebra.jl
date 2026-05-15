@@ -102,6 +102,8 @@ abstract type ResidueField{T<:RingElement} <: Field end
 
 abstract type FracField{T<:RingElement} <: Field end
 
+abstract type TotFracRing{T<:RingElement} <: Ring end
+
 abstract type MatRing{T<:NCRingElement} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
@@ -134,6 +136,8 @@ abstract type ResElem{T<:RingElement} <: RingElem end
 abstract type ResFieldElem{T<:RingElement} <: FieldElem end
 
 abstract type FracElem{T<:RingElement} <: FieldElem end
+
+abstract type TotFrac{T<:RingElement} <: RingElem end
 
 abstract type SeriesElem{T<:RingElement} <: RingElem end
 
