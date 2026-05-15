@@ -20,7 +20,7 @@ base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(
 #
 ###############################################################################
 
-function Base.hash(a::MatRingElem, h::UInt)
+function Base.hash(a::MatRingElem, h::UInt)   # FIXME: replace this by `hash(a::MatRingElem, h::UInt) = hash(matrix(a), h)` ?
    b = 0x6413942b83a26c65%UInt
    for i in 1:nrows(a)
       for j in 1:ncols(a)
