@@ -108,6 +108,8 @@ export SimpleNumFieldElem
 export SkewDiagram
 export Strassen
 export SymmetricGroup
+export TotFrac
+export TotFracRing
 export UniversalPolyRing
 export UniversalPolyRingElem
 export UniversalRing

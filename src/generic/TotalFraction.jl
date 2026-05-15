@@ -370,6 +370,36 @@ end
 # Division is not possible generically due to the possibility of non-units
 # that are also non-zero divisors
 
+##############################################################################
+#
+#  Evaluation
+#
+##############################################################################
+
+function evaluate(f::TotFrac, V::Vector{<:RingElement})
+    return evaluate(numerator(f), V)//evaluate(denominator(f), V)
+end
+
+function evaluate(f::TotFrac, v::RingElement)
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function evaluate(f::TotFrac{<:PolyRingElem}, v::Integer)
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function evaluate(f::TotFrac, vars::Vector{Int}, vals::Vector{<:RingElement})
+    return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
+function (a::TotFrac)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::TotFrac)(vals::RingElement...)
+   return evaluate(a, [vals...])
+end
+
 ###############################################################################
 #
 #   Powering
