@@ -1606,3 +1606,45 @@ end
 function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
   return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
 end
+
+################################################################################
+#
+#   Univariate Ore algebra, its element type skew derivations
+#
+################################################################################
+abstract type AbstractOreAlgebra <: NCRing end
+abstract type SkewDerivation{D,S} <: Map{D,D,Map,SkewDerivation} where {S<:Map{D,D}} end
+
+@attributes mutable struct OreAlgebra{T<:RingElem} <: AbstractOreAlgebra
+  base_ring::Ring
+  D::Symbol
+  δ::Map(SkewDerivation)
+
+  function OreAlgebra{T}(R::Ring, D::Symbol, δ; cached=true) where T<:RingElem
+    return get_cached!(OreID, (R,D,δ), cached) do
+      new{T}(R,D,δ)
+    end
+  end
+end
+
+const OreID = CacheDictType{Tuple{Ring,Symbol,Map(SkewDerivation)},NCRing}()
+
+mutable struct OreOperator{T<:RingElem} <: NCPolyRingElem{T}
+  parent::OreAlgebra{T}
+  coeffs::Vector{T}
+  length::Int
+end
+
+mutable struct PolySkewDerivation{D,S} <: SkewDerivation{D,S}
+  domain::D
+  σ::S
+  intermediate_cache::Vector{<:NCRingElem}
+
+  function PolySkewDerivation{D,S}(dom::D,σ::S,coeff::T) where {D,S,T<:NCRingElem}
+    return new{D,S}(dom,σ,[coeff])
+  end
+end
+
+function sigma_endomorphism(::SkewDerivation{D,S}) where {D,S} end
+
+Univariateish = Union{PolyRing,FracField{<:PolyRingElem},RationalFunctionField}
