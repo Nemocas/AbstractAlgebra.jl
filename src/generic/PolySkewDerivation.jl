@@ -72,15 +72,14 @@ function (d::PolySkewDerivation{D,S})(a::T) where {D,S<:Map{D,D,<:Map,<:Any},T<:
 
   x = parent(a) |> gen
   σ = sigma_endomorphism(d)
-  for i in (length(d.intermediate_cache)+1):degree(a)
+  cached_degree = length(d.intermediate_cache+1)
+  for i in cached_degree:degree(a)
     res = last(d.intermediate_cache)*x + σ(x^(i-1))*c
     push!(d.intermediate_cache, res)
   end
 
   return sum(σ.(Iterators.drop(coefficients(a),1)) .* d.intermediate_cache; init=parent(a)())
 end
-
-#import AbstractAlgebra: Generic.RationalFunctionFieldElem
 
 function (d::PolySkewDerivation{D,S})(a::T) where {
   D<:FracField{<:PolyRingElem},
