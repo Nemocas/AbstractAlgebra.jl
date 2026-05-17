@@ -620,3 +620,11 @@ export zero!
 export zero_matrix
 export zeros
 export zz
+
+export ore_extension
+export trivial_derivation
+export derivation
+export sigma_endomorphism
+export OreAlgebra
+export OreOperator
+export SkewDerivation
