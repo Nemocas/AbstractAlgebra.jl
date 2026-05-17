@@ -1637,10 +1637,7 @@ end
 #   Univariate Ore algebra, its element type skew derivations
 #
 ################################################################################
-abstract type AbstractOreAlgebra <: NCRing end
-abstract type SkewDerivation{D,S} <: Map{D,D,Map,SkewDerivation} where {S<:Map{D,D}} end
-
-@attributes mutable struct OreAlgebra{T<:RingElem} <: AbstractOreAlgebra
+@attributes mutable struct OreAlgebra{T<:RingElem} <: AbstractAlgebra.OreAlgebra{T}
   base_ring::Ring
   D::Symbol
   δ::Map(SkewDerivation)
@@ -1654,7 +1651,7 @@ end
 
 const OreID = CacheDictType{Tuple{Ring,Symbol,Map(SkewDerivation)},NCRing}()
 
-mutable struct OreOperator{T<:RingElem} <: NCPolyRingElem{T}
+mutable struct OreOperator{T<:RingElem} <: AbstractAlgebra.OreOperator{T}
   parent::OreAlgebra{T}
   coeffs::Vector{T}
   length::Int
@@ -1669,7 +1666,5 @@ mutable struct PolySkewDerivation{D,S} <: SkewDerivation{D,S}
     return new{D,S}(dom,σ,[coeff])
   end
 end
-
-function sigma_endomorphism(::SkewDerivation{D,S}) where {D,S} end
 
 Univariateish = Union{PolyRing,FracField{<:PolyRingElem},RationalFunctionField}
