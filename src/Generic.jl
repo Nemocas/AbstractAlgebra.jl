@@ -96,7 +96,7 @@ include("generic/FreeAssociativeAlgebraGroebner.jl")
 
 include("generic/PolyRingHom.jl")
 
-include("generic/OreOperator.jl")
+include("generic/OreAlgebras.jl")
 include("generic/PolySkewDerivation.jl")
 
 ###############################################################################
