@@ -1609,6 +1609,30 @@ end
 
 ################################################################################
 #
+#   R-algebra morphisms of R(x)
+#
+################################################################################
+
+mutable struct PolyFracFieldAnyMap{
+    D <: Union{FracField{<:PolyRingElem},RationalFunctionField{<:RingElement,<:PolyRingElem}},
+    C <: NCRing,
+    V <: Map{<:PolyRing,C}} <: Map{D,C,Map,PolyFracFieldAnyMap}
+
+  domain::D
+  morphism::V
+
+  function PolyFracFieldAnyMap{D,C,V}(d::D,ϕ::V) where {D,C,V}
+    return new{D,C,V}(d,ϕ)
+  end
+end
+
+function PolyFracFieldAnyMap(d::D,i::V) where {D,C,V<:Map{<:PolyRing,C}}
+  return PolyFracFieldAnyMap{D,C,V}(d,i)
+end
+
+
+################################################################################
+#
 #   Univariate Ore algebra, its element type skew derivations
 #
 ################################################################################
