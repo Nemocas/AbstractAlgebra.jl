@@ -388,6 +388,12 @@ function evaluate(f::TotFrac{<:PolyRingElem}, v::Integer)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
+# function evaluate(f::TotFrac, vals::Vector{<:RingElement})
+#     @req length(vals) == ngens(base_ring(parent(a)))  "Evaluation point needs 1 coordinate per variable"
+#     vars = collect(1:ngens(base_ring(parent(a))))
+#     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+# end
+
 function evaluate(f::TotFrac, vars::Vector{Int}, vals::Vector{<:RingElement})
     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
 end
@@ -397,7 +403,13 @@ function (a::TotFrac)(val::RingElement)
 end
 
 function (a::TotFrac)(vals::RingElement...)
-   return evaluate(a, [vals...])
+   vars = collect(1:ngens(base_ring(parent(a))))
+   return evaluate(a, vars, [vals...])
+end
+
+function (a::TotFrac)(vals::Vector{<:RingElement})
+   vars = collect(1:ngens(base_ring(parent(a))))
+   return evaluate(a, vars, vals)
 end
 
 ###############################################################################
