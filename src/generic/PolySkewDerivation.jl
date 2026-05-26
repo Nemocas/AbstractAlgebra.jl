@@ -72,7 +72,7 @@ function (d::PolySkewDerivation{D,S})(a::T) where {D,S<:Map{D,D,<:Map,<:Any},T<:
 
   x = parent(a) |> gen
   σ = sigma_endomorphism(d)
-  cached_degree = length(d.intermediate_cache+1)
+  cached_degree = length(d.intermediate_cache)+1
   for i in cached_degree:degree(a)
     res = last(d.intermediate_cache)*x + σ(x^(i-1))*c
     push!(d.intermediate_cache, res)
