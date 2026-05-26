@@ -1648,8 +1648,8 @@ mutable struct PolyFracFieldAnyMap{
   domain::D
   morphism::V
 
-  function PolyFracFieldAnyMap{D,C,V}(d::D,ϕ::V) where {D,C,V}
-    return new{D,C,V}(d,ϕ)
+  function PolyFracFieldAnyMap{D,C,V}(d::D,phi::V) where {D,C,V}
+    return new{D,C,V}(d,phi)
   end
 end
 
