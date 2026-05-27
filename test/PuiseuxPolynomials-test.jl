@@ -2,12 +2,6 @@ using Test
 using Oscar
 
 @testset "PuiseuxPolynomials.jl" begin
-    @testset "TrivialTests" begin
-        @test 1+1==2
-        @test 1+2==3
-        # @test 1+1==3 # this one fails
-    end
-
     @testset "Construction" begin
         K, (t1,t2,t3) = laurent_polynomial_ring(QQ, ["t1","t2","t3"])
         K_p,(tp1,tp2,tp3) = puiseux_polynomial_ring(QQ, ["t1","t2","t3"])
