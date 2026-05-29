@@ -310,16 +310,18 @@ end
 
    # multivariate over non domain
    R, = residue_ring(ZZ, 15)
-   S, (x,) = polynomial_ring(R, ["x"])
+   S, (x,y) = polynomial_ring(R, ["x","y"])
 
    f = (x^2 + 3)//(x + 1)
    @test f isa Generic.TotFrac
 
-   @test evaluate(f, [1]) == R(2)
-   @test evaluate(f, [R(1)]) == R(2)
+   @test evaluate(f, [1,2]) == R(2)
+   @test evaluate(f, [R(1),R(2)]) == R(2)
 
-   @test f([1]) == R(2)
-   @test f([R(1)]) == R(2)
+   @test f([1,2]) == R(2)
+   @test f([R(1),R(2)]) == R(2)
+   @test f(1,2) == R(2)
+   @test f(R(1),R(2)) == R(2)
 
    # universal
    R = universal_polynomial_ring(ZZ)
