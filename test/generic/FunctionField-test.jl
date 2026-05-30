@@ -18,15 +18,17 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 #end
 
 @testset "Generic.FunctionField.constructors" begin
-   @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
-   @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
+   @test function_field(P1[1], :y)[1] === function_field(P1[1], :y; cached=true)[1]
+   @test function_field(P1[1], :y; cached=true)[1] !== function_field(P1[1], :y; cached=false)[1]
 
-   for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
+   for (S, y) in  [function_field(P1[3], :y), function_field(P2[3], :y)]
       R = base_ring(base_ring(S))
+      T = elem_type(R)
+      U = dense_poly_type(T)
 
-      @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
-      @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
-      @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
+      @test elem_type(S) == Generic.FunctionFieldElem{T, U}
+      @test elem_type(Generic.FunctionField{T, U}) == Generic.FunctionFieldElem{T, U}
+      @test parent_type(Generic.FunctionFieldElem{T, U}) == Generic.FunctionField{T, U}
 
       @test S isa Generic.FunctionField
 

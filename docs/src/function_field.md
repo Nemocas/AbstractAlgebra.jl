@@ -191,10 +191,11 @@ These are implemented in a module implemented in
 ## Generic function field types
 
 Function field objects $K/k(x)$ in AbstractAlgebra have type
-`Generic.FunctionField{T}` where `T` is the type of elements of the field `k`.
+`Generic.FunctionField{T, U}` where `T` is the type of elements of the field `k`
+and `U` is the type of the univariate polynomials over that field.
 
 Corresponding function field elements have type
-`Generic.FunctionFieldElement{T}`. See the file `src/generic/GenericTypes.jl`
+`Generic.FunctionFieldElem{T, U}`. See the file `src/generic/GenericTypes.jl`
 for details.
 
 ## Abstract types
@@ -319,11 +320,11 @@ defining_polynomial(R::Generic.FunctionField)
 ```
 
 ```@docs
-Base.numerator(::Generic.FunctionField{T}, ::Bool=true) where T <: FieldElement
+Base.numerator(::Generic.FunctionField{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs
-Base.numerator(::Generic.FunctionFieldElem{T}, ::Bool=true) where T <: FieldElement
+Base.numerator(::Generic.FunctionFieldElem{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs
@@ -331,7 +332,7 @@ degree(::Generic.FunctionField)
 ```
 
 ```@docs
-gen(::Generic.FunctionField{T}) where T <: FieldElement
+gen(::Generic.FunctionField{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs

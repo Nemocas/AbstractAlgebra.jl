@@ -1015,35 +1015,34 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   num::Poly{<:PolyRingElem{T}}
-   den::PolyRingElem{T}
+@attributes mutable struct FunctionField{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.Field
+   num::Poly{U}
+   den::U
    S::Symbol
-   powers::Vector{Poly{<:PolyRingElem{T}}}
-   powers_den::Vector{<:PolyRingElem{T}}
-   traces::Vector{<:PolyRingElem{T}}
-   traces_den::PolyRingElem{T}
+   powers::Vector{Poly{U}}
+   powers_den::Vector{U}
+   traces::Vector{U}
+   traces_den::U
    monic::Bool
-   pol::Poly{RationalFunctionFieldElem{T, U}} where U <: PolyRingElem{T}
-   base_ring::RationalFunctionField{T, U} where U <: PolyRingElem{T}
+   pol::Poly{RationalFunctionFieldElem{T, U}}
+   base_ring::RationalFunctionField{T, U}
 
-   function FunctionField{T}(num::Poly{<:PolyRingElem{T}},
-             den::PolyRingElem{T}, s::Symbol, cached::Bool = true) where
-                                                          T <: FieldElement
+   function FunctionField{T, U}(num::Poly{U},
+             den::U, s::Symbol, cached::Bool = true) where {T, U}
       return get_cached!(FunctionFieldDict, (num, den, s), cached) do
-         new{T}(num, den, s)
-      end::FunctionField{T}
+         new{T, U}(num, den, s)
+      end::FunctionField{T, U}
    end
 end
 
 const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
 
-mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   num::Poly{<:PolyRingElem{T}}
-   den::PolyRingElem{T}
-   parent::FunctionField{T}
+mutable struct FunctionFieldElem{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.FieldElem
+   num::Poly{U}
+   den::U
+   parent::FunctionField{T, U}
 
-   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyRingElem{T}}
+   function FunctionFieldElem{T, U}(R::FunctionField{T, U}, num::Poly{U}, den::U) where {T, U}
       if !iszero(num) #normalize the denominator
          c = content(den)
          if !is_one(c)
@@ -1051,7 +1050,7 @@ mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
             den = divexact(den, c)
          end
       end
-      return new{T}(num, den, R)
+      return new{T, U}(num, den, R)
    end
 end
 
