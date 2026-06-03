@@ -3519,6 +3519,18 @@ end
 
 Return a polynomial whose roots are the squares of the roots of
 the given polynomial.  Also known as Dandelin-Graeffe transform.
+
+# Examples
+```jldoctest
+julia> ZZx, x = polynomial_ring(ZZ, :x);
+
+julia> graeffe_transform(x^2-1)
+x^2 - 2*x + 1
+
+julia> graeffe_transform(x^3-x-1)
+x^3 - 2*x^2 + x - 1
+
+```
 """
 function graeffe_transform(f::PolyRingElem)
    f_e = parent(f)([coeff(f, 2*i)  for i=0:div(degree(f), 2)])
