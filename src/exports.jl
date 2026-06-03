@@ -246,6 +246,7 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export graeffe_transform
 export gram
 export has_attribute
 export has_bottom_neighbor
