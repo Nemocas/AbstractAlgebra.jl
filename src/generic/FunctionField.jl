@@ -521,41 +521,41 @@ end
 #
 ###############################################################################
 
-parent_type(::Type{FunctionFieldElem{T, U}}) where {T, U} = FunctionField{T, U}
+parent_type(::Type{AbsSimpleFunctionFieldElem{T, U}}) where {T, U} = AbsSimpleFunctionField{T, U}
 
-elem_type(::Type{FunctionField{T, U}}) where {T, U} = FunctionFieldElem{T, U}
+elem_type(::Type{AbsSimpleFunctionField{T, U}}) where {T, U} = AbsSimpleFunctionFieldElem{T, U}
 
-base_ring_type(::Type{FunctionField{T, U}}) where {T, U} = RationalFunctionField{T, U}
+base_ring_type(::Type{AbsSimpleFunctionField{T, U}}) where {T, U} = RationalFunctionField{T, U}
 
-base_ring(R::FunctionField{T, U}) where {T, U} = R.base_ring::RationalFunctionField{T, U}
+base_ring(R::AbsSimpleFunctionField{T, U}) where {T, U} = R.base_ring::RationalFunctionField{T, U}
 
 # For consistency with number fields in Hecke.jl
 @doc raw"""
-    base_field(R::FunctionField)
+    base_field(R::AbsSimpleFunctionField)
 
 Return the rational function field that the field `R` is an extension of.
 Synonymous with `base_ring`.
 """
-base_field(R::FunctionField) = base_ring(R)
+base_field(R::AbsSimpleFunctionField) = base_ring(R)
 
-parent(a::FunctionFieldElem) = a.parent
+parent(a::AbsSimpleFunctionFieldElem) = a.parent
 
-function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: FunctionFieldElem{S}}
+function is_exact_type(a::Type{T}) where {S <: FieldElement, T <: AbsSimpleFunctionFieldElem{S}}
    return is_exact_type(S)
 end
 
 @doc raw"""
-    var(R::FunctionField)
+    var(R::AbsSimpleFunctionField)
 
 Return the variable name of the generator of the function field `R` as a
 symbol.
 """
-var(R::FunctionField) = R.S
+var(R::AbsSimpleFunctionField) = R.S
 
-characteristic(R::FunctionField) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::FunctionField) = is_known(characteristic, base_ring(R))
+characteristic(R::AbsSimpleFunctionField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::AbsSimpleFunctionField) = is_known(characteristic, base_ring(R))
 
-is_perfect(R::FunctionField) = characteristic(R) == 0
+is_perfect(R::AbsSimpleFunctionField) = characteristic(R) == 0
 
 ###############################################################################
 #
@@ -564,34 +564,34 @@ is_perfect(R::FunctionField) = characteristic(R) == 0
 ###############################################################################
 
 @doc raw"""
-    defining_polynomial(R::FunctionField)
-    modulus(R::FunctionField)
+    defining_polynomial(R::AbsSimpleFunctionField)
+    modulus(R::AbsSimpleFunctionField)
 
 Return the original polynomial that was used to define the function field `R`.
 """
-defining_polynomial(R::FunctionField) = R.pol
+defining_polynomial(R::AbsSimpleFunctionField) = R.pol
 
-modulus(R::FunctionField) = defining_polynomial(R)
+modulus(R::AbsSimpleFunctionField) = defining_polynomial(R)
 
-function power_precomp(R::FunctionField{T, U}, n::Int) where {T, U}
+function power_precomp(R::AbsSimpleFunctionField{T, U}, n::Int) where {T, U}
    return R.powers[n + 1]
 end
 
-function power_precomp_den(R::FunctionField{T, U}, n::Int) where {T, U}
+function power_precomp_den(R::AbsSimpleFunctionField{T, U}, n::Int) where {T, U}
    return R.powers_den[n + 1]
 end
 
-function trace_precomp(R::FunctionField{T, U}, n::Int) where {T, U}
+function trace_precomp(R::AbsSimpleFunctionField{T, U}, n::Int) where {T, U}
    return R.traces[n + 1]
 end
 
-function trace_precomp_den(R::FunctionField{T, U}) where {T, U}
+function trace_precomp_den(R::AbsSimpleFunctionField{T, U}) where {T, U}
    return R.traces_den
 end
 
 @doc raw"""
-    Base.numerator(R::FunctionField{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
-    Base.denominator(R::FunctionField{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+    Base.numerator(R::AbsSimpleFunctionField{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+    Base.denominator(R::AbsSimpleFunctionField{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 
 Thinking of elements of the rational function field as fractions, put the
 defining polynomial of the function field over a common denominator
@@ -600,24 +600,24 @@ polynomials belong to a different ring than the original defining polynomial.
 The `canonicalise` is ignored, but exists for compatibility with the Generic
 interface.
 """
-function Base.numerator(R::FunctionField{T, U}, canonicalise::Bool=true) where {T, U}
+function Base.numerator(R::AbsSimpleFunctionField{T, U}, canonicalise::Bool=true) where {T, U}
    return R.num
 end
 
-function Base.denominator(R::FunctionField{T, U}, canonicalise::Bool=true) where {T, U}
+function Base.denominator(R::AbsSimpleFunctionField{T, U}, canonicalise::Bool=true) where {T, U}
    return R.den
 end
 
 @doc raw"""
-    Base.numerator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
-    Base.denominator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+    Base.numerator(a::AbsSimpleFunctionFieldElem{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+    Base.denominator(a::AbsSimpleFunctionFieldElem{T, U}, canonicalise::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 
 Return the numerator and denominator of the function field element `a`.
 Note that elements are stored in fraction free form so that the denominator
 is a common denominator for the coefficients of the element `a`.
 If `canonicalise` is set to `true` the fraction is first canonicalised.
 """
-function Base.numerator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) where {T, U}
+function Base.numerator(a::AbsSimpleFunctionFieldElem{T, U}, canonicalise::Bool=true) where {T, U}
    anum = a.num
    aden = a.den
    if canonicalise
@@ -628,7 +628,7 @@ function Base.numerator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) whe
    end
 end
 
-function Base.denominator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) where {T, U}
+function Base.denominator(a::AbsSimpleFunctionFieldElem{T, U}, canonicalise::Bool=true) where {T, U}
    aden = a.den
    if canonicalise
       u = canonical_unit(aden)
@@ -639,44 +639,44 @@ function Base.denominator(a::FunctionFieldElem{T, U}, canonicalise::Bool=true) w
 end
 
 @doc raw"""
-    degree(S::FunctionField)
+    degree(S::AbsSimpleFunctionField)
 
 Return the degree of the defining polynomial of the function field, i.e. the
 degree of the extension that the function field makes of the underlying
 rational function field.
 """
-degree(S::FunctionField) = degree(numerator(S))
+degree(S::AbsSimpleFunctionField) = degree(numerator(S))
 
-zero(S::FunctionField) = S()
+zero(S::AbsSimpleFunctionField) = S()
 
-one(S::FunctionField) = S(1)
+one(S::AbsSimpleFunctionField) = S(1)
 
 @doc raw"""
-    gen(S::FunctionField{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
+    gen(S::AbsSimpleFunctionField{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
 
 Return the generator of the function field returned by the function field
 constructor.
 """
-function gen(S::FunctionField{T, U}) where {T, U}
+function gen(S::AbsSimpleFunctionField{T, U}) where {T, U}
    if degree(S) == 1
       return S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
    else
-      return FunctionFieldElem{T, U}(S, deepcopy(power_precomp(S, 1)),
+      return AbsSimpleFunctionFieldElem{T, U}(S, deepcopy(power_precomp(S, 1)),
                                         deepcopy(power_precomp_den(S, 1)))
    end
 end
 
-iszero(a::FunctionFieldElem) = iszero(numerator(a, false))
+iszero(a::AbsSimpleFunctionFieldElem) = iszero(numerator(a, false))
 
-isone(a::FunctionFieldElem) = numerator(a, false) == denominator(a, false)
+isone(a::AbsSimpleFunctionFieldElem) = numerator(a, false) == denominator(a, false)
 
 @doc raw"""
-    is_gen(a::FunctionFieldElem)
+    is_gen(a::AbsSimpleFunctionFieldElem)
 
 Return `true` if `a` is the generator of the function field returned by the
 function field constructor.
 """
-function is_gen(a::FunctionFieldElem)
+function is_gen(a::AbsSimpleFunctionFieldElem)
    S = parent(a)
    if degree(S) == 1
       return a == S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
@@ -687,14 +687,14 @@ function is_gen(a::FunctionFieldElem)
 end
 
 @doc raw"""
-    coeff(a::FunctionFieldElem, n::Int)
+    coeff(a::AbsSimpleFunctionFieldElem, n::Int)
 
 Return the degree `n` coefficient of the element `a` in its polynomial
 representation in terms of the generator of the function field. The
 coefficient is returned as an element of the underlying rational function
 field.
 """
-function coeff(a::FunctionFieldElem, n::Int)
+function coeff(a::AbsSimpleFunctionFieldElem, n::Int)
    R = base_ring(a)
    n = coeff(numerator(a, false), n)
    d = denominator(a, false)
@@ -702,7 +702,7 @@ function coeff(a::FunctionFieldElem, n::Int)
 end
 
 @doc raw"""
-    num_coeff(a::FunctionFieldElem, n::Int)
+    num_coeff(a::AbsSimpleFunctionFieldElem, n::Int)
 
 Return the degree `n` coefficient of the numerator of the element `a` (in its
 polynomial representation in terms of the generator of the function field,
@@ -710,24 +710,24 @@ rationalised as per `numerator/denominator` described above). The coefficient
 will be an polynomial over the `base_ring` of the underlying rational function
 field.
 """
-function num_coeff(a::FunctionFieldElem, n::Int)
+function num_coeff(a::AbsSimpleFunctionFieldElem, n::Int)
    return coeff(numerator(a, false), n)
 end
 
-function deepcopy_internal(a::FunctionFieldElem, dict::IdDict)
+function deepcopy_internal(a::AbsSimpleFunctionFieldElem, dict::IdDict)
    S = parent(a)
    return S(deepcopy_internal(numerator(a, false), dict),
             deepcopy_internal(denominator(a, false), dict))
 end
 
-function Base.hash(a::FunctionFieldElem, h::UInt)
+function Base.hash(a::AbsSimpleFunctionFieldElem, h::UInt)
    b = 0x52fd76bf2694aa02%UInt
    b = xor(hash(denominator(a, false), h),
                                           xor(hash(numerator(a, false), h), b))
    return b
 end
 
-function _rat_poly(a::FunctionFieldElem)
+function _rat_poly(a::AbsSimpleFunctionFieldElem)
    return numerator(a, false), denominator(a, false)
 end
 
@@ -737,7 +737,7 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
+function AbstractAlgebra.expressify(a::AbsSimpleFunctionFieldElem; context = nothing)
    n = numerator(a, true)
    d = denominator(a, true)
    if isone(d)
@@ -747,9 +747,9 @@ function AbstractAlgebra.expressify(a::FunctionFieldElem; context = nothing)
    end
 end
 
-@enable_all_show_via_expressify FunctionFieldElem
+@enable_all_show_via_expressify AbsSimpleFunctionFieldElem
 
-function show(io::IO, R::FunctionField)
+function show(io::IO, R::AbsSimpleFunctionField)
    @show_name(io, R)
    @show_special(io, R)
    print(terse(pretty(io)), "Function Field over ", Lowercase(),
@@ -763,7 +763,7 @@ end
 #
 ###############################################################################
 
-function -(a::FunctionFieldElem)
+function -(a::AbsSimpleFunctionFieldElem)
    R = parent(a)
    return R(-numerator(a, false), denominator(a, false))
 end
@@ -774,7 +774,7 @@ end
 #
 ###############################################################################
 
-function +(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function +(a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    check_parent(a, b)
    R = parent(a)
    n1, d1 = _rat_poly(a)
@@ -782,7 +782,7 @@ function +(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
    return R(_rat_poly_add(n1, d1, n2, d2)...)
 end
 
-function -(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function -(a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    check_parent(a, b)
    R = parent(a)
    n1, d1 = _rat_poly(a)
@@ -790,7 +790,7 @@ function -(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
    return R(_rat_poly_sub(n1, d1, n2, d2)...)
 end
 
-function *(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function *(a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    check_parent(a, b)
    R = parent(a)
    n1, d1 = _rat_poly(a)
@@ -805,23 +805,23 @@ end
 #
 ###############################################################################
 
-function *(a::FunctionFieldElem, b::Union{Integer, Rational})
+function *(a::AbsSimpleFunctionFieldElem, b::Union{Integer, Rational})
    R = parent(a)
    num = numerator(a, false)*b
    return R(_rat_poly_canonicalise(num, denominator(a, false))...)
 end
 
-*(a::Union{Integer, Rational}, b::FunctionFieldElem) = b*a
+*(a::Union{Integer, Rational}, b::AbsSimpleFunctionFieldElem) = b*a
 
-function *(a::FunctionFieldElem{T, U}, b::T) where {T <: FieldElem, U}
+function *(a::AbsSimpleFunctionFieldElem{T, U}, b::T) where {T <: FieldElem, U}
    R = parent(a)
    num = numerator(a, false)*b
    return R(_rat_poly_canonicalise(num, denominator(a, false))...)
 end
 
-*(a::T, b::FunctionFieldElem{T, U}) where {T <: FieldElem, U} = b*a
+*(a::T, b::AbsSimpleFunctionFieldElem{T, U}) where {T <: FieldElem, U} = b*a
 
-function *(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
+function *(a::AbsSimpleFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
    parent(b) != base_ring(a) && error("Could not coerce element")
    R = parent(a)
    num = numerator(a, false)*numerator(b, false)
@@ -829,32 +829,32 @@ function *(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where
    return R(_rat_poly_canonicalise(num, den)...)
 end
 
-*(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U} = b*a
+*(a::RationalFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U} = b*a
 
-function +(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
+function +(a::AbsSimpleFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    return a + parent(a)(b)
 end
 
-+(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U} = b + a
++(a::RationalFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U} = b + a
 
-+(a::FunctionFieldElem, b::Union{Integer, Rational}) = a + base_ring(a)(b)
++(a::AbsSimpleFunctionFieldElem, b::Union{Integer, Rational}) = a + base_ring(a)(b)
 
-+(a::Union{Integer, Rational}, b::FunctionFieldElem) = b + a
++(a::Union{Integer, Rational}, b::AbsSimpleFunctionFieldElem) = b + a
 
-function -(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
+function -(a::AbsSimpleFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    return a - parent(a)(b)
 end
 
-function -(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function -(a::RationalFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    parent(a) != base_ring(b) && error("Unable to coerce element")
    return parent(b)(a) - b
 end
 
--(a::FunctionFieldElem, b::Union{Integer, Rational}) = a - base_ring(a)(b)
+-(a::AbsSimpleFunctionFieldElem, b::Union{Integer, Rational}) = a - base_ring(a)(b)
 
--(a::Union{Integer, Rational}, b::FunctionFieldElem) = base_ring(b)(a) - b
+-(a::Union{Integer, Rational}, b::AbsSimpleFunctionFieldElem) = base_ring(b)(a) - b
 
 ###############################################################################
 #
@@ -862,7 +862,7 @@ end
 #
 ###############################################################################
 
-function ^(a::FunctionFieldElem{T, U}, b::Int) where {T, U}
+function ^(a::AbsSimpleFunctionFieldElem{T, U}, b::Int) where {T, U}
    b < 0 && error("Not implemented")
    R = parent(a)
    if is_gen(a) && b < 2*length(numerator(R)) - 3 # special case powers of generator
@@ -900,7 +900,7 @@ end
 #
 ###############################################################################
 
-function ==(a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function ==(a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    check_parent(a, b)
    aden = denominator(a, true)
    bden = denominator(b, true)
@@ -918,7 +918,7 @@ end
 #
 ###############################################################################
 
-function ==(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
+function ==(a::AbsSimpleFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T, U}
    parent(b) != base_ring(a) && error("Unable to coerce element")
    if iszero(a) && iszero(b)
       return true
@@ -928,11 +928,11 @@ function ==(a::FunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) wher
    return a == parent(a)(b)
 end
 
-==(a::RationalFunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U} = b == a
+==(a::RationalFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U} = b == a
 
-==(a::FunctionFieldElem, b::Union{Integer, Rational}) = a == base_ring(a)(b)
+==(a::AbsSimpleFunctionFieldElem, b::Union{Integer, Rational}) = a == base_ring(a)(b)
 
-==(a::Union{Integer, Rational}, b::FunctionFieldElem) = b == a
+==(a::Union{Integer, Rational}, b::AbsSimpleFunctionFieldElem) = b == a
 
 ###############################################################################
 #
@@ -940,7 +940,7 @@ end
 #
 ###############################################################################
 
-function Base.inv(a::FunctionFieldElem)
+function Base.inv(a::AbsSimpleFunctionFieldElem)
    R = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -956,8 +956,8 @@ end
 #
 ###############################################################################
 
-function divexact(a::FunctionFieldElem{T, U},
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+function divexact(a::AbsSimpleFunctionFieldElem{T, U},
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: FieldElement, U <: PolyRingElem{T}}
    return a*inv(b)
 end
@@ -968,7 +968,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::FunctionFieldElem,
+function divexact(a::AbsSimpleFunctionFieldElem,
                   b::Union{Rational, Integer}; check::Bool=true)
    S = parent(a)
    anum = numerator(a, false)
@@ -978,7 +978,7 @@ function divexact(a::FunctionFieldElem,
    return S(rnum, rden*aden)
 end
 
-function divexact(a::FunctionFieldElem{T, U},
+function divexact(a::AbsSimpleFunctionFieldElem{T, U},
                   b::T; check::Bool=true) where {T <: FieldElem, U <: PolyRingElem{T}}
    S = parent(a)
    anum = numerator(a, false)
@@ -988,7 +988,7 @@ function divexact(a::FunctionFieldElem{T, U},
    return S(rnum, rden*aden)
 end
 
-function divexact(a::FunctionFieldElem{T, U},
+function divexact(a::AbsSimpleFunctionFieldElem{T, U},
                   b::RationalFunctionFieldElem{T, U}; check::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
    S = parent(a)
    base_ring(a) != parent(b) && error("Incompatible fields")
@@ -999,36 +999,36 @@ function divexact(a::FunctionFieldElem{T, U},
    return S(_rat_poly_canonicalise(anum*bden, aden*bnum)...)
 end
 
-function divexact(a::FunctionFieldElem, b::RingElem; check::Bool=true)
+function divexact(a::AbsSimpleFunctionFieldElem, b::RingElem; check::Bool=true)
    return divexact(a, base_ring(a)(b))
 end
 
 function divexact(a::Union{Rational, Integer},
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T, U}
    return a*inv(b)
 end
 
 function divexact(a::T,
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: Integer, U}
    return a*inv(b)
 end
 
 function divexact(a::T,
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: Rational, U}
    return a*inv(b)
 end
 
 function divexact(a::T,
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: FieldElem, U}
    return a*inv(b)
 end
 
 function divexact(a::RationalFunctionFieldElem{T, U},
-                  b::FunctionFieldElem{T, U}; check::Bool=true
+                  b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T, U}
    return a*inv(b)
 end
@@ -1040,12 +1040,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    norm(a::FunctionFieldElem)
+    norm(a::AbsSimpleFunctionFieldElem)
 
 Return the absolute norm of `a` as an element of the underlying rational
 function field.
 """
-function norm(a::FunctionFieldElem)
+function norm(a::AbsSimpleFunctionFieldElem)
    R = base_ring(a)
    S = parent(a)
    if iszero(a)
@@ -1074,12 +1074,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    tr(a::FunctionFieldElem)
+    tr(a::AbsSimpleFunctionFieldElem)
 
 Return the absolute trace of `a` as an element of the underlying rational
 function field.
 """
-function tr(a::FunctionFieldElem)
+function tr(a::AbsSimpleFunctionFieldElem)
    R = base_ring(a)
    S = parent(a)
    if iszero(a)
@@ -1102,14 +1102,14 @@ end
 #
 ###############################################################################
 
-function zero!(a::FunctionFieldElem)
+function zero!(a::AbsSimpleFunctionFieldElem)
    a.num = zero!(numerator(a, false))
    R = parent(denominator(a, false))
    a.den = one(R)
    return a
 end
 
-function setcoeff!(a::FunctionFieldElem{T, U}, n::Int, c::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
+function setcoeff!(a::AbsSimpleFunctionFieldElem{T, U}, n::Int, c::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
    base_ring(a) != parent(c) && error("Unable to coerce element")
    n < 0 || n > degree(parent(a)) && error("Degree not in range")
    cnum = numerator(c.d, false)
@@ -1131,7 +1131,7 @@ function setcoeff!(a::FunctionFieldElem{T, U}, n::Int, c::RationalFunctionFieldE
    return a
 end
 
-function setcoeff!(a::FunctionFieldElem{T, U}, n::Int, c::U) where {T <: FieldElement, U <: PolyRingElem{T}}
+function setcoeff!(a::AbsSimpleFunctionFieldElem{T, U}, n::Int, c::U) where {T <: FieldElement, U <: PolyRingElem{T}}
    parent(c) != parent(denominator(a, false)) && error("Unable to coerce element")
    n < 0 || n > degree(parent(a)) && error("Degree not in range")
    aden = denominator(a, false)
@@ -1143,11 +1143,11 @@ function setcoeff!(a::FunctionFieldElem{T, U}, n::Int, c::U) where {T <: FieldEl
    return a
 end
 
-function setcoeff!(a::FunctionFieldElem, n::Int, c::RingElement)
+function setcoeff!(a::AbsSimpleFunctionFieldElem, n::Int, c::RingElement)
    return setcoeff!(a, n, base_ring(a)(c))
 end
 
-function reduce!(a::FunctionFieldElem{T, U}) where {T, U}
+function reduce!(a::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    R = parent(a)
    len = length(numerator(R))
    num = numerator(a, false)
@@ -1165,23 +1165,23 @@ function reduce!(a::FunctionFieldElem{T, U}) where {T, U}
    return a
 end
 
-function add!(c::FunctionFieldElem{T, U},
-              a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function add!(c::AbsSimpleFunctionFieldElem{T, U},
+              a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    n1, d1 = _rat_poly(a)
    n2, d2 = _rat_poly(b)
    c.num, c.den = _rat_poly_add(n1, d1, n2, d2)
    return c
 end
 
-function add!(c::FunctionFieldElem{T, U}, a::FunctionFieldElem{T, U}) where {T, U}
+function add!(c::AbsSimpleFunctionFieldElem{T, U}, a::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    n1, d1 = _rat_poly(c)
    n2, d2 = _rat_poly(a)
    c.num, c.den = _rat_poly_add(n1, d1, n2, d2)
    return c
 end
 
-function mul!(c::FunctionFieldElem{T, U},
-              a::FunctionFieldElem{T, U}, b::FunctionFieldElem{T, U}) where {T, U}
+function mul!(c::AbsSimpleFunctionFieldElem{T, U},
+              a::AbsSimpleFunctionFieldElem{T, U}, b::AbsSimpleFunctionFieldElem{T, U}) where {T, U}
    n1, d1 = _rat_poly(a)
    n2, d2 = _rat_poly(b)
    c.num, c.den = _rat_poly_mul(n1, d1, n2, d2)
@@ -1194,9 +1194,9 @@ end
 #
 ###############################################################################
 
-RandomExtensions.maketype(K::FunctionField, _) = elem_type(K)
+RandomExtensions.maketype(K::AbsSimpleFunctionField, _) = elem_type(K)
 
-function RandomExtensions.make(S::FunctionField, vs...)
+function RandomExtensions.make(S::AbsSimpleFunctionField, vs...)
    R = parent(numerator(S))
    n = degree(numerator(S))
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
@@ -1206,8 +1206,8 @@ function RandomExtensions.make(S::FunctionField, vs...)
    end
 end
 
-function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:FunctionFieldElem,
-                                                                <:FunctionField}})
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:AbsSimpleFunctionFieldElem,
+                                                                <:AbsSimpleFunctionField}})
    K, v = sp[][1:end]
    r = v[3]
    S = parent(numerator(K))
@@ -1215,9 +1215,9 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:FunctionFieldElem,
    return K(_rat_poly_canonicalise(rand(rng, v), rand(rng, r))...)
 end
 
-rand(rng::AbstractRNG, K::FunctionField, v...) = rand(rng, make(K, v...))
+rand(rng::AbstractRNG, K::AbsSimpleFunctionField, v...) = rand(rng, make(K, v...))
 
-rand(K::FunctionField, v...) = rand(Random.default_rng(), K, v...)
+rand(K::AbsSimpleFunctionField, v...) = rand(Random.default_rng(), K, v...)
 
 ###############################################################################
 #
@@ -1225,7 +1225,7 @@ rand(K::FunctionField, v...) = rand(Random.default_rng(), K, v...)
 #
 ###############################################################################
 
-function ConformanceTests.generate_element(R::FunctionField{Rational{BigInt}})
+function ConformanceTests.generate_element(R::AbsSimpleFunctionField{Rational{BigInt}})
   rand(R, 1:10, -10:10)
 end
 
@@ -1235,12 +1235,12 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{FunctionFieldElem{T, U}}, ::Type{FunctionFieldElem{T, U}}) where {T, U} = FunctionFieldElem{T, U}
+promote_rule(::Type{AbsSimpleFunctionFieldElem{T, U}}, ::Type{AbsSimpleFunctionFieldElem{T, U}}) where {T, U} = AbsSimpleFunctionFieldElem{T, U}
 
-function promote_rule(::Type{FunctionFieldElem{T, U}}, ::Type{V}) where
+function promote_rule(::Type{AbsSimpleFunctionFieldElem{T, U}}, ::Type{V}) where
       {T, U, V <: RingElem}
-   # The base ring element type of FunctionFieldElem{T, U} is RationalFunctionFieldElem{T, U}, not T
-   promote_rule(RationalFunctionFieldElem{T, U}, V) == RationalFunctionFieldElem{T, U} ? FunctionFieldElem{T, U} : Union{}
+   # The base ring element type of AbsSimpleFunctionFieldElem{T, U} is RationalFunctionFieldElem{T, U}, not T
+   promote_rule(RationalFunctionFieldElem{T, U}, V) == RationalFunctionFieldElem{T, U} ? AbsSimpleFunctionFieldElem{T, U} : Union{}
 end
 
 ###############################################################################
@@ -1249,49 +1249,49 @@ end
 #
 ###############################################################################
 
-function (R::FunctionField{T, U})(p::Poly{U}, den::U) where {T, U}
-   z = FunctionFieldElem{T, U}(R, p, den)
+function (R::AbsSimpleFunctionField{T, U})(p::Poly{U}, den::U) where {T, U}
+   z = AbsSimpleFunctionFieldElem{T, U}(R, p, den)
    return z
 end
 
-function (R::FunctionField{T, U})() where {T, U}
+function (R::AbsSimpleFunctionField{T, U})() where {T, U}
    p = zero(parent(power_precomp(R, 0)))
    den = one(parent(power_precomp_den(R, 0)))
-   z = FunctionFieldElem{T, U}(R, p, den)
+   z = AbsSimpleFunctionFieldElem{T, U}(R, p, den)
    return z
 end
 
-function (R::FunctionField{T, U})(a::Union{Rational, Integer}) where {T, U}
+function (R::AbsSimpleFunctionField{T, U})(a::Union{Rational, Integer}) where {T, U}
    p = parent(power_precomp(R, 0))(a)
    den = one(parent(power_precomp_den(R, 0)))
-   z = FunctionFieldElem{T, U}(R, p, den)
+   z = AbsSimpleFunctionFieldElem{T, U}(R, p, den)
    return z
 end
 
-function (R::FunctionField{T, U})(a::T) where {T <: FieldElem, U <: PolyRingElem{T}}
+function (R::AbsSimpleFunctionField{T, U})(a::T) where {T <: FieldElem, U <: PolyRingElem{T}}
    p = parent(power_precomp(R, 0))(a)
    den = one(parent(power_precomp_den(R, 0)))
-   z = FunctionFieldElem{T, U}(R, p, den)
+   z = AbsSimpleFunctionFieldElem{T, U}(R, p, den)
    return z
 end
 
-function (R::FunctionField{T, U})(a::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
+function (R::AbsSimpleFunctionField{T, U})(a::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
    p = parent(power_precomp(R, 0))([numerator(a, false)])
    den = parent(power_precomp_den(R, 0))(denominator(a, false))
-   z = FunctionFieldElem{T, U}(R, p, den)
+   z = AbsSimpleFunctionFieldElem{T, U}(R, p, den)
    return z
 end
 
-function (R::FunctionField{T, U})(a::FunctionFieldElem) where {T <: FieldElement, U <: PolyRingElem{T}}
+function (R::AbsSimpleFunctionField{T, U})(a::AbsSimpleFunctionFieldElem) where {T <: FieldElement, U <: PolyRingElem{T}}
    parent(a) !== R && error("Unable to coerce element")
    return a
 end
 
-(R::FunctionField)(b::RingElem) = R(base_ring(R)(b))
+(R::AbsSimpleFunctionField)(b::RingElem) = R(base_ring(R)(b))
 
 ###############################################################################
 #
-#   FunctionField constructor
+#   AbsSimpleFunctionField constructor
 #
 ###############################################################################
 
@@ -1363,7 +1363,7 @@ function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; ca
    length(p) < 2 && error("Polynomial must have degree at least 1")
    pol, den = _rat_poly(p, Symbol(s))
 
-   par = FunctionField{T, U}(pol, den, Symbol(s), cached)
+   par = AbsSimpleFunctionField{T, U}(pol, den, Symbol(s), cached)
    par.monic, par.powers, par.powers_den = powers_precompute(pol, den)
    par.traces, par.traces_den = traces_precompute(pol, den)
    par.base_ring = base_ring(p)
