@@ -34,6 +34,9 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
 end
 
 @inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+   if S === T
+      return x, y
+   end
    U = promote_rule_sym(S, T)
    if S === U
       return true, x, parent(x)(y)
