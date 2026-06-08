@@ -191,11 +191,11 @@ These are implemented in a module implemented in
 ## Generic function field types
 
 Function field objects $K/k(x)$ in AbstractAlgebra have type
-`Generic.FunctionField{T, U}` where `T` is the type of elements of the field `k`
+`Generic.AbsSimpleFunctionField{T, U}` where `T` is the type of elements of the field `k`
 and `U` is the type of the univariate polynomials over that field.
 
 Corresponding function field elements have type
-`Generic.FunctionFieldElem{T, U}`. See the file `src/generic/GenericTypes.jl`
+`Generic.AbsSimpleFunctionFieldElem{T, U}`. See the file `src/generic/GenericTypes.jl`
 for details.
 
 ## Abstract types
@@ -308,40 +308,40 @@ The following functionality is provided for function fields.
 ### Basic manipulation
 
 ```@docs
-base_field(::Generic.FunctionField)
+base_field(::Generic.AbsSimpleFunctionField)
 ```
 
 ```@docs
-var(::Generic.FunctionField)
+var(::Generic.AbsSimpleFunctionField)
 ```
 
 ```@docs
-defining_polynomial(R::Generic.FunctionField)
+defining_polynomial(R::Generic.AbsSimpleFunctionField)
 ```
 
 ```@docs
-Base.numerator(::Generic.FunctionField{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+Base.numerator(::Generic.AbsSimpleFunctionField{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs
-Base.numerator(::Generic.FunctionFieldElem{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+Base.numerator(::Generic.AbsSimpleFunctionFieldElem{T, U}, ::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs
-degree(::Generic.FunctionField)
+degree(::Generic.AbsSimpleFunctionField)
 ```
 
 ```@docs
-gen(::Generic.FunctionField{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
+gen(::Generic.AbsSimpleFunctionField{T, U}) where {T <: FieldElement, U <: PolyRingElem{T}}
 ```
 
 ```@docs
-is_gen(a::Generic.FunctionFieldElem)
+is_gen(a::Generic.AbsSimpleFunctionFieldElem)
 ```
 
 ```@docs
-coeff(::Generic.FunctionFieldElem, ::Int)
-num_coeff(::Generic.FunctionFieldElem, ::Int)
+coeff(::Generic.AbsSimpleFunctionFieldElem, ::Int)
+num_coeff(::Generic.AbsSimpleFunctionFieldElem, ::Int)
 ```
 
 **Examples**
@@ -406,7 +406,7 @@ x + 1
 ### Trace and norm
 
 ```@docs
-norm(::Generic.FunctionFieldElem)
+norm(::Generic.AbsSimpleFunctionFieldElem)
 ```
 
 ```jldoctest

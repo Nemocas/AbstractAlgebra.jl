@@ -1011,11 +1011,11 @@ end
 
 ###############################################################################
 #
-#   FunctionField / FunctionFieldElem
+#   AbsSimpleFunctionField / AbsSimpleFunctionFieldElem
 #
 ###############################################################################
 
-@attributes mutable struct FunctionField{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.Field
+@attributes mutable struct AbsSimpleFunctionField{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.Field
    num::Poly{U}
    den::U
    S::Symbol
@@ -1027,22 +1027,22 @@ end
    pol::Poly{RationalFunctionFieldElem{T, U}}
    base_ring::RationalFunctionField{T, U}
 
-   function FunctionField{T, U}(num::Poly{U},
+   function AbsSimpleFunctionField{T, U}(num::Poly{U},
              den::U, s::Symbol, cached::Bool = true) where {T, U}
-      return get_cached!(FunctionFieldDict, (num, den, s), cached) do
+      return get_cached!(AbsSimpleFunctionFieldDict, (num, den, s), cached) do
          new{T, U}(num, den, s)
-      end::FunctionField{T, U}
+      end::AbsSimpleFunctionField{T, U}
    end
 end
 
-const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
+const AbsSimpleFunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
 
-mutable struct FunctionFieldElem{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.FieldElem
+mutable struct AbsSimpleFunctionFieldElem{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.FieldElem
    num::Poly{U}
    den::U
-   parent::FunctionField{T, U}
+   parent::AbsSimpleFunctionField{T, U}
 
-   function FunctionFieldElem{T, U}(R::FunctionField{T, U}, num::Poly{U}, den::U) where {T, U}
+   function AbsSimpleFunctionFieldElem{T, U}(R::AbsSimpleFunctionField{T, U}, num::Poly{U}, den::U) where {T, U}
       if !iszero(num) #normalize the denominator
          c = content(den)
          if !is_one(c)

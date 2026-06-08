@@ -20,6 +20,11 @@ const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem, T}
 const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem, T}
 const UnivPoly{T} = UniversalPolyRingElem{T}
 
+# renamed in 0.49.1:
+# Generic.FunctionField -> Generic.AbsSimpleFunctionField,
+# Generic.FunctionFieldElem -> Generic.AbsSimpleFunctionFieldElem
+# NOTE: aliases live at the end of src/Generic.jl, inside module Generic
+
 ###############################################################################
 #
 #   Deprecated bindings
