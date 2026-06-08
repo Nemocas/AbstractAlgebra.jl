@@ -953,7 +953,7 @@ end
 #
 ###############################################################################
 
-function *(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
+function *(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -963,7 +963,7 @@ function *(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
-function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+function *(x::T, y::MatElem{T}) where {T <: NCRingElem}
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -973,7 +973,7 @@ function *(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
    return z
 end
 
-function *(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
+function *(x::MatElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -983,7 +983,7 @@ function *(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    return z
 end
 
-function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+function *(x::MatElem{T}, y::T) where {T <: NCRingElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -993,7 +993,7 @@ function *(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
+function +(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -1008,14 +1008,14 @@ function +(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
-+(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement = y + x
++(x::MatElem{T}, y::JuliaRingElement) where T <: NCRingElement = y + x
 
 @doc raw"""
-    +(x::NCRingElement, y::MatrixElem{<:NCRingElement})
+    +(x::NCRingElement, y::MatElem{<:NCRingElement})
 
 Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+function +(x::T, y::MatElem{T}) where {T <: NCRingElem}
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -1030,13 +1030,13 @@ function +(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
+    +(x::MatElem{<:NCRingElement}, y::NCRingElement)
 
 Return $x + S(y)$, where $S$ is the parent of $a$.
 """
-+(x::MatrixElem{T}, y::T) where {T <: NCRingElem} = y + x
++(x::MatElem{T}, y::T) where {T <: NCRingElem} = y + x
 
-function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
+function -(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -1051,7 +1051,7 @@ function -(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement
    return z
 end
 
-function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
+function -(x::MatElem{T}, y::JuliaRingElement) where T <: NCRingElement
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -1067,11 +1067,11 @@ function -(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
 end
 
 @doc raw"""
-    -(x::NCRingElement, y::MatrixElem{<:NCRingElement})
+    -(x::NCRingElement, y::MatElem{<:NCRingElement})
 
 Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
+function -(x::T, y::MatElem{T}) where {T <: NCRingElem}
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -1087,11 +1087,11 @@ function -(x::T, y::MatrixElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    -(x::MatrixElem{<:NCRingElem}, y::NCRingElement)
+    -(x::MatElem{<:NCRingElem}, y::NCRingElement)
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+function -(x::MatElem{T}, y::T) where {T <: NCRingElem}
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -1123,7 +1123,7 @@ function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: NCRingEle
    return z
 end
 
-function *(x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
+function *(x::MatElem{T}, y::Vector{T}) where T <: NCRingElement
    ncols(x) == length(y) || error("Incompatible dimensions")
    return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
 end
@@ -1145,7 +1145,7 @@ function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: NCRingEle
    return z
 end
 
-function *(x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
+function *(x::Vector{T}, y::MatElem{T}) where T <: NCRingElement
    length(x) == nrows(y) || error("Incompatible dimensions")
    return mul!(T[base_ring(y)() for j in 1:ncols(y)], x, y)
 end

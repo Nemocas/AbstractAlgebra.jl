@@ -252,6 +252,67 @@ end
 
 ==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
 
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x * matrix(y))
+end
+
+function *(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x * matrix(y))
+end
+
+function *(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) * y)
+end
+
+function *(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) * y)
+end
+
+function +(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x + matrix(y))
+end
+
+function +(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) + y)
+end
+
+function +(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x + matrix(y))
+end
+
+function +(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) + y)
+end
+
+function -(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x - matrix(y))
+end
+
+function -(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) - y)
+end
+
+function -(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x - matrix(y))
+end
+
+function -(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) - y)
+end
+
+function *(x::MatRingElem{T}, y::Vector{T}) where T <: NCRingElement
+  return matrix(x) * y
+end
+
+function *(x::Vector{T}, y::MatRingElem{T}) where T <: NCRingElement
+  return x * matrix(y)
+end
 
 ###############################################################################
 #
