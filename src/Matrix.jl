@@ -2696,7 +2696,7 @@ end
     is_alternating(M::MatElem)
 
 Return whether the form corresponding to the matrix `M` is alternating,
-i.e. `M = -transpose(M)` and `M` has zeros on the diagonal.
+i.e. `M == -transpose(M)` and `M` has zeros on the diagonal.
 Return `false` if `M` is not a square matrix.
 """
 function is_alternating(M::MatElem)
