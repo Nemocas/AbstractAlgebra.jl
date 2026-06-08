@@ -186,7 +186,7 @@ parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPo
 # @test base_ring_type(T) == typeof(base_ring(zero(R)))
 #
 
-base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = AbstractAlgebra.Generic.LaurentMPolyRing{T}
+base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.LaurentMPolyRing{T}
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = coefficient_ring_type(T)
 
 # The next function is required but not tested in AbstractAlgebra.
