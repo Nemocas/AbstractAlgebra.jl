@@ -499,6 +499,8 @@ export primpart
 export pseudo_inv
 export pseudodivrem
 export pseudorem
+export puiseux_polynomial_ring
+export puiseux_polynomial_ring_elem
 export puiseux_series_field
 export puiseux_series_ring
 export push_term!
