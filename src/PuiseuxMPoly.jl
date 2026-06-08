@@ -35,12 +35,12 @@ end
 mutable struct PuiseuxMPolyRingElem{T <: FieldElement} <: RingElem
     parent::PuiseuxMPolyRing{T}
     poly::LaurentMPolyRingElem
-    scale::ZZRingElem
+    scale::Int
 
     function PuiseuxMPolyRingElem(
         Kt::PuiseuxMPolyRing,
         f::LaurentMPolyRingElem,
-        d::ZZRingElem = one(ZZ)
+        d::Int = Int(1)
         )
 
         @req parent(f) == base_ring(Kt) "polynomial must be in the base ring"
@@ -52,7 +52,7 @@ end
 function puiseux_polynomial_ring_elem(
     Kt::PuiseuxMPolyRing,
     f::LaurentMPolyRingElem,
-    d::ZZRingElem = one(ZZ);
+    d::Int = Int(1);
     skip_normalization::Bool = false
     )
     pf = PuiseuxMPolyRingElem(Kt, f, d)
@@ -125,7 +125,7 @@ function normalize!(f::PuiseuxMPolyRingElem)
 end
 
 # WARNING: output may not be normalized
-function rescale(f::PuiseuxMPolyRingElem, newScale::ZZRingElem)
+function rescale(f::PuiseuxMPolyRingElem, newScale::Int)
     @req newScale > 0 "new scale must be positive"
 
     # we assume f is normalized
@@ -370,7 +370,7 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational{Int})
     return f^(QQ(a))
 end
 
-function Base.:^(f::PuiseuxMPolyRingElem, a::ZZRingElem)
+function Base.:^(f::PuiseuxMPolyRingElem, a::Int)
     if a == 0
         return one(parent(f))
     end
