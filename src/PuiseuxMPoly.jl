@@ -24,7 +24,7 @@
 #
 #################################################################################
 
-struct PuiseuxMPolyRing{T <: FieldElement} <: Ring
+struct PuiseuxMPolyRing{T <: RingElement} <: Ring
     baseRing::LaurentMPolyRing
 
     function PuiseuxMPolyRing(R::LaurentMPolyRing)
@@ -32,7 +32,7 @@ struct PuiseuxMPolyRing{T <: FieldElement} <: Ring
     end
 end
 
-mutable struct PuiseuxMPolyRingElem{T <: FieldElement} <: RingElem
+mutable struct PuiseuxMPolyRingElem{T <: RingElement} <: RingElem
     parent::PuiseuxMPolyRing{T}
     poly::LaurentMPolyRingElem
     scale::Int
@@ -82,11 +82,11 @@ end
 #
 #################################################################################
 
-base_ring(R::PuiseuxMPolyRing{T}) where T = R.baseRing::LaurentMPolyRing{T}
+base_ring(R::PuiseuxMPolyRing{T}) where T = R.baseRing::LaurentMPolyRing
 coefficient_ring(R::PuiseuxMPolyRing) = base_ring(base_ring(R))
 
 Base.parent(f::PuiseuxMPolyRingElem) = f.parent
-poly(f::PuiseuxMPolyRingElem{T}) where {T} = f.poly::LaurentMPolyRingElem{T}
+poly(f::PuiseuxMPolyRingElem{T}) where {T} = f.poly::LaurentMPolyRingElem
 scale(f::PuiseuxMPolyRingElem) = f.scale
 
 
@@ -109,13 +109,13 @@ function normalize!(f::PuiseuxMPolyRingElem)
 
     # make sure scale is correct,
     # i.e., gcd of numerators (= exponents of poly + shift) and denominatos (= scale) is 1
-    gcdExponents = gcd(vcat(scale(f), reduce(vcat,[e for e in exponents(poly(f))])))
+    gcdExponents = gcd(vcat(scale(f), reduce(vcat,[e for e in exponent_vectors(poly(f))])))
     if gcdExponents > 1
         # TODO: use delflate for laurent polys when it is implemented
 
         vars = gens(base_ring(parent(f)))
         f.poly = sum(c*prod(vars[i].^(Int.(div.(e, gcdExponents))[i]) for i in 1:nvars(parent(f)))
-            for (c, e) in zip(coefficients(poly(f)), exponents(poly(f)))
+            for (c, e) in zip(coefficients(poly(f)), exponent_vectors(poly(f)))
             )
 
         f.scale = div(f.scale, gcdExponents)
@@ -164,7 +164,7 @@ function (Kt::PuiseuxMPolyRing)(c::RingElement)
     return PuiseuxMPolyRingElem(Kt,base_ring(Kt)(c))
 end
 
-function (Kt::PuiseuxMPolyRing{T})(ct::PuiseuxMPolyRingElem{T}) where T <: FieldElement
+function (Kt::PuiseuxMPolyRing{T})(ct::PuiseuxMPolyRingElem{T}) where T <: RingElement
     return ct
 end
 
@@ -176,9 +176,9 @@ end
 #
 #################################################################################
 
-elem_type(::Type{PuiseuxMPolyRing{T}}) where T <: FieldElement = PuiseuxMPolyRingElem{T}
-parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: FieldElement = PuiseuxMPolyRing{T}
-base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: FieldElement = AbstractAlgebra.Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}
+elem_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = PuiseuxMPolyRingElem{T}
+parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPolyRing{T}
+base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = LaurentMPolyRing
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
 # The next function is required but not tested in AbstractAlgebra.
@@ -219,7 +219,7 @@ function Base.deepcopy_internal(f::PuiseuxMPolyRingElem, dict::IdDict)
 end
 
 coefficients(f::PuiseuxMPolyRingElem) = coefficients(poly(f))
-exponents(f::PuiseuxMPolyRingElem) = [ e .// scale(f) for e in exponents(poly(f)) ]
+exponent_vectors(f::PuiseuxMPolyRingElem) = [ e .// scale(f) for e in exponent_vectors(poly(f)) ]
 monomials(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem.(Ref(parent(f)), monomials(poly(f)), Ref(scale(f)))
 
 Base.length(f::PuiseuxMPolyRingElem) = length(poly(f))
@@ -229,7 +229,7 @@ function valuation(f::PuiseuxMPolyRingElem)
     if iszero(f)
         return PosInf()
     end
-    return minimum(e[1] for e in exponents(f))
+    return minimum(e[1] for e in exponent_vectors(f))
 end
 
 is_univariate(R::PuiseuxMPolyRing) = is_univariate(base_ring(R))
@@ -263,7 +263,7 @@ function Base.show(io::IO, f::PuiseuxMPolyRingElem)
 
     t = gens(base_ring(parent(f)))
     termStrings = []
-    for (c, e) in zip(coefficients(poly(f)), exponents(poly(f)))
+    for (c, e) in zip(coefficients(poly(f)), exponent_vectors(poly(f)))
         exponentVector = e .// scale(f)
         if iszero(exponentVector)
             push!(termStrings, string(c))
@@ -391,7 +391,7 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Integer)
 end
 
 
-function divexact(f::PuiseuxMPolyRingElem{K}, a::K) where K <: FieldElement
+function divexact(f::PuiseuxMPolyRingElem{K}, a::K) where K <: RingElement
     @req !iszero(a) "division by zero"
     return puiseux_polynomial_ring_elem(parent(f), poly(f)*1//a, scale(f); skip_normalization=true)
 end
