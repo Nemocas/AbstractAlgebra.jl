@@ -350,7 +350,7 @@ function Base.:*(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     return puiseux_polynomial_ring_elem(parent(f), newPoly, newScale)
 end
 
-function Base.:^(f::PuiseuxMPolyRingElem, a::QQFieldElem)
+function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
 
     if denominator(a) == 1
         return f^numerator(a)
