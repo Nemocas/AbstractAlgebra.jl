@@ -464,7 +464,7 @@ end
 function ConformanceTests.generate_element(R::PuiseuxMPolyRing)
     f = ConformanceTests.generate_element(base_ring(R).mpolyring)
     f_laurent = base_ring(R)(f)
-    scale = rand(ZZ, 1:10)
+    scale = Int(rand(ZZ, 1:10))
     return puiseux_polynomial_ring_elem(R, f_laurent, scale)
 end
 

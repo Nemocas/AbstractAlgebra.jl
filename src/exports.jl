@@ -524,6 +524,7 @@ export rem!
 export remove
 export renest
 export renormalize!
+export rescale
 export rescale!
 export residue_field
 export residue_ring
