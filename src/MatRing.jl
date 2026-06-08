@@ -21,14 +21,8 @@ base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(
 ###############################################################################
 
 function Base.hash(a::MatRingElem, h::UInt)
-   b = 0x6413942b83a26c65%UInt
-   for i in 1:nrows(a)
-      for j in 1:ncols(a)
-         b = xor(b, xor(hash(a[i, j], h), h))
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-      end
-   end
-   return b
+  # b = 0x6413942b83a26c65 % UInt # FIXME: comment in once `isequal(::MatRingElem, ::MatElem)` is removed.
+  return xor(b, hash(matrix(a), h))
 end
 
 vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(a)^2
@@ -250,7 +244,30 @@ end
 
 ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
 
-==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
+==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
+
+isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
+
+# FIXME: maybe remove the below methods, or comment the errors in
+function ==(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+  # error("Equality comparison of MatElem with MatRingElem unsupported")
+  return x == matrix(y)
+end
+
+function ==(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+  # error("Equality comparison of MatRingElem with MatElem unsupported")
+  return matrix(x) == y
+end
+
+function isequal(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+  # error("Equality comparison of MatElem with MatRingElem unsupported")
+  return isequal(x, matrix(y))
+end
+
+function isequal(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+  # error("Equality comparison of MatRingElem with MatElem unsupported")
+  return isequal(matrix(x), y)
+end
 
 ###############################################################################
 #

@@ -1448,3 +1448,14 @@ end
    @test v isa Vector{elem_type(M)}
    @test all(x -> parent(x) == M, v)
 end
+
+@testset "Generic.MatRing.adhoc_equality" begin
+   # FIXME: may be removed, depending on how we decide to handle equality between MatRingElem and MatElem.
+   # Test equality comparison between MatRingElem & MatElem
+   R = matrix_ring(ZZ, 2)
+   M = R(matrix(ZZ, 2,2, [1,2,3,4]))
+   @test M == matrix(M)
+   @test matrix(M) == M
+   @test M == matrix(QQ, M)
+   @test matrix(QQ, M) == M
+end
