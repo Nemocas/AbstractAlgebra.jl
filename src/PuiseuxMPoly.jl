@@ -179,14 +179,7 @@ end
 elem_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = PuiseuxMPolyRingElem{T}
 parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPolyRing{T}
 
-# TODO: fix base_ring_type to be consistent with NCRing interface test, they need to satisfy:
-# @test base_ring_type(R) == typeof(base_ring(R))
-# @test base_ring_type(zero(R)) == typeof(base_ring(zero(R)))
-# @test base_ring_type(typeof(R)) == typeof(base_ring(R))
-# @test base_ring_type(T) == typeof(base_ring(zero(R)))
-#
-
-base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.LaurentMPolyRing{T}
+base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.LaurentMPolyWrapRing{elem_type(coefficient_ring_type(T)), parent_type(T)}
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = coefficient_ring_type(T)
 
 # The next function is required but not tested in AbstractAlgebra.

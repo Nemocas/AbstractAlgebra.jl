@@ -143,7 +143,7 @@ using Test
         # and
         # base_ring_type(K) == LaurentMPolyRing{AA.Generic.Mpoly{..}}
 
-        # ConformanceTests.test_Ring_interface(K_p) # basic tests
+        ConformanceTests.test_Ring_interface(K_p) # basic tests
         # ConformanceTests.test_Ring_interface_recursive(K_p) # also tests constructions like mpoly over your ring; if you have this, you don't need the line above
     end
 end
