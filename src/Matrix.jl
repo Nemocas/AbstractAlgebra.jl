@@ -7006,15 +7006,11 @@ function matrix(R::NCRing, arr::MatElem)
 end
 
 function matrix(R::NCRing, arr::MatRingElem)
-   M = dense_matrix_type(R)(R, undef, nrows(arr), ncols(arr))
-   for i in 1:nrows(arr), j in 1:ncols(arr)
-      M[i, j] = arr[i, j]
-   end
-   return M
+   return map_entries(R, matrix(arr))
 end
 
 function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
-   return matrix(base_ring(mat), mat)
+   return deepcopy(mat)
 end
 
 function matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
