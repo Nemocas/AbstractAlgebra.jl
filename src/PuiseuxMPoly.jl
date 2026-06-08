@@ -83,7 +83,7 @@ end
 #################################################################################
 
 base_ring(R::PuiseuxMPolyRing{T}) where T = R.baseRing::LaurentMPolyRing
-coefficient_ring(R::PuiseuxMPolyRing) = base_ring(base_ring(R))
+coefficient_ring(R::PuiseuxMPolyRing) = coefficient_ring(base_ring(R))
 
 Base.parent(f::PuiseuxMPolyRingElem) = f.parent
 poly(f::PuiseuxMPolyRingElem{T}) where {T} = f.poly::LaurentMPolyRingElem
@@ -179,7 +179,7 @@ end
 elem_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = PuiseuxMPolyRingElem{T}
 parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPolyRing{T}
 base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = LaurentMPolyRing
-coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
+coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = coefficient_ring_type(T)
 
 # The next function is required but not tested in AbstractAlgebra.
 # The following code errors without it:
@@ -366,9 +366,13 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
     )
 end
 
-function Base.:^(f::PuiseuxMPolyRingElem, a::Rational{Int})
-    return f^(QQ(a))
-end
+#
+# The next function converts the exponent to a Rational{BigInt}, which
+# is not compatible with exponentiating LaurentMPolyRingElems
+
+# function Base.:^(f::PuiseuxMPolyRingElem, a::Rational{Int})
+#     return f^(QQ(a))
+# end
 
 function Base.:^(f::PuiseuxMPolyRingElem, a::Int)
     if a == 0
@@ -387,7 +391,7 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Int)
 end
 
 function Base.:^(f::PuiseuxMPolyRingElem, a::Integer)
-    return f^(ZZ(a))
+    return f^(Int(a))
 end
 
 
