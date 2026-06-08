@@ -457,6 +457,7 @@ export newton_to_monomial!
 export norm
 export normal_form
 export normalise
+export normalize!
 export nullspace
 export num_coeff
 export number_of_columns
