@@ -17,18 +17,16 @@ elem_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} =
 
 parent(p::LaurentMPolyWrap) = p.parent
 
-base_ring_type(::Type{<:LaurentMPolyWrapRing{T}}) where {T} = parent_type(T)
-base_ring(R::LaurentMPolyWrapRing) = base_ring(R.mpolyring)::base_ring_type(R)
+base_ring_type(::Type{<:LaurentMPolyWrapRing{T}}) where {T} = mpoly_ring_type(T)
+base_ring(R::LaurentMPolyWrapRing) = R.mpolyring::base_ring_type(R)
 
 coefficient_ring_type(::Type{LaurentMPolyWrapRing{T, PR}}) where {T, PR} = coefficient_ring_type(PR)
-coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(R.mpolyring)
+coefficient_ring(R::LaurentMPolyWrapRing) = coefficient_ring(base_ring(R))
 
-symbols(R::LaurentMPolyWrapRing) = symbols(R.mpolyring)
+symbols(R::LaurentMPolyWrapRing) = symbols(base_ring(R))
 
-number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
-number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(R.mpolyring)
-
-characteristic(R::LaurentMPolyWrapRing) = characteristic(R.mpolyring)
+number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
+number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
 
 ###############################################################################
 #
@@ -44,7 +42,7 @@ end
 function Base.hash(a::LaurentMPolyWrap, h::UInt)
     (ap, ad) = _normalize(a)
     h = hash(ap, h)
-    h ^= 0x9c64b62806a3d51d%UInt
+    h = xor(h, 0x9c64b62806a3d51d%UInt)
     return hash(ad, h)
 end
 
@@ -52,16 +50,24 @@ function length(a::LaurentMPolyWrap)
     return length(a.mpoly)
 end
 
+function is_term(a::LaurentMPolyWrap)
+    return is_term(a.mpoly)
+end
+
+function is_monomial(a::LaurentMPolyWrap)
+    return is_monomial(a.mpoly)
+end
+
 function zero(R::LaurentMPolyWrapRing)
-    return LaurentMPolyWrap(R, zero(R.mpolyring))
+    return LaurentMPolyWrap(R, zero(base_ring(R)))
 end
 
 function one(R::LaurentMPolyWrapRing)
-    return LaurentMPolyWrap(R, one(R.mpolyring))
+    return LaurentMPolyWrap(R, one(base_ring(R)))
 end
 
 function gen(R::LaurentMPolyWrapRing, i::Int)
-    return LaurentMPolyWrap(R, gen(R.mpolyring, i))
+    return LaurentMPolyWrap(R, gen(base_ring(R), i))
 end
 
 function iszero(a::LaurentMPolyWrap)
@@ -113,17 +119,13 @@ end
 function is_unit(f::T) where {T <: LaurentMPolyRingElem}
   # **NOTE** f.mpoly is not normalized in any way
   is_trivial(parent(f)) && return true  # coeffs in zero ring
-  unit_seen = false
-  for i in 1:length(f.mpoly)
-    if is_nilpotent(coeff(f.mpoly, i))
-      continue
-    end
-    if unit_seen || !is_unit(coeff(f.mpoly, i))
-      return false
-    end
-    unit_seen = true
-  end
-  return unit_seen
+  is_zero(f) && return false
+  is_one(length(f.mpoly)) && return is_unit(coeff(f.mpoly,1))
+  is_domain_type(coefficient_ring(parent(f))) && return false
+  # For coefficient rings with zero divisors, things are more complex;
+  # if someone needs it we can implement some more, just ask for it
+  # see also <https://github.com/Nemocas/AbstractAlgebra.jl/issues/2359>
+  throw(NotImplementedError(is_unit, f))
 end
 
 
@@ -190,7 +192,7 @@ function ^(a::LaurentMPolyWrap, b::Integer)
     end
 end
 
-function *(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+function *(a::LaurentMPolyWrap{T}, b::LaurentMPolyWrap{T}) where {T}
     check_parent(a, b)
     return LaurentMPolyWrap(parent(a), a.mpoly*b.mpoly, a.mindegs + b.mindegs)
 end
@@ -587,11 +589,11 @@ function (a::LaurentMPolyWrapRing{T})() where T <: RingElement
 end
 
 function (a::LaurentMPolyWrapRing{T})(b::RingElement) where T <: RingElement
-   return LaurentMPolyWrap(a, a.mpolyring(b))
+   return LaurentMPolyWrap(a, base_ring(a)(b))
 end
 
 function (a::LaurentMPolyWrapRing{T})(b::MPolyRingElem{T}) where T <: RingElement
-   parent(b) == a.mpolyring || error("Unable to coerce polynomial")
+   parent(b) == base_ring(a) || error("Unable to coerce polynomial")
    return LaurentMPolyWrap(a, b)
 end
 
@@ -610,7 +612,7 @@ function (a::LaurentMPolyWrapRing{T})(b::Vector{T}, e::Vector{Vector{Int}}) wher
         length(e[i]) == n || error("Exponent vector $i has length $(length(m[i])) (expected $(n))")
         min_broadcast!(m, m, e[i])
     end
-    return LaurentMPolyWrap(a, a.mpolyring(b, map(x -> x - m, e)), m)
+    return LaurentMPolyWrap(a, base_ring(a)(b, map(x -> x - m, e)), m)
 end
 
 ###############################################################################
@@ -619,9 +621,14 @@ end
 #
 ###############################################################################
 
+# rule for R -> R[...]
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{T}) where {T <: NCRingElement, PE, LR}
+  return LaurentMPolyWrap{T, PE, LR}
+end
+
 # If U can be promoted to R[x,y], then U can be promoted to R[x,1/x,y,1/y].
 # Handles promotion from R[x,y] to R[x,1/x,y,1/y] as well.
-function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U}
+function promote_rule(::Type{LaurentMPolyWrap{T, PE, LR}}, ::Type{U}) where {T, PE, LR, U <: NCRingElement}
    promote_rule(PE, U) == PE ? LaurentMPolyWrap{T, PE, LR} : Union{}
 end
 
@@ -632,7 +639,7 @@ end
 ################################################################################
 
 function AbstractAlgebra._map(g::T, p::LaurentMPolyWrap, R::LaurentMPolyWrapRing) where T
-   return LaurentMPolyWrap(R, AbstractAlgebra._map(g, p.mpoly, R.mpolyring),
+   return LaurentMPolyWrap(R, AbstractAlgebra._map(g, p.mpoly, base_ring(R)),
                               p.mindegs)
 end
 
@@ -650,6 +657,58 @@ function map_coefficients(g::T, p::LaurentMPolyWrap; cached::Bool = true,
                         AbstractAlgebra._change_mpoly_ring(AbstractAlgebra.parent(g(zero(base_ring(p.mpoly)))), AbstractAlgebra.parent(p.mpoly), cached),
                             cached)) where T
    return AbstractAlgebra._map(g, p, parent)
+end
+
+###############################################################################
+#
+#   Inflation
+#
+###############################################################################
+
+function inflate(f::LaurentMPolyWrap, shift::Vector{Int}, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl.+shift)
+end
+
+function inflate(f::LaurentMPolyWrap, defl::Vector{Int})
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, defl), f.mindegs.*defl)
+end
+
+function inflate(f::LaurentMPolyWrap, vars::Vector{Int}, shifts::Vector{Int}, defls::Vector{Int})
+   mindegs = copy(f.mindegs)
+   for (var, shift, defl) in zip(vars, shifts, defls)
+      mindegs[var] *= defl
+      mindegs[var] += shift
+   end
+   return LaurentMPolyWrap(parent(f), inflate(f.mpoly, vars, zeros(Int, length(shifts)), defls), mindegs)
+end
+
+###############################################################################
+#
+#  Universal laurent polynomial ring methods
+#
+###############################################################################
+
+@doc raw"""
+    _upgrade(p::LaurentMPolyWrap{T}, R::LaurentMPolyRingWrap{T}) where {T}
+
+Return an element of `R` which is obtained from `p` by mapping the $i$-th variable
+of `parent(p)` to the $i$-th variable of `R`.
+For this to work, `R` needs to have at least as many variables as `parent(p)`.
+"""
+function _upgrade(p::LaurentMPolyWrap{T}, R::LaurentMPolyWrapRing{T}) where {T}
+   n = nvars(R) - nvars(parent(p))
+   n < 0 && error("Too few variables")
+   return LaurentMPolyWrap(R, _upgrade(p.mpoly, R.mpolyring), vcat(p.mindegs, zeros(Int, n)))
+end
+
+@doc raw"""
+    _add_gens(R::LaurentMPolyWrapRing, varnames::Vector{Symbol})
+
+Return a new uncached multivariate Laurent polynomial ring which has the same properties
+as `R` but `varnames` as additional generators.
+"""
+function _add_gens(R::LaurentMPolyWrapRing, varnames::Vector{Symbol})
+   return LaurentMPolyWrapRing(_add_gens(R.mpolyring, varnames), false)
 end
 
 ###############################################################################

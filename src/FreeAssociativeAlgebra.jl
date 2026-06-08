@@ -25,6 +25,10 @@ characteristic(R::FreeAssociativeAlgebra) = characteristic(base_ring(R))
 is_known(::typeof(characteristic), R::FreeAssociativeAlgebra) = is_known(characteristic, base_ring(R))
 
 is_finite(R::FreeAssociativeAlgebra) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+is_known(::typeof(is_finite), R::FreeAssociativeAlgebra) =
+  is_known(is_trivial, base_ring(R)) &&
+    (is_trivial(base_ring(R)) || nvars(R) > 0 || is_known(is_finite, base_ring(R)))
+
 
 ###############################################################################
 #
@@ -103,26 +107,33 @@ end
 #
 ###############################################################################
 
-function coefficients(a::FreeAssociativeAlgebraElem)
-   return Generic.MPolyCoeffs(a)
+function coefficients(a::FreeAssociativeAlgebraElem; inplace::Bool = false)
+   return Generic.MPolyCoeffs(a; inplace)
 end
 
-function terms(a::FreeAssociativeAlgebraElem)
-   return Generic.MPolyTerms(a)
+function terms(a::FreeAssociativeAlgebraElem; inplace::Bool = false)
+   return Generic.MPolyTerms(a; inplace)
 end
 
-function monomials(a::FreeAssociativeAlgebraElem)
-   return Generic.MPolyMonomials(a)
+function monomials(a::FreeAssociativeAlgebraElem; inplace::Bool = false)
+   return Generic.MPolyMonomials(a; inplace)
 end
 
 @doc raw"""
-    exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    exponent_words(a::FreeAssociativeAlgebraElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the exponent words of the given polynomial. To
 retrieve an array of the exponent words, use `collect(exponent_words(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-   return Generic.FreeAssAlgExponentWords(a)
+function exponent_words(a::FreeAssociativeAlgebraElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.FreeAssAlgExponentWords(a; inplace)
 end
 
 function is_unit(a::FreeAssociativeAlgebraElem{T}) where T
@@ -289,7 +300,7 @@ end
 ###############################################################################
 
 function free_associative_algebra(
-  R::AbstractAlgebra.Ring,
+  R::Ring,
   s::Vector{Symbol};
   cached::Bool = true,
 )

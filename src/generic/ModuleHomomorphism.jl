@@ -13,14 +13,14 @@
 domain(f::ModuleHomomorphism) = f.domain
 codomain(f::ModuleHomomorphism) = f.codomain
 image_fn(f::ModuleHomomorphism) = f.image_fn
+matrix(f::ModuleHomomorphism) = f.matrix
 
 domain(f::ModuleIsomorphism) = f.domain
 codomain(f::ModuleIsomorphism) = f.codomain
 image_fn(f::ModuleIsomorphism) = f.image_fn
-
-inverse_mat(f::Map(ModuleIsomorphism)) = f.inverse_matrix
-
-inverse_image_fn(f::Map(ModuleIsomorphism)) = f.inverse_image_fn
+inverse_image_fn(f::ModuleIsomorphism) = f.inverse_image_fn
+matrix(f::ModuleIsomorphism) = f.matrix
+inverse_mat(f::ModuleIsomorphism) = f.inverse_matrix
 
 ###############################################################################
 #
@@ -40,6 +40,31 @@ Base.:*(a::T, b::ModuleHomomorphism{T}) where {T <: RingElement} = hom(domain(b)
 Base.:*(a::T, b::ModuleIsomorphism{T}) where {T <: RingElement} = hom(domain(b), codomain(b), a * matrix(b))
 Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
 Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
+
+function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomorphism))
+   check_composable(f, g)
+   @assert f.is_left == g.is_left
+   m1 = f.matrix
+   local mp::Union{Nothing, Map} = nothing
+   if isdefined(g, :map) 
+     m1 = map_entries(g.map, m1)
+     mp = g.map
+   end
+   if isdefined(f, :map)
+     if isa(mp, Nothing)
+       mp = f.map
+     else
+       mp = f.map*mp
+     end
+   end
+
+   if f.is_left
+     return ModuleHomomorphism(domain(f), codomain(g), m1*g.matrix; is_left = true, map = mp)
+   else
+     return ModuleHomomorphism(domain(f), codomain(g), g.matrix*m1; is_left = false)
+   end
+end
+
 
 ###############################################################################
 #
@@ -66,7 +91,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, f::Map(ModuleIsomorphism))
+function show(io::IO, f::ModuleIsomorphism)
   if is_terse(io)
     print(io, "Module isomorphism")
   else
@@ -83,11 +108,25 @@ end
 #
 ###############################################################################
 
-function compose(f::Map(ModuleIsomorphism), g::Map(ModuleIsomorphism))
+function compose(f::ModuleIsomorphism, g::ModuleIsomorphism)
    check_composable(f, g)
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(domain(f), codomain(g), f.matrix*g.matrix,
                                              g.inverse_matrix*f.inverse_matrix)
+end
+
+###############################################################################
+#
+#   Preimage
+#
+###############################################################################
+
+function AbstractAlgebra.solve_ctx(f::ModuleHomomorphism)
+  # cache solver context
+  if !isdefined(f, :solve_ctx)
+    f.solve_ctx = AbstractAlgebra.compute_solve_ctx(f)
+  end
+  return f.solve_ctx::AbstractAlgebra.Solve.solve_context_type(base_ring(codomain(f)))
 end
 
 ###############################################################################
@@ -97,12 +136,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    Base.inv(f::Map(ModuleIsomorphism))
+    Base.inv(f::ModuleIsomorphism)
 
 Return the inverse map of the given module isomorphism. This is computed
 cheaply.
 """
-function Base.inv(f::Map(ModuleIsomorphism))
+function Base.inv(f::ModuleIsomorphism)
    T = elem_type(base_ring(domain(f)))
    return ModuleIsomorphism{T}(codomain(f), domain(f), inverse_mat(f), matrix(f))
 end
@@ -117,7 +156,7 @@ end
 #
 ###############################################################################
 
-function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: NCRingElement
    parent(a) !== domain(f) && error("Incompatible module element")
    return image_fn(f)(a)
 end
@@ -134,17 +173,31 @@ end
 ###############################################################################
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where
+                                                               T <: NCRingElement
+   if is_left
+     (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
+                                                      error("dimension mismatch")
+   else
+     (nrows(m) == ngens(M2) && ncols(m) == ngens(M1)) ||
+                                                      error("dimension mismatch")
+   end
+   return ModuleHomomorphism{T}(M1, M2, m; is_left, map)
+end
+
+function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where
                                                                T <: RingElement
    (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
                                                     error("dimension mismatch")
+   @assert is_left
    return ModuleHomomorphism{T}(M1, M2, m)
 end
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
                  M2::AbstractAlgebra.FPModule{T}, v::Vector{S}) where
                          {T <: RingElement, S<:AbstractAlgebra.FPModuleElem{T}}
-   return ModuleHomomorphism(M1, M2, vcat([Generic._matrix(x) for x = v]...))
+   return ModuleHomomorphism(M1, M2, vcat([_matrix(x) for x = v]...))
 end
 
 function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
@@ -190,6 +243,6 @@ function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:M
   return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
 end
 
-function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true)
-  return ModuleHomomorphism(V, W, v)
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true, map::Union{Nothing, Map} = nothing)
+  return ModuleHomomorphism(V, W, v; is_left, map)
 end

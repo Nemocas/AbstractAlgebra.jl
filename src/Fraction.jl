@@ -838,7 +838,7 @@ fraction_field_type(x::Type{<:RingElement}) = fraction_field_type(parent_type(x)
 fraction_field_type(T::DataType) = throw(MethodError(fraction_field_type, (T,)))
 
 fraction_field_type(::Type{T}) where {T <: Field} = T
-fraction_field_type(::Type{T}) where {T <: Ring} = AbstractAlgebra.Generic.FracField{elem_type(T)}
+fraction_field_type(::Type{T}) where {T <: Ring} = Generic.FracField{elem_type(T)}
 
 
 @doc raw"""

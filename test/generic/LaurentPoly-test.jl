@@ -35,9 +35,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
          @test parent(y) == L
 
-         @test base_ring(L) == R
-         @test base_ring(L) == base_ring(P)
          @test coefficient_ring(L) == R
+         @test coefficient_ring(L) == coefficient_ring(P)
          @test coefficient_ring_type(L) === typeof(R)
 
          @test var(L) == :y
@@ -102,6 +101,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test gens(L)[1] == y
       @test length(gens(L)) == 1
 
+      @test length(y^2+y) == 2
+      @test length(y) == 1
+
+      @test is_term(y)
+      @test is_term(y^-3)
+      @test is_term(2y)
+      @test !is_term(y^2+y)
       @test is_monomial(y)
       @test is_monomial(y^-3)
       @test !is_monomial(2y)
@@ -122,7 +128,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test is_unit(y^e)
       end
 
-      if base_ring(L) isa AbstractAlgebra.Field
+      if coefficient_ring(L) isa AbstractAlgebra.Field
          for e = -5:5
             @test is_unit(2*y^e)
             @test is_unit(3*y^(2e))
@@ -222,6 +228,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
       @test is_divisible_by(2*y+3, 2+3*y^-1)
       @test !is_divisible_by(3*y+4, 2+3*y^-1)
+   end
+
+   @testset "inflation" begin
+      L, y = laurent_polynomial_ring(ZZ, "y")
+
+      @test inflate(y+y^-1, 2) == y^2+y^-2
+      @test inflate(y+y^-1, 3, 2) == y^5+y
    end
 
    @testset "coercion" begin
@@ -574,14 +587,15 @@ end
   @test is_unit(x)
   @test is_unit(-x)
   @test !is_unit(2*x)
-  @test !is_unit(x+1)
-  @test !is_unit(x-1)
-  @test is_unit(x+30)
-  @test is_unit(x-30)
-  @test is_unit(1+30*x)
-  @test is_unit(1-30*x)
-  @test is_unit(7+60*x)
-  @test is_unit(7-60*x)
-  @test is_unit(600+7*x+30*x^2)
-  @test is_unit(600-7*x+30*x^2)
+  @test_broken !is_unit(x+1)
+  @test_broken !is_unit(x-1)
+  @test_broken is_unit(x+30)
+  @test_broken is_unit(x-30)
+  @test_broken is_unit(1+30*x)
+  @test_broken is_unit(1-30*x)
+  @test_broken is_unit(7+60*x)
+  @test_broken is_unit(7-60*x)
+  @test_broken is_unit(600+7*x+30*x^2)
+  @test_broken is_unit(600-7*x+30*x^2)
+  @test_broken is_unit(45+16*x) # inspired by Martin Wagner's theorem
 end

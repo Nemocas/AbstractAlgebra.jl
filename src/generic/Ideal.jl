@@ -1833,14 +1833,18 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          return [parent(p)(gcd(constant_coefficient(p), constant_coefficient(V[n])))]
       end
       # check if p can replace V[n]
-      swap = false
-      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+      q = nothing
+      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q1) = divides(lc, leading_coefficient(p)))[1]
          p, V[n] = V[n], reduce_tail(p, view(V, 1:n - 1), res)
          insert_spoly(V, H, n, res)
-         swap = true
+         q = q1
       end
       # check if leading coefficients divide leading_coefficient of p
-      while n >= 1 && (swap || ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n])))[1])
+      while n >= 1
+         if q === nothing
+            fl, q = divides(leading_coefficient(p), leading_coefficient(V[n]))
+            fl || break
+         end
          best_v = V[n]
          best_size = mysize(V[n])
          best_q = q
@@ -1859,7 +1863,7 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          while n >= 1 && length(V[n]) > length(p)
             n -= 1
          end
-         swap = false
+         q = nothing
       end
       if iszero(p) # p was absorbed, yay!
          return V
@@ -2049,7 +2053,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       else
          res = divexact(res, canonical_unit(res))
          V = [S(res)]
-         B0 = [reduce_by_resultant(p, res) for p in D]
+         B0 = map(Base.Fix2(reduce_by_resultant, res), D)
          B0 = filter(!iszero, B0)
          B = sort(B0, by=mysize2, rev=true)
          H = T[]

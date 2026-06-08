@@ -21,10 +21,17 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
     mpoly_type(::Type{S}) where S<:Ring
     mpoly_type(::S) where S<:Ring
 
-The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.MPoly{T}`.
+Return the type of a (multivariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`mpoly_ring_type`](@ref).
 
-See also [`mpoly_ring_type`](@ref), [`poly_type`](@ref) and [`poly_ring_type`](@ref).
+For univariate polynomials see [`poly_type`](@ref).
+
+# Implementation
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest
@@ -41,6 +48,8 @@ julia> mpoly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
+mpoly_type
+
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
@@ -53,10 +62,18 @@ mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
     mpoly_ring_type(::Type{S}) where S<:Ring
     mpoly_ring_type(::S) where S<:Ring
 
-The type of multivariate polynomial rings with coefficients of type `T`
-respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
+Return the type of the parent of a (multivariate) polynomial whose coefficients
+have type `T` or type `elem_type(S)`.
+The type of the polynomials themselves can be found via [`mpoly_type`](@ref).
 
-See also [`poly_type`](@ref) and [`poly_ring_type`](@ref).
+For univariate polynomials see [`poly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
+
 
 # Examples
 ```jldoctest
@@ -144,8 +161,12 @@ function is_gen(x::MPolyRingElem, i::Int)
 end
 
 characteristic(R::MPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::MPolyRing) = is_known(characteristic, base_ring(R))
 
 is_finite(R::MPolyRing) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+is_known(::typeof(is_finite), R::MPolyRing) =
+  is_known(is_trivial, base_ring(R)) &&
+    (is_trivial(base_ring(R)) || nvars(R) > 0 || is_known(is_finite, base_ring(R)))
 
 
 ###############################################################################
@@ -313,14 +334,6 @@ function constant_coefficient(p::MPolyRingElem{T}) where T <: RingElement
             return c
          end
       end
-   end
-   return zero(base_ring(p))
-end
-
-function constant_coefficient(p::MPolyRingElem)
-   len = length(p)
-   if !iszero(p) && iszero(exponent_vector(p, len))
-      return coeff(p, len)
    end
    return zero(base_ring(p))
 end
@@ -914,25 +927,16 @@ end
 #
 ###############################################################################
 
-function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
-   newvals = map(parent(a), vals)
-   if typeof(vals) == typeof(newvals)
-     throw(NotImplementedError(:evaluate, a, vals))
-   end
-   return evaluate(a, newvals)
-end
-
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   @req length(vals) == nvars(parent(a)) "Incorrect number of values in evaluation"
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
    if (U <: Integer && U !== BigInt) ||
       (U <: Rational && U !== Rational{BigInt})
@@ -942,6 +946,7 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
          return evaluate(a, [parent(c)(v) for v in vals])
       end
    end
+   @req !isempty(vals) "No values supplied"
    powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
@@ -951,34 +956,23 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
    # must be done in a certain order.
    # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = elem_type(S)[zero(S)]
-   i = UInt(1)
+   r = zero(S)
    cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
       for j = 1:length(vals)
          exp = v[j]
-         if iszero(exp)
-           continue
-         end
          pe = get!(powers[j], exp) do
+            if iszero(exp)
+               return one(vals[j])
+            end
             return vals[j]^exp
          end
          t = mul!(t, pe)
       end
-      push!(r, c*t)
-      j = i = i + 1
-      while iseven(j) && length(r) > 1
-          top = pop!(r)
-          r[end] = add!(r[end], top)
-          j >>= 1
-      end
+      r = add!(r, c*t)
    end
-   while length(r) > 1
-      top = pop!(r)
-      r[end] = add!(r[end], top)
-   end
-   return r[1]
+   return r
 end
 
 @doc raw"""
@@ -1119,19 +1113,18 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingE
 end
 
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
 
-Evaluate the polynomial expression at the supplied values, which may be any
-ring elements, commutative or non-commutative, but in the same ring. Evaluation
-always proceeds in the order of the variables as supplied when creating the
-polynomial ring to which $a$ belongs. The evaluation will succeed if a product
-of a coefficient of the polynomial by one of the values is defined.
+Evaluate the polynomial at the supplied values, which may be any ring elements,
+commutative or non-commutative, but in the same ring. Evaluation always proceeds
+in the order of the variables as supplied when creating the polynomial ring to
+which $a$ belongs. The evaluation will succeed if a product of a coefficient
+of the polynomial by one of the values is defined.
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-   return a(vals...)
-end
+(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
 function (a::MPolyRingElem)(;kwargs...)
+   @req !isempty(kwargs) "No values supplied"
    ss = symbols(parent(a))
    vars = Array{Int}(undef, length(kwargs))
    vals = Array{RingElement}(undef, length(kwargs))
@@ -1346,6 +1339,12 @@ end
 #the block is also not used here I think
 #functionality to view mpoly as upoly in variable `i`, so the
 #coefficients are mpoly's without variable `i`.
+@doc raw"""
+    leading_coefficient(f::MPolyRingElem, i::Int)
+
+Return the leading coefficient of `f` when viewed as a univariate polynomial in the `i`-th
+variable.
+"""
 function leading_coefficient(f::MPolyRingElem, i::Int)
    g = MPolyBuildCtx(parent(f))
    d = degree(f, i)

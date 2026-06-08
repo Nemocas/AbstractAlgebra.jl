@@ -672,6 +672,7 @@ gen(G::SymmetricGroup, i::Int) = gens(G)[i]
 number_of_generators(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
 
 is_finite(G::SymmetricGroup) = true
+is_known(::typeof(is_finite), ::SymmetricGroup) = true
 
 order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 
@@ -751,7 +752,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Generic.emb!(one(G), p, V)
+   return p -> emb!(one(G), p, V)
 end
 
 @doc raw"""

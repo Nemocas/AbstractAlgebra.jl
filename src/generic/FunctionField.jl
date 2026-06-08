@@ -1378,6 +1378,6 @@ function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; ca
    return par, gen(par)
 end
 
-function function_field(p::Generic.Poly{Generic.RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: MPolyRingElem}
-   return Generic.FunctionField(p, Symbol(s); cached)
+function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: MPolyRingElem}
+   return FunctionField(p, Symbol(s); cached)
 end

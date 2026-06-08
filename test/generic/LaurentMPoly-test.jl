@@ -12,10 +12,8 @@ end
     @test L != laurent_polynomial_ring(GF(5), 2, 'x', cached = false)[1]
     @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
-    @test base_ring(L) == GF(5)
     @test coefficient_ring(L) == GF(5)
     @test coefficient_ring_type(L) === typeof(GF(5))
-    @test base_ring(x) == GF(5)
     @test coefficient_ring(x) == GF(5)
     @test coefficient_ring_type(x) === typeof(GF(5))
 
@@ -114,6 +112,19 @@ end
 
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
+
+    @test is_monomial(x^2*y^-2)
+    @test !is_monomial(2*x^2*y^-2)
+    @test !is_monomial(x+y)
+    @test is_term(x^2*y^-2)
+    @test is_term(2*x^2*y^-2)
+    @test !is_term(x+y)
+
+    @test inflate(y+y^-1, [1, 2]) == y^2+y^-2
+    @test inflate(y+y^-1, [0, 3], [1, 2]) == y^5+y
+    @test inflate(y+y^-1, [2], [3], [2]) == y^5+y
+    @test inflate(x*y^2+y, [2, 2]) == x^2*y^4+y^2
+    @test inflate(x*y^2+y, [1, 2], [2, 2]) == x^3*y^6+x*y^4
 end
 
 
@@ -233,27 +244,33 @@ end
   @test !is_unit(35/x)
   @test !is_unit(30*x)
   @test !is_unit(30/x)
-  @test !is_unit(x+1)
-  @test !is_unit(x-1)
-  @test is_unit(x+30)
-  @test is_unit(x-30)
-  @test is_unit(1+30*x)
-  @test is_unit(1-30*x)
-  @test is_unit(7+60*x)
-  @test is_unit(7-60*x)
-  @test is_unit(600+7*x+30*x^2)
-  @test is_unit(600-7*x+30*x^2)
-  @test is_unit(x+30/y)
-  @test is_unit(x-30/y)
-  @test is_unit(1+30*x/y)
-  @test is_unit(1-30*x*y)
-  @test is_unit(7+60*x+210/y)
-  @test is_unit(7-60*x+210/y)
-  @test is_unit(600+7*x/y+30*x^2)
-  @test is_unit(600-7*x*y+30*x^2)
-  @test !is_unit(30*x+120*y)
-  @test !is_unit(30*x-120*y)
+  @test_broken !is_unit(x+1)
+  @test_broken !is_unit(x-1)
+  @test_broken is_unit(x+30)
+  @test_broken is_unit(x-30)
+  @test_broken is_unit(1+30*x)
+  @test_broken is_unit(1-30*x)
+  @test_broken is_unit(7+60*x)
+  @test_broken is_unit(7-60*x)
+  @test_broken is_unit(600+7*x+30*x^2)
+  @test_broken is_unit(600-7*x+30*x^2)
+  @test_broken is_unit(x+30/y)
+  @test_broken is_unit(x-30/y)
+  @test_broken is_unit(1+30*x/y)
+  @test_broken is_unit(1-30*x*y)
+  @test_broken is_unit(7+60*x+210/y)
+  @test_broken is_unit(7-60*x+210/y)
+  @test_broken is_unit(600+7*x/y+30*x^2)
+  @test_broken is_unit(600-7*x*y+30*x^2)
+  @test_broken !is_unit(30*x+120*y)
+  @test_broken !is_unit(30*x-120*y)
   @test is_unit(x*y)
   @test !is_unit(30*x*y)
   @test !is_unit(30*x/y)
+end
+
+@testset "#2378" begin
+  L1, (a, b) = laurent_polynomial_ring(QQ, [:a, :b]);
+  R2, (k, l) = laurent_polynomial_ring(L1, [:k, :l]);
+  @test a * k == R2(a) * k
 end

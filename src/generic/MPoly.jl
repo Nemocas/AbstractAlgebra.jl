@@ -660,6 +660,14 @@ function coeff!(c::T, x::MPoly{T}, i::Int) where T <: RingElement
   return x.coeffs[i]
 end
 
+function constant_coefficient(p::MPoly{T}) where T <: RingElement
+   len = length(p)
+   if !iszero(p) && iszero(exponent_vector(p, len))
+      return coeff(p, len)
+   end
+   return zero(base_ring(p))
+end
+
 function trailing_coefficient(p::MPoly{T}) where T <: RingElement
    @req !iszero(p) "Zero polynomial does not have a leading monomial"
    return coeff(p, length(p))
@@ -829,7 +837,7 @@ function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(Rc, Re)
 end
 
-Base.copy(f::Generic.MPoly) = deepcopy(f)
+Base.copy(f::MPoly) = deepcopy(f)
 
 ###############################################################################
 #
@@ -3230,7 +3238,7 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
       if k != 1
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
-         e2 = [zeros(UInt, M, length(b[i])) for i in 1:len]
+         e2 = [zeros(UInt, M, length(bi)) for bi in b]
          pack_monomials(e1, a.exps, k, exp_bits, length(a))
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits, length(b[i]))
@@ -3238,7 +3246,7 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
-         b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
+         b1 = [par(bi.coeffs, e2i) for (bi, e2i) in zip(b, e2)]
          for i = 1:len
             b1[i].length = b[i].length
          end
@@ -3246,20 +3254,20 @@ function Base.divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
          if flag == false
             exp_bits *= 2
          else
-            eq = [zeros(UInt, N, length(q[i])) for i in 1:len]
+            eq = [zeros(UInt, N, length(qi)) for qi in q]
             for i = 1:len
                unpack_monomials(eq[i], q[i].exps, k, exp_bits, length(q[i]))
             end
             er = zeros(UInt, N, length(r))
             unpack_monomials(er, r.exps, k, exp_bits, length(r))
-            return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
+            return [parent(a)(qi.coeffs, eqi) for (qi, eqi) in zip(q, eq)], parent(a)(r.coeffs, er)
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
          flag == false && error("Exponent overflow in divrem_monagan_pearce")
-         eq = [q[i].exps for i in 1:len]
+         eq = [qi.exps for qi in q]
          er = r.exps
-         return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
+         return [parent(a)(qi.coeffs, eqi) for (qi, eqi) in zip(q, eq)], parent(a)(r.coeffs, er)
       end
    end
 end
@@ -3271,12 +3279,13 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
+    evaluate(a::MPoly{T}, vals::Vector{T}) where {T <: RingElement}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables.
 """
-function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
+function evaluate(a::MPoly{T}, vals::Vector{T}) where T <: RingElement
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    if iszero(a)
       return base_ring(a)()
    end
@@ -3292,13 +3301,13 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
          p = main_variable_extract(R, a, k)
-         a = evaluate(p, A[k])
+         a = evaluate(p, vals[k])
       end
   else
       while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
          k = main_variable(a, start_var)
          p = main_variable_extract(R, a, k)
-         a = evaluate(p, A[start_var - k + 1])
+         a = evaluate(p, vals[start_var - k + 1])
       end
    end
    if a.length == 0
@@ -3306,68 +3315,6 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    else
       return a.coeffs[1]
    end
-end
-
-function (a::MPoly{T})() where T <: RingElement
-   nvars(parent(a)) != 0 && error("Number of variables does not match number of values")
-   return evaluate(a, T[])
-end
-
-function (a::MPoly{T})(vals::T...) where T <: RingElement
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-   return evaluate(a, [vals...])
-end
-
-function (a::MPoly{T})(val::U, vals::U...) where {T <: RingElement, U <: JuliaRingElement}
-   length(vals) + 1 != nvars(parent(a)) && error("Number of variables does not match number of values")
-   return evaluate(a, [val, vals...])
-end
-
-@doc raw"""
-    (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
-
-Evaluate the polynomial at the supplied values, which may be any ring elements,
-commutative or non-commutative. Evaluation always proceeds in the order of the
-variables as supplied when creating the polynomial ring to which $a$ belongs.
-The evaluation will succeed if a product of a coefficient of the polynomial by
-all of the supplied values in order is defined. Note that this evaluation is
-more general than those provided by the evaluate function. The values do not
-need to be in the same ring, just in compatible rings.
-"""
-function (a::MPoly{T})(vals::NCRingElement...) where T <: RingElement
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-   R = base_ring(a)
-   # The best we can do here is to cache previously used powers of the values
-   # being substituted, as we cannot assume anything about the relative
-   # performance of powering vs multiplication. The function should not try
-   # to optimise computing new powers in any way.
-   # Note that this function accepts values in a non-commutative ring, so operations
-   # must be done in a certain order.
-   powers = [Dict{Int, Any}() for i in 1:length(vals)]
-   # First work out types of products
-   r = R()
-   for j = 1:length(vals)
-      W = typeof(vals[j])
-      if ((W <: Integer && W !== BigInt) ||
-          (W <: Rational && W !== Rational{BigInt}))
-         r = r*zero(W)
-      else
-         r = r*zero(parent(vals[j]))
-      end
-   end
-   cvzip = zip(coefficients(a), exponent_vectors(a))
-   for (c, v) in cvzip
-      t = deepcopy(c)
-      for j = 1:length(vals)
-         exp = v[j]
-         pe = get!(powers[j], exp) do
-            return vals[j]^exp
-         end
-         t = mul!(t, pe)
-      end
-      r = add!(r, t)
-   end
-   return r
 end
 
 ###############################################################################
@@ -3906,8 +3853,11 @@ function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
 end
 
 function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = b * c
-   return add!(a, t)
+   return add!(a, b * c)
+end
+
+function submul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   return sub!(a, b * c)
 end
 
 function resize_exps!(a::Matrix{UInt}, n::Int)
@@ -4064,7 +4014,7 @@ end
 # This is the main user interface for efficiently creating a polynomial. It accepts
 # an array of coefficients and an array of exponent vectors. Sorting, coalescing of
 # like terms and removal of zero terms is performed.
-function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{UInt}}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
        parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -4080,22 +4030,22 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    if ord == :lex
       for i = 1:length(m)
          for j = 1:N
-            Pe[j, i] = UInt(m[i][N - j + 1])
+            Pe[j, i] = m[i][N - j + 1]
          end
       end
    elseif ord == :deglex
       for i = 1:length(m)
          for j = 1:N - 1
-            Pe[j, i] = UInt(m[i][N - j])
+            Pe[j, i] = m[i][N - j]
          end
-         Pe[N, i] = UInt(sum(m[i]))
+         Pe[N, i] = sum(m[i])
       end
    else # degrevlex
       for i = 1:length(m)
          for j = 1:N - 1
-            Pe[j, i] = UInt(m[i][j])
+            Pe[j, i] = m[i][j]
          end
-         Pe[N, i] = UInt(sum(m[i]))
+         Pe[N, i] = sum(m[i])
       end
    end
 
@@ -4103,4 +4053,8 @@ function (a::MPolyRing{T})(b::Vector{T}, m::Vector{Vector{Int}}) where {T <: Rin
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
+end
+
+function (S::MPolyRing{T})(b::Vector{T}, m::Vector{<:Vector{<:Integer}}) where {T <: RingElement}
+   return S(b, convert(Vector{Vector{UInt}}, m))
 end

@@ -135,15 +135,19 @@ Return the array `[s]` where `s` is a `Symbol` representing the variable of the 
 polynomial ring. This is provided for uniformity with the multivariate interface, where
 there is more than one variable and hence an array of symbols.
 
-```julia
-poly_type(::Type{T}) where T <: RingElement
+Given a type for the coefficients, we can obtain the corresponding type of a
+univariate polynomial having that type of coefficient:
+
+```@docs
+poly_type
 ```
 
-Return the type of a polynomial whose coefficients have the given type. In our
-example `MyPoly{T}`.
+Analogously, given a type for the coefficients, we can obtain the corresponding
+type of the ring of univariate polynomials having that type of coefficient:
 
-This function is defined for generic polynomials and only needs to be defined for
-custom polynomial rings, e.g. ones defined by a C implementation.
+```@docs
+poly_ring_type
+```
 
 ```@docs
 poly_ring(R::Ring, s::Symbol; cached::Bool=false)

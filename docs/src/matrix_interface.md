@@ -318,7 +318,7 @@ It is recommended to overload this method for custom matrices.
 ### Optional symmetry test
 
 ```julia
-is_symmetric(a::MatrixElem)
+is_symmetric(a::MatElem)
 ```
 
 Return `true` if the given matrix is symmetric with respect to its main diagonal,

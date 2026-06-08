@@ -25,10 +25,17 @@ end
     poly_type(::Type{S}) where S<:NCRing
     poly_type(::S) where S<:NCRing
 
-The type of univariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
+Return the type of a (univariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`poly_ring_type`](@ref).
 
-See also [`poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+For multivariate polynomials see [`mpoly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic univariate polynomials (namely `Generic.NCPoly{T}` or `Generic.Poly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest
@@ -45,6 +52,8 @@ julia> poly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
+poly_type
+
 poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
 poly_type(::Type{S}) where S<:NCRing = poly_type(elem_type(S))
 poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
@@ -105,7 +114,8 @@ number_of_variables(a::NCPolyRing) = 1
 characteristic(R::NCPolyRing) = characteristic(base_ring(R))
 is_known(::typeof(characteristic), R::NCPolyRing) = is_known(characteristic, base_ring(R))
 
-is_finite(a::NCPolyRing) = is_trivial(a)
+is_finite(R::NCPolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::NCPolyRing) = is_known(is_trivial, R)
 
 ###############################################################################
 #
@@ -657,18 +667,6 @@ function _map(g::T, p::NCPolyRingElem, Rx) where {T}
                                      iszero(c) ? zero(R) : R(g(c))
                                    end for i in 0:degree(p)]
    return Rx(new_coefficients)
-end
-
-###############################################################################
-#
-#   Unsafe functions
-#
-###############################################################################
-
-function addmul!(z::NCPolyRingElem{T}, x::NCPolyRingElem{T}, y::NCPolyRingElem{T}, c::NCPolyRingElem{T}) where T <: NCRingElem
-   c = mul!(c, x, y)
-   z = add!(z, c)
-   return z
 end
 
 ###############################################################################

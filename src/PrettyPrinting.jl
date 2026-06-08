@@ -115,18 +115,19 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
+function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+    return !AbstractAlgebra.is_ijulia_inited()
+end
+
 function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited
-      error("Dummy error for jupyter")
-   end
    show_via_expressify(io, mi, x)
 end
 
+function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+   return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
+end
+
 function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
@@ -243,12 +244,16 @@ end
 #
 # The challenge for us is that we always want to define text/latex and
 # text/html methods for sprint and friends. This has the disadvantage that if
-# get_html_as_latex()== false, then our objects will print their ordinary
+# get_html_as_latex() == false, then our objects will print their ordinary
 # string presentation, but since it is coming from text/html, it will be
 # rendered using the "normal" font.
 #
-# Thus, inside IJulia we will throw an error for text/latex (always) and
-# text/html (unless get_html_as_latex()).
+# Thus, when IJulia is initialized we make `showable` return false for
+# text/latex (always) and text/html (unless get_html_as_latex()), so IJulia
+# falls back to text/plain.
+#
+# The IJulia state is queried via AbstractAlgebra.is_ijulia_inited(); by
+# default this is false, and the IJulia extension installs the real check.
 #
 # Super easy!
 
@@ -263,10 +268,7 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.showable(mi::MIME"text/latex", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited
-          return false
-       end
-       return true
+       return !AbstractAlgebra.is_ijulia_inited()
      end
 
     function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
@@ -274,11 +276,7 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.showable(mi::MIME"text/html", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-             !AbstractAlgebra.get_html_as_latex()
-          return false
-       end
-       return true
+       return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
     end
 
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
@@ -1257,7 +1255,7 @@ const _latex_to_string = Dict{String, String}(
   "ι" => "\\iota", "Κ" => "\\Kappa", "κ" => "\\kappa", "Λ" => "\\Lambda", "λ"
   => "\\lambda", "Μ" => "\\Mu", "μ" => "\\mu", "Ν" => "\\Nu", "ν" => "\\nu",
   "Ξ" => "\\Xi", "ξ" => "\\xi", "Ο" => "\\Omicron", "ο" => "\\omicron", "Π" =>
-  "\\Pie", "π" => "\\pie", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
+  "\\Pi", "π" => "\\pi", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
   "σ" => "\\sigma", "Τ" => "\\Tau", "τ" => "\\tau", "Υ" => "\\Upsilon", "υ" =>
   "\\upsilon", "Φ" => "\\Phi", "φ" => "\\phi", "Χ" => "\\Chi", "χ" => "\\chi",
   "Ψ" => "\\Psi", "ψ" => "\\psi", "Ω" => "\\Omega", "omega" => "\\omega")
@@ -2012,8 +2010,8 @@ _isbuffer(io::IO) = false
 _isbuffer(io::IOContext) = _isbuffer(io.io)
 _isbuffer(io::IOCustom) = _isbuffer(io.io)
 
-function _write_line(io::IOCustom, str::AbstractString)
-  written = 0
+function _write_line(io::IOCustom, str::Union{String,SubString{String}})
+  written::Int = 0
 
   # We handle io.indent_level == 0 differently for the following reason
   # $(s) will call print(io, s)
@@ -2126,7 +2124,7 @@ function _write_line(io::IOCustom, str::AbstractString)
 end
 
 function write(io::IOCustom, str::String)
-  written = 0
+  written::Int = 0
   if str == "\n"
     written = write(io.io, str)
     io.indented_line = false

@@ -42,6 +42,7 @@ It is supposed to be implemented in the src file of the respective type.
 """
 function generate_element end
 
+include("exercise.jl")
 
 ###############################################################################
 #
@@ -70,6 +71,7 @@ function test_Poly_interface end
 function test_MPoly_interface end
 function test_MatSpace_interface end
 function test_MatRing_interface end
+function test_NCRing_interface_recursive end
 function test_Ring_interface_recursive end
 function test_Field_interface_recursive end
 

@@ -55,7 +55,8 @@ number_of_variables(a::PolyRing) = 1
 characteristic(R::PolyRing) = characteristic(coefficient_ring(R))
 is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, coefficient_ring(R))
 
-is_finite(a::PolyRing) = is_trivial(a)
+is_finite(R::PolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::PolyRing) = is_known(is_trivial, R)
 
 Base.copy(a::PolyRingElem) = deepcopy(a)
 
@@ -3421,18 +3422,6 @@ end
 
 ###############################################################################
 #
-#   Unsafe functions
-#
-###############################################################################
-
-function addmul!(z::PolyRingElem{T}, x::PolyRingElem{T}, y::PolyRingElem{T}, c::PolyRingElem{T}) where T <: RingElement
-   c = mul!(c, x, y)
-   z = add!(z, c)
-   return z
-end
-
-###############################################################################
-#
 #   Random elements
 #
 ###############################################################################
@@ -3515,6 +3504,40 @@ function ConformanceTests.generate_element(Rx::PolyRing)
   R = base_ring(Rx)
   return Rx(elem_type(R)[ConformanceTests.generate_element(R) for i in 1:rand(0:6)])
 end
+
+###############################################################################
+#
+#   Graeffe-Dandelin transform
+#
+###############################################################################
+
+# see e.g. https://en.wikipedia.org/wiki/Graeffe%27s_method
+# Author: Claus Fieker (taken from Hecke/examples)
+
+@doc raw"""
+    graeffe_transform(f::PolyRingElem)
+
+Return a polynomial whose roots are the squares of the roots of
+the given polynomial.  Also known as Dandelin-Graeffe transform.
+
+# Examples
+```jldoctest
+julia> ZZx, x = polynomial_ring(ZZ, :x);
+
+julia> graeffe_transform(x^2-1)
+x^2 - 2*x + 1
+
+julia> graeffe_transform(x^3-x-1)
+x^3 - 2*x^2 + x - 1
+
+```
+"""
+function graeffe_transform(f::PolyRingElem)
+   f_e = parent(f)([coeff(f, 2*i)  for i=0:div(degree(f), 2)])
+   f_o = parent(f)([coeff(f, 2*i+1)  for i=0:div(degree(f), 2)])
+   return (-1)^degree(f)*(f_e^2-shift_left(f_o^2, 1))
+end
+
 
 ###############################################################################
 #

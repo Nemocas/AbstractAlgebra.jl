@@ -110,6 +110,9 @@ export Strassen
 export SymmetricGroup
 export UniversalPolyRing
 export UniversalPolyRingElem
+export UniversalRing
+export UniversalRingElem
+export UnivPoly
 export VarName
 export YoungTableau
 export ZZ
@@ -243,6 +246,7 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export graeffe_transform
 export gram
 export has_attribute
 export has_bottom_neighbor
@@ -332,6 +336,7 @@ export is_nilpotent
 export is_noetherian
 export is_odd
 export is_one
+export is_pairwise
 export is_perfect
 export is_popov
 export is_positive
@@ -505,6 +510,7 @@ export rational_function_field
 export reduce!
 export rel_series
 export rel_series_type
+export relations
 export rels
 export rem!
 export remove
@@ -592,6 +598,9 @@ export truncate
 export typed_hcat
 export typed_hvcat
 export unit
+export universal_laurent_polynomial_ring
+export universal_poly_ring_type
+export universal_poly_type
 export universal_polynomial_ring
 export upper_triangular_matrix
 export upscale

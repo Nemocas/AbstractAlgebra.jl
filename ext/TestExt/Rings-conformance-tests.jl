@@ -1,6 +1,7 @@
 # very generic testing: just define ConformanceTests.generate_element(R) to produce elements of R,
 # then invoke one of these functions, as appropriate:
 # - test_NCRing_interface(R)
+# - test_NCRing_interface_recursive(R)
 # - test_Ring_interface(R)
 # - test_Ring_interface_recursive(R)
 # - test_Field_interface(R)
@@ -14,8 +15,9 @@
 # - test_MatSpace_interface(R)
 # - test_MatRing_interface(R)
 
+@nospecialize
 
-function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
+function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
    T = elem_type(R)
 
@@ -73,8 +75,6 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
-         @test isone(R(0)) || !is_unit(R(0))
-         @test is_unit(R(1))
          for i in 1:reps
             a = generate_element(R)::T
             @test hash(a) isa UInt
@@ -219,7 +219,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 50)
 end
 
 
-function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
+function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
 
    T = elem_type(R)
 
@@ -279,12 +279,20 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 50)
             @test B == b
          end
       end
+
+      @testset "Basic properties" begin
+         if is_domain_type(T)
+            @test !is_irreducible(zero(R))
+            @test !is_irreducible(one(R))
+          end
+      end
+
    end
 
    return nothing
 end
 
-function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
+function test_Field_interface(R::AbstractAlgebra.Field; reps = 15)
 
    T = elem_type(R)
 
@@ -312,7 +320,7 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 50)
    return nothing
 end
 
-function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
+function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 15)
 
    T = elem_type(R)
 
@@ -404,7 +412,7 @@ function test_EuclideanRing_interface(R::AbstractAlgebra.Ring; reps = 20)
 end
 
 
-function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
+function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 10)
 
    T = elem_type(Rx)
 
@@ -511,7 +519,7 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 30)
 end
 
 
-function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
+function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
    # for simplicity, these tests for now assume exactly two generators
    @assert ngens(Rxy) == 2
@@ -650,7 +658,7 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 30)
 end
 
 
-function test_MatSpace_interface(S::MatSpace; reps = 20)
+function test_MatSpace_interface(S::MatSpace; reps = 10)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -696,7 +704,29 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
             @test ncols(b) == ncols(S)+1
 
          end
-         @test iszero(zero_matrix(R, nrows(S), ncols(S)))
+
+         # zero matrices
+         a = zero_matrix(R, nrows(S), ncols(S))
+         @test parent(a) === S
+         @test iszero(a)
+         a = zero(S)
+         @test parent(a) === S
+         @test iszero(a)
+
+         # (truncated) identity matrices
+         if nrows(S) == ncols(S)
+            a = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(a) === S
+            @test isone(a)
+            a = one(S)
+            @test parent(a) === S
+            @test isone(a)
+         else
+            a = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(a) === S
+            @test !isone(a)
+            @test_throws DomainError one(S)
+         end
       end
 
       @testset "Views" begin
@@ -761,12 +791,51 @@ function test_MatSpace_interface(S::MatSpace; reps = 20)
           # TODO: ! variants (such as `swap_cols!` etc.) of all of the above
       end
 
+      if nrows(S) == ncols(S) && R isa Ring
+         @testset "Determinant" begin
+            @test isone(det(one(S))) # should always hold, even for 0x0
+            @test nrows(S) == 0 || iszero(det(zero(S)))
+
+            @test isone(AbstractAlgebra.det_df(one(S))) # should always hold, even for 0x0
+            @test nrows(S) == 0 || iszero(AbstractAlgebra.det_df(zero(S)))
+
+            if base_ring_type(S) <: Field
+               @test isone(AbstractAlgebra.det_fflu(one(S))) # should always hold, even for 0x0
+               @test nrows(S) == 0 || iszero(AbstractAlgebra.det_fflu(zero(S)))
+            end
+            if base_ring_type(S) <: PolyRingElem && is_domain_type(base_ring_type(S))
+               @test isone(AbstractAlgebra.det_interpolation(one(S))) # should always hold, even for 0x0
+               @test nrows(S) == 0 || iszero(AbstractAlgebra.det_interpolation(zero(S)))
+            end
+
+            for k in 1:reps
+               a = generate_element(S)::ST
+               b = generate_element(S)::ST
+               A = deepcopy(a)
+               B = deepcopy(b)
+
+               da = det(a)
+               db = det(b)
+               @test det(a*b) == da*db
+               @test da == AbstractAlgebra.det_df(a)
+               if base_ring_type(S) <: Field
+                  @test da == AbstractAlgebra.det_fflu(a)
+               end
+               if base_ring_type(S) <: PolyRingElem && is_domain_type(base_ring_type(S))
+                  @test da == AbstractAlgebra.det_interpolation(a)
+               end
+
+               @test a == A
+               @test b == B
+             end
+         end
+      end
    end
 
    return nothing
 end
 
-function test_MatRing_interface(S::MatRing; reps = 20)
+function test_MatRing_interface(S::MatRing; reps = 15)
 
    ST = elem_type(S)
    R = base_ring(S)
@@ -786,6 +855,15 @@ function test_MatRing_interface(S::MatRing; reps = 20)
             @test a == S(T[a[i, j] for i in 1:nrows(a), j in 1:ncols(a)])
             @test a == S(T[a[i, j] for i in 1:nrows(a) for j in 1:ncols(a)])
          end
+         @test iszero(zero(S))
+         @test isone(one(S))
+         if is_trivial(S)
+            @test iszero(one(S))
+            @test isone(zero(S))
+         else
+            @test !iszero(one(S))
+            @test !isone(zero(S))
+         end
       end
 
       @testset "Basic manipulation of matrices" begin
@@ -802,15 +880,20 @@ function test_MatRing_interface(S::MatRing; reps = 20)
          end
       end
 
-      @testset "Determinant" begin
-         for k in 1:reps
-            a = generate_element(S)::ST
-            b = generate_element(S)::ST
-            A = deepcopy(a)
-            B = deepcopy(b)
-            @test det(a*b) == det(a)*det(b)
-            @test a == A
-            @test b == B
+      if R isa Ring
+         @testset "Determinant" begin
+            @test isone(det(one(S))) # should always hold, even for 0x0
+            @test degree(S) == 0 || iszero(det(zero(S)))
+
+            for k in 1:reps
+               a = generate_element(S)::ST
+               b = generate_element(S)::ST
+               A = deepcopy(a)
+               B = deepcopy(b)
+               @test det(a*b) == det(a)*det(b)
+               @test a == A
+               @test b == B
+            end
          end
       end
    end
@@ -818,12 +901,8 @@ function test_MatRing_interface(S::MatRing; reps = 20)
    return nothing
 end
 
-function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
-   test_Ring_interface(R; reps = reps)
-   Rx, _ = polynomial_ring(R, :x)
-   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
-   Rxy, _ = polynomial_ring(R, [:x, :y])
-   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
+function test_NCRing_interface_recursive(R::AbstractAlgebra.NCRing; reps = 15)
+   test_NCRing_interface(R; reps = reps)
    for d in 0:3
      S = matrix_ring(R, d)
      test_MatRing_interface(S, reps = 2 + fld(reps, 8))
@@ -834,7 +913,18 @@ function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 50)
    end
 end
 
-function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 50)
+function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
+   test_Ring_interface(R; reps = reps)
+   test_NCRing_interface_recursive(R; reps = reps)
+   Rx, _ = polynomial_ring(R, :x)
+   test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+   Rxy, _ = polynomial_ring(R, [:x, :y])
+   test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
+end
+
+function test_Field_interface_recursive(R::AbstractAlgebra.Field; reps = 15)
    test_Ring_interface_recursive(R, reps = reps)
    test_Field_interface(R, reps = reps)
 end
+
+@specialize

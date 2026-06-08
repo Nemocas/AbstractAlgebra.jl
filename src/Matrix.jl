@@ -55,16 +55,16 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = Generic.MatSpaceElem{T}
 ###############################################################################
 
 """
-    is_zero_initialized(T::Type{<:MatrixElem})
-    is_zero_initialized(mat::T) where {T<:MatrixElem}
+    is_zero_initialized(T::Type{<:MatElem})
+    is_zero_initialized(mat::T) where {T<:MatElem}
 
 Specify whether the default-constructed matrices of type `T`, via the
 `T(R::Ring, ::UndefInitializer, r::Int, c::Int)` constructor, are
 zero-initialized. The default is `false`, and new matrix types should
 specialize this method to return `true` if suitable, to enable optimizations.
 """
-is_zero_initialized(::Type{<:MatrixElem}) = false
-is_zero_initialized(::T) where {T<:MatrixElem} = is_zero_initialized(T)
+is_zero_initialized(::Type{<:MatElem}) = false
+is_zero_initialized(::T) where {T<:MatElem} = is_zero_initialized(T)
 
 function check_parent(a::MatrixElem, b::MatrixElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -110,17 +110,10 @@ function _checkbounds(A, rows::AbstractArray{Int}, cols::AbstractArray{Int})
       throw(BoundsError(A, cols))
 end
 
-function check_square(A::MatrixElem{T}) where T <: NCRingElement
-   is_square(A) || throw(DomainError(A, "matrix must be square"))
-   A
-end
-
 function check_square(S::MatSpace)
    nrows(S) == ncols(S) || throw(DomainError(S, "matrices must be square"))
    S
 end
-
-check_square(S::MatRing) = S
 
 ###############################################################################
 #
@@ -186,18 +179,18 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_rows(a::MatElem)
 
 Return the number of rows of the given matrix.
 """
-number_of_rows(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(a::MatElem)
 
 @doc raw"""
-    number_of_columns(a::MatrixElem{T}) where T <: NCRingElement
+    number_of_columns(a::MatElem)
 
 Return the number of columns of the given matrix.
 """
-number_of_columns(a::MatrixElem{T}) where {T<:NCRingElement}
+number_of_columns(a::MatElem)
 
 @doc raw"""
     length(a::MatrixElem{T}) where T <: NCRingElement
@@ -241,7 +234,10 @@ zero(a::MatSpace) = a()
 Return the identity matrix of given matrix space. The matrix space must contain
 square matrices or else an error is thrown.
 """
-one(a::MatSpace) = check_square(a)(1)
+function one(a::MatSpace)
+   check_square(a)
+   return a(1)
+end
 
 @doc raw"""
     one(a::MatElem{T}) where T <: NCRingElement
@@ -457,7 +453,7 @@ function canonical_unit(a::MatElem)
   for a_ij in a
     !is_zero(a_ij) && return canonical_unit(a_ij)
   end
-  return one(coefficient_ring(a))
+  return one(base_ring(a))
 end
 
 ###############################################################################
@@ -1496,7 +1492,6 @@ end
 
 @doc raw"""
     transpose(x::MatElem)
-    transpose(x::MatRingElem)
 
 Return the transpose of `x`.
 
@@ -1525,14 +1520,15 @@ end
 
 @doc raw"""
     transpose!(x::MatElem)
-    transpose!(x::MatRingElem)
     transpose!(z::T, x::T) where T <: MatElem
-    transpose!(z::T, x::T) where T <: MatRingElem
 
-Return the transpose of `x`, possibly modifying the object `z` in the process.
-Aliasing is permitted.
+Return the transpose of `x`; the unary version may modify `x`, the binary version may modify `z`.
+**The binary version does not check dimensions -- the caller must ensure that**
+`ncols(z) == nrows(x)` and `nrows(z) == ncols(x)`.
 
-The unary version only is supported if `x` is a square matrix.
+If the dimensions of `z` are wrong then the behaviour is undefined!
+Aliasing between `z` and `x` is permitted.
+The unary version reports an error if `x` is not a square matrix.
 """
 function transpose!(x::MatElem)
   @req is_square(x) "Matrix must be a square matrix"
@@ -1631,7 +1627,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    tr(x::MatrixElem{T}) where T <: NCRingElement
+    tr(x::MatElem{T}) where T <: NCRingElement
 
 Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 require the matrix to be square.
@@ -1656,7 +1652,7 @@ t^2 + 3*t + 2
 
 ```
 """
-function tr(x::MatrixElem{T}) where T <: NCRingElement
+function tr(x::MatElem{T}) where T <: NCRingElement
    !is_square(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:nrows(x)
@@ -2383,9 +2379,7 @@ end
 function det_clow(M::MatElem{T}) where {T <: RingElement}
    R = base_ring(M)
    n = nrows(M)
-   if n == 0
-      return one(R)
-   end
+   n == 0 && return one(R)
    A = Matrix{T}(undef, n, n)
    B = Matrix{T}(undef, n, n)
    C = R()
@@ -2433,9 +2427,10 @@ function det_clow(M::MatElem{T}) where {T <: RingElement}
 end
 
 function det_df(M::MatElem{T}) where {T <: RingElement}
-   R = base_ring(M)
-   S = poly_ring(R)
    n = nrows(M)
+   R = base_ring(M)
+   n == 0 && return one(R)
+   S = poly_ring(R)
    p = charpoly(S, M)
    d = coeff(p, 0)
    return isodd(n) ? -d : d
@@ -2443,9 +2438,7 @@ end
 
 function det_fflu(M::MatElem{T}) where {T <: RingElement}
    n = nrows(M)
-   if n == 0
-      return base_ring(M)()
-   end
+   n == 0 && return one(base_ring(M))
    A = deepcopy(M)
    P = one(SymmetricGroup(n))
    r, d = fflu!(P, A)
@@ -2454,14 +2447,11 @@ end
 
 function det(M::MatElem{T}) where {T <: FieldElement}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
    return det_fflu(M)
 end
 
 @doc raw"""
-    det(M::MatrixElem{T}) where {T <: RingElement}
+    det(M::MatElem{T}) where {T <: RingElement}
 
 Return the determinant of the matrix $M$. We assume $M$ is square.
 
@@ -2479,9 +2469,7 @@ x^3 - 1
 """
 function det(M::MatElem{T}) where {T <: RingElement}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    try
       return det_fflu(M)
    catch
@@ -2491,12 +2479,10 @@ end
 
 function det_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
    n = nrows(M)
-   !is_domain_type(elem_type(base_ring(base_ring(M)))) &&
-          error("Generic interpolation requires a domain type")
    R = base_ring(M)
-   if n == 0
-      return R()
-   end
+   n == 0 && return one(R)
+   !is_domain_type(elem_type(base_ring(R))) &&
+          error("Generic interpolation requires a domain type")
    maxlen = 0
    for i = 1:n
       for j = 1:n
@@ -2527,17 +2513,13 @@ end
 
 function det(M::MatElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    return det_popov(M)
 end
 
 function det(M::MatElem{T}) where {T <: PolyRingElem}
    !is_square(M) && error("Not a square matrix in det")
-   if nrows(M) == 0
-      return one(base_ring(M))
-   end
+   nrows(M) == 0 && return one(base_ring(M))
    try
       return det_interpolation(M)
    catch
@@ -2711,7 +2693,7 @@ end
 ###############################################################################
 
 """
-    is_alternating(M::MatrixElem)
+    is_alternating(M::MatElem)
 
 Return whether the form corresponding to the matrix `M` is alternating,
 i.e. `M == -transpose(M)` and `M` has zeros on the diagonal.
@@ -2726,7 +2708,7 @@ function is_alternating(M::MatElem)
 end
 
 """
-    is_skew_symmetric(M::MatrixElem)
+    is_skew_symmetric(M::MatElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
@@ -2905,7 +2887,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    rank(M::MatrixElem{T}) where {T <: RingElement}
+    rank(M::MatElem{T}) where {T <: RingElement}
 
 Return the rank of the matrix $M$.
 
@@ -2940,9 +2922,9 @@ function rank(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    rank_interpolation(M::MatrixElem{T}) where {T <: PolyRingElem} -> Int
-    rank_interpolation(M::MatrixElem{T}) where {T <: MPolyRingElem} -> Int
-    rank_interpolation(M::MatrixElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem} -> Int
+    rank_interpolation(M::MatElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ using an interpolation-like method. 
 
@@ -3052,11 +3034,11 @@ function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: PolyRingElem} -> Int
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: MPolyRingElem} -> Int
-    rank_interpolation_mc(M::MatrixElem{T}, ϵ::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
-Returns the rank of $A$ with error probability < $ϵ$ using an interpolation-like method.
+Returns the rank of $A$ with error probability < $err$ using an interpolation-like method.
 
 # Examples
 
@@ -3706,7 +3688,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_upper_triangular(A::MatrixElem)
+    is_upper_triangular(A::MatElem)
 
 Return `true` if $A$ is an upper triangular matrix, that is,
 all entries below the main diagonal are zero. Note that this
@@ -3871,7 +3853,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_lower_triangular(A::MatrixElem)
+    is_lower_triangular(A::MatElem)
 
 Return `true` if $A$ is an lower triangular matrix, that is,
 all entries above the main diagonal are zero. Note that this
@@ -3906,7 +3888,7 @@ function is_lower_triangular(M::MatElem)
 end
 
 @doc raw"""
-    is_diagonal(A::MatrixElem)
+    is_diagonal(A::MatElem)
 
 Return `true` if $A$ is a diagonal matrix, that is,
 all entries off the main diagonal are zero. Note that this
@@ -3944,7 +3926,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+    pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix $M$ over a ring return a tuple $X, d$
 consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
@@ -3952,14 +3934,14 @@ $MX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
 will be the determinant of $M$ up to sign. If $M$ is singular an exception
 is raised.
 """
-function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
    !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
 
-function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
+function Base.inv(M::MatElem{T}) where {T <: FieldElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
    flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
@@ -3967,15 +3949,15 @@ function Base.inv(M::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    inv(M::MatrixElem{T}) where {T <: RingElement}
+    inv(M::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n\times n$ matrix over a ring, return an
 $n\times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is the $n\times n$
 identity matrix. If $M$ is not invertible over the base ring an exception is
 raised.
 """
-function Base.inv(M::MatrixElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+function Base.inv(M::MatElem{T}) where {T <: RingElement}
+   is_square(M) || throw(DomainError(M, "Cannot invert non-square Matrix"))
    X, d = pseudo_inv(M)
    is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
@@ -3988,7 +3970,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Given an $n \times m$ matrix $A$ over a ring, return a tuple `(flag, B)`. If
 `side` is `:right` and `flag` is `true`, $B$ is a right inverse of $A$ i.e.
@@ -4012,14 +3994,14 @@ function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) wher
 end
 
 @doc raw"""
-    is_invertible(A::MatrixElem{T}) where {T <: RingElement}
+    is_invertible(A::MatElem{T}) where {T <: RingElement}
 
 Return true if a given square matrix is invertible, false otherwise. If
 the inverse should also be computed, use `is_invertible_with_inverse`.
 """
-is_invertible(A::MatrixElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
+is_invertible(A::MatElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
 
-is_invertible(A::MatrixElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
+is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
 
 ###############################################################################
 #
@@ -4154,12 +4136,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
+    is_nilpotent(A::MatElem{T}) where {T <: RingElement}
 
 Return if `A` is nilpotent, i.e. if there exists a natural number $k$
 such that $A^k = 0$. If `A` is not square an exception is raised.
 """
-function is_nilpotent(A::MatrixElem{T}) where {T <: RingElement}
+function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
   !is_square(A) && error("Dimensions don't match in is_nilpotent")
   is_zero(tr(A)) || return false
@@ -4181,7 +4163,7 @@ end
 #
 ###############################################################################
 
-function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
+function hessenberg!(A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in hessenberg")
    R = base_ring(A)
    n = nrows(A)
@@ -4225,14 +4207,14 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    hessenberg(A::MatElem{T}) where {T <: RingElement}
 
 Return the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 which is similar to $M$. The upper Hessenberg form has nonzero entries
 above and on the diagonal and in the diagonal line immediately below the
 diagonal.
 """
-function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+function hessenberg(A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in hessenberg")
    M = deepcopy(A)
    hessenberg!(M)
@@ -4240,14 +4222,12 @@ function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    is_hessenberg(A::MatElem{T}) where {T <: RingElement}
 
 Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function is_hessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   if !is_square(A)
-      return false
-   end
+function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
+   is_square(A) || return false
    n = nrows(A)
    for i = 3:n
       for j = 1:i - 2
@@ -4265,7 +4245,7 @@ end
 #
 ###############################################################################
 
-function charpoly_hessenberg!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
+function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -4508,8 +4488,8 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(Y::MatrixElem{T}) where {T <: RingElement}
-    charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(Y::MatElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
 
 Return the characteristic polynomial $p$ of the square matrix $Y$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
@@ -4541,7 +4521,7 @@ julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 ```
 """
-function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
+function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
    !is_square(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
    base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
@@ -4594,7 +4574,7 @@ function charpoly(S::PolyRing{T}, Y::MatrixElem{T}) where {T <: RingElement}
    return f
 end
 
-function charpoly(Y::MatrixElem)
+function charpoly(Y::MatElem)
    R = base_ring(Y)
    Rx, x = polynomial_ring(R; cached=false)
    return charpoly(Rx, Y)
@@ -5207,23 +5187,23 @@ end
 #  Kannan-Bachem algorithm
 
 @doc raw"""
-    hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
-function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_kb(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val(false))
 end
 
 @doc raw"""
-    hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
-function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val(true))
 end
 
@@ -5253,7 +5233,7 @@ function kb_search_first_pivot(H, start_element::Int = 1)
 end
 
 # Reduces the entries above H[pivot[c], c]
-function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+function kb_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivot::Vector{Int}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
 
    # Let c = 4 and pivot[c] = 4. H could look like this:
    # ( 0 . * # * )
@@ -5307,7 +5287,7 @@ function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    return nothing
 end
 
-function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
+function kb_sort_rows!(H::MatElem{T}, U::MatElem{T}, pivot::Vector{Int}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot2 = zeros(Int, m)
@@ -5343,7 +5323,7 @@ function kb_sort_rows!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Vector{Int}, w
    return nothing
 end
 
-function hnf_kb!(H::MatrixElem{T}, U::MatrixElem{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
+function hnf_kb!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
    m = nrows(H)
    n = ncols(H)
    pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
@@ -5425,30 +5405,30 @@ function hnf_kb!(H::MatrixElem{T}, U::MatrixElem{T}, with_trafo::Bool = false, s
 end
 
 @doc raw"""
-    hnf(A::MatrixElem{T}) where {T <: RingElement}
+    hnf(A::MatElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$.
 """
-function hnf(A::MatrixElem{T}) where {T <: RingElement}
+function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
 @doc raw"""
-    hnf_with_transform(A)
+    hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Return the tuple $H, U$ consisting of the upper right row Hermite normal
 form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
 """
-function hnf_with_transform(A)
+function hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb_with_transform(A)
 end
 
 @doc raw"""
-    is_hnf(M::MatrixElem{T}) where T <: RingElement
+    is_hnf(M::MatElem{T}) where T <: RingElement
 
 Return `true` if the matrix is in Hermite normal form.
 """
-function is_hnf(M::MatrixElem{T}) where T <: RingElement
+function is_hnf(M::MatElem{T}) where T <: RingElement
    r = nrows(M)
    c = ncols(M)
    row = 1
@@ -5498,11 +5478,11 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_snf(A::MatrixElem{T}) where T <: RingElement
+    is_snf(A::MatElem{T}) where T <: RingElement
 
 Return `true` if $A$ is in Smith Normal Form.
 """
-function is_snf(A::MatrixElem{T}) where T <: RingElement
+function is_snf(A::MatElem{T}) where T <: RingElement
    m = nrows(A)
    n = ncols(A)
    a = A[1, 1]
@@ -5526,15 +5506,15 @@ function is_snf(A::MatrixElem{T}) where T <: RingElement
    return true
 end
 
-function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
+function snf_kb(A::MatElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val(false))
 end
 
-function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function snf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val(true))
 end
 
-function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
+function _snf_kb(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    S = deepcopy(A)
    m = nrows(S)
    n = ncols(S)
@@ -5551,7 +5531,7 @@ function _snf_kb(A::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T 
    end
 end
 
-function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_clear_row!(S::MatElem{T}, K::MatElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
    m = nrows(S)
    n = ncols(S)
    t = base_ring(S)()
@@ -5588,7 +5568,7 @@ function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::B
    return nothing
 end
 
-function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_trafo::Bool = false) where {T <: RingElement}
+function snf_kb!(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, with_trafo::Bool = false) where {T <: RingElement}
    m = nrows(S)
    n = ncols(S)
    l = min(m, n)
@@ -5648,21 +5628,21 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
 end
 
 @doc raw"""
-    snf(A::MatrixElem{T}) where {T <: RingElement}
+    snf(A::MatElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$.
 """
-function snf(a::MatrixElem{T}) where {T <: RingElement}
-  return snf_kb(a)
+function snf(A::MatElem{T}) where {T <: RingElement}
+  return snf_kb(A)
 end
 
 @doc raw"""
-    snf_with_transform(A)
+    snf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Return the tuple $S, T, U$ consisting of the Smith normal form $S$ of $A$
 together with invertible matrices $T$ and $U$ such that $TAU = S$.
 """
-function snf_with_transform(a::MatrixElem{T}) where {T <: RingElement}
+function snf_with_transform(a::MatElem{T}) where {T <: RingElement}
   return snf_kb_with_transform(a)
 end
 
@@ -6370,10 +6350,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
-row are swapped.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
+rows are swapped.
 
 # Examples
 ```jldoctest
@@ -6393,7 +6373,7 @@ julia> M  # was not modified
 [0   0   1]
 ```
 """
-function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_rows!(b, i, j)
@@ -6401,10 +6381,11 @@ function swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$th and $j$th row of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+Swap the $i$-th and $j$-th rows of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
+the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
 
 # Examples
 ```jldoctest
@@ -6424,7 +6405,7 @@ julia> M  # was modified
 [0   0   1]
 ```
 """
-function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:ncols(a)
          a[i, k], a[j, k] = a[j, k], a[i, k]
@@ -6434,12 +6415,12 @@ function swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
-row are swapped.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
+columns are swapped.
 """
-function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_cols!(b, i, j)
@@ -6447,12 +6428,13 @@ function swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$th and $j$th column of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).
+Swap the $i$-th and $j$-th columns of $a$ in place. The function returns the mutated
+matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
+the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
 """
-function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
       for k = 1:nrows(a)
          a[k, i], a[k, j] = a[k, j], a[k, i]
@@ -6462,12 +6444,13 @@ function swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_rows!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
-where $r$ is the number of rows of $a$.
+Swap the $i$-th and $(r - i)$-th rows of $a$ for each $1 \leq i \leq r/2$,
+where $r$ is the number of rows of $a$.  The swaps are performed in place.
+The return value is the modified matrix.
 """
-function reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_rows!(a::MatElem{T}) where T <: NCRingElement
    k = div(nrows(a), 2)
    for i in 1:k
       swap_rows!(a, i, nrows(a) - i + 1)
@@ -6476,24 +6459,25 @@ function reverse_rows!(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_rows(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_rows(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
-row is swapped for $1 \leq i \leq r/2$. Here $r$ is the number of rows of
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
+rows are swapped for each $1 \leq i \leq r/2$, where $r$ is the number of rows of
 $a$.
 """
-function reverse_rows(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_rows(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
    return reverse_rows!(b)
 end
 
 @doc raw"""
-    reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_cols!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
-where $c$ is the number of columns of $a$.
+Swap the $i$-th and $(r - i)$-th columns of $a$ for each $1 \leq i \leq c/2$,
+where $c$ is the number of columns of $a$.  The swaps are performed in place.
+The return value is the modified matrix.
 """
-function reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_cols!(a::MatElem{T}) where T <: NCRingElement
    k = div(ncols(a), 2)
    for i in 1:k
       swap_cols!(a, i, ncols(a) - i + 1)
@@ -6502,13 +6486,12 @@ function reverse_cols!(a::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    reverse_cols(a::MatrixElem{T}) where T <: NCRingElement
+    reverse_cols(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
-column is swapped for $1 \leq i \leq c/2$. Here $c$ is the number of columns
-of$a$.
+Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
+columns are swapped for each $1 \leq i \leq c/2$, where $c$ is the number of columns of $a$.
 """
-function reverse_cols(a::MatrixElem{T}) where T <: NCRingElement
+function reverse_cols(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
    return reverse_cols!(b)
 end
@@ -6593,7 +6576,7 @@ end
 @doc raw"""
     multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Multiply the $i$th column of $a$ with $s$.
+Multiply the $i$-th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
@@ -6612,7 +6595,7 @@ end
 @doc raw"""
     multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply the $i$th column of $a$ with $s$.
+Create a copy of $a$ and multiply the $i$-th column of $a$ with $s$.
 
 By default, the transformation is applied to all rows of $a$. This can be
 changed using the optional `rows` argument.
@@ -6627,7 +6610,7 @@ end
 @doc raw"""
     multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Multiply the $i$th row of $a$ with $s$.
+Multiply the $i$-th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
@@ -6646,7 +6629,7 @@ end
 @doc raw"""
     multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply  the $i$th row of $a$ with $s$.
+Create a copy of $a$ and multiply the $i$-th row of $a$ with $s$.
 
 By default, the transformation is applied to all columns of $a$. This can be
 changed using the optional `cols` argument.
@@ -6663,12 +6646,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    vcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
+    vcat(A::MatElem{T}...) where T <: NCRingElement -> MatElem
 
 Return the horizontal concatenation of the matrices $A$.
-All component matrices need to have the same base ring and number of columns.
+All component matrices must have the same base ring and same number of columns.
 """
-function Base.vcat(A::MatrixElem...)
+function Base.vcat(A::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
   # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
   # producing an array of the arguments.
@@ -6676,7 +6659,7 @@ function Base.vcat(A::MatrixElem...)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
-Base.reduce(::typeof(vcat), A::AbstractVector{<:MatrixElem}) = _vcat(A)
+Base.reduce(::typeof(vcat), A::AbstractVector{<:MatElem}) = _vcat(A)
 
 function _vcat(A)
   if length(A) == 0
@@ -6701,12 +6684,12 @@ function _vcat(A)
 end
 
 @doc raw"""
-    hcat(A::MatrixElem{T}...) where T <: NCRingElement -> MatrixElem
+    hcat(A::MatElem{T}...) where T <: NCRingElement -> MatElem
 
 Return the horizontal concatenating of the matrices $A$.
 All component matrices need to have the same base ring and number of rows.
 """
-function Base.hcat(A::MatrixElem...)
+function Base.hcat(A::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
   # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
   # producing an array of the arguments.
@@ -6714,7 +6697,7 @@ function Base.hcat(A::MatrixElem...)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
-Base.reduce(::typeof(hcat), A::AbstractVector{<:MatrixElem}) = _hcat(A)
+Base.reduce(::typeof(hcat), A::AbstractVector{<:MatElem}) = _hcat(A)
 
 function _hcat(A)
   if length(A) == 0
@@ -6738,7 +6721,7 @@ function _hcat(A)
   return M
 end
 
-function Base.cat(A::MatrixElem, As::MatrixElem...; dims)
+function Base.cat(A::MatElem, As::MatElem...; dims)
   @assert dims == (1,2) || isa(dims, Int)
 
   if isa(dims, Int)
@@ -6758,7 +6741,7 @@ function Base.cat(A::MatrixElem, As::MatrixElem...; dims)
   return X
 end
 
-function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatElem...)
   if any(x -> base_ring(x) !== base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
@@ -7132,7 +7115,8 @@ with ones down the diagonal and zeroes elsewhere. `M` must be square.
 This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
-   identity_matrix(check_square(M), nrows(M))
+   is_square(M) || throw(DomainError(M, "matrix must be square"))
+   return identity_matrix(M, nrows(M))
 end
 
 function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement

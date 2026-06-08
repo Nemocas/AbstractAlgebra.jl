@@ -65,8 +65,8 @@ julia> P = zero_matrix(ZZ, 3, 2)
 ```
 
 ```@docs
-number_of_rows(::MatrixElem{T}) where T <: RingElement
-number_of_columns(::MatrixElem{T}) where T <: RingElement
+number_of_rows(::MatElem)
+number_of_columns(::MatElem)
 length(::MatrixElem{T}) where T <: RingElement
 isempty(::MatrixElem{T}) where T <: RingElement
 identity_matrix(::Ring, ::Int)
@@ -74,6 +74,7 @@ identity_matrix(::MatElem{T}) where T <: RingElement
 ones_matrix(::Ring, ::Int, ::Int)
 scalar_matrix(R::Ring, n::Int, a::RingElement)
 diagonal_matrix(::RingElement, ::Int, ::Int)
+diagonal_matrix(::NCRing, ::AbstractVector{<:NCRingElement})
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
 transpose(::MatElem)
@@ -96,10 +97,10 @@ Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: Rin
 ## Inverse
 
 ```@docs; canonical=false
-Base.inv(::MatrixElem{T}) where T <: RingElement
-is_invertible(::MatrixElem{T}) where T <: RingElement
-is_invertible_with_inverse(::MatrixElem{T}) where T <: RingElement
-pseudo_inv(M::MatrixElem{T}) where T <: RingElement
+Base.inv(::MatElem{T}) where T <: RingElement
+is_invertible(::MatElem{T}) where T <: RingElement
+is_invertible_with_inverse(::MatElem{T}) where T <: RingElement
+pseudo_inv(M::MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -229,10 +230,10 @@ julia> multiply_row(M, 2, 3)
 ## Swapping rows and columns
 
 ```@docs
-swap_rows(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_rows!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols!(a::MatrixElem{T}, i::Int, j::Int) where T <: RingElement
+swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
+swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
 ```
 
 Swap the rows of `M` in place. The function returns the mutated matrix (since
@@ -581,7 +582,7 @@ true
 ### Characteristic polynomial
 
 ```@docs
-charpoly(::PolyRing{T}, ::MatrixElem{T}) where T <: RingElem
+charpoly(::PolyRing{T}, ::MatElem{T}) where T <: RingElem
 ```
 
 ### Minimal polynomial
@@ -633,7 +634,7 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
-is_snf(::MatrixElem{T}) where T <: RingElement
+is_snf(::MatElem{T}) where T <: RingElement
 
 snf(::MatElem{T}) where T <: RingElem
 snf_with_transform(::MatElem{T}) where T <: RingElem

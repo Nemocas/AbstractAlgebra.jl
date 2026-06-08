@@ -47,11 +47,11 @@ jobs:
           # be able to properly deal with PRs / merges
           fetch-depth: 2
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
       - name: "Cache artifacts"
-        uses: julia-actions/cache@v2
+        uses: julia-actions/cache@v3
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
       - name: "Run tests"
@@ -74,7 +74,7 @@ jobs:
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -83,12 +83,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: '1.10'
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-docdeploy@v1
+      - name: Install TeX
+        run: |
+              sudo apt-get update
+              sudo apt-get install -y --no-install-recommends \
+              latexmk \
+              texlive-latex-base \
+              texlive-latex-recommended \
+              texlive-latex-extra \
+              texlive-fonts-recommended \
+              texlive-luatex \
+              texlive-xetex \
+              python3-pygments \
+              fontconfig \
+              fonts-dejavu-core \
+              fonts-dejavu-extra
+      - name: Prepare building docs
+        run: |
+          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
+          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+      - name: Build docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        run: |
+          julia --color=yes --project=docs/ docs/make.jl --pdf
+      - name: Upload PDF
+        uses: actions/upload-artifact@v7
+        with:
+          path: docs/build/AbstractAlgebra.jl.pdf
+          archive: false
+          if-no-files-found: warn 

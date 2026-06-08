@@ -171,16 +171,47 @@ function coeff(a::FreeAssociativeAlgebraElem, i::Int)
     return a.coeffs[i]
 end
 
+# Only for compatibility, we can't do anything in place here
+function coeff!(c::T, a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
+    return coeff(a, i)
+end
+
 function term(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
     R = parent(a)
     return FreeAssociativeAlgebraElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
 end
 
+function term!(
+    t::FreeAssociativeAlgebraElem{T},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    fit!(t, 1)
+    t.coeffs[1] = deepcopy(a.coeffs[i])
+    t.exps[1] = copy(a.exps[i])
+    t.length = 1
+    return t
+end
+
 function monomial(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
     R = parent(a)
     return FreeAssociativeAlgebraElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
+end
+
+function monomial!(
+    m::FreeAssociativeAlgebraElem{T},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    fit!(m, 1)
+    if !isassigned(m.coeffs, 1) || !is_one(m.coeffs[1])
+        m.coeffs[1] = one(base_ring(a))
+    end
+    m.exps[1] = copy(a.exps[i])
+    m.length = 1
+    return m
 end
 
 @doc raw"""
@@ -195,10 +226,24 @@ function exponent_word(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: Ring
     return a.exps[i]
 end
 
-function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
-    state += 1
-    state <= length(a.poly) || return nothing
-    return exponent_word(a.poly, state), state
+function exponent_word!(
+    w::Vector{Int},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    resize!(w, length(a.exps[i]))
+    copyto!(w, a.exps[i])
+    return w
+end
+
+function Base.iterate(a::FreeAssAlgExponentWords, state::Union{Nothing, Int} = nothing)
+    s = isnothing(state) ? 1 : state + 1
+    if length(a.poly) >= s
+      w = a.inplace ? exponent_word!(a.temp, a.poly, s) : exponent_word(a.poly, s)
+      return w, s
+    else
+      return nothing
+    end
 end
 
 function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
@@ -226,9 +271,7 @@ function total_degree(a::FreeAssociativeAlgebraElem{T}) where T
     return length(a) > 0 ? length(a.exps[1]) : -1
 end
 
-function Base.length(
-    x::FreeAssAlgExponentWords{T},
-) where {S <: RingElement, T <: FreeAssociativeAlgebraElem{S}}
+function Base.length(x::FreeAssAlgExponentWords)
     return length(x.poly)
 end
 

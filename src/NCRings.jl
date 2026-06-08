@@ -34,6 +34,9 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
 end
 
 @inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+   if S === T
+      return x, y
+   end
    U = promote_rule_sym(S, T)
    if S === U
       return true, x, parent(x)(y)
@@ -99,11 +102,27 @@ function ==(x::NCRingElem, y::NCRingElem)
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
 
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
-   return divexact_left(promote(x, y)...)
+   xx, yy = promote(x, y)
+   # - if divexact_left is not implemented, we need to break the recursion
+   #   we assume that promotion returns identical operands if no proper
+   #   promotion can be performed
+   # - add type checks to make it constant-fold away in most cases
+   if typeof(xx) === typeof(x) && typeof(y) === typeof(yy) && (xx, yy) === (x, y)
+     throw(NotImplementedError(:divexact_left, x, y))
+   end
+   return divexact_left(xx, yy; check=check)
 end
 
 function divexact_right(x::NCRingElem, y::NCRingElem; check::Bool = true)
-   return divexact_right(promote(x, y)...)
+   xx, yy = promote(x, y)
+   # - if divexact_right is not implemented, we need to break the recursion
+   #   we assume that promotion returns identical operands if no proper
+   #   promotion can be performed
+   # - add type checks to make it constant-fold away in most cases
+   if typeof(xx) === typeof(x) && typeof(y) === typeof(yy) && (xx, yy) === (x, y)
+     throw(NotImplementedError(:divexact_right, x, y))
+   end
+   return divexact_right(xx, yy; check=check)
 end
 
 function divexact_left(

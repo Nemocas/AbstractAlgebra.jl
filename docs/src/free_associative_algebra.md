@@ -4,13 +4,13 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# Free algebras
+# Free associative algebras
 
 AbstractAlgebra.jl provides a module, implemented in `src/FreeAssociativeAlgebra.jl` for
 free associative algebras over any commutative ring belonging to the
 AbstractAlgebra abstract type hierarchy.
 
-## Generic free algebra types
+## Generic free associative algebra types
 
 AbstractAlgebra provides a generic type `Generic.FreeAssociativeAlgebraElem{T}`
 where `T` is the type of elements of the coefficient ring. The elements are
@@ -28,7 +28,7 @@ base_ring(a::FreeAssociativeAlgebraElem)
 parent(a::FreeAssociativeAlgebraElem)
 ```
 
-## Free algebra constructors
+## Free associative algebra constructors
 
 ```julia
 free_associative_algebra(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
@@ -61,9 +61,9 @@ julia> (x*y*x*x)^4
 x*y*x^3*y*x^3*y*x^3*y*x^2
 ```
 
-## Free algebra element constructors
+## Free associative algebra element constructors
 
-Elements of a free algebra can be constructed from the generators in the
+Elements of a free associative algebra can be constructed from the generators in the
 usual way using arithmetic operations. Also, all of the standard ring element
 constructors may be used. Finally, the `MPolyBuildCtx` is overloaded to work
 with coefficients and monomial words and not exponent vectors.

@@ -1069,6 +1069,14 @@ U, z = polynomial_ring(R, :z)
 h = rand(U, 3:3, -1:2, -10:10)
 ```
 
+### Graeffe transform
+
+
+```@docs
+graeffe_transform(f::PolyRingElem)
+```
+
+
 ### Ring homomorphisms
 
 ```@docs

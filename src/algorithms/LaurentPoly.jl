@@ -103,55 +103,49 @@ end
 
 function leading_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, last(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, last(dr))
 end
 
 function trailing_coefficient(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   isempty(dr) ? zero(base_ring(p)) : coeff(p, first(dr))
+   isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, first(dr))
 end
 
 gens(R::LaurentPolyRing) = [gen(R)]
 
 is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))
 
+length(p::LaurentPolyRingElem) = length(degrees_range(p))
+
+is_term(p::LaurentPolyRingElem) = isone(length(p))
+
 # whether p is a (monic) monomial of degree i, non-recursively:
 # return true iff `p` has only one non-null coefficient
 # (of degree i) at the outer layer, and this coefficient is one
 # (as an element of the base ring)
-function is_monomial(p::LaurentPolyRingElem, i::Integer)
-   dr = degrees_range(p)
-   length(dr) == 1 || return false
-   dr[] == i || return false
-   isone(coeff(p, i))
-end
+is_monomial(p::LaurentPolyRingElem, i::Integer) = is_term(p) && isone(coeff(p, i))
 
 function is_monomial(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   length(dr) == 1 || return false
-   isone(coeff(p, dr[]))
+   return isone(length(dr)) && isone(coeff(p, dr[]))
 end
 
 function is_monomial_recursive(p::LaurentPolyRingElem)
    dr = degrees_range(p)
-   length(dr) == 1 || return false
-   is_monomial_recursive(coeff(p, dr[]))
+   return isone(length(dr)) && is_monomial_recursive(coeff(p, dr[]))
 end
 
 function is_unit(f::T) where {T <: LaurentPolyRingElem}
   # **NOTE**  f.poly is not normalized so that the degree 0 coeff is non-zero
   is_trivial(parent(f)) && return true  # coeffs in zero ring
-  unit_seen = false
-  for i in 0:degree(f.poly)
-    if is_nilpotent(coeff(f.poly, i))
-      continue
-    end
-    if unit_seen || !is_unit(coeff(f.poly, i))
-      return false
-    end
-    unit_seen = true
-  end
-  return unit_seen
+  is_zero(f) && return false
+  dr = degrees_range(f)
+  is_one(length(dr)) && return is_unit(coeff(f, dr[]))
+  is_domain_type(coefficient_ring(parent(f))) && return false
+  # For coefficient rings with zero divisors, things are more complex;
+  # if someone needs it we can implement some more, just ask for it
+  # see also <https://github.com/Nemocas/AbstractAlgebra.jl/issues/2359>
+  throw(NotImplementedError(is_unit, f))
 end
 
 
@@ -218,7 +212,7 @@ function show(io::IO, mime::MIME"text/plain", p::LaurentPolyRing)
   print(io, "Univariate Laurent polynomial ring in ", var(p))
   println(io)
   io = pretty(io)
-  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
 end
 
@@ -230,7 +224,7 @@ function show(io::IO, p::LaurentPolyRing)
   else
     io = pretty(io)
     print(io, "Univariate Laurent polynomial ring in ", var(p), " over ")
-    print(terse(io), Lowercase(), base_ring(p))
+    print(terse(io), Lowercase(), coefficient_ring(p))
   end
 end
 

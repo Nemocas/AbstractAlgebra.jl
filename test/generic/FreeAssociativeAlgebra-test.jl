@@ -210,6 +210,21 @@ end
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.iterators" begin
+   R, (x, y) = free_associative_algebra(QQ, [:x, :y])
+   f = x * y * x + 2 * x + 3
+
+   @test (@inferred collect(coefficients(f))) == [QQ(1), QQ(2), QQ(3)]
+   @test (@inferred collect(terms(f))) == [x * y * x, 2 * x, 3]
+   @test (@inferred collect(monomials(f))) == [x * y * x, x, 1]
+   @test (@inferred collect(exponent_words(f))) == [Int[1, 2, 1], Int[1], Int[]]
+
+   @test (@inferred first(coefficients(f, inplace = true))) == QQ(1)
+   @test (@inferred first(terms(f, inplace = true))) == x * y * x
+   @test (@inferred first(monomials(f, inplace = true))) == x * y * x
+   @test (@inferred first(exponent_words(f, inplace = true))) == Int[1, 2, 1]
+end
+
 @testset "Generic.FreeAssociativeAlgebra.adhoc_binary" begin
    R, x = ZZ["y"]
 
@@ -270,10 +285,10 @@ end
 
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    S, = free_associative_algebra(ZZ, 3)
-   ConformanceTests.test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface_recursive(S)
 
    R, = QQ[:x, :y]
    S, = free_associative_algebra(R, :z => 1:3)
-   ConformanceTests.test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface_recursive(S)
 end
 

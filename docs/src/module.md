@@ -64,7 +64,7 @@ gens(M::FPModule{T}) where T <: RingElement
 Return a Julia array of the generators of the module $M$.
 
 ```julia
-rels(M::FPModule{T}) where T <: RingElement
+relations(M::FPModule{T}) where T <: RingElement
 ```
 
 Return a Julia vector of all the relations between the generators of `M`. Each
@@ -84,7 +84,7 @@ julia> G = gens(M)
  (1//1, 0//1)
  (0//1, 1//1)
 
-julia> R = rels(M)
+julia> R = relations(M)
 AbstractAlgebra.Generic.MatSpaceElem{Rational{BigInt}}[]
 
 julia> g1 = gen(M, 1)

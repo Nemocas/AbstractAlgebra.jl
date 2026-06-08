@@ -223,12 +223,12 @@ function Base.iterate(t::WeakKeyIdDict{K,V}, state...) where {K, V}
         while true
             y = iterate(t.ht, state...)
             y === nothing && return nothing
-            wkv, state = y
+            wkv, new_state = y
             k = wkv[1].w.value
             GC.safepoint() # ensure `k` is now gc-rooted
             k === nothing && continue # indicates `k` is scheduled for deletion
             kv = Pair{K,V}(k::K, wkv[2])
-            return (kv, state)
+            return (kv, new_state)
         end
     end
 end
