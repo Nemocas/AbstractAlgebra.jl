@@ -7009,7 +7009,7 @@ function matrix(R::NCRing, arr::MatRingElem)
    return map_entries(R, matrix(arr))
 end
 
-function matrix(mat::MatrixElem{T}) where {T<:NCRingElement}
+function matrix(mat::MatElem{T}) where {T<:NCRingElement}
    return deepcopy(mat)
 end
 
