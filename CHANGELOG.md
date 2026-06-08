@@ -9,6 +9,27 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.50.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.0) - 2026-06-08
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2410](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2410) Extend // to create total_ring_of_fractions if necessary
+
+#### Performance improvements or improved testing
+
+- [#2414](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2414) Parametrize `FunctionField` as `FunctionField{T, U}`
+
+### New or extended functionality
+
+- [#2406](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2406) Add `generators` as alias for `gens`
+- [#2409](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2409) Add `graeffe_transform(::PolyRingElem)`
+- [#2413](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2413) Disallow nondistinct variable names for universal rings
+- [#2416](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2416) Rename FunctionField to AbsSimpleFunctionField
+
 ## [0.49.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.49.0) - 2026-04-30
 
 ### Breaking changes
