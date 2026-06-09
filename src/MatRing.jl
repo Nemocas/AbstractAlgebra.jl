@@ -278,12 +278,12 @@ function +(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
   return Generic.MatRingElem(x + matrix(y))
 end
 
-function +(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
-  return Generic.MatRingElem(matrix(x) + y)
-end
-
 function +(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
   return Generic.MatRingElem(x + matrix(y))
+end
+
+function +(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) + y)
 end
 
 function +(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
@@ -294,12 +294,12 @@ function -(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
   return Generic.MatRingElem(x - matrix(y))
 end
 
-function -(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
-  return Generic.MatRingElem(matrix(x) - y)
-end
-
 function -(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
   return Generic.MatRingElem(x - matrix(y))
+end
+
+function -(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) - y)
 end
 
 function -(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
