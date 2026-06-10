@@ -101,7 +101,8 @@ using Test
         @test (g)^1 == g
         @test (g)^0 == 1
 
-        # @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        # TODO: add some more divexact tests
 
         g = u^(1//2)*v^(2//3) + w^(1//4)
         h = u^(2//3)
@@ -137,13 +138,9 @@ using Test
 
     @testset "Conformance tests" begin
         K_p,(tp1,tp2,tp3) = puiseux_polynomial_ring(QQ, ["t1","t2","t3"])
-
-        # TODO: Coconcile difference between:
-        # typeof(base_ring(K)) == AA.Generic.LaurentMPolyWrapRing{Rational{..}, AA.Generic.MPolyRing{..}}
-        # and
-        # base_ring_type(K) == LaurentMPolyRing{AA.Generic.Mpoly{..}}
-
         ConformanceTests.test_Ring_interface(K_p) # basic tests
-        # ConformanceTests.test_Ring_interface_recursive(K_p) # also tests constructions like mpoly over your ring; if you have this, you don't need the line above
+
+        K_p,(tp1,) = puiseux_polynomial_ring(QQ, ["t1"])
+        ConformanceTests.test_Ring_interface_recursive(K_p) # also tests constructions like mpoly over your ring; if you have this, you don't need the line above
     end
 end

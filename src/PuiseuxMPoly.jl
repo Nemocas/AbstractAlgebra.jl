@@ -396,14 +396,18 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Integer)
 end
 
 
-# TODO: there is an issue with divexact with coefficients over the coefficient ring:
-# E.g.
+# TODO: In this example:
+
 # K, (u,v,w) = puiseux_polynomial_ring(QQ,["u","v","w"])
 # g = v^(1//3)+u^(1//2)
 # divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+
+#  divexact correctly goes to the code below, but it seems like the type checking might
+#  allow for too many input types, there should be some tests for this plus a fix
+#  for the type checking if necessary.
 #
 
-function divexact(f::PuiseuxMPolyRingElem{K}, a::K) where K <: RingElement
+function divexact(f::PuiseuxMPolyRingElem{T}, a::K) where {T, K <: RingElement}
     @req !iszero(a) "division by zero"
     return puiseux_polynomial_ring_elem(parent(f), poly(f)*1//a, scale(f); skip_normalization=true)
 end
