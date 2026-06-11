@@ -24,7 +24,7 @@ number_of_variables(a::OrePolyRing) = 1
 #
 ###############################################################################
 
-function expressify(a::OrePolyRingElem{T}, D=parent(a)|>var; context=nothing) where T
+function expressify(a::OrePolyRingElem, D=parent(a)|>var; context=nothing)
   sum = Expr(:call,:+)
   for i in order(a):-1:0
     c = coeff(a,i)
