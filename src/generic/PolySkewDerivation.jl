@@ -1,6 +1,25 @@
 
 function trivial_derivation(R::D,σ::S) where {D<:Univariateish,S}
-  return PolySkewDerivation{D,S}(R,σ,zero(R))
+  return TrivialSkewDerivation{D,S}(R,σ)
+end
+
+function show(io::IO, d::TrivialSkewDerivation)
+  io = pretty(io)
+  if is_terse(io)
+    print(io, "Trivial skew-derivation")
+  else
+    print(io, "Trivial σ-Der: ")
+    print(terse(io), Lowercase(), domain(d), " -> ")
+    print(terse(io), Lowercase(), codomain(d))
+  end
+end
+
+function show_map_data(io::IO, d::TrivialSkewDerivation)
+  println(io)
+  print(io, "which is identically zero ")
+  println(io, "and with commutation rule", Indent())
+  print(io, sigma_endomorphism(d))
+  show_map_data(io,sigma_endomorphism(d))
 end
 
 function derivation(R::D,σ::S,c::T) where {D<:Univariateish,S<:Map{D,D},T}
@@ -9,6 +28,10 @@ function derivation(R::D,σ::S,c::T) where {D<:Univariateish,S<:Map{D,D},T}
 end
 derivation(R::D) where {D<:Univariateish} = derivation(R,identity_map(R),one(R))
 derivation(R::D,σ::S) where {D<:Univariateish,S<:Map{D,D}} = derivation(R,σ,one(R))
+
+function derivation(R::D,s::S,x::MPolyRingElem{C},c::MPolyRingElem) where {C,D<:MPolyRing{C},S<:Map{D,D}}
+  return MPolySkewDerivation{D,S}(R,s,x,c)
+end
 
 function show(io::IO, d::PolySkewDerivation)
   io = pretty(io)
@@ -53,12 +76,16 @@ function show_map_data(io::IO, d::PolySkewDerivation{D,<:Map(IdentityMap)}) wher
     print(io, "with coefficient ", coefficient(d))
   end
 end
-
 domain(d::PolySkewDerivation) = d.domain
 codomain(d::PolySkewDerivation) = d.domain
 coefficient(d::PolySkewDerivation) = first(d.intermediate_cache)
 
-sigma_endomorphism(δ::PolySkewDerivation{D,S}) where {D,S} = δ.σ
+sigma_endomorphism(d::PolySkewDerivation{D,S}) where {D,S} = d.s
+
+domain(d::TrivialSkewDerivation) = d.domain
+codomain(d::TrivialSkewDerivation) = d.domain
+
+sigma_endomorphism(d::TrivialSkewDerivation) = d.s
 
 function (d::PolySkewDerivation{D,S})(a) where {D,S<:Map(IdentityMap)}
   c = coefficient(d)
