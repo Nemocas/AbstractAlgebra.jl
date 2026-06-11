@@ -629,6 +629,6 @@ export ore_extension
 export trivial_derivation
 export derivation
 export sigma_endomorphism
-export OreAlgebra
-export OreOperator
+export OrePolyRing
+export OrePolyRingElem
 export SkewDerivation

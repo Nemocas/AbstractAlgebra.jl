@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   OreAlgebras.jl: skew-commutative polynomial ring R<D;σ,δ>
+#   OrePolyRings.jl: skew-commutative polynomial ring R<D;σ,δ>
 #
 ###############################################################################
 
@@ -10,13 +10,13 @@
 #
 ###############################################################################
 
-#coefficient_ring_type(T::Type{<:OreAlgebra}) = base_ring_type(T)
-#coefficient_ring(R::OreAlgebra{T}) where T <: RingElement = base_ring(R)
+#coefficient_ring_type(T::Type{<:OrePolyRing}) = base_ring_type(T)
+#coefficient_ring(R::OrePolyRing{T}) where T <: RingElement = base_ring(R)
 
-#is_domain_type(::Type{OreOperator{T}}) where {T <: RingElement} = is_domain_type(T)
-#is_exact_type(::Type{OreOperator{T}}) where {T <: RingElement} = is_exact_type(T)
+#is_domain_type(::Type{OrePolyRingElem{T}}) where {T <: RingElement} = is_domain_type(T)
+#is_exact_type(::Type{OrePolyRingElem{T}}) where {T <: RingElement} = is_exact_type(T)
 
-number_of_variables(a::OreAlgebra) = 1
+number_of_variables(a::OrePolyRing) = 1
 
 ###############################################################################
 #
@@ -24,7 +24,7 @@ number_of_variables(a::OreAlgebra) = 1
 #
 ###############################################################################
 
-function expressify(a::OreOperator{T}, D=parent(a)|>var; context=nothing) where T
+function expressify(a::OrePolyRingElem{T}, D=parent(a)|>var; context=nothing) where T
   sum = Expr(:call,:+)
   for i in order(a):-1:0
     c = coeff(a,i)
@@ -40,9 +40,9 @@ function expressify(a::OreOperator{T}, D=parent(a)|>var; context=nothing) where 
 
   return sum
 end
-@enable_all_show_via_expressify OreOperator
+@enable_all_show_via_expressify OrePolyRingElem
 
-function show(io::IO, R::OreAlgebra)
+function show(io::IO, R::OrePolyRing)
   @show_name(io, R)
   @show_special(io, R)
 

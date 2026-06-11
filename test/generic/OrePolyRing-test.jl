@@ -99,24 +99,23 @@
       @test order(a1) == 2
     end
   end
-end
 
-#@testset "Univariate Ore algebra over $name" verbose=true for (name,(R,x)) in [
-#    ("univariate polynomial fraction field", begin
-#      R,x = polynomial_ring(QQ,:x)
-#      K = fraction_field(R)
-#      K,K(x)
-#     end),
-#    ("univariate polynomial function field", rational_function_field(QQ)),
-#  ]
-#
-#  @testset "Differential operators" verbose=true begin
-#    δ = derivation(R)
-#    σ = sigma_endomorphism(δ)
-#    AD,D = ore_extension(R,:D,δ)
-#
-#    U = AD([3x+1,2x-3,-(2x+1),3x+5])
-#    V = AD([-(3x+5),x+2])
+@testset "Univariate Ore algebra over $name" verbose=true for (name,(R,x)) in [
+    ("univariate polynomial fraction field", begin
+      R,x = polynomial_ring(QQ,:x)
+      K = fraction_field(R)
+      K,K(x)
+     end),
+    ("univariate polynomial function field", rational_function_field(QQ)),
+  ]
+
+  @testset "Differential operators" verbose=true begin
+    δ = derivation(R)
+    σ = sigma_endomorphism(δ)
+    AD,D = ore_extension(R,:D,δ)
+
+    U = AD([3x+1,2x-3,-(2x+1),3x+5])
+    V = AD([-(3x+5),x+2])
 #    q,r = rdivrem(U,V)
 #    @test q*V + r == U
 #
@@ -145,11 +144,11 @@ end
 #      @test uncouple(H3,δ) == P3
 #      @test gauge_transform(H3,δ) == (σ.(P3)*H3 + δ.(P3))*inv(P3)
 #    end
-#  end
-#  @testset "Recurrence operators" verbose=true begin
-#    σ = hom(R,R,x+1)
-#    δ = trivial_derivation(R,σ)
-#    AS,S = ore_extension(R,:S,δ)
+  end
+  @testset "Recurrence operators" verbose=true begin
+    σ = hom(R,R,x+1)
+    δ = trivial_derivation(R,σ)
+    AS,S = ore_extension(R,:S,δ)
 #
 #    U = AS([3x+1,2x-3,-(2x+1),3x+5])
 #    V = AS([-(3x+5),x+2])
@@ -175,13 +174,14 @@ end
 #      @test rdivrem(S^2+S,S) == (S+1,zero(AS))
 #    end
 #
-#    @testset "Arithmetic" verbose=true begin
-#      c1 = [x, x^3, x^2, x^5]
-#      a1 = (c1[1]*S + c1[2])*(c1[3]*S + c1[4])
-#      @test coefficients(a1) == [c1[2]*c1[4],c1[1]*σ(c1[4]) + c1[2]*c1[3],c1[1]*σ(c1[3])]
-#      @test length(a1) == 3
-#      @test order(a1) == 2
-#    end
-#  end
-#end
-#
+    @testset "Arithmetic" verbose=true begin
+      c1 = [x, x^3, x^2, x^5]
+      a1 = (c1[1]*S + c1[2])*(c1[3]*S + c1[4])
+      @test coefficients(a1) == [c1[2]*c1[4],c1[1]*σ(c1[4]) + c1[2]*c1[3],c1[1]*σ(c1[3])]
+      @test length(a1) == 3
+      @test order(a1) == 2
+    end
+  end
+end
+end
+

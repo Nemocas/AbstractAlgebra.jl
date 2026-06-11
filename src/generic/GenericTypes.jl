@@ -1636,12 +1636,12 @@ end
 #   Univariate Ore algebra, its element type skew derivations
 #
 ################################################################################
-@attributes mutable struct OreAlgebra{T<:RingElem} <: AbstractAlgebra.OreAlgebra{T}
+@attributes mutable struct OrePolyRing{T<:RingElem} <: AbstractAlgebra.OrePolyRing{T}
   base_ring::Ring
   D::Symbol
   δ::Map(SkewDerivation)
 
-  function OreAlgebra{T}(R::Ring, D::Symbol, δ; cached=true) where T<:RingElem
+  function OrePolyRing{T}(R::Ring, D::Symbol, δ; cached=true) where T<:RingElem
     return get_cached!(OreID, (R,D,δ), cached) do
       new{T}(R,D,δ)
     end
@@ -1650,8 +1650,8 @@ end
 
 const OreID = CacheDictType{Tuple{Ring,Symbol,Map(SkewDerivation)},NCRing}()
 
-mutable struct OreOperator{T<:RingElem} <: AbstractAlgebra.OreOperator{T}
-  parent::OreAlgebra{T}
+mutable struct OrePolyRingElem{T<:RingElem} <: AbstractAlgebra.OrePolyRingElem{T}
+  parent::OrePolyRing{T}
   coeffs::Vector{T}
   length::Int
 end
