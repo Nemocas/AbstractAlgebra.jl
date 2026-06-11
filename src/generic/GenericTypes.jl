@@ -1636,21 +1636,21 @@ end
 #   Univariate Ore algebra, its element type skew derivations
 #
 ################################################################################
-@attributes mutable struct OrePolyRing{T<:RingElem} <: AbstractAlgebra.OrePolyRing{T}
+@attributes mutable struct OrePolyRing{T<:RingElem,S<:SkewDerivation} <: AbstractAlgebra.OrePolyRing{T,S}
   base_ring::Ring
   D::Symbol
-  δ::Map(SkewDerivation)
+  d::S
 
-  function OrePolyRing{T}(R::Ring, D::Symbol, δ; cached=true) where T<:RingElem
-    return get_cached!(OreID, (R,D,δ), cached) do
-      new{T}(R,D,δ)
+  function OrePolyRing{T,S}(R::Ring, D::Symbol, d::S; cached=true) where {T<:RingElem,S<:Map(SkewDerivation)}
+    return get_cached!(OreID, (R,D,d), cached) do
+      new{T,S}(R,D,d)
     end
   end
 end
 
 const OreID = CacheDictType{Tuple{Ring,Symbol,Map(SkewDerivation)},NCRing}()
 
-mutable struct OrePolyRingElem{T<:RingElem} <: AbstractAlgebra.OrePolyRingElem{T}
+mutable struct OrePolyRingElem{T<:RingElem,S<:SkewDerivation} <: AbstractAlgebra.OrePolyRingElem{T,S}
   parent::OrePolyRing{T}
   coeffs::Vector{T}
   length::Int
@@ -1658,11 +1658,31 @@ end
 
 mutable struct PolySkewDerivation{D,S} <: SkewDerivation{D,S}
   domain::D
-  σ::S
+  s::S
   intermediate_cache::Vector{<:NCRingElem}
 
   function PolySkewDerivation{D,S}(dom::D,σ::S,coeff::T) where {D,S,T<:NCRingElem}
     return new{D,S}(dom,σ,[coeff])
+  end
+end
+
+mutable struct MPolySkewDerivation{D,S} <: SkewDerivation{D,S}
+  domain::D
+  s::S
+  g
+  coeff
+
+  function MPolySkewDerivation{D,S}(dom::D,s::S,g,coeff) where {D,S}
+    return new{D,S}(dom,s,g,coeff)
+  end
+end
+
+mutable struct TrivialSkewDerivation{D,S} <: SkewDerivation{D,S}
+  domain::D
+  s::S
+
+  function TrivialSkewDerivation{D,S}(dom::D,s::S) where {D,S}
+    return new{D,S}(dom,s)
   end
 end
 
