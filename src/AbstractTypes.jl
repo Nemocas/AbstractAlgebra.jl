@@ -110,7 +110,7 @@ abstract type MatRing{T<:NCRingElement} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
 
-abstract type OreAlgebra{T<:RingElement} <: NCPolyRing{T} end
+abstract type OrePolyRing{T<:RingElement} <: NCPolyRing{T} end
 
 # Abstract types for number fields, parmeterised by the element type of
 # the base field.
@@ -159,7 +159,7 @@ abstract type MatRingElem{T<:NCRingElement} <: NCRingElem end
 
 abstract type FreeAssociativeAlgebraElem{T<:RingElement} <: NCRingElem end
 
-abstract type OreOperator{T<:RingElem} <: NCPolyRingElem{T} end
+abstract type OrePolyRingElem{T<:RingElem} <: NCPolyRingElem{T} end
 
 abstract type NumFieldElem{T<:RingElement} <: FieldElem end
 
