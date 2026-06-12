@@ -9,6 +9,12 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.50.1](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.1) - 2026-06-12
+
+### Other fixed bugs
+
+- [#2426](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2426) Add `is_domain_type` for multivariate laurent polynomials
+
 ## [0.50.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.0) - 2026-06-08
 
 ### Breaking changes
