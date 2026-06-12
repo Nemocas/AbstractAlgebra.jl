@@ -28,6 +28,8 @@ symbols(R::LaurentMPolyWrapRing) = symbols(base_ring(R))
 number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
 number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
 
+is_domain_type(::Type{LaurentMPolyWrapRing{S, T}}) where {S, T} = is_domain_type(T)
+
 ###############################################################################
 #
 #   Basic manipulation
