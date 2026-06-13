@@ -1,9 +1,13 @@
 using Test
 
+import AbstractAlgebra: Generic.puiseux_polynomial_ring_elem
+import AbstractAlgebra: Generic.rescale
+import AbstractAlgebra: Generic.normalize!
+
 @testset "PuiseuxPolynomials.jl" begin
     @testset "Construction" begin
         K, (t1,t2,t3) = laurent_polynomial_ring(QQ, ["t1","t2","t3"])
-        K_p,(tp1,tp2,tp3) = puiseux_polynomial_ring(QQ, ["t1","t2","t3"])
+        K_p, (tp1,tp2,tp3) = puiseux_polynomial_ring(QQ, ["t1","t2","t3"])
         @test K_p.baseRing == K
 
         h = 1+t1 + 2*t2+3*t1^4+t1*t2^4+t3^2

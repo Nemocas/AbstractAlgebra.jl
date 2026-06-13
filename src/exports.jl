@@ -457,7 +457,6 @@ export newton_to_monomial!
 export norm
 export normal_form
 export normalise
-export normalize!
 export nullspace
 export num_coeff
 export number_of_columns
@@ -503,7 +502,6 @@ export pseudo_inv
 export pseudodivrem
 export pseudorem
 export puiseux_polynomial_ring
-export puiseux_polynomial_ring_elem
 export puiseux_series_field
 export puiseux_series_ring
 export push_term!
@@ -524,7 +522,6 @@ export rem!
 export remove
 export renest
 export renormalize!
-export rescale
 export rescale!
 export residue_field
 export residue_ring

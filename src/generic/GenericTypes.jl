@@ -1606,3 +1606,34 @@ end
 function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
   return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
 end
+
+################################################################################
+#
+#  Multivariate Puiseux polynomials
+#  
+################################################################################
+
+struct PuiseuxMPolyRing{T <: RingElement} <: Ring
+    baseRing::LaurentMPolyRing
+
+    function PuiseuxMPolyRing(R::LaurentMPolyRing)
+        return new{elem_type(coefficient_ring_type(R))}(R)
+    end
+end
+
+mutable struct PuiseuxMPolyRingElem{T <: RingElement} <: RingElem
+    parent::PuiseuxMPolyRing{T}
+    poly::LaurentMPolyRingElem
+    scale::Int
+
+    function PuiseuxMPolyRingElem(
+        Kt::PuiseuxMPolyRing{T},
+        f::LaurentMPolyRingElem,
+        d::Int = Int(1)
+      ) where {T}
+
+        @req parent(f) == base_ring(Kt) "polynomial must be in the base ring"
+        @req d > 0 "scale must be positive"
+        return new{T}(Kt, f, d)
+    end
+end
