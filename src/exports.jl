@@ -161,6 +161,7 @@ export codomain
 export coeff
 export coeff!
 export coefficient_ring
+export coefficient_type
 export coefficient_ring_type
 export coefficients
 export coefficients_of_univariate
