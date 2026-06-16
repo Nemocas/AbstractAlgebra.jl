@@ -394,7 +394,7 @@ mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra
   temp::S # only used if inplace == true
 
   function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
-    I = new{typeof(f), elem_type(coefficient_ring_type(f))}(f, inplace)
+    I = new{typeof(f), coefficient_type(f)}(f, inplace)
     if inplace
       I.temp = zero(coefficient_ring(parent(f)))
     end

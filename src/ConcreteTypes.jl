@@ -28,7 +28,7 @@ end
 
   function UniversalRing(R::Ring)
     @req allunique(symbols(R)) "Variable names must be unique"
-    return new{elem_type(R), elem_type(coefficient_ring(R))}(R)
+    return new{elem_type(R), coefficient_type(R)}(R)
   end
 end
 
