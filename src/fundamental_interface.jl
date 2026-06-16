@@ -189,6 +189,31 @@ coefficient_ring_type(x::Type{<:Ideal}) = coefficient_ring_type(parent_type(x))
 coefficient_ring_type(T::DataType) = throw(MethodError(coefficient_ring_type, (T,)))
 coefficient_ring_type(T::Type{Union{}}) = throw(MethodError(coefficient_ring_type, (T,)))
 
+@doc raw"""
+    coefficient_type(a)
+
+Return the type of the coefficients of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> coefficient_type(R) == elem_type(coefficient_ring(R))
+true
+
+julia> coefficient_type(zero(R)) == elem_type(coefficient_ring(zero(R)))
+true
+
+julia> coefficient_type(typeof(R)) == elem_type(coefficient_ring(R))
+true
+
+julia> coefficient_type(typeof(zero(R))) == elem_type(coefficient_ring(zero(R)))
+true
+```
+"""
+coefficient_type(x) = elem_type(coefficient_ring_type(x))
+
 ###############################################################################
 #
 #   Special elements
