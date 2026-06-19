@@ -115,6 +115,11 @@ function check_square(S::MatSpace)
    S
 end
 
+function check_square(A::MatElem)
+   nrows(A) == ncols(A) || throw(DomainError(A, "Matrix must be a square matrix"))
+   A
+end
+
 ###############################################################################
 #
 #   Parent object call overload
