@@ -4478,7 +4478,7 @@ end
   @test AbstractAlgebra.transpose!(x, x) == QQ[1 3; 2 4]
 
   # in-place transpose of non-square matrix does not work
-  @test_throws ArgumentError AbstractAlgebra.transpose!(a)
+  @test_throws DomainError AbstractAlgebra.transpose!(a)
 end
 
 @testset "Generic.Mat.MatSpace_iteration" begin
