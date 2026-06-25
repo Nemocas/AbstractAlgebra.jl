@@ -559,6 +559,50 @@ end
 randmat_with_rank(S::MatRing{T}, rank::Int, v...) where {T <: RingElement} =
    randmat_with_rank(Random.default_rng(), S, rank, v...)
 
+################################################################################
+#
+#  Promotion
+#
+################################################################################
+
+function Base.promote(x::MatRingElem{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, change_base_ring(base_ring(x), y)
+   elseif U === T
+      return change_base_ring(base_ring(y), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+# matrix * vec and vec * matrx
+function Base.promote(x::MatRingElem{S},
+                      y::Vector{T}) where {S <: NCRingElement,
+                                           T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
+   elseif U === T && length(y) != 0
+      return change_base_ring(parent(y[1]), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::Vector{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+   yy, xx = promote(y, x)
+   return xx, yy
+end
+
+*(x::MatRingElem, y::Vector) = *(promote(x, y)...)
+
+*(x::Vector, y::MatRingElem) = *(promote(x, y)...)
+
 ###############################################################################
 #
 #   Conformance test element generation
