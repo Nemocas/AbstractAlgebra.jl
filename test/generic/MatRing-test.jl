@@ -1450,12 +1450,38 @@ end
 end
 
 @testset "Generic.MatRing.adhoc_equality" begin
-   # FIXME: may be removed, depending on how we decide to handle equality between MatRingElem and MatElem.
-   # Test equality comparison between MatRingElem & MatElem
    R = matrix_ring(ZZ, 2)
+   S = matrix_ring(QQ, 2)
    M = R(matrix(ZZ, 2,2, [1,2,3,4]))
-   @test M == matrix(M)
-   @test matrix(M) == M
-   @test M == matrix(QQ, M)
-   @test matrix(QQ, M) == M
+   N_ZZ = R(matrix(ZZ, 2,2, [1,2,3,4]))
+   N_QQ = S(matrix(QQ, 2,2, [1,2,3,4]))
+   @test M == N_ZZ
+   @test_throws ErrorException M == matrix(N_ZZ)
+   @test_throws ErrorException matrix(M) == N_ZZ
+   @test_throws NotImplementedError M == N_QQ
+   @test_throws ErrorException M == matrix(N_QQ)
+   @test_throws ErrorException matrix(M) == N_QQ
+
+   # MatRingElem as scalars in a MatSpace
+   A_R = matrix(R, 2,2, [1,2,3,4])
+   @test M != A_R
+   @test A_R != M
+   @test M == matrix(R, 2, 2, [M, 0, 0, M])
+   @test matrix(R, 2, 2, [M, 0, 0, M]) == M
+
+   # MatRings over MatRings
+   T = matrix_ring(R, 2)
+   @test one(T) == one(T)
+   @test one(T) == 1
+   @test 1 == one(T)
+   @test one(R) == one(T)
+   @test one(T) == one(R)
+
+   M2 = T(matrix(R, 2, 2, [M, 0, M, 5]))
+   A_T = matrix(T, 2,2, [1,2,3,4])
+   @test M2 != A_T
+   @test A_T != M2
+   @test M2 == matrix(T, 2, 2, [M2, 0, 0, M2])
+   @test matrix(T, 2, 2, [M2, 0, 0, M2]) == M2
+
 end

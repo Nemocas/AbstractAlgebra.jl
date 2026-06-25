@@ -1352,7 +1352,7 @@ end
 #
 ###############################################################################
 
-function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
+function ==(x::MatElem{T}, y::JuliaRingElement) where T <: NCRingElement
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1368,15 +1368,15 @@ function ==(x::MatrixElem{T}, y::JuliaRingElement) where T <: NCRingElement
    return true
 end
 
-==(x::JuliaRingElement, y::MatrixElem{T}) where T <: NCRingElement = y == x
+==(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement = y == x
 
 @doc raw"""
-    ==(x::MatrixElem{<:NCRingElement}, y::NCRingElement)
+    ==(x::MatElem{<:NCRingElement}, y::NCRingElement)
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
-function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
+function ==(x::MatElem{T}, y::T) where {T <: NCRingElem}
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -1393,12 +1393,12 @@ function ==(x::MatrixElem{T}, y::T) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    ==(x::NCRingElement, y::MatrixElem{<:NCRingElement})
+    ==(x::NCRingElement, y::MatElem{<:NCRingElement})
 
 Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 otherwise return `false`.
 """
-==(x::T, y::MatrixElem{T}) where {T <: NCRingElem} = y == x
+==(x::T, y::MatElem{T}) where {T <: NCRingElem} = y == x
 
 ###############################################################################
 #

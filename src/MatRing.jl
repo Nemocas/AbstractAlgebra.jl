@@ -21,7 +21,7 @@ base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(
 ###############################################################################
 
 function Base.hash(a::MatRingElem, h::UInt)
-  # b = 0x6413942b83a26c65 % UInt # FIXME: comment in once `isequal(::MatRingElem, ::MatElem)` is removed.
+  b = 0x6413942b83a26c65 % UInt
   return xor(b, hash(matrix(a), h))
 end
 
@@ -188,50 +188,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc comparisons
-#
-###############################################################################
-
-function ==(x::MatRingElem, y::JuliaRingElement)
-   n = degree(x)
-   for i = 1:n
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:n
-      for j = 1:n
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::JuliaRingElement, y::MatRingElem) = y == x
-
-function ==(x::MatRingElem{T}, y::T) where T <: NCRingElem
-   n = degree(x)
-   for i = 1:n
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:n
-      for j = 1:n
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::T, y::MatRingElem{T}) where T <: NCRingElem = y == x
-
-###############################################################################
-#
 #   Basic arithmetic -- delegate to MatElem
 #
 ###############################################################################
@@ -247,27 +203,6 @@ end
 ==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
 
 isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
-
-# FIXME: maybe remove the below methods, or comment the errors in
-function ==(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
-  # error("Equality comparison of MatElem with MatRingElem unsupported")
-  return x == matrix(y)
-end
-
-function ==(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-  # error("Equality comparison of MatRingElem with MatElem unsupported")
-  return matrix(x) == y
-end
-
-function isequal(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
-  # error("Equality comparison of MatElem with MatRingElem unsupported")
-  return isequal(x, matrix(y))
-end
-
-function isequal(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-  # error("Equality comparison of MatRingElem with MatElem unsupported")
-  return isequal(matrix(x), y)
-end
 
 ###############################################################################
 #
@@ -330,6 +265,59 @@ end
 function *(x::Vector{T}, y::MatRingElem{T}) where T <: NCRingElement
   return x * matrix(y)
 end
+
+###############################################################################
+#
+#   Ad hoc comparisons
+#
+###############################################################################
+
+function ==(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+   return matrix(x) == y
+end
+
+==(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement = y == x
+
+function ==(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+   return matrix(x) == y
+end
+
+==(x::T, y::MatRingElem{T}) where {T <: NCRingElem} = y == x
+
+function ==(x::MatElem{T}, y::MatRingElem) where {T <: NCRingElement}
+  error("Equality comparison of MatElem with MatRingElem unsupported. Call `x == matrix(y)` instead.")
+end
+
+function ==(x::MatRingElem, y::MatElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatRingElem with MatElem unsupported. Call `matrix(x) == y` instead.")
+end
+
+function isequal(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatElem with MatRingElem unsupported. Call `isequal(x, matrix(y))` instead.")
+end
+
+function isequal(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatRingElem with MatElem unsupported. Call `isequal(matrix(x), y)` instead.")
+end
+
+# to resolve ambiguities:
+function ==(x::MatElem{T}, y::T) where {T <: MatRingElem}
+   for i = 1:min(nrows(x), ncols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         if i != j && !is_zero_entry(x, i, j)
+            return false
+         end
+      end
+   end
+   return true
+end
+
+==(x::T, y::MatElem{T}) where {T <: MatRingElem} = y == x
 
 ###############################################################################
 #
