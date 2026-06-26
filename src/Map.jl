@@ -158,6 +158,54 @@ end
 
 ################################################################################
 #
+#  HeckeMap
+#
+################################################################################
+
+# abstract type HeckeMap <: SetMap end  #needed here for the hasspecial stuff
+             #maybe move to Maps?
+
+# import AbstractAlgebra: get_attribute, set_attribute!, @show_name, @show_special,
+#        _get_attributes, _get_attributes!, _is_attribute_storing_type,
+#        @show_special_elem, @attributes, extra_name, set_name!, get_name
+
+# Hecke maps store attributes in the header object
+_get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.header)
+_get_attributes!(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes!(G.header)
+_is_attribute_storing_type(::Type{Map{<:Any, <:Any, HeckeMap, <:Any}}) = true
+
+(f::Map{D, C, <:AbstractAlgebra.HeckeMap, T} where {D, C, T})(x) = image(f, x)
+
+function domain(M::Map(HeckeMap))
+  return M.header.domain
+end
+
+function codomain(M::Map(HeckeMap))
+  return M.header.codomain
+end
+
+function image_function(f::Map(HeckeMap))
+  if isdefined(f.header, :image)
+    return f.header.image
+  else
+    return x -> image(f, x)
+  end
+end
+
+function preimage_function(f::Map(HeckeMap))
+  if isdefined(f.header, :preimage)
+    return f.header.preimage
+  else
+    return x -> preimage(f, x)
+  end
+end
+
+
+
+
+
+################################################################################
+#
 #  Comparison of objects as maps
 #
 #  Rationale: Often objects are implicitly used as maps. For instance, a `Ring`
