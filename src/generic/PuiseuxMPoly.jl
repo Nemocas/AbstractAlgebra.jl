@@ -57,8 +57,7 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     if PuiseuxMPolyRingElem{S} === T
         return T
     end
-    SS = elem_type(coefficient_ring_type(parent_type(S)))
-    return promote_rule(SS, T)
+    return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
 
 #################################################################################
@@ -224,6 +223,9 @@ function expressify(a::PuiseuxMPolyRingElem, x = symbols(parent(a)); context = n
          push!(prod.args, expressify(c, context = context))
       end
       for i in 1:n
+         if v[i] == 0
+           continue
+         end
          if v[i] != 1
             push!(prod.args, Expr(:call, :^, x[i], expressify(v[i]; context = context)))
          elseif v[i] == 1

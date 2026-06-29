@@ -1614,7 +1614,7 @@ end
 ################################################################################
 
 struct PuiseuxMPolyRing{T <: RingElement} <: Ring
-    baseRing::LaurentMPolyRing
+    baseRing::LaurentMPolyRing{T}
 
     function PuiseuxMPolyRing(R::LaurentMPolyRing)
         return new{elem_type(coefficient_ring_type(R))}(R)
@@ -1623,7 +1623,7 @@ end
 
 mutable struct PuiseuxMPolyRingElem{T <: RingElement} <: RingElem
     parent::PuiseuxMPolyRing{T}
-    poly::LaurentMPolyRingElem
+    poly::LaurentMPolyRingElem{T}
     scale::Int
 
     function PuiseuxMPolyRingElem(
