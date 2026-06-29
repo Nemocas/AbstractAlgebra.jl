@@ -240,7 +240,7 @@ function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:M
   if ngens(V) == 0
     return ModuleHomomorphism(V, W, zero_matrix(base_ring(V), ngens(V), ngens(W)))
   end
-  return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
+  return ModuleHomomorphism(V, W, reduce(vcat, [_matrix(x) for x in v]))
 end
 
 function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true, map::Union{Nothing, Map} = nothing)

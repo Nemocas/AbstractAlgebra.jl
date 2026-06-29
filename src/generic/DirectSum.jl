@@ -65,11 +65,11 @@ function show(io::IO, v::DirectSumModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), v.v[1, i])
+      print(IOContext(io, :compact => true), v[i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), v.v[1, len])
+      print(IOContext(io, :compact => true), v[len])
    end
    print(io, ")")
 end
@@ -156,7 +156,7 @@ function direct_sum_injection(i::Int, D::DirectSumModule{T}, v::AbstractAlgebra.
    # create embedded value
    X = zero(D)
    for j = 1:ngens(m)
-      X.v[j + start] = v[j]
+      _matrix(X)[j + start] = v[j]
    end
    return X
 end
@@ -170,7 +170,7 @@ function add_direct_sum_injection!(X::DirectSumModuleElem{T}, i::Int, v::Abstrac
    start = sum(map(x->ngens(x)::Int, S[1:i-1]))
    # create embedded value
    for j = 1:ngens(m)
-     X.v[j+start] += v[j]
+      _matrix(X)[j + start] += v[j]
    end
    return X
 end
@@ -197,7 +197,7 @@ function direct_sum_projection(D::DirectSumModule{T}, i::Int, v::AbstractAlgebra
    # create projected value
    X = zero(m)
    for j=1:ngens(m)
-     X.v[j] = v[j+start]
+     _matrix(X)[j] = v[j+start]
    end
    return X
    newv = T[v[j + start] for j in 1:ngens(m)]

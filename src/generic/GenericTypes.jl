@@ -1384,26 +1384,26 @@ mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{Abs
    is_left::Bool  # x -> is_left ? #xA : Ax so is_left is the "normal" case
    solve_ctx::Any # really: SolveCtx
    map::Map # to change the ring. The morphism is
-   #1st apply map (coefficient wise, map_entries(map, x.v))
+   #1st apply map (coefficient wise, map_entries(map, _matrix(x)))
    #2nd apply matrix
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), true)
+      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), true)
    end
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where T <: NCRingElement
 
       if is_left
-         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), is_left)
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), is_left)
          if !isa(map, Nothing)
            z.map = map
-           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(map_entries(map, x.v)*m)
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(map_entries(map, _matrix(x))*m)
          end
       else
-         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*x.v), is_left)
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*_matrix(x)), is_left)
          if !isa(map, Nothing)
            z.map = map
-           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(m*map_entries(map, x.v))
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(m*map_entries(map, _matrix(x)))
          end
       end
       return z
@@ -1420,7 +1420,7 @@ mutable struct ModuleIsomorphism{T <: RingElement} <: AbstractAlgebra.Map{Abstra
    inverse_image_fn::Function
 
    function ModuleIsomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, minv, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), y::AbstractAlgebra.FPModuleElem{T} -> D(y.v*minv))
+      z = new(D, C, m, minv, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), y::AbstractAlgebra.FPModuleElem{T} -> D(_matrix(y)*minv))
    end
 end
 

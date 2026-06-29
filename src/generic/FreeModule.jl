@@ -67,7 +67,7 @@ end
 
 basis(N::FreeModule) = gens(N)
 
-Base.hash(a::FreeModuleElem, h::UInt) = hash(a.v, h)
+Base.hash(a::FreeModuleElem, h::UInt) = hash(_matrix(a), h)
 
 ###############################################################################
 #
