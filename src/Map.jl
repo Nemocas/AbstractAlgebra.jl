@@ -136,14 +136,18 @@ identity_map(R::D) where D <: Set = Generic.IdentityMap{D}(R)
 ################################################################################
 
 @doc raw"""
-    map_from_func(image_fn::Function, domain, codomain)
+    map_from_func(D, C, image_fn, [inverse_fn])
 
-Construct the generic functional map with domain and codomain given by the parent objects
+Creates the map `D -> C, x -> image_fn(x)` of type `MapFromFunc` given the callable
+object `image_fn`. If `inverse_fn` is provided, it is assumed to satisfy
+`image_fn(inverse_fn(x)) = x` and will be used as the preimage function.
+
+Construct the MapFromFunc with domain and codomain given by the parent objects
 $R$ and $S$ corresponding to the Julia function $f$.
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
 Map defined by a Julia function
   from integers
   to integers
@@ -152,9 +156,9 @@ julia> f(ZZ(2))
 3
 ```
 """
-function map_from_func(image_fn::Function, domain, codomain)
-   return Generic.FunctionalMap(domain, codomain, image_fn)
-end
+map_from_func(D, C, image_fn) = MapFromFunc(D, C, image_fn)
+map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_fn)
+
 
 ################################################################################
 #
