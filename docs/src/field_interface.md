@@ -26,7 +26,7 @@ The parent type must belong to `Field` and the element type must belong
 to `FieldElem`. Of course, the types may belong to these abstract types
 transitively.
 
-For parametrized fields, we advise parametrizing both the type of parent objects and 
+For parameterised fields, we advise parametrizing both the type of parent objects and 
 the type of the element objects by the type of the elements of the base ring.
 
 There can be variations on this theme: e.g. in some areas of mathematics there is a
