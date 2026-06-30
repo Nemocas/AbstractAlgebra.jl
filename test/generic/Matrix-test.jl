@@ -4195,7 +4195,7 @@ end
                if !isempty(mat)
                   # when empty, it may happen that the result of map below has Any
                   # as eltype, and calling M on it fails, cf. issue #423
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
             end
          end
@@ -4210,7 +4210,7 @@ end
                @test m == m0 # map's input must not be mutated
                M = algebra ? matrix_ring(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
                @test n isa (algebra ? MatRingElem : MatElem)
             end
