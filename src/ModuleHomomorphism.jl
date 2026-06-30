@@ -127,8 +127,8 @@ end
       v::FPModuleElem{T}) where T <: RingElement
 
 Check if $v$ has a preimage under the homomorphism $f$.
-If it does, return a tuple (true, y) for $y$ in domain(f) such that $f(y) = x$ holds,
-otherwise, return (false, id) where id is the identity of domain(f).
+If it does, return a tuple `(true, y)` for `y` in `domain(f)` such that $f(y) = x$ holds,
+otherwise, return `(false, z)` where `z` is any element of type `elem_type(domain(f))`.
 """
 function has_preimage_with_preimage(
   f::Map(FPModuleHomomorphism), v::FPModuleElem{T}
