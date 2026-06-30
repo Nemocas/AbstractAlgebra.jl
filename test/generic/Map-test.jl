@@ -182,3 +182,148 @@ end
    @test t.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(6), ZZ(8), ZZ(10)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> t == [ZZ(6), ZZ(8), ZZ(10)]
 end
+
+# New versions of tests using `MapFromFunc`
+
+@testset "MapFromFunc" begin
+   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+   g = MapFromFunc(ZZ, QQ, x -> QQ(x))
+
+   @test isa(f, Map(MapFromFunc))
+   @test isa(g, Map(MapFromFunc))
+
+   @test domain(f) == AbstractAlgebra.JuliaZZ
+   @test codomain(f) == AbstractAlgebra.JuliaZZ
+   @test domain(g) == AbstractAlgebra.JuliaZZ
+   @test codomain(g) == AbstractAlgebra.JuliaQQ
+
+   @test image(f, ZZ(1)) == 2
+   @test image(g, ZZ(2)) == QQ(2)
+
+   @test image_fn(f)(ZZ(1)) == 2
+   @test image_fn(g)(ZZ(2)) == QQ(2)
+
+   h = compose(f, g)
+
+   @test isa(h, Map(Generic.CompositeMap))
+
+   k = f*g
+
+   for i in 1:10
+      @test h(ZZ(i)) == k(ZZ(i))
+      @test image(h, ZZ(i)) == image(k, ZZ(i))
+   end
+
+   @test domain(h) == AbstractAlgebra.JuliaZZ
+   @test codomain(h) == AbstractAlgebra.JuliaQQ
+
+   @test image(h, ZZ(1)) == QQ(2)
+   @test image_fn(h)(ZZ(1)) == QQ(2)
+
+   @test map1(h) === f
+   @test map2(h) === g
+end
+
+@testset "MapFromFunc CompositeMap" begin
+   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+
+   s = MyMapMod.MyMap(2)
+
+   t = compose(f, s)
+
+   @test isa(t, Map(Generic.CompositeMap))
+
+   for i in 1:10
+      @test t(ZZ(i)) == 2*(i + 2)
+      @test image(t, ZZ(i)) == 2*(i + 2)
+   end
+
+   @test domain(t) == AbstractAlgebra.JuliaZZ
+   @test codomain(t) == AbstractAlgebra.JuliaZZ
+
+   @test map1(t) === f
+   @test map2(t) === s
+
+   V = free_module(QQ, 2)
+   f = AbstractAlgebra.ModuleHomomorphism(V, V, QQ[1 1; 1 2])
+   g = identity_map(V)
+   h = f * g
+   @test domain(h) == V
+   @test codomain(h) == V
+end
+
+@testset "MapFromFunc IdentityMap" begin
+   f = MapFromFunc(ZZ, QQ, x -> QQ(x + 1))
+   g = identity_map(ZZ)
+   h = identity_map(QQ)
+
+   @test isa(g, Map(IdentityMap))
+   @test isa(h, Map(IdentityMap))
+
+   @test compose(g, f) === f
+   @test compose(f, h) === f
+
+   @test domain(g) == AbstractAlgebra.JuliaZZ
+   @test codomain(g) == AbstractAlgebra.JuliaZZ
+   @test domain(h) == AbstractAlgebra.JuliaQQ
+   @test codomain(h) == AbstractAlgebra.JuliaQQ
+
+   for i = 1:10
+      @test g(ZZ(i)) == ZZ(i)
+      @test h(ZZ(i)//(i + 1)) == ZZ(i)//(i + 1)
+      @test image(g, ZZ(i)) == ZZ(i)
+      @test image(h, ZZ(i)//(i + 1)) == ZZ(i)//(i + 1)
+   end
+
+   @test compose(g, g) === g
+   @test compose(h, h) === h
+
+   @test inv(g) === g
+   @test inv(h) === h
+end
+
+@testset "MapFromFunc printing" begin
+  u = MapFromFunc(ZZ, QQ, x -> QQ(x + 1))
+  str = """
+        Map defined by a Julia function
+          from integers
+          to rationals"""
+  @test PrettyPrinting.repr_detailed(u) == str
+  @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
+  @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
+
+  f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+  g = MapFromFunc(ZZ, QQ, x -> QQ(x))
+  v = compose(f, g)
+  str = """
+         Composite map
+            from integers
+            to rationals
+         which is the composite of
+            Map: integers -> integers
+            Map: integers -> rationals"""
+  @test PrettyPrinting.repr_detailed(v) == str
+  @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
+  @test PrettyPrinting.repr_terse(v) == "Composite map"
+
+  f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+  s = MyMapMod.MyMap(2)
+  t = compose(f, s)
+  str = """
+        Composite map
+          from integers
+          to integers
+        which is the composite of
+          Map: integers -> integers
+          Map: integers -> integers"""
+  @test PrettyPrinting.repr_detailed(t) == str
+  @test PrettyPrinting.repr_oneline(t) == "Map: integers -> integers -> integers"
+  @test PrettyPrinting.repr_terse(t) == "Composite map"
+
+end
+
+@testset "MapFromFunc broadcasting" begin
+   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+   @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
+   @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
+end
