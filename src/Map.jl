@@ -204,7 +204,7 @@ function preimage_function(f::Map(HeckeMap))
   end
 end
 
-
+image_fn(F::Map(HeckeMap)) = image_function(f)
 
 
 
