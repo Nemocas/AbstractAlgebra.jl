@@ -1,7 +1,7 @@
 @testset "Generic.MapCache.constructors" begin
-   f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
-   g = cached(map_from_func(x -> QQ(x), ZZ, QQ), limit=2)
-   h = cached(map_from_func(x -> x + 2, ZZ, ZZ), enabled=false)
+   f = cached(MapFromFunc(ZZ, ZZ, x -> x + 1))
+   g = cached(MapFromFunc(ZZ, QQ, x -> QQ(x)), limit=2)
+   h = cached(MapFromFunc(ZZ, ZZ, x -> x + 2), enabled=false)
 
    @test isa(f, Map(Generic.MapCache))
    @test isa(g, Map(Generic.MapCache))
@@ -27,7 +27,7 @@
 end
 
 @testset "Generic.MapCache.enable_disable" begin
-   f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
+   f = cached(MapFromFunc(ZZ, ZZ, x -> x + 1))
 
    @test f(ZZ(1)) == 2
    @test image(f, ZZ(1)) == 2
@@ -46,7 +46,7 @@ end
    @test image(f, ZZ(1)) == 2
    @test image(f, ZZ(3)) == 4
 
-   g = cached(map_from_func(x -> x + 1, ZZ, ZZ), enabled=false)
+   g = cached(MapFromFunc(ZZ, ZZ, x -> x + 1), enabled=false)
 
    @test g(ZZ(1)) == 2
    @test image(g, ZZ(1)) == 2
@@ -67,7 +67,7 @@ end
 end
 
 @testset "Generic.MapCache.limit" begin
-   g = cached(map_from_func(x -> QQ(x), ZZ, QQ), limit=2)
+   g = cached(MapFromFunc(ZZ, QQ, x -> QQ(x)), limit=2)
 
    set_limit!(g, 3)
 
