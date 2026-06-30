@@ -105,7 +105,7 @@ julia> f(QQ(1//3))
 1
 
 julia> println(f)
-Map: QQ -> F
+Map: rationals -> F
 
 julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(ZZ, y)),)
 Map defined by a julia-function with inverse
