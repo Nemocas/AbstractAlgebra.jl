@@ -1,5 +1,5 @@
 @testset "Test inverse of MapFromFunc" begin
-  f = MapFromFunc(ZZ, ZZ, x -> x+1, x -> x-1)
+  f = map_from_func(ZZ, ZZ, x -> x+1, x -> x-1)
   x = ZZ(1)
   y = f(x)
   @test preimage(f, y) == x

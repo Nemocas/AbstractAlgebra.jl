@@ -83,9 +83,9 @@ Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(
 
 # Examples
 ```jldoctest
-julia> f = MapFromFunc(ZZ, ZZ, x -> x + 1);
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 
-julia> g = MapFromFunc(ZZ, QQ, x -> QQ(x));
+julia> g = map_from_func(ZZ, QQ, x -> QQ(x));
 
 julia> h = compose(f, g)
 Functional composite map

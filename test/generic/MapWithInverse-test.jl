@@ -1,8 +1,8 @@
 import AbstractAlgebra.PrettyPrinting
 
 @testset "Generic.MapWithInverse.constructors" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
-   g = MapFromFunc(ZZ, ZZ, x -> x - 1)
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   g = map_from_func(ZZ, ZZ, x -> x - 1)
 
    s = map_with_section(f, g)
 
@@ -52,10 +52,10 @@ import AbstractAlgebra.PrettyPrinting
 end
 
 @testset "Generic.MapWithInverse.composition" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
-   g = MapFromFunc(ZZ, ZZ, x -> x - 1)
-   h = MapFromFunc(ZZ, ZZ, x -> x + 2)
-   k = MapFromFunc(ZZ, ZZ, x -> x - 2)
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   g = map_from_func(ZZ, ZZ, x -> x - 1)
+   h = map_from_func(ZZ, ZZ, x -> x + 2)
+   k = map_from_func(ZZ, ZZ, x -> x - 2)
 
    s = map_with_section(f, g)
    t = map_with_section(h, k)
@@ -79,10 +79,10 @@ end
 end
 
 @testset "Generic.MapWithInverse.inv" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
-   g = MapFromFunc(ZZ, ZZ, x -> x - 1)
-   h = MapFromFunc(ZZ, ZZ, x -> x + 2)
-   k = MapFromFunc(ZZ, ZZ, x -> x - 2)
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   g = map_from_func(ZZ, ZZ, x -> x - 1)
+   h = map_from_func(ZZ, ZZ, x -> x + 2)
+   k = map_from_func(ZZ, ZZ, x -> x - 2)
 
    s = map_with_section(f, g)
    t = map_with_section(h, k)
