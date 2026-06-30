@@ -172,7 +172,7 @@ end
    @test id.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(1), ZZ(2), ZZ(3)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> id == [ZZ(1), ZZ(2), ZZ(3)]
 
-   f = Generic.FunctionaMap(ZZ, ZZ, x -> x + 1)
+   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
    @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
 
