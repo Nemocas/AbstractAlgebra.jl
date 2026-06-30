@@ -185,11 +185,11 @@ end
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> t == [ZZ(6), ZZ(8), ZZ(10)]
 end
 
-# New versions of tests using `MapFromFunc`
+# New versions of tests using `map_from_func`
 
 @testset "MapFromFunc" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
-   g = MapFromFunc(ZZ, QQ, x -> QQ(x))
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   g = map_from_func(ZZ, QQ, x -> QQ(x))
 
    @test isa(f, Map(MapFromFunc))
    @test isa(g, Map(MapFromFunc))
@@ -227,7 +227,7 @@ end
 end
 
 @testset "MapFromFunc CompositeMap" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
 
    s = MyMapMod.MyMap(2)
 
@@ -255,7 +255,7 @@ end
 end
 
 @testset "MapFromFunc IdentityMap" begin
-   f = MapFromFunc(ZZ, QQ, x -> QQ(x + 1))
+   f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
    g = identity_map(ZZ)
    h = identity_map(QQ)
 
@@ -285,7 +285,7 @@ end
 end
 
 @testset "MapFromFunc printing" begin
-  u = MapFromFunc(ZZ, QQ, x -> QQ(x + 1))
+  u = map_from_func(ZZ, QQ, x -> QQ(x + 1))
   str = """
         Map defined by a Julia function
           from integers
@@ -294,8 +294,8 @@ end
   @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
   @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
 
-  f = MapFromFunc(ZZ, ZZ, x -> x + 1)
-  g = MapFromFunc(ZZ, QQ, x -> QQ(x))
+  f = map_from_func(ZZ, ZZ, x -> x + 1)
+  g = map_from_func(ZZ, QQ, x -> QQ(x))
   v = compose(f, g)
   str = """
          Composite map
@@ -308,7 +308,7 @@ end
   @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
   @test PrettyPrinting.repr_terse(v) == "Composite map"
 
-  f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+  f = map_from_func(ZZ, ZZ, x -> x + 1)
   s = MyMapMod.MyMap(2)
   t = compose(f, s)
   str = """
@@ -325,7 +325,7 @@ end
 end
 
 @testset "MapFromFunc broadcasting" begin
-   f = MapFromFunc(ZZ, ZZ, x -> x + 1)
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
    @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
 end
