@@ -70,9 +70,9 @@ abstract type Map{D, C, S, T} <: SetElem end
 
 abstract type SetMap end
 
-abstract type HeckeMap <: SetMap end
-
 abstract type FunctionalMap <: SetMap end
+
+abstract type HeckeMap <: FunctionalMap end
 
 abstract type IdentityMap <: SetMap end
 
