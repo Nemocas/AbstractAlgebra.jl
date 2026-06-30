@@ -121,20 +121,20 @@ Map: QQ -> F
 ```
 """
 mutable struct MapFromFunc{R, T} <: Map{R, T, HeckeMap, MapFromFunc}
-  header::AbstractAlgebra.MapHeader{R, T}
+  header::MapHeader{R, T}
   f
   g
 
   function MapFromFunc{R, T}(D::R, C::T, f) where {R, T}
     n = new{R, T}()
-    n.header = AbstractAlgebra.MapHeader(D, C, f)
+    n.header = MapHeader(D, C, f)
     n.f = f
     return n
   end
 
   function MapFromFunc{R, T}(D::R, C::T, f, g) where {R, T}
     n = new{R, T}()
-    n.header = AbstractAlgebra.MapHeader(D, C, f, g)
+    n.header = MapHeader(D, C, f, g)
     n.f = f
     n.g = g
     return n
