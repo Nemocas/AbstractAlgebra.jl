@@ -132,7 +132,7 @@ end
 #
 #################################################################################
 
-# The next function is required but not tested in AbstractAlgebra.
+# The next function is required but not tested in AbstractAlgebra conformance tests.
 # The following code errors without it:
 #   QQt,(t,) = puiseux_polynomial_ring(QQ,["t"]);
 #   QQtx, x = polynomial_ring(QQt,3);
@@ -150,7 +150,7 @@ function (Kt::PuiseuxMPolyRing{T})(ct::PuiseuxMPolyRingElem{T}) where T <: RingE
     return ct
 end
 
-# The next function is required but not tested in AbstractAlgebra.
+# The next function is required but not tested in AbstractAlgebra conformance tests.
 # The following code errors without it:
 # K = algebraic_closure(QQ);
 # Kz, z = polynomial_ring(K, "z");
@@ -163,7 +163,6 @@ end
 # Ktx,x = polynomial_ring(Kt,3);
 # f = sum([ rand(Ct) * prod(x .^ rand(1:9,3))  for _ in 1:9])
 # evaluate(f, [Ktx(1), Ktx(1), Ktx(1)+x[3]]) # runs ^(::MPoly,Int) in AA/src/generic/MPoly,jl
-
 function Base.hash(f::PuiseuxMPolyRingElem, h::UInt)
     normalize!(f)
     return hash((parent(f), poly(f), scale(f)), h)
@@ -337,8 +336,8 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
         return f^numerator(a)
     end
 
-    @req length(f) == 1 "only monomials can be exponentiated to rational powers"
-    @req isone(first(coefficients(f))) "only monomials with coefficient 1 can be exponentiated to rational powers"
+    @req length(f) == 1 "only monomials can be exponentiated to non-integer powers"
+    @req isone(first(coefficients(f))) "only monomials can be exponentiated to non-integer powers"
 
     return puiseux_polynomial_ring_elem(
         parent(f),
