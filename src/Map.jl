@@ -167,12 +167,6 @@ map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_
 #
 ################################################################################
 
-# abstract type HeckeMap <: SetMap end  #needed here for the hasspecial stuff
-             #maybe move to Maps?
-
-# import AbstractAlgebra: get_attribute, set_attribute!, @show_name, @show_special,
-#        _get_attributes, _get_attributes!, _is_attribute_storing_type,
-#        @show_special_elem, @attributes, extra_name, set_name!, get_name
 
 # Hecke maps store attributes in the header object
 _get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.header)
