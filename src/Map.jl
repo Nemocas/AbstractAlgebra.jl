@@ -88,7 +88,7 @@ julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 julia> g = map_from_func(ZZ, QQ, x -> QQ(x));
 
 julia> h = compose(f, g)
-Functional composite map
+Composite map
   from integers
   to rationals
 which is the composite of
