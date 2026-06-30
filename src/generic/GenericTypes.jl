@@ -1617,7 +1617,7 @@ struct PuiseuxMPolyRing{T <: RingElement} <: Ring
     baseRing::LaurentMPolyRing{T}
 
     function PuiseuxMPolyRing(R::LaurentMPolyRing)
-        return new{elem_type(coefficient_ring_type(R))}(R)
+        return new{coefficient_type(R)}(R)
     end
 end
 
