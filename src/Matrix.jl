@@ -116,7 +116,7 @@ function check_square(S::MatSpace)
 end
 
 function check_square(A::MatElem)
-   nrows(A) == ncols(A) || throw(DomainError(A, "Matrix must be a square matrix"))
+   is_square(A) || throw(DomainError(A, "Argument must be a square matrix"))
    A
 end
 
