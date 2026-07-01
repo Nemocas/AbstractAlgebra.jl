@@ -60,6 +60,7 @@ end
 is_gen(p::UniversalRingElem) = is_gen(data(p))
 
 function _ensure_variables(S::UniversalRing, v::Vector{<:VarName})
+   @req allunique(v) "Variable names must be unique"
    idx = Int[]
    current_symbols = symbols(S)
    n = length(current_symbols)
