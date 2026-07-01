@@ -25,7 +25,7 @@ matrix reside.
 ## Generic constructors
 
 Given an $r \times c$ Julia matrix, the following command constructs the corresponding
-matrix over the given ring `R`, assuming all the entries can be coerced into `R`.
+matrix over the given ring `R`, provided that all the entries can be coerced into `R`.
 
 ```julia
 matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
