@@ -235,6 +235,7 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
            new_rels[rel] = new_rel
            rel += 1
         end
+        start += degs[i]
      end
    end
    # Construct DirectSumModule object
@@ -301,4 +302,3 @@ function hom_direct_sum(A::DirectSumModule{T}, B::DirectSumModule{T}, M::Matrix{
   end
   return s
 end
-
