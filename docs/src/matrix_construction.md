@@ -92,7 +92,7 @@ julia> identity_matrix(ZZ, 2)
 
 ### The ones matrix
 
-Create the $r \times c$ matrix over the unital ring `R` whose entries are
+Create the $r \times c$ matrix over the ring `R` whose entries are
 all equal to the multiplicative identity of `R`.
 
 ```@docs
