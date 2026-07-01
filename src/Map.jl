@@ -83,12 +83,12 @@ Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ);
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 
-julia> g = map_from_func(x -> QQ(x), ZZ, QQ);
+julia> g = map_from_func(ZZ, QQ, x -> QQ(x));
 
 julia> h = compose(f, g)
-Functional composite map
+Composite map
   from integers
   to rationals
 which is the composite of
@@ -136,15 +136,20 @@ identity_map(R::D) where D <: Set = Generic.IdentityMap{D}(R)
 ################################################################################
 
 @doc raw"""
-    map_from_func(image_fn::Function, domain, codomain)
+    map_from_func(D, C, image_fn, [inverse_fn])
 
-Construct the generic functional map with domain and codomain given by the parent objects
+Creates the map `D -> C, x -> image_fn(x)` of type `MapFromFunc` given the callable
+object `image_fn`. If `inverse_fn` is provided, it is assumed to satisfy
+`image_fn(inverse_fn(x)) = x` and will be used as the preimage function.
+
+Construct the MapFromFunc with domain and codomain given by the parent objects
 $R$ and $S$ corresponding to the Julia function $f$.
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
-Map defined by a Julia function
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
+Map defined by a
+  julia function
   from integers
   to integers
 
@@ -152,9 +157,51 @@ julia> f(ZZ(2))
 3
 ```
 """
-function map_from_func(image_fn::Function, domain, codomain)
-   return Generic.FunctionalMap(domain, codomain, image_fn)
+map_from_func(D, C, image_fn) = MapFromFunc(D, C, image_fn)
+map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_fn)
+
+
+################################################################################
+#
+#  HeckeMap
+#
+################################################################################
+
+
+# Hecke maps store attributes in the header object
+_get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.header)
+_get_attributes!(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes!(G.header)
+_is_attribute_storing_type(::Type{Map{<:Any, <:Any, HeckeMap, <:Any}}) = true
+
+(f::Map{D, C, <:AbstractAlgebra.HeckeMap, T} where {D, C, T})(x) = image(f, x)
+
+function domain(M::Map(HeckeMap))
+  return M.header.domain
 end
+
+function codomain(M::Map(HeckeMap))
+  return M.header.codomain
+end
+
+function image_function(f::Map(HeckeMap))
+  if isdefined(f.header, :image)
+    return f.header.image
+  else
+    return x -> image(f, x)
+  end
+end
+
+function preimage_function(f::Map(HeckeMap))
+  if isdefined(f.header, :preimage)
+    return f.header.preimage
+  else
+    return x -> preimage(f, x)
+  end
+end
+
+image_fn(f::Map(HeckeMap)) = image_function(f)
+
+
 
 ################################################################################
 #
