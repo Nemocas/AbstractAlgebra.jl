@@ -134,7 +134,7 @@ julia> scalar_matrix(QQ, 3, 1//2)
 Create a matrix over the ring `R` whose entries are all zero except for
 the diagonal entries. Two constructors are provided. One function creates a rectangular
 diagonal matrix whose diagonal entries are all equal to a given scalar. The
-other constructs a diagonal matrix whose diagonal entries are taken from a given
+other constructs a square diagonal matrix whose diagonal entries are taken from a given
 vector.
 
 ```@docs
