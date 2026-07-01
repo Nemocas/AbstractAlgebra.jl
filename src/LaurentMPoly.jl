@@ -10,6 +10,14 @@
 #
 ###############################################################################
 
+laurent_mpoly_type(::Type{T}) where T<:RingElement = Generic.LaurentMPolyWrap{T, mpoly_type(T), Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}}
+laurent_mpoly_type(::Type{S}) where S<:Ring = laurent_mpoly_type(elem_type(S))
+laurent_mpoly_type(x) = laurent_mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+laurent_mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+laurent_mpoly_type(T::Type{Union{}}) = throw(MethodError(laurent_mpoly_type, (T,)))
+
+laurent_mpoly_ring_type(x) = parent_type(laurent_mpoly_type(x))
+
 characteristic(R::LaurentMPolyRing) = characteristic(coefficient_ring(R))
 is_known(::typeof(characteristic), R::LaurentMPolyRing) = is_known(characteristic, coefficient_ring(R))
 

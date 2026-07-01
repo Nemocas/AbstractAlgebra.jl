@@ -89,6 +89,8 @@ export PolyRing
 export PolyRingElem
 export PolynomialElem
 export PosInf
+export PuiseuxMPolyRing
+export PuiseuxMPolyRingElem
 export QQ
 export RDF
 export RealField
@@ -499,6 +501,7 @@ export primpart
 export pseudo_inv
 export pseudodivrem
 export pseudorem
+export puiseux_polynomial_ring
 export puiseux_series_field
 export puiseux_series_ring
 export push_term!
@@ -544,6 +547,7 @@ export rref
 export rref!
 export rref_rational
 export rref_rational!
+export scale
 export scalar_matrix
 export section_map
 export set_attribute!
