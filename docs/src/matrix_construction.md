@@ -145,7 +145,7 @@ diagonal_matrix(::NCRing, ::AbstractVector{<:NCRingElement})
 **Examples**
 
 ```jldoctest
-julia> diagonal_matrix(1, 3, 4)
+julia> diagonal_matrix(ZZ(1), 3, 4)
 [1   0   0   0]
 [0   1   0   0]
 [0   0   1   0]
