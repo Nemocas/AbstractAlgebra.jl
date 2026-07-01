@@ -198,7 +198,7 @@ julia> block_diagonal_matrix([M, N])
 
 ## Triangular matrices
 
-Create (strictly) trianngular matrices over the ring `R`.
+Create (strictly) triangular matrices over the ring `R`.
 
 Why does this not require the ring as an argument?
 
