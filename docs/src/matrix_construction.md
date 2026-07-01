@@ -160,7 +160,7 @@ julia> diagonal_matrix(ZZ, [1,2,3])
 
 ## Block diagonal matrix constructors
 
-Create block diagonal matrices from a vector of existing matrices.
+Create a block diagonal matrix from a vector of existing matrices.
 If Julia matrices are provided, one also has to supply the base ring.
 
 Note that if the input matrices are not square, the output matrix may
