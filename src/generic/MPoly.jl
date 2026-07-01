@@ -1067,6 +1067,89 @@ function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return r
 end
 
+function spoly(a::MPoly{T}, b::MPoly{T}, la::Int = length(a), lb::Int = length(b)) where {T <: RingElement}
+   check_parent(a, b)
+   N = size(a.exps, 1)
+   par = parent(a)
+   r = par()
+   ca = a.coeffs[la]
+   cb = b.coeffs[lb]
+
+   comm = zeros(UInt, nrows(a.exps), 1)
+   monomial_set!(comm, 1, a.exps, la, N)
+   monomial_vecmin!(comm, 1, b.exps, lb, N) #the gcd of the "leading monomials"
+
+   mb = zeros(UInt, nrows(b.exps), 1)
+   monomial_set!(mb, 1, b.exps, lb, N)
+   monomial_sub!(mb, 1, mb, 1, comm, 1, N) #a[la]*mb should be the lcm
+
+   ma = zeros(UInt, nrows(a.exps), 1)
+   monomial_set!(ma, 1, a.exps, la, N)
+   monomial_sub!(ma, 1, ma, 1, comm, 1, N) #b[lb]*ma as well
+
+   fit!(r, length(a) + length(b))
+   i = 1
+   j = 1
+   k = 1
+   mai = zeros(UInt, nrows(a.exps), 1)
+   monomial_add!(mai, 1, a.exps, i, mb, 1, N)
+
+   mbj = zeros(UInt, nrows(a.exps), 1)
+   monomial_add!(mbj, 1, b.exps, j, ma, 1, N)
+
+   while i <= length(a) && j <= length(b)
+      cmpexp = monomial_cmp(mai, 1, mbj, 1, N, par, UInt(0))
+      if cmpexp > 0
+         r.coeffs[k] = a.coeffs[i]*cb
+         monomial_set!(r.exps, k, mai, 1, N)
+         i += 1
+         if i <= length(a)
+           monomial_add!(mai, 1, a.exps, i, mb, 1, N)
+         end
+
+      elseif cmpexp == 0
+         c = a.coeffs[i]*cb - b.coeffs[j]*ca
+         if !iszero(c)
+            r.coeffs[k] = c
+            monomial_set!(r.exps, k, mai, 1, N)
+         else
+            k -= 1
+         end
+         i += 1
+         if i <= length(a)
+           monomial_add!(mai, 1, a.exps, i, mb, 1, N)
+         end
+         j += 1
+         if j <= length(b)
+           monomial_add!(mbj, 1, b.exps, j, ma, 1, N)
+         end
+      else
+         r.coeffs[k] = -b.coeffs[j]*ca
+         monomial_set!(r.exps, k, mbj, 1, N)
+         j += 1
+         if j <= length(b)
+           monomial_add!(mbj, 1, b.exps, j, ma, 1, N)
+         end
+      end
+      k += 1
+   end
+   while i <= length(a)
+      r.coeffs[k] = a.coeffs[i]*cb
+      monomial_add!(r.exps, k, a.exps, i, mb, 1, N)
+      i += 1
+      k += 1
+   end
+   while j <= length(b)
+      r.coeffs[k] = -b.coeffs[j]*ca
+      monomial_add!(r.exps, k, b.exps, j, ma, 1, N)
+      j += 1
+      k += 1
+   end
+   r.length = k - 1
+   return r
+end
+
+
 function do_copy(Ac::Vector{T}, Bc::Vector{T},
                Ae::Matrix{UInt}, Be::Matrix{UInt},
         s1::Int, r::Int, n1::Int, par::MPolyRing{T}) where {T <: RingElement}
