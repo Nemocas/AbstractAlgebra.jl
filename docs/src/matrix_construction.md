@@ -226,5 +226,5 @@ julia> upper_triangular_matrix([3, 2, 1])
 
 julia> strictly_upper_triangular_matrix([-2])
 [0   -2]
-[0   0]
+[0    0]
 ```
