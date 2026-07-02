@@ -1869,7 +1869,7 @@ $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1896,6 +1896,12 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
       end
    end
    return rank, p, L, U
+end
+
+function lu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+  S = parent(A)
+  r, p, L, U = lu(matrix(A))
+  return r, p, S(L), S(U)
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
@@ -2025,7 +2031,7 @@ $\pm \mathrm{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 $A$ is square and nonsingular) and the sign is decided by the parity of the
 permutation.
 """
-function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+function fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -2065,6 +2071,12 @@ function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEl
    end
 
    return rank, d, p, L, U
+end
+
+function fflu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+  S = parent(A)
+  rank, d, p, L, U = fflu(matrix(A))
+  return rank, d, p, S(L), S(U)
 end
 
 ###############################################################################
