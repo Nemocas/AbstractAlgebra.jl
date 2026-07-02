@@ -57,7 +57,7 @@ julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
 
 ### The zero matrix
 
-Construct the $r \times c$ matrix over the ring `R` whose entries are all zero in `R`.
+Construct the $r \times c$ matrix over the ring `R` whose entries are all zero.
 
 ```julia
 zero_matrix(R::Ring, r::Int, c::Int)
