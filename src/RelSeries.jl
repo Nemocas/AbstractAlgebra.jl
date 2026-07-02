@@ -731,8 +731,7 @@ that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
 function ==(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    xval = valuation(x)
    xprec = precision(x)
@@ -766,9 +765,8 @@ power series are precisely the same, to the same precision, are they declared
 equal by this function.
 """
 function isequal(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
-   if parent(x) != parent(y)
-      return false
-   end
+   parent(x) == parent(y) || return false
+
    if precision(x) != precision(y) || pol_length(x) != pol_length(y) ||
       valuation(x) != valuation(y)
       return false

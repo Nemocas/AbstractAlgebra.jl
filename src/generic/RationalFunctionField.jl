@@ -302,7 +302,7 @@ end
 
 function isequal(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    check_parent(a, b)
-   return data(a) == data(b)
+   return isequal(data(a), data(b))
 end
 
 ###############################################################################
