@@ -115,6 +115,11 @@ function check_square(S::MatSpace)
    S
 end
 
+function check_square(A::MatElem)
+   is_square(A) || throw(DomainError(A, "Argument must be a square matrix"))
+   A
+end
+
 ###############################################################################
 #
 #   Parent object call overload
