@@ -293,7 +293,7 @@ end
           to rationals"""
   @test PrettyPrinting.repr_detailed(u) == str
   @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
-  @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
+  @test PrettyPrinting.repr_terse(u) == "Map"
 
   f = map_from_func(ZZ, ZZ, x -> x + 1)
   g = map_from_func(ZZ, QQ, x -> QQ(x))
