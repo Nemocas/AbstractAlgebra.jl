@@ -115,6 +115,11 @@ function check_square(S::MatSpace)
    S
 end
 
+function check_square(A::MatElem)
+   is_square(A) || throw(DomainError(A, "Argument must be a square matrix"))
+   A
+end
+
 ###############################################################################
 #
 #   Parent object call overload
@@ -1272,7 +1277,7 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <:
 Return $a^b$. We require that the matrix $a$ is square.
 """
 function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
-   !is_square(a) && error("Incompatible matrix dimensions in power")
+   check_square(a)
    if b < 0
       return inv(a)^(-b)
    end
@@ -1531,7 +1536,7 @@ Aliasing between `z` and `x` is permitted.
 The unary version reports an error if `x` is not a square matrix.
 """
 function transpose!(x::MatElem)
-  @req is_square(x) "Matrix must be a square matrix"
+  check_square(x)
   return transpose!(x, x)
 end
 
@@ -1653,7 +1658,7 @@ t^2 + 3*t + 2
 ```
 """
 function tr(x::MatElem{T}) where T <: NCRingElement
-   !is_square(x) && error("Not a square matrix in trace")
+   check_square(x)
    d = zero(base_ring(x))
    for i = 1:nrows(x)
       d = add!(d, x[i, i])
@@ -2446,7 +2451,7 @@ function det_fflu(M::MatElem{T}) where {T <: RingElement}
 end
 
 function det(M::MatElem{T}) where {T <: FieldElement}
-   !is_square(M) && error("Not a square matrix in det")
+   check_square(M)
    return det_fflu(M)
 end
 
@@ -2468,7 +2473,7 @@ x^3 - 1
 ```
 """
 function det(M::MatElem{T}) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in det")
+   check_square(M)
    nrows(M) == 0 && return one(base_ring(M))
    try
       return det_fflu(M)
@@ -2512,13 +2517,13 @@ function det_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
 end
 
 function det(M::MatElem{T}) where {S <: FinFieldElem, T <: PolyRingElem{S}}
-   !is_square(M) && error("Not a square matrix in det")
+   check_square(M)
    nrows(M) == 0 && return one(base_ring(M))
    return det_popov(M)
 end
 
 function det(M::MatElem{T}) where {T <: PolyRingElem}
-   !is_square(M) && error("Not a square matrix in det")
+   check_square(M)
    nrows(M) == 0 && return one(base_ring(M))
    try
       return det_interpolation(M)
@@ -3935,14 +3940,14 @@ will be the determinant of $M$ up to sign. If $M$ is singular an exception
 is raised.
 """
 function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   check_square(M)
    flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
    !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
 
 function Base.inv(M::MatElem{T}) where {T <: FieldElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   check_square(M)
    flag, A = can_solve_with_solution(M, identity_matrix(M))
    !flag && error("Singular matrix in inv")
    return A
@@ -3957,7 +3962,7 @@ identity matrix. If $M$ is not invertible over the base ring an exception is
 raised.
 """
 function Base.inv(M::MatElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Cannot invert non-square Matrix"))
+   check_square(M)
    X, d = pseudo_inv(M)
    is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
    return divexact(X, d)
@@ -4143,7 +4148,7 @@ such that $A^k = 0$. If `A` is not square an exception is raised.
 """
 function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
-  !is_square(A) && error("Dimensions don't match in is_nilpotent")
+  check_square(A)
   is_zero(tr(A)) || return false
   n = nrows(A)
   A = deepcopy(A)
@@ -4164,7 +4169,7 @@ end
 ###############################################################################
 
 function hessenberg!(A::MatElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in hessenberg")
+   check_square(A)
    R = base_ring(A)
    n = nrows(A)
    u = R()
@@ -4215,7 +4220,7 @@ above and on the diagonal and in the diagonal line immediately below the
 diagonal.
 """
 function hessenberg(A::MatElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in hessenberg")
+   check_square(A)
    M = deepcopy(A)
    hessenberg!(M)
    return M
@@ -4246,7 +4251,7 @@ end
 ###############################################################################
 
 function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
+   check_square(A)
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -4272,7 +4277,7 @@ function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
 end
 
 function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
+   check_square(A)
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -4390,7 +4395,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
 end
 
 function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in charpoly")
+   check_square(A)
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = nrows(A)
@@ -4522,7 +4527,7 @@ x^4 + 2*x^2 + 6*x + 2
 ```
 """
 function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
-   !is_square(Y) && error("Dimensions don't match in charpoly")
+   check_square(Y)
    R = base_ring(Y)
    base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = nrows(Y)
@@ -4603,7 +4608,7 @@ end
 # extremely fast to compute over some fields).
 
 function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-   !is_square(M) && error("Not a square matrix in minpoly")
+   check_square(M)
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
@@ -4725,7 +4730,7 @@ x^2 + 10*x
 ```
 """
 function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in minpoly")
+   check_square(M)
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = nrows(M)
    if n == 0
@@ -5944,7 +5949,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
 end
 
 function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   nrows(A) != ncols(A) && error("Not a square matrix in det_popov.")
+   check_square(A)
    B = deepcopy(A)
    n = ncols(B)
    R = base_ring(B)
@@ -7111,7 +7116,7 @@ with ones down the diagonal and zeroes elsewhere. `M` must be square.
 This is an alias for `one(M)`.
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
-   is_square(M) || throw(DomainError(M, "matrix must be square"))
+   check_square(M)
    return identity_matrix(M, nrows(M))
 end
 
