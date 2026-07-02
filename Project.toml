@@ -3,6 +3,7 @@ uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 version = "0.50.1"
 
 [deps]
+Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
@@ -20,6 +21,7 @@ IJuliaExt = "IJulia"
 TestExt = "Test"
 
 [compat]
+Compat = "4.13.0"
 IJulia = "1"
 LinearAlgebra = "1.10"
 MacroTools = "0.5"
