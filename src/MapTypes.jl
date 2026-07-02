@@ -97,7 +97,7 @@ object `f`. If `g` is provided, it is assumed to satisfy
 julia> F = GF(2);
 
 julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))))
-Map defined by a julia-function
+Map defined by a Julia function
   from rational field
   to prime field of characteristic 2
 
@@ -108,7 +108,7 @@ julia> println(f)
 Map: rationals -> F
 
 julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(y)),)
-Map defined by a julia-function with inverse
+Map defined by a Julia function with inverse
   from rational field
   to prime field of characteristic 2
 
@@ -158,7 +158,7 @@ end
 function Base.show(io::IO, ::MIME"text/plain", M::MapFromFunc)
   @show_name(io, M)
   io = pretty(io)
-  print(io, "Map defined by a julia-function")
+  print(io, "Map defined by a Julia function")
   if isdefined(M, :g)
     print(io, " with inverse")
   end
