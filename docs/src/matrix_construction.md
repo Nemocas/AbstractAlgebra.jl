@@ -112,7 +112,7 @@ julia> I = ones_matrix(ZZ, 3, 2)
 ### Scalar matrices
 
 Create the $n \times n$ diagonal matrix over the ring `R`, whose diagonal entries are all
-identical to a given scalar `a` in `R`.
+equal to the image of `a` in `R`.
 
 ```@docs
 scalar_matrix(R::Ring, n::Int, a::RingElement)
