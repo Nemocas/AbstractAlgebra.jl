@@ -220,7 +220,8 @@ end
    @test codomain(h) == AbstractAlgebra.JuliaQQ
 
    @test image(h, ZZ(1)) == QQ(2)
-   # @test image_fn(h)(ZZ(1)) == QQ(2) # no `image_fn` defined for Generic.CompositeMap - is this a problem?
+   # no `image_fn` defined for Generic.CompositeMap - is this a problem?
+   # @test image_fn(h)(ZZ(1)) == QQ(2)
 
    @test map1(h) === f
    @test map2(h) === g
@@ -298,12 +299,12 @@ end
   g = map_from_func(ZZ, QQ, x -> QQ(x))
   v = compose(f, g)
   str = """
-         Composite map
-            from integers
-            to rationals
-         which is the composite of
-            Map: integers -> integers
-            Map: integers -> rationals"""
+        Composite map
+          from integers
+          to rationals
+        which is the composite of
+          Map: integers -> integers
+          Map: integers -> rationals"""
   @test PrettyPrinting.repr_detailed(v) == str
   @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
   @test PrettyPrinting.repr_terse(v) == "Composite map"
