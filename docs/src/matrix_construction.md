@@ -111,7 +111,7 @@ julia> I = ones_matrix(ZZ, 3, 2)
 
 ### Scalar matrices
 
-Create the $n \times n$ matrix over the ring `R`, whose entries are all
+Create the $n \times n$ diagonal matrix over the ring `R`, whose diagonal entries are all
 identical to a given scalar `a` in `R`.
 
 ```@docs
