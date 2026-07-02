@@ -8,73 +8,11 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 ## Basic matrix functionality
 
-As well as the Ring and Matrix interfaces, the following functions are provided to
-manipulate matrices and to set and retrieve entries and other basic data associated
-with the matrices.
-
-It is possible to create matrices directly, without first
-creating a corresponding matrix space. The following constructors are necessary,
-because unfortunately, Julia's matrices and linear algebra cannot be made to work in
-our context due to two independent problems:
-- In empty matrices (0 rows or columns) all that is known is the type of the matrix entries,
-however for the complex types used in AbstractAlgebra, this information is not sufficient to create elements,
-hence `zero(T)` or friends cannot work
-- Many functions (e.g. `det`) assume that all types used embed into the real or complex numbers,
-in Julia `det(ones(Int, (1,1))) == 1.0`, so the fact that this is exactly the integer `1` is lost.
-Furthermore, more general rings cannot be embedded into the reals at all.
-
-```julia
-matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
-```
-
-Given an $m\times n$ Julia matrix of entries, construct the corresponding
-AbstractAlgebra.jl matrix over the given ring `R`, assuming all the entries can be
-coerced into `R`.
-
-
-```julia
-matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElement
-```
-
-Construct the given $r\times c$ AbstractAlgebra.jl matrix over the ring `R` whose
-$(i, j)$ entry is given by `A[c*(i - 1) + j]`, assuming that all the entries can be
-coerced into `R`.
-
-```julia
-zero_matrix(R::Ring, r::Int, c::Int)
-```
-
-Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
-
-**Examples**
-
-```jldoctest
-julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3   1   2]
-[2   0   1]
-
-julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-[3   1]
-[2   2]
-[0   1]
-
-julia> P = zero_matrix(ZZ, 3, 2)
-[0   0]
-[0   0]
-[0   0]
-```
-
 ```@docs
 number_of_rows(::MatElem)
 number_of_columns(::MatElem)
 length(::MatrixElem{T}) where T <: RingElement
 isempty(::MatrixElem{T}) where T <: RingElement
-identity_matrix(::Ring, ::Int)
-identity_matrix(::MatElem{T}) where T <: RingElement
-ones_matrix(::Ring, ::Int, ::Int)
-scalar_matrix(R::Ring, n::Int, a::RingElement)
-diagonal_matrix(::RingElement, ::Int, ::Int)
-diagonal_matrix(::NCRing, ::AbstractVector{<:NCRingElement})
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
 transpose(::MatElem)
@@ -82,10 +20,6 @@ transpose!(::MatElem)
 tr(::MatElem{T}) where T <: RingElement
 det(::MatElem{T}) where T <: RingElem
 rank(::MatElem{T}) where T <: RingElem
-lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
 is_lower_triangular(::MatElem)
 is_upper_triangular(::MatElem)
 is_diagonal(::MatElem)
@@ -288,44 +222,6 @@ julia> Q = vcat(M, N)
 ## Linear solving
 
 See [Linear Solving & Kernel](@ref solving_chapter)
-
-## Block diagonal matrix constructors
-
-It is also possible to create block diagonal matrices from a vector of
-existing matrices. It is also possible to construct them from Julia
-matrices if one supplies the base ring.
-
-Note that if the input matrices are not square, the output matrix may
-not be square.
-
-```@docs
-block_diagonal_matrix(::Vector{<:MatElem{T}}) where T <: RingElement
-block_diagonal_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
-
-julia> M = matrix(ZZ, [1 2; 3 4])
-[1   2]
-[3   4]
-
-julia> N = matrix(ZZ, [4 5 6; 7 8 9])
-[4   5   6]
-[7   8   9]
-
-julia> block_diagonal_matrix([M, N])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
-```
 
 ## Similar and zero
 

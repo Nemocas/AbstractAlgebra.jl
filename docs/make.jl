@@ -70,10 +70,14 @@ makedocs(
              ],
              "Matrices" => [
                  "matrix_introduction.md",
-                 "matrix.md",
+                 "Working with matrices" => [
+                    "matrix_construction.md",
+                 ],
                  "matrix_spaces.md",
-                 "matrix_implementation.md",
                  "matrix_algebras.md",
+                 "Developer documentation" => [
+                    "matrix_implementation.md"
+                 ],
              ],
              "Maps" => [
                  "map_introduction.md",
