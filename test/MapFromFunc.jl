@@ -5,7 +5,7 @@
   @test preimage(s, ZZ(1)) == 0
 
   @test image_fn(f)(ZZ(1)) == 2
-  @test inverse_fn(f)(ZZ(1)) == 0
+  @test preimage_fn(f)(ZZ(1)) == 0
 
   @test preimage(f, image(f, ZZ(1))) == ZZ(1)
 
