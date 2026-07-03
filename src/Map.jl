@@ -170,7 +170,7 @@ map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_
 # Hecke maps store attributes in the header object
 _get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.header)
 _get_attributes!(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes!(G.header)
-_is_attribute_storing_type(::Type{Map{<:Any, <:Any, HeckeMap, <:Any}}) = true
+_is_attribute_storing_type(::Type{<:Map(HeckeMap)}) = true
 
 (f::Map(HeckeMap))(x) = image(f, x)
 
