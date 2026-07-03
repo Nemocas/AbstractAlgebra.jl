@@ -148,8 +148,7 @@ $R$ and $S$ corresponding to the Julia function $f$.
 # Examples
 ```jldoctest
 julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
-Map defined
-  by a Julia function
+Map defined by a Julia function
   from integers
   to integers
 
