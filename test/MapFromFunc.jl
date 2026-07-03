@@ -2,7 +2,7 @@
   f = map_from_func(ZZ, ZZ, x -> x+1, x -> x-1)
 
   @test image(f, ZZ(1)) == 2
-  @test preimage(s, ZZ(1)) == 0
+  @test preimage(f, ZZ(1)) == 0
 
   @test image_fn(f)(ZZ(1)) == 2
   @test inverse_fn(f)(ZZ(1)) == 0
