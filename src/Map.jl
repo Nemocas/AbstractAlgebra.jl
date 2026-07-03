@@ -199,7 +199,7 @@ function preimage_function(f::Map(HeckeMap))
 end
 
 image_fn(f::Map(HeckeMap)) = image_function(f)
-preimage_fn(f::Map(HeckeMap)) = preimage_function(f)
+inverse_fn(f::Map(HeckeMap)) = preimage_function(f)
 
 
 ################################################################################
