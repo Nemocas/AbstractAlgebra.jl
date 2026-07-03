@@ -194,6 +194,8 @@ end
    @test isa(f, Map(MapFromFunc))
    @test isa(g, Map(MapFromFunc))
 
+   @test is_attribute_storing(f)
+
    @test domain(f) == AbstractAlgebra.JuliaZZ
    @test codomain(f) == AbstractAlgebra.JuliaZZ
    @test domain(g) == AbstractAlgebra.JuliaZZ
