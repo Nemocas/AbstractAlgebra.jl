@@ -173,7 +173,7 @@ _get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.heade
 _get_attributes!(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes!(G.header)
 _is_attribute_storing_type(::Type{Map{<:Any, <:Any, HeckeMap, <:Any}}) = true
 
-(f::Map{D, C, <:AbstractAlgebra.HeckeMap, T} where {D, C, T})(x) = image(f, x)
+(f::Map(HeckeMap))(x) = image(f, x)
 
 function domain(M::Map(HeckeMap))
   return M.header.domain
@@ -200,7 +200,7 @@ function preimage_function(f::Map(HeckeMap))
 end
 
 image_fn(f::Map(HeckeMap)) = image_function(f)
-
+preimage_fn(f::Map(HeckeMap)) = preimage_function(f)
 
 
 ################################################################################
