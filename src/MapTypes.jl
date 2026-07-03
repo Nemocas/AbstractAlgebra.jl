@@ -98,8 +98,9 @@ julia> F = GF(2);
 
 julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))))
 Map defined by a Julia function
-  from rational field
-  to prime field of characteristic 2
+  from
+  rationals
+  to finite field F_2
 
 julia> f(QQ(1//3))
 1
@@ -109,14 +110,15 @@ Map: rationals -> F
 
 julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(y)),)
 Map defined by a Julia function with inverse
-  from rational field
-  to prime field of characteristic 2
+  from
+  rationals
+  to finite field F_2
 
 julia> preimage(f, F(1))
-1
+1//1
 
 julia> println(f)
-Map: QQ -> F
+Map: rationals -> F
 
 ```
 """
