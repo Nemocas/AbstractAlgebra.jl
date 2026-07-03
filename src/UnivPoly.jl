@@ -598,17 +598,10 @@ _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbo
 function _map(f::Any, p::UniversalRingElem{<:MPolyRingElem}, S::UniversalRing{<:MPolyRingElem})
   q = data(p)
   old_R = parent(q)
+  symbols_map = _ensure_variables(S, symbols(old_R))
   new_R = base_ring(S)
-  old_symbols = symbols(old_R)
-  new_symbols = symbols(new_R)
   old_nvars = nvars(old_R)
   new_nvars = nvars(new_R)
-  symbols_map = Vector{Int64}(undef, old_nvars)
-  for i in 1:old_nvars
-    j = findfirst(==(old_symbols[i]), new_symbols)
-    @req j !== nothing "Symbols do not match"
-    symbols_map[i] = j
-  end
   M = MPolyBuildCtx(new_R)
   for (c, v) in zip(coefficients(q), exponent_vectors(q))
     w = zeros(Int, new_nvars)
