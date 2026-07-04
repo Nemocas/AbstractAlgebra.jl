@@ -159,6 +159,7 @@ import ..AbstractAlgebra: integral
 import ..AbstractAlgebra: internal_ordering
 import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: inv!
+import ..AbstractAlgebra: inverse_fn
 import ..AbstractAlgebra: is_constant
 import ..AbstractAlgebra: is_divisible_by
 import ..AbstractAlgebra: is_domain_type
