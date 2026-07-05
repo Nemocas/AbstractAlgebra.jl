@@ -144,3 +144,14 @@ end
   @test get_attribute(f, :has_inverse)
   @test get_attribute(f.header, :has_inverse)
 end
+
+
+@testset "MapHeader constructions" begin
+   M1 = AbstractAlgebra.MapHeader{typeof(ZZ), typeof(QQ)}()
+   M2 = AbstractAlgebra.MapHeader{typeof(ZZ), typeof(QQ)}(ZZ, QQ)
+   M3 = AbstractAlgebra.MapHeader(ZZ, QQ)
+   @test typeof(M1) == typeof(M2)
+   @test typeof(M2) == typeof(M3)
+   @test M2.domain == M3.domain
+   @test M2.codomain == M3.codomain
+end
