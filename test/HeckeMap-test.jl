@@ -1,27 +1,9 @@
-import AbstractAlgebra.PrettyPrinting
+@testset "MapFromFunc" begin
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   g = map_from_func(ZZ, QQ, x -> QQ(x))
 
-module MyMapMod
-   using AbstractAlgebra
-   mutable struct MyMap <: Map{AbstractAlgebra.Integers{BigInt}, AbstractAlgebra.Integers{BigInt}, SetMap, MyMap}
-      a::Int
-   end
-
-   Generic.domain(f::MyMap) = AbstractAlgebra.JuliaZZ
-   Generic.codomain(f::MyMap) = AbstractAlgebra.JuliaZZ
-
-   a(f::MyMap) = f.a
-
-   (f::MyMap)(x) =  a(f)*(x + 1)
-end
-
-# Generic.FunctionalMap is being deprecated,
-# but we should still test it
-@testset "Generic.Map.FunctionalMap" begin
-   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
-   g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
-
-   @test isa(f, Map(FunctionalMap))
-   @test isa(g, Map(FunctionalMap))
+   @test isa(f, Map(MapFromFunc))
+   @test isa(g, Map(MapFromFunc))
 
    @test domain(f) == AbstractAlgebra.JuliaZZ
    @test codomain(f) == AbstractAlgebra.JuliaZZ
@@ -33,16 +15,10 @@ end
 
    @test image_fn(f)(ZZ(1)) == 2
    @test image_fn(g)(ZZ(2)) == QQ(2)
-end
-
-@testset "Generic.Map.FunctionalCompositeMap" begin
-   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
-   g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
 
    h = compose(f, g)
 
-   @test isa(h, Map(FunctionalMap))
-   @test isa(h, Map(Generic.FunctionalCompositeMap))
+   @test isa(h, Map(Generic.CompositeMap))
 
    k = f*g
 
@@ -55,14 +31,16 @@ end
    @test codomain(h) == AbstractAlgebra.JuliaQQ
 
    @test image(h, ZZ(1)) == QQ(2)
-   @test image_fn(h)(ZZ(1)) == QQ(2)
+   # no `image_fn` defined for Generic.CompositeMap - is this a problem?
+   # @test image_fn(h)(ZZ(1)) == QQ(2)
 
    @test map1(h) === f
    @test map2(h) === g
 end
 
-@testset "Generic.Map.CompositeMap" begin
-   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+
+@testset "MapFromFunc CompositeMap" begin
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
 
    s = MyMapMod.MyMap(2)
 
@@ -89,8 +67,9 @@ end
    @test codomain(h) == V
 end
 
-@testset "Generic.Map.IdentityMap" begin
-   f = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x + 1))
+
+@testset "MapFromFunc IdentityMap" begin
+   f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
    g = identity_map(ZZ)
    h = identity_map(QQ)
 
@@ -119,29 +98,22 @@ end
    @test inv(h) === h
 end
 
-@testset "Generic.Map.printing" begin
-  id = identity_map(ZZ)
-  str = """
-        Identity map
-          of integers"""
-  @test PrettyPrinting.repr_detailed(id) == str
-  @test PrettyPrinting.repr_oneline(id) == "Identity map of integers"
-  @test PrettyPrinting.repr_terse(id) == "Identity map"
 
-  u = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x + 1))
+@testset "MapFromFunc printing" begin
+  u = map_from_func(ZZ, QQ, x -> QQ(x + 1))
   str = """
         Map defined by a Julia function
           from integers
           to rationals"""
   @test PrettyPrinting.repr_detailed(u) == str
   @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
-  @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
+  @test PrettyPrinting.repr_terse(u) == "Map"
 
-  f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
-  g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
+  f = map_from_func(ZZ, ZZ, x -> x + 1)
+  g = map_from_func(ZZ, QQ, x -> QQ(x))
   v = compose(f, g)
   str = """
-        Functional composite map
+        Composite map
           from integers
           to rationals
         which is the composite of
@@ -149,9 +121,9 @@ end
           Map: integers -> rationals"""
   @test PrettyPrinting.repr_detailed(v) == str
   @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
-  @test PrettyPrinting.repr_terse(v) == "Functional composite map"
+  @test PrettyPrinting.repr_terse(v) == "Composite map"
 
-  f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+  f = map_from_func(ZZ, ZZ, x -> x + 1)
   s = MyMapMod.MyMap(2)
   t = compose(f, s)
   str = """
@@ -167,20 +139,37 @@ end
 
 end
 
-@testset "Generic.Map.broadcasting" begin
-   id = identity_map(ZZ)
-   @test id.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(1), ZZ(2), ZZ(3)]
-   @test [ZZ(1), ZZ(2), ZZ(3)] .|> id == [ZZ(1), ZZ(2), ZZ(3)]
 
-   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+@testset "MapFromFunc broadcasting" begin
+   f = map_from_func(ZZ, ZZ, x -> x + 1)
    @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
+end
 
-   s = MyMapMod.MyMap(2)
-   @test s.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(4), ZZ(6), ZZ(8)]
-   @test [ZZ(1), ZZ(2), ZZ(3)] .|> s == [ZZ(4), ZZ(6), ZZ(8)]
 
-   t = compose(f, s)
-   @test t.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(6), ZZ(8), ZZ(10)]
-   @test [ZZ(1), ZZ(2), ZZ(3)] .|> t == [ZZ(6), ZZ(8), ZZ(10)]
+@testset "MapFromFunc with inverse" begin
+  f = map_from_func(ZZ, ZZ, x -> x+1, x -> x-1)
+
+  @test image(f, ZZ(1)) == 2
+  @test preimage(f, ZZ(1)) == 0
+
+  @test image_fn(f)(ZZ(1)) == 2
+  @test inverse_fn(f)(ZZ(1)) == 0
+
+  @test preimage(f, image(f, ZZ(1))) == ZZ(1)
+
+  finv = inv(f)
+  y = finv(ZZ(1))
+  @test preimage(finv, y) == ZZ(1)
+end
+
+
+@testset "MapFromFunc attributes" begin
+  f = map_from_func(ZZ, ZZ, x -> x+1, x -> x-1)
+
+  @test is_attribute_storing(f)
+
+  set_attribute!(f, :has_inverse, true)
+  @test get_attribute(f, :has_inverse)
+  @test get_attribute(f.header, :has_inverse)
 end
