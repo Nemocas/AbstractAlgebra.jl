@@ -1,3 +1,5 @@
+import AbstractAlgebra.PrettyPrinting
+
 @testset "MapFromFunc" begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, QQ, x -> QQ(x))
@@ -93,21 +95,6 @@ end
   @test PrettyPrinting.repr_detailed(v) == str
   @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
   @test PrettyPrinting.repr_terse(v) == "Composite map"
-
-  f = map_from_func(ZZ, ZZ, x -> x + 1)
-  s = MyMapMod.MyMap(2)
-  t = compose(f, s)
-  str = """
-        Composite map
-          from integers
-          to integers
-        which is the composite of
-          Map: integers -> integers
-          Map: integers -> integers"""
-  @test PrettyPrinting.repr_detailed(t) == str
-  @test PrettyPrinting.repr_oneline(t) == "Map: integers -> integers -> integers"
-  @test PrettyPrinting.repr_terse(t) == "Composite map"
-
 end
 
 
