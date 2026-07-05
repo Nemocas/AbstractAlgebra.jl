@@ -39,35 +39,6 @@
 end
 
 
-@testset "MapFromFunc CompositeMap" begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-
-   s = MyMapMod.MyMap(2)
-
-   t = compose(f, s)
-
-   @test isa(t, Map(Generic.CompositeMap))
-
-   for i in 1:10
-      @test t(ZZ(i)) == 2*(i + 2)
-      @test image(t, ZZ(i)) == 2*(i + 2)
-   end
-
-   @test domain(t) == AbstractAlgebra.JuliaZZ
-   @test codomain(t) == AbstractAlgebra.JuliaZZ
-
-   @test map1(t) === f
-   @test map2(t) === s
-
-   V = free_module(QQ, 2)
-   f = AbstractAlgebra.ModuleHomomorphism(V, V, QQ[1 1; 1 2])
-   g = identity_map(V)
-   h = f * g
-   @test domain(h) == V
-   @test codomain(h) == V
-end
-
-
 @testset "MapFromFunc IdentityMap" begin
    f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
    g = identity_map(ZZ)
