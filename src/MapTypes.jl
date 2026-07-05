@@ -176,6 +176,9 @@ function MapFromFunc(D, C, f, g)
 end
 
 function Base.inv(M::MapFromFunc)
-  @req isdefined(M, :g) "Inverse is not defined"
-  return MapFromFunc(codomain(M), domain(M), M.g, M.f)
+  if isdefined(M, :g)
+     return MapFromFunc(codomain(M), domain(M), M.g, M.f)
+  else
+     return MapFromFunc(codomain(M), domain(M), x->preimage(M, x))
+  end
 end
