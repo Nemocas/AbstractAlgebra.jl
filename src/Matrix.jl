@@ -7379,9 +7379,9 @@ julia> diagonal_matrix([A, B])
 [0   0   5   6]
 
 julia> diagonal_matrix(QQ, [A, B])
-[1   2   0   0]
-[3   4   0   0]
-[0   0   5   6]
+[1//1   2//1   0//1   0//1]
+[3//1   4//1   0//1   0//1]
+[0//1   0//1   5//1   6//1]
 
 julia> diagonal_matrix(B, A)
 [5   6   0   0]
