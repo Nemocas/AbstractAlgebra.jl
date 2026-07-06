@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# [Constructing Matrices](@id matrix_construction)
+# [Constructing Algebraic Matrices](@id matrix_construction)
 
 
 ## Why Julia matrices are not sufficient
