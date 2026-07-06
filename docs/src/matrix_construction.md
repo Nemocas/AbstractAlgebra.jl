@@ -111,31 +111,11 @@ scalar_matrix(n::Int, a::NCRingElement)
 
 ### Diagonal matrices
 
-Create a matrix over the ring `R` whose entries are all zero except for
-the diagonal entries. Two constructors are provided. One function creates a rectangular
-diagonal matrix whose diagonal entries are all equal to a given scalar. The
-other constructs a square diagonal matrix whose diagonal entries are taken from a given
-vector.
-
 ```@docs
-diagonal_matrix(::RingElement, ::Int, ::Int)
-diagonal_matrix(::NCRing, ::AbstractVector{<:NCRingElement})
+diagonal_matrix(x::NCRingElement, m::Int, n::Int)
+diagonal_matrix(x::NCRingElement, m::Int)
+diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
 ```
-
-**Examples**
-
-```jldoctest
-julia> diagonal_matrix(ZZ(1), 3, 4)
-[1   0   0   0]
-[0   1   0   0]
-[0   0   1   0]
-
-julia> diagonal_matrix(ZZ, [1,2,3])
-[1   0   0]
-[0   2   0]
-[0   0   3]
-```
-
 
 
 ## Block diagonal matrix constructors

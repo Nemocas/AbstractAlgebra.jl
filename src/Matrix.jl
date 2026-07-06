@@ -7233,19 +7233,14 @@ end
 @doc raw"""
     diagonal_matrix(x::NCRingElement, m::Int, [n::Int])
 
-Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
-zeroes elsewhere. If `n` is not specified, it defaults to `m`.
+Return the $m \times n$ matrix over the ring `parent(x)` with `x` along the
+main diagonal and zeros elsewhere.
 
 # Examples
 ```jldoctest
 julia> diagonal_matrix(ZZ(2), 2, 3)
 [2   0   0]
 [0   2   0]
-
-julia> diagonal_matrix(QQ(-1), 3)
-[-1//1    0//1    0//1]
-[ 0//1   -1//1    0//1]
-[ 0//1    0//1   -1//1]
 ```
 """
 function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
@@ -7256,16 +7251,34 @@ function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
    return z
 end
 
+@doc raw"""
+    diagonal_matrix(x::NCRingElement, m::Int)
+
+Return the $m \times m$ matrix over the ring `parent(x)` with `x` along the
+main diagonal and zeros elsewhere.
+
+# Examples
+```jldoctest
+julia> diagonal_matrix(QQ(-1), 3)
+[-1//1    0//1    0//1]
+[ 0//1   -1//1    0//1]
+[ 0//1    0//1   -1//1]
+```
+"""
 diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
 
 @doc raw"""
-    diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(R::NCRing, x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, entries::AbstractVector{<:NCRingElement})
+    diagonal_matrix(entries::AbstractVector{<:NCRingElement})
+    diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
 
-Returns a diagonal matrix whose diagonal entries are the elements of $x$.
-If a ring $R$ is given then it is used a parent for the entries of the created
-matrix. Otherwise the parent is inferred from the vector $x$.
+Return a diagonal matrix with the given entries on the main diagonal.
+
+For the vector forms, the diagonal entries are the elements of `entries`.
+For the vararg form, the diagonal entries are `x, xs...`.
+
+If the ring `R` is given, the entries are coerced into `R`. Otherwise, the base
+ring is inferred from the entries.
 
 # Examples
 
@@ -7274,32 +7287,32 @@ julia> diagonal_matrix(ZZ(1), ZZ(2))
 [1   0]
 [0   2]
 
-julia> diagonal_matrix([ZZ(3), ZZ(4)])
-[3   0]
-[0   4]
-
 julia> diagonal_matrix(ZZ, [5, 6])
 [5   0]
 [0   6]
+
+julia> diagonal_matrix([ZZ(3), ZZ(4)])
+[3   0]
+[0   4]
 ```
 """
-function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
-    Base.require_one_based_indexing(x)
-    x = R.(x)
-    M = zero_matrix(R, length(x), length(x))
-    for i = 1:length(x)
-        M[i, i] = x[i]
+function diagonal_matrix(R::NCRing, entries::AbstractVector{<:NCRingElement})
+    Base.require_one_based_indexing(entries)
+    entries = R.(entries)
+    M = zero_matrix(R, length(entries), length(entries))
+    for i = 1:length(entries)
+        M[i, i] = entries[i]
     end
     return M
 end
 
-function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
-    return diagonal_matrix([x, xs...])
+function diagonal_matrix(entries::AbstractVector{<:NCRingElement})
+   @req !isempty(entries) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
+   return diagonal_matrix(parent(first(entries)), entries)
 end
 
-function diagonal_matrix(x::AbstractVector{<:NCRingElement})
-   @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
-   return diagonal_matrix(parent(first(x)), x)
+function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
+    return diagonal_matrix([x, xs...])
 end
 
 @doc raw"""
