@@ -6973,9 +6973,10 @@ end
 ################################################################################
 
 @doc raw"""
-    matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
+    matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
 
-Constructs the matrix over $R$ with entries as in `arr`.
+Return the matrix over the ring `R` with entries as in the Julia
+`AbstractMatrix` `arr`. All entries of `arr` must be coercible into `R`.
 
 # Examples
 
@@ -6984,9 +6985,9 @@ julia> matrix(GF(3), [1 2 ; 3 4])
 [1   2]
 [0   1]
 
-julia> using LinearAlgebra ; matrix(GF(5), I(2))
-[1   0]
-[0   1]
+julia> matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3   1   2]
+[2   0   1]
 ```
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
@@ -7035,12 +7036,25 @@ function matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 end
 
 @doc raw"""
-    matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
+    matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
 
-Constructs the $r \times c$ matrix over $R$, where the entries are taken
-row-wise from `arr`.
+Return the `r` by `c` matrix over the ring `R` from the entries of `arr`.
+
+If `arr` is a vector, its entries are read row-wise, so the ``(i, j)`` entry is
+given by `arr[c*(i - 1) + j]`. All entries must be coercible into `R`.
+
+If `arr` is a matrix, this is equivalent to `matrix(R, arr)`.
+
+# Examples
+
+```jldoctest
+julia> matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+[3   1]
+[2   2]
+[0   1]
+```
 """
-function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
+function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T && all(e -> parent(e) === R, arr)

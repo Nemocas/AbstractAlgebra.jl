@@ -29,32 +29,38 @@ matrix reside.
 
 ## Generic constructors
 
-Given an $r \times c$ Julia matrix, the following command constructs the corresponding
-matrix over the given ring `R`, provided that all the entries can be coerced into `R`.
-
-```julia
-matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
+```@docs
+matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
+matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
 ```
 
-We can construct row-wise the $r \times c$ matrix over the ring `R` whose $(i, j)$ entry is
-given by `A[c*(i - 1) + j]`, provided that all the entries can be coerced into `R`, as
-follows:
+Several other signatures are supported. Existing matrices can be converted
+to a different base ring:
 
 ```julia
-matrix(R::Ring, r::Int, c::Int, A::Vector{T}) where T <: RingElement
+matrix(R::NCRing, arr::MatElem)
+matrix(R::NCRing, arr::MatRingElem)
 ```
 
-**Examples**
+We can also create a deep copy of an existing algebraic matrix:
 
-```jldoctest
-julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-[3   1   2]
-[2   0   1]
+```julia
+matrix(mat::MatElem{T}) where {T<:NCRingElement}
+```
 
-julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-[3   1]
-[2   2]
-[0   1]
+The base ring can also be inferred from the entries:
+
+```julia
+matrix(arr::AbstractMatrix{T}) where {T<:NCRingElement}
+matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
+matrix(arr::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
+```
+
+Finally, nested vectors can be used to construct matrices over a specified
+base ring:
+
+```julia
+matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 ```
 
 
