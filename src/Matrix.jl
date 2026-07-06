@@ -7415,12 +7415,11 @@ end
 @doc raw"""
     lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$n(n+1)/2$.
+Return the $n \times n$ lower triangular matrix whose entries on and below the
+main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n + 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7454,12 +7453,11 @@ end
 @doc raw"""
     upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$n(n+1)/2$.
+Return the $n \times n$ upper triangular matrix whose entries on and below the
+main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n + 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7493,12 +7491,11 @@ end
 @doc raw"""
     strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries below the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$(n-1)n/2$.
+Return the $n \times n$ strictly lower triangular matrix whose entries below
+the main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n - 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7533,12 +7530,12 @@ end
 @doc raw"""
     strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries above the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$(n-1)n/2$.
+Return the $n \times n$ strictly upper triangular matrix whose entries above
+the main diagonal are given by the elements of `L`. The entries are filled
+row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n - 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest

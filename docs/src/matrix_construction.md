@@ -135,33 +135,9 @@ block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where {T <: NCRingEleme
 
 ## Triangular matrices
 
-Create (strictly) triangular matrices over the ring `R`.
-
-Why does this not require the ring as an argument?
-
 ```@docs
-lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: RingElement}
-```
-
-**Examples**
-
-```jldoctest
-julia> lower_triangular_matrix([1, 2, 3])
-[1   0]
-[2   3]
-
-julia> strictly_lower_triangular_matrix([5])
-[0   0]
-[5   0]
-
-julia> upper_triangular_matrix([3, 2, 1])
-[3   2]
-[0   1]
-
-julia> strictly_upper_triangular_matrix([-2])
-[0   -2]
-[0    0]
+lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
+upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
+strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
+strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 ```
