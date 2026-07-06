@@ -7132,16 +7132,37 @@ end
 @doc raw"""
     identity_matrix(R::NCRing, n::Int)
 
-Return the $n \times n$ identity matrix over $R$.
+Return the $n \times n$ identity matrix over the ring `R`.
+
+# Examples
+
+```jldoctest
+julia> identity_matrix(ZZ, 2)
+[1   0]
+[0   1]
+```
 """
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
 @doc raw"""
     identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
-Construct the identity matrix in the same matrix space as `M`, i.e.
-with ones down the diagonal and zeroes elsewhere. `M` must be square.
+Return the identity matrix with the same base ring and dimensions
+as the given abstract matrix `M`. The matrix `M` must be square.
+
 This is an alias for `one(M)`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> identity_matrix(M)
+[1   0]
+[0   1]
+```
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
    is_square(M) || throw(DomainError(M, "matrix must be square"))

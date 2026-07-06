@@ -88,20 +88,17 @@ ones_matrix(R::NCRing, r::Int, c::Int)
 
 ### The identity matrix
 
-Create the $n \times n$ identity matrix over the ring `R`.
-
 ```@docs
-identity_matrix(::Ring, ::Int)
+identity_matrix(R::NCRing, n::Int)
+identity_matrix(M::MatElem{T}) where T <: NCRingElement
 ```
 
-**Examples**
+The following additional signatures are also supported:
 
-```jldoctest
-julia> identity_matrix(ZZ, 2)
-[1   0]
-[0   1]
+```julia
+identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
+identity_matrix(::Type{MatElem}, R::Ring, n::Int)
 ```
-
 
 ### Scalar matrices
 
