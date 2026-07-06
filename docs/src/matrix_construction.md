@@ -8,7 +8,7 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 There are several functions for creating algebraic matrices -- in each case you need to indicate the
 ring to which the matrix elements belong, unless this is already unambiguously indicated
-by the ring to which the arguments belong.  Here we present several of the basic functions for
+by the ring to which the arguments belong. Here we present several of the basic functions for
 constructing matrices.
 
 
