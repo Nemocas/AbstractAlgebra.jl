@@ -336,10 +336,30 @@ end
 ###############################################################################
 
 @doc raw"""
-    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
+    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where {T <: NCRingElement}
 
-Create the block diagonal matrix whose blocks are given by the matrices in `V`.
-There must be at least one matrix in V.
+Return the block diagonal matrix whose diagonal blocks are the matrices in `V`.
+
+The vector `V` must be non-empty, since otherwise the base ring cannot be
+inferred.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> N = matrix(ZZ, [4 5 6; 7 8 9])
+[4   5   6]
+[7   8   9]
+
+julia> block_diagonal_matrix([M, N])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+```
 """
 function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    @req !isempty(V) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `block_diagonal_matrix`"
@@ -369,11 +389,25 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    return M
 end
 
-@doc raw"""
-    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
-Create the block diagonal matrix over the ring `R` whose blocks are given
-by the matrices in `V`. Entries are coerced into `R` upon creation.
+@doc raw"""
+    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where {T <: NCRingElement}
+
+Return the block diagonal matrix over the ring `R` whose diagonal blocks are the
+matrices in `V`.
+
+The entries of the blocks are coerced into `R`. If `V` is empty, the $0 \times 0$
+zero matrix over `R` is returned.
+
+# Examples
+
+```jldoctest
+julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+```
 """
 function block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
    if length(V) == 0
@@ -7316,16 +7350,47 @@ function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
 end
 
 @doc raw"""
-    diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
+    diagonal_matrix(V::Vector{T}) where {T <: MatElem}
+    diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
+    diagonal_matrix(x::T, xs::T...) where {T <: MatElem}
 
-Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
+Return the block diagonal matrix whose diagonal blocks are the given matrices.
+
+For the vector forms, the diagonal blocks are the elements of `V`.
+For the vararg form, the diagonal blocks are `x, xs...`.
+
+If the ring `R` is given, the entries of the blocks are coerced into `R`.
+
+These constructors use the corresponding `block_diagonal_matrix` functionality.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> B = matrix(ZZ, [5 6])
+[5   6]
+
+julia> diagonal_matrix([A, B])
+[1   2   0   0]
+[3   4   0   0]
+[0   0   5   6]
+
+julia> diagonal_matrix(QQ, [A, B])
+[1   2   0   0]
+[3   4   0   0]
+[0   0   5   6]
+
+julia> diagonal_matrix(B, A)
+[5   6   0   0]
+[0   0   1   2]
+[0   0   3   4]
+```
 """
 function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
     return block_diagonal_matrix(V)
-end
-
-function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
-    return block_diagonal_matrix([x, xs...])
 end
 
 function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
@@ -7334,6 +7399,10 @@ function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
     else
         return block_diagonal_matrix(map(x -> change_base_ring(R, x), V))
     end
+end
+
+function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
+    return block_diagonal_matrix([x, xs...])
 end
 
 

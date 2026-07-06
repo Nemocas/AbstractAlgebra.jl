@@ -117,42 +117,19 @@ diagonal_matrix(x::NCRingElement, m::Int)
 diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
 ```
 
+Diagonal matrices can also be constructed from matrix blocks. This is
+an alias for `block_diagonal_matrix`.
+
+```@docs
+diagonal_matrix(V::Vector{T}) where {T <: MatElem}
+```
+
 
 ## Block diagonal matrix constructors
 
-Create a block diagonal matrix from a vector of existing matrices.
-If Julia matrices are provided, one also has to supply the base ring.
-
-Note that if the input matrices are not square, the output matrix may
-not be square.
-
 ```@docs
-block_diagonal_matrix(::Vector{<:MatElem{T}}) where T <: RingElement
-block_diagonal_matrix(::Ring, ::Vector{<:Matrix{T}}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
-
-julia> M = matrix(ZZ, [1 2; 3 4])
-[1   2]
-[3   4]
-
-julia> N = matrix(ZZ, [4 5 6; 7 8 9])
-[4   5   6]
-[7   8   9]
-
-julia> block_diagonal_matrix([M, N])
-[1   2   0   0   0]
-[3   4   0   0   0]
-[0   0   4   5   6]
-[0   0   7   8   9]
+block_diagonal_matrix(V::Vector{<:MatElem{T}}) where {T <: NCRingElement}
+block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where {T <: NCRingElement}
 ```
 
 
