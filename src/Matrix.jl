@@ -7188,15 +7188,38 @@ identity_matrix(::Type{MatElem}, R::Ring, n::Int) = identity_matrix(R, n)
 
 @doc raw"""
     scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
-    scalar_matrix(n::Int, a::NCRingElement)
 
-Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
-zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
+Return the $n \times n$ diagonal matrix over the ring `R` whose diagonal entries
+are all equal to the ring element `a` of `R`.
+
+# Examples
+
+```jldoctest
+julia> scalar_matrix(QQ, 3, 1//2)
+[1//2   0//1   0//1]
+[0//1   1//2   0//1]
+[0//1   0//1   1//2]
+```
 """
 function scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
    return diagonal_matrix(R(a), n)
 end
 
+@doc raw"""
+    scalar_matrix(n::Int, a::NCRingElement)
+
+Return the $n \times n$ diagonal matrix over `parent(a)` whose diagonal entries
+are all equal to the ring element `a`.
+
+# Examples
+
+```jldoctest
+julia> scalar_matrix(3, ZZ(5))
+[5   0   0]
+[0   5   0]
+[0   0   5]
+```
+"""
 function scalar_matrix(n::Int, a::NCRingElement)
    return diagonal_matrix(a, n)
 end

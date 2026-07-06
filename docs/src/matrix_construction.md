@@ -100,24 +100,13 @@ identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
 identity_matrix(::Type{MatElem}, R::Ring, n::Int)
 ```
 
-### Scalar matrices
 
-Create the $n \times n$ diagonal matrix over the ring `R`, whose diagonal entries are all
-equal to the image of `a` in `R`.
+### Scalar matrices
 
 ```@docs
 scalar_matrix(R::Ring, n::Int, a::RingElement)
+scalar_matrix(n::Int, a::NCRingElement)
 ```
-
-**Examples**
-
-```jldoctest
-julia> scalar_matrix(QQ, 3, 1//2)
-[1//2   0//1   0//1]
-[0//1   1//2   0//1]
-[0//1   0//1   1//2]
-```
-
 
 
 ### Diagonal matrices
