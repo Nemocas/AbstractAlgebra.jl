@@ -79,6 +79,13 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
 ```
 
 
+### The ones matrix
+
+```@docs
+ones_matrix(R::NCRing, r::Int, c::Int)
+```
+
+
 ### The identity matrix
 
 Create the $n \times n$ identity matrix over the ring `R`.
@@ -93,25 +100,6 @@ identity_matrix(::Ring, ::Int)
 julia> identity_matrix(ZZ, 2)
 [1   0]
 [0   1]
-```
-
-
-### The ones matrix
-
-Create the $r \times c$ matrix over the ring `R` whose entries are
-all equal to the multiplicative identity of `R`.
-
-```@docs
-ones_matrix(::Ring, ::Int, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> I = ones_matrix(ZZ, 3, 2)
-[1   1]
-[1   1]
-[1   1]
 ```
 
 

@@ -7101,9 +7101,19 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 ################################################################################
 
 @doc raw"""
-    ones_matrix(R::Ring, r::Int, c::Int)
+    ones_matrix(R::NCRing, r::Int, c::Int)
 
-Return the $r \times c$ ones matrix over $R$.
+Return the $r \times c$ matrix over the ring `R` whose entries are
+all equal to the multiplicative identity of `R`.
+
+# Examples
+
+```jldoctest
+julia> ones_matrix(ZZ, 3, 2)
+[1   1]
+[1   1]
+[1   1]
+```
 """
 function ones_matrix(R::NCRing, r::Int, c::Int)
    z = dense_matrix_type(R)(R, undef, r, c)
