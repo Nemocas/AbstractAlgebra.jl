@@ -68,19 +68,14 @@ matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 
 ### The zero matrix
 
-Construct the $r \times c$ matrix over the ring `R` whose entries are all zero.
-
-```julia
-zero_matrix(R::Ring, r::Int, c::Int)
+```@docs
+zero_matrix(R::NCRing, r::Int, c::Int)
 ```
 
-**Examples**
+The following convenience method is also supported:
 
-```jldoctest
-julia> P = zero_matrix(ZZ, 3, 2)
-[0   0]
-[0   0]
-[0   0]
+```julia
+zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
 ```
 
 

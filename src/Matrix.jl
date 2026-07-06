@@ -7073,9 +7073,18 @@ end
 ################################################################################
 
 @doc raw"""
-    zero_matrix(R::Ring, r::Int, c::Int)
+    zero_matrix(R::NCRing, r::Int, c::Int)
 
-Return the $r \times c$ zero matrix over $R$.
+Return the $r \times c$ matrix over the ring `R` whose entries are all zero.
+
+# Examples
+
+```jldoctest
+julia> P = zero_matrix(ZZ, 3, 2)
+[0   0]
+[0   0]
+[0   0]
+```
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
   (r < 0 || c < 0) && error("Dimensions must be non-negative")
