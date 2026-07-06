@@ -10,6 +10,8 @@ There are several functions for creating algebraic matrices -- in each case you 
 ring to which the matrix elements belong, unless this is already unambiguously indicated
 by the ring to which the arguments belong.  Here we present several of the basic functions for
 constructing matrices.
+
+
 ## Why Julia matrices are not sufficient
 
 Unfortunately, Julia's matrices cannot be used in our context due to two independent problems:
