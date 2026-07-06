@@ -34,7 +34,7 @@ matrix over the given ring `R`, provided that all the entries can be coerced int
 matrix(R::Ring, arr::Matrix{T}) where T <: RingElement
 ```
 
-Likewise, we construct the $r \times c$ matrix over the ring `R` whose $(i, j)$ entry is
+We can construct row-wise the $r \times c$ matrix over the ring `R` whose $(i, j)$ entry is
 given by `A[c*(i - 1) + j]`, provided that all the entries can be coerced into `R`, as
 follows:
 
