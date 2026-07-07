@@ -72,6 +72,7 @@ makedocs(
                  "matrix_introduction.md",
                  "Working with matrices" => [
                     "matrix_construction.md",
+                    "matrix_manipulation.md",
                  ],
                  "matrix_spaces.md",
                  "matrix_algebras.md",

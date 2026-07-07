@@ -24,8 +24,6 @@ is_lower_triangular(::MatElem)
 is_upper_triangular(::MatElem)
 is_diagonal(::MatElem)
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
-Base.map(f, ::MatrixElem{T}) where T <: RingElement
-Base.map!(f, ::MatrixElem{S}, ::MatrixElem{T}) where {S <: RingElement, T <: RingElement}
 ```
 
 ## Inverse
@@ -120,58 +118,6 @@ julia> R = N1*N2
 [20   29]
 ```
 
-## Elementary row and column operations
-
-```@docs
-add_column(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
-add_column!(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
-add_row(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
-add_row!(::MatElem{T}, ::Int, ::Int, ::Int) where T <: RingElement
-multiply_column(::MatElem{T}, ::Int, ::Int) where T <: RingElement
-multiply_column!(::MatElem{T}, ::Int, ::Int) where T <: RingElement
-multiply_row(::MatElem{T}, ::Int, ::Int) where T <: RingElement
-multiply_row!(::MatElem{T}, ::Int, ::Int) where T <: RingElement
-```
-
-**Examples**
-```jldoctest
-julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
-[1   2   3]
-[2   3   4]
-[4   5   5]
-
-julia> add_column(M, 2, 3, 1)
-[ 7   2   3]
-[10   3   4]
-[14   5   5]
-
-julia> add_row(M, 1, 2, 3)
-[1   2   3]
-[2   3   4]
-[6   8   9]
-
-julia> multiply_column(M, 2, 3)
-[1   2    6]
-[2   3    8]
-[4   5   10]
-
-julia> multiply_row(M, 2, 3)
-[1    2    3]
-[2    3    4]
-[8   10   10]
-```
-
-## Swapping rows and columns
-
-```@docs
-swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
-swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
-swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: RingElement
-```
-
-Swap the rows of `M` in place. The function returns the mutated matrix (since
-matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 ## Concatenation
 
