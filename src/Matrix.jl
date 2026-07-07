@@ -6937,12 +6937,12 @@ julia> N = zero_matrix(ZZ, 2, 2)
 [0   0]
 
 julia> map_entries!(x -> x^2, N, M)
-[ 1    4]
-[ 9   16]
+[1    4]
+[9   16]
 
 julia> N
-[ 1    4]
-[ 9   16]
+[1    4]
+[9   16]
 ```
 """
 function map_entries!(f::S, dst::MatElem{T}, src::MatElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
@@ -6976,8 +6976,8 @@ julia> M = matrix(ZZ, [1 2; 3 4])
 [3   4]
 
 julia> M2 = map_entries(x -> x^2, M)
-[ 1    4]
-[ 9   16]
+[1    4]
+[9   16]
 ```
 """
 function map_entries(f::S, a::MatElem{T}) where {S, T <: NCRingElement}
