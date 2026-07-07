@@ -1969,10 +1969,24 @@ end
 @doc raw"""
     lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
 
-Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
-$p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
-triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
-matrix whose rows are the given permutation $p$ of the rows of $A$.
+Return the LU decomposition of $A$.
+
+More precisely, return a tuple $r, p, L, U$ consisting of the rank $r$
+of $A$, a permutation $p$ belonging to $P$, a lower triangular matrix $L$
+and an upper triangular matrix $U$ such that $p(A) = LU$. Here $p(A)$ denotes
+the matrix obtained by applying the permutation $p$ to the rows of $A$.
+
+**Examples**
+
+```@jldoctest
+julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+[0//1   0//1   1//1]
+
+julia> r, p, L, U = lu(M)
+(3, (), [1 0 0; 4 1 0; 0 0 1], [1 2 3; 0 -3 -6; 0 0 1])
+```
 """
 function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
@@ -2119,16 +2133,32 @@ end
 @doc raw"""
     fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 
-Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
-denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
-triangular matrix $L$ and an upper triangular matrix $U$ such that
-$p(A) = LDU$, where $p(A)$ stands for the matrix whose rows are the
-given permutation $p$ of the rows of $A$ and such that $D$ is the diagonal
-matrix diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}p_n)$ where the $p_i$
-are the inverses of the diagonal entries of $L$. The denominator $d$ is set to
-$\pm \mathrm{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
-$A$ is square and nonsingular) and the sign is decided by the parity of the
-permutation.
+Return the fraction-free LU decomposition of $A$.
+
+More precisely, return a tuple $r, d, p, L, U$ consisting of the rank $r$ of
+$A$, a denominator $d$, a permutation $p$ belonging to $P$, a lower triangular
+matrix $L$ and an upper triangular matrix $U$ such that $p(A) = LDU$. Here $p(A)$
+denotes the matrix obtained by applying the permutation $p$ to the rows of $A$.
+
+The matrix $D$ is the diagonal matrix
+$\operatorname{diag}(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}p_n)$,
+where the $p_i$ are the inverses of the diagonal entries of $L$.
+
+The denominator $d$ is set to $\pm \det(S)$, where $S$ is an appropriate
+submatrix of $A$; if $A$ is square and nonsingular, then $S = A$. The sign
+is determined by the parity of the permutation.
+
+**Examples**
+
+```@jldoctest
+julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+[0//1   0//1   1//1]
+
+julia> r, d, p, L, U = fflu(M)
+(3, -3//1, (), [1 0 0; 4 -3 0; 0 0 -3], [1 2 3; 0 -3 -6; 0 0 -3])
+```
 """
 function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
    m = nrows(A)
@@ -2234,13 +2264,38 @@ function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
    return rank, d
 end
 
+
 @doc raw"""
     rref_rational(M::MatrixElem{T}) where {T <: RingElement}
 
-Return a tuple $(r, A, d)$ consisting of the rank $r$ of $M$ and a
-denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
-the reduced row echelon form of $M$. Note that the denominator is not usually
-minimal.
+Return the reduced row echelon form of $M$ using fraction-free
+arithmetic.
+
+More precisely, return a tuple $r, A, d$ consisting of the rank $r$ of
+$M$, a matrix $A$ and a denominator $d$ in the base ring of $M$ such that
+$A/d$ is the reduced row echelon form of $M$.
+
+Note that the denominator $d$ is not necessarily minimal.
+
+**Examples**
+
+```@jldoctest
+julia> M = matrix(ZZ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
+[1   2   3]
+[4   5   6]
+[0   0   1]
+
+julia> r, A, d = rref_rational(M)
+(3, [-3 0 0; 0 -3 0; 0 0 -3], -3)
+
+julia> is_rref(A)
+true
+
+julia> A/d
+[1   0   0]
+[0   1   0]
+[0   0   1]
+```
 """
 function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
    A = deepcopy(M)
@@ -2311,8 +2366,25 @@ end
 @doc raw"""
     rref(M::MatrixElem{T}) where {T <: FieldElement}
 
-Return a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
-echelon form $A$ of $M$.
+Return the reduced row echelon form of $M$.
+
+More precisely, return a tuple $r, A$ consisting of the rank $r$ of
+$M$ and the reduced row echelon form $A$ of $M$.
+
+**Examples**
+
+```@jldoctest
+julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+[0//1   0//1   1//1]
+
+julia> r, A = rref(M)
+(3, [1 0 0; 0 1 0; 0 0 1])
+
+julia> is_rref(A)
+true
+```
 """
 function rref(M::MatrixElem{T}) where {T <: FieldElement}
    A = deepcopy(M)
@@ -4442,10 +4514,31 @@ end
 @doc raw"""
     hessenberg(A::MatElem{T}) where {T <: RingElement}
 
-Return the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
-which is similar to $M$. The upper Hessenberg form has nonzero entries
-above and on the diagonal and in the diagonal line immediately below the
-diagonal.
+Return the Hessenberg form of $A$, i.e. an upper Hessenberg matrix
+which is similar to $A$.
+
+An upper Hessenberg matrix has zero entries below the first subdiagonal.
+
+**Examples**
+
+```@jldoctest
+julia> R, = residue_ring(ZZ, 7);
+
+julia> M = matrix(R, 4, 4, [1 2 4 3; 2 5 1 0; 6 1 3 2; 1 1 3 5])
+[1   2   4   3]
+[2   5   1   0]
+[6   1   3   2]
+[1   1   3   5]
+
+julia> H = hessenberg(M)
+[1   5   5   3]
+[2   1   1   0]
+[0   1   3   2]
+[0   0   2   2]
+
+julia> is_hessenberg(H)
+true
+```
 """
 function hessenberg(A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in hessenberg")
@@ -5663,6 +5756,26 @@ end
     hnf(A::MatElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$.
+
+The Hermite normal form is a canonical form for matrices. It is obtained
+by employing elementary row operations to produce an upper triangular matrix.
+
+**Examples**
+
+```@jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2   3   -1]
+[ 3   5    7]
+[11   1   12]
+
+julia> H = hnf(A)
+[1   0   255]
+[0   1    17]
+[0   0   281]
+
+julia> is_hnf(H)
+true
+```
 """
 function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
@@ -5671,8 +5784,27 @@ end
 @doc raw"""
     hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
-Return the tuple $H, U$ consisting of the upper right row Hermite normal
-form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
+Return the upper right row Hermite normal form of $A$, together with a
+transformation matrix.
+
+More precisely, return a tuple $H, U$ where $H$ is the upper right row
+Hermite normal form of $A$ and $U$ is an invertible matrix such that
+$UA = H$.
+
+**Examples**
+
+```@jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2   3   -1]
+[ 3   5    7]
+[11   1   12]
+
+julia> H, U = hnf_with_transform(A)
+([1 0 255; 0 1 17; 0 0 281], [-47 28 1; -3 2 0; -52 31 1])
+
+julia> U*A == H
+true
+```
 """
 function hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb_with_transform(A)
@@ -5924,6 +6056,26 @@ end
     snf(A::MatElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$.
+
+The Smith normal form is a canonical diagonal form obtained by applying
+invertible row and column transformations.
+
+**Examples**
+
+```@jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2   3   -1]
+[ 3   5    7]
+[11   1   12]
+
+julia> S = snf(A)
+[1   0     0]
+[0   1     0]
+[0   0   281]
+
+julia> is_snf(S)
+true
+```
 """
 function snf(A::MatElem{T}) where {T <: RingElement}
   return snf_kb(A)
@@ -5932,8 +6084,26 @@ end
 @doc raw"""
     snf_with_transform(A::MatElem{T}) where {T <: RingElement}
 
-Return the tuple $S, T, U$ consisting of the Smith normal form $S$ of $A$
-together with invertible matrices $T$ and $U$ such that $TAU = S$.
+Return the Smith normal form of $A$, together with transformation
+matrices.
+
+More precisely, return a tuple $S, T, U$ where $S$ is the Smith normal
+form of $A$ and $T$ and $U$ are invertible matrices such that $TAU = S$.
+
+**Examples**
+
+```@jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2   3   -1]
+[ 3   5    7]
+[11   1   12]
+
+julia> S, T, U = snf_with_transform(A)
+([1 0 0; 0 1 0; 0 0 281], [1 0 0; 7 1 0; 229 31 1], [0 -3 26; 0 2 -17; -1 0 1])
+
+julia> T*A*U == S
+true
+```
 """
 function snf_with_transform(a::MatElem{T}) where {T <: RingElement}
   return snf_kb_with_transform(a)
@@ -6072,6 +6242,26 @@ end
     weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$.
+
+The matrix $A$ must have entries in a univariate polynomial ring over a
+field. The weak Popov form is a row-reduced matrix, in which the nonzero
+rows have distinct leading positions with respect to their degrees.
+
+**Examples**
+
+```@jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+[1         2           3               x]
+[x       2*x         3*x             x^2]
+[x   x^2 + 1   x^3 + x^2   x^4 + x^2 + 1]
+
+julia> P = weak_popov(A)
+[   1                        2                    3   x]
+[   0                        0                    0   0]
+[-x^3   -2*x^3 + x^2 - 2*x + 1   -2*x^3 + x^2 - 3*x   1]
+```
 """
 function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val(false))
@@ -6080,8 +6270,31 @@ end
 @doc raw"""
     weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
-Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
-is a transformation matrix so that $P = UA$.
+Return the weak Popov form of $A$, together with a transformation matrix.
+
+The matrix $A$ must have entries in a univariate polynomial ring over a
+field. The weak Popov form is a row-reduced form in which the nonzero
+rows have distinct leading positions determined by their degrees.
+
+More precisely, return a tuple $P, U$ where $P$ is the weak Popov form
+of $A$ and $U$ is a transformation matrix such that $P = UA$.
+
+**Examples**
+
+```@jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+[1         2           3               x]
+[x       2*x         3*x             x^2]
+[x   x^2 + 1   x^3 + x^2   x^4 + x^2 + 1]
+
+julia> P, U = weak_popov_with_transform(A)
+([1 2 3 x; 0 0 0 0; -x^3 -2*x^3+x^2-2*x+1 -2*x^3+x^2-3*x 1], [1 0 0; -x 1 0; -x^3-x 0 1])
+
+julia> U*A == P
+true
+```
 """
 function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _weak_popov(A, Val(true))
@@ -6344,6 +6557,27 @@ end
     popov(A::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$.
+
+The matrix $A$ must have entries in a univariate polynomial ring over a
+field. The Popov form is a canonical row-reduced form. It is a weak Popov
+form satisfying additional normalization conditions on the leading
+entries.
+
+**Examples**
+
+```@jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+[1         2           3               x]
+[x       2*x         3*x             x^2]
+[x   x^2 + 1   x^3 + x^2   x^4 + x^2 + 1]
+
+julia> P = popov(A)
+[       0                           0                         0       0]
+[       1                           2                         3       x]
+[1//2*x^3   x^3 - 1//2*x^2 + x - 1//2   x^3 - 1//2*x^2 + 3//2*x   -1//2]
+```
 """
 function popov(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val(false))
@@ -6352,8 +6586,32 @@ end
 @doc raw"""
     popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 
-Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
-is a transformation matrix so that $P = UA$.
+Return the Popov form of $A$, together with a transformation matrix.
+
+The matrix $A$ must have entries in a univariate polynomial ring over a
+field. The Popov form is a canonical row-reduced form. It is a weak Popov
+form satisfying additional normalization conditions on the leading
+entries.
+
+More precisely, return a tuple $P, U$ where $P$ is the Popov form of
+$A$ and $U$ is a transformation matrix such that $P = UA$.
+
+**Examples**
+
+```@jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+[1         2           3               x]
+[x       2*x         3*x             x^2]
+[x   x^2 + 1   x^3 + x^2   x^4 + x^2 + 1]
+
+julia> P, U = popov_with_transform(A)
+([0 0 0 0; 1 2 3 x; 1//2*x^3 x^3-1//2*x^2+x-1//2 x^3-1//2*x^2+3//2*x -1//2], [-x 1 0; 1 0 0; 1//2*x^3+1//2*x 0 -1//2])
+
+julia> U*A == P
+true
+```
 """
 function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
    return _popov(A, Val(true))
