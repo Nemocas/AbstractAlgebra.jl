@@ -7265,41 +7265,32 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::NCRingElement, m::Int, n::Int)
+    diagonal_matrix(x::NCRingElement, m::Int, n::Int = m)
+
 
 Return the $m \times n$ matrix over the ring `parent(x)` with `x` along the
-main diagonal and zeros elsewhere.
+main diagonal and zeros elsewhere. If `n` is omitted, return an $m \times m$
+matrix.
 
 # Examples
 ```jldoctest
 julia> diagonal_matrix(ZZ(2), 2, 3)
 [2   0   0]
 [0   2   0]
-```
-"""
-function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
-   z = zero_matrix(parent(x), m, n)
-   for i in 1:min(m, n)
-      z[i, i] = x
-   end
-   return z
-end
 
-@doc raw"""
-    diagonal_matrix(x::NCRingElement, m::Int)
-
-Return the $m \times m$ matrix over the ring `parent(x)` with `x` along the
-main diagonal and zeros elsewhere.
-
-# Examples
-```jldoctest
 julia> diagonal_matrix(QQ(-1), 3)
 [-1//1    0//1    0//1]
 [ 0//1   -1//1    0//1]
 [ 0//1    0//1   -1//1]
 ```
 """
-diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
+function diagonal_matrix(x::NCRingElement, m::Int, n::Int = m)
+   z = zero_matrix(parent(x), m, n)
+   for i in 1:min(m, n)
+      z[i, i] = x
+   end
+   return z
+end
 
 @doc raw"""
     diagonal_matrix(R::NCRing, entries::AbstractVector{<:NCRingElement})

@@ -112,8 +112,7 @@ scalar_matrix(n::Int, a::NCRingElement)
 ### Diagonal matrices
 
 ```@docs
-diagonal_matrix(x::NCRingElement, m::Int, n::Int)
-diagonal_matrix(x::NCRingElement, m::Int)
+diagonal_matrix(x::NCRingElement, m::Int, n::Int = m)
 diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
 ```
 
