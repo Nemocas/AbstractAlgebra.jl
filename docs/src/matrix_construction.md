@@ -17,7 +17,7 @@ constructing matrices.
 Unfortunately, Julia's matrices cannot be used in our context due to two independent problems:
 
 - In empty matrices (0 rows or columns) all that is known about a Julia matrix is the type of its entries,
-however for the complex algebraic types, this information is not sufficient to create elements,
+however for advanced algebraic types, this information is insufficient to create elements,
 hence `zero(T)` or friends cannot work.
 - Many Julia functions (e.g. `det`) assume that all types used embed into the real or complex numbers. For
 instance, in Julia `det(ones(Int, (1,1))) == 1.0`, so the fact that the determinant is exactly the integer `1`
