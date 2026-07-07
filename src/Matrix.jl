@@ -200,15 +200,53 @@ Return the number of entries in the given matrix.
 length(a::MatrixElem{T}) where T <: NCRingElement = nrows(a) * ncols(a)
 
 @doc raw"""
-    isempty(a::MatrixElem{T}) where T <: NCRingElement
+    isempty(a::MatrixElem{T}) where {T <: NCRingElement}
 
-Return `true` if `a` does not contain any entry (i.e. `length(a) == 0`), and `false` otherwise.
+Return `true` if `a` has no entries, that is, if either the number
+of rows or the number of columns is zero. Otherwise, return `false`.
+
+# Examples
+
+```jldoctest
+julia> A = zero_matrix(ZZ, 0, 3)
+0 by 3 empty matrix
+
+julia> isempty(A)
+true
+
+julia> B = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> isempty(B)
+false
+```
 """
-isempty(a::MatrixElem{T}) where T <: NCRingElement = (nrows(a) == 0) | (ncols(a) == 0)
+isempty(a::MatrixElem{T}) where {T <: NCRingElement} = (nrows(a) == 0) || (ncols(a) == 0)
 
 Base.eltype(::Type{<:MatrixElem{T}}) where {T <: NCRingElement} = T
 
-function Base.isassigned(a::MatrixElem{T}, i, j) where T <: NCRingElement
+@doc raw"""
+    Base.isassigned(a::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
+
+Return `true` if the matrix `a` has an entry at position `(i, j)`,
+and `false` otherwise.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [3 1 2; 2 0 1])
+[3   1   2]
+[2   0   1]
+
+julia> isassigned(M, 1, 2)
+true
+
+julia> isassigned(M, 4, 4)
+false
+```
+"""
+function Base.isassigned(a::MatrixElem{T}, i, j) where {T <: NCRingElement}
     try
         a[i, j]
         true
@@ -300,8 +338,24 @@ Return `is_negative(M[i,j])`, but possibly more efficiently.
 @doc raw"""
     is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
 
-Return `true` if the $i$-th row of the matrix $M$ is zero,
-but possibly more efficiently than checking all entries individually.
+Return `true` if the $i$-th row of the matrix $M$ is zero, and `false`
+otherwise.
+
+This may be more efficient than checking all entries individually.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 0 0 0])
+[1   2   3]
+[0   0   0]
+
+julia> is_zero_row(M, 1)
+false
+
+julia> is_zero_row(M, 2)
+true
+```
 """
 function is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
   @boundscheck 1 <= i <= nrows(M) || Base.throw_boundserror(M, (i, 1:ncols(M)))
@@ -316,8 +370,25 @@ end
 @doc raw"""
     is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
 
-Return `true` if the $j$-th column of the matrix $M$ is zero,
-but possibly more efficiently than checking all entries individually.
+Return `true` if the $j$-th column of the matrix $M$ is zero, and
+`false` otherwise.
+
+This may be more efficient than checking all entries individually.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 0; 2 0; 3 0])
+[1   0]
+[2   0]
+[3   0]
+
+julia> is_zero_column(M, 1)
+false
+
+julia> is_zero_column(M, 2)
+true
+```
 """
 function is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
   @boundscheck 1 <= j <= ncols(M) || Base.throw_boundserror(M, (1:nrows(M), j))
@@ -1486,7 +1557,7 @@ end
 #
 ###############################################################################
 
-"""
+@doc raw"""
     is_symmetric(M::MatElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
@@ -2251,9 +2322,41 @@ end
 
 @doc raw"""
     is_rref(M::MatrixElem{T}) where {T <: RingElement}
+    is_rref(M::MatrixElem{T}) where {T <: FieldElement}
 
-Return `true` if $M$ is in reduced row echelon form, otherwise return
-`false`.
+Return `true` if $M$ is in reduced row echelon form, and `false`
+otherwise.
+
+For matrices over fields, leading entries are required to be normalized
+to one.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(QQ, [1 0 2; 0 1 3; 0 0 0])
+[1//1   0//1   2//1]
+[0//1   1//1   3//1]
+[0//1   0//1   0//1]
+
+julia> is_rref(A)
+true
+
+julia> B = matrix(QQ, [2 0 4; 0 1 3; 0 0 0])
+[2//1   0//1   4//1]
+[0//1   1//1   3//1]
+[0//1   0//1   0//1]
+
+julia> is_rref(B)
+false
+
+julia> C = matrix(ZZ, [2 0 4; 0 3 6; 0 0 0])
+[2   0   4]
+[0   3   6]
+[0   0   0]
+
+julia> is_rref(C)
+true
+```
 """
 function is_rref(M::MatrixElem{T}) where {T <: RingElement}
    m = nrows(M)
@@ -2279,12 +2382,6 @@ function is_rref(M::MatrixElem{T}) where {T <: RingElement}
    return true
 end
 
-@doc raw"""
-    is_rref(M::MatrixElem{T}) where {T <: FieldElement}
-
-Return `true` if $M$ is in reduced row echelon form, otherwise return
-`false`.
-"""
 function is_rref(M::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(M)
    n = ncols(M)
@@ -2726,12 +2823,32 @@ end
 #
 ###############################################################################
 
-"""
+@doc raw"""
     is_alternating(M::MatElem)
 
-Return whether the form corresponding to the matrix `M` is alternating,
-i.e. `M == -transpose(M)` and `M` has zeros on the diagonal.
-Return `false` if `M` is not a square matrix.
+Return `true` if `M` is alternating, that is, if `M` is skew-symmetric
+and all entries on the main diagonal are zero. Return `false` otherwise.
+
+Non-square matrices are not considered alternating.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [0 2 -3; -2 0 5; 3 -5 0])
+[ 0    2   -3]
+[-2    0    5]
+[ 3   -5    0]
+
+julia> is_alternating(M)
+true
+
+julia> N = matrix(ZZ, [1 2; -2 1])
+[ 1   2]
+[-2   1]
+
+julia> is_alternating(N)
+false
+```
 """
 function is_alternating(M::MatElem)
   is_skew_symmetric(M) || return false
@@ -2741,13 +2858,14 @@ function is_alternating(M::MatElem)
   return true
 end
 
-"""
+@doc raw"""
     is_skew_symmetric(M::MatElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
 
 # Examples
+
 ```jldoctest
 julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
 [0   -1   -2]
@@ -2756,7 +2874,6 @@ julia> M = matrix(ZZ, [0 -1 -2; 1 0 -3; 2 3 0])
 
 julia> is_skew_symmetric(M)
 true
-
 ```
 """
 function is_skew_symmetric(M::MatElem)
@@ -3722,9 +3839,9 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_upper_triangular(A::MatElem)
+    is_upper_triangular(M::MatElem)
 
-Return `true` if $A$ is an upper triangular matrix, that is,
+Return `true` if $M$ is an upper triangular matrix, that is,
 all entries below the main diagonal are zero. Note that this
 definition also applies to non-square matrices.
 
@@ -3887,9 +4004,9 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_lower_triangular(A::MatElem)
+    is_lower_triangular(M::MatElem)
 
-Return `true` if $A$ is an lower triangular matrix, that is,
+Return `true` if $M$ is a lower triangular matrix, that is,
 all entries above the main diagonal are zero. Note that this
 definition also applies to non-square matrices.
 
@@ -3925,7 +4042,7 @@ end
     is_diagonal(A::MatElem)
 
 Return `true` if $A$ is a diagonal matrix, that is,
-all entries off the main diagonal are zero. Note that this
+if all entries off the main diagonal are zero. Note that this
 definition also applies to non-square matrices.
 
 Alias for `LinearAlgebra.isdiag`.
@@ -4003,18 +4120,60 @@ end
 #
 ###############################################################################
 
+
 @doc raw"""
-    is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
 
-Given an $n \times m$ matrix $A$ over a ring, return a tuple `(flag, B)`. If
-`side` is `:right` and `flag` is `true`, $B$ is a right inverse of $A$ i.e.
-$A B$ is the $n \times n$ unit matrix. If `side` is `:left` and `flag` is
-`true`, $B$ is a left inverse of $A$ i.e. $B A$ is the $m \times m$ unit matrix.
-If `flag` is `false`, no right or left inverse exists.
+Return a tuple `(flag, B)` indicating whether the matrix $A$ has a one-sided
+inverse.
 
-To get the space of all inverses, note that if $B$ and $C$ are both right
-inverses, then $A (B - C) = 0$, and similar for left inverses. Hence from one
-inverse one can find all by making suitable use of [`kernel`](@ref).
+If $A$ is an $n \times m$ matrix and `side == :right`, then `flag` is `true`
+precisely if a right inverse exists. In this case, $B$ is an $m \times n$
+matrix such that $A B$ is the $n \times n$ identity matrix.
+
+If `side == :left`, then `flag` is `true` precisely if a left inverse exists.
+In this case, $B$ is an $m \times n$ matrix such that $B A$ is the
+$m \times m$ identity matrix.
+
+If `flag` is `false`, then no inverse exists on the requested side.
+
+To compute all one-sided inverses from one inverse, use the kernel: if $B$
+and $C$ are both right inverses, then $A(B - C) = 0$, and similarly for left
+inverses.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(QQ, [1 2; 3 4])
+[1//1   2//1]
+[3//1   4//1]
+
+julia> flag, B = is_invertible_with_inverse(A);
+
+julia> flag
+true
+
+julia> B
+[-2//1    1//1]
+[ 3//2   -1//2]
+
+julia> B*A == one(parent(A))
+true
+```
+
+```jldoctest
+julia> A = matrix(QQ, [1 0 0; 0 1 0])
+[1//1   0//1   0//1]
+[0//1   1//1   0//1]
+
+julia> flag, B = is_invertible_with_inverse(A; side = :right);
+
+julia> flag
+true
+
+julia> A*B == one(parent(A*B))
+true
+```
 """
 function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
    if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
@@ -4030,8 +4189,26 @@ end
 @doc raw"""
     is_invertible(A::MatElem{T}) where {T <: RingElement}
 
-Return true if a given square matrix is invertible, false otherwise. If
-the inverse should also be computed, use `is_invertible_with_inverse`.
+Return `true` if the square matrix $A$ is invertible, and `false`
+otherwise. To also compute an inverse, use [`is_invertible_with_inverse`](@ref).
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> is_invertible(A)
+false
+
+julia> B = matrix(QQ, [1 2; 3 4])
+[1//1   2//1]
+[3//1   4//1]
+
+julia> is_invertible(B)
+true
+```
 """
 is_invertible(A::MatElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
 
@@ -4172,8 +4349,30 @@ end
 @doc raw"""
     is_nilpotent(A::MatElem{T}) where {T <: RingElement}
 
-Return if `A` is nilpotent, i.e. if there exists a natural number $k$
-such that $A^k = 0$. If `A` is not square an exception is raised.
+Return `true` if `A` is nilpotent, that is, if there exists a positive
+integer $k$ such that $A^k = 0$. Return `false` otherwise.
+
+If `A` is not square, an exception is raised. The test is only supported
+for matrices defined over integral domains.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [0 1 0; 0 0 1; 0 0 0])
+[0   1   0]
+[0   0   1]
+[0   0   0]
+
+julia> is_nilpotent(A)
+true
+
+julia> B = matrix(ZZ, [1 1; 0 1])
+[1   1]
+[0   1]
+
+julia> is_nilpotent(B)
+false
+```
 """
 function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
@@ -4258,7 +4457,29 @@ end
 @doc raw"""
     is_hessenberg(A::MatElem{T}) where {T <: RingElement}
 
-Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
+Return `true` if $A$ is in (upper) Hessenberg form, that is, if
+all entries below the first subdiagonal are zero, and `false`
+otherwise.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [1 2 3; 4 5 6; 0 7 8])
+[1   2   3]
+[4   5   6]
+[0   7   8]
+
+julia> is_hessenberg(A)
+true
+
+julia> B = matrix(ZZ, [1 2 3; 4 5 6; 7 8 9])
+[1   2   3]
+[4   5   6]
+[7   8   9]
+
+julia> is_hessenberg(B)
+false
+```
 """
 function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
    is_square(A) || return false
@@ -5458,11 +5679,32 @@ function hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    is_hnf(M::MatElem{T}) where T <: RingElement
+    is_hnf(M::MatElem{T}) where {T <: RingElement}
 
-Return `true` if the matrix is in Hermite normal form.
+Return `true` if the matrix $M$ is in Hermite normal form, and `false`
+otherwise.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
+[ 2   3   -1]
+[ 3   5    7]
+[11   1   12]
+
+julia> is_hnf(A)
+false
+
+julia> H = hnf(A)
+[1   0   255]
+[0   1    17]
+[0   0   281]
+
+julia> is_hnf(H)
+true
+```
 """
-function is_hnf(M::MatElem{T}) where T <: RingElement
+function is_hnf(M::MatElem{T}) where {T <: RingElement}
    r = nrows(M)
    c = ncols(M)
    row = 1
@@ -5512,11 +5754,28 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_snf(A::MatElem{T}) where T <: RingElement
+    is_snf(A::MatElem{T}) where {T <: RingElement}
 
-Return `true` if $A$ is in Smith Normal Form.
+Return `true` if $A$ is in Smith normal form, and `false` otherwise.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [2 4 4; -6 6 12; 10 -4 -16])
+[ 2    4     4]
+[-6    6    12]
+[10   -4   -16]
+
+julia> S = snf(A)
+[2   0    0]
+[0   6    0]
+[0   0   12]
+
+julia> is_snf(S)
+true
+```
 """
-function is_snf(A::MatElem{T}) where T <: RingElement
+function is_snf(A::MatElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    a = A[1, 1]
@@ -5687,11 +5946,31 @@ end
 ################################################################################
 
 @doc raw"""
-    is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
+    is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 
-Return `true` if $P$ is a matrix in weak Popov form of the given rank.
+Return `true` if $P$ is in weak Popov form with the given rank, and
+`false` otherwise.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]));
+
+julia> P = weak_popov(A)
+[   1                        2                    3   x]
+[   0                        0                    0   0]
+[-x^3   -2*x^3 + x^2 - 2*x + 1   -2*x^3 + x^2 - 3*x   1]
+
+julia> is_weak_popov(P, 2)
+true
+
+julia> is_weak_popov(P, 3)
+false
+```
 """
-function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
+function is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -5713,11 +5992,31 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
 end
 
 @doc raw"""
-    is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
+    is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 
-Return `true` if $P$ is a matrix in Popov form with the given rank.
+Return `true` if $P$ is in Popov form with the given rank, and `false`
+otherwise.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]));
+
+julia> P = popov(A)
+[       0                           0                         0       0]
+[       1                           2                         3       x]
+[1//2*x^3   x^3 - 1//2*x^2 + x - 1//2   x^3 - 1//2*x^2 + 3//2*x   -1//2]
+
+julia> is_popov(P, 1)
+false
+
+julia> is_popov(P, 2)
+true
+```
 """
-function is_popov(P::MatrixElem{T}, rank::Int) where T <: PolyRingElem
+function is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
    for r = 1:nrows(P)
       p = find_pivot_popov(P, r)
