@@ -12,7 +12,6 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 number_of_rows(::MatElem)
 number_of_columns(::MatElem)
 length(::MatrixElem{T}) where T <: RingElement
-isempty(::MatrixElem{T}) where T <: RingElement
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
 transpose(::MatElem)
@@ -20,9 +19,6 @@ transpose!(::MatElem)
 tr(::MatElem{T}) where T <: RingElement
 det(::MatElem{T}) where T <: RingElem
 rank(::MatElem{T}) where T <: RingElem
-is_lower_triangular(::MatElem)
-is_upper_triangular(::MatElem)
-is_diagonal(::MatElem)
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 ```
 
@@ -30,8 +26,6 @@ change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 
 ```@docs; canonical=false
 Base.inv(::MatElem{T}) where T <: RingElement
-is_invertible(::MatElem{T}) where T <: RingElement
-is_invertible_with_inverse(::MatElem{T}) where T <: RingElement
 pseudo_inv(M::MatElem{T}) where T <: RingElement
 ```
 
@@ -269,9 +263,6 @@ julia> r, d, P, L, U = fflu(M)
 ```@docs; canonical=false
 rref_rational(::MatElem{T}) where T <: RingElem
 rref(::MatElem{T}) where T <: FieldElem
-
-is_rref(::MatElem{T}) where T <: RingElem
-is_rref(::MatElem{T}) where T <: FieldElem
 ```
 
 **Examples**
@@ -302,16 +293,6 @@ true
 
 ## Other functionality
 
-### Symmetry testing
-
-```@docs
-is_symmetric(::MatElem)
-
-is_skew_symmetric(::MatElem)
-
-is_alternating(::MatElem)
-```
-
 ### Powering
 
 ```@docs
@@ -334,12 +315,6 @@ content(::MatElem{T}) where T <: RingElement
 
 ```@docs
 *(::Perm, ::MatElem{T}) where T <: RingElement
-```
-
-### Nilpotency
-
-```@docs
-is_nilpotent(::MatElem{T}) where {T <: RingElement}
 ```
 
 ### Minors
@@ -396,8 +371,6 @@ nullspace(::MatElem{T}) where T <: FieldElem
 
 ```@docs; canonical=false
 hessenberg(::MatElem{T}) where T <: RingElem
-
-is_hessenberg(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -444,8 +417,6 @@ similarity!(::MatElem{T}, ::Int, ::T) where T <: RingElem
 ```@docs
 hnf(::MatElem{T}) where T <: RingElem
 hnf_with_transform(::MatElem{T}) where T <: RingElem
-
-is_hnf(::MatElem{T}) where T <: RingElem
 ```
 
 **Examples**
@@ -476,8 +447,6 @@ julia> U*A
 ### Smith normal form
 
 ```@docs
-is_snf(::MatElem{T}) where T <: RingElement
-
 snf(::MatElem{T}) where T <: RingElem
 snf_with_transform(::MatElem{T}) where T <: RingElem
 ```
@@ -510,8 +479,6 @@ AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matri
 entries in a univariate polynomial ring over a field.
 
 ```@docs
-is_weak_popov(P::MatrixElem{T}, rank::Int) where T <: Generic.Poly
-
 weak_popov(::MatElem{T}) where T <: PolyRingElem
 weak_popov_with_transform(::MatElem{T}) where T <: PolyRingElem
 popov(::MatElem{T}) where T <: PolyRingElem
