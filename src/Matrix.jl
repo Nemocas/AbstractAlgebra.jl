@@ -7265,7 +7265,7 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::NCRingElement, m::Int, [n::Int])
+    diagonal_matrix(x::NCRingElement, m::Int, n::Int)
 
 Return the $m \times n$ matrix over the ring `parent(x)` with `x` along the
 main diagonal and zeros elsewhere.
