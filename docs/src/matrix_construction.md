@@ -104,7 +104,7 @@ identity_matrix(::Type{MatElem}, R::Ring, n::Int)
 ### Scalar matrices
 
 ```@docs
-scalar_matrix(R::Ring, n::Int, a::RingElement)
+scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
 scalar_matrix(n::Int, a::NCRingElement)
 ```
 
