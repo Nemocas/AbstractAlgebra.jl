@@ -6386,10 +6386,12 @@ end
 @doc raw"""
     swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
-rows are swapped.
+Return a new matrix obtained from `a` by swapping the `i`-th and `j`-th rows.
+
+The original matrix `a` remains unchanged.
 
 # Examples
+
 ```jldoctest
 julia> M = identity_matrix(ZZ, 3)
 [1   0   0]
@@ -6401,7 +6403,7 @@ julia> swap_rows(M, 1, 2)
 [1   0   0]
 [0   0   1]
 
-julia> M  # was not modified
+julia> M
 [1   0   0]
 [0   1   0]
 [0   0   1]
@@ -6417,9 +6419,10 @@ end
 @doc raw"""
     swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$-th and $j$-th rows of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
-the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
+Swap the `i`-th and `j`-th rows of `a` in place and return the modified
+matrix `a`.
+
+No bounds checking is performed; the indices `i` and `j` must be in range.
 
 # Examples
 ```jldoctest
@@ -6433,7 +6436,7 @@ julia> swap_rows!(M, 1, 2)
 [1   0   0]
 [0   0   1]
 
-julia> M  # was modified
+julia> M
 [0   1   0]
 [1   0   0]
 [0   0   1]
@@ -6451,8 +6454,8 @@ end
 @doc raw"""
     swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$-th and $j$-th
-columns are swapped.
+Return a new matrix obtained from `a` by swapping the `i`-th and `j`-th
+columns.
 """
 function swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
@@ -6464,9 +6467,10 @@ end
 @doc raw"""
     swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
-Swap the $i$-th and $j$-th columns of $a$ in place. The function returns the mutated
-matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).  It is
-the caller's responsibility to ensure that the indices $i$ and $j$ are in range.
+Swap the `i`-th and `j`-th columns of `a` in place and return the modified
+matrix `a`.
+
+No bounds checking is performed; the indices `i` and `j` must be in range.
 """
 function swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
@@ -6480,9 +6484,8 @@ end
 @doc raw"""
     reverse_rows!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$-th and $(r - i)$-th rows of $a$ for each $1 \leq i \leq r/2$,
-where $r$ is the number of rows of $a$.  The swaps are performed in place.
-The return value is the modified matrix.
+Reverse the order of the rows of `a` in place and return the modified
+matrix `a`.
 """
 function reverse_rows!(a::MatElem{T}) where T <: NCRingElement
    k = div(nrows(a), 2)
@@ -6495,9 +6498,7 @@ end
 @doc raw"""
     reverse_rows(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
-rows are swapped for each $1 \leq i \leq r/2$, where $r$ is the number of rows of
-$a$.
+Return a new matrix obtained from `a` by reversing the order of its rows.
 """
 function reverse_rows(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
@@ -6507,9 +6508,8 @@ end
 @doc raw"""
     reverse_cols!(a::MatElem{T}) where T <: NCRingElement
 
-Swap the $i$-th and $(r - i)$-th columns of $a$ for each $1 \leq i \leq c/2$,
-where $c$ is the number of columns of $a$.  The swaps are performed in place.
-The return value is the modified matrix.
+Reverse the order of the columns of `a` in place and return the modified
+matrix `a`.
 """
 function reverse_cols!(a::MatElem{T}) where T <: NCRingElement
    k = div(ncols(a), 2)
@@ -6522,8 +6522,7 @@ end
 @doc raw"""
     reverse_cols(a::MatElem{T}) where T <: NCRingElement
 
-Return a matrix $b$ with the entries of $a$, where the $i$-th and $(r - i)$-th
-columns are swapped for each $1 \leq i \leq c/2$, where $c$ is the number of columns of $a$.
+Return a new matrix obtained from `a` by reversing the order of its columns.
 """
 function reverse_cols(a::MatElem{T}) where T <: NCRingElement
    b = deepcopy(a)
@@ -6539,10 +6538,36 @@ end
 @doc raw"""
     add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Add $s$ times the $i$-th row to the $j$-th row of $a$.
+Add `s` times the `i`-th column to the `j`-th column of `a` and return the
+modified matrix `a`.
 
-By default, the transformation is applied to all rows of $a$. This can be
-changed using the optional `rows` argument.
+By default, this operation modifies all entries of the `j`-th column.
+An optional final argument restricts the operation to entries in the
+specified rows.
+
+# Examples
+
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> add_column!(M, 2, 3, 1)
+[ 7   2   3]
+[10   3   4]
+[14   5   5]
+
+julia> M
+[ 7   2   3]
+[10   3   4]
+[14   5   5]
+
+julia> add_column!(M, 2, 3, 1, 1:1)
+[13   2   3]
+[10   3   4]
+[14   5   5]
+```
 """
 function add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
    v = base_ring(a)(s)
@@ -6560,11 +6585,36 @@ end
 @doc raw"""
     add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
+Return a new matrix obtained from `a` by adding `s` times the `i`-th
+column to the `j`-th column.
 
-By default, the transformation is applied to all rows of $a$. This can be
-changed using the optional `rows` argument.
+By default, this operation changes all entries of the `j`-th column
+in the returned matrix. An optional final argument restricts the operation
+to entries in the specified rows.
 
+# Examples
+
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> add_column(M, 2, 3, 1)
+[ 7   2   3]
+[10   3   4]
+[14   5   5]
+
+julia> M
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> add_column(M, 2, 3, 1, 1:1)
+[7   2   3]
+[2   3   4]
+[4   5   5]
+```
 """
 function add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
    b = deepcopy(a)
@@ -6574,10 +6624,12 @@ end
 @doc raw"""
     add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Add $s$ times the $i$-th row to the $j$-th row of $a$.
+Add `s` times the `i`-th row to the `j`-th row of `a` and return the modified
+matrix `a`.
 
-By default, the transformation is applied to all columns of $a$. This can be
-changed using the optional `cols` argument.
+By default, this operation modifies all entries of the `j`-th row.
+An optional final argument restricts the operation to entries in the
+specified columns.
 """
 function add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
    v = base_ring(a)(s)
@@ -6595,10 +6647,12 @@ end
 @doc raw"""
     add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Create a copy of $a$ and add $s$ times the $i$-th row to the $j$-th row of $a$.
+Return a new matrix obtained from `a` by adding `s` times the `i`-th
+row to the `j`-th row.
 
-By default, the transformation is applied to all columns of $a$. This can be
-changed using the optional `cols` argument.
+By default, this operation changes all entries of the `j`-th row in the returned
+matrix. An optional final argument restricts the operation to entries in the
+specified columns.
 """
 function add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
    b = deepcopy(a)
@@ -6610,15 +6664,16 @@ end
 @doc raw"""
     multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Multiply the $i$-th column of $a$ with $s$.
+Multiply the `i`-th column of `a` by `s` and return the modified matrix `a`.
 
-By default, the transformation is applied to all rows of $a$. This can be
-changed using the optional `rows` argument.
+By default, this operation modifies all entries of the `i`-th column.
+An optional final argument restricts the operation to entries in the
+specified rows.
 """
 function multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
    c = base_ring(a)(s)
    nc = ncols(a)
-   !_checkbounds(nc, i) && error("Row index ($i) must be between 1 and $nc")
+   !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
    temp = base_ring(a)()
    for r in rows
       a[r, i] = c*a[r, i] # cannot mutate matrix entries
@@ -6629,10 +6684,11 @@ end
 @doc raw"""
     multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply the $i$-th column of $a$ with $s$.
+Return a new matrix obtained from `a` by multiplying the `i`-th column by `s`.
 
-By default, the transformation is applied to all rows of $a$. This can be
-changed using the optional `rows` argument.
+By default, this operation changes all entries of the `i`-th column in the returned
+matrix. An optional final argument restricts the operation to entries in the
+specified rows.
 """
 function multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
    b = deepcopy(a)
@@ -6644,10 +6700,11 @@ end
 @doc raw"""
     multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Multiply the $i$-th row of $a$ with $s$.
+Multiply the `i`-th row of `a` by `s` and return the modified matrix `a`.
 
-By default, the transformation is applied to all columns of $a$. This can be
-changed using the optional `cols` argument.
+By default, this operation modifies all entries of the `i`-th row.
+An optional final argument restricts the operation to entries in the
+specified columns.
 """
 function multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
    c = base_ring(a)(s)
@@ -6663,10 +6720,35 @@ end
 @doc raw"""
     multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
 
-Create a copy of $a$ and multiply the $i$-th row of $a$ with $s$.
+Return a new matrix obtained from `a` by multiplying the `i`-th row by `s`.
 
-By default, the transformation is applied to all columns of $a$. This can be
-changed using the optional `cols` argument.
+By default, this operation changes all entries of the `i`-th row in the returned
+matrix. An optional final argument restricts the operation to entries in the
+specified columns.
+
+# Examples
+
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> multiply_row(M, 2, 3)
+[1    2    3]
+[2    3    4]
+[8   10   10]
+
+julia> M
+[1   2   3]
+[2   3   4]
+[4   5   5]
+
+julia> multiply_row(M, 2, 3, 2:2)
+[1    2   3]
+[2    3   4]
+[4   10   5]
+```
 """
 function multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
    b = deepcopy(a)
@@ -6836,10 +6918,32 @@ end
 #
 ###############################################################################
 
+
 @doc raw"""
     map_entries!(f, dst::MatElem{T}, src::MatElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
-Like `map_entries`, but stores the result in `dst` rather than a new matrix.
+Apply `f` to each entry of `src`, store the result in the given
+matrix `dst` and return the modified matrix `dst`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> N = zero_matrix(ZZ, 2, 2)
+[0   0]
+[0   0]
+
+julia> map_entries!(x -> x^2, N, M)
+[1    4]
+[9   16]
+
+julia> N
+[1    4]
+[9   16]
+```
 """
 function map_entries!(f::S, dst::MatElem{T}, src::MatElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
    for i = 1:nrows(src), j = 1:ncols(src)
@@ -6851,15 +6955,30 @@ end
 @doc raw"""
     map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
-Like `map`, but stores the result in `dst` rather than a new matrix.
-This is equivalent to `map_entries!(f, dst, src)`.
+Apply `f` to each entry of `src`, store the result in the given
+matrix `dst` and return the modified matrix `dst`.
+
+This is equivalent to `map_entries!(f, dst, src)`, see [`map_entries!`](@ref).
 """
 Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc raw"""
     map_entries(f, a::MatElem{T}) where T <: NCRingElement
 
-Transform matrix `a` by applying `f` to each element.
+Return a new matrix obtained by applying `f` to each entry of the
+matrix `a`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> M2 = map_entries(x -> x^2, M)
+[1    4]
+[9   16]
+```
 """
 function map_entries(f::S, a::MatElem{T}) where {S, T <: NCRingElement}
    isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
@@ -6876,8 +6995,10 @@ end
 @doc raw"""
     map(f, a::MatrixElem{T}) where T <: NCRingElement
 
-Transform matrix `a` by applying `f` to each element.
-This is equivalent to `map_entries(f, a)`.
+Return a new matrix obtained by applying `f` to each entry of the
+matrix `a`.
+
+This is equivalent to `map_entries(f, a)`, see [`map_entries`](@ref).
 """
 Base.map(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, a)
 
