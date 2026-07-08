@@ -182,6 +182,17 @@ end
     number_of_rows(a::MatElem)
 
 Return the number of rows of the given matrix.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 4 5 6])
+[1   2   3]
+[4   5   6]
+
+julia> number_of_rows(M)
+2
+```
 """
 number_of_rows(a::MatElem)
 
@@ -189,6 +200,17 @@ number_of_rows(a::MatElem)
     number_of_columns(a::MatElem)
 
 Return the number of columns of the given matrix.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 4 5 6])
+[1   2   3]
+[4   5   6]
+
+julia> number_of_columns(M)
+3
+```
 """
 number_of_columns(a::MatElem)
 
@@ -196,6 +218,17 @@ number_of_columns(a::MatElem)
     length(a::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of entries in the given matrix.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 4 5 6])
+[1   2   3]
+[4   5   6]
+
+julia> length(M)
+6
+```
 """
 length(a::MatrixElem{T}) where T <: NCRingElement = nrows(a) * ncols(a)
 
@@ -1686,9 +1719,9 @@ end
 @doc raw"""
     gram(x::MatElem)
 
-Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
-the $r\times r$ matrix whose entries $i, j$ are the dot products of the
-$i$-th and $j$-th rows, respectively.
+Return the Gram matrix of $x$, i.e. if $x$ is an $r \times c$ matrix, return
+the $r \times r$ matrix whose $(i, j)$-th entry is the dot product of the
+$i$-th and $j$-th rows of $x$.
 
 # Examples
 
@@ -1709,7 +1742,6 @@ julia> B = gram(A)
 [2*t^2 + 2*t + 2   t^3 + 2*t^2 + t                   2*t^2 + t - 1]
 [t^3 + 2*t^2 + t       t^4 + 2*t^2                       t^3 + 3*t]
 [  2*t^2 + t - 1         t^3 + 3*t   t^4 + 2*t^3 + 4*t^2 + 6*t + 9]
-
 ```
 """
 function gram(x::MatElem)
@@ -1734,8 +1766,8 @@ end
 @doc raw"""
     tr(x::MatElem{T}) where T <: NCRingElement
 
-Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
-require the matrix to be square.
+Return the trace of the matrix $x$, i.e. the sum of its diagonal elements.
+The matrix is required to be square.
 
 # Examples
 
@@ -1754,7 +1786,6 @@ julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
 julia> b = tr(A)
 t^2 + 3*t + 2
-
 ```
 """
 function tr(x::MatElem{T}) where T <: NCRingElement
@@ -1775,8 +1806,8 @@ end
 @doc raw"""
     content(x::MatrixElem{T}) where T <: RingElement
 
-Return the content of the matrix $a$, i.e. the greatest common divisor of all
-its entries, assuming it exists.
+Return the greatest common divisor of all entries of the matrix $x$,
+assuming such a greatest common divisor exists.
 
 # Examples
 
@@ -1795,7 +1826,6 @@ julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
 julia> b = content(A)
 1
-
 ```
 """
 function content(x::MatrixElem{T}) where T <: RingElement
@@ -2656,7 +2686,8 @@ end
 @doc raw"""
     det(M::MatElem{T}) where {T <: RingElement}
 
-Return the determinant of the matrix $M$. We assume $M$ is square.
+Return the determinant of the given matrix $M$. The matrix is required to be
+square.
 
 # Examples
 
@@ -2666,7 +2697,7 @@ julia> R, x = polynomial_ring(QQ, :x)
 
 julia> A = R[x 1; 1 x^2];
 
-julia> d = det(A)
+julia> det(A)
 x^3 - 1
 ```
 """
@@ -2768,7 +2799,8 @@ end
 @doc raw"""
     minors(A::MatElem, k::Int)
 
-Return an array consisting of the `k`-minors of `A`.
+Return an array consisting of all $k$-minors of the given matrix $A$,
+i.e. the determinants of all $k \times k$ submatrices of $A$.
 
 # Examples
 
@@ -2782,7 +2814,6 @@ julia> minors(A, 2)
  -3
  -6
  -3
-
 ```
 """
 minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
@@ -2790,7 +2821,8 @@ minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
 @doc raw"""
     minors_with_position(A::MatElem, k::Int)
 
-Return an array consisting of the `k`-minors of `A` and the respective data on the rows and columns involved.
+Return an array consisting of all $k$-minors of $A$, together with the row
+and column indices defining the corresponding submatrices.
 
 # Examples
 
@@ -2804,7 +2836,6 @@ julia> minors_with_position(A, 2)
  (-3, [1, 2], [1, 2])
  (-6, [1, 2], [1, 3])
  (-3, [1, 2], [2, 3])
-
 ```
 """
 minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
@@ -2812,7 +2843,8 @@ minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position
 @doc raw"""
     minors_iterator(A::MatElem, k::Int)
 
-Return an iterator that computes the `k`-minors of `A`.
+Return an iterator computing all $k$-minors of $A$, i.e. the determinants
+of all $k \times k$ submatrices of $A$.
 
 # Examples
 
@@ -2841,7 +2873,8 @@ end
 @doc raw"""
     minors_iterator_with_position(A::MatElem, k::Int)
 
-Return an iterator that computes the `k`-minors of `A` also specifying the row and column indices of the minor.
+Return an iterator computing all $k$-minors of $A$, together with the row
+and column indices defining the corresponding submatrices.
 
 # Examples
 
@@ -2852,7 +2885,6 @@ julia> A = ZZ[1 2 3; 4 5 6]
 
 julia> first(minors_iterator_with_position(A, 2))
 (-3, [1, 2], [1, 2])
-
 ```
 """
 function minors_iterator_with_position(M::MatElem, k::Int)
@@ -2864,7 +2896,8 @@ end
 @doc raw"""
     exterior_power(A::MatElem, k::Int) -> MatElem
 
-Return the `k`-th exterior power of `A`.
+Return the matrix of the induced map on the `k`-th exterior power. Its entries
+are the determinants of the $k \times k$ submatrices of $A$.
 
 # Examples
 
@@ -2965,7 +2998,22 @@ end
 @doc raw"""
     pfaffian(M::MatElem)
 
-Return the Pfaffian of a skew-symmetric matrix `M`.
+Return the Pfaffian of the skew-symmetric matrix $M$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, ["x$i" for i in 1:6]);
+
+julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
+[  0    x1    x2   x3]
+[-x1     0    x4   x5]
+[-x2   -x4     0   x6]
+[-x3   -x5   -x6    0]
+
+julia> pfaffian(M)
+x1*x6 - x2*x5 + x3*x4
+```
 """
 function pfaffian(M::MatElem)
    check_skew_symmetric(M)
@@ -2983,7 +3031,29 @@ end
 @doc raw"""
     pfaffians(M::MatElem, k::Int)
 
-Return a vector consisting of the `k`-Pfaffians of a skew-symmetric matrix `M`.
+Return a vector consisting of the Pfaffians of all $k \times k$ principal
+submatrices of the skew-symmetric matrix $M$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, ["x$i" for i in 1:6]);
+
+julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
+[  0    x1    x2   x3]
+[-x1     0    x4   x5]
+[-x2   -x4     0   x6]
+[-x3   -x5   -x6    0]
+
+julia> pfaffians(M, 2)
+6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
+ x1
+ x2
+ x4
+ x3
+ x5
+ x6
+```
 """
 function pfaffians(M::MatElem, k::Int)
    check_skew_symmetric(M)
@@ -3112,14 +3182,14 @@ end
 @doc raw"""
     rank(M::MatElem{T}) where {T <: RingElement}
 
-Return the rank of the matrix $M$.
+Return the rank of the given matrix $M$.
 
 # Examples
 
 ```jldoctest
-julia> A = QQ[1 2; 3 4];
+julia> A = QQ[1 2 3; 2 4 6; 1 1 1];
 
-julia> d = rank(A)
+julia> rank(A)
 2
 ```
 """
@@ -4151,11 +4221,25 @@ end
 @doc raw"""
     pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 
-Given a non-singular $n\times n$ matrix $M$ over a ring return a tuple $X, d$
-consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
-$MX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
-will be the determinant of $M$ up to sign. If $M$ is singular an exception
-is raised.
+Given a non-singular $n \times n$ matrix $M$ over a ring, return a tuple
+$X, d$ consisting of an $n \times n$ matrix $X$ and a denominator $d$ such
+that $MX = dI_n$, where $I_n$ is the $n \times n$ identity matrix.
+
+The denominator $d$ is the determinant of $M$ up to sign.
+
+If $M$ is not invertible over the base ring, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(QQ, 3, 3, [1 2 3;4 5 6;0 0 1])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+[0//1   0//1   1//1]
+
+julia> pseudo_inv(M)
+([5 -2 -3; -4 1 6; 0 0 -3], -3//1)
+```
 """
 function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
    is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
@@ -4174,10 +4258,25 @@ end
 @doc raw"""
     inv(M::MatElem{T}) where {T <: RingElement}
 
-Given a non-singular $n\times n$ matrix over a ring, return an
-$n\times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is the $n\times n$
-identity matrix. If $M$ is not invertible over the base ring an exception is
-raised.
+Given an invertible $n \times n$ matrix $M$ over a ring, return
+the $n \times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is
+the $n \times n$ identity matrix.
+
+If $M$ is not invertible over the base ring, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+[0//1   0//1   1//1]
+
+julia> inv(M)
+[-5//3    2//3    1//1]
+[ 4//3   -1//3   -2//1]
+[ 0//1    0//1    1//1]
+```
 """
 function Base.inv(M::MatElem{T}) where {T <: RingElement}
    is_square(M) || throw(DomainError(M, "Cannot invert non-square Matrix"))
@@ -4294,36 +4393,42 @@ is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) ==
 
 @doc raw"""
     nullspace(M::MatElem{T}) where {T <: RingElement}
+    nullspace(M::MatElem{T}) where {T <: FieldElement}
 
-Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
-a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
-i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
-$N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
-the vector space kernel over the fraction field of the base ring if the
-latter is not a field. In AbstractAlgebra we use the name "kernel" for a
-function to compute an integral kernel.
+Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a matrix
+$N$ whose columns form a basis for the right nullspace of $M$, i.e. such that
+$MN$ is the zero matrix. If $M$ is an $m \times n$ matrix, then $N$ is an
+$n \times \nu$ matrix.
+
+If the base ring is not a field, the nullspace is computed over the fraction
+field of the base ring.
+
+The function `kernel` computes an integral kernel instead.
 
 # Examples
 
 ```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
+julia> M = matrix(ZZ, 2, 2, [2 3; 4 6])
+[2   3]
+[4   6]
 
-julia> S = matrix_space(R, 4, 4)
-Matrix space of 4 rows and 4 columns
-  over univariate polynomial ring in x over integers
+julia> nu, N = nullspace(M)
+(1, [3; -2])
 
-julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
-              -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
-              -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
-              -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
-[  -6*x^2 + 6*x + 12   -12*x^2 - 21*x - 15    -15*x^2 + 21*x + 33     -21*x^2 - 9*x - 9]
-[  -8*x^2 + 8*x + 16   -16*x^2 + 38*x - 20     90*x^2 - 82*x - 44    60*x^2 + 54*x - 34]
-[   -4*x^2 + 4*x + 8    -8*x^2 + 13*x - 10     35*x^2 - 31*x - 14    22*x^2 + 21*x - 15]
-[-10*x^2 + 10*x + 20   -20*x^2 + 70*x - 25   150*x^2 - 140*x - 85   105*x^2 + 90*x - 50]
+julia> M*N
+[0]
+[0]
 
-julia> n, N = nullspace(M)
-(2, [1320*x^4-330*x^2-1320*x-1320 1056*x^4+1254*x^3+1848*x^2-66*x-330; -660*x^4+1320*x^3+1188*x^2-1848*x-1056 -528*x^4+132*x^3+1584*x^2+660*x-264; 396*x^3-396*x^2-792*x 0; 0 396*x^3-396*x^2-792*x])
+julia> M2 = matrix(QQ, 2, 2, [2 3; 4 6])
+[2//1   3//1]
+[4//1   6//1]
+
+julia> nu2, N2 = nullspace(M2)
+(1, [-3//2; 1])
+
+julia> M2*N2
+[0//1]
+[0//1]
 ```
 """
 function nullspace(M::MatElem{T}) where {T <: RingElement}
@@ -4365,14 +4470,6 @@ function nullspace(M::MatElem{T}) where {T <: RingElement}
    return nullity, U
 end
 
-@doc raw"""
-    nullspace(M::MatElem{T}) where {T <: FieldElement}
-
-Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
-a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
-i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
-$N$ will be an $n\times \nu$ matrix.
-"""
 function nullspace(M::MatElem{T}) where {T <: FieldElement}
    m = nrows(M)
    n = ncols(M)

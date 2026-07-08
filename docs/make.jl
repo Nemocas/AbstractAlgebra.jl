@@ -74,6 +74,7 @@ makedocs(
                     "matrix_construction.md",
                     "matrix_manipulation.md",
                     "matrix_predicates.md",
+                    "matrix_computed_quantities.md",
                     "matrix_normal_forms.md",
                  ],
                  "matrix_spaces.md",

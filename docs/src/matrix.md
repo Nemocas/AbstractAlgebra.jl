@@ -9,48 +9,13 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 ## Basic matrix functionality
 
 ```@docs
-number_of_rows(::MatElem)
-number_of_columns(::MatElem)
-length(::MatrixElem{T}) where T <: RingElement
 zero(::MatElem{T}, ::Ring) where T <: RingElement
 one(::MatElem{T}) where T <: RingElement
 transpose(::MatElem)
 transpose!(::MatElem)
-tr(::MatElem{T}) where T <: RingElement
-det(::MatElem{T}) where T <: RingElem
-rank(::MatElem{T}) where T <: RingElem
 change_base_ring(::Ring, ::MatElem{T}) where T <: RingElement
 ```
 
-## Inverse
-
-```@docs; canonical=false
-Base.inv(::MatElem{T}) where T <: RingElement
-pseudo_inv(M::MatElem{T}) where T <: RingElement
-```
-
-**Examples**
-
-```@jldoctest
-julia> M = matrix(QQ, 3, 3, [1 2 3;4 5 6;0 0 1])
-[1//1   2//1   3//1]
-[4//1   5//1   6//1]
-[0//1   0//1   1//1]
-
-julia> X = inv(M)
-[-5//3    2//3    1//1]
-[ 4//3   -1//3   -2//1]
-[ 0//1    0//1    1//1]
-
-julia> is_invertible(M)
-true
-
-julia> is_invertible_with_inverse(M)
-(true, [-5//3 2//3 1; 4//3 -1//3 -2; 0 0 1])
-
-julia> pseudo_inv(M)
-([5 -2 -3; -4 1 6; 0 0 -3], -3//1)
-```
 
 ## Submatrices
 
@@ -237,90 +202,10 @@ Rationals
 
 ## Other functionality
 
-### Powering
-
-```@docs
-powers(::MatElem, ::Int)
-```
-
-### Gram matrix
-
-```@docs
-gram(::MatElem)
-```
-
-### Content
-
-```@docs
-content(::MatElem{T}) where T <: RingElement
-```
-
 ### Permutation
 
 ```@docs
 *(::Perm, ::MatElem{T}) where T <: RingElement
-```
-
-### Minors
-
-```@docs
-minors(::MatElem, ::Int)
-```
-
-### Exterior power
-
-```@docs
-exterior_power(::MatElem, ::Int)
-```
-
-### Pfaffian
-
-```@docs
-pfaffian(::MatElem)
-pfaffians(::MatElem, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(QQ, ["x$i" for i in 1:6])
-(Multivariate polynomial ring in 6 variables over rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3, x4, x5, x6])
-
-julia> M = R[0 x[1] x[2] x[3]; -x[1] 0 x[4] x[5]; -x[2] -x[4] 0 x[6]; -x[3] -x[5] -x[6] 0]
-[  0    x1    x2   x3]
-[-x1     0    x4   x5]
-[-x2   -x4     0   x6]
-[-x3   -x5   -x6    0]
-
-julia> pfaffian(M)
-x1*x6 - x2*x5 + x3*x4
-
-julia> pfaffians(M, 2)
-6-element Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}:
- x1
- x2
- x4
- x3
- x5
- x6
-```
-
-### Nullspace
-
-```@docs
-nullspace(::MatElem{T}) where T <: FieldElem
-```
-
-### Characteristic polynomial
-
-```@docs
-charpoly(::PolyRing{T}, ::MatElem{T}) where T <: RingElem
-```
-
-### Minimal polynomial
-
-```@docs
-minpoly(::PolyRing{T}, ::MatElem{T}, ::Bool) where T <: RingElem
 ```
 
 ### Transforms
