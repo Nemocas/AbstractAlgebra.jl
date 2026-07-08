@@ -204,7 +204,7 @@ Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
 """
 function ModuleHomomorphism(M1::FPModule{T},
                          M2::FPModule{T}, m::MatElem{T}; check::Bool = true) where T <: RingElement
-   return Generic.ModuleHomomorphism(M1, M2, m; check)
+   return Generic.ModuleHomomorphism{T}(M1, M2, m; check)
 end
 
 function ModuleHomomorphism(M1::FPModule{T},
