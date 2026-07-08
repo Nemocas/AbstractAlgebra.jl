@@ -336,10 +336,30 @@ end
 ###############################################################################
 
 @doc raw"""
-    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
+    block_diagonal_matrix(V::Vector{<:MatElem{T}}) where {T <: NCRingElement}
 
-Create the block diagonal matrix whose blocks are given by the matrices in `V`.
-There must be at least one matrix in V.
+Return the block diagonal matrix whose diagonal blocks are the matrices in `V`.
+
+The vector `V` must be non-empty, since otherwise the base ring cannot be
+inferred.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> N = matrix(ZZ, [4 5 6; 7 8 9])
+[4   5   6]
+[7   8   9]
+
+julia> block_diagonal_matrix([M, N])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+```
 """
 function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    @req !isempty(V) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `block_diagonal_matrix`"
@@ -369,11 +389,25 @@ function block_diagonal_matrix(V::Vector{<:MatElem{T}}) where T <: NCRingElement
    return M
 end
 
-@doc raw"""
-    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
 
-Create the block diagonal matrix over the ring `R` whose blocks are given
-by the matrices in `V`. Entries are coerced into `R` upon creation.
+@doc raw"""
+    block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where {T <: NCRingElement}
+
+Return the block diagonal matrix over the ring `R` whose diagonal blocks are the
+matrices in `V`.
+
+The entries of the blocks are coerced into `R`. If `V` is empty, the $0 \times 0$
+zero matrix over `R` is returned.
+
+# Examples
+
+```jldoctest
+julia> block_diagonal_matrix(ZZ, [[1 2; 3 4], [4 5 6; 7 8 9]])
+[1   2   0   0   0]
+[3   4   0   0   0]
+[0   0   4   5   6]
+[0   0   7   8   9]
+```
 """
 function block_diagonal_matrix(R::NCRing, V::Vector{<:Matrix{T}}) where T <: NCRingElement
    if length(V) == 0
@@ -6973,9 +7007,10 @@ end
 ################################################################################
 
 @doc raw"""
-    matrix(R::Ring, arr::AbstractMatrix{T}) where {T}
+    matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
 
-Constructs the matrix over $R$ with entries as in `arr`.
+Return the matrix over the ring `R` with entries as in the Julia
+`AbstractMatrix` `arr`. All entries of `arr` must be coercible into `R`.
 
 # Examples
 
@@ -6984,9 +7019,9 @@ julia> matrix(GF(3), [1 2 ; 3 4])
 [1   2]
 [0   1]
 
-julia> using LinearAlgebra ; matrix(GF(5), I(2))
-[1   0]
-[0   1]
+julia> matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3   1   2]
+[2   0   1]
 ```
 """
 function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
@@ -7035,12 +7070,25 @@ function matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 end
 
 @doc raw"""
-    matrix(R::Ring, r::Int, c::Int, arr::AbstractVector{T}) where {T}
+    matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
 
-Constructs the $r \times c$ matrix over $R$, where the entries are taken
-row-wise from `arr`.
+Return the `r` by `c` matrix over the ring `R` from the entries of `arr`.
+
+If `arr` is a vector, its entries are read row-wise, so the ``(i, j)`` entry is
+given by `arr[c*(i - 1) + j]`. All entries must be coercible into `R`.
+
+If `arr` is a matrix, this is equivalent to `matrix(R, arr)`.
+
+# Examples
+
+```jldoctest
+julia> matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+[3   1]
+[2   2]
+[0   1]
+```
 """
-function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where T
+function matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
    _check_dim(r, c, arr)
    ndims(arr) == 2 && return matrix(R, arr)
    if elem_type(R) === T && all(e -> parent(e) === R, arr)
@@ -7059,9 +7107,18 @@ end
 ################################################################################
 
 @doc raw"""
-    zero_matrix(R::Ring, r::Int, c::Int)
+    zero_matrix(R::NCRing, r::Int, c::Int)
 
-Return the $r \times c$ zero matrix over $R$.
+Return the $r \times c$ matrix over the ring `R` whose entries are all zero.
+
+# Examples
+
+```jldoctest
+julia> P = zero_matrix(ZZ, 3, 2)
+[0   0]
+[0   0]
+[0   0]
+```
 """
 function zero_matrix(R::NCRing, r::Int, c::Int)
   (r < 0 || c < 0) && error("Dimensions must be non-negative")
@@ -7078,9 +7135,19 @@ zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int) = zero_matrix(R, n, m)
 ################################################################################
 
 @doc raw"""
-    ones_matrix(R::Ring, r::Int, c::Int)
+    ones_matrix(R::NCRing, r::Int, c::Int)
 
-Return the $r \times c$ ones matrix over $R$.
+Return the $r \times c$ matrix over the ring `R` whose entries are
+all equal to the multiplicative identity of `R`.
+
+# Examples
+
+```jldoctest
+julia> ones_matrix(ZZ, 3, 2)
+[1   1]
+[1   1]
+[1   1]
+```
 """
 function ones_matrix(R::NCRing, r::Int, c::Int)
    z = dense_matrix_type(R)(R, undef, r, c)
@@ -7099,16 +7166,37 @@ end
 @doc raw"""
     identity_matrix(R::NCRing, n::Int)
 
-Return the $n \times n$ identity matrix over $R$.
+Return the $n \times n$ identity matrix over the ring `R`.
+
+# Examples
+
+```jldoctest
+julia> identity_matrix(ZZ, 2)
+[1   0]
+[0   1]
+```
 """
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
 @doc raw"""
     identity_matrix(M::MatElem{T}) where T <: NCRingElement
 
-Construct the identity matrix in the same matrix space as `M`, i.e.
-with ones down the diagonal and zeroes elsewhere. `M` must be square.
+Return the identity matrix with the same base ring and dimensions
+as the given abstract matrix `M`. The matrix `M` must be square.
+
 This is an alias for `one(M)`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> identity_matrix(M)
+[1   0]
+[0   1]
+```
 """
 function identity_matrix(M::MatElem{T}) where T <: NCRingElement
    is_square(M) || throw(DomainError(M, "matrix must be square"))
@@ -7134,15 +7222,38 @@ identity_matrix(::Type{MatElem}, R::Ring, n::Int) = identity_matrix(R, n)
 
 @doc raw"""
     scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
-    scalar_matrix(n::Int, a::NCRingElement)
 
-Return the $n \times n$ matrix over `R` with `a` along the main diagonal and
-zeroes elsewhere. If `R` is not specified, it defaults to `parent(a)`.
+Return the $n \times n$ diagonal matrix over the ring `R` whose diagonal entries
+are all equal to the ring element `a` of `R`.
+
+# Examples
+
+```jldoctest
+julia> scalar_matrix(QQ, 3, 1//2)
+[1//2   0//1   0//1]
+[0//1   1//2   0//1]
+[0//1   0//1   1//2]
+```
 """
 function scalar_matrix(R::NCRing, n::Int, a::NCRingElement)
    return diagonal_matrix(R(a), n)
 end
 
+@doc raw"""
+    scalar_matrix(n::Int, a::NCRingElement)
+
+Return the $n \times n$ diagonal matrix over `parent(a)` whose diagonal entries
+are all equal to the ring element `a`.
+
+# Examples
+
+```jldoctest
+julia> scalar_matrix(3, ZZ(5))
+[5   0   0]
+[0   5   0]
+[0   0   5]
+```
+"""
 function scalar_matrix(n::Int, a::NCRingElement)
    return diagonal_matrix(a, n)
 end
@@ -7154,10 +7265,12 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal_matrix(x::NCRingElement, m::Int, [n::Int])
+    diagonal_matrix(x::NCRingElement, m::Int, n::Int = m)
 
-Return the $m \times n$ matrix over $R$ with `x` along the main diagonal and
-zeroes elsewhere. If `n` is not specified, it defaults to `m`.
+
+Return the $m \times n$ matrix over the ring `parent(x)` with `x` along the
+main diagonal and zeros elsewhere. If `n` is omitted, return an $m \times m$
+matrix.
 
 # Examples
 ```jldoctest
@@ -7171,7 +7284,7 @@ julia> diagonal_matrix(QQ(-1), 3)
 [ 0//1    0//1   -1//1]
 ```
 """
-function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
+function diagonal_matrix(x::NCRingElement, m::Int, n::Int = m)
    z = zero_matrix(parent(x), m, n)
    for i in 1:min(m, n)
       z[i, i] = x
@@ -7179,16 +7292,18 @@ function diagonal_matrix(x::NCRingElement, m::Int, n::Int)
    return z
 end
 
-diagonal_matrix(x::NCRingElement, m::Int) = diagonal_matrix(x, m, m)
-
 @doc raw"""
-    diagonal_matrix(x::T...) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
-    diagonal_matrix(R::NCRing, x::AbstractVector{T}) where T <: NCRingElement -> MatElem{T}
+    diagonal_matrix(R::NCRing, entries::AbstractVector{<:NCRingElement})
+    diagonal_matrix(entries::AbstractVector{<:NCRingElement})
+    diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
 
-Returns a diagonal matrix whose diagonal entries are the elements of $x$.
-If a ring $R$ is given then it is used a parent for the entries of the created
-matrix. Otherwise the parent is inferred from the vector $x$.
+Return a diagonal matrix with the given entries on the main diagonal.
+
+For the vector forms, the diagonal entries are the elements of `entries`.
+For the vararg form, the diagonal entries are `x, xs...`.
+
+If the ring `R` is given, the entries are coerced into `R`. Otherwise, the base
+ring is inferred from the entries.
 
 # Examples
 
@@ -7197,45 +7312,76 @@ julia> diagonal_matrix(ZZ(1), ZZ(2))
 [1   0]
 [0   2]
 
-julia> diagonal_matrix([ZZ(3), ZZ(4)])
-[3   0]
-[0   4]
-
 julia> diagonal_matrix(ZZ, [5, 6])
 [5   0]
 [0   6]
+
+julia> diagonal_matrix([ZZ(3), ZZ(4)])
+[3   0]
+[0   4]
 ```
 """
-function diagonal_matrix(R::NCRing, x::AbstractVector{<:NCRingElement})
-    Base.require_one_based_indexing(x)
-    x = R.(x)
-    M = zero_matrix(R, length(x), length(x))
-    for i = 1:length(x)
-        M[i, i] = x[i]
+function diagonal_matrix(R::NCRing, entries::AbstractVector{<:NCRingElement})
+    Base.require_one_based_indexing(entries)
+    entries = R.(entries)
+    M = zero_matrix(R, length(entries), length(entries))
+    for i = 1:length(entries)
+        M[i, i] = entries[i]
     end
     return M
+end
+
+function diagonal_matrix(entries::AbstractVector{<:NCRingElement})
+   @req !isempty(entries) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
+   return diagonal_matrix(parent(first(entries)), entries)
 end
 
 function diagonal_matrix(x::T, xs::T...) where {T<:NCRingElement}
     return diagonal_matrix([x, xs...])
 end
 
-function diagonal_matrix(x::AbstractVector{<:NCRingElement})
-   @req !isempty(x) "Cannot infer base ring from empty vector; consider passing the desired base ring as first argument to `diagonal_matrix`"
-   return diagonal_matrix(parent(first(x)), x)
-end
-
 @doc raw"""
-    diagonal_matrix(V::Vector{T}) where T <: MatElem -> MatElem
+    diagonal_matrix(V::Vector{T}) where {T <: MatElem}
+    diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
+    diagonal_matrix(x::T, xs::T...) where {T <: MatElem}
 
-Returns a block diagonal matrix whose diagonal blocks are the matrices in $x$.
+Return the block diagonal matrix whose diagonal blocks are the given matrices.
+
+For the vector forms, the diagonal blocks are the elements of `V`.
+For the vararg form, the diagonal blocks are `x, xs...`.
+
+If the ring `R` is given, the entries of the blocks are coerced into `R`.
+
+These constructors use the corresponding `block_diagonal_matrix` functionality.
+
+# Examples
+
+```jldoctest
+julia> A = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> B = matrix(ZZ, [5 6])
+[5   6]
+
+julia> diagonal_matrix([A, B])
+[1   2   0   0]
+[3   4   0   0]
+[0   0   5   6]
+
+julia> diagonal_matrix(QQ, [A, B])
+[1//1   2//1   0//1   0//1]
+[3//1   4//1   0//1   0//1]
+[0//1   0//1   5//1   6//1]
+
+julia> diagonal_matrix(B, A)
+[5   6   0   0]
+[0   0   1   2]
+[0   0   3   4]
+```
 """
 function diagonal_matrix(V::Vector{T}) where {T<:MatElem}
     return block_diagonal_matrix(V)
-end
-
-function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
-    return block_diagonal_matrix([x, xs...])
 end
 
 function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
@@ -7244,6 +7390,10 @@ function diagonal_matrix(R::NCRing, V::Vector{<:MatElem})
     else
         return block_diagonal_matrix(map(x -> change_base_ring(R, x), V))
     end
+end
+
+function diagonal_matrix(x::T, xs::T...) where {T<:MatElem}
+    return block_diagonal_matrix([x, xs...])
 end
 
 
@@ -7256,12 +7406,11 @@ end
 @doc raw"""
     lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries on and below the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$n(n+1)/2$.
+Return the $n \times n$ lower triangular matrix whose entries on and below the
+main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n + 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7295,12 +7444,11 @@ end
 @doc raw"""
     upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries on and above the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$n(n+1)/2$.
+Return the $n \times n$ upper triangular matrix whose entries on and below the
+main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n + 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7334,12 +7482,11 @@ end
 @doc raw"""
     strictly_lower_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries below the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$(n-1)n/2$.
+Return the $n \times n$ strictly lower triangular matrix whose entries below
+the main diagonal are given by the elements of `L`. The entries are filled row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n - 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
@@ -7374,12 +7521,12 @@ end
 @doc raw"""
     strictly_upper_triangular_matrix(L::AbstractVector{T}) where {T <: NCRingElement}
 
-Return the $n$ by $n$ matrix whose entries above the main diagonal are
-the elements of `L`, and which has zeroes elsewhere.
-The value of $n$ is determined by the condition that `L` has length
-$(n-1)n/2$.
+Return the $n \times n$ strictly upper triangular matrix whose entries above
+the main diagonal are given by the elements of `L`. The entries are filled
+row by row.
 
-An exception is thrown if there is no integer $n$ with this property.
+The size $n$ is determined by the condition that `L` has length $n(n - 1)/2$.
+An exception is thrown if no such integer $n$ exists.
 
 # Examples
 ```jldoctest
