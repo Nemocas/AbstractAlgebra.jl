@@ -198,8 +198,8 @@ function _is_identity_matrix_mod_rels(M::AbstractAlgebra.FPModule{T},
    R = base_ring(M)
    n = ngens(M)
    (nrows(A) == n && ncols(A) == n) || return false
+   row = zero_matrix(R, 1, n)
    for i = 1:n
-      row = zero_matrix(R, 1, n)
       for j = 1:n
          row[1, j] = A[i, j]
       end
