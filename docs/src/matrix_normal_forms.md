@@ -27,10 +27,11 @@ rref(M::MatrixElem{T}) where {T <: FieldElement}
 ```
 
 
-## Hessenberg form
+## Hessenberg form and similarity transformations
 
 ```@docs
 hessenberg(A::MatElem{T}) where {T <: RingElement}
+similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
 ```
 
 

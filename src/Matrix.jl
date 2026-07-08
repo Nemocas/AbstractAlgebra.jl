@@ -311,14 +311,15 @@ function one(a::MatSpace)
 end
 
 @doc raw"""
-    one(a::MatElem{T}) where T <: NCRingElement
+    one(a::MatElem{T}) where {T <: NCRingElement}
 
-Return the identity matrix in the same matrix space as $a$.
-If the matrix space does not comprise square matrices, an error is thrown.
+Return the identity matrix with the same base ring and dimensions as `a`.
+
+The matrix `a` must be square.
 """
 one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a)
 
-function iszero(a::MatElem{T}) where T <: NCRingElement
+function iszero(a::MatElem{T}) where {T <: NCRingElement}
    for i = 1:nrows(a)
       for j = 1:ncols(a)
          if !is_zero_entry(a, i, j)
@@ -548,8 +549,32 @@ end
     similar(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
     similar(x::MatElem{T}) where T <: NCRingElement
 
-Create an uninitialized matrix over the given ring and dimensions,
-with defaults based upon the given source matrix `x`.
+Create an uninitialized matrix with the same implementation type as `x`.
+
+By default, the base ring and dimensions are inherited from `x`, but they can
+also be specified explicitly.
+
+This method is useful when implementing algorithms which create new matrices
+whose entries will be filled in later.
+
+Despite the name, `similar` is not related to similarity transformations or
+similar matrices in the mathematical sense.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2 3; 4 5 6])
+[1   2   3]
+[4   5   6]
+
+julia> similar(M)
+[#undef   #undef   #undef]
+[#undef   #undef   #undef]
+
+julia> similar(M, 2, 2)
+[#undef   #undef]
+[#undef   #undef]
+```
 """
 similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
 
@@ -560,15 +585,17 @@ similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 similar(x::MatElem) = similar(x, nrows(x), ncols(x))
 
 @doc raw"""
-    zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-    zero(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
-    zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement
-    zero(x::MatElem{T}) where T <: NCRingElement
+    zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where {T <: NCRingElement}
+    zero(x::MatElem{T}, r::Int, c::Int) where {T <: NCRingElement}
+    zero(x::MatElem{T}, R::NCRing) where T <: {NCRingElement}
+    zero(x::MatElem{T}) where {T <: NCRingElement}
 
-Create an zero matrix over the given ring and dimensions,
-with defaults based upon the given source matrix `x`.
+Create a zero matrix with the same implementation type as the given matrix `x`.
+
+By default, the base ring and dimensions are inherited from `x`, but they can
+also be specified explicitly.
 """
-zero(x::MatElem{T}, R::NCRing) where T <: NCRingElement = zero(x, R, nrows(x), ncols(x))
+zero(x::MatElem{T}, R::NCRing) where {T <: NCRingElement} = zero(x, R, nrows(x), ncols(x))
 zero(x::MatElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
 
 function zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
@@ -1631,7 +1658,7 @@ end
 @doc raw"""
     transpose(x::MatElem)
 
-Return the transpose of `x`.
+Return a new matrix containing the transpose of `x`.
 
 # Examples
 
@@ -1644,11 +1671,10 @@ julia> A = matrix(R, [t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 [  t^2       t             t]
 [   -2   t + 2   t^2 + t + 1]
 
-julia> B = transpose(A)
+julia> transpose(A)
 [t + 1   t^2            -2]
 [    t     t         t + 2]
 [    1     t   t^2 + t + 1]
-
 ```
 """
 function transpose(x::MatElem)
@@ -1660,13 +1686,14 @@ end
     transpose!(x::MatElem)
     transpose!(z::T, x::T) where T <: MatElem
 
-Return the transpose of `x`; the unary version may modify `x`, the binary version may modify `z`.
-**The binary version does not check dimensions -- the caller must ensure that**
-`ncols(z) == nrows(x)` and `nrows(z) == ncols(x)`.
+Return the transpose of `x`, storing the result in a pre-existing matrix.
 
-If the dimensions of `z` are wrong then the behaviour is undefined!
-Aliasing between `z` and `x` is permitted.
-The unary version reports an error if `x` is not a square matrix.
+The unary version stores the result in `x` itself and requires `x` to be square;
+an error is raised otherwise.
+
+The binary version stores the transpose of `x` in `z` and returns `z`. The matrix
+`z` must have size `ncols(x)` by `nrows(x)`. No dimension checks are performed,
+and incorrect dimensions may result in undefined behaviour.
 """
 function transpose!(x::MatElem)
   @req is_square(x) "Matrix must be a square matrix"
@@ -1847,7 +1874,7 @@ end
 @doc raw"""
     *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
 
-Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
+Return a new matrix obtained by applying the permutation `P` to the rows of `x`.
 
 # Examples
 
@@ -1870,11 +1897,10 @@ julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 julia> P = G([1, 3, 2])
 (2,3)
 
-julia> B = P*A
+julia> P*A
 [t + 1       t             1]
 [   -2   t + 2   t^2 + t + 1]
 [  t^2       t             t]
-
 ```
 """
 function *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
@@ -1892,7 +1918,7 @@ end
 @doc raw"""
     *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
 
-Apply the pemutation $P$ to the columns of the matrix $x$ and return the result.
+Return a new matrix obtained by applying the permutation `P` to the columns of `x`.
 
 # Examples
 
@@ -1915,11 +1941,10 @@ julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 julia> P = G([1, 3, 2])
 (2,3)
 
-julia> B = A*P
+julia> A*P
 [t + 1             1       t]
 [  t^2             t       t]
 [   -2   t^2 + t + 1   t + 2]
-
 ```
 """
 function *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
@@ -6980,11 +7005,13 @@ end
 @doc raw"""
     similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
 
-Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
-$P$ be the $n\times n$ identity matrix that has had all zero entries of row
-$r$ replaced with $d$, then the transform applied is equivalent to
-$M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
-preserves the minimal and characteristic polynomials of a matrix.
+Apply a similarity transformation to the square matrix $A$ in-place.
+
+Let $P$ be the identity matrix with all off-diagonal entries in row $r$
+replaced by $d$. This function replaces $A$ by $P^{-1}AP$.
+
+Similarity transformations preserve the minimal and characteristic
+polynomials of a matrix.
 
 # Examples
 
@@ -7003,7 +7030,6 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 [1   1   3   5]
 
 julia> similarity!(M, 1, R(3))
-
 ```
 """
 function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
@@ -7416,10 +7442,34 @@ end
 ###############################################################################
 
 @doc raw"""
-    vcat(A::MatElem{T}...) where T <: NCRingElement -> MatElem
+    Base.vcat(A::MatElem...)
 
-Return the horizontal concatenation of the matrices $A$.
-All component matrices must have the same base ring and same number of columns.
+Return the vertical concatenation of the matrices in $A$.
+
+All component matrices must have the same base ring and the same number of
+columns.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+[1   0   1]
+[0   1   0]
+[1   0   1]
+
+julia> vcat(M, N)
+[1   2   3]
+[2   3   4]
+[3   4   5]
+[1   0   1]
+[0   1   0]
+[1   0   1]
+```
 """
 function Base.vcat(A::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
@@ -7454,10 +7504,31 @@ function _vcat(A)
 end
 
 @doc raw"""
-    hcat(A::MatElem{T}...) where T <: NCRingElement -> MatElem
+    Base.hcat(A::MatElem...)
 
-Return the horizontal concatenating of the matrices $A$.
-All component matrices need to have the same base ring and number of rows.
+Return the horizontal concatenation of the matrices in $A$.
+
+All component matrices must have the same base ring and the same number of
+rows.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1   2   3]
+[2   3   4]
+[3   4   5]
+
+julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+[1   0   1]
+[0   1   0]
+[1   0   1]
+
+julia> hcat(M, N)
+[1   2   3   1   0   1]
+[2   3   4   0   1   0]
+[3   4   5   1   0   1]
+```
 """
 function Base.hcat(A::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
@@ -7554,11 +7625,28 @@ _change_base_ring(R::NCRing, a::MatElem) = dense_matrix_type(R)(R, undef, nrows(
 _change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
-    change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
+    change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
 
-Return the matrix obtained by coercing each entry into `R`.
+Return a new matrix over `R` by coercing each entry of `M` into `R`.
+
+The input matrix is not modified.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(ZZ, [1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> N = change_base_ring(QQ, M)
+[1//1   2//1]
+[3//1   4//1]
+
+julia> base_ring(N)
+Rationals
+```
 """
-function change_base_ring(R::NCRing, M::MatrixElem{T}) where T <: NCRingElement
+function change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
    N = _change_base_ring(R, M)
    for i = 1:nrows(M), j = 1:ncols(M)
       N[i,j] = R(M[i,j])
@@ -7954,7 +8042,7 @@ julia> identity_matrix(ZZ, 2)
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
 @doc raw"""
-    identity_matrix(M::MatElem{T}) where T <: NCRingElement
+    identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
 
 Return the identity matrix with the same base ring and dimensions
 as the given abstract matrix `M`. The matrix `M` must be square.
@@ -7973,12 +8061,19 @@ julia> identity_matrix(M)
 [0   1]
 ```
 """
-function identity_matrix(M::MatElem{T}) where T <: NCRingElement
+function identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
    is_square(M) || throw(DomainError(M, "matrix must be square"))
    return identity_matrix(M, nrows(M))
 end
 
-function identity_matrix(M::MatElem{T}, n::Int) where T <: NCRingElement
+
+@doc raw"""
+    identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
+
+Return the identity $n \times n$ matrix over the same base ring
+as the given abstract matrix `M`.
+"""
+function identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
    z = zero(M, n, n)
    R = base_ring(M)
    for i = 1:n

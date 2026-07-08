@@ -34,9 +34,11 @@ multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where
 ```
 
 
-## Swapping and reversing rows and columns
+## Row and column permutations
 
 ```@docs
+*(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
+*(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
 swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
@@ -45,4 +47,15 @@ reverse_rows(a::MatElem{T}) where T <: NCRingElement
 reverse_rows!(a::MatElem{T}) where T <: NCRingElement
 reverse_cols(a::MatElem{T}) where T <: NCRingElement
 reverse_cols!(a::MatElem{T}) where T <: NCRingElement
+```
+
+
+## Transposition
+
+Matrices can be transposed either by creating a new matrix or by modifying an
+existing square matrix in place.
+
+```@docs
+transpose(x::MatElem)
+transpose!(x::MatElem)
 ```
