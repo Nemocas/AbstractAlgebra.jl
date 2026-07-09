@@ -31,13 +31,48 @@ vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} 
     degree(a::MatRing)
 
 Return the degree $n$ of the given matrix algebra.
+
+The degree is the number of rows of the square matrices belonging to `a`.
+
+**Examples**
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+
+julia> degree(S)
+3
+```
 """
 degree(a::MatRing) = nrows(a)
 
 @doc raw"""
-    degree(a::MatRingElem{T}) where T <: RingElement
+    degree(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the degree $n$ of the given matrix algebra.
+Return the degree $n$ of the parent matrix algebra of `a`.
+
+**Examples**
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> degree(A)
+3
+```
 """
 degree(a::MatRingElem{T}) where T <: NCRingElement = degree(parent(a))
 
@@ -649,10 +684,23 @@ end
 ###############################################################################
 
 @doc raw"""
-    matrix_ring(R::Ring, n::Int)
+    matrix_ring(R::NCRing, n::Int)
 
-Return parent object corresponding to the ring of $n\times n$ matrices over
-the ring $R$.
+Return the matrix algebra (or matrix ring) of degree $n$ over the base ring $R$.
+
+The returned parent object represents the ring of all $n \times n$ matrices
+over $R$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+```
 """
 function matrix_ring(R::NCRing, n::Int)
    Generic.matrix_ring(R, n)
