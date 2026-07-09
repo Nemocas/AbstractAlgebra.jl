@@ -21,11 +21,24 @@ base_ring_type(::Type{<:MatElem{T}}) where T <: NCRingElement = parent_type(T)
 parent_type(::Type{<:MatElem{T}}) where {T <: NCRingElement} = MatSpace{T}
 
 @doc raw"""
-    parent(a::MatElem)
+    parent(M::MatElem)
 
-Return the parent object of the given matrix.
+Return the matrix space over the base ring of `M` with the same dimensions as
+`M`.
+
+# Examples
+
+```jldoctest
+julia> M = matrix(QQ, [1 2 3; 4 5 6])
+[1//1   2//1   3//1]
+[4//1   5//1   6//1]
+
+julia> parent(M)
+Matrix space of 2 rows and 3 columns
+  over rationals
+```
 """
-parent(a::MatElem) = matrix_space(base_ring(a), nrows(a), ncols(a))
+parent(M::MatElem) = matrix_space(base_ring(M), nrows(M), ncols(M))
 
 @doc raw"""
     dense_matrix_type(::Type{T}) where T<:NCRingElement
@@ -126,7 +139,60 @@ end
 #
 ###############################################################################
 
-# create a zero matrix
+@doc raw"""
+    (s::MatSpace{T})() where {T <: NCRingElement}
+    (s::MatSpace)(a::NCRingElement)
+    (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+    (s::MatSpace{T})(a::AbstractVecOrMat) where {T <: NCRingElement}
+
+Construct an element of the matrix space `s`.
+
+The call `s()` returns the zero matrix in `s`.
+
+If `a` is a ring element coercible into the base ring of `s`, then
+`s(a)` returns the diagonal matrix in `s` whose diagonal entries are `a`.
+
+If `a` is an algebraic matrix whose dimensions and base ring agree with
+those of `s`, then `s(a)` returns the corresponding element of `s`. If
+necessary, a new matrix with the appropriate implementation type is constructed.
+
+If `a` is a Julia vector or matrix, then `s(a)` constructs an element of `s`
+whose entries are obtained by coercing the entries of `a` into the base ring
+of `s`. The entries are interpreted in row-major order and must have length
+`nrows(s) * ncols(s)`.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_space(R, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over univariate polynomial ring in t over rationals
+
+julia> S()
+[0   0   0]
+[0   0   0]
+[0   0   0]
+
+julia> S(12)
+[12    0    0]
+[ 0   12    0]
+[ 0    0   12]
+
+julia> S(zero_matrix(R, 3, 3))
+[0   0   0]
+[0   0   0]
+[0   0   0]
+
+julia> S(BigInt[2 3 1; 1 0 4; 0 0 1])
+[2   3   1]
+[1   0   4]
+[0   0   1]
+```
+""" MatSpace
+
 function (s::MatSpace{T})() where {T <: NCRingElement}
   return zero_matrix(base_ring(s), nrows(s), ncols(s))::eltype(s)
 end
@@ -139,14 +205,14 @@ function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
 end
 
 # create a matrix with b on the diagonal
-function (s::MatSpace)(b::NCRingElement)
+function (s::MatSpace)(a::NCRingElement)
   R = base_ring(s)
-  return diagonal_matrix(R(b), nrows(s), ncols(s))
+  return diagonal_matrix(R(a), nrows(s), ncols(s))
 end
 
 # convert a Julia matrix or vector
-function (a::MatSpace{T})(b::AbstractVecOrMat) where T <: NCRingElement
-  return matrix(base_ring(a), nrows(a), ncols(a), b)
+function (s::MatSpace{T})(a::AbstractVecOrMat) where T <: NCRingElement
+  return matrix(base_ring(s), nrows(s), ncols(s), a)
 end
 
 
@@ -157,18 +223,40 @@ end
 ###############################################################################
 
 @doc raw"""
-    number_of_rows(a::MatSpace)
+    number_of_rows(s::MatSpace)
 
-Return the number of rows of the given matrix space.
+Return the number of rows of the matrices in the matrix space `s`.
+
+# Examples
+
+```jldoctest
+julia> S = matrix_space(QQ, 2, 3)
+Matrix space of 2 rows and 3 columns
+  over rationals
+
+julia> number_of_rows(S)
+2
+```
 """
-number_of_rows(a::MatSpace) = a.nrows
+number_of_rows(s::MatSpace) = s.nrows
 
 @doc raw"""
-    number_of_columns(a::MatSpace)
+    number_of_columns(s::MatSpace)
 
-Return the number of columns of the given matrix space.
+Return the number of columns of the matrices in the matrix space `s`.
+
+# Examples
+
+```jldoctest
+julia> S = matrix_space(QQ, 2, 3)
+Matrix space of 2 rows and 3 columns
+  over rationals
+
+julia> number_of_columns(S)
+3
+```
 """
-number_of_columns(a::MatSpace) = a.ncols
+number_of_columns(s::MatSpace) = s.ncols
 
 vector_space_dim(a::MatSpace{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = a.nrows * a.ncols
 
@@ -227,21 +315,47 @@ function Base.isassigned(a::MatrixElem{T}, i, j) where T <: NCRingElement
 end
 
 @doc raw"""
-    zero(a::MatSpace)
+    zero(s::MatSpace)
 
-Return the zero matrix in the given matrix space.
+Return the zero matrix in the matrix space `s`.
+
+# Examples
+
+```jldoctest
+julia> S = matrix_space(QQ, 2, 3)
+Matrix space of 2 rows and 3 columns
+  over rationals
+
+julia> zero(S)
+[0//1   0//1   0//1]
+[0//1   0//1   0//1]
+```
 """
-zero(a::MatSpace) = a()
+zero(s::MatSpace) = s()
 
 @doc raw"""
-    one(a::MatSpace)
+    one(s::MatSpace)
 
-Return the identity matrix of given matrix space. The matrix space must contain
-square matrices or else an error is thrown.
+Return the identity matrix in the matrix space `s`.
+
+The matrix space `s` must contain square matrices.
+
+# Examples
+
+```jldoctest
+julia> S = matrix_space(QQ, 3, 3)
+Matrix space of 3 rows and 3 columns
+  over rationals
+
+julia> one(S)
+[1//1   0//1   0//1]
+[0//1   1//1   0//1]
+[0//1   0//1   1//1]
+```
 """
-function one(a::MatSpace)
-   check_square(a)
-   return a(1)
+function one(s::MatSpace)
+   check_square(s)
+   return s(1)
 end
 
 @doc raw"""
@@ -7419,8 +7533,21 @@ end
 @doc raw"""
     matrix_space(R::NCRing, r::Int, c::Int)
 
-Return parent object corresponding to the space of $r\times c$ matrices over
-the ring $R$.
+Return the space of ``r \times c`` matrices over the ring `R`.
+
+The returned object is the parent object for matrices with `r` rows
+and `c` columns whose entries belong to `R`.
+
+**Examples**
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_space(R, 2, 3)
+Matrix space of 2 rows and 3 columns
+  over univariate polynomial ring in t over rationals
+```
 """
 function matrix_space(R::NCRing, r::Int, c::Int; cached::Bool = true)
   # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
