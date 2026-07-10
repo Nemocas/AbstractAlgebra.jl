@@ -94,6 +94,10 @@ include("generic/FreeAssociativeAlgebraGroebner.jl")
 
 include("generic/PolyRingHom.jl")
 
+include("generic/OreAlgebras.jl")
+include("generic/PolySkewDerivation.jl")
+include("generic/PolyFracFieldHom.jl")
+
 ###############################################################################
 #
 #   Temporary miscellaneous files being moved from Hecke.jl
