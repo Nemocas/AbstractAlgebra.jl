@@ -183,6 +183,8 @@ import ..AbstractAlgebra: is_zero_divisor
 import ..AbstractAlgebra: is_zero_divisor_with_annihilator
 import ..AbstractAlgebra: isreduced_form
 import ..AbstractAlgebra: JuliaRingElement
+import ..AbstractAlgebra: laurent_mpoly_type
+import ..AbstractAlgebra: laurent_mpoly_ring_type
 import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial
@@ -207,6 +209,8 @@ import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: number_of_rows
 import ..AbstractAlgebra: number_of_variables
 import ..AbstractAlgebra: numerator
+import ..AbstractAlgebra: ngens
+import ..AbstractAlgebra: nvars
 import ..AbstractAlgebra: one!
 import ..AbstractAlgebra: order
 import ..AbstractAlgebra: parent_type
