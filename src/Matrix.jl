@@ -4909,11 +4909,11 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          q = -div(H[j,i], H[k, i])
          for c = i:n
             t = mul!(t, q, H[k, c])
-            H[j, c] = add!(H[j, c], t)
+            H[j, c] += t
          end
          for c = 1:m
             t = mul!(t, q, U[k, c])
-            U[j, c] = add!(U[j, c], t)
+            U[j, c] += t
          end
       end
       k += 1
@@ -5877,17 +5877,17 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
             q = -div(P[pivots[i][j], i], P[pivot, i])
             for c = 1:n
                t = mul!(t, q, P[pivot, c])
-               P[pivots[i][j], c] = add!(P[pivots[i][j], c], t)
+               P[pivots[i][j], c] += t
             end
             if with_trafo
                for c = 1:ncols(U)
                   t = mul!(t, q, U[pivot, c])
-                  U[pivots[i][j], c] = add!(U[pivots[i][j], c], t)
+                  U[pivots[i][j], c] += t
                end
             end
             if extended
                t = mul!(t, q, W[pivot,1])
-               W[pivots[i][j], 1] = add!(W[pivots[i][j], 1], t)
+               W[pivots[i][j], 1] += t
             end
          end
          old_pivots = pivots[i]
@@ -6127,12 +6127,12 @@ function popov!(P::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) where {T
          q = -div(P[r, c2], P[r2, c2])
          for c = 1:n
             t = mul!(t, q, P[r2, c])
-            P[r, c] = add!(P[r, c], t)
+            P[r, c] += t
          end
          if with_trafo
             for c = 1:ncols(U)
                t = mul!(t, q, U[r2, c])
-               U[r, c] = add!(U[r, c], t)
+               U[r, c] += t
             end
          end
       end
@@ -6191,12 +6191,12 @@ function hnf_via_popov_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivots_hermite:
       q = -div(H[r, c], H[pivot, c])
       for j = c:n
          t = mul!(t, q, H[pivot, j])
-         H[r, j] = add!(H[r, j], t)
+         H[r, j] += t
       end
       if with_trafo
          for j = 1:ncols(U)
             t = mul!(t, q, U[pivot, j])
-            U[r, j] = add!(U[r, j], t)
+            U[r, j] += t
          end
       end
    end
@@ -6218,12 +6218,12 @@ function hnf_via_popov_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivots_hermi
       q = -div(H[i, c], H[r, c])
       for j = 1:n
          t = mul!(t, q, H[r, j])
-         H[i, j] = add!(H[i, j], t)
+         H[i, j] += t
       end
       if with_trafo
          for j = 1:ncols(U)
             t = mul!(t, q, U[r, j])
-            U[i, j] = add!(U[i, j], t)
+            U[i, j] += t
          end
       end
    end
@@ -6263,12 +6263,12 @@ function hnf_via_popov!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false) 
          q = -div(H[r1, c], H[r2, c])
          for j = 1:n
             t = mul!(t, q, H[r2, j])
-            H[r1, j] = add!(H[r1, j], t)
+            H[r1, j] += t
          end
          if with_trafo
             for j = 1:ncols(U)
                t = mul!(t, q, U[r2, j])
-               U[r1, j] = add!(U[r1, j], t)
+               U[r1, j] += t
             end
          end
          hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
