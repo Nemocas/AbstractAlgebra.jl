@@ -34,7 +34,7 @@ Return the degree $n$ of the given matrix algebra.
 
 The degree is the number of rows of the square matrices belonging to `a`.
 
-**Examples**
+# Examples
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
@@ -55,7 +55,7 @@ degree(a::MatRing) = nrows(a)
 
 Return the degree $n$ of the parent matrix algebra of `a`.
 
-**Examples**
+# Examples
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)

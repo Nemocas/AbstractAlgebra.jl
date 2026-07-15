@@ -26,7 +26,7 @@ Return the matrix algebra containing `a`.
 This is the matrix algebra over the base ring of `a` whose degree is the
 number of rows (equivalently columns) of `a`.
 
-**Examples**
+# Examples
 
 ```jldoctest
 julia> S = matrix_ring(ZZ, 2)
