@@ -38,12 +38,6 @@ pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 ```
 
 
-## Nullspace
-
-```@docs
-nullspace(M::MatElem{T}) where {T <: RingElement}
-```
-
 
 ## Characteristic and minimal polynomials
 

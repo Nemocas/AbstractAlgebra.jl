@@ -4425,10 +4425,11 @@ $N$ whose columns form a basis for the right nullspace of $M$, i.e. such that
 $MN$ is the zero matrix. If $M$ is an $m \times n$ matrix, then $N$ is an
 $n \times \nu$ matrix.
 
-If the base ring is not a field, the nullspace is computed over the fraction
-field of the base ring.
+If the base ring is not a field, this function performs the computation over
+the fraction field of the base ring.
 
-The function `kernel` computes an integral kernel instead.
+Use [`kernel`](@ref) instead when possible. Unlike `nullspace`, `kernel`
+computes an integral kernel over suitable base rings.
 
 # Examples
 
