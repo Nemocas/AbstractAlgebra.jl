@@ -15,7 +15,7 @@ Matrix algebras are noncommutative rings. They support the usual ring
 operations, such as addition and multiplication, and can be used in
 constructions accepting noncommutative base rings.
 
-Although elements of matrix algebras behave like matrices, their parent object
+Although elements of matrix algebras mostly behave like matrices, their parent object
 is a matrix algebra rather than a matrix space. Therefore, some functionality
 available for matrices in matrix spaces is not available for matrix algebra
 elements, in particular functions which do not preserve square matrices (e.g.
