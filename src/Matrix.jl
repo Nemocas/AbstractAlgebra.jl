@@ -7538,7 +7538,7 @@ Return the space of ``r \times c`` matrices over the ring `R`.
 The returned object is the parent object for matrices with `r` rows
 and `c` columns whose entries belong to `R`.
 
-**Examples**
+# Examples
 
 ```jldoctest
 julia> R, t = polynomial_ring(QQ, :t)
