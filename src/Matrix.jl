@@ -560,7 +560,7 @@ whose entries will be filled in later.
 Despite the name, `similar` is not related to similarity transformations or
 similar matrices in the mathematical sense.
 
-**Examples**
+# Examples
 
 ```jldoctest
 julia> M = matrix(ZZ, [1 2 3; 4 5 6])
@@ -2031,7 +2031,7 @@ of $A$, a permutation $p$ belonging to $P$, a lower triangular matrix $L$
 and an upper triangular matrix $U$ such that $p(A) = LU$. Here $p(A)$ denotes
 the matrix obtained by applying the permutation $p$ to the rows of $A$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
@@ -2203,7 +2203,7 @@ The denominator $d$ is set to $\pm \det(S)$, where $S$ is an appropriate
 submatrix of $A$; if $A$ is square and nonsingular, then $S = A$. The sign
 is determined by the parity of the permutation.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
@@ -2332,7 +2332,7 @@ $A/d$ is the reduced row echelon form of $M$.
 
 Note that the denominator $d$ is not necessarily minimal.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> M = matrix(ZZ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
@@ -2426,7 +2426,7 @@ Return the reduced row echelon form of $M$.
 More precisely, return a tuple $r, A$ consisting of the rank $r$ of
 $M$ and the reduced row echelon form $A$ of $M$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> M = matrix(QQ, 3, 3, [1 2 3; 4 5 6; 0 0 1])
@@ -4641,7 +4641,7 @@ which is similar to $A$.
 
 An upper Hessenberg matrix has zero entries below the first subdiagonal.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> R, = residue_ring(ZZ, 7);
@@ -5882,7 +5882,7 @@ Return the upper right row Hermite normal form of $A$.
 The Hermite normal form is a canonical form for matrices. It is obtained
 by employing elementary row operations to produce an upper triangular matrix.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
@@ -5913,7 +5913,7 @@ More precisely, return a tuple $H, U$ where $H$ is the upper right row
 Hermite normal form of $A$ and $U$ is an invertible matrix such that
 $UA = H$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
@@ -6182,7 +6182,7 @@ Return the Smith normal form of $A$.
 The Smith normal form is a canonical diagonal form obtained by applying
 invertible row and column transformations.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
@@ -6212,7 +6212,7 @@ matrices.
 More precisely, return a tuple $S, T, U$ where $S$ is the Smith normal
 form of $A$ and $T$ and $U$ are invertible matrices such that $TAU = S$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> A = matrix(ZZ, [2 3 -1; 3 5 7; 11 1 12])
@@ -6369,7 +6369,7 @@ The matrix $A$ must have entries in a univariate polynomial ring over a
 field. The weak Popov form is a row-reduced matrix, in which the nonzero
 rows have distinct leading positions with respect to their degrees.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> R, x = polynomial_ring(QQ, :x);
@@ -6401,7 +6401,7 @@ rows have distinct leading positions determined by their degrees.
 More precisely, return a tuple $P, U$ where $P$ is the weak Popov form
 of $A$ and $U$ is a transformation matrix such that $P = UA$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> R, x = polynomial_ring(QQ, :x);
@@ -6685,7 +6685,7 @@ field. The Popov form is a canonical row-reduced form. It is a weak Popov
 form satisfying additional normalization conditions on the leading
 entries.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> R, x = polynomial_ring(QQ, :x);
@@ -6718,7 +6718,7 @@ entries.
 More precisely, return a tuple $P, U$ where $P$ is the Popov form of
 $A$ and $U$ is a transformation matrix such that $P = UA$.
 
-**Examples**
+# Examples
 
 ```@jldoctest
 julia> R, x = polynomial_ring(QQ, :x);
