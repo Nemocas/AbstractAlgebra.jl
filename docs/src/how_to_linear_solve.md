@@ -59,9 +59,6 @@ julia> kernel(A)
 
 See the documentation of [`kernel`](@ref) for more information on computing kernels.
 
-!!! note
-    The function [`nullspace`](@ref) computes the *right* nullspace (together with its nullity).
-
 
 ## Left and right linear systems
 
