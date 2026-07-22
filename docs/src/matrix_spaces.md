@@ -25,7 +25,7 @@ number_of_rows(s::MatSpace)
 number_of_columns(s::MatSpace)
 ```
 
-The base ring and the vector space dimension of the matrix space can be querried
+The base ring and the vector space dimension of the matrix space can be queried
 with `base_space` and `vector_space_dim`, respectively.
 
 
