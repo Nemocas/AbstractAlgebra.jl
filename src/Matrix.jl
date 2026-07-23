@@ -140,26 +140,26 @@ end
 ###############################################################################
 
 @doc raw"""
-    (s::MatSpace{T})() where {T <: NCRingElement}
-    (s::MatSpace)(a::NCRingElement)
-    (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
-    (s::MatSpace{T})(a::AbstractVecOrMat) where {T <: NCRingElement}
+    (S::MatSpace{T})() where {T <: NCRingElement}
+    (S::MatSpace)(a::NCRingElement)
+    (S::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+    (S::MatSpace{T})(a::AbstractVecOrMat) where {T <: NCRingElement}
 
-Construct an element of the matrix space `s`.
+Construct an element of the matrix space `S`.
 
-The call `s()` returns the zero matrix in `s`.
+The call `S()` returns the zero matrix in `s`.
 
-If `a` is a ring element coercible into the base ring of `s`, then
-`s(a)` returns the diagonal matrix in `s` whose diagonal entries are `a`.
+If `a` is a ring element coercible into the base ring of `S`, then
+`S(a)` returns the diagonal matrix in `S` whose diagonal entries are `a`.
 
 If `a` is an algebraic matrix whose dimensions and base ring agree with
-those of `s`, then `s(a)` returns the corresponding element of `s`. If
+those of `S`, then `S(a)` returns the corresponding element of `S`. If
 necessary, a new matrix with the appropriate implementation type is constructed.
 
-If `a` is a Julia vector or matrix, then `s(a)` constructs an element of `s`
+If `a` is a Julia vector or matrix, then `S(a)` constructs an element of `S`
 whose entries are obtained by coercing the entries of `a` into the base ring
-of `s`. The entries are interpreted in row-major order and must have length
-`nrows(s) * ncols(s)`.
+of `S`. The entries are interpreted in row-major order and must have length
+`nrows(S) * ncols(S)`.
 
 # Examples
 
@@ -193,26 +193,26 @@ julia> S(BigInt[2 3 1; 1 0 4; 0 0 1])
 ```
 """ MatSpace
 
-function (s::MatSpace{T})() where {T <: NCRingElement}
-  return zero_matrix(base_ring(s), nrows(s), ncols(s))::eltype(s)
+function (S::MatSpace{T})() where {T <: NCRingElement}
+  return zero_matrix(base_ring(S), nrows(S), ncols(S))::eltype(S)
 end
 
-function (s::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
-  _check_dim(nrows(s), ncols(s), a)
-  base_ring(s) == base_ring(a) || throw(DomainError((s, a), "Base rings do not match."))
-  a isa eltype(s) && return a
-  return matrix(base_ring(s), a)
+function (S::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+  _check_dim(nrows(S), ncols(S), a)
+  base_ring(S) == base_ring(a) || throw(DomainError((S, a), "Base rings do not match."))
+  a isa eltype(S) && return a
+  return matrix(base_ring(S), a)
 end
 
 # create a matrix with b on the diagonal
-function (s::MatSpace)(a::NCRingElement)
-  R = base_ring(s)
-  return diagonal_matrix(R(a), nrows(s), ncols(s))
+function (S::MatSpace)(a::NCRingElement)
+  R = base_ring(S)
+  return diagonal_matrix(R(a), nrows(S), ncols(S))
 end
 
 # convert a Julia matrix or vector
-function (s::MatSpace{T})(a::AbstractVecOrMat) where T <: NCRingElement
-  return matrix(base_ring(s), nrows(s), ncols(s), a)
+function (S::MatSpace{T})(a::AbstractVecOrMat) where T <: NCRingElement
+  return matrix(base_ring(S), nrows(S), ncols(S), a)
 end
 
 
