@@ -6,7 +6,7 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 # [Constructing Algebraic Matrices](@id matrix_construction)
 
-There are several functions for creating algebraic matrices -- in each case you need to indicate the
+There are several functions for creating matrices -- in each case you need to indicate the
 ring to which the matrix elements belong, unless this is already unambiguously indicated
 by the ring to which the arguments belong. Here we present several of the basic functions for
 constructing matrices.
@@ -55,7 +55,7 @@ matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 
 ### Changing the base ring
 
-Algebraic matrices can be converted to another base ring using `change_base_ring`.
+Matrices can be converted to another base ring using `change_base_ring`.
 
 ```@docs
 change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
@@ -71,7 +71,7 @@ matrix(R::NCRing, arr::MatRingElem)
 
 ### Copying
 
-An independent copy of an existing algebraic matrix can be created.
+An independent copy of an existing matrix can be created.
 
 ```julia
 matrix(mat::MatElem{T}) where {T<:NCRingElement}

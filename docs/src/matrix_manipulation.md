@@ -4,9 +4,9 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# [Manipulating algebraic matrices](@id matrix_manipulation)
+# [Manipulating matrices](@id matrix_manipulation)
 
-This page describes functions for modifying or rearranging algebraic matrices.
+This page describes functions for modifying or rearranging matrices.
 Many operations are available both as in-place and non-mutating variants.
 
 

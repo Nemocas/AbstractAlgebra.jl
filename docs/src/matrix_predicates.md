@@ -12,7 +12,7 @@ for testing whether matrices satisfy certain structural or normal-form condition
 
 ## Basic predicates
 
-Algebraic matrices support `iszero` and `isone` for testing whether a matrix
+Matrices support `iszero` and `isone` for testing whether a matrix
 is the zero matrix or the identity matrix, respectively.
 
 ```@docs
