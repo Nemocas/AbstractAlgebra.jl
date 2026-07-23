@@ -19,7 +19,7 @@ Although elements of matrix algebras mostly behave like matrices, their parent o
 is a matrix algebra rather than a matrix space. Therefore, some functionality
 available for matrices in matrix spaces is not available for matrix algebra
 elements, in particular functions which do not preserve square matrices (e.g.
-`nullspace`).
+`kernel`).
 
 
 ## Creating matrix algebras
