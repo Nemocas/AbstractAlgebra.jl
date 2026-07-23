@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# [Matrix computed quantities](@id matrix_computed_quantities)
+# [Matrix properties](@id matrix_properties)
 
 This page collects functions which compute values, invariants,
 or associated objects from matrices, rather than testing whether matrices
