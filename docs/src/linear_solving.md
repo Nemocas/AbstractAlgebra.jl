@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# [Linear solving](@id solving_chapter)
+# [Linear solving interface](@id solving_chapter)
 
 ## Overview of the functionality
 

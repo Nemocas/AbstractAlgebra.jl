@@ -70,6 +70,9 @@ makedocs(
              ],
              "Matrices" => [
                  "matrix_introduction.md",
+                 "Working with matrices" => [
+                     "how_to_linear_solve.md", 
+                 ],
                  "matrix.md",
                  "matrix_spaces.md",
                  "matrix_implementation.md",
