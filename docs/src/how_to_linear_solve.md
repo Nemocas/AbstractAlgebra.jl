@@ -24,16 +24,16 @@ To solve a system of linear equations, use the function
     Right linear systems are discussed in the next section.
 
 ```jldoctest
-julia> A = matrix(QQ, [2 0 0; 0 3 0; 0 0 0])
+julia> A = matrix(QQ, [2 0 0; 0 0 0; 0 3 0])
 [2//1   0//1   0//1]
-[0//1   3//1   0//1]
 [0//1   0//1   0//1]
+[0//1   3//1   0//1]
 
 julia> b = matrix(QQ, 1, 3, [1, 3//2, 0])
 [1//1   3//2   0//1]
 
 julia> x = solve(A, b)
-[1//2   1//2   0//1]
+[1//2   0//1   1//2]
 
 julia> x * A == b
 true
@@ -48,13 +48,13 @@ adding arbitrary elements of the *left* kernel of `A` to the particular
 solution returned by `solve`.
 
 ```jldoctest
-julia> A = matrix(QQ, [2 0 0; 0 3 0; 0 0 0]);
+julia> A = matrix(QQ, [2 0 0; 0 0 0; 0 3 0]);
 
 julia> rank(A)
 2
 
 julia> kernel(A)
-[0//1   0//1   1//1]
+[0//1   1//1   0//1]
 ```
 
 See the documentation of [`kernel`](@ref) for more information on computing kernels.
@@ -71,15 +71,15 @@ The keyword argument `side` determines which convention is used.
 The following example solves a right linear system:
 
 ```jldoctest
-julia> A = matrix(QQ, [2 0 0; 0 3 0; 0 0 0])
+julia> A = matrix(QQ, [2 0 0; 0 0 0; 0 3 0])
 [2//1   0//1   0//1]
-[0//1   3//1   0//1]
 [0//1   0//1   0//1]
+[0//1   3//1   0//1]
 
-julia> b = matrix(QQ, 3, 1, [1, 3//2, 0])
+julia> b = matrix(QQ, 3, 1, [1, 0, 3//2])
 [1//1]
-[3//2]
 [0//1]
+[3//2]
 
 julia> x = solve(A, b, side = :right)
 [1//2]
@@ -112,7 +112,7 @@ appropriate:
 For example:
 
 ```jldoctest
-julia> A = matrix(QQ, [2 0 0; 0 3 0; 0 0 0]);
+julia> A = matrix(QQ, [2 0 0; 0 0 0; 0 3 0]);
 
 julia> b = matrix(QQ, 1, 3, [1, 3//2, 1]);
 
@@ -122,10 +122,10 @@ false
 julia> b2 = matrix(QQ, 1, 3, [1, 3//2, 0]);
 
 julia> can_solve_with_solution(A, b2)
-(true, [1//2 1//2 0])
+(true, [1//2 0 1//2])
 
 julia> can_solve_with_solution_and_kernel(A, b2)
-(true, [1//2 1//2 0], [0 0 1])
+(true, [1//2 0 1//2], [0 1 0])
 ```
 
 
