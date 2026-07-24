@@ -110,7 +110,7 @@ coefficients of which are given by `A`, starting from the constant term. Only `l
 terms of the array are used, the remaining terms being ignored.
 
 Note that `len` is usually maintained separately of any polynomial that is underlying
-the power series. This allows for easy trucation of a power series without actually
+the power series. This allows for easy truncation of a power series without actually
 modifying the polynomial underlying it.
 
 It is permitted to have trailing zeros in the array, but it is not needed, even if the
@@ -345,4 +345,3 @@ The default implementation of zero calls out to similar, so it's generally
 sufficient to specialise only similar. For both similar and zero only the most
 general method has to be implemented as all other methods call out to this more
 general method.
-
