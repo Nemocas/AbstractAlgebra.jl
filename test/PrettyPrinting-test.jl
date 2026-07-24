@@ -409,7 +409,7 @@ end
 
 end
 
-@testset "PrettyPrinting: Intendation and Decapitalization" begin
+@testset "PrettyPrinting: Indentation and Decapitalization" begin
   io = IOBuffer()
   io = AbstractAlgebra.pretty(io, force_newlines = true)
   @test io isa AbstractAlgebra.PrettyPrinting.IOCustom
