@@ -345,3 +345,4 @@ The default implementation of zero calls out to similar, so it's generally
 sufficient to specialise only similar. For both similar and zero only the most
 general method has to be implemented as all other methods call out to this more
 general method.
+
