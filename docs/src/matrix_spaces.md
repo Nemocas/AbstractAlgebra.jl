@@ -140,7 +140,7 @@ julia> c = M[1, 1]
 
 ## Inverses
 
-```@docs
+```@docs; canonical=false
 Base.inv(::MatElem{T}) where T <: RingElement
 is_invertible(::MatElem{T}) where T <: RingElement
 is_invertible_with_inverse(::MatElem{T}) where T <: RingElement
@@ -223,7 +223,7 @@ julia> r, d, P, L, U = fflu(A)
 
 ## Reduced row-echelon form
 
-```@docs
+```@docs; canonical=false
 rref_rational(::MatElem{T}) where T <: RingElem
 rref(::MatElem{T}) where T <: FieldElem
 
@@ -369,7 +369,7 @@ julia> P = R[1; 2; t] # create a column vector
 
 ### Hessenberg form
 
-```@docs
+```@docs; canonical=false
 hessenberg(::MatElem{T}) where T <: RingElem
 
 is_hessenberg(::MatElem{T}) where T <: RingElem
