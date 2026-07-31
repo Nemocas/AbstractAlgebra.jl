@@ -21,7 +21,25 @@ base_ring(a::MatRingElem{T}) where {T <: NCRingElement} = base_ring(matrix(a))
 @doc raw"""
     parent(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the parent object of the given matrix.
+Return the matrix algebra containing `a`.
+
+This is the matrix algebra over the base ring of `a` whose degree is the
+number of rows (equivalently columns) of `a`.
+
+# Examples
+
+```jldoctest
+julia> S = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> A = S([1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> parent(A) == S
+true
+```
 """
 parent(a::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(a), nrows(matrix(a)))
 
@@ -171,6 +189,75 @@ end
 #   Parent object call overload
 #
 ###############################################################################
+
+@doc raw"""
+    (a::MatRing{T})() where {T <: NCRingElement}
+    (a::MatRing{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
+    (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
+    (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
+
+Construct an element of the matrix algebra `a`.
+
+The call `a()` returns the zero matrix in `a`.
+
+If `b` is a ring element coercible into the base ring of `a`, then
+`a(b)` returns the scalar matrix in `a` whose diagonal entries are `b`.
+
+If `b` is a matrix algebra element whose parent is `a`, then `a(b)`
+returns `b` unchanged.
+
+If `b` is an algebraic matrix whose dimensions and base ring agree with
+those of `a`, then `a(b)` returns the corresponding element of `a`. If
+necessary, a new matrix with the appropriate implementation type is constructed.
+
+If `b` is a Julia vector or matrix, then `a(b)` constructs an element of
+`a` whose entries are obtained by coercing the entries of `b` into the base
+ring of `a`. The dimensions of the Julia object must be compatible with
+the degree of the matrix algebra.
+
+# Examples
+
+```jldoctest
+julia> R, = residue_ring(ZZ, 7);
+
+julia> A = matrix_ring(R, 3);
+
+julia> A()
+[0   0   0]
+[0   0   0]
+[0   0   0]
+
+julia> A(R(3))
+[3   0   0]
+[0   3   0]
+[0   0   3]
+
+julia> M = A([R(1) R(2) R(3); R(4) R(5) R(6); R(0) R(1) R(2)])
+[1   2   3]
+[4   5   6]
+[0   1   2]
+
+julia> A(M) === M
+true
+
+julia> A([R(1), R(2), R(3), R(4), R(5), R(6), R(0), R(1), R(2)])
+[1   2   3]
+[4   5   6]
+[0   1   2]
+
+julia> S = matrix_space(R, 3, 3);
+
+julia> N = S([R(1) R(0) R(0); R(0) R(2) R(0); R(0) R(0) R(3)]);
+
+julia> A(N)
+[1   0   0]
+[0   2   0]
+[0   0   3]
+```
+""" MatRing
 
 function (a::MatRing{T})() where {T <: NCRingElement}
    R = base_ring(a)
