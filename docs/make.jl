@@ -78,7 +78,6 @@ makedocs(
                     "matrix_normal_forms.md",
                     "how_to_linear_solve.md", 
                  ],
-                 "matrix.md",
                  "matrix_spaces.md",
                  "matrix_algebras.md",
                  "Developer documentation" => [
