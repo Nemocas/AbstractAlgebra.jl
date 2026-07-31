@@ -76,6 +76,7 @@ makedocs(
                     "matrix_predicates.md",
                     "matrix_properties.md",
                     "matrix_normal_forms.md",
+                    "how_to_linear_solve.md", 
                  ],
                  "matrix_spaces.md",
                  "matrix_algebras.md",
