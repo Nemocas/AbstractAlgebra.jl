@@ -9,6 +9,23 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.50.2](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.2) - 2026-07-31
+
+### New or extended functionality
+
+- [#2391](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2391) Add Puiseux polynomials
+- [#2430](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2430) Add `coefficient_type`
+- [#2449](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2449) Disallow nondistinct variable names for `gens(::UniversalRing, ...)`
+
+### Fixed bugs that returned incorrect results
+
+- [#2434](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2434) Fix construction of direct sums of modules
+- [#2450](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2450) Fix `map_coefficients` and `change_coefficient_ring` for universal polys
+
+### Improvements or additions to documentation
+
+- [#2448](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2448) Overhaul Linear Algebra documentation
+
 ## [0.50.1](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.1) - 2026-06-12
 
 ### Other fixed bugs
