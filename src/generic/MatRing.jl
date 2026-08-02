@@ -19,7 +19,7 @@ base_ring(a::MatRing{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T
 base_ring(a::MatRingElem{T}) where {T <: NCRingElement} = base_ring(matrix(a))
 
 @doc raw"""
-    parent(a::MatRingElem{T}) where T <: NCRingElement
+    parent(m::MatRingElem{T}) where T <: NCRingElement
 
 Return the matrix algebra containing `a`.
 
@@ -41,7 +41,7 @@ julia> parent(A) == S
 true
 ```
 """
-parent(a::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(a), nrows(matrix(a)))
+parent(m::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(m), nrows(matrix(m)))
 
 is_exact_type(::Type{MatRingElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
@@ -123,13 +123,13 @@ end
 ###############################################################################
 
 @doc raw"""
-    minpoly(S::Ring, M::MatRingElem{T}) where {T <: RingElement}
+    minpoly(S::Ring, m::MatRingElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
-function minpoly(S::Ring, M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   return minpoly(S, matrix(M), charpoly_only)
+function minpoly(S::Ring, m::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   return minpoly(S, matrix(m), charpoly_only)
 end
 
 function minpoly(M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
@@ -194,9 +194,9 @@ end
     (a::MatRing{T})() where {T <: NCRingElement}
     (a::MatRing{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
     (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
-    (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
-    (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
-    (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(m::MatRingElem{T}) where {T <: NCRingElement}
+    (a::MatRing{T})(m::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(m::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
     (a::MatRing{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
 
 Construct an element of the matrix algebra `a`.
@@ -278,22 +278,22 @@ function (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
    return z
 end
 
-function (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
-   parent(b) != a && error("Unable to coerce matrix")
-   return b
+function (a::MatRing{T})(m::MatRingElem{T}) where {T <: NCRingElement}
+   parent(m) != a && error("Unable to coerce matrix")
+   return m
 end
 
-function (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+function (a::MatRing{T})(m::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
-   _check_dim(nrows(a), ncols(a), b)
-   z = MatRingElem(matrix(R, b))
+   _check_dim(nrows(a), ncols(a), m)
+   z = MatRingElem(matrix(R, m))
    return z
 end
 
-function (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
-   _check_dim(a.n, a.n, b)
+function (a::MatRing{T})(m::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
+   _check_dim(a.n, a.n, m)
    R = base_ring(a)
-   z = MatRingElem(matrix(R, b))
+   z = MatRingElem(matrix(R, m))
    return z
 end
 
