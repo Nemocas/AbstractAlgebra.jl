@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# [Constructing Algebraic Matrices](@id matrix_construction)
+# [Constructing Matrices](@id matrix_construction)
 
 There are several functions for creating matrices -- in each case you need to indicate the
 ring to which the matrix elements belong, unless this is already unambiguously indicated

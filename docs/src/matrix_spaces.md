@@ -8,7 +8,7 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 A matrix space represents the collection of all matrices with a fixed number
 of rows and columns over a fixed base ring. Matrix spaces are parent objects;
-their elements are the corresponding algebraic matrices.
+their elements are the corresponding matrices.
 
 
 ## Creating matrix spaces

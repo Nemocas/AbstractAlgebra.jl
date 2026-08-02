@@ -209,7 +209,7 @@ If `b` is a ring element coercible into the base ring of `a`, then
 If `b` is a matrix algebra element whose parent is `a`, then `a(b)`
 returns `b` unchanged.
 
-If `b` is an algebraic matrix whose dimensions and base ring agree with
+If `b` is a matrix whose dimensions and base ring agree with
 those of `a`, then `a(b)` returns the corresponding element of `a`. If
 necessary, a new matrix with the appropriate implementation type is constructed.
 

@@ -152,7 +152,7 @@ The call `S()` returns the zero matrix in `s`.
 If `a` is a ring element coercible into the base ring of `S`, then
 `S(a)` returns the diagonal matrix in `S` whose diagonal entries are `a`.
 
-If `a` is an algebraic matrix whose dimensions and base ring agree with
+If `a` is a matrix whose dimensions and base ring agree with
 those of `S`, then `S(a)` returns the corresponding element of `S`. If
 necessary, a new matrix with the appropriate implementation type is constructed.
 
