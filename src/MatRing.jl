@@ -51,7 +51,7 @@ julia> degree(S)
 degree(a::MatRing) = nrows(a)
 
 @doc raw"""
-    degree(a::MatRingElem{T}) where T <: NCRingElement
+    degree(m::MatRingElem{T}) where T <: NCRingElement
 
 Return the degree $n$ of the parent matrix algebra of `a`.
 
@@ -74,7 +74,7 @@ julia> degree(A)
 3
 ```
 """
-degree(a::MatRingElem{T}) where T <: NCRingElement = degree(parent(a))
+degree(m::MatRingElem{T}) where T <: NCRingElement = degree(parent(m))
 
 zero(a::MatRing) = a()
 
@@ -107,15 +107,15 @@ is_known(::typeof(is_finite), R::MatRing) = iszero(nrows(R)) || is_known(is_fini
 ###############################################################################
 
 @doc raw"""
-    similar(x::MatRingElem, R::NCRing, n::Int)
-    similar(x::MatRingElem, R::NCRing)
-    similar(x::MatRingElem, n::Int)
-    similar(x::MatRingElem)
+    similar(m::MatRingElem, R::NCRing, n::Int)
+    similar(m::MatRingElem, R::NCRing)
+    similar(m::MatRingElem, n::Int)
+    similar(m::MatRingElem)
 
 Create an uninitialized matrix ring element over the given ring and dimension,
 with defaults based upon the given source matrix ring element `x`.
 """
-function similar(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x))
+function similar(m::MatRingElem, R::NCRing=base_ring(m), n::Int=degree(m))
    @req (n >= 0)  "Matrix dimension must be non-negative"
    @req (n < 2^30)  "Matrix dimension is excessively large"
    return Generic.MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
@@ -132,16 +132,16 @@ end
 similar(x::MatRingElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
 @doc raw"""
-    zero(x::MatRingElem, R::NCRing, n::Int)
-    zero(x::MatRingElem, R::NCRing)
-    zero(x::MatRingElem, n::Int)
-    zero(x::MatRingElem)
+    zero(m::MatRingElem, R::NCRing, n::Int)
+    zero(m::MatRingElem, R::NCRing)
+    zero(m::MatRingElem, n::Int)
+    zero(m::MatRingElem)
 
 Create a zero matrix ring element over the given ring and dimension,
 with defaults based upon the given source matrix ring element `x`.
 """
-zero(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x)) = zero!(similar(x, R, n))
-zero(x::MatRingElem, n::Int) = zero!(similar(x, n))
+zero(m::MatRingElem, R::NCRing=base_ring(m), n::Int=degree(m)) = zero!(similar(m, R, n))
+zero(m::MatRingElem, n::Int) = zero!(similar(m, n))
 
 # TODO: deprecate these
 zero(x::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(x, R, r, c))
@@ -395,20 +395,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    gram(x::MatRingElem)
+    gram(m::MatRingElem)
 
 Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 $i$-th and $j$-th rows, respectively.
 """
-function gram(x::MatRingElem)
-   n = degree(x)
-   z = similar(x)
+function gram(m::MatRingElem)
+   n = degree(m)
+   z = similar(m)
    for i = 1:n
       for j = 1:n
-         z[i, j] = zero(base_ring(x))
+         z[i, j] = zero(base_ring(m))
          for k = 1:n
-            z[i, j] += x[i, k] * x[j, k]
+            z[i, j] += m[i, k] * m[j, k]
          end
       end
    end
@@ -668,13 +668,13 @@ function identity_matrix(M::MatRingElem{T}, n::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    identity_matrix(M::MatRingElem{T}) where T <: RingElement
+    identity_matrix(m::MatRingElem{T}) where T <: RingElement
 
 Return the identity matrix over the same base ring as $M$ and with the
 same dimensions.
 """
-function identity_matrix(M::MatRingElem{T}) where T <: NCRingElement
-   return identity_matrix(M, nrows(M))
+function identity_matrix(m::MatRingElem{T}) where T <: NCRingElement
+   return identity_matrix(m, nrows(m))
 end
 
 ###############################################################################
