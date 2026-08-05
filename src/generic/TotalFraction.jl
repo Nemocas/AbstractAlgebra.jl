@@ -371,8 +371,7 @@ end
 # that are also non-zero divisors
 
 function divexact(a::TotFrac{T}, b::TotFrac{T}; check::Bool=true)  where {T <: RingElem}
-   is_zero_divisor(numerator(b, false)) && throw(NotInvertibleError(b))
-  return a*inv(b)
+  return a*inv(b)  # inv(b) will throw if b is a zero divisor
 end
 
 ##############################################################################
