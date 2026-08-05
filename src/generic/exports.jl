@@ -22,7 +22,6 @@ export defining_polynomial
 export degrees
 export dim
 export disable_cache!
-export dixexact
 export downscale
 export enable_cache!
 export exp_gcd
