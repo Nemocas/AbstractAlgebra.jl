@@ -195,6 +195,26 @@ end
    @test_throws(NotInvertibleError, inv(S(3, 7)))
 end
 
+@testset "Generic.TotFrac.divexact" begin
+   R, = residue_ring(ZZ, 100)
+   S = total_ring_of_fractions(R)
+
+   ten = R(10);
+   @test_throws(ErrorException, 1//ten)
+
+   a = S(ten)
+   @test  ten == S(10)
+   @test_throws(NotInvertibleError, inv(a))
+   @test_throws(NotInvertibleError, 1/a)
+   @test_throws(NotInvertibleError, R(1)/a)
+   @test_throws(NotInvertibleError, S(1)/a)
+
+   b = S(9)
+   @test inv(b)*b == 1
+   @test is_one(inv(b)*b)
+   @test is_one(b/b)
+end
+
 @testset "Generic.TotFrac.promotion" begin
    R, = residue_ring(ZZ, 12)
    S = total_ring_of_fractions(R)
