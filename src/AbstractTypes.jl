@@ -74,6 +74,8 @@ abstract type FunctionalMap <: SetMap end
 
 abstract type IdentityMap <: SetMap end
 
+abstract type HeckeMap <: FunctionalMap end
+
 abstract type FPModuleHomomorphism <: FunctionalMap end
 
 # rings, fields etc, parameterised by an element type
