@@ -35,7 +35,7 @@ end
 
 @inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
    if S === T
-      return x, y
+      return true, x, y
    end
    U = promote_rule_sym(S, T)
    if S === U
