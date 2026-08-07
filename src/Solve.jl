@@ -170,7 +170,7 @@ function Base.show(io::IO, C::SolveCtx)
 end
 
 @doc raw"""
-    solve_init(A::MatElem)
+    solve_init(m::MatElem)
 
 Return a context object `C` that allows to efficiently solve linear systems
 $Ax = b$ or $xA = b$ for different $b$.
@@ -199,12 +199,12 @@ julia> solve(C, [QQ(1), QQ(1), QQ(1)]; side = :right)
  2//45
 ```
 """
-function solve_init(A::MatElem)
-  return solve_context_type(base_ring(A))(A)
+function solve_init(m::MatElem)
+  return solve_context_type(base_ring(m))(m)
 end
 
-function solve_init(NF::MatrixNormalFormTrait, A::MatElem)
-  return solve_context_type(NF, base_ring(A))(A)
+function solve_init(NF::MatrixNormalFormTrait, m::MatElem)
+  return solve_context_type(NF, base_ring(m))(m)
 end
 
 # For a ring R, the following signatures of `solve_context_type` need to be
@@ -228,8 +228,8 @@ function solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracFiel
   return solve_context_type(FFLUTrait(), elem_type(K))
 end
 
-function solve_context_type(A::MatElem)
-  return solve_context_type(base_ring(A))
+function solve_context_type(m::MatElem)
+  return solve_context_type(base_ring(m))
 end
 
 function solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRingElement}
@@ -545,8 +545,8 @@ end
 ################################################################################
 
 @doc raw"""
-    solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
-    solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    solve(m::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    solve(m::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
     solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
     solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
@@ -573,8 +573,8 @@ julia> solve(A, one(A))
 [0//1   0//1   1//5]
 ```
 """
-function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
-  return solve(matrix_normal_form_type(A), A, b; side)
+function solve(m::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
+  return solve(matrix_normal_form_type(m), m, b; side)
 end
 
 function solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
@@ -584,8 +584,8 @@ function solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::
 end
 
 @doc raw"""
-    can_solve(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
-    can_solve(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve(m::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve(m::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
     can_solve(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
     can_solve(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
@@ -616,8 +616,8 @@ julia> can_solve(A,one(A))
 false
 ```
 """
-function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
-  return can_solve(matrix_normal_form_type(A), A, b; side)
+function can_solve(m::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
+  return can_solve(matrix_normal_form_type(m), m, b; side)
 end
 
 function can_solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
@@ -625,8 +625,8 @@ function can_solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}},
 end
 
 @doc raw"""
-    can_solve_with_solution(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
-    can_solve_with_solution(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve_with_solution(m::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution(m::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
     can_solve_with_solution(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
     can_solve_with_solution(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
@@ -640,8 +640,8 @@ If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 """
-function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
-  return can_solve_with_solution(matrix_normal_form_type(A), A, b; side)
+function can_solve_with_solution(m::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
+  return can_solve_with_solution(matrix_normal_form_type(m), m, b; side)
 end
 
 function can_solve_with_solution(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
@@ -649,8 +649,8 @@ function can_solve_with_solution(NF::MatrixNormalFormTrait, A::Union{MatElem{T},
 end
 
 @doc raw"""
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
-    can_solve_with_solution_and_kernel(A::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
+    can_solve_with_solution_and_kernel(m::MatElem{T}, b::Vector{T}; side::Symbol = :left) where T
+    can_solve_with_solution_and_kernel(m::MatElem{T}, b::MatElem{T}; side::Symbol = :left) where T
     can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::Vector{T}; side::Symbol = :left) where T
     can_solve_with_solution_and_kernel(C::SolveCtx{T}, b::MatElem{T}; side::Symbol = :left) where T
 
@@ -665,8 +665,8 @@ If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T) and [`kernel`](@ref kernel(::Union{MatElem, SolveCtx})).
 """
-function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
-  return can_solve_with_solution_and_kernel(matrix_normal_form_type(A), A, b; side)
+function can_solve_with_solution_and_kernel(m::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
+  return can_solve_with_solution_and_kernel(matrix_normal_form_type(m), m, b; side)
 end
 
 function can_solve_with_solution_and_kernel(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
@@ -674,7 +674,7 @@ function can_solve_with_solution_and_kernel(NF::MatrixNormalFormTrait, A::Union{
 end
 
 @doc raw"""
-    kernel(A::MatElem; side::Symbol = :left)
+    kernel(m::MatElem; side::Symbol = :left)
     kernel(C::SolveCtx; side::Symbol = :left)
 
 Return a matrix $K$ whose rows generate the left kernel of $A$, that
@@ -703,8 +703,8 @@ julia> kernel(A)
 [-1//2   1//1   0//1]
 ```
 """
-function kernel(A::Union{MatElem, SolveCtx}; side::Symbol = :left)
-  return kernel(matrix_normal_form_type(A), A; side)
+function kernel(m::Union{MatElem, SolveCtx}; side::Symbol = :left)
+  return kernel(matrix_normal_form_type(m), m; side)
 end
 
 ################################################################################

@@ -71,6 +71,6 @@ julia> one(S)
 ## Properties of matrix algebra elements
 
 ```@docs
-parent(a::MatRingElem{T}) where T <: NCRingElement
-degree(a::MatRingElem{T}) where T <: NCRingElement
+parent(m::MatRingElem{T}) where T <: NCRingElement
+degree(m::MatRingElem{T}) where T <: NCRingElement
 ```

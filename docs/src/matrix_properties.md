@@ -15,26 +15,26 @@ nullspaces, polynomials, and related constructions.
 ## Basic properties
 
 ```@docs
-number_of_rows(a::MatElem)
-number_of_columns(a::MatElem)
-length(a::MatrixElem{T}) where T <: NCRingElement
+number_of_rows(m::MatElem)
+number_of_columns(m::MatElem)
+length(m::MatrixElem{T}) where T <: NCRingElement
 ```
 
 
 ## Trace, determinant and rank
 
 ```@docs
-tr(x::MatElem{T}) where T <: NCRingElement
-det(M::MatElem{T}) where {T <: RingElement}
-rank(::MatElem{T}) where T <: RingElem
+tr(m::MatElem{T}) where T <: NCRingElement
+det(m::MatElem{T}) where {T <: RingElement}
+rank(m::MatElem{T}) where T <: RingElem
 ```
 
 
 ## Inverses
 
 ```@docs
-Base.inv(M::MatElem{T}) where {T <: RingElement}
-pseudo_inv(M::MatElem{T}) where {T <: RingElement}
+Base.inv(m::MatElem{T}) where {T <: RingElement}
+pseudo_inv(m::MatElem{T}) where {T <: RingElement}
 ```
 
 
@@ -42,46 +42,46 @@ pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 ## Characteristic and minimal polynomials
 
 ```@docs
-charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
-minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
+charpoly(S::PolyRing{T}, m::MatElem{T}) where {T <: RingElement}
+minpoly(S::PolyRing{T}, m::MatElem{T}) where {T <: RingElement}
 ```
 
 
 ## Powers
 
 ```@docs
-powers(::MatElem, ::Int)
+powers(m::MatElem, ::Int)
 ```
 
 
 ## Gram matrices
 
 ```@docs
-gram(x::MatElem)
+gram(m::MatElem)
 ```
 
 
 ## Content
 
 ```@docs
-content(::MatElem{T}) where T <: RingElement
+content(m::MatElem{T}) where T <: RingElement
 ```
 
 
 ## Minors and exterior powers
 
 ```@docs
-minors(A::MatElem, k::Int)
-minors_with_position(A::MatElem, k::Int)
-minors_iterator(A::MatElem, k::Int)
-minors_iterator_with_position(M::MatElem, k::Int)
-exterior_power(A::MatElem, k::Int)
+minors(m::MatElem, k::Int)
+minors_with_position(m::MatElem, k::Int)
+minors_iterator(m::MatElem, k::Int)
+minors_iterator_with_position(m::MatElem, k::Int)
+exterior_power(m::MatElem, k::Int)
 ```
 
 
 ## Pfaffians
 
 ```@docs
-pfaffian(M::MatElem)
-pfaffians(M::MatElem, k::Int)
+pfaffian(m::MatElem)
+pfaffians(m::MatElem, k::Int)
 ```

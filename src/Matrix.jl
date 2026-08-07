@@ -21,7 +21,7 @@ base_ring_type(::Type{<:MatElem{T}}) where T <: NCRingElement = parent_type(T)
 parent_type(::Type{<:MatElem{T}}) where {T <: NCRingElement} = MatSpace{T}
 
 @doc raw"""
-    parent(M::MatElem)
+    parent(m::MatElem)
 
 Return the matrix space over the base ring of `M` with the same dimensions as
 `M`.
@@ -38,7 +38,7 @@ Matrix space of 2 rows and 3 columns
   over rationals
 ```
 """
-parent(M::MatElem) = matrix_space(base_ring(M), nrows(M), ncols(M))
+parent(m::MatElem) = matrix_space(base_ring(m), nrows(m), ncols(m))
 
 @doc raw"""
     dense_matrix_type(::Type{T}) where T<:NCRingElement
@@ -142,7 +142,7 @@ end
 @doc raw"""
     (S::MatSpace{T})() where {T <: NCRingElement}
     (S::MatSpace)(a::NCRingElement)
-    (S::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+    (S::MatSpace{T})(m::MatrixElem{T}) where {T <: NCRingElement}
     (S::MatSpace{T})(a::AbstractVecOrMat) where {T <: NCRingElement}
 
 Construct an element of the matrix space `S`.
@@ -272,7 +272,7 @@ function Base.hash(a::MatElem, h::UInt)
 end
 
 @doc raw"""
-    number_of_rows(a::MatElem)
+    number_of_rows(m::MatElem)
 
 Return the number of rows of the given matrix.
 
@@ -287,10 +287,10 @@ julia> number_of_rows(M)
 2
 ```
 """
-number_of_rows(a::MatElem)
+number_of_rows(m::MatElem)
 
 @doc raw"""
-    number_of_columns(a::MatElem)
+    number_of_columns(m::MatElem)
 
 Return the number of columns of the given matrix.
 
@@ -305,10 +305,10 @@ julia> number_of_columns(M)
 3
 ```
 """
-number_of_columns(a::MatElem)
+number_of_columns(m::MatElem)
 
 @doc raw"""
-    length(a::MatrixElem{T}) where T <: NCRingElement
+    length(m::MatrixElem{T}) where T <: NCRingElement
 
 Return the number of entries in the given matrix.
 
@@ -323,10 +323,10 @@ julia> length(M)
 6
 ```
 """
-length(a::MatrixElem{T}) where T <: NCRingElement = nrows(a) * ncols(a)
+length(m::MatrixElem{T}) where T <: NCRingElement = nrows(m) * ncols(m)
 
 @doc raw"""
-    isempty(a::MatrixElem{T}) where {T <: NCRingElement}
+    isempty(m::MatrixElem{T}) where {T <: NCRingElement}
 
 Return `true` if `a` has no entries, that is, if either the number
 of rows or the number of columns is zero. Otherwise, return `false`.
@@ -348,12 +348,12 @@ julia> isempty(B)
 false
 ```
 """
-isempty(a::MatrixElem{T}) where {T <: NCRingElement} = (nrows(a) == 0) || (ncols(a) == 0)
+isempty(m::MatrixElem{T}) where {T <: NCRingElement} = (nrows(m) == 0) || (ncols(m) == 0)
 
 Base.eltype(::Type{<:MatrixElem{T}}) where {T <: NCRingElement} = T
 
 @doc raw"""
-    Base.isassigned(a::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
+    Base.isassigned(m::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
 
 Return `true` if the matrix `a` has an entry at position `(i, j)`,
 and `false` otherwise.
@@ -372,9 +372,9 @@ julia> isassigned(M, 4, 4)
 false
 ```
 """
-function Base.isassigned(a::MatrixElem{T}, i, j) where {T <: NCRingElement}
+function Base.isassigned(m::MatrixElem{T}, i, j) where {T <: NCRingElement}
     try
-        a[i, j]
+        m[i, j]
         true
     catch e
         if isa(e, BoundsError) || isa(e, UndefRefError)
@@ -430,13 +430,13 @@ function one(s::MatSpace)
 end
 
 @doc raw"""
-    one(a::MatElem{T}) where {T <: NCRingElement}
+    one(m::MatElem{T}) where {T <: NCRingElement}
 
 Return the identity matrix with the same base ring and dimensions as `a`.
 
 The matrix `a` must be square.
 """
-one(a::MatElem{T}) where T <: NCRingElement = identity_matrix(a)
+one(m::MatElem{T}) where T <: NCRingElement = identity_matrix(m)
 
 function iszero(a::MatElem{T}) where {T <: NCRingElement}
    for i = 1:nrows(a)
@@ -663,10 +663,10 @@ end
 ###############################################################################
 
 @doc raw"""
-    similar(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
-    similar(x::MatElem{T}, R::NCRing) where T <: NCRingElement
-    similar(x::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
-    similar(x::MatElem{T}) where T <: NCRingElement
+    similar(m::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
+    similar(m::MatElem{T}, R::NCRing) where T <: NCRingElement
+    similar(m::MatElem{T}, r::Int, c::Int) where T <: NCRingElement
+    similar(m::MatElem{T}) where T <: NCRingElement
 
 Create an uninitialized matrix with the same implementation type as `x`.
 
@@ -695,7 +695,7 @@ julia> similar(M, 2, 2)
 [#undef   #undef]
 ```
 """
-similar(x::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
+similar(m::MatElem, R::NCRing, r::Int, c::Int) = dense_matrix_type(R)(R, undef, r, c)
 
 similar(x::MatElem, R::NCRing) = similar(x, R, nrows(x), ncols(x))
 
@@ -704,18 +704,18 @@ similar(x::MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 similar(x::MatElem) = similar(x, nrows(x), ncols(x))
 
 @doc raw"""
-    zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where {T <: NCRingElement}
-    zero(x::MatElem{T}, r::Int, c::Int) where {T <: NCRingElement}
-    zero(x::MatElem{T}, R::NCRing) where T <: {NCRingElement}
-    zero(x::MatElem{T}) where {T <: NCRingElement}
+    zero(m::MatElem{T}, R::NCRing, r::Int, c::Int) where {T <: NCRingElement}
+    zero(m::MatElem{T}, r::Int, c::Int) where {T <: NCRingElement}
+    zero(m::MatElem{T}, R::NCRing) where T <: {NCRingElement}
+    zero(m::MatElem{T}) where {T <: NCRingElement}
 
 Create a zero matrix with the same implementation type as the given matrix `x`.
 
 By default, the base ring and dimensions are inherited from `x`, but they can
 also be specified explicitly.
 """
-zero(x::MatElem{T}, R::NCRing) where {T <: NCRingElement} = zero(x, R, nrows(x), ncols(x))
-zero(x::MatElem{T}) where T <: NCRingElement = zero(x, nrows(x), ncols(x))
+zero(m::MatElem{T}, R::NCRing) where {T <: NCRingElement} = zero(m, R, nrows(m), ncols(m))
+zero(m::MatElem{T}) where T <: NCRingElement = zero(m, nrows(m), ncols(m))
 
 function zero(x::MatElem{T}, R::NCRing, r::Int, c::Int) where T <: NCRingElement
   y = similar(x, R, r, c)
@@ -747,7 +747,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    Base.getindex(M::MatElem, rows, cols)
+    Base.getindex(m::MatElem, rows, cols)
 
 When `rows` and `cols` are specified as an `AbstractVector{Int}`, return a copy of
 the submatrix $A$ of $M$ defined by `A[i,j] = M[rows[i], cols[j]]`
@@ -756,7 +756,7 @@ Instead of a vector, `rows` and `cols` can also be:
 * an integer `i`, which is  interpreted as `i:i`, or
 * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
-getindex(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = sub(M, r, c)
+getindex(m::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = sub(m, r, c)
 
 function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
    _checkbounds(M, i, cols)
@@ -1314,11 +1314,11 @@ function +(x::T, y::MatElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    +(x::MatElem{<:NCRingElement}, y::NCRingElement)
+    +(m::MatElem{<:NCRingElement}, y::NCRingElement)
 
 Return $x + S(y)$, where $S$ is the parent of $a$.
 """
-+(x::MatElem{T}, y::T) where {T <: NCRingElem} = y + x
++(m::MatElem{T}, y::T) where {T <: NCRingElem} = y + m
 
 function -(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement
    z = similar(y)
@@ -1371,19 +1371,19 @@ function -(x::T, y::MatElem{T}) where {T <: NCRingElem}
 end
 
 @doc raw"""
-    -(x::MatElem{<:NCRingElem}, y::NCRingElement)
+    -(m::MatElem{<:NCRingElem}, y::NCRingElement)
 
 Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::MatElem{T}, y::T) where {T <: NCRingElem}
-   z = similar(x)
-   R = base_ring(x)
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
+function -(m::MatElem{T}, y::T) where {T <: NCRingElem}
+   z = similar(m)
+   R = base_ring(m)
+   for i = 1:nrows(m)
+      for j = 1:ncols(m)
          if i != j
-            z[i, j] = deepcopy(x[i, j])
+            z[i, j] = deepcopy(m[i, j])
          else
-            z[i, j] = x[i, j] - y
+            z[i, j] = m[i, j] - y
          end
       end
    end
@@ -1551,31 +1551,31 @@ divexact_right(x::MatElem, y::NCRingElem; check::Bool = true) =
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, U <: NCRingElement, T <: MatrixElem{U}} = x^p
 
 @doc raw"""
-    ^(a::MatElem{T}, b::Int) where T <: NCRingElement
+    ^(m::MatElem{T}, b::Int) where T <: NCRingElement
 
 Return $a^b$. We require that the matrix $a$ is square.
 """
-function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
-   !is_square(a) && error("Incompatible matrix dimensions in power")
+function ^(m::MatElem{T}, b::Int) where T <: NCRingElement
+   !is_square(m) && error("Incompatible matrix dimensions in power")
    if b < 0
-      return inv(a)^(-b)
+      return inv(m)^(-b)
    end
    # special case powers of x for constructing polynomials efficiently
    if b == 0
-      return identity_matrix(a)
+      return identity_matrix(m)
    elseif b == 1
-      return deepcopy(a)
+      return deepcopy(m)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
          bit >>= 1
       end
-      z = a
+      z = m
       bit >>= 1
       while bit != 0
          z = z*z
          if (UInt(bit) & b) != 0
-            z *= a
+            z *= m
          end
          bit >>= 1
       end
@@ -1590,18 +1590,18 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    ==(m::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-   b = check_parent(x, y, false)
+function ==(m::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+   b = check_parent(m, y, false)
    !b && return false
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if x[i, j] != y[i, j]
+   for i = 1:nrows(m)
+      for j = 1:ncols(m)
+         if m[i, j] != y[i, j]
             return false
          end
       end
@@ -1610,19 +1610,19 @@ function ==(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
 end
 
 @doc raw"""
-    isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+    isequal(m::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
 
 Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 useful in cases where the entries of the matrices are inexact, e.g. power
 series. Only if the power series are precisely the same, to the same precision,
 are they declared equal by this function.
 """
-function isequal(x::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
-   b = check_parent(x, y, false)
+function isequal(m::MatElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+   b = check_parent(m, y, false)
    !b && return false
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if !isequal(x[i, j], y[i, j])
+   for i = 1:nrows(m)
+      for j = 1:ncols(m)
+         if !isequal(m[i, j], y[i, j])
             return false
          end
       end
@@ -1655,20 +1655,20 @@ end
 ==(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement = y == x
 
 @doc raw"""
-    ==(x::MatElem{<:NCRingElement}, y::NCRingElement)
+    ==(m::MatElem{<:NCRingElement}, y::NCRingElement)
 
 Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 otherwise return `false`.
 """
-function ==(x::MatElem{T}, y::T) where {T <: NCRingElem}
-   for i = 1:min(nrows(x), ncols(x))
-      if x[i, i] != y
+function ==(m::MatElem{T}, y::T) where {T <: NCRingElem}
+   for i = 1:min(nrows(m), ncols(m))
+      if m[i, i] != y
          return false
       end
    end
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j && !is_zero_entry(x, i, j)
+   for i = 1:nrows(m)
+      for j = 1:ncols(m)
+         if i != j && !is_zero_entry(m, i, j)
             return false
          end
       end
@@ -1737,7 +1737,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_symmetric(M::MatElem)
+    is_symmetric(m::MatElem)
 
 Return `true` if the given matrix is symmetric with respect to its main
 diagonal, i.e., `transpose(M) == M`, otherwise return `false`.
@@ -1764,18 +1764,18 @@ julia> is_symmetric(N)
 false
 ```
 """
-function is_symmetric(M::MatElem)
-   n = nrows(M)
-   n == ncols(M) || return false
+function is_symmetric(m::MatElem)
+   n = nrows(m)
+   n == ncols(m) || return false
    for i in 2:n, j in 1:i-1
-      M[i, j] == M[j, i] || return false
+      m[i, j] == m[j, i] || return false
    end
    return true
 end
 
 
 @doc raw"""
-    transpose(x::MatElem)
+    transpose(m::MatElem)
 
 Return a new matrix containing the transpose of `x`.
 
@@ -1796,13 +1796,13 @@ julia> transpose(A)
 [    1     t   t^2 + t + 1]
 ```
 """
-function transpose(x::MatElem)
-  z = similar(base_ring(x), ncols(x), nrows(x))
-  return transpose!(z, x)
+function transpose(m::MatElem)
+  z = similar(base_ring(m), ncols(m), nrows(m))
+  return transpose!(z, m)
 end
 
 @doc raw"""
-    transpose!(x::MatElem)
+    transpose!(m::MatElem)
     transpose!(z::T, x::T) where T <: MatElem
 
 Return the transpose of `x`, storing the result in a pre-existing matrix.
@@ -1814,9 +1814,9 @@ The binary version stores the transpose of `x` in `z` and returns `z`. The matri
 `z` must have size `ncols(x)` by `nrows(x)`. No dimension checks are performed,
 and incorrect dimensions may result in undefined behaviour.
 """
-function transpose!(x::MatElem)
-  @req is_square(x) "Matrix must be a square matrix"
-  return transpose!(x, x)
+function transpose!(m::MatElem)
+  @req is_square(m) "Matrix must be a square matrix"
+  return transpose!(m, m)
 end
 
 function transpose!(z::T, x::T) where T <: MatElem
@@ -1863,7 +1863,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    gram(x::MatElem)
+    gram(m::MatElem)
 
 Return the Gram matrix of $x$, i.e. if $x$ is an $r \times c$ matrix, return
 the $r \times r$ matrix whose $(i, j)$-th entry is the dot product of the
@@ -1890,13 +1890,13 @@ julia> B = gram(A)
 [  2*t^2 + t - 1         t^3 + 3*t   t^4 + 2*t^3 + 4*t^2 + 6*t + 9]
 ```
 """
-function gram(x::MatElem)
-   z = similar(x, nrows(x), nrows(x))
-   for i = 1:nrows(x)
-      for j = 1:nrows(x)
-         z[i, j] = zero(base_ring(x))
-         for k = 1:ncols(x)
-            z[i, j] += x[i, k] * x[j, k]
+function gram(m::MatElem)
+   z = similar(m, nrows(m), nrows(m))
+   for i = 1:nrows(m)
+      for j = 1:nrows(m)
+         z[i, j] = zero(base_ring(m))
+         for k = 1:ncols(m)
+            z[i, j] += m[i, k] * m[j, k]
          end
       end
    end
@@ -1910,7 +1910,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    tr(x::MatElem{T}) where T <: NCRingElement
+    tr(m::MatElem{T}) where T <: NCRingElement
 
 Return the trace of the matrix $x$, i.e. the sum of its diagonal elements.
 The matrix is required to be square.
@@ -1934,11 +1934,11 @@ julia> b = tr(A)
 t^2 + 3*t + 2
 ```
 """
-function tr(x::MatElem{T}) where T <: NCRingElement
-   !is_square(x) && error("Not a square matrix in trace")
-   d = zero(base_ring(x))
-   for i = 1:nrows(x)
-      d = add!(d, x[i, i])
+function tr(m::MatElem{T}) where T <: NCRingElement
+   !is_square(m) && error("Not a square matrix in trace")
+   d = zero(base_ring(m))
+   for i = 1:nrows(m)
+      d = add!(d, m[i, i])
    end
    return d
 end
@@ -1950,7 +1950,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    content(x::MatrixElem{T}) where T <: RingElement
+    content(m::MatrixElem{T}) where T <: RingElement
 
 Return the greatest common divisor of all entries of the matrix $x$,
 assuming such a greatest common divisor exists.
@@ -1974,11 +1974,11 @@ julia> b = content(A)
 1
 ```
 """
-function content(x::MatrixElem{T}) where T <: RingElement
-  d = zero(base_ring(x))
-  for i = 1:nrows(x)
-     for j = 1:ncols(x)
-        d = gcd!(d, x[i, j])
+function content(m::MatrixElem{T}) where T <: RingElement
+  d = zero(base_ring(m))
+  for i = 1:nrows(m)
+     for j = 1:ncols(m)
+        d = gcd!(d, m[i, j])
      end
   end
   return d
@@ -1991,7 +1991,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
+    *(P::Perm, m::MatrixElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained by applying the permutation `P` to the rows of `x`.
 
@@ -2022,20 +2022,20 @@ julia> P*A
 [  t^2       t             t]
 ```
 """
-function *(P::Perm, x::MatrixElem{T}) where T <: NCRingElement
-   z = similar(x)
-   m = nrows(x)
-   n = ncols(x)
-   for i = 1:m
+function *(P::Perm, m::MatrixElem{T}) where T <: NCRingElement
+   z = similar(m)
+   nr = nrows(m)
+   n = ncols(m)
+   for i = 1:nr
       for j = 1:n
-         z[P[i], j] = x[i, j]
+         z[P[i], j] = m[i, j]
       end
    end
    return z
 end
 
 @doc raw"""
-    *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
+    *(m::MatrixElem{T}, P::Perm) where T <: NCRingElement
 
 Return a new matrix obtained by applying the permutation `P` to the columns of `x`.
 
@@ -2066,13 +2066,13 @@ julia> A*P
 [   -2   t^2 + t + 1   t + 2]
 ```
 """
-function *(x::MatrixElem{T}, P::Perm) where T <: NCRingElement
-   z = similar(x)
-   m = nrows(x)
-   n = ncols(x)
-   for i = 1:m
+function *(m::MatrixElem{T}, P::Perm) where T <: NCRingElement
+   z = similar(m)
+   nr = nrows(m)
+   n = ncols(m)
+   for i = 1:nr
       for j = 1:n
-         z[i, P[j]] = x[i, j]
+         z[i, P[j]] = m[i, j]
       end
    end
    return z
@@ -2141,7 +2141,7 @@ function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+    lu(m::MatrixElem{T}, P = SymmetricGroup(nrows(m))) where {T <: FieldElement}
 
 Return the LU decomposition of $A$.
 
@@ -2162,29 +2162,29 @@ julia> r, p, L, U = lu(M)
 (3, (), [1 0 0; 4 1 0; 0 0 1], [1 2 3; 0 -3 -6; 0 0 1])
 ```
 """
-function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
-   m = nrows(A)
-   n = ncols(A)
-   P.n != m && error("Permutation does not match matrix")
+function lu(m::MatrixElem{T}, P = SymmetricGroup(nrows(m))) where {T <: FieldElement}
+   nr = nrows(m)
+   n = ncols(m)
+   P.n != nr && error("Permutation does not match matrix")
    p = one(P)
-   R = base_ring(A)
-   U = deepcopy(A)
-   L = similar(A, m, m)
+   R = base_ring(m)
+   U = deepcopy(m)
+   L = similar(m, nr, nr)
    rank = lu!(p, U)
-   for i = 1:m
+   for i = 1:nr
       for j = 1:n
          if i > j
             L[i, j] = U[i, j]
             U[i, j] = R()
          elseif i == j
             L[i, j] = one(R)
-         elseif j <= m
+         elseif j <= nr
             L[i, j] = R()
          end
       end
    end
-   for i = 1:m
-      for j = n + 1:m
+   for i = 1:nr
+      for j = n + 1:nr
          L[i, j] = R()
       end
    end
@@ -2305,7 +2305,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
 end
 
 @doc raw"""
-    fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+    fflu(m::MatrixElem{T}, P = SymmetricGroup(nrows(m))) where {T <: RingElement}
 
 Return the fraction-free LU decomposition of $A$.
 
@@ -2334,25 +2334,25 @@ julia> r, d, p, L, U = fflu(M)
 (3, -3//1, (), [1 0 0; 4 -3 0; 0 0 -3], [1 2 3; 0 -3 -6; 0 0 -3])
 ```
 """
-function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
-   m = nrows(A)
-   n = ncols(A)
-   P.n != m && error("Permutation does not match matrix")
+function fflu(m::MatrixElem{T}, P = SymmetricGroup(nrows(m))) where {T <: RingElement}
+   nr = nrows(m)
+   n = ncols(m)
+   P.n != nr && error("Permutation does not match matrix")
    p = one(P)
-   R = base_ring(A)
-   U = deepcopy(A)
-   L = similar(A, m, m)
+   R = base_ring(m)
+   U = deepcopy(m)
+   L = similar(m, nr, nr)
    rank, d = fflu!(p, U)
    i = 1
    j = 1
    k = 1
-   while i <= m && j <= n
+   while i <= nr && j <= n
       if !is_zero_entry(U, i, j)
          L[i, k] = U[i, j]
          for l = 1:i - 1
             L[l, k] = 0
          end
-         for l = i + 1:m
+         for l = i + 1:nr
             L[l, k] = U[l, j]
             U[l, j] = 0
          end
@@ -2362,12 +2362,12 @@ function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEl
       j += 1
    end
 
-   while k <= m
+   while k <= nr
       for l = 1:k - 1
          L[l, k] = 0
       end
       L[k, k] = 1
-      for l = k + 1: m
+      for l = k + 1: nr
          L[l, k] = 0
       end
       k += 1
@@ -2440,7 +2440,7 @@ end
 
 
 @doc raw"""
-    rref_rational(M::MatrixElem{T}) where {T <: RingElement}
+    rref_rational(m::MatrixElem{T}) where {T <: RingElement}
 
 Return the reduced row echelon form of $M$ using fraction-free
 arithmetic.
@@ -2471,8 +2471,8 @@ julia> A/d
 [0   0   1]
 ```
 """
-function rref_rational(M::MatrixElem{T}) where {T <: RingElement}
-   A = deepcopy(M)
+function rref_rational(m::MatrixElem{T}) where {T <: RingElement}
+   A = deepcopy(m)
    r, d = rref_rational!(A)
    return r, A, d
 end
@@ -2538,7 +2538,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    rref(M::MatrixElem{T}) where {T <: FieldElement}
+    rref(m::MatrixElem{T}) where {T <: FieldElement}
 
 Return the reduced row echelon form of $M$.
 
@@ -2560,15 +2560,15 @@ julia> is_rref(A)
 true
 ```
 """
-function rref(M::MatrixElem{T}) where {T <: FieldElement}
-   A = deepcopy(M)
+function rref(m::MatrixElem{T}) where {T <: FieldElement}
+   A = deepcopy(m)
    r = rref!(A)
    return r, A
 end
 
 @doc raw"""
-    is_rref(M::MatrixElem{T}) where {T <: RingElement}
-    is_rref(M::MatrixElem{T}) where {T <: FieldElement}
+    is_rref(m::MatrixElem{T}) where {T <: RingElement}
+    is_rref(m::MatrixElem{T}) where {T <: FieldElement}
 
 Return `true` if $M$ is in reduced row echelon form, and `false`
 otherwise.
@@ -2604,22 +2604,22 @@ julia> is_rref(C)
 true
 ```
 """
-function is_rref(M::MatrixElem{T}) where {T <: RingElement}
-   m = nrows(M)
-   n = ncols(M)
+function is_rref(m::MatrixElem{T}) where {T <: RingElement}
+   nr = nrows(m)
+   n = ncols(m)
    c = 1
-   for r = 1:m
+   for r = 1:nr
       for i = 1:c - 1
-         if !is_zero_entry(M, r, i)
+         if !is_zero_entry(m, r, i)
             return false
          end
       end
-      while c <= n && is_zero_entry(M, r, c)
+      while c <= n && is_zero_entry(m, r, c)
          c += 1
       end
       if c <= n
          for i = 1:r - 1
-            if !is_zero_entry(M, i, c)
+            if !is_zero_entry(m, i, c)
                return false
             end
          end
@@ -2828,7 +2828,7 @@ function det(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    det(M::MatElem{T}) where {T <: RingElement}
+    det(m::MatElem{T}) where {T <: RingElement}
 
 Return the determinant of the given matrix $M$. The matrix is required to be
 square.
@@ -2845,13 +2845,13 @@ julia> det(A)
 x^3 - 1
 ```
 """
-function det(M::MatElem{T}) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in det")
-   nrows(M) == 0 && return one(base_ring(M))
+function det(m::MatElem{T}) where {T <: RingElement}
+   !is_square(m) && error("Not a square matrix in det")
+   nrows(m) == 0 && return one(base_ring(m))
    try
-      return det_fflu(M)
+      return det_fflu(m)
    catch
-      return det_df(M)
+      return det_df(m)
    end
 end
 
@@ -2941,7 +2941,7 @@ function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::Abstract
 end
 
 @doc raw"""
-    minors(A::MatElem, k::Int)
+    minors(m::MatElem, k::Int)
 
 Return an array consisting of all $k$-minors of the given matrix $A$,
 i.e. the determinants of all $k \times k$ submatrices of $A$.
@@ -2960,10 +2960,10 @@ julia> minors(A, 2)
  -3
 ```
 """
-minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
+minors(m::MatElem, k::Int) = collect(minors_iterator(m, k))
 
 @doc raw"""
-    minors_with_position(A::MatElem, k::Int)
+    minors_with_position(m::MatElem, k::Int)
 
 Return an array consisting of all $k$-minors of $A$, together with the row
 and column indices defining the corresponding submatrices.
@@ -2982,10 +2982,10 @@ julia> minors_with_position(A, 2)
  (-3, [1, 2], [2, 3])
 ```
 """
-minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
+minors_with_position(m::MatElem, k::Int) = collect(minors_iterator_with_position(m,k))
 
 @doc raw"""
-    minors_iterator(A::MatElem, k::Int)
+    minors_iterator(m::MatElem, k::Int)
 
 Return an iterator computing all $k$-minors of $A$, i.e. the determinants
 of all $k \times k$ submatrices of $A$.
@@ -3008,14 +3008,14 @@ julia> collect(minors_iterator(A, 2))
 
 ```
 """
-function minors_iterator(M::MatElem, k::Int)
-  row_indices = combinations(nrows(M), k)
-  col_indices = combinations(ncols(M), k)
-  return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
+function minors_iterator(m::MatElem, k::Int)
+  row_indices = combinations(nrows(m), k)
+  col_indices = combinations(ncols(m), k)
+  return (det(m[rows, cols]) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
-    minors_iterator_with_position(A::MatElem, k::Int)
+    minors_iterator_with_position(m::MatElem, k::Int)
 
 Return an iterator computing all $k$-minors of $A$, together with the row
 and column indices defining the corresponding submatrices.
@@ -3031,14 +3031,14 @@ julia> first(minors_iterator_with_position(A, 2))
 (-3, [1, 2], [1, 2])
 ```
 """
-function minors_iterator_with_position(M::MatElem, k::Int)
-  row_indices = combinations(nrows(M), k)
-  col_indices = combinations(ncols(M), k)
-  return ((det(M[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
+function minors_iterator_with_position(m::MatElem, k::Int)
+  row_indices = combinations(nrows(m), k)
+  col_indices = combinations(ncols(m), k)
+  return ((det(m[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
-    exterior_power(A::MatElem, k::Int) -> MatElem
+    exterior_power(m::MatElem, k::Int) -> MatElem
 
 Return the matrix of the induced map on the `k`-th exterior power. Its entries
 are the determinants of the $k \times k$ submatrices of $A$.
@@ -3054,13 +3054,13 @@ julia> exterior_power(A, 2)
 [-3    -6   -3]
 ```
 """
-function exterior_power(A::MatElem, k::Int)
-  ri = combinations(nrows(A), k)
+function exterior_power(m::MatElem, k::Int)
+  ri = combinations(nrows(m), k)
   n = length(ri)
-  res = similar(A, n, n)
+  res = similar(m, n, n)
    for i in 1:n
      for j in 1:n
-       res[i, j] = det(A[ri[i], ri[j]])
+       res[i, j] = det(m[ri[i], ri[j]])
      end
    end
    return res
@@ -3073,7 +3073,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_alternating(M::MatElem)
+    is_alternating(m::MatElem)
 
 Return `true` if `M` is alternating, that is, if `M` is skew-symmetric
 and all entries on the main diagonal are zero. Return `false` otherwise.
@@ -3099,16 +3099,16 @@ julia> is_alternating(N)
 false
 ```
 """
-function is_alternating(M::MatElem)
-  is_skew_symmetric(M) || return false
-  for i in 1:nrows(M)
-    is_zero_entry(M, i, i) || return false
+function is_alternating(m::MatElem)
+  is_skew_symmetric(m) || return false
+  for i in 1:nrows(m)
+    is_zero_entry(m, i, i) || return false
   end
   return true
 end
 
 @doc raw"""
-    is_skew_symmetric(M::MatElem)
+    is_skew_symmetric(m::MatElem)
 
 Return `true` if the given matrix is skew symmetric with respect to its main
 diagonal, i.e., `transpose(M) == -M`, otherwise return `false`.
@@ -3125,11 +3125,11 @@ julia> is_skew_symmetric(M)
 true
 ```
 """
-function is_skew_symmetric(M::MatElem)
-   n = nrows(M)
-   n == ncols(M) || return false
+function is_skew_symmetric(m::MatElem)
+   n = nrows(m)
+   n == ncols(m) || return false
    for i in 1:n, j in 1:i
-      M[i, j] == -M[j, i] || return false
+      m[i, j] == -m[j, i] || return false
    end
    return true
 end
@@ -3140,7 +3140,7 @@ function check_skew_symmetric(M::MatElem)
 end
 
 @doc raw"""
-    pfaffian(M::MatElem)
+    pfaffian(m::MatElem)
 
 Return the Pfaffian of the skew-symmetric matrix $M$.
 
@@ -3159,21 +3159,21 @@ julia> pfaffian(M)
 x1*x6 - x2*x5 + x3*x4
 ```
 """
-function pfaffian(M::MatElem)
-   check_skew_symmetric(M)
+function pfaffian(m::MatElem)
+   check_skew_symmetric(m)
    # when the matrix is big, try use the BFL algorithm
-   if ncols(M) > 10
+   if ncols(m) > 10
       try
-         return pfaffian_bfl_bsgs(M)
+         return pfaffian_bfl_bsgs(m)
       catch
       end
    end
    # fallback to using recursion
-   return pfaffian_r(M)
+   return pfaffian_r(m)
 end
 
 @doc raw"""
-    pfaffians(M::MatElem, k::Int)
+    pfaffians(m::MatElem, k::Int)
 
 Return a vector consisting of the Pfaffians of all $k \times k$ principal
 submatrices of the skew-symmetric matrix $M$.
@@ -3199,12 +3199,12 @@ julia> pfaffians(M, 2)
  x6
 ```
 """
-function pfaffians(M::MatElem, k::Int)
-   check_skew_symmetric(M)
-   indices = combinations(ncols(M), k)
-   pfs = elem_type(base_ring(M))[]
+function pfaffians(m::MatElem, k::Int)
+   check_skew_symmetric(m)
+   indices = combinations(ncols(m), k)
+   pfs = elem_type(base_ring(m))[]
    for i in indices
-      push!(pfs, pfaffian(M[i, i]))
+      push!(pfs, pfaffian(m[i, i]))
    end
    return pfs
 end
@@ -3324,7 +3324,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    rank(M::MatElem{T}) where {T <: RingElement}
+    rank(m::MatElem{T}) where {T <: RingElement}
 
 Return the rank of the given matrix $M$.
 
@@ -3337,12 +3337,12 @@ julia> rank(A)
 2
 ```
 """
-function rank(M::MatElem{T}) where {T <: RingElement}
-   n = nrows(M)
+function rank(m::MatElem{T}) where {T <: RingElement}
+   n = nrows(m)
    if n == 0
       return 0
    end
-   A = deepcopy(M)
+   A = deepcopy(m)
    P = one(SymmetricGroup(n))
    r, d = fflu!(P, A)
    return r
@@ -3359,9 +3359,9 @@ function rank(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem} -> Int
-    rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem} -> Int
-    rank_interpolation(M::MatElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation(m::MatElem{T}) where {T <: PolyRingElem} -> Int
+    rank_interpolation(m::MatElem{T}) where {T <: MPolyRingElem} -> Int
+    rank_interpolation(m::MatElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ using an interpolation-like method. 
 
@@ -3379,27 +3379,27 @@ julia> AbstractAlgebra.rank_interpolation(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]))
 2
 ```
 """
-function rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
-   n = nrows(M)
-   m = ncols(M)
-   if is_zero(n) || is_zero(m)
+function rank_interpolation(m::MatElem{T}) where {T <: PolyRingElem}
+   n = nrows(m)
+   nc = ncols(m)
+   if is_zero(n) || is_zero(nc)
       return 0
    end
-   Kx = base_ring(M)
+   Kx = base_ring(m)
    K = base_ring(Kx)
-   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
-   min_ = min(n, m)
+   #The maximum degree of det(m') is calculated where m' is an arbitrary quadratic submatrix of m.
+   min_ = min(n, nc)
    if (min_ == n)
-      maxdetdeg = sum(maximum(degree(M[i, j]) for j in 1:m) for i in 1:n)
+      maxdetdeg = sum(maximum(degree(m[i, j]) for j in 1:nc) for i in 1:n)
    else 
-      maxdetdeg = sum(maximum(degree(M[i, j]) for i in 1:n) for j in 1:m)
+      maxdetdeg = sum(maximum(degree(m[i, j]) for i in 1:n) for j in 1:nc)
    end
    r = 0
    eval_set = evaluation_points(K, maxdetdeg+1)
    if !is_empty(eval_set)
-      #rank(M) is calculated by computing the rank of det_deg+1 matrices, evaluated in an element of eval_set, respectively.
+      #rank(m) is calculated by computing the rank of det_deg+1 matrices, evaluated in an element of eval_set, respectively.
       for elem in eval_set
-         M_eval = map_entries(p -> evaluate(p, elem), M)
+         M_eval = map_entries(p -> evaluate(p, elem), m)
          r = max(rank_interpolation(M_eval), r)
          if r == min_
             break
@@ -3415,8 +3415,8 @@ function rank_interpolation(M::MatElem{T}) where {T <: PolyRingElem}
       #d = clog(order(K), ZZ(maxdetdeg+1))
       L, l = ext_of_degree(K, d)
       Lx, _ = polynomial_ring(L, var(Kx)) 
-      #The given matrix M is embedded into the space of matrices over Lx
-      A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+      #The given matrix m is embedded into the space of matrices over Lx
+      A = matrix(Lx, n, nc, [map_coefficients(l, m[i, j]; parent = Lx) for i in 1:n, j in 1:nc])
       return rank_interpolation(A)
    end
 end
@@ -3471,9 +3471,9 @@ function rank_interpolation(M::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem} -> Int
-    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
-    rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
+    rank_interpolation_mc(m::MatElem{T}, err::Float64) where {T <: PolyRingElem} -> Int
+    rank_interpolation_mc(m::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
+    rank_interpolation_mc(m::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
 Returns the rank of $A$ with error probability < $err$ using an interpolation-like method.
 
@@ -3491,26 +3491,26 @@ julia> AbstractAlgebra.rank_interpolation_mc(matrix(Qy, 2, 2, [1//y -y^2; 3 2-y]
 2
 ```
 """
-function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRingElem}
-   n = nrows(M)
-   m = ncols(M)
-   if is_zero(n) || is_zero(m)
+function rank_interpolation_mc(m::MatElem{T}, err::Float64) where {T <: PolyRingElem}
+   n = nrows(m)
+   nc = ncols(m)
+   if is_zero(n) || is_zero(nc)
       return 0
    end
-   Kx = base_ring(M)
+   Kx = base_ring(m)
    K = base_ring(Kx)
-   min_ = min(n, m)
-   #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
-   maxdetdeg = min_*maximum(degree(M[i, j]) for i in 1:n, j in 1:n)
+   min_ = min(n, nc)
+   #The maximum degree of det(m') is calculated where m' is an arbitrary quadratic submatrix of m.
+   maxdetdeg = min_*maximum(degree(m[i, j]) for i in 1:n, j in 1:n)
    S = evaluation_points(K, 10*maxdetdeg)
-   #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
+   #k is the minimum amount of evaluations of m needed to compute the correct rank of m with error probability < err
    k = ceil(Base.log(10, 1/err))
    r = 0
    if !is_empty(S)
-      #rank(M) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
+      #rank(m) is calculated by computing the rank of k matrices, evaluated in elements of eval_set, and taking the maximum
       for _ = 1:k
          a = rand(S)
-         M_eval = map_entries(p -> evaluate(p, a), M)
+         M_eval = map_entries(p -> evaluate(p, a), m)
          r = max(rank(M_eval), r)
          if r == min_
             return r
@@ -3525,8 +3525,8 @@ function rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: PolyRing
       @assert order(K)^d >= maxdetdeg*10
       L, l = ext_of_degree(K, d)
       Lx, _ = polynomial_ring(L, var(Kx)) 
-      #The given matrix M is embedded into the space of matrices over Lx
-      A = matrix(Lx, n, m, [map_coefficients(l, M[i, j]; parent = Lx) for i in 1:n, j in 1:m])
+      #The given matrix m is embedded into the space of matrices over Lx
+      A = matrix(Lx, n, nc, [map_coefficients(l, m[i, j]; parent = Lx) for i in 1:n, j in 1:nc])
       return rank_interpolation_mc(A, err)
    end
    return r
@@ -4063,7 +4063,7 @@ function _can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) wh
 end
 
 @doc raw"""
-    _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
+    _solve_rational(m::MatElem{T}, b::MatElem{T}) where T <: RingElement
 
 Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 matrix over the same ring, return a tuple $x, d$ consisting of an
@@ -4071,8 +4071,8 @@ $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 exception is raised.
 """
-function _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
-   return _solve_ringelem(M, b)
+function _solve_rational(m::MatElem{T}, b::MatElem{T}) where T <: RingElement
+   return _solve_ringelem(m, b)
 end
 
 function _solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
@@ -4125,7 +4125,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_upper_triangular(M::MatElem)
+    is_upper_triangular(m::MatElem)
 
 Return `true` if $M$ is an upper triangular matrix, that is,
 all entries below the main diagonal are zero. Note that this
@@ -4148,11 +4148,11 @@ julia> is_upper_triangular(QQ[1 ; 2])
 false
 ```
 """
-function is_upper_triangular(M::MatElem)
-    m = ncols(M)
-    for i = 2:nrows(M)
-        for j = 1:min(i - 1, m)
-            if !is_zero_entry(M, i, j)
+function is_upper_triangular(m::MatElem)
+    nc = ncols(m)
+    for i = 2:nrows(m)
+        for j = 1:min(i - 1, nc)
+            if !is_zero_entry(m, i, j)
                 return false
             end
         end
@@ -4290,7 +4290,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_lower_triangular(M::MatElem)
+    is_lower_triangular(m::MatElem)
 
 Return `true` if $M$ is a lower triangular matrix, that is,
 all entries above the main diagonal are zero. Note that this
@@ -4313,10 +4313,10 @@ julia> is_lower_triangular(QQ[1 ; 2])
 true
 ```
 """
-function is_lower_triangular(M::MatElem)
-    for i = 1:nrows(M)
-        for j = i+1:ncols(M)
-            if !is_zero_entry(M, i, j)
+function is_lower_triangular(m::MatElem)
+    for i = 1:nrows(m)
+        for j = i+1:ncols(m)
+            if !is_zero_entry(m, i, j)
                 return false
             end
         end
@@ -4325,7 +4325,7 @@ function is_lower_triangular(M::MatElem)
 end
 
 @doc raw"""
-    is_diagonal(A::MatElem)
+    is_diagonal(m::MatElem)
 
 Return `true` if $A$ is a diagonal matrix, that is,
 if all entries off the main diagonal are zero. Note that this
@@ -4345,10 +4345,10 @@ julia> is_diagonal(QQ[1 0 ;])
 true
 ```
 """
-function is_diagonal(A::MatElem)
-    for i = 1:ncols(A)
-        for j = 1:nrows(A)
-            if i != j && !is_zero_entry(A, j, i)
+function is_diagonal(m::MatElem)
+    for i = 1:ncols(m)
+        for j = 1:nrows(m)
+            if i != j && !is_zero_entry(m, j, i)
                 return false
             end
         end
@@ -4363,7 +4363,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    pseudo_inv(M::MatElem{T}) where {T <: RingElement}
+    pseudo_inv(m::MatElem{T}) where {T <: RingElement}
 
 Given a non-singular $n \times n$ matrix $M$ over a ring, return a tuple
 $X, d$ consisting of an $n \times n$ matrix $X$ and a denominator $d$ such
@@ -4385,9 +4385,9 @@ julia> pseudo_inv(M)
 ([5 -2 -3; -4 1 6; 0 0 -3], -3//1)
 ```
 """
-function pseudo_inv(M::MatElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
-   flag, X, d = _can_solve_with_solution_fflu(M, identity_matrix(M))
+function pseudo_inv(m::MatElem{T}) where {T <: RingElement}
+   is_square(m) || throw(DomainError(m, "Can not invert non-square Matrix"))
+   flag, X, d = _can_solve_with_solution_fflu(m, identity_matrix(m))
    !flag && error("Singular matrix in pseudo_inv")
    return X, d
 end
@@ -4400,7 +4400,7 @@ function Base.inv(M::MatElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    inv(M::MatElem{T}) where {T <: RingElement}
+    inv(m::MatElem{T}) where {T <: RingElement}
 
 Given an invertible $n \times n$ matrix $M$ over a ring, return
 the $n \times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is
@@ -4422,10 +4422,10 @@ julia> inv(M)
 [ 0//1    0//1    1//1]
 ```
 """
-function Base.inv(M::MatElem{T}) where {T <: RingElement}
-   is_square(M) || throw(DomainError(M, "Cannot invert non-square Matrix"))
-   X, d = pseudo_inv(M)
-   is_unit(d) || throw(DomainError(M, "Matrix is not invertible."))
+function Base.inv(m::MatElem{T}) where {T <: RingElement}
+   is_square(m) || throw(DomainError(m, "Cannot invert non-square Matrix"))
+   X, d = pseudo_inv(m)
+   is_unit(d) || throw(DomainError(m, "Matrix is not invertible."))
    return divexact(X, d)
 end
 
@@ -4437,7 +4437,7 @@ end
 
 
 @doc raw"""
-    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(m::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Return a tuple `(flag, B)` indicating whether the matrix $A$ has a one-sided
 inverse.
@@ -4490,19 +4490,19 @@ julia> A*B == one(parent(A*B))
 true
 ```
 """
-function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
-   if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
-      return (false, zero(A, 0, 0))
+function is_invertible_with_inverse(m::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+   if (side == :left && nrows(m) < ncols(m)) || (side == :right && ncols(m) < nrows(m))
+      return (false, zero(m, 0, 0))
    end
-   I = (side == :left) ? zero(A, ncols(A), ncols(A)) : zero(A, nrows(A), nrows(A))
+   I = (side == :left) ? zero(m, ncols(m), ncols(m)) : zero(m, nrows(m), nrows(m))
    for i = 1:ncols(I)
       I[i, i] = one(base_ring(I))
    end
-   return can_solve_with_solution(A, I; side = side)
+   return can_solve_with_solution(m, I; side = side)
 end
 
 @doc raw"""
-    is_invertible(A::MatElem{T}) where {T <: RingElement}
+    is_invertible(m::MatElem{T}) where {T <: RingElement}
 
 Return `true` if the square matrix $A$ is invertible, and `false`
 otherwise. To also compute an inverse, use [`is_invertible_with_inverse`](@ref).
@@ -4525,7 +4525,7 @@ julia> is_invertible(B)
 true
 ```
 """
-is_invertible(A::MatElem{T}) where {T <: RingElement} = is_square(A) && is_unit(det(A))
+is_invertible(m::MatElem{T}) where {T <: RingElement} = is_square(m) && is_unit(det(m))
 
 is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) == rank(A)
 
@@ -4536,8 +4536,8 @@ is_invertible(A::MatElem{T}) where {T <: FieldElement} = nrows(A) == ncols(A) ==
 ###############################################################################
 
 @doc raw"""
-    nullspace(M::MatElem{T}) where {T <: RingElement}
-    nullspace(M::MatElem{T}) where {T <: FieldElement}
+    nullspace(m::MatElem{T}) where {T <: RingElement}
+    nullspace(m::MatElem{T}) where {T <: FieldElement}
 
 Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a matrix
 $N$ whose columns form a basis for the right nullspace of $M$, i.e. such that
@@ -4576,12 +4576,12 @@ julia> M2*N2
 [0//1]
 ```
 """
-function nullspace(M::MatElem{T}) where {T <: RingElement}
-   n = ncols(M)
-   rank, A, d = rref_rational(M)
+function nullspace(m::MatElem{T}) where {T <: RingElement}
+   n = ncols(m)
+   rank, A, d = rref_rational(m)
    nullity = n - rank
-   R = base_ring(M)
-   U = zero(M, n, nullity)
+   R = base_ring(m)
+   U = zero(m, n, nullity)
    if rank == 0
       for i = 1:nullity
          U[i, i] = one(R)
@@ -4661,7 +4661,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+    is_nilpotent(m::MatElem{T}) where {T <: RingElement}
 
 Return `true` if `A` is nilpotent, that is, if there exists a positive
 integer $k$ such that $A^k = 0$. Return `false` otherwise.
@@ -4688,18 +4688,18 @@ julia> is_nilpotent(B)
 false
 ```
 """
-function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+function is_nilpotent(m::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
-  !is_square(A) && error("Dimensions don't match in is_nilpotent")
-  is_zero(tr(A)) || return false
-  n = nrows(A)
-  A = deepcopy(A)
+  !is_square(m) && error("Dimensions don't match in is_nilpotent")
+  is_zero(tr(m)) || return false
+  n = nrows(m)
+  m = deepcopy(m)
   i = 1
-  is_zero(A) && return true
+  is_zero(m) && return true
   while i < n
     i *= 2
-    A = mul!(A, A, A)
-    is_zero(A) && return true
+    m = mul!(m, m, m)
+    is_zero(m) && return true
   end
   return false
 end
@@ -4754,7 +4754,7 @@ function hessenberg!(A::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    hessenberg(A::MatElem{T}) where {T <: RingElement}
+    hessenberg(m::MatElem{T}) where {T <: RingElement}
 
 Return the Hessenberg form of $A$, i.e. an upper Hessenberg matrix
 which is similar to $A$.
@@ -4782,15 +4782,15 @@ julia> is_hessenberg(H)
 true
 ```
 """
-function hessenberg(A::MatElem{T}) where {T <: RingElement}
-   !is_square(A) && error("Dimensions don't match in hessenberg")
-   M = deepcopy(A)
+function hessenberg(m::MatElem{T}) where {T <: RingElement}
+   !is_square(m) && error("Dimensions don't match in hessenberg")
+   M = deepcopy(m)
    hessenberg!(M)
    return M
 end
 
 @doc raw"""
-    is_hessenberg(A::MatElem{T}) where {T <: RingElement}
+    is_hessenberg(m::MatElem{T}) where {T <: RingElement}
 
 Return `true` if $A$ is in (upper) Hessenberg form, that is, if
 all entries below the first subdiagonal are zero, and `false`
@@ -4816,12 +4816,12 @@ julia> is_hessenberg(B)
 false
 ```
 """
-function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
-   is_square(A) || return false
-   n = nrows(A)
+function is_hessenberg(m::MatElem{T}) where {T <: RingElement}
+   is_square(m) || return false
+   n = nrows(m)
    for i = 3:n
       for j = 1:i - 2
-         if !is_zero_entry(A, i, j)
+         if !is_zero_entry(m, i, j)
             return false
          end
       end
@@ -5078,8 +5078,8 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(Y::MatElem{T}) where {T <: RingElement}
-    charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
+    charpoly(m::MatElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, m::MatElem{T}) where {T <: RingElement}
 
 Return the characteristic polynomial $p$ of the square matrix $Y$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
@@ -5111,30 +5111,30 @@ julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 ```
 """
-function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
-   !is_square(Y) && error("Dimensions don't match in charpoly")
-   R = base_ring(Y)
-   base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
-   n = nrows(Y)
+function charpoly(S::PolyRing{T}, m::MatElem{T}) where {T <: RingElement}
+   !is_square(m) && error("Dimensions don't match in charpoly")
+   R = base_ring(m)
+   base_ring(S) != base_ring(m) && error("Cannot coerce into polynomial ring")
+   n = nrows(m)
    if n == 0
       return one(S)
    end
    F = Vector{elem_type(R)}(undef, n)
    A = Vector{elem_type(R)}(undef, n)
    M = Matrix{elem_type(R)}(undef, n - 1, n)
-   F[1] = -Y[1, 1]
+   F[1] = -m[1, 1]
    for i = 2:n
       F[i] = R()
       for j = 1:i
-         M[1, j] = Y[j, i]
+         M[1, j] = m[j, i]
       end
-      A[1] = Y[i, i]
+      A[1] = m[i, i]
       p = R()
       for j = 2:i - 1
          for k = 1:i
             s = R()
             for l = 1:i
-               s = addmul_delayed_reduction!(s, Y[k, l], M[j - 1, l], p)
+               s = addmul_delayed_reduction!(s, m[k, l], M[j - 1, l], p)
             end
             s = reduce!(s)
             M[j, k] = s
@@ -5143,7 +5143,7 @@ function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
       end
       s = R()
       for j = 1:i
-         s = addmul_delayed_reduction!(s, Y[i, j], M[i - 1, j], p)
+         s = addmul_delayed_reduction!(s, m[i, j], M[i - 1, j], p)
       end
       s = reduce!(s)
       A[i] = s
@@ -5283,8 +5283,8 @@ function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) whe
 end
 
 @doc raw"""
-    minpoly(M::MatElem{T}) where {T <: RingElement}
-    minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
+    minpoly(m::MatElem{T}) where {T <: RingElement}
+    minpoly(S::PolyRing{T}, m::MatElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the square matrix $M$.
 If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
@@ -5314,17 +5314,17 @@ x^2 + 10*x
 
 ```
 """
-function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   !is_square(M) && error("Not a square matrix in minpoly")
-   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
-   n = nrows(M)
+function minpoly(S::PolyRing{T}, m::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   !is_square(m) && error("Not a square matrix in minpoly")
+   base_ring(S) != base_ring(m) && error("Unable to coerce polynomial")
+   n = nrows(m)
    if n == 0
       return one(S)
    end
-   R = base_ring(M)
+   R = base_ring(m)
    p = one(S)
-   A = similar(M, n + 1, 2n + 1)
-   B = similar(M, n, n)
+   A = similar(m, n + 1, 2n + 1)
+   B = similar(m, n, n)
    L1 = zeros(Int, n + 1)
    for i in 1:n + 1
       L1[i] = i + n
@@ -5337,7 +5337,7 @@ function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) whe
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = zero(M, n, 1)
+      v = zero(m, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -5359,7 +5359,7 @@ function minpoly(S::PolyRing{T}, M::MatElem{T}, charpoly_only::Bool = false) whe
       while c1 <= n && r1 <= n
          r1 += 1
          r2 = indep ? r2 + 1 : r2
-         v = M*v
+         v = m*v
          for j = 1:n
             A[r1, j] = deepcopy(v[j, 1])
          end
@@ -5513,27 +5513,27 @@ end
 #  Vol. 8, No. 4, pp. 499-507.
 
 @doc raw"""
-    hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors(m::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using the algorithm of
 Kannan-Bachem. The input must have full column rank.
 """
-function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
-   _hnf_minors!(H, similar(A, 0, 0), Val(false))
+function hnf_minors(m::MatrixElem{T}) where {T <: RingElement}
+   H = deepcopy(m)
+   _hnf_minors!(H, similar(m, 0, 0), Val(false))
    return H
 end
 
 @doc raw"""
-    hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors_with_transform(m::MatrixElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 have full column rank.
 """
-function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
-   U = similar(A, nrows(A), nrows(A))
+function hnf_minors_with_transform(m::MatrixElem{T}) where {T <: RingElement}
+   H = deepcopy(m)
+   U = similar(m, nrows(m), nrows(m))
    _hnf_minors!(H, U, Val(true))
    return H, U
 end
@@ -5777,24 +5777,24 @@ end
 #  Kannan-Bachem algorithm
 
 @doc raw"""
-    hnf_kb(A::MatElem{T}) where {T <: RingElement}
+    hnf_kb(m::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using a modification
 of the algorithm of Kannan-Bachem.
 """
-function hnf_kb(A::MatElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val(false))
+function hnf_kb(m::MatElem{T}) where {T <: RingElement}
+   return _hnf_kb(m, Val(false))
 end
 
 @doc raw"""
-    hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
+    hnf_kb_with_transform(m::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 matrix $U$ with $UA = H$ using a modification of the algorithm of
 Kannan-Bachem.
 """
-function hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
-   return _hnf_kb(A, Val(true))
+function hnf_kb_with_transform(m::MatElem{T}) where {T <: RingElement}
+   return _hnf_kb(m, Val(true))
 end
 
 function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
@@ -5995,7 +5995,7 @@ function hnf_kb!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false, start_e
 end
 
 @doc raw"""
-    hnf(A::MatElem{T}) where {T <: RingElement}
+    hnf(m::MatElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$.
 
@@ -6019,12 +6019,12 @@ julia> is_hnf(H)
 true
 ```
 """
-function hnf(A::MatElem{T}) where {T <: RingElement}
-  return hnf_kb(A)
+function hnf(m::MatElem{T}) where {T <: RingElement}
+  return hnf_kb(m)
 end
 
 @doc raw"""
-    hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
+    hnf_with_transform(m::MatElem{T}) where {T <: RingElement}
 
 Return the upper right row Hermite normal form of $A$, together with a
 transformation matrix.
@@ -6048,12 +6048,12 @@ julia> U*A == H
 true
 ```
 """
-function hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
-  return hnf_kb_with_transform(A)
+function hnf_with_transform(m::MatElem{T}) where {T <: RingElement}
+  return hnf_kb_with_transform(m)
 end
 
 @doc raw"""
-    is_hnf(M::MatElem{T}) where {T <: RingElement}
+    is_hnf(m::MatElem{T}) where {T <: RingElement}
 
 Return `true` if the matrix $M$ is in Hermite normal form, and `false`
 otherwise.
@@ -6078,17 +6078,17 @@ julia> is_hnf(H)
 true
 ```
 """
-function is_hnf(M::MatElem{T}) where {T <: RingElement}
-   r = nrows(M)
-   c = ncols(M)
+function is_hnf(m::MatElem{T}) where {T <: RingElement}
+   r = nrows(m)
+   c = ncols(m)
    row = 1
    col = 1
    pivots = zeros(Int, r)
    # first check the staircase, since it is cheap to do
    while row <= r
-      while col <= c && M[row, col] == 0
+      while col <= c && m[row, col] == 0
          for i = row + 1:r
-            if M[i, col] != 0
+            if m[i, col] != 0
                return false
             end
          end
@@ -6097,7 +6097,7 @@ function is_hnf(M::MatElem{T}) where {T <: RingElement}
       if col <= c # found pivot
          pivots[row] = col
          for i = row + 1:r
-            if M[i, col] != 0
+            if m[i, col] != 0
                return false
             end
          end
@@ -6109,10 +6109,10 @@ function is_hnf(M::MatElem{T}) where {T <: RingElement}
    row = 1
    while row <= r && pivots[row] != 0
       col = pivots[row]
-      p = M[row, col]
+      p = m[row, col]
       for i = 1:row - 1
-         qq, rr = divrem(M[i, col], p)
-         if rr != M[i, col]
+         qq, rr = divrem(m[i, col], p)
+         if rr != m[i, col]
             return false
          end
       end
@@ -6128,7 +6128,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_snf(A::MatElem{T}) where {T <: RingElement}
+    is_snf(m::MatElem{T}) where {T <: RingElement}
 
 Return `true` if $A$ is in Smith normal form, and `false` otherwise.
 
@@ -6149,23 +6149,23 @@ julia> is_snf(S)
 true
 ```
 """
-function is_snf(A::MatElem{T}) where {T <: RingElement}
-   m = nrows(A)
-   n = ncols(A)
-   a = A[1, 1]
-   for i = 2:min(m, n)
-      q, r = divrem(A[i, i], a)
+function is_snf(m::MatElem{T}) where {T <: RingElement}
+   nr = nrows(m)
+   n = ncols(m)
+   a = m[1, 1]
+   for i = 2:min(nr, n)
+      q, r = divrem(m[i, i], a)
       if !iszero(r)
          return false
       end
-      a = A[i,i]
+      a = m[i,i]
    end
    for i = 1:n
-      for j = 1:m
+      for j = 1:nr
          if i == j
             continue
          end
-         if !is_zero_entry(A, j, i)
+         if !is_zero_entry(m, j, i)
             return false
          end
       end
@@ -6324,7 +6324,7 @@ function snf(A::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    snf_with_transform(A::MatElem{T}) where {T <: RingElement}
+    snf_with_transform(m::MatElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$, together with transformation
 matrices.
@@ -6347,8 +6347,8 @@ julia> T*A*U == S
 true
 ```
 """
-function snf_with_transform(a::MatElem{T}) where {T <: RingElement}
-  return snf_kb_with_transform(a)
+function snf_with_transform(m::MatElem{T}) where {T <: RingElement}
+  return snf_kb_with_transform(m)
 end
 
 ################################################################################
@@ -6358,7 +6358,7 @@ end
 ################################################################################
 
 @doc raw"""
-    is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+    is_weak_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 
 Return `true` if $P$ is in weak Popov form with the given rank, and
 `false` otherwise.
@@ -6382,12 +6382,12 @@ julia> is_weak_popov(P, 3)
 false
 ```
 """
-function is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+function is_weak_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
-   pivots = zeros(ncols(P))
-   for r = 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] == 0
+   pivots = zeros(ncols(m))
+   for r = 1:nrows(m)
+      p = find_pivot_popov(m, r)
+      if m[r, p] == 0
          zero_rows += 1
          continue
       end
@@ -6397,14 +6397,14 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
       end
       pivots[p] = r
    end
-   if zero_rows != nrows(P) - rank
+   if zero_rows != nrows(m) - rank
       return false
    end
    return true
 end
 
 @doc raw"""
-    is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+    is_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 
 Return `true` if $P$ is in Popov form with the given rank, and `false`
 otherwise.
@@ -6428,24 +6428,24 @@ julia> is_popov(P, 2)
 true
 ```
 """
-function is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+function is_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
-   for r = 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] != 0
+   for r = 1:nrows(m)
+      p = find_pivot_popov(m, r)
+      if m[r, p] != 0
          break
       end
       zero_rows += 1
    end
    # The zero rows must all be on top.
-   if zero_rows != nrows(P) - rank
+   if zero_rows != nrows(m) - rank
       return false
    end
-   pivotscr = zeros(Int, ncols(P)) # pivotscr[i] == j means the pivot of column i is in row j
-   pivots = zeros(Int, nrows(P)) # the other way round
-   for r = zero_rows + 1:nrows(P)
-      p = find_pivot_popov(P, r)
-      if P[r, p] == 0
+   pivotscr = zeros(Int, ncols(m)) # pivotscr[i] == j means the pivot of column i is in row j
+   pivots = zeros(Int, nrows(m)) # the other way round
+   for r = zero_rows + 1:nrows(m)
+      p = find_pivot_popov(m, r)
+      if m[r, p] == 0
          return false
       end
       if pivotscr[p] != 0
@@ -6455,22 +6455,22 @@ function is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
       pivotscr[p] = r
       pivots[r] = p
    end
-   for r = zero_rows + 1:nrows(P)
+   for r = zero_rows + 1:nrows(m)
       p = pivots[r]
-      f = P[r, p]
+      f = m[r, p]
       if !isone(leading_coefficient(f))
          return false
       end
-      for i = 1:nrows(P)
+      for i = 1:nrows(m)
          i == r ? continue : nothing
-         if degree(P[i, p]) >= degree(f)
+         if degree(m[i, p]) >= degree(f)
             return false
          end
       end
-      if r == nrows(P)
+      if r == nrows(m)
          break
       end
-      g = P[r + 1, pivots[r + 1]]
+      g = m[r + 1, pivots[r + 1]]
       if degree(f) >= degree(g)
          if pivots[r] >= pivots[r + 1]
             return false
@@ -6481,7 +6481,7 @@ function is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 end
 
 @doc raw"""
-    weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
+    weak_popov(m::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$.
 
@@ -6505,12 +6505,12 @@ julia> P = weak_popov(A)
 [-x^3   -2*x^3 + x^2 - 2*x + 1   -2*x^3 + x^2 - 3*x   1]
 ```
 """
-function weak_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val(false))
+function weak_popov(m::MatElem{T}) where {T <: PolyRingElem}
+   return _weak_popov(m, Val(false))
 end
 
 @doc raw"""
-    weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
+    weak_popov_with_transform(m::MatElem{T}) where {T <: PolyRingElem}
 
 Return the weak Popov form of $A$, together with a transformation matrix.
 
@@ -6538,8 +6538,8 @@ julia> U*A == P
 true
 ```
 """
-function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _weak_popov(A, Val(true))
+function weak_popov_with_transform(m::MatElem{T}) where {T <: PolyRingElem}
+   return _weak_popov(m, Val(true))
 end
 
 function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
@@ -6558,26 +6558,26 @@ function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T
 end
 
 @doc raw"""
-    extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
+    extended_weak_popov(m::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
 Return the tuple $(P, W)$.
 """
-function extended_weak_popov(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val(false))
+function extended_weak_popov(m::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
+   return _extended_weak_popov(m, V, Val(false))
 end
 
 @doc raw"""
-    extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
+    extended_weak_popov_with_transform(m::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
 
 Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 on $A$, a vector $W$ by applying the same transformations on the vector $V$,
 and a transformation matrix $U$ so that $P = UA$.
 Return the tuple $(P, W, U)$.
 """
-function extended_weak_popov_with_transform(A::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
-   return _extended_weak_popov(A, V, Val(true))
+function extended_weak_popov_with_transform(m::MatElem{T}, V::MatElem{T}) where {T <: PolyRingElem}
+   return _extended_weak_popov(m, V, Val(true))
 end
 
 function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
@@ -6690,16 +6690,16 @@ function weak_popov_with_pivots!(P::MatElem{T}, W::MatElem{T}, U::MatElem{T}, pi
 end
 
 @doc raw"""
-    rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
+    rank_profile_popov(m::MatElem{T}) where {T <: PolyRingElem}
 
 Return an array of $r$ row indices such that these rows of $A$ are linearly
 independent, where $r$ is the rank of $A$.
 """
-function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   B = deepcopy(A)
-   m = nrows(A)
-   n = ncols(A)
-   U = similar(A, 0, 0)
+function rank_profile_popov(m::MatElem{T}) where {T <: PolyRingElem}
+   B = deepcopy(m)
+   nr = nrows(m)
+   n = ncols(m)
+   U = similar(m, 0, 0)
    V = U
    r = 0
    rank_profile = Vector{Int}(undef, 0)
@@ -6713,7 +6713,7 @@ function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
       r = 1
       push!(rank_profile, 1)
    end
-   for i = 2:m
+   for i = 2:nr
       p = find_pivot_popov(B, i)
       !is_zero_entry(B, i, p) ? push!(pivots[p], i) : nothing
       weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
@@ -6796,7 +6796,7 @@ function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
 end
 
 @doc raw"""
-    popov(A::MatElem{T}) where {T <: PolyRingElem}
+    popov(m::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$.
 
@@ -6821,12 +6821,12 @@ julia> P = popov(A)
 [1//2*x^3   x^3 - 1//2*x^2 + x - 1//2   x^3 - 1//2*x^2 + 3//2*x   -1//2]
 ```
 """
-function popov(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val(false))
+function popov(m::MatElem{T}) where {T <: PolyRingElem}
+   return _popov(m, Val(false))
 end
 
 @doc raw"""
-    popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
+    popov_with_transform(m::MatElem{T}) where {T <: PolyRingElem}
 
 Return the Popov form of $A$, together with a transformation matrix.
 
@@ -6855,8 +6855,8 @@ julia> U*A == P
 true
 ```
 """
-function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
-   return _popov(A, Val(true))
+function popov_with_transform(m::MatElem{T}) where {T <: PolyRingElem}
+   return _popov(m, Val(true))
 end
 
 function _popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
@@ -7123,7 +7123,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+    similarity!(m::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
 
 Apply a similarity transformation to the square matrix $A$ in-place.
 
@@ -7152,28 +7152,28 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 julia> similarity!(M, 1, R(3))
 ```
 """
-function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
-   n = nrows(A)
-   t = base_ring(A)()
+function similarity!(m::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+   n = nrows(m)
+   t = base_ring(m)()
    for i = 1:n
       for j = 1:r - 1
-         t = mul!(t, A[i, r], d)
-         A[i, j] = add!(A[i, j], t)
+         t = mul!(t, m[i, r], d)
+         m[i, j] = add!(m[i, j], t)
       end
       for j = r + 1:n
-         t = mul!(t, A[i, r], d)
-         A[i, j] = add!(A[i, j], t)
+         t = mul!(t, m[i, r], d)
+         m[i, j] = add!(m[i, j], t)
       end
    end
    d = -d
    for i = 1:n
       for j = 1:r - 1
-         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
+         m[r, i] = addmul_delayed_reduction!(m[r, i], m[j, i], d, t)
       end
       for j = r + 1:n
-         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
+         m[r, i] = addmul_delayed_reduction!(m[r, i], m[j, i], d, t)
       end
-      A[r, i] = reduce!(A[r, i])
+      m[r, i] = reduce!(m[r, i])
    end
 end
 
@@ -7184,7 +7184,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
 Return a new matrix obtained from `a` by swapping the `i`-th and `j`-th rows.
 
@@ -7209,15 +7209,15 @@ julia> M
 [0   0   1]
 ```
 """
-function swap_rows(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
-   b = deepcopy(a)
+function swap_rows(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+   (1 <= i <= nrows(m) && 1 <= j <= nrows(m)) || throw(BoundsError())
+   b = deepcopy(m)
    swap_rows!(b, i, j)
    return b
 end
 
 @doc raw"""
-    swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_rows!(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
 Swap the `i`-th and `j`-th rows of `a` in place and return the modified
 matrix `a`.
@@ -7242,90 +7242,90 @@ julia> M
 [0   0   1]
 ```
 """
-function swap_rows!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_rows!(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
-      for k = 1:ncols(a)
-         a[i, k], a[j, k] = a[j, k], a[i, k]
+      for k = 1:ncols(m)
+         m[i, k], m[j, k] = m[j, k], m[i, k]
       end
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
 Return a new matrix obtained from `a` by swapping the `i`-th and `j`-th
 columns.
 """
-function swap_cols(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
-   (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
-   b = deepcopy(a)
+function swap_cols(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+   (1 <= i <= ncols(m) && 1 <= j <= ncols(m)) || throw(BoundsError())
+   b = deepcopy(m)
    swap_cols!(b, i, j)
    return b
 end
 
 @doc raw"""
-    swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+    swap_cols!(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 
 Swap the `i`-th and `j`-th columns of `a` in place and return the modified
 matrix `a`.
 
 No bounds checking is performed; the indices `i` and `j` must be in range.
 """
-function swap_cols!(a::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
+function swap_cols!(m::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    if i != j
-      for k = 1:nrows(a)
-         a[k, i], a[k, j] = a[k, j], a[k, i]
+      for k = 1:nrows(m)
+         m[k, i], m[k, j] = m[k, j], m[k, i]
       end
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    reverse_rows!(a::MatElem{T}) where T <: NCRingElement
+    reverse_rows!(m::MatElem{T}) where T <: NCRingElement
 
 Reverse the order of the rows of `a` in place and return the modified
 matrix `a`.
 """
-function reverse_rows!(a::MatElem{T}) where T <: NCRingElement
-   k = div(nrows(a), 2)
+function reverse_rows!(m::MatElem{T}) where T <: NCRingElement
+   k = div(nrows(m), 2)
    for i in 1:k
-      swap_rows!(a, i, nrows(a) - i + 1)
+      swap_rows!(m, i, nrows(m) - i + 1)
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    reverse_rows(a::MatElem{T}) where T <: NCRingElement
+    reverse_rows(m::MatElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained from `a` by reversing the order of its rows.
 """
-function reverse_rows(a::MatElem{T}) where T <: NCRingElement
-   b = deepcopy(a)
+function reverse_rows(m::MatElem{T}) where T <: NCRingElement
+   b = deepcopy(m)
    return reverse_rows!(b)
 end
 
 @doc raw"""
-    reverse_cols!(a::MatElem{T}) where T <: NCRingElement
+    reverse_cols!(m::MatElem{T}) where T <: NCRingElement
 
 Reverse the order of the columns of `a` in place and return the modified
 matrix `a`.
 """
-function reverse_cols!(a::MatElem{T}) where T <: NCRingElement
-   k = div(ncols(a), 2)
+function reverse_cols!(m::MatElem{T}) where T <: NCRingElement
+   k = div(ncols(m), 2)
    for i in 1:k
-      swap_cols!(a, i, ncols(a) - i + 1)
+      swap_cols!(m, i, ncols(m) - i + 1)
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    reverse_cols(a::MatElem{T}) where T <: NCRingElement
+    reverse_cols(m::MatElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained from `a` by reversing the order of its columns.
 """
-function reverse_cols(a::MatElem{T}) where T <: NCRingElement
-   b = deepcopy(a)
+function reverse_cols(m::MatElem{T}) where T <: NCRingElement
+   b = deepcopy(m)
    return reverse_cols!(b)
 end
 
@@ -7336,7 +7336,7 @@ end
 ################################################################################
 
 @doc raw"""
-    add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
+    add_column!(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(m)) where T <: RingElement
 
 Add `s` times the `i`-th column to the `j`-th column of `a` and return the
 modified matrix `a`.
@@ -7369,21 +7369,21 @@ julia> add_column!(M, 2, 3, 1, 1:1)
 [14   5   5]
 ```
 """
-function add_column!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
-   v = base_ring(a)(s)
-   nc = ncols(a)
+function add_column!(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(m)) where T <: RingElement
+   v = base_ring(m)(s)
+   nc = ncols(m)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
    !_checkbounds(nc, j) && error("Column index ($j) must be between 1 and $nc")
-   temp = base_ring(a)()
+   temp = base_ring(m)()
    for r in rows
-      temp = mul!(temp, v, a[r, i])
-      a[r, j] += temp # cannot mutate matrix entries
+      temp = mul!(temp, v, m[r, i])
+      m[r, j] += temp # cannot mutate matrix entries
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
+    add_column(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(m)) where T <: RingElement
 
 Return a new matrix obtained from `a` by adding `s` times the `i`-th
 column to the `j`-th column.
@@ -7416,13 +7416,13 @@ julia> add_column(M, 2, 3, 1, 1:1)
 [4   5   5]
 ```
 """
-function add_column(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(a)) where T <: RingElement
-   b = deepcopy(a)
+function add_column(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(m)) where T <: RingElement
+   b = deepcopy(m)
    return add_column!(b, s, i, j, rows)
 end
 
 @doc raw"""
-    add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
+    add_row!(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(m)) where T <: RingElement
 
 Add `s` times the `i`-th row to the `j`-th row of `a` and return the modified
 matrix `a`.
@@ -7431,21 +7431,21 @@ By default, this operation modifies all entries of the `j`-th row.
 An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function add_row!(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
-   v = base_ring(a)(s)
-   nr = nrows(a)
+function add_row!(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(m)) where T <: RingElement
+   v = base_ring(m)(s)
+   nr = nrows(m)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
    !_checkbounds(nr, j) && error("Row index ($j) must be between 1 and $nr")
-   temp = base_ring(a)()
+   temp = base_ring(m)()
    for c in cols
-      temp = mul!(temp, v, a[i, c])
-      a[j, c] += temp # cannot mutate matrix entries
+      temp = mul!(temp, v, m[i, c])
+      m[j, c] += temp # cannot mutate matrix entries
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
+    add_row(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(m)) where T <: RingElement
 
 Return a new matrix obtained from `a` by adding `s` times the `i`-th
 row to the `j`-th row.
@@ -7454,15 +7454,15 @@ By default, this operation changes all entries of the `j`-th row in the returned
 matrix. An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function add_row(a::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(a)) where T <: RingElement
-   b = deepcopy(a)
+function add_row(m::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(m)) where T <: RingElement
+   b = deepcopy(m)
    return add_row!(b, s, i, j, cols)
 end
 
 # Multiply column
 
 @doc raw"""
-    multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
+    multiply_column!(m::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(m)) where T <: RingElement
 
 Multiply the `i`-th column of `a` by `s` and return the modified matrix `a`.
 
@@ -7470,19 +7470,19 @@ By default, this operation modifies all entries of the `i`-th column.
 An optional final argument restricts the operation to entries in the
 specified rows.
 """
-function multiply_column!(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
-   c = base_ring(a)(s)
-   nc = ncols(a)
+function multiply_column!(m::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(m)) where T <: RingElement
+   c = base_ring(m)(s)
+   nc = ncols(m)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
-   temp = base_ring(a)()
+   temp = base_ring(m)()
    for r in rows
-      a[r, i] = c*a[r, i] # cannot mutate matrix entries
+      m[r, i] = c*m[r, i] # cannot mutate matrix entries
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
+    multiply_column(m::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(m)) where T <: RingElement
 
 Return a new matrix obtained from `a` by multiplying the `i`-th column by `s`.
 
@@ -7490,15 +7490,15 @@ By default, this operation changes all entries of the `i`-th column in the retur
 matrix. An optional final argument restricts the operation to entries in the
 specified rows.
 """
-function multiply_column(a::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(a)) where T <: RingElement
-   b = deepcopy(a)
+function multiply_column(m::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(m)) where T <: RingElement
+   b = deepcopy(m)
    return multiply_column!(b, s, i, rows)
 end
 
 # Multiply row
 
 @doc raw"""
-    multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
+    multiply_row!(m::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(m)) where T <: RingElement
 
 Multiply the `i`-th row of `a` by `s` and return the modified matrix `a`.
 
@@ -7506,19 +7506,19 @@ By default, this operation modifies all entries of the `i`-th row.
 An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function multiply_row!(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
-   c = base_ring(a)(s)
-   nr = nrows(a)
+function multiply_row!(m::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(m)) where T <: RingElement
+   c = base_ring(m)(s)
+   nr = nrows(m)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
-   temp = base_ring(a)()
+   temp = base_ring(m)()
    for r in cols
-      a[i, r] = c*a[i, r] # cannot mutate matrix entries
+      m[i, r] = c*m[i, r] # cannot mutate matrix entries
    end
-   return a
+   return m
 end
 
 @doc raw"""
-    multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
+    multiply_row(m::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(m)) where T <: RingElement
 
 Return a new matrix obtained from `a` by multiplying the `i`-th row by `s`.
 
@@ -7550,8 +7550,8 @@ julia> multiply_row(M, 2, 3, 2:2)
 [4   10   5]
 ```
 """
-function multiply_row(a::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(a)) where T <: RingElement
-   b = deepcopy(a)
+function multiply_row(m::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(m)) where T <: RingElement
+   b = deepcopy(m)
    return multiply_row!(b, s, i, cols)
 end
 
@@ -7562,7 +7562,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    Base.vcat(A::MatElem...)
+    Base.vcat(m::MatElem...)
 
 Return the vertical concatenation of the matrices in $A$.
 
@@ -7591,11 +7591,11 @@ julia> vcat(M, N)
 [1   0   1]
 ```
 """
-function Base.vcat(A::MatElem...)
+function Base.vcat(m::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
   # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
   # producing an array of the arguments.
-  return _vcat(A)
+  return _vcat(m)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -7624,7 +7624,7 @@ function _vcat(A)
 end
 
 @doc raw"""
-    Base.hcat(A::MatElem...)
+    Base.hcat(m::MatElem...)
 
 Return the horizontal concatenation of the matrices in $A$.
 
@@ -7650,11 +7650,11 @@ julia> hcat(M, N)
 [3   4   5   1   0   1]
 ```
 """
-function Base.hcat(A::MatElem...)
+function Base.hcat(m::MatElem...)
   # We don't add a type parameter T <: NCRingElement, so that this function is
   # called for e.g. vcat(QQ[1 0; 0 1], ZZ[1 0; 0 1]) and ERRORS instead of
   # producing an array of the arguments.
-  return _hcat(A)
+  return _hcat(m)
 end
 
 # this leads to an ambiguity when calling `reduce(hcat, Union{}[])`, but we don't have a better solution right now
@@ -7745,7 +7745,7 @@ _change_base_ring(R::NCRing, a::MatElem) = dense_matrix_type(R)(R, undef, nrows(
 _change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
-    change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
+    change_base_ring(R::NCRing, m::MatrixElem{T}) where {T <: NCRingElement}
 
 Return a new matrix over `R` by coercing each entry of `M` into `R`.
 
@@ -7766,10 +7766,10 @@ julia> base_ring(N)
 Rationals
 ```
 """
-function change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
-   N = _change_base_ring(R, M)
-   for i = 1:nrows(M), j = 1:ncols(M)
-      N[i,j] = R(M[i,j])
+function change_base_ring(R::NCRing, m::MatrixElem{T}) where {T <: NCRingElement}
+   N = _change_base_ring(R, m)
+   for i = 1:nrows(m), j = 1:ncols(m)
+      N[i,j] = R(m[i,j])
    end
    return N
 end
@@ -7825,7 +7825,7 @@ This is equivalent to `map_entries!(f, dst, src)`, see [`map_entries!`](@ref).
 Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc raw"""
-    map_entries(f, a::MatElem{T}) where T <: NCRingElement
+    map_entries(f, m::MatElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained by applying `f` to each entry of the
 matrix `a`.
@@ -7842,27 +7842,27 @@ julia> M2 = map_entries(x -> x^2, M)
 [9   16]
 ```
 """
-function map_entries(f::S, a::MatElem{T}) where {S, T <: NCRingElement}
-   isempty(a) && return _change_base_ring(parent(f(zero(base_ring(a)))), a)
-   b11 = f(a[1, 1])
-   b = _change_base_ring(parent(b11), a)
+function map_entries(f::S, m::MatElem{T}) where {S, T <: NCRingElement}
+   isempty(m) && return _change_base_ring(parent(f(zero(base_ring(m)))), m)
+   b11 = f(m[1, 1])
+   b = _change_base_ring(parent(b11), m)
    b[1, 1] = b11
-   for i = 1:nrows(a), j = 1:ncols(a)
+   for i = 1:nrows(m), j = 1:ncols(m)
       i == j == 1 && continue
-      b[i, j] = f(a[i, j])
+      b[i, j] = f(m[i, j])
    end
    b
 end
 
 @doc raw"""
-    map(f, a::MatrixElem{T}) where T <: NCRingElement
+    map(f, m::MatrixElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained by applying `f` to each entry of the
 matrix `a`.
 
 This is equivalent to `map_entries(f, a)`, see [`map_entries`](@ref).
 """
-Base.map(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, a)
+Base.map(f::S, m::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, m)
 
 ###############################################################################
 #
@@ -7990,7 +7990,7 @@ end
 ################################################################################
 
 @doc raw"""
-    matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
+    matrix(R::NCRing, m::AbstractMatrix{T}) where {T}
 
 Return the matrix over the ring `R` with entries as in the Julia
 `AbstractMatrix` `arr`. All entries of `arr` must be coercible into `R`.
@@ -8007,13 +8007,13 @@ julia> matrix(ZZ, BigInt[3 1 2; 2 0 1])
 [2   0   1]
 ```
 """
-function matrix(R::NCRing, arr::AbstractMatrix{T}) where {T}
-   Base.require_one_based_indexing(arr)
-   if elem_type(R) === T && all(e -> parent(e) === R, arr)
-      z = Generic.MatSpaceElem{elem_type(R)}(R, arr)
+function matrix(R::NCRing, m::AbstractMatrix{T}) where {T}
+   Base.require_one_based_indexing(m)
+   if elem_type(R) === T && all(e -> parent(e) === R, m)
+      z = Generic.MatSpaceElem{elem_type(R)}(R, m)
       return z
    else
-      mat = (arr isa Matrix{T}) ? arr : convert(Matrix{T}, arr)
+      mat = (m isa Matrix{T}) ? m : convert(Matrix{T}, m)
       arr_coerce = convert(Matrix{elem_type(R)}, map(R, mat))::Matrix{elem_type(R)}
       return matrix(R, arr_coerce)
    end
@@ -8162,7 +8162,7 @@ julia> identity_matrix(ZZ, 2)
 identity_matrix(R::NCRing, n::Int) = diagonal_matrix(one(R), n)
 
 @doc raw"""
-    identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
+    identity_matrix(m::MatElem{T}) where {T <: NCRingElement}
 
 Return the identity matrix with the same base ring and dimensions
 as the given abstract matrix `M`. The matrix `M` must be square.
@@ -8181,21 +8181,21 @@ julia> identity_matrix(M)
 [0   1]
 ```
 """
-function identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
-   is_square(M) || throw(DomainError(M, "matrix must be square"))
-   return identity_matrix(M, nrows(M))
+function identity_matrix(m::MatElem{T}) where {T <: NCRingElement}
+   is_square(m) || throw(DomainError(m, "matrix must be square"))
+   return identity_matrix(m, nrows(m))
 end
 
 
 @doc raw"""
-    identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
+    identity_matrix(m::MatElem{T}, n::Int) where {T <: NCRingElement}
 
 Return the identity $n \times n$ matrix over the same base ring
 as the given abstract matrix `M`.
 """
-function identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
-   z = zero(M, n, n)
-   R = base_ring(M)
+function identity_matrix(m::MatElem{T}, n::Int) where {T <: NCRingElement}
+   z = zero(m, n, n)
+   R = base_ring(m)
    for i = 1:n
       z[i, i] = one(R)
    end
