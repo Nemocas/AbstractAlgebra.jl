@@ -6295,7 +6295,7 @@ function snf_kb!(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, with_trafo::Bool =
 end
 
 @doc raw"""
-    snf(A::MatElem{T}) where {T <: RingElement}
+    snf(m::MatElem{T}) where {T <: RingElement}
 
 Return the Smith normal form of $A$.
 
@@ -6319,8 +6319,8 @@ julia> is_snf(S)
 true
 ```
 """
-function snf(A::MatElem{T}) where {T <: RingElement}
-  return snf_kb(A)
+function snf(m::MatElem{T}) where {T <: RingElement}
+  return snf_kb(m)
 end
 
 @doc raw"""
