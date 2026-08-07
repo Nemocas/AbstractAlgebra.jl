@@ -2162,7 +2162,7 @@ julia> r, p, L, U = lu(M)
 (3, (), [1 0 0; 4 1 0; 0 0 1], [1 2 3; 0 -3 -6; 0 0 1])
 ```
 """
-function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -2189,6 +2189,12 @@ function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldEle
       end
    end
    return rank, p, L, U
+end
+
+function lu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+  S = parent(A)
+  r, p, L, U = lu(matrix(A))
+  return r, p, S(L), S(U)
 end
 
 function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
@@ -2334,7 +2340,7 @@ julia> r, d, p, L, U = fflu(M)
 (3, -3//1, (), [1 0 0; 4 -3 0; 0 0 -3], [1 2 3; 0 -3 -6; 0 0 -3])
 ```
 """
-function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+function fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -2374,6 +2380,12 @@ function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEl
    end
 
    return rank, d, p, L, U
+end
+
+function fflu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+  S = parent(A)
+  rank, d, p, L, U = fflu(matrix(A))
+  return rank, d, p, S(L), S(U)
 end
 
 ###############################################################################
