@@ -370,6 +370,10 @@ end
 # Division is not possible generically due to the possibility of non-units
 # that are also non-zero divisors
 
+function divexact(a::TotFrac{T}, b::TotFrac{T}; check::Bool=true)  where {T <: RingElem}
+  return a*inv(b)  # inv(b) will throw if b is a zero divisor
+end
+
 ##############################################################################
 #
 #  Evaluation
