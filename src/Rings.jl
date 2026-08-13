@@ -93,10 +93,6 @@ function evaluate(x::PolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 
-function evaluate(x::MPolyRingElem{T}, y::Integer) where T <: RingElem
-   return evaluate(x, base_ring(x)(y))
-end
-
 ###############################################################################
 #
 #   Type traits
