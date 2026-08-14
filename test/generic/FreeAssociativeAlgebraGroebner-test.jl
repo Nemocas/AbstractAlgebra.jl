@@ -1,5 +1,3 @@
-include("AhoCorasick-test.jl")
-
 @testset "Generic.FreeAssociativeAlgebra.groebner" begin
 
     R, (x, y, u, v, t, s) = free_associative_algebra(GF(2), ["x", "y", "u", "v", "t", "s"])
