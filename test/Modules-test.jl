@@ -16,12 +16,3 @@ function rand_module(R::AbstractAlgebra.Ring, vals...)
    end
    return M
 end
-
-
-include("generic/FreeModule-test.jl")
-include("generic/ModuleHomomorphism-test.jl")
-include("generic/Submodule-test.jl")
-include("generic/QuotientModule-test.jl")
-include("generic/DirectSum-test.jl")
-include("generic/Module-test.jl")
-include("generic/InvariantFactorDecomposition-test.jl")

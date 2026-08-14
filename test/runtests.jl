@@ -1,6 +1,19 @@
 using ParallelTestRunner
 using AbstractAlgebra
 
+# artificially low cutoffs for testing purposes
+function AbstractAlgebra.hgcd_prefers_basecase(a::T, b::T) where T <: PolyRingElem
+   return degree(b) < 5
+end
+
+function AbstractAlgebra.mat22_mul_prefers_classical(
+   a11::T, a12::T, a21::T, a22::T,
+   b11::T, b12::T, b21::T, b22::T
+) where T <: PolyRingElem
+
+   return degree(a11) + degree(a22) < 4 || degree(b11) + degree(b22) < 4
+end
+
 # disable until we encounter GC problems again
 if false # VERSION >= v"1.8.0"
   GC.enable_logging(true)
