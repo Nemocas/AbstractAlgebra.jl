@@ -61,7 +61,7 @@ if false # VERSION >= v"1.8.0"
 end
 
 # Start with autodiscovered tests
-testsuite = find_tests(pwd())
+testsuite = find_tests(@__DIR__)
 
 # Parse arguments
 args = parse_args(ARGS)
