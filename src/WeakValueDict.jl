@@ -115,8 +115,13 @@ function _deleteindex!(h::WeakValueCache, index)
    h.nmissing += 1
    h.slots[index] = 0x2
    h.age += 1
-   Base._unsetindex!(h.keys, index)
-   Base._unsetindex!(h.vals, index)
+   @static if VERSION >= v"1.14.0-DEV.2908" # https://github.com/JuliaLang/julia/pull/62181
+      Base.unsetindex!(h.keys, index)
+      Base.unsetindex!(h.vals, index)
+   else
+      Base._unsetindex!(h.keys, index)
+      Base._unsetindex!(h.vals, index)
+   end
    return h
 end
 
