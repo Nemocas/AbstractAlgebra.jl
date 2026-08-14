@@ -14,6 +14,30 @@ function AbstractAlgebra.mat22_mul_prefers_classical(
    return degree(a11) + degree(a22) < 4 || degree(b11) + degree(b22) < 4
 end
 
+const init_code = quote
+  using Test
+  using AbstractAlgebra
+
+  function rand_module(R::AbstractAlgebra.Ring, vals...)
+    rk = rand(0:5)
+    M = free_module(R, rk)
+    levels = rand(0:3)
+    for i = 1:levels
+      if ngens(M) == 0
+        break
+      end
+      G = [rand(M, vals...) for i in 1:rand(1:ngens(M))]
+      S, f = sub(M, G)
+      if rand(1:2) == 1
+        M, f = quo(M, S)
+      else
+        M = S
+      end
+    end
+    return M
+  end
+end
+
 # disable until we encounter GC problems again
 if false # VERSION >= v"1.8.0"
   GC.enable_logging(true)
@@ -49,4 +73,4 @@ if filter_tests!(testsuite, args)
   delete!(testsuite, "utils/Banners/ModA/src/ModA")
 end
 
-runtests(AbstractAlgebra, args; testsuite)
+runtests(AbstractAlgebra, args; testsuite, init_code)
