@@ -1,7 +1,5 @@
+using ParallelTestRunner
 using AbstractAlgebra
-
-using Test
-
 
 # disable until we encounter GC problems again
 if false # VERSION >= v"1.8.0"
@@ -25,8 +23,17 @@ if false # VERSION >= v"1.8.0"
 =#
 end
 
-include("utils/Banners/banners.jl")
+# Start with autodiscovered tests
+testsuite = find_tests(pwd())
 
-include("Aqua.jl")
-include("rand.jl")
-include("AbstractAlgebra-test.jl")
+# Parse arguments
+args = parse_args(ARGS)
+
+if filter_tests!(testsuite, args)
+  # Remove Banners test packages
+  delete!(testsuite, "utils/Banners/ModA/src/ModA")
+  delete!(testsuite, "utils/Banners/ModA/src/ModA")
+  delete!(testsuite, "utils/Banners/ModA/src/ModA")
+end
+
+runtests(AbstractAlgebra, args; testsuite)
