@@ -69,8 +69,8 @@ args = parse_args(ARGS)
 if filter_tests!(testsuite, args)
   # Remove Banners test packages
   delete!(testsuite, "utils/Banners/ModA/src/ModA")
-  delete!(testsuite, "utils/Banners/ModA/src/ModA")
-  delete!(testsuite, "utils/Banners/ModA/src/ModA")
+  delete!(testsuite, "utils/Banners/ModB/src/ModB")
+  delete!(testsuite, "utils/Banners/ModC/src/ModC")
 end
 
 runtests(AbstractAlgebra, args; testsuite, init_code)
