@@ -10,13 +10,21 @@
 #
 ###############################################################################
 
-characteristic(R::LaurentMPolyRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::LaurentMPolyRing) = is_known(characteristic, base_ring(R))
+laurent_mpoly_type(::Type{T}) where T<:RingElement = Generic.LaurentMPolyWrap{T, mpoly_type(T), Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}}
+laurent_mpoly_type(::Type{S}) where S<:Ring = laurent_mpoly_type(elem_type(S))
+laurent_mpoly_type(x) = laurent_mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+laurent_mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+laurent_mpoly_type(T::Type{Union{}}) = throw(MethodError(laurent_mpoly_type, (T,)))
 
-is_finite(R::LaurentMPolyRing) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+laurent_mpoly_ring_type(x) = parent_type(laurent_mpoly_type(x))
+
+characteristic(R::LaurentMPolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::LaurentMPolyRing) = is_known(characteristic, coefficient_ring(R))
+
+is_finite(R::LaurentMPolyRing) = is_trivial(coefficient_ring(R)) || (nvars(R) == 0 && is_finite(coefficient_ring(R)))
 is_known(::typeof(is_finite), R::LaurentMPolyRing) =
-  is_known(is_trivial, base_ring(R)) &&
-    (is_trivial(base_ring(R)) || nvars(R) > 0 || is_known(is_finite, base_ring(R)))
+  is_known(is_trivial, coefficient_ring(R)) &&
+    (is_trivial(coefficient_ring(R)) || nvars(R) > 0 || is_known(is_finite, coefficient_ring(R)))
 
 ###############################################################################
 #
@@ -62,7 +70,7 @@ function show(io::IO, mime::MIME"text/plain", p::LaurentMPolyRing)
     println(io)
   end
   io = pretty(io)
-  print(io, Indent(), "over ", Lowercase(), base_ring(p))
+  print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
 end
 
@@ -74,7 +82,7 @@ function show(io::IO, p::LaurentMPolyRing)
   else
     io = pretty(io)
     print(io, "Multivariate Laurent polynomial ring in ", ItemQuantity(nvars(p), "variable"))
-    print(terse(io), " over ", Lowercase(), base_ring(p))
+    print(terse(io), " over ", Lowercase(), coefficient_ring(p))
   end
 end
 
@@ -113,7 +121,7 @@ function RandomExtensions.make(S::LaurentMPolyRing,
                                term_range::AbstractUnitRange{Int},
                                exp_bound::AbstractUnitRange{Int},
                                vs...)
-   R = base_ring(S)
+   R = coefficient_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       Make(S, term_range, exp_bound, vs[1])
    else
@@ -129,7 +137,7 @@ function rand(rng::AbstractRNG,
    S, term_range, exp_bound, v = sp[][1:end]
    f = zero(S)
    g = gens(S)
-   R = base_ring(S)
+   R = coefficient_ring(S)
    for i = 1:rand(rng, term_range)
       term = one(S)
       for j = 1:length(g)

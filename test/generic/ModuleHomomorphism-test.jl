@@ -1,5 +1,11 @@
 import AbstractAlgebra.PrettyPrinting
 
+function _cyclic_module(n::Int)
+   F = free_module(ZZ, 1)
+   S, _ = sub(F, [n*gen(F, 1)])
+   return quo(F, S)[1]
+end
+
 @testset "Generic.ModuleHomomorphism.constructors" begin
    M = free_module(ZZ, 2)
 
@@ -23,6 +29,29 @@ import AbstractAlgebra.PrettyPrinting
    @test g(m2) == N([ZZ(12)])
 
    @test !occursin("\n", sprint(show, g))
+
+   Z2 = _cyclic_module(2)
+   Z4 = _cyclic_module(4)
+
+   @test_throws ErrorException ModuleHomomorphism(Z2, Z4, matrix(ZZ, 1, 1, [1]))
+   @test_throws ErrorException ModuleHomomorphism(Z2, Z4, matrix(ZZ, 2, 2, [1, 0, 0, 1]))
+
+   h = ModuleHomomorphism(Z2, Z4, matrix(ZZ, 1, 1, [2]))
+   @test h(gen(Z2, 1)) == 2*gen(Z4, 1)
+
+   hv = ModuleHomomorphism(Z2, Z4, [2*gen(Z4, 1)])
+   @test hv(gen(Z2, 1)) == 2*gen(Z4, 1)
+
+   @test_throws ErrorException module_homomorphism(Z2, Z4, matrix(ZZ, 1, 1, [1]))
+   @test isa(module_homomorphism(Z2, Z4, matrix(ZZ, 1, 1, [1]); check = false),
+             Generic.Map(FunctionalMap))
+
+   @test_throws ErrorException hom(Z2, Z4, [gen(Z4, 1)])
+   @test isa(hom(Z2, Z4, [gen(Z4, 1)]; check = false), Generic.Map(FunctionalMap))
+
+   zhom = hom(free_module(ZZ, 0), Z4, elem_type(Z4)[])
+   @test domain(zhom) == free_module(ZZ, 0)
+   @test codomain(zhom) == Z4
 end
 
 @testset "Generic.ModuleHomomorphism.kernel" begin
@@ -205,6 +234,20 @@ end
       f = ModuleIsomorphism(M, M, N)
       @test mod(matrix(f)[1,1]*matrix(inv(f))[1,1], 304) == 1
     end
+  end
+  let
+    Z2 = _cyclic_module(2)
+    Z4 = _cyclic_module(4)
+
+    @test_throws ErrorException ModuleIsomorphism(Z2, Z4, matrix(ZZ, 1, 1, [1]))
+    @test_throws ErrorException ModuleIsomorphism(Z4, Z2, matrix(ZZ, 1, 1, [1]))
+
+    f = ModuleIsomorphism(Z4, Z4, matrix(ZZ, 1, 1, [3]))
+    @test inv(f)(f(gen(Z4, 1))) == gen(Z4, 1)
+    @test f(inv(f)(gen(Z4, 1))) == gen(Z4, 1)
+
+    g = module_isomorphism(Z4, Z4, matrix(ZZ, 1, 1, [3]))
+    @test inv(g)(g(gen(Z4, 1))) == gen(Z4, 1)
   end
 end
 

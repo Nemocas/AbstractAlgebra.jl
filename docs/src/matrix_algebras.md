@@ -4,154 +4,73 @@ CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# Generic matrix algebras
+# Matrix algebras
 
-AbstractAlgebra.jl allows the creation of an algebra (ring) of $m\times m$ matrices over
-a computable, commutative ring.
+A matrix algebra (or matrix ring) represents the collection of all square matrices
+of a fixed number of rows, referred to as the degree of the matrix algebra, over a
+fixed base ring. Matrix algebras are parent objects; their elements are the
+corresponding matrices.
 
-Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in
-`src/generic/MatRing.jl`. The remaining functionality is in the file
-`src/generic/Matrix.jl`.
+Matrix algebras are noncommutative rings. They support the usual ring
+operations, such as addition and multiplication, and can be used in
+constructions accepting noncommutative base rings.
 
-As well as implementing the entire Matrix interface, including the optional
-functionality, there are many additional generic algorithms implemented for matrix
-algebras.
+Although elements of matrix algebras mostly behave like matrices, their parent object
+is a matrix algebra rather than a matrix space. Therefore, some functionality
+available for matrices in matrix spaces is not available for matrix algebra
+elements, in particular functions which do not preserve square matrices (e.g.
+`kernel`).
 
-Almost all of the functionality specified for generic matrices is available for matrix
-algebras. The exceptions are functions such as `solve` and `nullspace` which may
-return non-square matrices, or which don't accept square matrices.
 
-All of the generic functionality is part of the Generic submodule of
-AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names
-of functions.
-
-## Types and parent objects
-
-Generic matrices in AbstractAlgebra.jl have type `Generic.MatRingElem{T}` for matrices in
-a matrix algebra, where `T` is the type of elements of the matrix. Internally, generic
-matrices are implemented using an object wrapping a Julia two dimensional array, though
-they are not themselves Julia arrays. See the file `src/generic/GenericTypes.jl` for
-details.
-
-Parents of generic matrices in a matrix algebra have type `Generic.MatRing{T}`.
-
-Note that matrix algebras are noncommutative rings. Thus their types belong to `NCRing`
-and `NCRingElem`. They cannot be used in constructions which require a commutative
-ring (`Ring` and `RingElem` respectively).
-
-The generic matrix algebra matrix types belong to the abstract type
-`MatRingElem{T}` and the parent types belong to
- `MatRing{T}` Note that both of these require disambiguation from
-the concrete types in `Generic` of the same name.
-
-The degree and base ring $R$ of a generic matrix are stored in its parent object,
-however to allow creation of matrices without first creating the matrix space parent,
-generic matrices in Julia do not contain a reference to their parent. They contain the
-row and column numbers (or degree, in the case of matrix algebras) and the base ring
-on a per matrix basis. The parent object can then be reconstructed from this data on
-demand.
-
-## Matrix algebra constructors
-
-A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with
-given degree and base ring.
-
-In order to construct matrices in AbstractAlgebra.jl, one must construct the
-matrix algebra itself. This is accomplished with the following constructor.
-
-```julia
-matrix_ring(R::Ring, degree::Int)
-```
-
-Construct the algebra of matrices with the given degree over the given base ring.
-
-Here are some examples of creating matrix algebras and making use of the
-resulting parent objects to coerce various elements into the matrix algebra.
-
-**Examples**
-
-```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
-
-julia> S = matrix_ring(R, 3)
-Matrix ring of degree 3
-  over univariate polynomial ring in t over rationals
-
-julia> A = S()
-[0   0   0]
-[0   0   0]
-[0   0   0]
-
-julia> B = S(12)
-[12    0    0]
-[ 0   12    0]
-[ 0    0   12]
-
-julia> C = S(R(11))
-[11    0    0]
-[ 0   11    0]
-[ 0    0   11]
-
-```
-
-## Matrix algebra element constructors
-
-The following additional constructors are provided for constructing various
-kinds of matrices in a matrix algebra.
+## Creating matrix algebras
 
 ```@docs
-identity_matrix(::Generic.MatRingElem{T}) where T <: RingElement
+matrix_ring(R::NCRing, n::Int)
 ```
 
-*Examples*
 
-```julia
-S = matrix_ring(ZZ, 2)
-M = zero(S)
-
-P = identity_matrix(M)
-```
-
-## Matrix algebra functionality provided by AbstractAlgebra.jl
-
-Most of the generic matrix functionality described in the generic matrix section of
-the documentation is available for both matrix spaces and matrix algebras. Exceptions
-include functions that do not return or accept square matrices or which cannot specify
-a parent. Such functions include `solve` and `nullspace` which can't be provided for
-matrix algebras.
-
-In addition to the functionality described for matrix spaces, matrix algebras support
-all noncommutative ring operations, and matrix algebras can be used as a base ring
-for other generic constructs that accept a *noncommutative* base ring (`NCRing`).
-
-In this section we describe functionality provided for matrix algebras only.
-
-### Basic matrix functionality
-
-As well as the Ring and Matrix interfaces, the following functions are provided to
-manipulate matrices.
+## Properties of matrix algebras
 
 ```@docs
-degree(::Generic.MatRingElem)
+degree(a::MatRing)
 ```
 
-**Examples**
+The base ring can be queried using `base_ring`.
+
+
+## Creating elements of a matrix algebra
+
+
+### Calling a matrix algebra
+
+```@docs
+Generic.MatRing
+```
+
+
+### Special elements
+
+As for other rings, the additive and multiplicative identities of a matrix
+algebra can be constructed using `zero` and `one`.
 
 ```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
+julia> S = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
 
-julia> S = matrix_ring(R, 3)
-Matrix ring of degree 3
-  over univariate polynomial ring in t over rationals
+julia> zero(S)
+[0   0]
+[0   0]
 
-julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t + 1       t             1]
-[  t^2       t             t]
-[   -2   t + 2   t^2 + t + 1]
+julia> one(S)
+[1   0]
+[0   1]
+```
 
-julia> n = degree(A)
-3
 
+## Properties of matrix algebra elements
+
+```@docs
+parent(a::MatRingElem{T}) where T <: NCRingElement
+degree(a::MatRingElem{T}) where T <: NCRingElement
 ```

@@ -33,6 +33,7 @@ const is_upper_triangular = istriu
 
 # predeclare some functions to allow defining aliases for some of our own functions
 function charpoly end
+function gens end
 function minpoly end
 function number_of_columns end
 function number_of_generators end
@@ -42,6 +43,7 @@ function number_of_relations end
 function relations end
 
 @alias characteristic_polynomial charpoly
+@alias generators gens
 @alias minimal_polynomial minpoly
 @alias ncols number_of_columns
 @alias ngens number_of_generators

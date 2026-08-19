@@ -41,6 +41,31 @@ Base.:*(a::T, b::ModuleIsomorphism{T}) where {T <: RingElement} = hom(domain(b),
 Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
 Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
 
+function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomorphism))
+   check_composable(f, g)
+   @assert f.is_left == g.is_left
+   m1 = f.matrix
+   local mp::Union{Nothing, Map} = nothing
+   if isdefined(g, :map) 
+     m1 = map_entries(g.map, m1)
+     mp = g.map
+   end
+   if isdefined(f, :map)
+     if isa(mp, Nothing)
+       mp = f.map
+     else
+       mp = f.map*mp
+     end
+   end
+
+   if f.is_left
+     return ModuleHomomorphism(domain(f), codomain(g), m1*g.matrix; is_left = true, map = mp)
+   else
+     return ModuleHomomorphism(domain(f), codomain(g), g.matrix*m1; is_left = false)
+   end
+end
+
+
 ###############################################################################
 #
 #   Comparison
@@ -131,7 +156,7 @@ end
 #
 ###############################################################################
 
-function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+function (f::ModuleHomomorphism{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: NCRingElement
    parent(a) !== domain(f) && error("Incompatible module element")
    return image_fn(f)(a)
 end
@@ -143,26 +168,85 @@ end
 
 ###############################################################################
 #
+#   Constructor validation
+#
+###############################################################################
+
+function _homomorphism_image_matrix(rel::AbstractAlgebra.MatElem{T},
+                                    m::AbstractAlgebra.MatElem{T};
+                                    is_left::Bool = true,
+                                    map::Union{Nothing, Map} = nothing) where T <: NCRingElement
+   if !isa(map, Nothing)
+      rel = map_entries(map, rel)
+   end
+   return is_left ? rel*m : m*rel
+end
+
+function _check_homomorphism(M1::AbstractAlgebra.FPModule{T},
+                             M2::AbstractAlgebra.FPModule{T},
+                             m::AbstractAlgebra.MatElem{T};
+                             is_left::Bool = true,
+                             map::Union{Nothing, Map} = nothing) where T <: NCRingElement
+   for rel in rels(M1)
+      iszero(M2(_homomorphism_image_matrix(rel, m; is_left, map))) ||
+                                       error("Matrix does not define a homomorphism")
+   end
+end
+
+function _is_identity_matrix_mod_rels(M::AbstractAlgebra.FPModule{T},
+                                      A::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   R = base_ring(M)
+   n = ngens(M)
+   (nrows(A) == n && ncols(A) == n) || return false
+   row = zero_matrix(R, 1, n)
+   for i = 1:n
+      for j = 1:n
+         row[1, j] = A[i, j]
+      end
+      row[1, i] = row[1, i] - one(R)
+      iszero(M(row)) || return false
+   end
+   return true
+end
+
+###############################################################################
+#
 #   ModuleHomomorphism constructor
 #
 ###############################################################################
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where
-                                                               T <: RingElement
-   (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
-                                                    error("dimension mismatch")
-   return ModuleHomomorphism{T}(M1, M2, m)
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing, check::Bool = true) where
+                                                               T <: NCRingElement
+   if is_left
+     (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
+                                                      error("dimension mismatch")
+   else
+     (nrows(m) == ngens(M2) && ncols(m) == ngens(M1)) ||
+                                                      error("dimension mismatch")
+   end
+   check && _check_homomorphism(M1, M2, m; is_left, map)
+   return ModuleHomomorphism{T}(M1, M2, m; is_left, map)
 end
 
 function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
-                 M2::AbstractAlgebra.FPModule{T}, v::Vector{S}) where
+  M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing, check::Bool = true) where
+                                                               T <: RingElement
+   (nrows(m) == ngens(M1) && ncols(m) == ngens(M2)) ||
+                                                    error("dimension mismatch")
+   @assert is_left
+   check && _check_homomorphism(M1, M2, m; is_left, map)
+   return ModuleHomomorphism{T}(M1, M2, m; is_left, map)
+end
+
+function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T},
+                 M2::AbstractAlgebra.FPModule{T}, v::Vector{S}; check::Bool = true) where
                          {T <: RingElement, S<:AbstractAlgebra.FPModuleElem{T}}
-   return ModuleHomomorphism(M1, M2, vcat([_matrix(x) for x = v]...))
+   return ModuleHomomorphism(M1, M2, vcat([_matrix(x) for x = v]...); check)
 end
 
 function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
-     M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T}) where
+     M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T}; check::Bool = true) where
                                                                T <: RingElement
    # Put rows of m and target relations into a matrix
    R = base_ring(M1)
@@ -173,6 +257,7 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
    n = ncols(M)
    (ngens(M1) != m || ngens(M2) != n) &&
                                         error("Matrix of the wrong dimensions")
+   check && _check_homomorphism(M1, M2, M)
    if m == 0 || n == 0
        M_inv = matrix(R, n, m, T[])
    else
@@ -194,16 +279,23 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T},
       # Construct matrix of inverse homomorphism from first m columns of X
       M_inv = X[:, 1:m]
    end
+   if check
+      _check_homomorphism(M2, M1, M_inv)
+      _is_identity_matrix_mod_rels(M1, M*M_inv) ||
+                                   error("Matrix does not define an isomorphism")
+      _is_identity_matrix_mod_rels(M2, M_inv*M) ||
+                                   error("Matrix does not define an isomorphism")
+   end
    return ModuleIsomorphism{T}(M1, M2, M, M_inv)
 end
 
 function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::Vector{<:ModuleElem}; check::Bool = true)
   if ngens(V) == 0
-    return ModuleHomomorphism(V, W, zero_matrix(base_ring(V), ngens(V), ngens(W)))
+    return ModuleHomomorphism(V, W, zero_matrix(base_ring(V), ngens(V), ngens(W)); check)
   end
-  return ModuleHomomorphism(V, W, reduce(vcat, [x.v for x = v]))
+  return ModuleHomomorphism(V, W, reduce(vcat, [_matrix(x) for x in v]); check)
 end
 
-function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true)
-  return ModuleHomomorphism(V, W, v)
+function hom(V::AbstractAlgebra.Module, W::AbstractAlgebra.Module, v::MatElem; check::Bool = true, is_left::Bool = true, map::Union{Nothing, Map} = nothing)
+  return ModuleHomomorphism(V, W, v; is_left, map, check)
 end

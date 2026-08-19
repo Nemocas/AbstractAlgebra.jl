@@ -285,7 +285,7 @@ end
    S, x = polynomial_ring(R, "x")
 
    f = (x^2 + 2)//(x + 1)
-   @test f isa Generic.FracFieldElem
+   @test f isa Generic.TotFrac
 
    @test evaluate(f, 1) == R(4)
    @test evaluate(f, R(1)) == R(4)
@@ -307,6 +307,21 @@ end
 
    @test f(1, 2) == ZZ(3)//ZZ(4)
    @test f(ZZ(1), ZZ(2)) == ZZ(3)//ZZ(4)
+
+   # multivariate over non domain
+   R, = residue_ring(ZZ, 15)
+   S, (x,y) = polynomial_ring(R, ["x","y"])
+
+   f = (x^2 + 3)//(x + 1)
+   @test f isa Generic.TotFrac
+
+   @test evaluate(f, [1,2]) == R(2)
+   @test evaluate(f, [R(1),R(2)]) == R(2)
+
+   @test f([1,2]) == R(2)
+   @test f([R(1),R(2)]) == R(2)
+   @test f(1,2) == R(2)
+   @test f(R(1),R(2)) == R(2)
 
    # universal
    R = universal_polynomial_ring(ZZ)

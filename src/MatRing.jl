@@ -21,14 +21,8 @@ base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(
 ###############################################################################
 
 function Base.hash(a::MatRingElem, h::UInt)
-   b = 0x6413942b83a26c65%UInt
-   for i in 1:nrows(a)
-      for j in 1:ncols(a)
-         b = xor(b, xor(hash(a[i, j], h), h))
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-      end
-   end
-   return b
+  b = 0x6413942b83a26c65 % UInt
+  return xor(b, hash(matrix(a), h))
 end
 
 vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(a)^2
@@ -37,13 +31,48 @@ vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} 
     degree(a::MatRing)
 
 Return the degree $n$ of the given matrix algebra.
+
+The degree is the number of rows of the square matrices belonging to `a`.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+
+julia> degree(S)
+3
+```
 """
 degree(a::MatRing) = nrows(a)
 
 @doc raw"""
-    degree(a::MatRingElem{T}) where T <: RingElement
+    degree(a::MatRingElem{T}) where T <: NCRingElement
 
-Return the degree $n$ of the given matrix algebra.
+Return the degree $n$ of the parent matrix algebra of `a`.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t + 1       t             1]
+[  t^2       t             t]
+[   -2   t + 2   t^2 + t + 1]
+
+julia> degree(A)
+3
+```
 """
 degree(a::MatRingElem{T}) where T <: NCRingElement = degree(parent(a))
 
@@ -194,50 +223,6 @@ end
 
 ###############################################################################
 #
-#   Ad hoc comparisons
-#
-###############################################################################
-
-function ==(x::MatRingElem, y::JuliaRingElement)
-   n = degree(x)
-   for i = 1:n
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:n
-      for j = 1:n
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::JuliaRingElement, y::MatRingElem) = y == x
-
-function ==(x::MatRingElem{T}, y::T) where T <: NCRingElem
-   n = degree(x)
-   for i = 1:n
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:n
-      for j = 1:n
-         if i != j && !is_zero_entry(x, i, j)
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::T, y::MatRingElem{T}) where T <: NCRingElem = y == x
-
-###############################################################################
-#
 #   Basic arithmetic -- delegate to MatElem
 #
 ###############################################################################
@@ -250,8 +235,124 @@ end
 
 ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
 
-==(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: NCRingElement} = matrix(x) == matrix(y)
+==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
 
+isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x * matrix(y))
+end
+
+function *(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x * matrix(y))
+end
+
+function *(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) * y)
+end
+
+function *(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) * y)
+end
+
+function +(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x + matrix(y))
+end
+
+function +(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x + matrix(y))
+end
+
+function +(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) + y)
+end
+
+function +(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) + y)
+end
+
+function -(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
+  return Generic.MatRingElem(x - matrix(y))
+end
+
+function -(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
+  return Generic.MatRingElem(x - matrix(y))
+end
+
+function -(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+  return Generic.MatRingElem(matrix(x) - y)
+end
+
+function -(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+  return Generic.MatRingElem(matrix(x) - y)
+end
+
+function *(x::MatRingElem{T}, y::Vector{T}) where T <: NCRingElement
+  return matrix(x) * y
+end
+
+function *(x::Vector{T}, y::MatRingElem{T}) where T <: NCRingElement
+  return x * matrix(y)
+end
+
+###############################################################################
+#
+#   Ad hoc comparisons
+#
+###############################################################################
+
+function ==(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
+   return matrix(x) == y
+end
+
+==(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement = y == x
+
+function ==(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
+   return matrix(x) == y
+end
+
+==(x::T, y::MatRingElem{T}) where {T <: NCRingElem} = y == x
+
+function ==(x::MatElem{T}, y::MatRingElem) where {T <: NCRingElement}
+  error("Equality comparison of MatElem with MatRingElem unsupported. Call `x == matrix(y)` instead.")
+end
+
+function ==(x::MatRingElem, y::MatElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatRingElem with MatElem unsupported. Call `matrix(x) == y` instead.")
+end
+
+function isequal(x::MatElem{T}, y::MatRingElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatElem with MatRingElem unsupported. Call `isequal(x, matrix(y))` instead.")
+end
+
+function isequal(x::MatRingElem{T}, y::MatElem{T}) where {T <: NCRingElement}
+  error("Equality comparison of MatRingElem with MatElem unsupported. Call `isequal(matrix(x), y)` instead.")
+end
+
+# to resolve ambiguities:
+function ==(x::MatElem{T}, y::T) where {T <: MatRingElem}
+   for i = 1:min(nrows(x), ncols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         if i != j && !is_zero_entry(x, i, j)
+            return false
+         end
+      end
+   end
+   return true
+end
+
+==(x::T, y::MatElem{T}) where {T <: MatRingElem} = y == x
 
 ###############################################################################
 #
@@ -498,6 +599,50 @@ end
 randmat_with_rank(S::MatRing{T}, rank::Int, v...) where {T <: RingElement} =
    randmat_with_rank(Random.default_rng(), S, rank, v...)
 
+################################################################################
+#
+#  Promotion
+#
+################################################################################
+
+function Base.promote(x::MatRingElem{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, change_base_ring(base_ring(x), y)
+   elseif U === T
+      return change_base_ring(base_ring(y), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+# matrix * vec and vec * matrx
+function Base.promote(x::MatRingElem{S},
+                      y::Vector{T}) where {S <: NCRingElement,
+                                           T <: NCRingElement}
+   U = promote_rule_sym(S, T)
+   if U === S
+      return x, map(base_ring(x), y)::Vector{S}  # Julia needs help here
+   elseif U === T && length(y) != 0
+      return change_base_ring(parent(y[1]), x), y
+   else
+      error("Cannot promote to common type")
+   end
+end
+
+function Base.promote(x::Vector{S},
+                      y::MatRingElem{T}) where {S <: NCRingElement,
+                                                T <: NCRingElement}
+   yy, xx = promote(y, x)
+   return xx, yy
+end
+
+*(x::MatRingElem, y::Vector) = *(promote(x, y)...)
+
+*(x::Vector, y::MatRingElem) = *(promote(x, y)...)
+
 ###############################################################################
 #
 #   Conformance test element generation
@@ -539,10 +684,23 @@ end
 ###############################################################################
 
 @doc raw"""
-    matrix_ring(R::Ring, n::Int)
+    matrix_ring(R::NCRing, n::Int)
 
-Return parent object corresponding to the ring of $n\times n$ matrices over
-the ring $R$.
+Return the matrix algebra (or matrix ring) of degree $n$ over the base ring $R$.
+
+The returned parent object represents the ring of all $n \times n$ matrices
+over $R$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S = matrix_ring(R, 3)
+Matrix ring of degree 3
+  over univariate polynomial ring in t over rationals
+```
 """
 function matrix_ring(R::NCRing, n::Int)
    Generic.matrix_ring(R, n)

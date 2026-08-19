@@ -25,6 +25,7 @@ import .ConformanceTests: test_Poly_interface
 import .ConformanceTests: test_MPoly_interface
 import .ConformanceTests: test_MatSpace_interface
 import .ConformanceTests: test_MatRing_interface
+import .ConformanceTests: test_NCRing_interface_recursive
 import .ConformanceTests: test_Ring_interface_recursive
 import .ConformanceTests: test_Field_interface_recursive
 

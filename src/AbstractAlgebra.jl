@@ -191,16 +191,6 @@ pretty_eq(x::Number, y::Number) = (x == y)
 
 include("julia/JuliaTypes.jl")
 
-# Unions of AbstractAlgebra abstract types and Julia types
-const JuliaRingElement = Union{Integer, Rational, AbstractFloat}
-const JuliaFieldElement = Union{Rational, AbstractFloat}
-const JuliaExactRingElement = Union{Integer, Rational}
-
-const RingElement = Union{RingElem, JuliaRingElement}
-const NCRingElement = Union{NCRingElem, JuliaRingElement}
-
-const FieldElement = Union{FieldElem, JuliaFieldElement}
-
 include("ConcreteTypes.jl")
 
 ###############################################################################
@@ -262,7 +252,6 @@ function check_base_ring(a, b, throw::Bool = true)
    return flag
 end
 
-include("algorithms/LaurentPoly.jl")
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
 
@@ -296,6 +285,7 @@ include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
 include("PuiseuxSeries.jl")
+include("PuiseuxMPoly.jl")
 include("SparsePoly.jl")
 include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
@@ -304,6 +294,8 @@ include("ResidueField.jl")
 include("Fraction.jl")
 include("TotalFraction.jl")
 include("MPoly.jl")
+include("UniversalLaurentPoly.jl")
+include("UniversalRing.jl")
 include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")

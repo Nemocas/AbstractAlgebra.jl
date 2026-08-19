@@ -34,7 +34,7 @@ makedocs(
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",
-                 "univpolynomial.md",
+                 "universal_ring.md",
                  "laurent_polynomial.md",
                  "laurent_mpolynomial.md",
                  "series.md",
@@ -70,10 +70,19 @@ makedocs(
              ],
              "Matrices" => [
                  "matrix_introduction.md",
-                 "matrix.md",
+                 "Working with matrices" => [
+                    "matrix_construction.md",
+                    "matrix_manipulation.md",
+                    "matrix_predicates.md",
+                    "matrix_properties.md",
+                    "matrix_normal_forms.md",
+                    "how_to_linear_solve.md", 
+                 ],
                  "matrix_spaces.md",
-                 "matrix_implementation.md",
                  "matrix_algebras.md",
+                 "Developer documentation" => [
+                    "matrix_implementation.md"
+                 ],
              ],
              "Maps" => [
                  "map_introduction.md",
