@@ -16,53 +16,53 @@ Matrices support `iszero` and `isone` for testing whether a matrix
 is the zero matrix or the identity matrix, respectively.
 
 ```@docs
-isempty(a::MatrixElem{T}) where {T <: NCRingElement}
-Base.isassigned(a::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
-is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
-is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
+isempty(m::MatrixElem{T}) where {T <: NCRingElement}
+Base.isassigned(m::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
+is_zero_row(m::Union{Matrix,MatrixElem}, i::Int)
+is_zero_column(m::Union{Matrix,MatrixElem}, j::Int)
 ```
 
 
 ## Triangular and diagonal matrices
 
 ```@docs
-is_lower_triangular(M::MatElem)
-is_upper_triangular(M::MatElem)
-is_diagonal(A::MatElem)
-is_hessenberg(A::MatElem{T}) where {T <: RingElement}
+is_lower_triangular(m::MatElem)
+is_upper_triangular(m::MatElem)
+is_diagonal(m::MatElem)
+is_hessenberg(m::MatElem{T}) where {T <: RingElement}
 ```
 
 
 ## Invertibility
 
 ```@docs
-is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
-is_invertible(A::MatElem{T}) where {T <: RingElement}
+is_invertible_with_inverse(m::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+is_invertible(m::MatElem{T}) where {T <: RingElement}
 ```
 
 
 ## Symmetry
 
 ```@docs
-is_symmetric(M::MatElem)
-is_skew_symmetric(M::MatElem)
-is_alternating(M::MatElem)
+is_symmetric(m::MatElem)
+is_skew_symmetric(m::MatElem)
+is_alternating(m::MatElem)
 ```
 
 
 ## Nilpotency
 
 ```@docs
-is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+is_nilpotent(m::MatElem{T}) where {T <: RingElement}
 ```
 
 
 ## Normal forms
 
 ```@docs
-is_rref(M::MatrixElem{T}) where {T <: RingElement}
-is_hnf(M::MatElem{T}) where {T <: RingElement}
-is_snf(A::MatElem{T}) where {T <: RingElement}
-is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
-is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+is_rref(m::MatrixElem{T}) where {T <: RingElement}
+is_hnf(m::MatElem{T}) where {T <: RingElement}
+is_snf(m::MatElem{T}) where {T <: RingElement}
+is_weak_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+is_popov(m::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 ```
