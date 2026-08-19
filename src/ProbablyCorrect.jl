@@ -54,26 +54,63 @@
 
 # Global stuff for the "probably correct" prototype.
 
-# KISS: DodgyMode is just a simple boolean here; getter & setter functions
-GLOBAL_VARIABLE_DodgyMode::Bool = false;
+# Fairly KISS: 
+GLOBAL_VARIABLE_ListOfDodgyFuncs::Vector{Symbol} = Symbol[];
+GLOBAL_VARIABLE_ActiveDodgyFuncs::Vector{Symbol} = Symbol[];
 
-function get_dodgy_mode()
-  global GLOBAL_VARIABLE_DodgyMode;
-  return GLOBAL_VARIABLE_DodgyMode;
+
+# This is for "registering" a dodgy function:
+# it would normally be called in the initialization of the package.
+function add_dodgy_func(func::Symbol)
+  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && push!(GLOBAL_VARIABLE_ListOfDodgyFuncs, func);
+  return nothing
+end
+
+
+function get_active_dodgy_funcs()
+  global GLOBAL_VARIABLE_ActiveDodgyFuncs;
+  return GLOBAL_VARIABLE_ActiveDodgyFuncs;
 end;
 
-function set_dodgy_mode(b::Bool)
-  global GLOBAL_VARIABLE_DodgyMode;
-  prev = GLOBAL_VARIABLE_DodgyMode;
-  GLOBAL_VARIABLE_DodgyMode = b;
-  return prev;
+
+# Activate (or deactivate) **all** dodgy functions
+function set_dodgy_mode(b::Bool = true)
+  global GLOBAL_VARIABLE_ListOfDodgyFuncs;
+  global GLOBAL_VARIABLE_ActiveDodgyFuncs;
+  if !b
+    GLOBAL_VARIABLE_ActiveDodgyFuncs = Symbol[];
+  else
+    GLOBAL_VARIABLE_ActiveDodgyFuncs = GLOBAL_VARIABLE_ListOfDodgyFuncs;
+  end
+  return GLOBAL_VARIABLE_ActiveDodgyFuncs;
 end;
+
+function set_dodgy_mode(func::Symbol, b::Bool = true)
+  global GLOBAL_VARIABLE_ListOfDodgyFuncs;
+  global GLOBAL_VARIABLE_ActiveDodgyFuncs;
+  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function ID");
+  if b
+    !(func in GLOBAL_VARIABLE_ActiveDodgyFuncs) && push!(GLOBAL_VARIABLE_ActiveDodgyFuncs, func);
+  else
+    GLOBAL_VARIABLE_ActiveDodgyFuncs = filter(!=(func), GLOBAL_VARIABLE_ActiveDodgyFuncs);
+  end;
+  return GLOBAL_VARIABLE_ActiveDodgyFuncs;  ## or just nothing?
+end;
+
+function get_dodgy_mode(func::Symbol)
+  global GLOBAL_VARIABLE_ListOfDodgyFuncs;
+  global GLOBAL_VARIABLE_ActiveDodgyFuncs;
+  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function ID");
+  return (func in GLOBAL_VARIABLE_ActiveDodgyFuncs);
+end;
+
 
 
 # Global variable DodgySteps is just a list of DodgyStepInfo structs
 # (KISS goodbye) The struct now contains several fields, but the protoype
 # currently uses only some of them.
 struct DodgyStepInfo
+# fn_family::Symbol    the "marker" used to identify the function family
   fn_name::Symbol
   #  methodID::Union{Nothing,Method}
   SourceLocation::Tuple{String,Int}
