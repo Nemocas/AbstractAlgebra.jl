@@ -552,11 +552,11 @@ function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where {T <
    return evaluate(a, varidx, vals)
 end
 
-function (a::UniversalRingElem{<:MPolyRingElem})(;kwargs...)
+function evaluate(a::UniversalRingElem{<:MPolyRingElem}, val_pairs::Pair{Symbol, <:RingElement}...)
    ss = symbols(parent(a))
    vars = Int[]
    vals = RingElement[]
-   for (var, val) in kwargs
+   for (var, val) in val_pairs
      vari = findfirst(isequal(var), ss)
      vari === nothing && continue
      push!(vars, vari)
@@ -564,6 +564,10 @@ function (a::UniversalRingElem{<:MPolyRingElem})(;kwargs...)
    end
    return evaluate(a, vars, vals)
 end
+
+evaluate(a::UniversalRingElem{<:MPolyRingElem}, val_dict::Dict{Symbol, <:RingElement}) = evaluate(a, val_dict...)
+
+(a::UniversalRingElem{<:MPolyRingElem})(;kwargs...) = evaluate(a, kwargs...)
 
 ###############################################################################
 #
