@@ -46,7 +46,7 @@ hnf_with_transform(A::MatElem{T}) where {T <: RingElement}
 ## Smith normal form
 
 ```@docs
-snf(A::MatElem{T}) where {T <: RingElement}
+snf(m::MatElem{T}) where {T <: RingElement}
 snf_with_transform(A::MatElem{T}) where {T <: RingElement}
 ```
 
