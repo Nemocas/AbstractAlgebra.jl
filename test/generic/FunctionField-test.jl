@@ -12,38 +12,40 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
      (x2^2 + 1)//(x2 + 1)*z2^5 + 4z2^4 + (x2 + 2)*z2^3 + x2//(x2 + 1)*z2 + 1//(x2 + 1)]
 
 # FIXME/TODO: conformance tests run into infinite loop???
-#@testset "Generic.FunctionField.conformance" begin
+#@testset "Generic.AbsSimpleFunctionField.conformance" begin
 #   S, y = function_field(P1[4], "y")
 #   ConformanceTests.test_Ring_interface(S)
 #end
 
-@testset "Generic.FunctionField.constructors" begin
-   @test function_field(P1[1], "y")[1] === function_field(P1[1], "y", cached=true)[1]
-   @test function_field(P1[1], "y", cached=true)[1] !== function_field(P1[1], "y", cached=false)[1]
+@testset "Generic.AbsSimpleFunctionField.constructors" begin
+   @test function_field(P1[1], :y)[1] === function_field(P1[1], :y; cached=true)[1]
+   @test function_field(P1[1], :y; cached=true)[1] !== function_field(P1[1], :y; cached=false)[1]
 
-   for (S, y) in  [function_field(P1[3], "y"), function_field(P2[3], "y")]
+   for (S, y) in  [function_field(P1[3], :y), function_field(P2[3], :y)]
       R = base_ring(base_ring(S))
+      T = elem_type(R)
+      U = dense_poly_type(T)
 
-      @test elem_type(S) == Generic.FunctionFieldElem{elem_type(R)}
-      @test elem_type(Generic.FunctionField{elem_type(R)}) == Generic.FunctionFieldElem{elem_type(R)}
-      @test parent_type(Generic.FunctionFieldElem{elem_type(R)}) == Generic.FunctionField{elem_type(R)}
+      @test elem_type(S) == Generic.AbsSimpleFunctionFieldElem{T, U}
+      @test elem_type(Generic.AbsSimpleFunctionField{T, U}) == Generic.AbsSimpleFunctionFieldElem{T, U}
+      @test parent_type(Generic.AbsSimpleFunctionFieldElem{T, U}) == Generic.AbsSimpleFunctionField{T, U}
 
-      @test S isa Generic.FunctionField
+      @test S isa Generic.AbsSimpleFunctionField
 
-      @test isa(y, Generic.FunctionFieldElem)
+      @test isa(y, Generic.AbsSimpleFunctionFieldElem)
       @test y isa FieldElem
 
       a = S()
 
-      @test isa(a, Generic.FunctionFieldElem)
+      @test isa(a, Generic.AbsSimpleFunctionFieldElem)
 
       b = S(1)
 
-      @test isa(b, Generic.FunctionFieldElem)
+      @test isa(b, Generic.AbsSimpleFunctionFieldElem)
 
       c = S(ZZ(2))
 
-      @test isa(c, Generic.FunctionFieldElem)
+      @test isa(c, Generic.AbsSimpleFunctionFieldElem)
    end
 
    S1, y1 = function_field(P1[3], "y1")
@@ -51,15 +53,15 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
 
    d = S1(QQ(2, 3))
 
-   @test isa(d, Generic.FunctionFieldElem)
+   @test isa(d, Generic.AbsSimpleFunctionFieldElem)
 
    k = S1(x1)
 
-   @test isa(k, Generic.FunctionFieldElem)
+   @test isa(k, Generic.AbsSimpleFunctionFieldElem)
 
    m = S1(y1)
 
-   @test isa(m, Generic.FunctionFieldElem)
+   @test isa(m, Generic.AbsSimpleFunctionFieldElem)
 
    @test base_ring(S1) === R1
    @test base_field(S1) === R1
@@ -76,7 +78,7 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
    @test var(S1) == :y1
 end
 
-@testset "Generic.FunctionField.printing" begin
+@testset "Generic.AbsSimpleFunctionField.printing" begin
    S, y = function_field(P1[4], "y")
 
    @test string(zero(S)) == "0"
@@ -94,7 +96,7 @@ end
    @test string(x2 + y + 1) == "y + x2 + 1"
 end
 
-@testset "Generic.FunctionField.rand" begin
+@testset "Generic.AbsSimpleFunctionField.rand" begin
    for f in P1
       S, y = function_field(f, "y")
 
@@ -110,7 +112,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.manipulation" begin
+@testset "Generic.AbsSimpleFunctionField.manipulation" begin
    for f in union(P1, P2)
       S, y = function_field(f, "y")
 
@@ -175,7 +177,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.unary_ops" begin
+@testset "Generic.AbsSimpleFunctionField.unary_ops" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -199,7 +201,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.binary_ops" begin
+@testset "Generic.AbsSimpleFunctionField.binary_ops" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -237,7 +239,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.adhoc_binary" begin
+@testset "Generic.AbsSimpleFunctionField.adhoc_binary" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -373,7 +375,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.comparison" begin
+@testset "Generic.AbsSimpleFunctionField.comparison" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -409,7 +411,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.adhoc_comparison" begin
+@testset "Generic.AbsSimpleFunctionField.adhoc_comparison" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -506,7 +508,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.powering" begin
+@testset "Generic.AbsSimpleFunctionField.powering" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -541,7 +543,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.inverse" begin
+@testset "Generic.AbsSimpleFunctionField.inverse" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -569,7 +571,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.exact_division" begin
+@testset "Generic.AbsSimpleFunctionField.exact_division" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -599,7 +601,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.adhoc_exact_division" begin
+@testset "Generic.AbsSimpleFunctionField.adhoc_exact_division" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -694,7 +696,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.norm" begin
+@testset "Generic.AbsSimpleFunctionField.norm" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -718,7 +720,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.trace" begin
+@testset "Generic.AbsSimpleFunctionField.trace" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -742,7 +744,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.unsafe_operators" begin
+@testset "Generic.AbsSimpleFunctionField.unsafe_operators" begin
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
@@ -850,7 +852,7 @@ end
    end
 end
 
-@testset "Generic.FunctionField.polynomial_ring" begin
+@testset "Generic.AbsSimpleFunctionField.polynomial_ring" begin
    for i = 1:length(P1)
       S, y = function_field(P1[i], "y")
 

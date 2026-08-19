@@ -1328,18 +1328,6 @@ end
    @test p1 == evaluate(p3, gen(U))
 end
 
-@testset "Generic.MatRing.row_swapping" begin
-   R, x = polynomial_ring(ZZ, "x")
-   M = matrix_ring(R, 3)
-
-   a = M(map(R, [1 2 3; 4 5 6; 7 8 9]))
-
-   @test swap_rows(a, 1, 3) == M(map(R, [7 8 9; 4 5 6; 1 2 3]))
-
-   swap_rows!(a, 2, 3)
-
-   @test a == M(map(R, [1 2 3; 7 8 9; 4 5 6]))
-end
 
 if false # see bug 160
     @testset "Generic.MatRing.hnf_minors" begin
@@ -1376,185 +1364,6 @@ if false # see bug 160
         @test is_unit(det(U))
         @test U*B == H
     end
-end
-
-@testset "Generic.MatRing.hnf_kb" begin
-   R, x = polynomial_ring(QQ, "x")
-
-   M = matrix_ring(R, 3)
-
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
-
-   H = @inferred AbstractAlgebra.hnf_kb(A)
-   @test is_upper_triangular(H)
-
-   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(A)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*A == H
-
-   # Fake up finite field of char 7, degree 2
-   R, x = polynomial_ring(GF(7), "x")
-   F, = residue_field(R, x^2 + 6x + 3)
-   a = F(x)
-
-   S, y = polynomial_ring(F, "y")
-
-   N = matrix_ring(S, 3)
-
-   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
-
-   H = @inferred AbstractAlgebra.hnf_kb(B)
-   @test is_upper_triangular(H)
-
-   H, U = @inferred AbstractAlgebra.hnf_kb_with_transform(B)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*B == H
-end
-
-@testset "Generic.MatRing.hnf_cohen" begin
-   R, x = polynomial_ring(QQ, "x")
-
-   M = matrix_ring(R, 3)
-
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
-
-   H = AbstractAlgebra.hnf_cohen(A)
-   @test is_upper_triangular(H)
-
-   H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*A == H
-
-   # Fake up finite field of char 7, degree 2
-   R, x = polynomial_ring(GF(7), "x")
-   F, = residue_field(R, x^2 + 6x + 3)
-   a = F(x)
-
-   S, y = polynomial_ring(F, "y")
-
-   N = matrix_ring(S, 3)
-
-   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
-
-   H = AbstractAlgebra.hnf_cohen(B)
-   @test is_upper_triangular(H)
-
-   H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*B == H
-end
-
-@testset "Generic.MatRing.hnf" begin
-   R, x = polynomial_ring(QQ, "x")
-
-   M = matrix_ring(R, 3)
-
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
-
-   H = hnf(A)
-   @test is_upper_triangular(H)
-
-   H, U = hnf_with_transform(A)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*A == H
-
-   # Fake up finite field of char 7, degree 2
-   R, x = polynomial_ring(GF(7), "x")
-   F, = residue_field(R, x^2 + 6x + 3)
-   a = F(x)
-
-   S, y = polynomial_ring(F, "y")
-
-   N = matrix_ring(S, 3)
-
-   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
-
-   H = hnf(B)
-   @test is_upper_triangular(H)
-
-   H, U = hnf_with_transform(B)
-   @test is_upper_triangular(H)
-   @test is_unit(det(U))
-   @test U*B == H
-end
-
-@testset "Generic.MatRing.snf_kb" begin
-   R, x = polynomial_ring(QQ, "x")
-
-   M = matrix_ring(R, 3)
-
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
-
-   T = @inferred AbstractAlgebra.snf_kb(A)
-   @test is_snf(T)
-
-   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(A)
-   @test is_snf(T)
-   @test is_unit(det(U))
-   @test is_unit(det(K))
-   @test U*A*K == T
-
-   # Fake up finite field of char 7, degree 2
-   R, x = polynomial_ring(GF(7), "x")
-   F, = residue_field(R, x^2 + 6x + 3)
-   a = F(x)
-
-   S, y = polynomial_ring(F, "y")
-
-   N = matrix_ring(S, 3)
-
-   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
-
-   T = @inferred AbstractAlgebra.snf_kb(B)
-   @test is_snf(T)
-
-   T, U, K = @inferred AbstractAlgebra.snf_kb_with_transform(B)
-   @test is_snf(T)
-   @test is_unit(det(U))
-   @test is_unit(det(K))
-   @test U*B*K == T
-end
-
-@testset "Generic.MatRing.snf" begin
-   R, x = polynomial_ring(QQ, "x")
-
-   M = matrix_ring(R, 3)
-
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
-
-   T = snf(A)
-   @test is_snf(T)
-
-   T, U, K = snf_with_transform(A)
-   @test is_snf(T)
-   @test is_unit(det(U))
-   @test is_unit(det(K))
-   @test U*A*K == T
-
-   # Fake up finite field of char 7, degree 2
-   R, x = polynomial_ring(GF(7), "x")
-   F, = residue_field(R, x^2 + 6x + 3)
-   a = F(x)
-
-   S, y = polynomial_ring(F, "y")
-
-   N = matrix_ring(S, 3)
-
-   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
-
-   T = snf(B)
-   @test is_snf(T)
-
-   T, U, K = snf_with_transform(B)
-   @test is_snf(T)
-   @test is_unit(det(U))
-   @test is_unit(det(K))
-   @test U*B*K == T
 end
 
 @testset "Generic.MatRing.$sim_zero" for sim_zero in (similar, zero)
@@ -1638,4 +1447,41 @@ end
    v = rand(sp, 3)
    @test v isa Vector{elem_type(M)}
    @test all(x -> parent(x) == M, v)
+end
+
+@testset "Generic.MatRing.adhoc_equality" begin
+   R = matrix_ring(ZZ, 2)
+   S = matrix_ring(QQ, 2)
+   M = R(matrix(ZZ, 2,2, [1,2,3,4]))
+   N_ZZ = R(matrix(ZZ, 2,2, [1,2,3,4]))
+   N_QQ = S(matrix(QQ, 2,2, [1,2,3,4]))
+   @test M == N_ZZ
+   @test_throws ErrorException M == matrix(N_ZZ)
+   @test_throws ErrorException matrix(M) == N_ZZ
+   @test_throws NotImplementedError M == N_QQ
+   @test_throws ErrorException M == matrix(N_QQ)
+   @test_throws ErrorException matrix(M) == N_QQ
+
+   # MatRingElem as scalars in a MatSpace
+   A_R = matrix(R, 2,2, [1,2,3,4])
+   @test M != A_R
+   @test A_R != M
+   @test M == matrix(R, 2, 2, [M, 0, 0, M])
+   @test matrix(R, 2, 2, [M, 0, 0, M]) == M
+
+   # MatRings over MatRings
+   T = matrix_ring(R, 2)
+   @test one(T) == one(T)
+   @test one(T) == 1
+   @test 1 == one(T)
+   @test one(R) == one(T)
+   @test one(T) == one(R)
+
+   M2 = T(matrix(R, 2, 2, [M, 0, M, 5]))
+   A_T = matrix(T, 2,2, [1,2,3,4])
+   @test M2 != A_T
+   @test A_T != M2
+   @test M2 == matrix(T, 2, 2, [M2, 0, 0, M2])
+   @test matrix(T, 2, 2, [M2, 0, 0, M2]) == M2
+
 end

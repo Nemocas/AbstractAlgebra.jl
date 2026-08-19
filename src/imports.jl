@@ -1,3 +1,5 @@
+using Compat: allequal, allunique
+
 using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
 

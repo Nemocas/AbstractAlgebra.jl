@@ -1,4 +1,4 @@
-@testset "Generic.FunctionField.conformance" begin
+@testset "Generic.RationalFunctionField.conformance" begin
    S, x = rational_function_field(QQ, "x")
    ConformanceTests.test_Ring_interface(S)
 end

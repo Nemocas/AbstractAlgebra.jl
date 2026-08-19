@@ -8,6 +8,8 @@ export EuclideanRingResidueRingElem
 export LocalizedEuclideanRing
 export LocalizedEuclideanRingElem
 export MPolyBuildCtx
+export PuiseuxMPolyRing
+export PuiseuxMPolyRingElem
 export abs_series_type
 export base_field
 export basis
@@ -110,6 +112,7 @@ export rising_factorial
 export rising_factorial2
 export roots
 export rowlength
+export scale
 export section_map
 export set_exponent_vector!
 export set_exponent_word!

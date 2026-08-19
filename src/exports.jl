@@ -89,6 +89,8 @@ export PolyRing
 export PolyRingElem
 export PolynomialElem
 export PosInf
+export PuiseuxMPolyRing
+export PuiseuxMPolyRingElem
 export QQ
 export RDF
 export RealField
@@ -108,8 +110,13 @@ export SimpleNumFieldElem
 export SkewDiagram
 export Strassen
 export SymmetricGroup
+export TotFrac
+export TotFracRing
 export UniversalPolyRing
 export UniversalPolyRingElem
+export UniversalRing
+export UniversalRingElem
+export UnivPoly
 export VarName
 export YoungTableau
 export ZZ
@@ -156,6 +163,7 @@ export codomain
 export coeff
 export coeff!
 export coefficient_ring
+export coefficient_type
 export coefficient_ring_type
 export coefficients
 export coefficients_of_univariate
@@ -243,6 +251,7 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export graeffe_transform
 export gram
 export has_attribute
 export has_bottom_neighbor
@@ -492,6 +501,7 @@ export primpart
 export pseudo_inv
 export pseudodivrem
 export pseudorem
+export puiseux_polynomial_ring
 export puiseux_series_field
 export puiseux_series_ring
 export push_term!
@@ -537,6 +547,7 @@ export rref
 export rref!
 export rref_rational
 export rref_rational!
+export scale
 export scalar_matrix
 export section_map
 export set_attribute!
@@ -594,6 +605,7 @@ export truncate
 export typed_hcat
 export typed_hvcat
 export unit
+export universal_laurent_polynomial_ring
 export universal_poly_ring_type
 export universal_poly_type
 export universal_polynomial_ring

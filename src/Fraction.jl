@@ -45,12 +45,21 @@ end
 ###############################################################################
 
 function //(x::T, y::T) where {T <: RingElem}
-   R = parent(x)
    iszero(y) && throw(DivideError())
+   R = parent(x)
    g = gcd(x, y)
-   z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
-   z.parent = get(Generic.FracDict, R) do
-      return Generic.fraction_field(R)
+   if is_domain_type(R)
+     z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
+     z.parent = get(Generic.FracDict, R) do
+       return Generic.fraction_field(R)
+     end
+     return z
+   end
+   # R might not be integral, so construct total ring of fractions
+   is_zero_divisor(y)  &&  error("Division by a zero-divisor")
+   z = Generic.TotFrac{T}(divexact(x, g), divexact(y, g))
+   z.parent = get(Generic.TotFracDict, R) do
+       return Generic.total_ring_of_fractions(R)
    end
    return z
 end

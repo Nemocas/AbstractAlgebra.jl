@@ -77,11 +77,11 @@ function show(io::IO, v::SNFModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), v.v[1, i])
+      print(IOContext(io, :compact => true), v[i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), v.v[1, len])
+      print(IOContext(io, :compact => true), v[len])
    end
    print(io, ")")
 end
@@ -192,7 +192,7 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    end
    # make matrix from gens
    mat = matrix(R, ncols(A) - nunits, ncols(K),
-        T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
+        T[gens[i][j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
    M = SNFModule{T}(m, gens, invariant_factors)
    f = ModuleIsomorphism{T}(M, m, mat, mat_inv)
    M.map = f

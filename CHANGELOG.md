@@ -9,6 +9,79 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.50.2](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.2) - 2026-07-31
+
+### New or extended functionality
+
+- [#2391](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2391) Add Puiseux polynomials
+- [#2430](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2430) Add `coefficient_type`
+- [#2449](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2449) Disallow nondistinct variable names for `gens(::UniversalRing, ...)`
+
+### Fixed bugs that returned incorrect results
+
+- [#2434](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2434) Fix construction of direct sums of modules
+- [#2450](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2450) Fix `map_coefficients` and `change_coefficient_ring` for universal polys
+
+### Improvements or additions to documentation
+
+- [#2448](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2448) Overhaul Linear Algebra documentation
+
+## [0.50.1](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.1) - 2026-06-12
+
+### Other fixed bugs
+
+- [#2426](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2426) Add `is_domain_type` for multivariate laurent polynomials
+
+## [0.50.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.0) - 2026-06-08
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2410](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2410) Extend // to create total_ring_of_fractions if necessary
+
+#### Performance improvements or improved testing
+
+- [#2414](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2414) Parametrize `FunctionField` as `FunctionField{T, U}`
+
+### New or extended functionality
+
+- [#2406](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2406) Add `generators` as alias for `gens`
+- [#2409](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2409) Add `graeffe_transform(::PolyRingElem)`
+- [#2413](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2413) Disallow nondistinct variable names for universal rings
+- [#2416](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2416) Rename FunctionField to AbsSimpleFunctionField
+
+## [0.49.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.49.0) - 2026-04-30
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+- [#2274](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2274) Introduce "universal ring" as a generalization of `UniversalPolyRing`
+- [#2286](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2286) Restrict static params of our types, so e.g. `PolyRing{T}` now always must satisfy `T<:RingElement`
+- [#2339](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2339) Restrict `swap_rows`, `hnf`, `snf` to `MatElem`; to apply to `MatRingElem` work with underlying matrix
+- [#2356](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2356) Change behavior of `base_ring` for Laurent polynomials
+- [#2364](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2364) Rework multivariate polynomial evaluation
+
+### Miscellaneous changes
+
+- [#2394](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2394) Add `!isone` test for truncated identity mats to conformance tests
+
+## [0.48.6](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.6) - 2026-04-27
+
+### New or extended functionality
+
+- [#2380](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2380) "Inplace" iterators over the coefficients, monomials, terms and exponent words of a free associative algebra element
+- [#2390](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2390) Add `ConformanceTests.test_NCRing_interface_recursive`
+- [#2392](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2392) Use `∞` in printing `PosInf()`, `NegInf()` when unicode allowed
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2379](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2379) Fix promotion bug for LaurenMPoly
+- [#2385](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2385) Fix stack overflow in MPoly creation
+
 ## [0.48.5](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.48.5) - 2026-03-05
 
 ### New or extended functionality

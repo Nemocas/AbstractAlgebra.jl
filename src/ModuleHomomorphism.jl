@@ -127,8 +127,8 @@ end
       v::FPModuleElem{T}) where T <: RingElement
 
 Check if $v$ has a preimage under the homomorphism $f$.
-If it does, return a tuple (true, y) for $y$ in domain(f) such that $f(y) = x$ holds,
-otherwise, return (false, id) where id is the identity of domain(f).
+If it does, return a tuple `(true, y)` for `y` in `domain(f)` such that $f(y) = x$ holds,
+otherwise, return `(false, z)` where `z` is any element of type `elem_type(domain(f))`.
 """
 function has_preimage_with_preimage(
   f::Map(FPModuleHomomorphism), v::FPModuleElem{T}
@@ -203,22 +203,26 @@ end
 Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
 """
 function ModuleHomomorphism(M1::FPModule{T},
-                         M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
-   return Generic.ModuleHomomorphism{T}(M1, M2, m)
+                         M2::FPModule{T}, m::MatElem{T}; check::Bool = true) where T <: RingElement
+   return Generic.ModuleHomomorphism(M1, M2, m; check)::Generic.ModuleHomomorphism{T}
 end
 
 function ModuleHomomorphism(M1::FPModule{T},
-               M2::FPModule{T}, v::Vector{S}) where
+               M2::FPModule{T}, v::Vector{S}; check::Bool = true) where
                         {T <: RingElement, S<:FPModuleElem{T}}
-   return Generic.ModuleHomomorphism(M1, M2, v)
+   return Generic.ModuleHomomorphism(M1, M2, v; check)
 end
 
 function ModuleHomomorphism(M1::Module, M2::Module, A...)
    Generic.ModuleHomomorphism(M1, M2, A...)
 end
 
-function module_homomorphism(M1::Module, M2::Module, m::MatElem)
-   Generic.ModuleHomomorphism(M1, M2, m)
+function module_homomorphism(M1::Module, M2::Module, m::MatElem; check::Bool = true)
+   Generic.ModuleHomomorphism(M1, M2, m; check)
+end
+
+function zero_map(M::FPModule, N::FPModule)
+   return module_homomorphism(M, N, zero_matrix(base_ring(M), ngens(M), ngens(N)))
 end
 
 @doc raw"""
@@ -228,14 +232,14 @@ Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
 inverse morphism is automatically computed.
 """
 function ModuleIsomorphism(M1::FPModule{T},
-                          M2::FPModule{T}, M::MatElem{T}) where T <: RingElement
-   return Generic.ModuleIsomorphism(M1, M2, M)
+                          M2::FPModule{T}, M::MatElem{T}; check::Bool = true) where T <: RingElement
+   return Generic.ModuleIsomorphism(M1, M2, M; check)
 end
 
 function ModuleIsomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleIsomorphism(M1, M2, m)
 end
 
-function module_isomorphism(M1::Module, M2::Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
+function module_isomorphism(M1::Module, M2::Module, m::MatElem; check::Bool = true)
+   Generic.ModuleIsomorphism(M1, M2, m; check)
 end

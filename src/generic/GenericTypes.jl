@@ -394,7 +394,7 @@ mutable struct MPolyCoeffs{T <: AbstractAlgebra.NCRingElem, S <: AbstractAlgebra
   temp::S # only used if inplace == true
 
   function MPolyCoeffs(f::AbstractAlgebra.NCRingElem; inplace::Bool = false)
-    I = new{typeof(f), elem_type(coefficient_ring_type(f))}(f, inplace)
+    I = new{typeof(f), coefficient_type(f)}(f, inplace)
     if inplace
       I.temp = zero(coefficient_ring(parent(f)))
     end
@@ -458,50 +458,6 @@ mutable struct MPolyBuildCtx{T, S}
   function MPolyBuildCtx(R::T, s::S) where {S, T}
     return new{elem_type(T), S}(R())
   end
-end
-
-###############################################################################
-#
-#   UniversalPolyRing / UnivPoly
-#
-###############################################################################
-
-@attributes mutable struct UniversalPolyRing{T <: RingElement} <: AbstractAlgebra.UniversalPolyRing{T}
-   base_ring::AbstractAlgebra.MPolyRing{T}
-
-   function UniversalPolyRing{T}(
-      R::Ring, s::Vector{Symbol}, internal_ordering::Symbol, cached::Bool=true
-   ) where {T<:RingElement}
-      @assert elem_type(R) == T
-      return get_cached!(
-         UnivPolyID, (R, s, internal_ordering), cached
-      ) do
-         new{T}(AbstractAlgebra.poly_ring(R, s; internal_ordering))
-      end::UniversalPolyRing{T}
-   end
-end
-
-const UnivPolyID = CacheDictType{Tuple{Ring, Vector{Symbol}, Symbol}, Ring}()
-
-mutable struct UnivPoly{T <: RingElement} <: AbstractAlgebra.UniversalPolyRingElem{T}
-   p::MPolyRingElem{T}
-   parent::UniversalPolyRing{T}
-end
-
-struct UnivPolyCoeffs{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyExponentVectors{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyTerms{T <: AbstractAlgebra.RingElem}
-   poly::T
-end
-
-struct UnivPolyMonomials{T <: AbstractAlgebra.RingElem}
-   poly::T
 end
 
 ###############################################################################
@@ -974,7 +930,7 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.Ring
+@attributes mutable struct TotFracRing{T <: RingElem} <: AbstractAlgebra.TotFracRing{T}
    base_ring::Ring
 
    function TotFracRing{T}(R::Ring, cached::Bool = true) where T <: RingElem
@@ -986,7 +942,7 @@ end
 
 const TotFracDict = CacheDictType{Ring, Ring}()
 
-mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.RingElem
+mutable struct TotFrac{T <: RingElem} <: AbstractAlgebra.TotFrac{T}
    num::T
    den::T
    parent::TotFracRing{T}
@@ -1055,40 +1011,46 @@ end
 
 ###############################################################################
 #
-#   FunctionField / FunctionFieldElem
+#   AbsSimpleFunctionField / AbsSimpleFunctionFieldElem
 #
 ###############################################################################
 
-@attributes mutable struct FunctionField{T <: FieldElement} <: AbstractAlgebra.Field
-   num::Poly{<:PolyRingElem{T}}
-   den::PolyRingElem{T}
+@attributes mutable struct AbsSimpleFunctionField{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.Field
+   num::Poly{U}
+   den::U
    S::Symbol
-   powers::Vector{Poly{<:PolyRingElem{T}}}
-   powers_den::Vector{<:PolyRingElem{T}}
-   traces::Vector{<:PolyRingElem{T}}
-   traces_den::PolyRingElem{T}
+   powers::Vector{Poly{U}}
+   powers_den::Vector{U}
+   traces::Vector{U}
+   traces_den::U
    monic::Bool
-   pol::Poly{RationalFunctionFieldElem{T, U}} where U <: PolyRingElem{T}
-   base_ring::RationalFunctionField{T, U} where U <: PolyRingElem{T}
+   pol::Poly{RationalFunctionFieldElem{T, U}}
+   base_ring::RationalFunctionField{T, U}
 
-   function FunctionField{T}(num::Poly{<:PolyRingElem{T}},
-             den::PolyRingElem{T}, s::Symbol, cached::Bool = true) where
-                                                          T <: FieldElement
-      return get_cached!(FunctionFieldDict, (num, den, s), cached) do
-         new{T}(num, den, s)
-      end::FunctionField{T}
+   function AbsSimpleFunctionField{T, U}(num::Poly{U},
+             den::U, s::Symbol, cached::Bool = true) where {T, U}
+      return get_cached!(AbsSimpleFunctionFieldDict, (num, den, s), cached) do
+         new{T, U}(num, den, s)
+      end::AbsSimpleFunctionField{T, U}
    end
 end
 
-const FunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
+const AbsSimpleFunctionFieldDict = CacheDictType{Tuple{Poly, PolyRingElem, Symbol}, Field}()
 
-mutable struct FunctionFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
-   num::Poly{<:PolyRingElem{T}}
-   den::PolyRingElem{T}
-   parent::FunctionField{T}
+mutable struct AbsSimpleFunctionFieldElem{T <: FieldElement, U <: PolyRingElem{T}} <: AbstractAlgebra.FieldElem
+   num::Poly{U}
+   den::U
+   parent::AbsSimpleFunctionField{T, U}
 
-   function FunctionFieldElem{T}(R::FunctionField{T}, num::Poly{S}, den::S) where {T <: FieldElement, S <: PolyRingElem{T}}
-      return new{T}(num, den, R)
+   function AbsSimpleFunctionFieldElem{T, U}(R::AbsSimpleFunctionField{T, U}, num::Poly{U}, den::U) where {T, U}
+      if !iszero(num) #normalize the denominator
+         c = content(den)
+         if !is_one(c)
+            num = divexact(num, c)
+            den = divexact(den, c)
+         end
+      end
+      return new{T, U}(num, den, R)
    end
 end
 
@@ -1364,15 +1326,16 @@ end
 @attributes mutable struct FreeModule{T <: NCRingElement} <: AbstractAlgebra.FPModule{T}
    rank::Int
    base_ring::NCRing
+   is_row::Bool
 
-   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: NCRingElement
-      return get_cached!(FreeModuleDict, (R, rank), cached) do
-         new{T}(rank, R)
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true; is_row::Bool = true) where T <: NCRingElement
+      return get_cached!(FreeModuleDict, (R, rank, is_row), cached) do
+         new{T}(rank, R, is_row)
       end::FreeModule{T}
    end
 end
 
-const FreeModuleDict = CacheDictType{Tuple{NCRing, Int}, FreeModule}()
+const FreeModuleDict = CacheDictType{Tuple{NCRing, Int, Bool}, FreeModule}()
 
 struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
    parent::FreeModule{T}
@@ -1412,16 +1375,38 @@ end
 #
 ###############################################################################
 
-mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
+mutable struct ModuleHomomorphism{T <: NCRingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
 
    domain::AbstractAlgebra.FPModule{T}
    codomain::AbstractAlgebra.FPModule{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
+   is_left::Bool  # x -> is_left ? #xA : Ax so is_left is the "normal" case
    solve_ctx::Any # really: SolveCtx
+   map::Map # to change the ring. The morphism is
+   #1st apply map (coefficient wise, map_entries(map, _matrix(x)))
+   #2nd apply matrix
 
    function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
+      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), true)
+   end
+
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}; is_left::Bool = true, map::Union{Nothing, Map} = nothing) where T <: NCRingElement
+
+      if is_left
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(map_entries(map, _matrix(x))*m)
+         end
+      else
+         z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(m*_matrix(x)), is_left)
+         if !isa(map, Nothing)
+           z.map = map
+           z.image_fn = x::AbstractAlgebra.FPModuleElem{T} -> C(m*map_entries(map, _matrix(x)))
+         end
+      end
+      return z
    end
 end
 
@@ -1435,7 +1420,7 @@ mutable struct ModuleIsomorphism{T <: RingElement} <: AbstractAlgebra.Map{Abstra
    inverse_image_fn::Function
 
    function ModuleIsomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, minv, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), y::AbstractAlgebra.FPModuleElem{T} -> D(y.v*minv))
+      z = new(D, C, m, minv, x::AbstractAlgebra.FPModuleElem{T} -> C(_matrix(x)*m), y::AbstractAlgebra.FPModuleElem{T} -> D(_matrix(y)*minv))
    end
 end
 
@@ -1620,4 +1605,35 @@ end
 
 function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
   return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
+end
+
+################################################################################
+#
+#  Multivariate Puiseux polynomials
+#  
+################################################################################
+
+struct PuiseuxMPolyRing{T <: RingElement} <: Ring
+    baseRing::LaurentMPolyRing{T}
+
+    function PuiseuxMPolyRing(R::LaurentMPolyRing)
+        return new{coefficient_type(R)}(R)
+    end
+end
+
+mutable struct PuiseuxMPolyRingElem{T <: RingElement} <: RingElem
+    parent::PuiseuxMPolyRing{T}
+    poly::LaurentMPolyRingElem{T}
+    scale::Int
+
+    function PuiseuxMPolyRingElem(
+        Kt::PuiseuxMPolyRing{T},
+        f::LaurentMPolyRingElem,
+        d::Int = Int(1)
+      ) where {T}
+
+        @req parent(f) == base_ring(Kt) "polynomial must be in the base ring"
+        @req d > 0 "scale must be positive"
+        return new{T}(Kt, f, d)
+    end
 end

@@ -13,7 +13,7 @@ The following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
 
 ```@raw html
-<img src="img/parents_diagram.svg" alt="Diagram of parent types"/>
+<img src="../assets/parents_diagram.svg" alt="Diagram of parent types"/>
 ```
 ```@raw latex
 \begin{figure}
@@ -28,7 +28,7 @@ Similarly the following diagram shows a complete list of all abstract types in
 AbstractAlgebra.jl.
 
 ```@raw html
-<img src="img/elements_diagram.svg" alt="Diagram of element types"/>
+<img src="../assets/elements_diagram.svg" alt="Diagram of element types"/>
 ```
 ```@raw latex
 \begin{figure}

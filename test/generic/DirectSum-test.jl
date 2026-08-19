@@ -29,6 +29,14 @@
 
    @test_throws ArgumentError gen(D, 0)
    @test_throws ArgumentError gen(D, ngens(D) + 1)
+
+   F = free_module(ZZ, 1)
+   S, _ = sub(F, [2*gen(F, 1)])
+   Q, _ = quo(F, S)
+   D, _, _ = direct_sum(Q, Q)
+
+   @test relations(D) == [matrix(ZZ, 1, 2, [2, 0]), matrix(ZZ, 1, 2, [0, 2])]
+   @test invariant_factors(D) == BigInt[2, 2]
 end
 
 @testset "Generic.DirectSum.basic_manipulation" begin
@@ -89,4 +97,3 @@ end
       end
    end
 end
-

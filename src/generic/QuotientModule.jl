@@ -90,11 +90,11 @@ function show(io::IO, v::QuotientModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), _matrix(v)[1, i])
+      print(IOContext(io, :compact => true), v[i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), _matrix(v)[1, len])
+      print(IOContext(io, :compact => true), v[len])
    end
    print(io, ")")
 end
