@@ -1143,7 +1143,7 @@ function evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
    vals = Array{RingElement}(undef, length(val_pairs))
    for (i, (var, val)) in enumerate(val_pairs)
      vari = findfirst(isequal(var), ss)
-     vari === nothing && error("Given polynomial has no variable $var")
+     vari === nothing && error("Polynomial ring has no variable $var")
      findnext(isequal(var), ss, vari+1) === nothing || error("$var is ambiguous")
      vars[i] = vari
      vals[i] = val
@@ -1158,11 +1158,11 @@ evaluate(a::MPolyRingElem, val_dict::Dict{Symbol, <:RingElement}) = evaluate(a, 
 @doc raw"""
     (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
 
-Evaluate the polynomial at the supplied values, which may be any ring elements,
-commutative or non-commutative, but in the same ring. Evaluation always proceeds
-in the order of the variables as supplied when creating the polynomial ring to
-which $a$ belongs. The evaluation will succeed if a product of a coefficient
-of the polynomial by one of the values is defined.
+Evaluate the polynomial `a` at the supplied values; the $k$-th supplied value
+specifies the image of the $k$-th variable in the polynomial ring of `a`.  The
+supplied values may be in commutative or non-commutative rings -- the
+supplied values should anyway commute amongst themselves. The
+evaluation will succeed if each product from a term in `a`  is defined.
 """
 (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
