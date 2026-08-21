@@ -1115,8 +1115,8 @@ end
 @doc raw"""
     evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
 
-Evaluate the polynomial `a` at the supplied variable value pairs. The result will be an element of the parent of `a`. The values
-can also be supplied as a dictionary or through keyword arguments as shown in the example below.
+Evaluate the polynomial `a` at the supplied variable-value pairs; the values must be in a commutative ring. The result will be an element of the parent of `a`. The values
+can alternatively be supplied as a dictionary or through keyword arguments as shown in the example below.
 
 ```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, [:x,:y]);
