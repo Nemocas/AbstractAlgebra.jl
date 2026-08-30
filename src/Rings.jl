@@ -110,6 +110,7 @@ is_exact_type(R::Type{T}) where T <: RingElem = true
 is_exact_type(x) = is_exact_type(typeof(x))
 is_exact_type(x::Type{<:Ring}) = is_exact_type(elem_type(x))
 is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
+is_exact_type(T::Type{Union{}}) = throw(MethodError(is_exact_type, (T,)))
 
 # Type can only represent elements of domains, i.e. without zero divisors
 # false unless explicitly specified
@@ -122,6 +123,7 @@ is_domain_type(R::Type{T}) where T <: NCRingElem = false
 is_domain_type(x) = is_domain_type(typeof(x))
 is_domain_type(x::Type{<:NCRing}) = is_domain_type(elem_type(x))
 is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
+is_domain_type(T::Type{Union{}}) = throw(MethodError(is_domain_type, (T,)))
 
 ###############################################################################
 #

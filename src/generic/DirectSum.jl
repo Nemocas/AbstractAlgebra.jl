@@ -210,10 +210,11 @@ function AbstractAlgebra.canonical_projection(A::DirectSumModule, i::Int)
   return ModuleHomomorphism(A, B, inj_proj_mat(base_ring(A), ngens(A), ngens(B), sum(ngens(x) for x = summands(A)[1:i-1]; init = 0)+1))
 end
 
-function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
+function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{<:RingElement}})
    length(m) == 0 && error("Cannot take a direct sum of an empty vector of modules")
    # Check base rings are the same
    R = base_ring(m[1])
+   T = elem_type(R)
    for i = 2:length(m)
       base_ring(m[i]) != R && error("Incompatible modules")
    end

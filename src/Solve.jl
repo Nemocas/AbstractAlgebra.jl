@@ -249,6 +249,7 @@ end
 solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRingElement} = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
 solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
+solve_context_type(NF::MatrixNormalFormTrait, T::Type{Union{}}) = throw(MethodError(solve_context_type, (NF, T)))
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{<: MatElem{T}}) where T = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::MatElem{T}) where T = solve_context_type(NF, T)
 

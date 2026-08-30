@@ -1290,7 +1290,9 @@ function extract_gens(D::Vector{U}, node::T) where {N, U <: AbstractAlgebra.MPol
 end
 
 # extract all generators from basis into array D which is returned
-function extract_gens(B::Vector{T}) where {N, U <: AbstractAlgebra.MPolyRingElem, V, T <: lmnode{U, V, N}}
+function extract_gens(B::Vector{T}) where T <: lmnode
+   isempty(B) && return B
+   U = T.parameters[1]
    D = Vector{U}()
    for node in B
       extract_gens(D, node)
