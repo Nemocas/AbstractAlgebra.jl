@@ -74,3 +74,10 @@ julia> one(S)
 parent(M::MatRingElem{T}) where T <: NCRingElement
 degree(M::MatRingElem{T}) where T <: NCRingElement
 ```
+
+
+## Converting matrix algebra elements to matrices
+
+```@docs
+matrix(R::NCRing, M::MatRingElem)
+```

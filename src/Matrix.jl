@@ -8023,6 +8023,13 @@ function matrix(R::NCRing, arr::MatElem)
    return map_entries(R, arr)
 end
 
+@doc raw"""
+    matrix(R::NCRing, M::MatRingElem)
+
+Return the matrix over the ring `R` obtained by coercing the entries of the
+matrix algebra element `M` into `R`. The result belongs to a matrix space
+rather than a matrix algebra.
+"""
 function matrix(R::NCRing, arr::MatRingElem)
    return map_entries(R, matrix(arr))
 end

@@ -62,11 +62,10 @@ change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
 ```
 
 The same conversion of `M` can also be performed using the following
-constructors:
+constructor:
 
 ```julia
 matrix(R::NCRing, M::MatElem)
-matrix(R::NCRing, M::MatRingElem)
 ```
 
 
