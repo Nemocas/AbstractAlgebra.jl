@@ -67,19 +67,19 @@ The entry type `T` must belong to the `RingElem` hierarchy.
 Implementations must provide constructors from Julia arrays of entries:
 
 ```julia
-(P::MyMatParent{T})(m::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
+(P::MyMatParent{T})(A::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
 ```
 
 Implementations must provide constructors from Julia arrays of entries:
 
 ```julia
-(P::MyMatParent{T})(m::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
+(P::MyMatParent{T})(A::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
 ```
 
 and constructors allowing coercion into the base ring:
 
 ```julia
-(P::MyMatParent{T})(m::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
+(P::MyMatParent{T})(A::Matrix{U}) where {T <: NCRingElem, U <: NCRingElem}
 ```
 
 as well as construction from flat vectors:
@@ -94,8 +94,8 @@ as well as construction from flat vectors:
 Matrix implementations must provide:
 
 ```julia
-number_of_rows(m::MyMat)
-number_of_columns(m::MyMat)
+number_of_rows(M::MyMat)
+number_of_columns(M::MyMat)
 ```
 
 returning the dimensions of the matrix.
@@ -103,8 +103,8 @@ returning the dimensions of the matrix.
 Entry access and mutation are provided through:
 
 ```julia
-getindex(m::MyMat, i::Int, j::Int)
-setindex!(m::MyMat, x, i::Int, j::Int)
+getindex(M::MyMat, i::Int, j::Int)
+setindex!(M::MyMat, x, i::Int, j::Int)
 ```
 
 Matrices are mutable, and `setindex!` modifies the given matrix in place.
@@ -115,7 +115,7 @@ Matrices are mutable, and `setindex!` modifies the given matrix in place.
 Implementations must provide:
 
 ```julia
-transpose(m::MyMat)
+transpose(M::MyMat)
 ```
 
 returning the transpose of the matrix.
@@ -164,7 +164,7 @@ performance.
 ### Submatrices
 
 ```julia
-Base.getindex(m::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})
+Base.getindex(M::MyMat, rows::AbstractVector{Int}, cols::AbstractVector{Int})
 ```
 
 Return the corresponding submatrix.
@@ -173,17 +173,17 @@ Return the corresponding submatrix.
 ### Row operations
 
 ```julia
-swap_rows!(m::MyMat, i::Int, j::Int)
+swap_rows!(M::MyMat, i::Int, j::Int)
 ```
 
-Swap two rows of `m` in place.
+Swap two rows of `M` in place.
 
 
 ### Concatenation
 
 ```julia
-hcat(m::MyMat, n::MyMat)
-vcat(m::MyMat, n::MyMat)
+hcat(M::MyMat, N::MyMat)
+vcat(M::MyMat, N::MyMat)
 ```
 
 Return horizontal and vertical concatenations.
@@ -192,9 +192,9 @@ Return horizontal and vertical concatenations.
 ### Zero tests
 
 ```julia
-is_zero_entry(m::MyMat, i::Int, j::Int)
-is_zero_row(m::MyMat, i::Int)
-is_zero_column(m::MyMat, j::Int)
+is_zero_entry(M::MyMat, i::Int, j::Int)
+is_zero_row(M::MyMat, i::Int)
+is_zero_column(M::MyMat, j::Int)
 ```
 
 
@@ -203,8 +203,8 @@ is_zero_column(m::MyMat, j::Int)
 Implementations may specialise:
 
 ```julia
-similar(m::MyMat, R::Ring, r::Int, c::Int)
-zero(m::MyMat, R::Ring, r::Int, c::Int)
+similar(M::MyMat, R::Ring, r::Int, c::Int)
+zero(M::MyMat, R::Ring, r::Int, c::Int)
 ```
 
 The function `similar` constructs a matrix of the requested type, base ring
@@ -218,7 +218,7 @@ whose entries are all initialised to zero.
 ### Assigned entries
 
 ```julia
-Base.isassigned(m::MyMat, i, j)
+Base.isassigned(M::MyMat, i, j)
 ```
 
 Tests whether an entry exists at the given position.
@@ -227,7 +227,7 @@ Tests whether an entry exists at the given position.
 ### Symmetry
 
 ```julia
-is_symmetric(m::MyMat)
+is_symmetric(M::MyMat)
 ```
 
 Return whether the matrix is symmetric.

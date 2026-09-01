@@ -30,23 +30,23 @@ matrix reside.
 ## Constructing matrices from entries
 
 ```@docs
-matrix(R::NCRing, m::AbstractMatrix{T}) where {T}
-matrix(R::NCRing, r::Int, c::Int, arr::AbstractVecOrMat{T}) where {T}
+matrix(R::NCRing, entries::AbstractMatrix{T}) where {T}
+matrix(R::NCRing, r::Int, c::Int, entries::AbstractVecOrMat{T}) where {T}
 ```
 
 Several other signatures are supported:
 
 ```julia
-matrix(m::AbstractMatrix{T}) where {T<:NCRingElement}
-matrix(arr::AbstractVector{T}) where {T<:NCRingElement}
-matrix(arr::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
+matrix(entries::AbstractMatrix{T}) where {T<:NCRingElement}
+matrix(entries::AbstractVector{T}) where {T<:NCRingElement}
+matrix(entries::AbstractVector{<:AbstractVector{T}}) where {T<:NCRingElement}
 ```
 
-Nested vectors can also be used to construct matrices over a specified
-base ring:
+In each signature, `entries` supplies the matrix entries. Nested vectors can
+also be used to construct matrices over a specified base ring:
 
 ```julia
-matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
+matrix(R::NCRing, entries::AbstractVector{<:AbstractVector})
 ```
 
 
@@ -58,14 +58,15 @@ matrix(R::NCRing, arr::AbstractVector{<:AbstractVector})
 Matrices can be converted to another base ring using `change_base_ring`.
 
 ```@docs
-change_base_ring(R::NCRing, m::MatrixElem{T}) where {T <: NCRingElement}
+change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
 ```
 
-The same conversion can also be performed using the following constructors:
+The same conversion of `M` can also be performed using the following
+constructors:
 
 ```julia
-matrix(R::NCRing, m::MatElem)
-matrix(R::NCRing, m::MatRingElem)
+matrix(R::NCRing, M::MatElem)
+matrix(R::NCRing, M::MatRingElem)
 ```
 
 
@@ -74,30 +75,30 @@ matrix(R::NCRing, m::MatRingElem)
 An independent copy of an existing matrix can be created.
 
 ```julia
-matrix(m::MatElem{T}) where {T<:NCRingElement}
+matrix(mat::MatElem{T}) where {T<:NCRingElement}
 ```
 
 
 ### Zero matrices
 
 ```@docs
-zero(m::MatElem{T}, R::NCRing) where {T <: NCRingElement}
+zero(M::MatElem{T}, R::NCRing) where {T <: NCRingElement}
 ```
 
 
 ### Identity matrices
 
 ```@docs
-identity_matrix(m::MatElem{T}) where {T <: NCRingElement}
-identity_matrix(m::MatElem{T}, n::Int) where {T <: NCRingElement}
-one(m::MatElem{T}) where {T <: NCRingElement}
+identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
+identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
+one(M::MatElem{T}) where {T <: NCRingElement}
 ```
 
 
 ### Uninitialized matrices
 
 ```@docs
-similar(m::MatElem, R::NCRing, r::Int, c::Int)
+similar(M::MatElem, R::NCRing, r::Int, c::Int)
 ```
 
 
@@ -107,8 +108,8 @@ Matrices can be constructed from existing matrices by concatenating them
 horizontally or vertically.
 
 ```@docs
-Base.hcat(m::MatElem...)
-Base.vcat(m::MatElem...)
+Base.hcat(A::MatElem...)
+Base.vcat(A::MatElem...)
 ```
 
 

@@ -14,8 +14,8 @@ number_of_columns(A::Matrix{T}) where {T} = size(A, 2)
 ###############################################################################
 
 """
-    Matrix(m::MatrixElem{T}) where {T<:NCRingElement}
-    Matrix{U}(m::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement}
+    Matrix(A::MatrixElem{T}) where {T<:NCRingElement}
+    Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement}
 
 Convert `A` to a Julia `Matrix{U}` of the same dimensions with the same elements.
 If `U` is omitted then `eltype(M)` is used in its place.
@@ -37,12 +37,12 @@ julia> Matrix{Int}(A)
  4  5  6
 ```
 """
-Matrix(m::MatrixElem{T}) where {T<:NCRingElement} = Matrix{eltype(m)}(m)
-Matrix{U}(m::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[m[i, j] for i = 1:nrows(m), j = 1:ncols(m)]
+Matrix(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix{eltype(M)}(M)
+Matrix{U}(M::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
 
 
 """
-    Array(m::MatrixElem{T}) where T <: NCRingElement
+    Array(A::MatrixElem{T}) where T <: NCRingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 
@@ -58,7 +58,7 @@ julia> Array(A)
  x^2  x^3
 ```
 """
-Array(m::MatrixElem{T}) where {T<:NCRingElement} = Matrix(m)
+Array(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix(M)
 
 ###############################################################################
 #

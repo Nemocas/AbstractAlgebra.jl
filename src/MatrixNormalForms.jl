@@ -5,7 +5,7 @@
 ################################################################################
 
 @doc raw"""
-    echelon_form(m::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+    echelon_form(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
 
 Return a row echelon form $R$ of $A$.
 
@@ -20,8 +20,8 @@ Return a row echelon form $R$ of $A$.
 
 See also [`echelon_form_with_transformation`](@ref).
 """
-function echelon_form(m::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
-  R = deepcopy(m)
+function echelon_form(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+  R = deepcopy(A)
   r = echelon_form!(R, reduced = reduced, shape = shape)
   if trim
     if shape === :upper
@@ -34,23 +34,23 @@ function echelon_form(m::MatElem{<:FieldElement}; reduced::Bool = true, shape::S
 end
 
 @doc raw"""
-    echelon_form_with_transformation(m::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
+    echelon_form_with_transformation(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
 
 Return a row echelon form $R$ of $A$ and an invertible matrix $U$ with $R = UA$.
 
 See [`echelon_form`](@ref) for the keyword arguments.
 """
-function echelon_form_with_transformation(m::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
+function echelon_form_with_transformation(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
   if shape === :upper
-    R = hcat(deepcopy(m), identity_matrix(base_ring(m), nrows(m)))
+    R = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
   else
-    R = hcat(identity_matrix(base_ring(m), nrows(m)), deepcopy(m))
+    R = hcat(identity_matrix(base_ring(A), nrows(A)), deepcopy(A))
   end
   echelon_form!(R, reduced = reduced, shape = shape)
   if shape === :upper
-    return sub(R, 1:nrows(m), 1:ncols(m)), sub(R, 1:nrows(m), ncols(m) + 1:ncols(R))
+    return sub(R, 1:nrows(A), 1:ncols(A)), sub(R, 1:nrows(A), ncols(A) + 1:ncols(R))
   else
-    return sub(R, 1:nrows(m), nrows(m) + 1:ncols(R)), sub(R, 1:nrows(m), 1:nrows(m))
+    return sub(R, 1:nrows(A), nrows(A) + 1:ncols(R)), sub(R, 1:nrows(A), 1:nrows(A))
   end
 end
 
@@ -79,7 +79,7 @@ end
 ################################################################################
 
 @doc raw"""
-    hermite_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+    hermite_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
 
 Return a Hermite normal form $H$ of $A$.
 It is assumed that `base_ring(A)` is euclidean.
@@ -95,15 +95,15 @@ It is assumed that `base_ring(A)` is euclidean.
 
 See also [`hermite_form_with_transformation`](@ref).
 """
-function hermite_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+function hermite_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
   if shape !== :upper && shape !== :lower
     throw(ArgumentError("Unsupported argument :$shape for shape: Must be :upper or :lower."))
   end
 
   if shape === :lower
-    m = reverse_cols(m)
+    A = reverse_cols(A)
   end
-  H = hnf(m)
+  H = hnf(A)
   r = nrows(H)
   # Compute the rank (if necessary)
   if trim
@@ -120,22 +120,22 @@ function hermite_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Sy
 end
 
 @doc raw"""
-    hermite_form_with_transformation(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
+    hermite_form_with_transformation(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
 
 Return a Hermite normal form $H$ of $A$ and an invertible matrix $U$ with $H = UA$.
 It is assumed that `base_ring(A)` is euclidean.
 
 See [`hermite_form`](@ref) for the keyword arguments.
 """
-function hermite_form_with_transformation(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
+function hermite_form_with_transformation(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
   if shape !== :upper && shape !== :lower
     throw(ArgumentError("Unsupported argument :$shape for shape: Must be :upper or :lower."))
   end
 
   if shape === :lower
-    m = reverse_cols(m)
+    A = reverse_cols(A)
   end
-  H, U = hnf_with_transform(m)
+  H, U = hnf_with_transform(A)
   if shape === :lower
     reverse_cols!(H)
     reverse_rows!(H)
@@ -308,7 +308,7 @@ function howell_form!(A::MatElem{<:RingElement})
 end
 
 @doc raw"""
-    howell_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+    howell_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
 
 Return a Howell form $H$ of $A$.
 It is assumed that `base_ring(A)` is a principal ideal ring.
@@ -323,12 +323,12 @@ It is assumed that `base_ring(A)` is a principal ideal ring.
 
 See also [`howell_form_with_transformation`](@ref).
 """
-function howell_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
+function howell_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
   if shape !== :upper && shape !== :lower
     throw(ArgumentError("Unsupported argument :$shape for shape: Must be :upper or :lower."))
   end
 
-  H = deepcopy(m)
+  H = deepcopy(A)
   if shape === :lower
     H = reverse_cols!(H)
   end
@@ -356,7 +356,7 @@ function howell_form(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Sym
 end
 
 @doc raw"""
-    howell_form_with_transformation(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
+    howell_form_with_transformation(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
 
 Return a Howell form $H$ of $A$ and a matrix $U$ with $H = UA$.
 Notice that $H$ may have more rows than $A$ and hence $U$ may not be invertible.
@@ -364,25 +364,25 @@ It is assumed that `base_ring(A)` is a principal ideal ring
 
 See [`hermite_form`](@ref) for the keyword arguments.
 """
-function howell_form_with_transformation(m::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
+function howell_form_with_transformation(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Symbol = :upper)
   if shape !== :upper && shape !== :lower
     throw(ArgumentError("Unsupported argument :$shape for shape: Must be :upper or :lower."))
   end
 
   if shape === :lower
-    B = hcat(reverse_cols(m), identity_matrix(m, nrows(m)))
+    B = hcat(reverse_cols(A), identity_matrix(A, nrows(A)))
   else
-    B = hcat(deepcopy(m), identity_matrix(m, nrows(m)))
+    B = hcat(deepcopy(A), identity_matrix(A, nrows(A)))
   end
   if nrows(B) < ncols(B)
-    B = vcat(B, zero(m, ncols(B) - nrows(B), ncols(B)))
+    B = vcat(B, zero(A, ncols(B) - nrows(B), ncols(B)))
   end
 
   howell_form!(B)
 
-  nr = max(nrows(m), ncols(m))
-  H = sub(B, 1:nr, 1:ncols(m))
-  U = sub(B, 1:nr, ncols(m) + 1:ncols(B))
+  m = max(nrows(A), ncols(A))
+  H = sub(B, 1:m, 1:ncols(A))
+  U = sub(B, 1:m, ncols(A) + 1:ncols(B))
 
   if shape === :lower
     reverse_cols!(H)

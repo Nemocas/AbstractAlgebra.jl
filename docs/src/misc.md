@@ -225,7 +225,7 @@ For a new trait `NewTrait <: MatrixNormalFormTrait`, one needs to implement the
 function
 ```julia
 Solve._can_solve_internal_no_check(
-  ::NewTrait, m::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left
+  ::NewTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left
   ) where T
 ```
 Inside this function, one can assume that `A` and `b` have the same base ring
@@ -248,7 +248,7 @@ The input `task` may be:
 
 One should further implement the function
 ```julia
-kernel(::NewTrait, m::MatElem; side::Symbol = :left)
+kernel(::NewTrait, A::MatElem; side::Symbol = :left)
 ```
 which computes a left (or right) kernel of `A`.
 
