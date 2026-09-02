@@ -5078,11 +5078,11 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc raw"""
-    charpoly(Y::MatElem{T}) where {T <: RingElement}
-    charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
+    charpoly(M::MatElem{T}) where {T <: RingElement}
+    charpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 
-Return the characteristic polynomial $p$ of the square matrix $Y$.
-If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+Return the characteristic polynomial $p$ of the square matrix $M$.
+If a polynomial ring $S$ over the same base ring as $M$ is supplied,
 the resulting polynomial is an element of it.
 
 # Examples
@@ -5111,39 +5111,39 @@ julia> A = charpoly(M)
 x^4 + 2*x^2 + 6*x + 2
 ```
 """
-function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
-   !is_square(Y) && error("Dimensions don't match in charpoly")
-   R = base_ring(Y)
-   base_ring(S) != base_ring(Y) && error("Cannot coerce into polynomial ring")
-   n = nrows(Y)
+function charpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
+   !is_square(M) && error("Dimensions don't match in charpoly")
+   R = base_ring(M)
+   base_ring(S) != base_ring(M) && error("Cannot coerce into polynomial ring")
+   n = nrows(M)
    if n == 0
       return one(S)
    end
    F = Vector{elem_type(R)}(undef, n)
    A = Vector{elem_type(R)}(undef, n)
-   M = Matrix{elem_type(R)}(undef, n - 1, n)
-   F[1] = -Y[1, 1]
+   W = Matrix{elem_type(R)}(undef, n - 1, n)
+   F[1] = -M[1, 1]
    for i = 2:n
       F[i] = R()
       for j = 1:i
-         M[1, j] = Y[j, i]
+         W[1, j] = M[j, i]
       end
-      A[1] = Y[i, i]
+      A[1] = M[i, i]
       p = R()
       for j = 2:i - 1
          for k = 1:i
             s = R()
             for l = 1:i
-               s = addmul_delayed_reduction!(s, Y[k, l], M[j - 1, l], p)
+               s = addmul_delayed_reduction!(s, M[k, l], W[j - 1, l], p)
             end
             s = reduce!(s)
-            M[j, k] = s
+            W[j, k] = s
          end
-         A[j] = M[j, i]
+         A[j] = W[j, i]
       end
       s = R()
       for j = 1:i
-         s = addmul_delayed_reduction!(s, Y[i, j], M[i - 1, j], p)
+         s = addmul_delayed_reduction!(s, M[i, j], W[i - 1, j], p)
       end
       s = reduce!(s)
       A[i] = s
@@ -5164,10 +5164,10 @@ function charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
    return f
 end
 
-function charpoly(Y::MatElem)
-   R = base_ring(Y)
+function charpoly(M::MatElem)
+   R = base_ring(M)
    Rx, x = polynomial_ring(R; cached=false)
-   return charpoly(Rx, Y)
+   return charpoly(Rx, M)
 end
 
 ###############################################################################

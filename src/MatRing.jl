@@ -467,8 +467,8 @@ is_invertible(A::MatRingElem{T}) where {T <: RingElement} = is_unit(det(A))
 
 is_invertible(A::MatRingElem{T}) where {T <: FieldElement} = ncols(A) == rank(A)
 
-function is_nilpotent(A::MatRingElem{T}) where {T <: RingElement}
-  return is_nilpotent(matrix(A))
+function is_nilpotent(M::MatRingElem{T}) where {T <: RingElement}
+  return is_nilpotent(matrix(M))
 end
 
 function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
@@ -479,8 +479,8 @@ function hessenberg(A::MatRingElem{T}) where {T <: RingElement}
   return Generic.MatRingElem(hessenberg(matrix(A)))
 end
 
-function is_hessenberg(A::MatRingElem{T}) where {T <: RingElement}
-  return is_hessenberg(matrix(A))
+function is_hessenberg(M::MatRingElem{T}) where {T <: RingElement}
+  return is_hessenberg(matrix(M))
 end
 
 function charpoly_hessenberg!(S::Ring, A::MatRingElem{T}) where {T <: RingElement}

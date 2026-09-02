@@ -42,7 +42,7 @@ pseudo_inv(M::MatElem{T}) where {T <: RingElement}
 ## Characteristic and minimal polynomials
 
 ```@docs
-charpoly(S::PolyRing{T}, Y::MatElem{T}) where {T <: RingElement}
+charpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 ```
 
@@ -50,7 +50,7 @@ minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 ## Powers
 
 ```@docs
-powers(::MatElem, ::Int)
+powers(M::MatElem, d::Int)
 ```
 
 
