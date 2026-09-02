@@ -74,7 +74,7 @@ julia> degree(A)
 3
 ```
 """
-degree(a::MatRingElem{T}) where T <: NCRingElement = degree(parent(a))
+degree(M::MatRingElem{T}) where T <: NCRingElement = degree(parent(M))
 
 zero(a::MatRing) = a()
 

@@ -41,7 +41,7 @@ julia> parent(A) == S
 true
 ```
 """
-parent(a::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(a), nrows(matrix(a)))
+parent(M::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(M), nrows(matrix(M)))
 
 is_exact_type(::Type{MatRingElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
