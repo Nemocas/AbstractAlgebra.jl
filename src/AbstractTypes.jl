@@ -78,7 +78,7 @@ abstract type FunctionalMap <: SetMap end
 
 abstract type IdentityMap <: SetMap end
 
-abstract type HeckeMap <: FunctionalMap end
+abstract type HeckeMap <: SetMap end
 
 abstract type FPModuleHomomorphism <: FunctionalMap end
 
