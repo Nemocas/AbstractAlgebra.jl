@@ -132,7 +132,7 @@ end
 
 
 function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
-  return is_nilpotent(f.mpoly);
+  return is_nilpotent(f.mpoly)
 end
 
 

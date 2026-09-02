@@ -151,7 +151,7 @@ end
 
 
 function is_nilpotent(f::T) where {T <: LaurentPolyRingElem}
-  return is_nilpotent(f.poly);
+  return is_nilpotent(f.poly)
 end
 
 ###############################################################################
