@@ -30,8 +30,8 @@ end
 @attributes mutable struct MapHeader{D, C}
   domain::D
   codomain::C
-  image
-  preimage
+  image           # object used to compute images
+  preimage        # object used to compute preimages
   cache::MapCache
 
   function MapHeader{D, C}() where {D, C}
