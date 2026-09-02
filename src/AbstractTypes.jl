@@ -68,6 +68,10 @@ abstract type IdealElem{T} <: SetElem end
 
 abstract type Map{D, C, S, T} <: SetElem end
 
+
+#
+# The following types are only used as type parameters for `Map` subtypes
+#
 abstract type SetMap end
 
 abstract type FunctionalMap <: SetMap end
