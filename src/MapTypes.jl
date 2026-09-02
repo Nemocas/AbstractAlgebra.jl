@@ -40,27 +40,15 @@ end
   end
 
   function MapHeader{D, C}(domain::D, codomain::C) where {D, C}
-    z = new{D, C}()
-    z.domain = domain
-    z.codomain = codomain
-    return z
+    return new{D,C}(domain, codomain)
   end
 
   function MapHeader{D, C}(domain::D, codomain::C, image) where {D, C}
-    z = new{D, C}()
-    z.domain = domain
-    z.codomain = codomain
-    z.image = image
-    return z
+    return new{D, C}(domain, codomain, image)
   end
 
   function MapHeader{D, C}(domain::D, codomain::C, image, preimage) where {D, C}
-    z = new{D, C}()
-    z.domain = domain
-    z.codomain = codomain
-    z.image = image
-    z.preimage = preimage
-    return z
+    return new{D, C}(domain, codomain, image, preimage)
   end
 end
 
