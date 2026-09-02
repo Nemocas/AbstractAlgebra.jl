@@ -108,7 +108,7 @@ Map: rationals -> F
 
 ```
 """
-mutable struct MapFromFunc{R, T} <: Map{R, T, HeckeMap, MapFromFunc}
+mutable struct MapFromFunc{R, T} <: Map{R, T, MapWithHeader, MapFromFunc}
   header::MapHeader{R, T}
   f
   g

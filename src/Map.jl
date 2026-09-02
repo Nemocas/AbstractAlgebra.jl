@@ -162,27 +162,27 @@ map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_
 
 ################################################################################
 #
-#  HeckeMap
+#  MapWithHeader
 #
 ################################################################################
 
 
 # Hecke maps store attributes in the header object
-_get_attributes(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes(G.header)
-_get_attributes!(G::Map{<:Any, <:Any, HeckeMap, <:Any}) = _get_attributes!(G.header)
-_is_attribute_storing_type(::Type{<:Map(HeckeMap)}) = true
+_get_attributes(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes(G.header)
+_get_attributes!(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes!(G.header)
+_is_attribute_storing_type(::Type{<:Map(MapWithHeader)}) = true
 
-(f::Map(HeckeMap))(x) = image(f, x)
+(f::Map(MapWithHeader))(x) = image(f, x)
 
-function domain(M::Map(HeckeMap))
+function domain(M::Map(MapWithHeader))
   return M.header.domain
 end
 
-function codomain(M::Map(HeckeMap))
+function codomain(M::Map(MapWithHeader))
   return M.header.codomain
 end
 
-function image_function(f::Map(HeckeMap))
+function image_function(f::Map(MapWithHeader))
   if isdefined(f.header, :image)
     return f.header.image
   else
@@ -190,7 +190,7 @@ function image_function(f::Map(HeckeMap))
   end
 end
 
-function preimage_function(f::Map(HeckeMap))
+function preimage_function(f::Map(MapWithHeader))
   if isdefined(f.header, :preimage)
     return f.header.preimage
   else
@@ -198,8 +198,8 @@ function preimage_function(f::Map(HeckeMap))
   end
 end
 
-image_fn(f::Map(HeckeMap)) = image_function(f)
-inverse_fn(f::Map(HeckeMap)) = preimage_function(f)
+image_fn(f::Map(MapWithHeader)) = image_function(f)
+inverse_fn(f::Map(MapWithHeader)) = preimage_function(f)
 
 
 ################################################################################
