@@ -28,8 +28,8 @@ is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
 ```@docs
 is_lower_triangular(M::MatElem)
 is_upper_triangular(M::MatElem)
-is_diagonal(A::MatElem)
-is_hessenberg(A::MatElem{T}) where {T <: RingElement}
+is_diagonal(M::MatElem)
+is_hessenberg(M::MatElem{T}) where {T <: RingElement}
 ```
 
 
@@ -53,7 +53,7 @@ is_alternating(M::MatElem)
 ## Nilpotency
 
 ```@docs
-is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+is_nilpotent(M::MatElem{T}) where {T <: RingElement}
 ```
 
 

@@ -4325,9 +4325,9 @@ function is_lower_triangular(M::MatElem)
 end
 
 @doc raw"""
-    is_diagonal(A::MatElem)
+    is_diagonal(M::MatElem)
 
-Return `true` if $A$ is a diagonal matrix, that is,
+Return `true` if $M$ is a diagonal matrix, that is,
 if all entries off the main diagonal are zero. Note that this
 definition also applies to non-square matrices.
 
@@ -4345,10 +4345,10 @@ julia> is_diagonal(QQ[1 0 ;])
 true
 ```
 """
-function is_diagonal(A::MatElem)
-    for i = 1:ncols(A)
-        for j = 1:nrows(A)
-            if i != j && !is_zero_entry(A, j, i)
+function is_diagonal(M::MatElem)
+    for i = 1:ncols(M)
+        for j = 1:nrows(M)
+            if i != j && !is_zero_entry(M, j, i)
                 return false
             end
         end
@@ -4661,12 +4661,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+    is_nilpotent(M::MatElem{T}) where {T <: RingElement}
 
-Return `true` if `A` is nilpotent, that is, if there exists a positive
-integer $k$ such that $A^k = 0$. Return `false` otherwise.
+Return `true` if `M` is nilpotent, that is, if there exists a positive
+integer $k$ such that $M^k = 0$. Return `false` otherwise.
 
-If `A` is not square, an exception is raised. The test is only supported
+If `M` is not square, an exception is raised. The test is only supported
 for matrices defined over integral domains.
 
 # Examples
@@ -4688,18 +4688,18 @@ julia> is_nilpotent(B)
 false
 ```
 """
-function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
+function is_nilpotent(M::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
-  !is_square(A) && error("Dimensions don't match in is_nilpotent")
-  is_zero(tr(A)) || return false
-  n = nrows(A)
-  A = deepcopy(A)
+  !is_square(M) && error("Dimensions don't match in is_nilpotent")
+  is_zero(tr(M)) || return false
+  n = nrows(M)
+  M = deepcopy(M)
   i = 1
-  is_zero(A) && return true
+  is_zero(M) && return true
   while i < n
     i *= 2
-    A = mul!(A, A, A)
-    is_zero(A) && return true
+    M = mul!(M, M, M)
+    is_zero(M) && return true
   end
   return false
 end
@@ -4790,9 +4790,9 @@ function hessenberg(A::MatElem{T}) where {T <: RingElement}
 end
 
 @doc raw"""
-    is_hessenberg(A::MatElem{T}) where {T <: RingElement}
+    is_hessenberg(M::MatElem{T}) where {T <: RingElement}
 
-Return `true` if $A$ is in (upper) Hessenberg form, that is, if
+Return `true` if $M$ is in (upper) Hessenberg form, that is, if
 all entries below the first subdiagonal are zero, and `false`
 otherwise.
 
@@ -4816,12 +4816,12 @@ julia> is_hessenberg(B)
 false
 ```
 """
-function is_hessenberg(A::MatElem{T}) where {T <: RingElement}
-   is_square(A) || return false
-   n = nrows(A)
+function is_hessenberg(M::MatElem{T}) where {T <: RingElement}
+   is_square(M) || return false
+   n = nrows(M)
    for i = 3:n
       for j = 1:i - 2
-         if !is_zero_entry(A, i, j)
+         if !is_zero_entry(M, i, j)
             return false
          end
       end
