@@ -99,3 +99,4 @@ end
 @deprecate polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring poly_ring(R, s; internal_ordering, cached)
 
 # to be deprecated in a future release
+@deprecated map_from_func(image_fn::Function, D, C) = MapFromFunc(D, C, image_fn)
