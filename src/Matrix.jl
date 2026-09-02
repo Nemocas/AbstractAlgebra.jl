@@ -1316,7 +1316,7 @@ end
 @doc raw"""
     +(x::MatElem{<:NCRingElement}, y::NCRingElement)
 
-Return $x + S(y)$, where $S$ is the parent of $a$.
+Return $x + S(y)$, where $S$ is the parent of $x$.
 """
 +(x::MatElem{T}, y::T) where {T <: NCRingElem} = y + x
 
@@ -1373,7 +1373,7 @@ end
 @doc raw"""
     -(x::MatElem{<:NCRingElem}, y::NCRingElement)
 
-Return $x - S(y)$, where $S$ is the parent of $a$.
+Return $x - S(y)$, where $S$ is the parent of $x$.
 """
 function -(x::MatElem{T}, y::T) where {T <: NCRingElem}
    z = similar(x)
@@ -3363,7 +3363,7 @@ end
     rank_interpolation(M::MatElem{T}) where {T <: MPolyRingElem} -> Int
     rank_interpolation(M::MatElem{T}) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
-Returns the rank of $A$ using an interpolation-like method. 
+Returns the rank of $M$ using an interpolation-like method.
 
 # Examples
 
@@ -3475,7 +3475,7 @@ end
     rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: MPolyRingElem} -> Int
     rank_interpolation_mc(M::MatElem{T}, err::Float64) where {T <: AbstractAlgebra.Generic.RationalFunctionFieldElem} -> Int
 
-Returns the rank of $A$ with error probability < $err$ using an interpolation-like method.
+Returns the rank of $M$ with error probability < $err$ using an interpolation-like method.
 
 # Examples
 
@@ -4063,30 +4063,30 @@ function _can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) wh
 end
 
 @doc raw"""
-    _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
+    _solve_rational(A::MatElem{T}, b::MatElem{T}) where T <: RingElement
 
-Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
+Given a non-singular $n\times n$ matrix $A$ over a ring and an $n\times m$
 matrix over the same ring, return a tuple $x, d$ consisting of an
 $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 exception is raised.
 """
-function _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
-   return _solve_ringelem(M, b)
+function _solve_rational(A::MatElem{T}, b::MatElem{T}) where T <: RingElement
+   return _solve_ringelem(A, b)
 end
 
-function _solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
-   return _solve_ff(M, b)
+function _solve_ringelem(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   base_ring(A) != base_ring(b) && error("Base rings don't match in solve")
+   nrows(A) != nrows(b) && error("Dimensions don't match in solve")
+   return _solve_ff(A, b)
 end
 
-function _solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+function _solve_rational(A::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
+   base_ring(A) != base_ring(b) && error("Base rings don't match in solve")
+   nrows(A) != nrows(b) && error("Dimensions don't match in solve")
    flag = true
    try
-      flag, x, d = _can_solve_with_solution_interpolation(M, b)
+      flag, x, d = _can_solve_with_solution_interpolation(A, b)
       !flag && error("No solution in _solve_rational")
       return x, d
    catch e
@@ -4094,7 +4094,7 @@ function _solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
          rethrow(e)
       end
       !flag && error("No solution in _solve_rational")
-      return _solve_ff(M, b)
+      return _solve_ff(A, b)
    end
 end
 
@@ -5287,7 +5287,7 @@ end
     minpoly(S::PolyRing{T}, M::MatElem{T}) where {T <: RingElement}
 
 Return the minimal polynomial $p$ of the square matrix $M$.
-If a polynomial ring $S$ over the same base ring as $Y$ is supplied,
+If a polynomial ring $S$ over the same base ring as $M$ is supplied,
 the resulting polynomial is an element of it.
 
 # Examples
@@ -6347,8 +6347,8 @@ julia> T*A*U == S
 true
 ```
 """
-function snf_with_transform(a::MatElem{T}) where {T <: RingElement}
-  return snf_kb_with_transform(a)
+function snf_with_transform(A::MatElem{T}) where {T <: RingElement}
+  return snf_kb_with_transform(A)
 end
 
 ################################################################################
@@ -8034,8 +8034,8 @@ function matrix(R::NCRing, M::MatRingElem)
    return map_entries(R, matrix(M))
 end
 
-function matrix(mat::MatElem{T}) where {T<:NCRingElement}
-   return deepcopy(mat)
+function matrix(M::MatElem{T}) where {T<:NCRingElement}
+   return deepcopy(M)
 end
 
 function matrix(entries::AbstractMatrix{T}) where {T<:NCRingElement}

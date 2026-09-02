@@ -74,7 +74,7 @@ matrix(R::NCRing, M::MatElem)
 An independent copy of an existing matrix can be created.
 
 ```julia
-matrix(mat::MatElem{T}) where {T<:NCRingElement}
+matrix(M::MatElem{T}) where {T<:NCRingElement}
 ```
 
 

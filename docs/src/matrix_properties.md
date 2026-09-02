@@ -64,7 +64,7 @@ gram(M::MatElem)
 ## Content
 
 ```@docs
-content(M::MatElem{T}) where T <: RingElement
+content(M::MatrixElem{T}) where T <: RingElement
 ```
 
 
