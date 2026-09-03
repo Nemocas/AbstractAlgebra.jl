@@ -756,7 +756,7 @@ Instead of a vector, `rows` and `cols` can also be:
 * an integer `i`, which is  interpreted as `i:i`, or
 * `:`, which is interpreted as `1:nrows(M)` or `1:ncols(M)` respectively.
 """
-getindex(M::MatElem, r::AbstractVector{<:Integer}, c::AbstractVector{<:Integer}) = sub(M, r, c)
+getindex(M::MatElem, rows::AbstractVector{<:Integer}, cols::AbstractVector{<:Integer}) = sub(M, rows, cols)
 
 function getindex(M::MatElem, i::Int, cols::AbstractVector{Int})
    _checkbounds(M, i, cols)
