@@ -108,6 +108,9 @@ import AbstractAlgebra: Generic.normalize!
         @test (g)^0 == 1
 
         @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        @test divexact(g, QQ(2)) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        @test divexact(2*g, QQ(2)) == g
+        @test_throws ArgumentError divexact(g, QQ(0))
         # TODO: add some more divexact tests
 
         g = u^(1//2)*v^(2//3) + w^(1//4)
