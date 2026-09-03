@@ -1113,29 +1113,58 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingE
 end
 
 @doc raw"""
-    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
+    evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
 
-Evaluate the polynomial at the supplied values, which may be any ring elements,
-commutative or non-commutative, but in the same ring. Evaluation always proceeds
-in the order of the variables as supplied when creating the polynomial ring to
-which $a$ belongs. The evaluation will succeed if a product of a coefficient
-of the polynomial by one of the values is defined.
+Evaluate the polynomial `a` at the supplied variable-value pairs; the values must be in a commutative ring. The result will be an element of the parent of `a`. The values
+can alternatively be supplied as a dictionary or through keyword arguments as shown in the example below.
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x,:y]);
+
+julia> f = x + y;
+
+julia> evaluate(f, :x => 2)
+y + 2
+
+julia> evaluate(f, :x => 2, :y => 3)
+5
+
+julia> evaluate(f, Dict(:x => 2, :y => 3))
+5
+
+julia> f(x=2,y=3)
+5
+```
 """
-(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
-
-function (a::MPolyRingElem)(;kwargs...)
-   @req !isempty(kwargs) "No values supplied"
+function evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
+   isempty(val_pairs) && return a
    ss = symbols(parent(a))
-   vars = Array{Int}(undef, length(kwargs))
-   vals = Array{RingElement}(undef, length(kwargs))
-   for (i, (var, val)) in enumerate(kwargs)
+   vars = Array{Int}(undef, length(val_pairs))
+   vals = Array{RingElement}(undef, length(val_pairs))
+   for (i, (var, val)) in enumerate(val_pairs)
      vari = findfirst(isequal(var), ss)
-     vari === nothing && error("Given polynomial has no variable $var")
+     vari === nothing && error("Polynomial ring has no variable $var")
+     findnext(isequal(var), ss, vari+1) === nothing || error("$var is ambiguous")
      vars[i] = vari
      vals[i] = val
    end
    return evaluate(a, vars, vals)
 end
+
+evaluate(a::MPolyRingElem, val_dict::Dict{Symbol, <:RingElement}) = evaluate(a, val_dict...)
+
+(a::MPolyRingElem)(;kwargs...) = evaluate(a, kwargs...)
+
+@doc raw"""
+    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
+
+Evaluate the polynomial `a` at the supplied values; the $k$-th supplied value
+specifies the image of the $k$-th variable in the polynomial ring of `a`.  The
+supplied values may be in commutative or non-commutative rings -- the
+supplied values should anyway commute amongst themselves. The
+evaluation will succeed if each product from a term in `a`  is defined.
+"""
+(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
 ################################################################################
 #
