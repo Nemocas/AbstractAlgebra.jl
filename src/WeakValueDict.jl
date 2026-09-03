@@ -83,7 +83,8 @@ Base.length(h::WeakValueCache) = h.nfilled
 function Base.show(io::IO, h::WeakValueCache)
    print(io, "\n")
    for i in 1:max(length(h.slots), length(h.keys), length(h.vals))
-      show(io, i); print(io,": ");
+      show(io, i)
+      print(io,": ")
       isassigned(h.slots, i) ? show(io,h.slots[i]) : print(io, Base.undef_ref_str); print(io, ", ")
       isassigned(h.keys, i) ? show(io, h.keys[i]) : print(io, Base.undef_ref_str); print(io, ", ")
       if isassigned(h.vals, i)
