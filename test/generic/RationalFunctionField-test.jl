@@ -22,6 +22,12 @@ end
 
    @test isa(T(BigInt(7)), Generic.RationalFunctionFieldElem)
 
+   @test isa(T(3//2), Generic.RationalFunctionFieldElem)
+
+   @test isa(T(QQ(3//2)), Generic.RationalFunctionFieldElem)
+
+   @test T(1.5) == T(3//2)
+
    @test isa(T(x + 2), Generic.RationalFunctionFieldElem)
 
    @test isa(T(numerator(x^2 + 2x + 1, false), numerator(x + 1, false)), Generic.RationalFunctionFieldElem)
