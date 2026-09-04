@@ -83,12 +83,12 @@ Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ);
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 
-julia> g = map_from_func(x -> QQ(x), ZZ, QQ);
+julia> g = map_from_func(ZZ, QQ, x -> QQ(x));
 
 julia> h = compose(f, g)
-Functional composite map
+Composite map
   from integers
   to rationals
 which is the composite of
@@ -136,14 +136,18 @@ identity_map(R::D) where D <: Set = Generic.IdentityMap{D}(R)
 ################################################################################
 
 @doc raw"""
-    map_from_func(image_fn::Function, domain, codomain)
+    map_from_func(D, C, image_fn, [inverse_fn])
 
-Construct the generic functional map with domain and codomain given by the parent objects
+Creates the map `D -> C, x -> image_fn(x)` of type `MapFromFunc` given the callable
+object `image_fn`. If `inverse_fn` is provided, it is assumed to satisfy
+`image_fn(inverse_fn(x)) = x` and will be used as the preimage function.
+
+Construct the MapFromFunc with domain and codomain given by the parent objects
 $R$ and $S$ corresponding to the Julia function $f$.
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
 Map defined by a Julia function
   from integers
   to integers
@@ -152,9 +156,157 @@ julia> f(ZZ(2))
 3
 ```
 """
-function map_from_func(image_fn::Function, domain, codomain)
-   return Generic.FunctionalMap(domain, codomain, image_fn)
+map_from_func(D, C, image_fn) = MapFromFunc(D, C, image_fn)
+map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_fn)
+
+
+################################################################################
+#
+#  MapWithHeader
+#
+################################################################################
+
+
+# Hecke maps store attributes in the header object
+_get_attributes(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes(G.header)
+_get_attributes!(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes!(G.header)
+_is_attribute_storing_type(::Type{<:Map(MapWithHeader)}) = true
+
+(f::Map(MapWithHeader))(x) = image(f, x)
+
+function domain(M::Map(MapWithHeader))
+  return M.header.domain
 end
+
+function codomain(M::Map(MapWithHeader))
+  return M.header.codomain
+end
+
+function image_fn(f::Map(MapWithHeader))
+  if isdefined(f.header, :image)
+    return f.header.image
+  else
+    return x -> image(f, x)
+  end
+end
+
+function inverse_fn(f::Map(MapWithHeader))
+  if isdefined(f.header, :preimage)
+    return f.header.preimage
+  else
+    return x -> preimage(f, x)
+  end
+end
+#
+# image_fn(f::Map(MapWithHeader)) = image_function(f)
+# inverse_fn(f::Map(MapWithHeader)) = preimage_function(f)
+
+
+################################################################################
+#
+#  Caching methods for MapWithHeader
+#
+################################################################################
+
+
+function change(D::Dict{K, V}, k::K, def::V, new::Function) where {K, V}
+  i = Base.ht_keyindex2!(D, k)
+  if i>0
+    D.vals[i] = new(D.vals[i])
+  else
+    pos = -i
+    D.keys[pos] = k
+    D.vals[pos] = def
+    D.count += 1
+    if pos < D.idxfloor
+      D.idxfloor = pos
+    end
+    D.slots[pos] = 0x1
+  end
+  return nothing
+end
+
+function inc(D::Dict{K, Int}, k::K, def::Int = 0) where K
+  i = Base.ht_keyindex2!(D, k)
+  if i>0
+    D.vals[i] += 1
+  else
+    pos = -i
+    D.keys[pos] = k
+    D.vals[pos] = def
+    D.count += 1
+    if pos < D.idxfloor
+      D.idxfloor = pos
+    end
+    D.slots[pos] = 0x1
+  end
+  return nothing
+end
+
+
+function _allow_cache!(M::Map, lim::Int, ::Type{D}, ::Type{C}, ::Type{De}, ::Type{Ce}) where {D, C, De, Ce}
+  if isdefined(M.header, :cache)
+#    println("Cache already installed")
+  else
+    M.header.cache = MapCache(domain(M), codomain(M), De, Ce, lim)
+    M.header.cache.old_pr = M.header.preimage
+    M.header.cache.old_im = M.header.image
+  end
+
+  if length(methods(M.header.image)) > 1
+    println("Cannot do image cache, too many types")
+  else
+    function im(a::De)
+      if haskey(M.header.cache.im, a)
+        inc(M.header.cache.imStat, a)
+        return M.header.cache.im[a]::Ce
+      else
+        b = M.header.cache.old_im(a)::Ce
+        M.header.cache.im[a] = b
+        M.header.cache.imStat[a] = 0
+        return b
+      end
+    end
+    M.header.image = im
+  end
+
+  if length(methods(M.header.preimage)) > 1
+    println("Cannot do preimage cache, too many types")
+  else
+    function pr(a::Ce)
+      i = Base.ht_keyindex(M.header.cache.pr, a)
+      if i >= 0
+        inc(M.header.cache.prStat, a)
+        return M.header.cache.pr.vals[i]::De
+      else
+        b = M.header.cache.old_pr(a)::De
+        M.header.cache.pr[a] = b
+        M.header.cache.prStat[a] = 0
+        return b
+      end
+    end
+    M.header.preimage = pr
+  end
+  nothing
+end
+
+function allow_cache!(M::T, lim::Int = 100) where T <: Map
+  return _allow_cache!(M, lim, typeof(domain(M)), typeof(codomain(M)), elem_type(domain(M)), elem_type(codomain(M)))
+end
+
+function stop_cache!(M::T) where T <: Map
+  if isdefined(M.header, :cache)
+    M.header.image = M.header.cache.old_im
+    M.header.preimage = M.header.cache.old_pr
+  end
+  nothing
+end
+
+# For InverseMap:
+function pseudo_inv(a::Map)
+  return InverseMap(a)
+end
+
 
 ################################################################################
 #

@@ -46,7 +46,7 @@ Caches can also be turned on and off at run time (see below).
 **Examples**
 
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
 Map defined by a Julia function
   from integers
   to integers
@@ -79,7 +79,7 @@ value. Setting the value to 0 will effectively disable further caching for this 
 **Examples**
 
 ```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
+julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1));
 
 julia> a = f(ZZ(1))
 2
