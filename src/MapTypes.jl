@@ -175,7 +175,7 @@ end
 # InverseMap
 ###########################################################
 
-mutable struct InverseMap{D, C} <: Map{D, C, HeckeMap, InverseMap}
+mutable struct InverseMap{D, C} <: Map{D, C, MapWithHeader, InverseMap}
   header::MapHeader{D, C}
   origin::Map{C, D}
 
