@@ -30,6 +30,22 @@ end
    @test rank(M) == 5
 end
 
+@testset "Generic.FreeModule.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+   M = free_module(R, 2)
+
+   @test order(M) == 16
+   @test length(M) == 16
+   @test eltype(M) == elem_type(M)
+   @test collect(M) == [M([i, j]) for j in 0:3 for i in 0:3]
+
+   N = free_module(R, 0)
+
+   @test order(N) == 1
+   @test length(N) == 1
+   @test collect(N) == [zero(N)]
+end
+
 @testset "Generic.FreeModule.unary_ops" begin
    R, x = polynomial_ring(ZZ, "x")
 
