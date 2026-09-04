@@ -612,7 +612,7 @@ function (a::RationalFunctionField{T, U})(b::Rational{<:Integer}) where {T <: Fi
    return z
 end
 
-function (a::RationalFunctionField)(b::RingElem)
+function (a::RationalFunctionField{T, U})(b::RingElement) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    return a(underlying_fraction_field(a)(b))
 end
 
