@@ -181,7 +181,7 @@ mutable struct InverseMap{D, C} <: Map{D, C, HeckeMap, InverseMap}
 
   function InverseMap{D, C}(f::Map{C, D}) where {D, C}
     z = new{D, C}()
-    z.header = MapHeader(codomain(f), domain(f), preimage_function(f), image_function(f))
+    z.header = MapHeader(codomain(f), domain(f), inverse_fn(f), image_fn(f))
     z.origin = f
     return z
   end
