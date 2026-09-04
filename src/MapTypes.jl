@@ -170,3 +170,29 @@ function Base.inv(M::MapFromFunc)
      return MapFromFunc(codomain(M), domain(M), x->preimage(M, x))
   end
 end
+
+###########################################################
+# InverseMap
+###########################################################
+
+mutable struct InverseMap{D, C} <: Map{D, C, HeckeMap, InverseMap}
+  header::MapHeader{D, C}
+  origin::Map{C, D}
+
+  function InverseMap{D, C}(f::Map{C, D}) where {D, C}
+    z = new{D, C}()
+    z.header = MapHeader(codomain(f), domain(f), preimage_function(f), image_function(f))
+    z.origin = f
+    return z
+  end
+end
+
+function InverseMap(f::Map{C, D}) where {D, C}
+  return InverseMap{D, C}(f)
+end
+
+function show(io::IO, M::InverseMap)
+  @show_name(io, M)
+  println(io, "inverse of")
+  print(io, " ", M.origin)
+end

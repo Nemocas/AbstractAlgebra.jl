@@ -302,6 +302,11 @@ function stop_cache!(M::T) where T <: Map
   nothing
 end
 
+# For InverseMap:
+function pseudo_inv(a::Map)
+  return InverseMap(a)
+end
+
 
 ################################################################################
 #
