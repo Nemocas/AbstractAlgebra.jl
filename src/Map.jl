@@ -182,7 +182,7 @@ function codomain(M::Map(MapWithHeader))
   return M.header.codomain
 end
 
-function image_function(f::Map(MapWithHeader))
+function image_fn(f::Map(MapWithHeader))
   if isdefined(f.header, :image)
     return f.header.image
   else
@@ -190,16 +190,16 @@ function image_function(f::Map(MapWithHeader))
   end
 end
 
-function preimage_function(f::Map(MapWithHeader))
+function inverse_fn(f::Map(MapWithHeader))
   if isdefined(f.header, :preimage)
     return f.header.preimage
   else
     return x -> preimage(f, x)
   end
 end
-
-image_fn(f::Map(MapWithHeader)) = image_function(f)
-inverse_fn(f::Map(MapWithHeader)) = preimage_function(f)
+#
+# image_fn(f::Map(MapWithHeader)) = image_function(f)
+# inverse_fn(f::Map(MapWithHeader)) = preimage_function(f)
 
 
 ################################################################################
