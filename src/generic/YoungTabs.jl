@@ -529,27 +529,22 @@ end
 
 Construct sparse integer matrix representing the tableau.
 
+Requires `SparseArrays` to be loaded.
+
 # Examples
 ```jldoctest
+julia> using SparseArrays
+
 julia> y = YoungTableau([4,3,1]);
 
-
 julia> matrix_repr(y)
-3×4 SparseArrays.SparseMatrixCSC{Int64, Int64} with 8 stored entries:
+3×4 SparseMatrixCSC{Int64, Int64} with 8 stored entries:
  1  2  3  4
  5  6  7  ⋅
  8  ⋅  ⋅  ⋅
 ```
 """
-function matrix_repr(Y::YoungTableau{T}) where T
-   tab = spzeros(T, length(Y.part), Y.part[1])
-   k=1
-   for (idx, p) in enumerate(Y.part)
-      tab[idx, 1:p] = Y.fill[k:k+p-1]
-      k += p
-   end
-   return tab
-end
+matrix_repr(::YoungTableau)
 
 @doc raw"""
     fill!(Y::YoungTableaux, V::Vector{<:Integer})
@@ -817,17 +812,10 @@ end
 
 Return a sparse representation of the diagram `xi`, i.e. a sparse array `A`
 where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
+
+Requires `SparseArrays` to be loaded.
 """
-function matrix_repr(xi::SkewDiagram)
-   skdiag = spzeros(eltype(xi), size(xi)...)
-   for i in 1:length(xi.mu)
-      skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
-   end
-   for i in length(xi.mu)+1:length(xi.lam)
-      skdiag[i,1:xi.lam[i]] .= 1
-   end
-   return skdiag
-end
+matrix_repr(::SkewDiagram)
 
 @doc raw"""
     has_left_neighbor(xi::SkewDiagram, i::Integer, j::Integer)

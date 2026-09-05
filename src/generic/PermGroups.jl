@@ -687,13 +687,17 @@ is_abelian(G::SymmetricGroup) = G.n <= 2
 Return the permutation matrix as a sparse matrix representing `a` via natural
 embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
+Requires `SparseArrays` to be loaded.
+
 # Examples
 ```jldoctest
+julia> using SparseArrays
+
 julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
-3×3 SparseArrays.SparseMatrixCSC{Int64, Int64} with 3 stored entries:
+3×3 SparseMatrixCSC{Int64, Int64} with 3 stored entries:
  ⋅  1  ⋅
  ⋅  ⋅  1
  1  ⋅  ⋅
@@ -705,7 +709,12 @@ julia> Array(ans)
  1  0  0
 ```
 """
-matrix_repr(a::Perm{T}) where {T<:Integer} = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+matrix_repr(::Perm)
+
+# The actual methods live in the SparseArraysExt package extension.
+function matrix_repr(::Union{Perm, YoungTableau, SkewDiagram})
+   throw(ArgumentError("`matrix_repr` requires `using SparseArrays`"))
+end
 
 @doc raw"""
     emb!(result::Perm, p::Perm, V)
