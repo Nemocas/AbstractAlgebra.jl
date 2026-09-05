@@ -14,6 +14,20 @@
       @test f == fac
    end
 
+   @testset "hlift_with_lcc" begin
+
+      R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
+
+      fac = [y*x^2+z, (z+1)*x^3+x*y+z, (y*z+1)*x^2+1]
+
+      ok, f = AbstractAlgebra.MPolyFactor.hlift_with_lcc(prod(fac),
+                                          [x^2+1, 2*x^3+x+1, 2*x^2+1],
+                                          [y, z+1, y*z+1],
+                                          1, [2, 3], [QQ(1), QQ(1)])
+      @test ok
+      @test f == fac
+   end
+
    @testset "hlift_bivar_combine" begin
 
       R, (x, y) = polynomial_ring(QQ, ["x", "y"])
