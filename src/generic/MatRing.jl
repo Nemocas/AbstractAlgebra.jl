@@ -19,12 +19,12 @@ base_ring(a::MatRing{T}) where {T <: NCRingElement} = a.base_ring::parent_type(T
 base_ring(a::MatRingElem{T}) where {T <: NCRingElement} = base_ring(matrix(a))
 
 @doc raw"""
-    parent(M::MatRingElem{T}) where T <: NCRingElement
+    parent(A::MatRingElem{T}) where T <: NCRingElement
 
-Return the matrix algebra containing `M`.
+Return the matrix algebra containing `A`.
 
-This is the matrix algebra over the base ring of `M` whose degree is the
-number of rows (equivalently columns) of `M`.
+This is the matrix algebra over the base ring of `A` whose degree is the
+number of rows (equivalently columns) of `A`.
 
 # Examples
 
@@ -41,7 +41,7 @@ julia> parent(A) == S
 true
 ```
 """
-parent(M::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(M), nrows(matrix(M)))
+parent(A::MatRingElem{T}) where T <: NCRingElement = MatRing{T}(base_ring(A), nrows(matrix(A)))
 
 is_exact_type(::Type{MatRingElem{T}}) where T <: NCRingElement = is_exact_type(T)
 
@@ -86,30 +86,30 @@ transpose!(z::T, x::T) where T <: MatRingElem = MatRingElem(transpose!(matrix(z)
 #
 ###############################################################################
 
-function _can_solve_with_solution_lu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
-   check_parent(M, B)
-   R = base_ring(M)
-   MS = matrix(M)
+function _can_solve_with_solution_lu(A::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+   check_parent(A, B)
+   R = base_ring(A)
+   MS = matrix(A)
    BS = matrix(B)
    flag, S = _can_solve_with_solution_lu(MS, BS)
    SA = MatRingElem(S)
    return flag, SA
 end
 
-function AbstractAlgebra.can_solve_with_solution(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
-   check_parent(M, B)
-   R = base_ring(M)
-   MS = matrix(M)
+function AbstractAlgebra.can_solve_with_solution(A::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+   check_parent(A, B)
+   R = base_ring(A)
+   MS = matrix(A)
    BS = matrix(B)
    flag, S = can_solve_with_solution(MS, BS)
    SA = MatRingElem(S)
    return flag, SA
 end
 
-function _can_solve_with_solution_fflu(M::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
-   check_parent(M, B)
-   R = base_ring(M)
-   MS = matrix(M)
+function _can_solve_with_solution_fflu(A::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+   check_parent(A, B)
+   R = base_ring(A)
+   MS = matrix(A)
    BS = matrix(B)
    flag, S, d = _can_solve_with_solution_fflu(MS, BS)
    SA = MatRingElem(S)
@@ -123,19 +123,19 @@ end
 ###############################################################################
 
 @doc raw"""
-    minpoly(S::Ring, M::MatRingElem{T}) where {T <: RingElement}
+    minpoly(S::Ring, A::MatRingElem{T}) where {T <: RingElement}
 
-Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
+Return the minimal polynomial $p$ of the matrix $A$. The polynomial ring $S$
 of the resulting polynomial must be supplied and the matrix must be square.
 """
-function minpoly(S::Ring, M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   return minpoly(S, matrix(M), charpoly_only)
+function minpoly(S::Ring, A::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   return minpoly(S, matrix(A), charpoly_only)
 end
 
-function minpoly(M::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   R = base_ring(M)
+function minpoly(A::MatRingElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+   R = base_ring(A)
    Rx, x = polynomial_ring(R; cached=false)
-   return minpoly(Rx, M, charpoly_only)
+   return minpoly(Rx, A, charpoly_only)
 end
 
 ###############################################################################

@@ -58,14 +58,14 @@ matrix(R::NCRing, entries::AbstractVector{<:AbstractVector})
 Matrices can be converted to another base ring using `change_base_ring`.
 
 ```@docs
-change_base_ring(R::NCRing, M::MatrixElem{T}) where {T <: NCRingElement}
+change_base_ring(R::NCRing, A::MatrixElem{T}) where {T <: NCRingElement}
 ```
 
-The same conversion of `M` can also be performed using the following
+The same conversion of `A` can also be performed using the following
 constructor:
 
 ```julia
-matrix(R::NCRing, M::MatElem)
+matrix(R::NCRing, A::MatElem)
 ```
 
 
@@ -74,30 +74,30 @@ matrix(R::NCRing, M::MatElem)
 An independent copy of an existing matrix can be created.
 
 ```julia
-matrix(M::MatElem{T}) where {T<:NCRingElement}
+matrix(A::MatElem{T}) where {T<:NCRingElement}
 ```
 
 
 ### Zero matrices
 
 ```@docs
-zero(M::MatElem{T}, R::NCRing) where {T <: NCRingElement}
+zero(A::MatElem{T}, R::NCRing) where {T <: NCRingElement}
 ```
 
 
 ### Identity matrices
 
 ```@docs
-identity_matrix(M::MatElem{T}) where {T <: NCRingElement}
-identity_matrix(M::MatElem{T}, n::Int) where {T <: NCRingElement}
-one(M::MatElem{T}) where {T <: NCRingElement}
+identity_matrix(A::MatElem{T}) where {T <: NCRingElement}
+identity_matrix(A::MatElem{T}, n::Int) where {T <: NCRingElement}
+one(A::MatElem{T}) where {T <: NCRingElement}
 ```
 
 
 ### Uninitialized matrices
 
 ```@docs
-similar(M::MatElem, R::NCRing, r::Int, c::Int)
+similar(A::MatElem, R::NCRing, r::Int, c::Int)
 ```
 
 
