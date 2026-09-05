@@ -291,6 +291,11 @@ end
    @test order(a) == 6
    @test a^6 == one(G)
 
+   M = matrix_repr(a)
+   @test M isa SparseMatrixCSC{T}
+   @test all(M[i, a[i]] == 1 for i in 1:10)
+   @test count(!iszero, M) == 10
+
    p = G([9,5,4,7,3,8,2,10,1,6])
 
    @test collect(cycles(p)) == [T[1,9],T[2,5,3,4,7],T[6,8,10]]

@@ -75,6 +75,10 @@ end
    @test Z isa Generic.YoungTableau
    @test Y == Z
    @test Z.fill !== Y.fill
+
+   M = matrix_repr(Y)
+   @test M isa SparseMatrixCSC{Int}
+   @test M == [1 2 3 4; 5 6 7 0; 8 0 0 0]
 end
 
 @testset "youngtabs.conjugation" begin
