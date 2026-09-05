@@ -38,7 +38,7 @@ data(M::LazyTransposeMatElem) = M.M
 # The entries of M and the result are SHARED, so e.g. a setindex! will modify
 # 'both' matrices. But this is the point: we don't want to actually transpose
 # the matrix.
-lazy_transpose(M::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(M)}(M)
+lazy_transpose(A::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(A)}(A)
 lazy_transpose(M::LazyTransposeMatElem) = data(M)
 
 # Change the order of rows and columns in nrows, ncols, getindex and setindex!

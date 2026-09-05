@@ -25,14 +25,14 @@ function Base.hash(a::MatRingElem, h::UInt)
   return xor(b, hash(matrix(a), h))
 end
 
-vector_space_dim(a::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(a)^2
+vector_space_dim(R::MatRing{T}) where {T <: Union{FieldElem, Rational{BigInt}}} = nrows(R)^2
 
 @doc raw"""
-    degree(a::MatRing)
+    degree(R::MatRing)
 
 Return the degree $n$ of the given matrix algebra.
 
-The degree is the number of rows of the square matrices belonging to `a`.
+The degree is the number of rows of the square matrices belonging to `R`.
 
 # Examples
 
@@ -48,12 +48,12 @@ julia> degree(S)
 3
 ```
 """
-degree(a::MatRing) = nrows(a)
+degree(R::MatRing) = nrows(R)
 
 @doc raw"""
-    degree(a::MatRingElem{T}) where T <: NCRingElement
+    degree(A::MatRingElem{T}) where T <: NCRingElement
 
-Return the degree $n$ of the parent matrix algebra of `a`.
+Return the degree $n$ of the parent matrix algebra of `A`.
 
 # Examples
 
@@ -74,24 +74,24 @@ julia> degree(A)
 3
 ```
 """
-degree(a::MatRingElem{T}) where T <: NCRingElement = degree(parent(a))
+degree(A::MatRingElem{T}) where T <: NCRingElement = degree(parent(A))
 
-zero(a::MatRing) = a()
+zero(R::MatRing) = R()
 
-one(a::MatRing) = a(1)
+one(R::MatRing) = R(1)
 
-is_unit(a::MatRingElem{T}) where T <: RingElement = is_unit(det(a))
+is_unit(A::MatRingElem{T}) where T <: RingElement = is_unit(det(A))
 
-is_unit(a::MatRingElem{T}) where T <: FieldElement = rank(a) == degree(a)
+is_unit(A::MatRingElem{T}) where T <: FieldElement = rank(A) == degree(A)
 
 # proof over a commutative ring: use adj(A)*A = det(A)*I = A*adj(A)
-is_zero_divisor(a::MatRingElem{T}) where T <: RingElement = is_zero_divisor(det(a))
+is_zero_divisor(A::MatRingElem{T}) where T <: RingElement = is_zero_divisor(det(A))
 
-is_zero_divisor(a::MatRingElem{T}) where T <: FieldElement = rank(a) != degree(a)
+is_zero_divisor(A::MatRingElem{T}) where T <: FieldElement = rank(A) != degree(A)
 
-function is_zero_divisor_with_annihilator(a::MatRingElem{T}) where T <: RingElement
-   f, b = is_zero_divisor_with_annihilator(det(a))
-   throw(NotImplementedError(:adj, a)) #return f, b*adj(A)
+function is_zero_divisor_with_annihilator(A::MatRingElem{T}) where T <: RingElement
+   f, b = is_zero_divisor_with_annihilator(det(A))
+   throw(NotImplementedError(:adj, A)) #return f, b*adj(A)
 end
 
 characteristic(R::MatRing) = iszero(nrows(R)) ? 1 : characteristic(base_ring(R))
@@ -107,51 +107,51 @@ is_known(::typeof(is_finite), R::MatRing) = iszero(nrows(R)) || is_known(is_fini
 ###############################################################################
 
 @doc raw"""
-    similar(x::MatRingElem, R::NCRing, n::Int)
-    similar(x::MatRingElem, R::NCRing)
-    similar(x::MatRingElem, n::Int)
-    similar(x::MatRingElem)
+    similar(A::MatRingElem, R::NCRing, n::Int)
+    similar(A::MatRingElem, R::NCRing)
+    similar(A::MatRingElem, n::Int)
+    similar(A::MatRingElem)
 
 Create an uninitialized matrix ring element over the given ring and dimension,
-with defaults based upon the given source matrix ring element `x`.
+with defaults based upon the given source matrix ring element `A`.
 """
-function similar(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x))
+function similar(A::MatRingElem, R::NCRing=base_ring(A), n::Int=degree(A))
    @req (n >= 0)  "Matrix dimension must be non-negative"
    @req (n < 2^30)  "Matrix dimension is excessively large"
    return Generic.MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
 end
 
-similar(x::MatRingElem, n::Int) = similar(x, base_ring(x), n)
+similar(A::MatRingElem, n::Int) = similar(A, base_ring(A), n)
 
 # TODO: deprecate these:
-function similar(x::MatRingElem{T}, R::NCRing, m::Int, n::Int) where T <: NCRingElement
+function similar(A::MatRingElem{T}, R::NCRing, m::Int, n::Int) where T <: NCRingElement
    m != n && error("Dimensions don't match in similar")
-   return similar(x, R, n)
+   return similar(A, R, n)
 end
 
-similar(x::MatRingElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
+similar(A::MatRingElem, m::Int, n::Int) = similar(A, base_ring(A), m, n)
 
 @doc raw"""
-    zero(x::MatRingElem, R::NCRing, n::Int)
-    zero(x::MatRingElem, R::NCRing)
-    zero(x::MatRingElem, n::Int)
-    zero(x::MatRingElem)
+    zero(A::MatRingElem, R::NCRing, n::Int)
+    zero(A::MatRingElem, R::NCRing)
+    zero(A::MatRingElem, n::Int)
+    zero(A::MatRingElem)
 
 Create a zero matrix ring element over the given ring and dimension,
-with defaults based upon the given source matrix ring element `x`.
+with defaults based upon the given source matrix ring element `A`.
 """
-zero(x::MatRingElem, R::NCRing=base_ring(x), n::Int=degree(x)) = zero!(similar(x, R, n))
-zero(x::MatRingElem, n::Int) = zero!(similar(x, n))
+zero(A::MatRingElem, R::NCRing=base_ring(A), n::Int=degree(A)) = zero!(similar(A, R, n))
+zero(A::MatRingElem, n::Int) = zero!(similar(A, n))
 
 # TODO: deprecate these
-zero(x::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(x, R, r, c))
-zero(x::MatRingElem, r::Int, c::Int) = zero!(similar(x, r, c))
+zero(A::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(A, R, r, c))
+zero(A::MatRingElem, r::Int, c::Int) = zero!(similar(A, r, c))
 
-iszero(a::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(a))
+iszero(A::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(A))
 
-one(a::MatRingElem{T}) where T <: NCRingElement = one(parent(a))
+one(A::MatRingElem{T}) where T <: NCRingElement = one(parent(A))
 
-isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
+isone(A::MatRingElem{T}) where T <: NCRingElement = isone(matrix(A))
 
 ###############################################################################
 #
@@ -159,7 +159,7 @@ isone(a::MatRingElem{T}) where T <: NCRingElement = isone(matrix(a))
 #
 ###############################################################################
 
-canonical_unit(a::MatRingElem{T}) where T <: NCRingElement = canonical_unit(matrix(a))
+canonical_unit(A::MatRingElem{T}) where T <: NCRingElement = canonical_unit(matrix(A))
 
 ################################################################################
 #
@@ -193,7 +193,7 @@ end
 #
 ################################################################################
 
-is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
+is_square(::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
 
 ###############################################################################
 #
@@ -201,23 +201,23 @@ is_square(a::MatRingElem) = true   # FIXME: remove this once we untangled MatRin
 #
 ###############################################################################
 
-function show(io::IO, mime::MIME"text/plain", a::MatRing)
+function show(io::IO, mime::MIME"text/plain", R::MatRing)
   print(io, "Matrix ring of")
-  print(io, " degree ", a.n)
+  print(io, " degree ", R.n)
   println(io)
   io = pretty(io)
   print(io, Indent(), "over ")
-  print(io, Lowercase(), base_ring(a))
+  print(io, Lowercase(), base_ring(R))
 end
 
-function show(io::IO, a::MatRing)
+function show(io::IO, R::MatRing)
    if is_terse(io)
       print(io, "Matrix ring")
    else
       io = pretty(io)
       print(io, "Matrix ring of ")
-      print(io, "degree ", a.n, " over ")
-      print(terse(io), Lowercase(), base_ring(a))
+      print(io, "degree ", R.n, " over ")
+      print(terse(io), Lowercase(), base_ring(R))
    end
 end
 
@@ -395,20 +395,20 @@ end
 ###############################################################################
 
 @doc raw"""
-    gram(x::MatRingElem)
+    gram(A::MatRingElem)
 
-Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
+Return the Gram matrix of $A$, i.e. if $A$ is an $r\times c$ matrix return
 the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 $i$-th and $j$-th rows, respectively.
 """
-function gram(x::MatRingElem)
-   n = degree(x)
-   z = similar(x)
+function gram(A::MatRingElem)
+   n = degree(A)
+   z = similar(A)
    for i = 1:n
       for j = 1:n
-         z[i, j] = zero(base_ring(x))
+         z[i, j] = zero(base_ring(A))
          for k = 1:n
-            z[i, j] += x[i, k] * x[j, k]
+            z[i, j] += A[i, k] * A[j, k]
          end
       end
    end
@@ -421,16 +421,16 @@ end
 #
 ###############################################################################
 
-det(M::MatRingElem) = det(matrix(M))
-rank(M::MatRingElem) = rank(matrix(M))
+det(A::MatRingElem) = det(matrix(A))
+rank(A::MatRingElem) = rank(matrix(A))
 
-is_symmetric(M::MatRingElem) = is_symmetric(matrix(M))
-is_alternating(M::MatRingElem) = is_alternating(matrix(M))
-is_skew_symmetric(M::MatRingElem) = is_skew_symmetric(matrix(M))
+is_symmetric(A::MatRingElem) = is_symmetric(matrix(A))
+is_alternating(A::MatRingElem) = is_alternating(matrix(A))
+is_skew_symmetric(A::MatRingElem) = is_skew_symmetric(matrix(A))
 
-is_upper_triangular(M::MatRingElem) = is_upper_triangular(matrix(M))
-is_lower_triangular(M::MatRingElem) = is_lower_triangular(matrix(M))
-is_diagonal(M::MatRingElem) = is_diagonal(matrix(M))
+is_upper_triangular(A::MatRingElem) = is_upper_triangular(matrix(A))
+is_lower_triangular(A::MatRingElem) = is_lower_triangular(matrix(A))
+is_diagonal(A::MatRingElem) = is_diagonal(matrix(A))
 
 function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: RingElement}
   return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
@@ -445,17 +445,17 @@ function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, 
   return dst
 end
 
-function map_entries(f::S, a::MatrixElem{T}) where {S, T <: NCRingElement}
-  return Generic.MatRingElem(map_entries(f, matrix(a)))
+function map_entries(f::S, A::MatrixElem{T}) where {S, T <: NCRingElement}
+  return Generic.MatRingElem(map_entries(f, matrix(A)))
 end
 
-function pseudo_inv(M::MatRingElem{T}) where {T <: RingElement}
-  X,d = pseudo_inv(matrix(M))
+function pseudo_inv(A::MatRingElem{T}) where {T <: RingElement}
+  X,d = pseudo_inv(matrix(A))
   return Generic.MatRingElem(X), d
 end
 
-function Base.inv(M::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(inv(matrix(M)))
+function Base.inv(A::MatRingElem{T}) where {T <: RingElement}
+  return Generic.MatRingElem(inv(matrix(A)))
 end
 
 function is_invertible_with_inverse(A::MatRingElem{T}; side::Symbol = :left) where {T <: RingElement}
@@ -489,8 +489,8 @@ function charpoly_hessenberg!(S::Ring, A::MatRingElem{T}) where {T <: RingElemen
   return charpoly_hessenberg!(S, a)  ## !!! WARNING !!!  may not be correct
 end
 
-function charpoly(S::PolyRing{T}, Y::MatRingElem{T}) where {T <: RingElement}
-  return charpoly(S, matrix(Y))
+function charpoly(S::PolyRing{T}, A::MatRingElem{T}) where {T <: RingElement}
+  return charpoly(S, matrix(A))
 end
 
 ###############################################################################
@@ -661,21 +661,21 @@ end
 #
 ###############################################################################
 
-function identity_matrix(M::MatRingElem{T}, n::Int) where T <: NCRingElement
+function identity_matrix(A::MatRingElem{T}, n::Int) where T <: NCRingElement
   @req (n >= 0)  "Matrix dimension must be non-negative"
   @req (n < 2^30)  "Matrix dimension is excessively large"
-  R = base_ring(M)
+  R = base_ring(A)
   return Generic.MatRingElem(identity_matrix(R,n))
 end
 
 @doc raw"""
-    identity_matrix(M::MatRingElem{T}) where T <: RingElement
+    identity_matrix(A::MatRingElem{T}) where T <: RingElement
 
-Return the identity matrix over the same base ring as $M$ and with the
+Return the identity matrix over the same base ring as $A$ and with the
 same dimensions.
 """
-function identity_matrix(M::MatRingElem{T}) where T <: NCRingElement
-   return identity_matrix(M, nrows(M))
+function identity_matrix(A::MatRingElem{T}) where T <: NCRingElement
+   return identity_matrix(A, nrows(A))
 end
 
 ###############################################################################

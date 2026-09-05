@@ -226,14 +226,14 @@ function zero_map(M::FPModule, N::FPModule)
 end
 
 @doc raw"""
-    ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, M::MatElem{T},
+    ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, A::MatElem{T},
                       minv::MatElem{T}) where T <: RingElement
-Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
+Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $A$. The
 inverse morphism is automatically computed.
 """
 function ModuleIsomorphism(M1::FPModule{T},
-                          M2::FPModule{T}, M::MatElem{T}; check::Bool = true) where T <: RingElement
-   return Generic.ModuleIsomorphism(M1, M2, M; check)
+                          M2::FPModule{T}, A::MatElem{T}; check::Bool = true) where T <: RingElement
+   return Generic.ModuleIsomorphism(M1, M2, A; check)
 end
 
 function ModuleIsomorphism(M1::Module, M2::Module, m::MatElem)

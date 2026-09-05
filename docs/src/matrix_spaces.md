@@ -47,5 +47,5 @@ one(s::MatSpace)
 ### Recovering the parent object
 
 ```@docs
-parent(M::MatElem)
+parent(A::MatElem)
 ```
