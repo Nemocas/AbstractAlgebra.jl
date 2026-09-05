@@ -2941,66 +2941,66 @@ function _combinations_dfs!(ans::Vector{Vector{T}}, comb::Vector{T}, v::Abstract
 end
 
 @doc raw"""
-    minors(A::MatElem, k::Int)
+    minors(M::MatElem, k::Int)
 
-Return an array consisting of all $k$-minors of the given matrix $A$,
-i.e. the determinants of all $k \times k$ submatrices of $A$.
+Return an array consisting of all $k$-minors of the given matrix $M$,
+i.e. the determinants of all $k \times k$ submatrices of $M$.
 
 # Examples
 
 ```jldoctest
-julia> A = ZZ[1 2 3; 4 5 6]
+julia> M = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
 
-julia> minors(A, 2)
+julia> minors(M, 2)
 3-element Vector{BigInt}:
  -3
  -6
  -3
 ```
 """
-minors(A::MatElem, k::Int) = collect(minors_iterator(A, k))
+minors(M::MatElem, k::Int) = collect(minors_iterator(M, k))
 
 @doc raw"""
-    minors_with_position(A::MatElem, k::Int)
+    minors_with_position(M::MatElem, k::Int)
 
-Return an array consisting of all $k$-minors of $A$, together with the row
+Return an array consisting of all $k$-minors of $M$, together with the row
 and column indices defining the corresponding submatrices.
 
 # Examples
 
 ```jldoctest
-julia> A = ZZ[1 2 3; 4 5 6]
+julia> M = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
 
-julia> minors_with_position(A, 2)
+julia> minors_with_position(M, 2)
 3-element Vector{Tuple{BigInt, Vector{Int64}, Vector{Int64}}}:
  (-3, [1, 2], [1, 2])
  (-6, [1, 2], [1, 3])
  (-3, [1, 2], [2, 3])
 ```
 """
-minors_with_position(A::MatElem, k::Int) = collect(minors_iterator_with_position(A,k))
+minors_with_position(M::MatElem, k::Int) = collect(minors_iterator_with_position(M,k))
 
 @doc raw"""
-    minors_iterator(A::MatElem, k::Int)
+    minors_iterator(M::MatElem, k::Int)
 
-Return an iterator computing all $k$-minors of $A$, i.e. the determinants
-of all $k \times k$ submatrices of $A$.
+Return an iterator computing all $k$-minors of $M$, i.e. the determinants
+of all $k \times k$ submatrices of $M$.
 
 # Examples
 
 ```jldoctest
-julia> A = ZZ[1 2 3; 4 5 6]
+julia> M = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
 
-julia> first(minors_iterator(A, 2))
+julia> first(minors_iterator(M, 2))
 -3
 
-julia> collect(minors_iterator(A, 2))
+julia> collect(minors_iterator(M, 2))
 3-element Vector{BigInt}:
  -3
  -6
@@ -3008,59 +3008,59 @@ julia> collect(minors_iterator(A, 2))
 
 ```
 """
-function minors_iterator(A::MatElem, k::Int)
-  row_indices = combinations(nrows(A), k)
-  col_indices = combinations(ncols(A), k)
-  return (det(A[rows, cols]) for rows in row_indices for cols in col_indices)
+function minors_iterator(M::MatElem, k::Int)
+  row_indices = combinations(nrows(M), k)
+  col_indices = combinations(ncols(M), k)
+  return (det(M[rows, cols]) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
-    minors_iterator_with_position(A::MatElem, k::Int)
+    minors_iterator_with_position(M::MatElem, k::Int)
 
-Return an iterator computing all $k$-minors of $A$, together with the row
+Return an iterator computing all $k$-minors of $M$, together with the row
 and column indices defining the corresponding submatrices.
 
 # Examples
 
 ```jldoctest
-julia> A = ZZ[1 2 3; 4 5 6]
+julia> M = ZZ[1 2 3; 4 5 6]
 [1   2   3]
 [4   5   6]
 
-julia> first(minors_iterator_with_position(A, 2))
+julia> first(minors_iterator_with_position(M, 2))
 (-3, [1, 2], [1, 2])
 ```
 """
-function minors_iterator_with_position(A::MatElem, k::Int)
-  row_indices = combinations(nrows(A), k)
-  col_indices = combinations(ncols(A), k)
-  return ((det(A[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
+function minors_iterator_with_position(M::MatElem, k::Int)
+  row_indices = combinations(nrows(M), k)
+  col_indices = combinations(ncols(M), k)
+  return ((det(M[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
 end
 
 @doc raw"""
-    exterior_power(A::MatElem, k::Int) -> MatElem
+    exterior_power(M::MatElem, k::Int) -> MatElem
 
 Return the matrix of the induced map on the `k`-th exterior power. Its entries
-are the determinants of the $k \times k$ submatrices of $A$.
+are the determinants of the $k \times k$ submatrices of $M$.
 
 # Examples
 
 ```jldoctest
-julia> A = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+julia> M = matrix(ZZ, 3, 3, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
-julia> exterior_power(A, 2)
+julia> exterior_power(M, 2)
 [-3    -6   -3]
 [-6   -12   -6]
 [-3    -6   -3]
 ```
 """
-function exterior_power(A::MatElem, k::Int)
-  ri = combinations(nrows(A), k)
+function exterior_power(M::MatElem, k::Int)
+  ri = combinations(nrows(M), k)
   n = length(ri)
-  res = similar(A, n, n)
+  res = similar(M, n, n)
    for i in 1:n
      for j in 1:n
-       res[i, j] = det(A[ri[i], ri[j]])
+       res[i, j] = det(M[ri[i], ri[j]])
      end
    end
    return res
@@ -4063,30 +4063,30 @@ function _can_solve_with_solution_interpolation(M::MatElem{T}, b::MatElem{T}) wh
 end
 
 @doc raw"""
-    _solve_rational(A::MatElem{T}, b::MatElem{T}) where T <: RingElement
+    _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
 
-Given a non-singular $n\times n$ matrix $A$ over a ring and an $n\times m$
+Given a non-singular $n\times n$ matrix $M$ over a ring and an $n\times m$
 matrix over the same ring, return a tuple $x, d$ consisting of an
-$n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
-denominator will be the determinant of $A$ up to sign. If $A$ is singular an
+$n\times m$ matrix $x$ and a denominator $d$ such that $Mx = db$. The
+denominator will be the determinant of $M$ up to sign. If $M$ is singular an
 exception is raised.
 """
-function _solve_rational(A::MatElem{T}, b::MatElem{T}) where T <: RingElement
-   return _solve_ringelem(A, b)
+function _solve_rational(M::MatElem{T}, b::MatElem{T}) where T <: RingElement
+   return _solve_ringelem(M, b)
 end
 
-function _solve_ringelem(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(A) != nrows(b) && error("Dimensions don't match in solve")
-   return _solve_ff(A, b)
+function _solve_ringelem(M::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
+   return _solve_ff(M, b)
 end
 
-function _solve_rational(A::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
-   base_ring(A) != base_ring(b) && error("Base rings don't match in solve")
-   nrows(A) != nrows(b) && error("Dimensions don't match in solve")
+function _solve_rational(M::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   nrows(M) != nrows(b) && error("Dimensions don't match in solve")
    flag = true
    try
-      flag, x, d = _can_solve_with_solution_interpolation(A, b)
+      flag, x, d = _can_solve_with_solution_interpolation(M, b)
       !flag && error("No solution in _solve_rational")
       return x, d
    catch e
@@ -4094,7 +4094,7 @@ function _solve_rational(A::MatElem{T}, b::MatElem{T}) where {T <: PolyRingElem}
          rethrow(e)
       end
       !flag && error("No solution in _solve_rational")
-      return _solve_ff(A, b)
+      return _solve_ff(M, b)
    end
 end
 

@@ -71,11 +71,11 @@ content(M::MatrixElem{T}) where T <: RingElement
 ## Minors and exterior powers
 
 ```@docs
-minors(A::MatElem, k::Int)
-minors_with_position(A::MatElem, k::Int)
-minors_iterator(A::MatElem, k::Int)
-minors_iterator_with_position(A::MatElem, k::Int)
-exterior_power(A::MatElem, k::Int)
+minors(M::MatElem, k::Int)
+minors_with_position(M::MatElem, k::Int)
+minors_iterator(M::MatElem, k::Int)
+minors_iterator_with_position(M::MatElem, k::Int)
+exterior_power(M::MatElem, k::Int)
 ```
 
 
