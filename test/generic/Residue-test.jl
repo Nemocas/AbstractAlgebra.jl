@@ -118,6 +118,19 @@ end
    @test is_trivial(R)
 end
 
+@testset "EuclideanRingResidueRingElem.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+
+   @test order(R) == 4
+   @test length(R) == 4
+   @test collect(R) == [R(i) for i in 0:3]
+
+   R, = residue_ring(ZZ, 1)
+
+   @test order(R) == 1
+   @test collect(R) == [zero(R)]
+end
+
 @testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
