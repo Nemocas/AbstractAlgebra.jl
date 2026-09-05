@@ -753,7 +753,7 @@ function exercise_MatSpace_interface(S::MatSpace)
          end
       end
 
-      begin
+      let # `a` must not share scope with the loops above (closure boxes)
           a = matrix(R, [1 2 ; 3 4])
           b = swap_rows(a, 1, 2)
           @assert b == matrix(R, [3 4 ; 1 2])

@@ -441,7 +441,7 @@ function hlift_with_lcc(
     end
   end
 
-  lcs = [divs[j]*m for j in 1:r]
+  lcs = divs .* m
   ok, fac = hlift_have_lcs(A*m^(r - 1), Auf, lcs, mainvar, minorvars, alphas)
 
   if !ok
@@ -500,7 +500,7 @@ function hlift_have_lcs(
   liftdegs = [tdegs[minorvars[i]] for i in 1:n]
 
   for i in 2:n+1
-    tfac = [set_lc(fac[j], mainvar, lc_evals[i, j]) for j in 1:r]
+    tfac = [set_lc(f, mainvar, lc_evals[i, j]) for (j, f) in enumerate(fac)]
     ok, fac = hliftstep(tfac, mainvar, minorvars[1:i-1], liftdegs, alphas,
                                                               A_evals[i], true)
     if !ok
