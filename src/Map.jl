@@ -17,6 +17,14 @@ function domain end
 function codomain end
 function image_fn end
 
+# Generic fallbacks: any map can be applied via `image`/`preimage`, so wrapping
+# those is always a valid way to obtain the underlying functions. Map types that
+# store the functions directly (e.g. `MapWithHeader`) specialize these to hand
+# back the stored function instead. Needed by `InverseMap`, which is built from
+# arbitrary maps.
+image_fn(f::Map) = x -> image(f, x)
+inverse_fn(f::Map) = x -> preimage(f, x)
+
 function coimage(h::Map)
   return quo(domain(h), kernel(h)[1])
 end

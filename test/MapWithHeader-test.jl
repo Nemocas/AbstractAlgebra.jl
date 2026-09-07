@@ -142,3 +142,18 @@ end
    @test M2.domain == M3.domain
    @test M2.codomain == M3.codomain
 end
+
+
+@testset "image_fn/inverse_fn fallbacks" begin
+  # `pseudo_inv` builds an `InverseMap` from an arbitrary map, so `image_fn`
+  # and `inverse_fn` must work beyond `MapWithHeader` too. Composing two
+  # `MapFromFunc`s yields a `CompositeMap`, which is not a `MapWithHeader`.
+  f = map_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+  g = map_from_func(ZZ, ZZ, x -> 2 * x, x -> divexact(x, 2))
+  h = compose(f, g)
+
+  @test !(h isa AbstractAlgebra.Map(AbstractAlgebra.MapWithHeader))
+  @test image_fn(h)(ZZ(1)) == ZZ(4)
+  @test inverse_fn(h)(ZZ(4)) == ZZ(1)
+  @test pseudo_inv(h) isa AbstractAlgebra.InverseMap
+end
