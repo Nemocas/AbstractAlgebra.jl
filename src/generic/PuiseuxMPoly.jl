@@ -378,7 +378,7 @@ end
 function divexact(f::PuiseuxMPolyRingElem{T}, a::T; check::Bool = true) where {T <: RingElement}
     @req !iszero(a) "division by zero"
     @req parent(a) === coefficient_ring(f) "coefficient rings must agree"
-    return puiseux_polynomial_ring_elem(parent(f), poly(f)*1//a, scale(f); skip_normalization=true)
+    return puiseux_polynomial_ring_elem(parent(f), divexact(poly(f), a; check = check), scale(f); skip_normalization=true)
 end
 
 function divexact(f::PuiseuxMPolyRingElem, a::Integer; check::Bool = true)

@@ -472,7 +472,8 @@ function is_nilpotent(A::MatRingElem{T}) where {T <: RingElement}
 end
 
 function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(hessenberg!(matrix(A)))
+  hessenberg!(matrix(A))
+  return A
 end
 
 function hessenberg(A::MatRingElem{T}) where {T <: RingElement}

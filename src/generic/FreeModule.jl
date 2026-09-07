@@ -46,6 +46,8 @@ Return the dimension of the given vector space.
 dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 vector_space_dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 
+order(M::FreeModule) = order(base_ring(M))^rank(M)
+
 number_of_generators(M::FreeModule{T}) where T <: NCRingElement = M.rank
 
 function gens(N::FreeModule{T}) where T <: NCRingElement

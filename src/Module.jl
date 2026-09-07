@@ -363,27 +363,31 @@ rand(M::FPModule, vals...) = rand(Random.default_rng(), M, vals...)
 #
 ###############################################################################
 
-Base.length(M::FPModule{T}) where T <: FinFieldElem = Int(order(M))
+Base.length(M::FPModule{T}) where T = Int(order(M))
 
-function Base.iterate(M::FPModule{T}) where T <: FinFieldElem
+Base.eltype(::Type{S}) where {S <: FPModule} = elem_type(S)
+
+function Base.iterate(M::FPModule{T}) where T
   k = base_ring(M)
-  if dim(M) == 0
+  d = M isa Generic.FreeModule ? rank(M) : dim(M)
+  if d == 0
     return zero(M), iterate([1])
   end
-  p = Base.Iterators.ProductIterator(Tuple([k for i=1:dim(M)]))
+  p = Base.Iterators.ProductIterator(Tuple([k for i=1:d]))
   f = iterate(p)
   @assert f !== nothing
-  return M(elem_type(k)[f[1][i] for i=1:dim(M)]), (f[2], p)
+  return M(elem_type(k)[f[1][i] for i=1:d]), (f[2], p)
 end
 
-function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.ProductIterator}) where T <: FinFieldElem
+function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.ProductIterator}) where T
   n = iterate(st[2], st[1])
   if n === nothing
     return n
   end
-  return M(elem_type(base_ring(M))[n[1][i] for i=1:dim(M)]), (n[2], st[2])
+  d = M isa Generic.FreeModule ? rank(M) : dim(M)
+  return M(elem_type(base_ring(M))[n[1][i] for i=1:d]), (n[2], st[2])
 end
 
-function Base.iterate(::FPModule{<:FinFieldElem}, ::Tuple{Int64, Int64})
+function Base.iterate(::FPModule, ::Tuple{Int64, Int64})
   return nothing
 end

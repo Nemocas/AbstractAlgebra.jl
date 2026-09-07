@@ -3092,7 +3092,7 @@ function power_sums_to_polynomial(P::Vector{T}, Rx::PolyRing{T}) where T <: Ring
             last_non_zero = k
         end
     end
-    E = E[1:last_non_zero + 1]
+    resize!(E, last_non_zero + 1)
     d = length(E) # the length of the resulting polynomial
     for i = 1:div(d, 2)
         E[i], E[d - i + 1] = (-1)^(d - i)*E[d - i + 1], (-1)^(i - 1)*E[i]

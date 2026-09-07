@@ -13,6 +13,8 @@ end
     @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
     @test is_domain_type(L)
+    @test !is_univariate(L)
+    @test is_univariate(laurent_polynomial_ring(GF(5), ["x"])[1])
 
     @test coefficient_ring(L) == GF(5)
     @test coefficient_ring_type(L) === typeof(GF(5))
