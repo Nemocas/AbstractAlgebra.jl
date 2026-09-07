@@ -1437,7 +1437,7 @@ end
    B = [divexact(d, canonical_unit(d)) for d in B]
    # do tail reduction if requested
    if complete_reduction
-      B = [tail_reduce(d, B) for d in B]
+      B = tail_reduce.(B, Ref(B))
    end
    # sort by leading monomial then leading coefficient
    B = sort!(B, lt = isless_monomial_lc)

@@ -706,25 +706,25 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
          end
 
          # zero matrices
-         a = zero_matrix(R, nrows(S), ncols(S))
-         @test parent(a) === S
-         @test iszero(a)
-         a = zero(S)
-         @test parent(a) === S
-         @test iszero(a)
+         z = zero_matrix(R, nrows(S), ncols(S))
+         @test parent(z) === S
+         @test iszero(z)
+         z = zero(S)
+         @test parent(z) === S
+         @test iszero(z)
 
          # (truncated) identity matrices
          if nrows(S) == ncols(S)
-            a = diagonal_matrix(one(R), nrows(S), ncols(S))
-            @test parent(a) === S
-            @test isone(a)
-            a = one(S)
-            @test parent(a) === S
-            @test isone(a)
+            e = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(e) === S
+            @test isone(e)
+            e = one(S)
+            @test parent(e) === S
+            @test isone(e)
          else
-            a = diagonal_matrix(one(R), nrows(S), ncols(S))
-            @test parent(a) === S
-            @test !isone(a)
+            e = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(e) === S
+            @test !isone(e)
             @test_throws DomainError one(S)
          end
       end
