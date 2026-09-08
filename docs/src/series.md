@@ -174,10 +174,10 @@ And for absolute series:
 It is also possible to create series directly without having to create the
 corresponding series ring.
 
-```julia
-abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
-rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
-laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+```@docs
+abs_series
+rel_series
+laurent_series
 ```
 
 **Examples**

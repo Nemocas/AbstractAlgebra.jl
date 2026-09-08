@@ -116,12 +116,9 @@ i.e. where `A[1]` is the constant coefficient.
 A third way of constructing polynomials is to construct them directly without
 creating the polynomial ring.
 
-```julia
-polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true)
+```@docs
+polynomial
 ```
-
-Given an array of coefficients construct the polynomial with those coefficients
-over the given ring and with the given variable.
 
 **Examples**
 
