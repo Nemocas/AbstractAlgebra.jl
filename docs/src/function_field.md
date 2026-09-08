@@ -32,16 +32,9 @@ In order to construct rational functions in AbstractAlgebra.jl, one can first
 construct the function field itself. This is accomplished with one of the
 following constructors.
 
-```julia
-rational_function_field(k::Field, s::VarName; cached::Bool = true)
-rational_function_field(k::Field, s::Vector{<:VarName}; cached::Bool = true)
+```@docs
+rational_function_field
 ```
-
-Given a coefficient field `k` return a tuple `(S, x)` consisting of the parent
-object of the rational function field over $k$ and the generator(s) `x`. By
-default the parent object `S` will depend only on `R` and `s` and will be cached.
-Setting the optional argument `cached` to `false` will prevent the parent object
-`S` from being cached.
 
 Here are some examples of creating rational function fields and making use of the
 resulting parent objects to coerce various elements into the function field.
@@ -209,16 +202,9 @@ In order to construct function fields in AbstractAlgebra.jl, one first
 constructs the rational function field they are an extension of, then supplies
 a polynomial over this field to the following constructor:
 
-```julia
-function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
+```@docs
+function_field
 ```
-
-Given an irreducible polynomial `p` over a rational function field return a
-tuple `(S, z)` consisting of the parent object of the function field defined by
-that polynomial over $k(x)$ and the generator `z`. By default the parent object
-`S` will depend only on `p` and `s` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `S` from being
-cached.
 
 Here are some examples of creating function fields and making use of the
 resulting parent objects to coerce various elements into the function field.
