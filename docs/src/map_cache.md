@@ -49,28 +49,3 @@ enable_cache!
 disable_cache!
 set_limit!
 ```
-
-**Examples**
-
-```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
-
-julia> a = f(ZZ(1))
-2
-
-julia> disable_cache!(f)
-
-julia> b = f(ZZ(1))
-2
-
-julia> enable_cache!(f)
-
-julia> c = f(ZZ(1))
-2
-
-julia> set_limit!(f, 200)
-200
-
-julia> d = f(ZZ(1))
-2
-```

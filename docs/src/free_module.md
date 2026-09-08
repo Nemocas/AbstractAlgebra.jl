@@ -69,25 +69,4 @@ dim(::Generic.FreeModule{T}) where T <: FieldElement
 basis(::Generic.FreeModule)
 ```
 
-**Examples**
-
-```jldoctest
-julia> M = free_module(ZZ, 3)
-Free module of rank 3 over integers
-
-julia> V = vector_space(QQ, 2)
-Vector space of dimension 2 over rationals
-
-julia> rank(M)
-3
-
-julia> dim(V)
-2
-
-julia> basis(V)
-2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
- (1//1, 0//1)
- (0//1, 1//1)
-```
-
 

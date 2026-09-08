@@ -1371,15 +1371,31 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 (*identical*) field is returned. Setting `cached` to `false` ensures a distinct
 new field is returned, and will also prevent it from being cached.
 
-# Example
+# Examples
 
 ```jldoctest
-julia> K, x = rational_function_field(QQ, :x);
+julia> R1, x1 = rational_function_field(QQ, :x1);  # characteristic 0
 
-julia> U, z = K[:z];
+julia> U1, z1 = R1[:z1];
 
-julia> S, y = function_field(z^2 - x, :y)
-(Function Field over rationals with defining polynomial y^2 - x, y)
+julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+
+julia> S1, y1 = function_field(f, :y1)
+(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
+
+julia> S1((x1 + 1)//(x1 + 2))
+(x1 + 1)//(x1 + 2)
+
+julia> R2, x2 = rational_function_field(GF(23), :x2);  # characteristic p
+
+julia> U2, z2 = R2[:z2];
+
+julia> S2, y2 = function_field(z2^2 + 3z2 + 1, :y2)
+(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
+
+julia> S2(R2(5))
+5
 ```
 """
 function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}

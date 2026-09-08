@@ -320,6 +320,9 @@ cached.
 ```jldoctest
 julia> rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 x^4 + 2*x^5 + 3*x^6 + O(x^7)
+
+julia> rel_series(ZZ, BigInt[], 0, 3, 1)
+O(x^3)
 ```
 """
 function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
