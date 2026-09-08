@@ -72,6 +72,6 @@ function RandomExtensions.make(S::EuclideanRingResidueField{Poly{Rational{BigInt
       Make(S, vs[1])
    else
       n = degree(S.modulus)
-      Make(S, make(base_ring(S), n - 1:n - 1, vs...))
+      Make(S, make(R, n - 1:n - 1, vs...))
    end
 end
