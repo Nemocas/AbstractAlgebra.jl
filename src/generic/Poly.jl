@@ -58,6 +58,17 @@ function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: Integer
    return c
 end
 
+@doc raw"""
+    normalise(f::PolynomialElem, n::Int)
+    normalise(f::SeriesElem, n::Int)
+
+Given `f` whose underlying polynomial has length at most `n`, including any
+leading zero coefficients, return the length that polynomial has once those
+are discarded. The polynomial itself is not modified.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function normalise(a::Poly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
       n -= 1
@@ -185,6 +196,17 @@ function set_length!(c::Poly{T}, n::Int) where T <: RingElement
    return c
 end
 
+@doc raw"""
+    fit!(f::PolynomialElem, n::Int)
+    fit!(f::SeriesElem, n::Int)
+
+Ensure that the polynomial underlying `f` internally has space for `n`
+coefficients, mutating `f` in place. Nothing is returned. Types that manage
+their own allocation may implement this as a no-op.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function fit!(c::Poly{T}, n::Int) where T <: RingElement
    if length(c.coeffs) < n
       resize!(c.coeffs, n)
