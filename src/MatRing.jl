@@ -493,6 +493,18 @@ function charpoly(S::PolyRing{T}, A::MatRingElem{T}) where {T <: RingElement}
   return charpoly(S, matrix(A))
 end
 
+function lu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+  S = parent(A)
+  r, p, L, U = lu(matrix(A), P)
+  return r, p, S(L), S(U)
+end
+
+function fflu(A::MatRingElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+  S = parent(A)
+  r, d, p, L, U = fflu(matrix(A), P)
+  return r, d, p, S(L), S(U)
+end
+
 ###############################################################################
 #
 #   Random generation

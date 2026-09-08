@@ -2162,7 +2162,7 @@ julia> r, p, L, U = lu(M)
 (3, (), [1 0 0; 4 1 0; 0 0 1], [1 2 3; 0 -3 -6; 0 0 1])
 ```
 """
-function lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -2334,7 +2334,7 @@ julia> r, d, p, L, U = fflu(M)
 (3, -3//1, (), [1 0 0; 4 -3 0; 0 0 -3], [1 2 3; 0 -3 -6; 0 0 -3])
 ```
 """
-function fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+function fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    P.n != m && error("Permutation does not match matrix")
