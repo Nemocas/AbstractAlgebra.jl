@@ -275,23 +275,6 @@ x^3 + 3*x + 1
 gcd(::FracElem{T}, ::FracElem{T}) where T <: RingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2 + 2*x + 1)//(x^2 + x + 1)
-
-julia> h = gcd(f, g)
-(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
-
-```
-
 ### Square root
 
 Methods for `is_square` and `sqrt` are provided for inputs of type `FracElem`.
@@ -327,26 +310,6 @@ remove(::FracElem{T}, ::T) where T <: RingElem
 
 ```@docs
 valuation(::FracElem{T}, ::T) where T <: RingElem
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 1)//(x^2 + x + 1)
-(x^2 + 1)//(x^2 + x + 1)
-
-julia> v, q = remove(f^3*g, x + 1)
-(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
-
-julia> v = valuation(f^3*g, x + 1)
-3
-
 ```
 
 ### Random generation
@@ -411,4 +374,3 @@ julia> collect(f)
  (10, 10)
  (42, -8)
 ```
-

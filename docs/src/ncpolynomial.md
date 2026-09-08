@@ -256,62 +256,11 @@ truncate(::NCPolyRingElem, ::Int)
 mullow(::NCPolyRingElem{T}, ::NCPolyRingElem{T}, ::Int) where T <: NCRingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R = matrix_ring(ZZ, 2)
-Matrix ring of degree 2
-  over integers
-
-julia> S, x = polynomial_ring(R, :x)
-(Univariate polynomial ring in x over matrix ring, x)
-
-julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over S, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + [3 0; 0 3]
-
-julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x + 1)*y + x^3 + [2 0; 0 2]*x + [2 0; 0 2]
-
-julia> h = truncate(f, 1)
-[3 0; 0 3]
-
-julia> k = mullow(f, g, 4)
-(x^2 + x)*y^3 + (x^4 + [3 0; 0 3]*x^2 + [4 0; 0 4]*x + 1)*y^2 + (x^4 + x^3 + [2 0; 0 2]*x^2 + [7 0; 0 7]*x + [5 0; 0 5])*y + [3 0; 0 3]*x^3 + [6 0; 0 6]*x + [6 0; 0 6]
-
-```
-
 ### Reversal
 
 ```@docs
 reverse(::NCPolyRingElem, ::Int)
 reverse(::NCPolyRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R = matrix_ring(ZZ, 2)
-Matrix ring of degree 2
-  over integers
-
-julia> S, x = polynomial_ring(R, :x)
-(Univariate polynomial ring in x over matrix ring, x)
-
-julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over S, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + [3 0; 0 3]
-
-julia> g = reverse(f, 7)
-[3 0; 0 3]*y^6 + (x + 1)*y^5 + x*y^4
-
-julia> h = reverse(f)
-[3 0; 0 3]*y^2 + (x + 1)*y + x
-
 ```
 
 ### Shifting
@@ -322,30 +271,6 @@ shift_left(::NCPolyRingElem, ::Int)
 
 ```@docs
 shift_right(::NCPolyRingElem, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R = matrix_ring(ZZ, 2)
-Matrix ring of degree 2
-  over integers
-
-julia> S, x = polynomial_ring(R, :x)
-(Univariate polynomial ring in x over matrix ring, x)
-
-julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over S, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + [3 0; 0 3]
-
-julia> g = shift_left(f, 7)
-x*y^9 + (x + 1)*y^8 + [3 0; 0 3]*y^7
-
-julia> h = shift_right(f, 2)
-x
-
 ```
 
 ### Evaluation
@@ -390,25 +315,3 @@ julia> r = f(23)
 ```@docs
 derivative(::NCPolyRingElem)
 ```
-
-**Examples**
-
-```jldoctest
-julia> R = matrix_ring(ZZ, 2)
-Matrix ring of degree 2
-  over integers
-
-julia> S, x = polynomial_ring(R, :x)
-(Univariate polynomial ring in x over matrix ring, x)
-
-julia> T, y = polynomial_ring(S, :y)
-(Univariate polynomial ring in y over S, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + [3 0; 0 3]
-
-julia> h = derivative(f)
-[2 0; 0 2]*x*y + x + 1
-
-```
-

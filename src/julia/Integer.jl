@@ -124,6 +124,19 @@ end
 
 Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
 $a = bc$.
+
+# Examples
+
+```jldoctest
+julia> r = ZZ(6)
+6
+
+julia> s = ZZ(3)
+3
+
+julia> is_divisible_by(r, s)
+true
+```
 """
 function is_divisible_by(a::Integer, b::Integer)
    if iszero(b)
@@ -510,6 +523,13 @@ end
 
 Return a pair $(c,d)$ such that $a=c*d$ and $c = gcd(a, b^\infty)$ if $a\neq 0$,
 and $c=b$, $d=0$ if $a=0$.
+
+# Examples
+
+```jldoctest
+julia> c, n = ppio(ZZ(12), ZZ(26))
+(4, 3)
+```
 """
 function ppio(a::T, b::T) where T <: Integer
    iszero(a) && return (b,T(0))

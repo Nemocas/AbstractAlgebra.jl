@@ -1018,6 +1018,52 @@ end
     truncate(a::PolynomialElem, n::Int)
 
 Return $a$ truncated to $n$ terms, i.e. the remainder upon division by $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + 2*x + 2
+
+julia> h = truncate(f, 1)
+3
+
+julia> k = mullow(f, g, 4)
+(x^2 + x)*y^3 + (x^4 + 3*x^2 + 4*x + 1)*y^2 + (x^4 + x^3 + 2*x^2 + 7*x + 5)*y + 3*x^3 + 6*x + 6
+```
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + [2 0; 0 2]*x + [2 0; 0 2]
+
+julia> h = truncate(f, 1)
+[3 0; 0 3]
+
+julia> k = mullow(f, g, 4)
+(x^2 + x)*y^3 + (x^4 + [3 0; 0 3]*x^2 + [4 0; 0 4]*x + 1)*y^2 + (x^4 + x^3 + [2 0; 0 2]*x^2 + [7 0; 0 7]*x + [5 0; 0 5])*y + [3 0; 0 3]*x^3 + [6 0; 0 6]*x + [6 0; 0 6]
+```
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -1183,6 +1229,46 @@ the given length (the polynomial will be notionally truncated or padded with
 zeroes before the leading term if necessary to match the specified length).
 The resulting polynomial is normalised. If `len` is negative we throw a
 `DomainError()`.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia> g = reverse(f, 7)
+3*y^6 + (x + 1)*y^5 + x*y^4
+
+julia> h = reverse(f)
+3*y^2 + (x + 1)*y + x
+```
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> g = reverse(f, 7)
+[3 0; 0 3]*y^6 + (x + 1)*y^5 + x*y^4
+
+julia> h = reverse(f)
+[3 0; 0 3]*y^2 + (x + 1)*y + x
+```
 """
 function reverse(x::PolynomialElem, len::Int)
    len < 0 && throw(DomainError(len, "len must be >= 0"))
@@ -1229,6 +1315,46 @@ end
 
 Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia> g = shift_left(f, 7)
+x*y^9 + (x + 1)*y^8 + 3*y^7
+
+julia> h = shift_right(f, 2)
+x
+```
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> g = shift_left(f, 7)
+x*y^9 + (x + 1)*y^8 + [3 0; 0 3]*y^7
+
+julia> h = shift_right(f, 2)
+x
+```
 """
 function shift_left(f::PolynomialElem, n::Int)
   n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -1587,6 +1713,28 @@ end
 
 Return the pseudoremainder of $f$ divided by $g$. If $g = 0$ we throw a
 `DivideError()`.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + 2*x + 2
+
+julia> h = pseudorem(f, g)
+x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
+
+julia> q, r = pseudodivrem(f, g)
+((x^2 + x)*y - x^4 - x^2 + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
+```
 """
 function pseudorem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   check_parent(f, g)
@@ -2374,6 +2522,54 @@ end
     derivative(a::PolynomialElem)
 
 Return the derivative of the polynomial $a$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> T, z = polynomial_ring(QQ, :z)
+(Univariate polynomial ring in z over rationals, z)
+
+julia> U, = residue_ring(T, z^3 + 3z + 1);
+
+julia> V, w = polynomial_ring(U, :w)
+(Univariate polynomial ring in w over U, w)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + 3
+
+julia> g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4
+(z^2 + 2*z + 1)*w^2 + (z + 1)*w - 2*z + 4
+
+julia> h = derivative(f)
+2*x*y + x + 1
+
+julia> k = integral(g)
+(1//3*z^2 + 2//3*z + 1//3)*w^3 + (1//2*z + 1//2)*w^2 + (-2*z + 4)*w
+```
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> h = derivative(f)
+[2 0; 0 2]*x*y + x + 1
+```
 """
 function derivative(a::PolynomialElem)
    if iszero(a)
@@ -3047,6 +3243,26 @@ Uses Newton (or Newton-Girard) formulas to compute the first $n$
 sums of powers of the roots of $f$ from the coefficients of $f$, starting
 with the sum of (first powers of) the roots. The input polynomial must be
 monic, at least degree $1$ and have nonzero constant coefficient.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> f = x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+
+julia> V = polynomial_to_power_sums(f)
+4-element Vector{BigInt}:
+   2
+ -16
+ -73
+  20
+
+julia> power_sums_to_polynomial(V)
+x^4 - 2*x^3 + 10*x^2 + 7*x - 5
+```
 """
 function polynomial_to_power_sums(f::PolyRingElem{T}, n::Int=degree(f)) where T <: RingElement
     # plain vanilla recursion
@@ -3135,6 +3351,32 @@ basis for the roots $r_0, r_1, \ldots, r_{n-2}$. In other words, this
 determines output coefficients $c_i$ such that
 $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 is equal to the input polynomial.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = 3x*y^2 + (x + 1)*y + 3
+3*x*y^2 + (x + 1)*y + 3
+
+julia> g = deepcopy(f)
+3*x*y^2 + (x + 1)*y + 3
+
+julia> roots = [R(1), R(2), R(3)]
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 1
+ 2
+ 3
+
+julia> monomial_to_newton!(g.coeffs, roots)
+
+julia> newton_to_monomial!(g.coeffs, roots)
+```
 """
 function monomial_to_newton!(P::Vector{T}, roots::Vector{T}) where T <: RingElement
    n = length(roots)
@@ -3191,6 +3433,33 @@ the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
 $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
 $ys$ must belong to the base ring of the polynomial ring $R$. If no such
 polynomial exists, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> xs = [R(1), R(2), R(3), R(4)]
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 1
+ 2
+ 3
+ 4
+
+julia> ys = [R(1), R(4), R(9), R(16)]
+4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 1
+ 4
+ 9
+ 16
+
+julia> f = interpolate(S, xs, ys)
+y^2
+```
 """
 function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingElement
    length(x) != length(y) && error("Array lengths don't match in interpolate")
@@ -3269,6 +3538,19 @@ into `R`.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> g = x^3 + 6*x + 1
+x^3 + 6*x + 1
+
+julia> change_base_ring(GF(2), g)
+x^3 + 1
+```
 """
 function change_base_ring(R::Ring, p::PolyRingElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
    return _map(R, p, parent)
@@ -3349,6 +3631,22 @@ end
 
 Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by
 $T_n(x) = \cos(n \cos^{-1}(x))$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> S, y = polynomial_ring(R, :y)
+(Univariate polynomial ring in y over R, y)
+
+julia> f = chebyshev_t(20, y)
+524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1
+
+julia> g = chebyshev_u(15, y)
+32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
+```
 """
 function chebyshev_t(n::Int, x::PolyRingElem)
    if n == 0

@@ -52,6 +52,25 @@ end
 Return a pair `K, g` consisting of the kernel object $K$ of the given module
 homomorphism $f$ (as a submodule of its domain) and the canonical injection
 from the kernel into the domain of $f$.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
+(1, 2, 3)
+
+julia> S, f = sub(M, [m])
+(Submodule over integers with 1 generator and no relations, Hom: S -> M)
+
+julia> Q, g = quo(M, S)
+(Quotient module over integers with 2 generators and no relations, Hom: M -> Q)
+
+julia> kernel(g)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
+```
 """
 function kernel(f::Map(FPModuleHomomorphism))
    D = domain(f)
@@ -201,6 +220,24 @@ end
     ModuleHomomorphism(M1::FPModule{T},
                        M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
 Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 2)
+Free module of rank 2 over integers
+
+julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+Module homomorphism
+  from free module of rank 2 over integers
+  to free module of rank 2 over integers
+
+julia> m = M([ZZ(1), ZZ(2)])
+(1, 2)
+
+julia> f(m)
+(7, 10)
+```
 """
 function ModuleHomomorphism(M1::FPModule{T},
                          M2::FPModule{T}, m::MatElem{T}; check::Bool = true) where T <: RingElement

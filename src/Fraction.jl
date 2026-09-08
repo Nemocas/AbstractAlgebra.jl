@@ -716,6 +716,22 @@ Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
 the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
 This requires the existence of a greatest common divisor function for the
 base ring.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
+(x^2 + 2*x + 1)//(x^2 + x + 1)
+
+julia> h = gcd(f, g)
+(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
+```
 """
 function gcd(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -741,6 +757,25 @@ end
 
 Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 $p$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia> g = (x^2 + 1)//(x^2 + x + 1)
+(x^2 + 1)//(x^2 + x + 1)
+
+julia> v, q = remove(f^3*g, x + 1)
+(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
+
+julia> v = valuation(f^3*g, x + 1)
+3
+```
 """
 function remove(z::FracElem{T}, p) where {T}
    p = convert(T, p)

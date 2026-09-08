@@ -313,6 +313,21 @@ end
 
 Return the inverse of the element $a$ in the residue ring. If an impossible
 inverse is encountered, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = inv(f)
+1//3*x^2 - 1//3*x + 4//3
+```
 """
 function Base.inv(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
@@ -366,6 +381,24 @@ end
 Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 by taking the greatest common divisor of the data associated with the
 supplied residues and taking its greatest common divisor with the modulus.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = S(x^2 + 2x + 1)
+x^2 + 2*x + 1
+
+julia> h = gcd(f, g)
+1
+```
 """
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
