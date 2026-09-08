@@ -14,8 +14,8 @@ matrices which certify the result.
 ## LU factorisation
 
 ```@docs
-lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
-fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 ```
 
 
