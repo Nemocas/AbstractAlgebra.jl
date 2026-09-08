@@ -65,6 +65,7 @@ export MPolyRing
 export MPolyRingElem
 export Map
 export MapFromFunc
+export MapWithHeader
 export MatElem
 export MatRing
 export MatRingElem
