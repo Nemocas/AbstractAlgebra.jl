@@ -23,11 +23,23 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 (*identical*) field is returned. Setting `cached` to `false` ensures a distinct
 new field is returned, and will also prevent it from being cached.
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, x = rational_function_field(QQ, :x)
 (Rational function field over rationals, x)
+
+julia> S(123)
+123
+
+julia> S(numerator(x + 1, false), numerator(x + 2, false))
+(x + 1)//(x + 2)
+
+julia> R, (x, y) = rational_function_field(QQ, [:x, :y])
+(Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
+
+julia> (x + y)//y^2
+(x + y)//y^2
 ```
 """
 function rational_function_field(k::Field, s::VarName = :t; cached::Bool=true)

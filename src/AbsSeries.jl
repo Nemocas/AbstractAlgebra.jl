@@ -168,6 +168,15 @@ to `false` prevents it from being cached.
 ```jldoctest
 julia> abs_series(ZZ, [1, 2, 3], 3, 5, :y)
 1 + 2*y + 3*y^2 + O(y^5)
+
+julia> abs_series(ZZ, [1, 2, 3], 1, 6; cached=false)
+1 + O(x^6)
+
+julia> abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+1 + 2*x + 3*x^2 + O(x^5)
+
+julia> abs_series(ZZ, [], 0, 6)
+O(x^6)
 ```
 """
 function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T

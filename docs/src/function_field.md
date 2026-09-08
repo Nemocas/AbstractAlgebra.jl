@@ -36,37 +36,6 @@ following constructors.
 rational_function_field
 ```
 
-Here are some examples of creating rational function fields and making use of the
-resulting parent objects to coerce various elements into the function field.
-
-**Examples**
-
-```jldoctest
-julia> S, x = rational_function_field(QQ, :x)
-(Rational function field over rationals, x)
-
-julia> f = S()
-0
-
-julia> g = S(123)
-123
-
-julia> h = S(BigInt(1234))
-1234
-
-julia> k = S(x + 1)
-x + 1
-
-julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
-(x + 1)//(x + 2)
-
-julia> R, (x, y) = rational_function_field(QQ, [:x, :y])
-(Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
-
-julia> (x + y)//y^2
-(x + y)//y^2
-```
-
 ## Basic rational function field functionality
 
 Fraction fields in AbstractAlgebra.jl implement the full Field interface and
@@ -204,52 +173,6 @@ a polynomial over this field to the following constructor:
 
 ```@docs
 function_field
-```
-
-Here are some examples of creating function fields and making use of the
-resulting parent objects to coerce various elements into the function field.
-
-**Examples**
-
-```jldoctest
-julia> R1, x1 = rational_function_field(QQ, "x1") # characteristic 0
-(Rational function field over rationals, x1)
-
-julia> U1, z1 = R1["z1"]
-(Univariate polynomial ring in z1 over R1, z1)
-
-julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
-(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
-
-julia> S1, y1 = function_field(f, "y1")
-(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
-
-julia> a = S1()
-0
-
-julia> b = S1((x1 + 1)//(x1 + 2))
-(x1 + 1)//(x1 + 2)
-
-julia> c = S1(1//3)
-1//3
-
-julia> R2, x2 = rational_function_field(GF(23), "x1") # characteristic p
-(Rational function field over finite field F_23, x1)
-
-julia> U2, z2 = R2["z2"]
-(Univariate polynomial ring in z2 over R2, z2)
-
-julia> g = z2^2 + 3z2 + 1
-z2^2 + 3*z2 + 1
-
-julia> S2, y2 = function_field(g, "y2")
-(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
-
-julia> d = S2(R2(5))
-5
-
-julia> e = S2(y2)
-y2
 ```
 
 ## Basic function field functionality
