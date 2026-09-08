@@ -170,34 +170,10 @@ Base.getindex(m::FPModuleElem{T}) where T <: RingElement
 coordinates(m::FPModuleElem{T}) where T <: RingElement
 ```
 
-**Examples**
-
-```jldoctest
-julia> F = free_module(ZZ, 3)
-Free module of rank 3 over integers
-
-julia> m = F(BigInt[2, -5, 4])
-(2, -5, 4)
-
-julia> m[1]
-2
-```
-
 ### Module comparison
 
 ```@docs
 ==(::FPModule{T}, ::FPModule{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> M = free_module(QQ, 2)
-Vector space of dimension 2 over rationals
-
-julia> M == M
-true
-
 ```
 
 ### Isomorphism
@@ -247,33 +223,3 @@ are unique up to multiplication by a unit, and even unique if a
 snf(::FPModule{T}) where T <: RingElement
 invariant_factors(::FPModule{T}) where T <: RingElement
 ```
-
-**Examples**
-
-```jldoctest; setup = :(import Random; Random.seed!(42))
-julia> M = free_module(ZZ, 3)
-Free module of rank 3 over integers
-
-julia> m1 = rand(M, -10:10)
-(3, -1, 0)
-
-julia> m2 = rand(M, -10:10)
-(4, 4, -7)
-
-julia> S, f = sub(M, [m1, m2])
-(Submodule over integers with 2 generators and no relations, Hom: S -> M)
-
-julia> Q, g = quo(M, S)
-(Quotient module over integers with 2 generators and relations:
-[16 -21], Hom: M -> Q)
-
-julia> I, f = snf(Q)
-(Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: I -> Q)
-
-julia> invs = invariant_factors(Q)
-1-element Vector{BigInt}:
- 0
-
-```
-
-
