@@ -261,6 +261,13 @@ function leading_term(a::FreeAssociativeAlgebraElem{T}) where T
     return term(a, 1)
 end
 
+@doc raw"""
+    leading_exponent_word(a::FreeAssociativeAlgebraElem)
+
+Return the exponent word of the leading term of `a`, i.e. the vector of
+variable indices spelling out its leading monomial. Throw an error if `a` is
+zero.
+"""
 function leading_exponent_word(a::FreeAssociativeAlgebraElem{T}) where T
     @req !is_zero(a) "Zero polynomial does not have a leading exponent word"
     return exponent_word(a, 1)
