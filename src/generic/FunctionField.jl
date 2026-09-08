@@ -1359,6 +1359,29 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
+@doc raw"""
+    function_field(p::PolyRingElem{<:RationalFunctionFieldElem}, s::VarName; cached::Bool=true)
+
+Given an irreducible polynomial `p` over a rational function field $k(x)$,
+return a tuple `(S, z)` consisting of the function field $S = k(x)[z]/(p)$ and
+its generator `z`.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`function_field` is invoked again with the same arguments, the same
+(*identical*) field is returned. Setting `cached` to `false` ensures a distinct
+new field is returned, and will also prevent it from being cached.
+
+# Example
+
+```jldoctest
+julia> K, x = rational_function_field(QQ, :x);
+
+julia> U, z = K[:z];
+
+julia> S, y = function_field(z^2 - x, :y)
+(Function Field over rationals with defining polynomial y^2 - x, y)
+```
+"""
 function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    length(p) < 2 && error("Polynomial must have degree at least 1")
    pol, den = _rat_poly(p, Symbol(s))
