@@ -274,6 +274,22 @@ zero(a::RelPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 #
 ###############################################################################
 
+@doc raw"""
+    rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the relative power series over `R` in the variable `var` of valuation
+`val` whose first `len` coefficients are given by `arr`, with absolute
+precision `prec`. The series ring is created on the fly with maximum relative
+precision `max_precision`; setting `cached` to `false` prevents it from being
+cached.
+
+# Examples
+
+```jldoctest
+julia> rel_series(ZZ, [1, 2, 3], 3, 7, 4)
+x^4 + 2*x^5 + 3*x^6 + O(x^7)
+```
+"""
 function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
    TT = elem_type(R)

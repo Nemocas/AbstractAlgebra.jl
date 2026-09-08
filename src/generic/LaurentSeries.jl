@@ -452,6 +452,23 @@ zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
 #
 ###############################################################################
 
+@doc raw"""
+    laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the Laurent series over `R` in the variable `var` of valuation `val`
+whose first `len` coefficients are given by `arr`, with absolute precision
+`prec`. Consecutive coefficients are `scale` exponents apart, i.e. `arr[i]` is
+the coefficient of `var^(val + (i - 1)*scale)`. The series ring is created on
+the fly with maximum relative precision `max_precision`; setting `cached` to
+`false` prevents it from being cached.
+
+# Examples
+
+```jldoctest
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+```
+"""
 function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")

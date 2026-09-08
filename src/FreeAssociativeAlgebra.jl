@@ -299,6 +299,25 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    free_associative_algebra(R::Ring, varnames::Vector{Symbol}; cached::Bool=true)
+
+Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
+return a tuple `S, [x1, x2, ...]` of the free associative algebra
+$S = R \left< x1, x2, \dots \right>$ and its generators $x1, x2, \dots$.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`free_associative_algebra` is invoked again with the same arguments, the same
+(*identical*) algebra is returned. Setting `cached` to `false` ensures a
+distinct new algebra is returned, and will also prevent it from being cached.
+
+# Example
+
+```jldoctest
+julia> S, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+(Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y])
+```
+"""
 function free_associative_algebra(
   R::Ring,
   s::Vector{Symbol};
@@ -310,6 +329,20 @@ function free_associative_algebra(
 end
 
 @varnames_interface free_associative_algebra(R::Ring, s)
+
+@doc raw"""
+    free_associative_algebra(R::Ring, n::Int, s::VarName=:x; cached::Bool=true)
+
+Same as [`free_associative_algebra(::Ring, ["s$i" for i in 1:n])`](@ref free_associative_algebra(::Ring, ::Vector{Symbol})).
+
+# Example
+
+```jldoctest
+julia> S, x = free_associative_algebra(ZZ, 3)
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x1, x2, x3])
+```
+"""
+free_associative_algebra(R::Ring, n::Int, s::VarName=:x)
 
 
 free_associative_algebra_type(::Type{T}) where T<:RingElement = Generic.FreeAssociativeAlgebra{T}
