@@ -33,37 +33,17 @@ a map with section.
 To construct a map with retraction/section from a pair of maps, we have the following
 functions:
 
-```julia
-map_with_retraction(m::Map{D, C}, r::Map{C, D}) where {D, C}
-map_with_section(m::Map{D, C}, s::Map{C, D}) where {D, C}
+```@docs
+map_with_retraction
+map_with_section
 ```
-
-Construct the map with retraction/section given a known retraction/section $r$ or $s$
-respectively, of $m$.
 
 For convenience we allow construction of maps with retraction/section from a pair of
 Julia functions/closures.
 
-```julia
-map_with_retraction_from_func(f::Function, r::Function, R, S)
-map_with_section_from_func(f::Function, s::Function, R, S)
-```
-
-Construct the map with retraction/section such that the map is given by the function $f$
-and the retraction/section is given by the function $r$ or $s$ respectively. Here $R$ is
-the parent object representing the domain and $S$ is the parent object representing the
-codomain of $f$.
-
-**Examples**
-
-```jldoctest
-julia> f = map_with_retraction_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
-Map with retraction
-  from integers
-  to integers
-
-julia> a = f(ZZ(1))
-2
+```@docs
+map_with_retraction_from_func
+map_with_section_from_func
 ```
 
 ## Functionality for maps with inverses
@@ -80,15 +60,11 @@ Return the map with the two maps contained in $M$ swapped. In the first case, a
 
 To access the two maps stored in a map with retraction/section, we have the following:
 
-```julia
-image_map(M::Generic.MapWithRetraction)
-image_map(M::Generic.MapWithSection)
-retraction_map(M::Generic.MapWithRetraction)
-section_map(M::Generic.MapWithSection)
+```@docs
+image_map
+retraction_map
+section_map
 ```
-
-The first two of these functions return the first map in a map with retraction/section,
-the second two functions return the corresponding second maps.
 
 **Examples**
 
