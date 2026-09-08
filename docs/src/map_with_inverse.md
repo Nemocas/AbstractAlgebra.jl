@@ -58,14 +58,6 @@ inv(M::Generic.MapWithSection)
 Return the map with the two maps contained in $M$ swapped. In the first case, a
 `MapWithSection` is returned. In the second case a `MapWithRetraction` is returned.
 
-To access the two maps stored in a map with retraction/section, we have the following:
-
-```@docs
-image_map
-retraction_map
-section_map
-```
-
 **Examples**
 
 ```jldoctest
@@ -87,7 +79,14 @@ which is the composite of
   Map: integers -> integers
   Map: integers -> integers
 
-julia> a = h(ZZ(1))
+julia> h(ZZ(1))
 1
+```
 
+To access the two maps stored in a map with retraction/section, we have the following:
+
+```@docs
+image_map
+retraction_map
+section_map
 ```
