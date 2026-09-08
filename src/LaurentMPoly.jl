@@ -154,7 +154,9 @@ function rand(rng::AbstractRNG, S::LaurentMPolyRing,
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::LaurentMPolyRing, term_range, exp_bound, v...)
+function rand(S::LaurentMPolyRing,
+              term_range::AbstractUnitRange{Int},
+              exp_bound::AbstractUnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 

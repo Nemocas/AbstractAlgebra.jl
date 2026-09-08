@@ -311,7 +311,7 @@ evaluate(::U, ::Vector{U}) where {T <: RingElement, U <: Generic.AbsMSeries{T}}
 ### Random generation
 
 ```@docs
-rand(::MSeriesRing, term_range, v...)
+rand(::MSeriesRing, ::AbstractUnitRange{Int}, v...)
 ```
 
 

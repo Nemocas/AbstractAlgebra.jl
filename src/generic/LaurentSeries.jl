@@ -1756,7 +1756,7 @@ end
 rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::LaurentSeriesRingOrField, val_range, v...) =
+rand(S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(Random.default_rng(), S, val_range, v...)
 
 ###############################################################################
