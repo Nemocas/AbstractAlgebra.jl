@@ -35,6 +35,16 @@ is_free(M::FreeModule) = true
     rank(M::FreeModule{T}) where T <: NCRingElement
 
 Return the rank of the given free module.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> rank(M)
+3
+```
 """
 rank(M::FreeModule{T}) where T <: NCRingElement = M.rank
 
@@ -42,6 +52,16 @@ rank(M::FreeModule{T}) where T <: NCRingElement = M.rank
     dim(M::FreeModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector space.
+
+# Examples
+
+```jldoctest
+julia> V = vector_space(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> dim(V)
+2
+```
 """
 dim(M::FreeModule{T}) where T <: FieldElement = M.rank
 vector_space_dim(M::FreeModule{T}) where T <: FieldElement = M.rank
@@ -71,6 +91,18 @@ end
     basis(M::FreeModule{T}) where T <: FieldElement
 
 Return the standard basis of the given vector space, i.e. its generators.
+
+# Examples
+
+```jldoctest
+julia> V = vector_space(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> basis(V)
+2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
+ (1//1, 0//1)
+ (0//1, 1//1)
+```
 """
 basis(N::FreeModule) = gens(N)
 
