@@ -219,6 +219,17 @@ end
 #        Expr(:hcat, a, b)       => a b
 
 
+@doc raw"""
+    expressify(a; context = nothing)
+
+Return an `Expr`, `Symbol`, `Integer` or `String` describing `a`, from which
+plain text, LaTeX and html output are derived. The fallback simply prints `a`.
+
+Implementing this for a new element type, and then applying
+[`@enable_all_show_via_expressify`](@ref) to that type, gives correctly
+bracketed output when values of the type appear inside composed types such as
+polynomials.
+"""
 function expressify(@nospecialize(a); context = nothing)
    return sprint(print, a; context = context)::String
 end
@@ -257,6 +268,12 @@ end
 #
 # Super easy!
 
+@doc raw"""
+    @enable_all_show_via_expressify(T)
+
+Define `Base.show` for the type `T` for plain text, LaTeX and html output, all
+derived from [`expressify`](@ref), which must already be implemented for `T`.
+"""
 macro enable_all_show_via_expressify(T)
   return quote
     function Base.show(io::IO, x::$(esc(T)))
