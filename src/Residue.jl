@@ -432,6 +432,16 @@ rand(rng::AbstractRNG, S::ResidueRing, v, vs...) = rand(rng, make(S, v, vs...))
 
 rand(S::ResidueRing, v, vs...) = rand(Random.default_rng(), S, v, vs...)
 
+# An integer (or tuple of integers) is an array size, never a sampling
+# specification; saying so resolves the ambiguity with `Base.rand(X, dims...)`.
+rand(rng::AbstractRNG, S::ResidueRing, dims::Dims) = rand(rng, make(S), dims)
+
+rand(S::ResidueRing, dims::Dims) = rand(Random.default_rng(), S, dims)
+
+rand(rng::AbstractRNG, S::ResidueRing, d::Integer, dims::Integer...) = rand(rng, S, Dims((d, dims...)))
+
+rand(S::ResidueRing, d::Integer, dims::Integer...) = rand(Random.default_rng(), S, Dims((d, dims...)))
+
 ###############################################################################
 #
 #   residue_ring constructor
