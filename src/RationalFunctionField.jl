@@ -47,3 +47,22 @@ function rational_function_field(k::Field, s::VarName = :t; cached::Bool=true)
 end
 
 @varnames_interface Generic.rational_function_field(K::Field, s)
+
+"""
+    @rational_function_field(k::Field, varnames...; cached=true)
+
+Return the field from [`rational_function_field`](@ref) and introduce the
+generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @rational_function_field(QQ, [:s, :t])
+Rational function field
+  over rationals
+
+julia> (s + t)//t
+(s + t)//t
+```
+"""
+:(@rational_function_field)

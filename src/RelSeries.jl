@@ -1612,6 +1612,16 @@ generator of the power series ring will be printed. By default, the parent
 object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> S, y = power_series_ring(ZZ, 10, :y; model=:capped_absolute)
+(Univariate power series ring over integers, y + O(y^10))
+```
 """
 function power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."

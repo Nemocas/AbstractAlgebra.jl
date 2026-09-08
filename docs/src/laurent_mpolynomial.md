@@ -43,9 +43,9 @@ polynomials, an implementation must provide access to the elements as a sum of
 individual terms *in some order*. This order currently cannot be specified in
 the constructor.
 
-```julia
-laurent_polynomial_ring(R::Ring, S::Vector{<:VarName}; cached::Bool = true)
-laurent_polynomial_ring(R::Ring, n::Int, s::VarName; cached::Bool = false)
+```@docs
+laurent_polynomial_ring(::Ring, ::Vector{Symbol})
+@laurent_polynomial_ring
 ```
 
 ```julia
