@@ -64,6 +64,7 @@ with one of the following constructor functions.
 
 ```@docs
 universal_polynomial_ring
+@universal_polynomial_ring
 ```
 
 Similarly, on can construct universal Laurent polynomial rings.

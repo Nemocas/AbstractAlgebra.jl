@@ -33,6 +33,7 @@ parent(a::FreeAssociativeAlgebraElem)
 ```@docs
 free_associative_algebra(::Ring, ::Vector{Symbol})
 free_associative_algebra(::Ring, ::Int)
+@free_associative_algebra
 ```
 
 ## Free associative algebra element constructors
