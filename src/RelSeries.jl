@@ -1493,11 +1493,27 @@ function power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, mo
    return Generic.power_series_ring(R, prec, Symbol(s); cached, model)
 end
 
+@doc raw"""
+    AbsPowerSeriesRing(R::Ring, prec::Int)
+    RelPowerSeriesRing(R::Ring, prec::Int)
+
+Return the absolute resp. relative power series ring over `R` with precision
+cap `prec` and the default variable `x`. Only the ring is returned, not a
+generator, and the ring is not cached.
+
+These are lightweight constructors meant for generic algorithms that need a
+series ring whose variable name does not matter.
+"""
 function AbsPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
    return Generic.AbsPowerSeriesRing{T}(R, prec, :x, false)
 end
 
+@doc raw"""
+    RelPowerSeriesRing(R::Ring, prec::Int)
+
+See [`AbsPowerSeriesRing`](@ref).
+"""
 function RelPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
    return Generic.RelPowerSeriesRing{T}(R, prec, :x, false)

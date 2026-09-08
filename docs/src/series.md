@@ -94,14 +94,10 @@ default variable. These are lightweight constructors and should be used in
 generic algorithms wherever possible when creating series rings where the
 symbol does not matter.
 
-```julia
-AbsPowerSeriesRing(R::Ring, prec::Int)
-RelPowerSeriesRing(R::Ring, prec::Int)
+```@docs
+AbsPowerSeriesRing
+RelPowerSeriesRing
 ```
-
-Return the absolute or relative power series ring over the given base ring $R$
-and with precision cap given by `prec`. Note that a tuple is not returned, only
-the power series ring itself, not a generator.
 
 Here are some examples of constructing various kinds of series rings and coercing
 various elements into those rings.

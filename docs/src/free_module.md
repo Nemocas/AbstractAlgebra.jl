@@ -63,10 +63,10 @@ Vector space of dimension 2 over rationals
 
 ### Basic manipulation
 
-```julia
-rank(M::Generic.FreeModule{T}) where T <: RingElem
-dim(V::Generic.FreeModule{T}) where T <: FieldElem
-basis(V::Generic.FreeModule{T}) where T <: FieldElem
+```@docs
+rank(::Generic.FreeModule{T}) where T <: NCRingElement
+dim(::Generic.FreeModule{T}) where T <: FieldElement
+basis(::Generic.FreeModule)
 ```
 
 **Examples**
