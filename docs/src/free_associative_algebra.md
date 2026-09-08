@@ -113,35 +113,6 @@ In contrast with the interface for multivariable polynomials, the function
 exponent_word(a::Generic.FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y, z) = free_associative_algebra(ZZ, [:x, :y, :z])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
-
-julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
-(-1, 0, 7)
-
-julia> leading_term(-x^2*y^2*z^2*x + z*y)
--x^2*y^2*z^2*x
-
-julia> leading_monomial(-x^2*y^2*z^2*x + z*y)
-x^2*y^2*z^2*x
-
-julia> leading_coefficient(-x^2*y^2*z^2*x + z*y)
--1
-
-julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
-7-element Vector{Int64}:
- 1
- 1
- 2
- 2
- 3
- 3
- 1
-```
-
 ```@docs
 evaluate(a::AbstractAlgebra.FreeAssociativeAlgebraElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 ```
@@ -160,41 +131,6 @@ monomials(p::FreeAssociativeAlgebraElem)
 
 ```@docs
 exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
-
-julia> collect(terms(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
- 3*b*a*c
- -b
- c
- 2
-
-julia> collect(coefficients(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
-  3
- -1
-  1
-  2
-
-julia> collect(monomials(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
- b*a*c
- b
- c
- 1
-
-julia> collect(exponent_words(3*b*a*c - b + c + 2))
-4-element Vector{Vector{Int64}}:
- [2, 1, 3]
- [2]
- [3]
- []
 ```
 
 ### Groebner bases

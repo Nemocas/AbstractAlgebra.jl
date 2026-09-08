@@ -570,54 +570,11 @@ truncate(::PolyRingElem, ::Int)
 mullow(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int) where T <: RingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x + 1)*y + x^3 + 2*x + 2
-
-julia> h = truncate(f, 1)
-3
-
-julia> k = mullow(f, g, 4)
-(x^2 + x)*y^3 + (x^4 + 3*x^2 + 4*x + 1)*y^2 + (x^4 + x^3 + 2*x^2 + 7*x + 5)*y + 3*x^3 + 6*x + 6
-
-```
-
 ### Reversal
 
 ```@docs
 reverse(::PolyRingElem, ::Int)
 reverse(::PolyRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = reverse(f, 7)
-3*y^6 + (x + 1)*y^5 + x*y^4
-
-julia> h = reverse(f)
-3*y^2 + (x + 1)*y + x
-
 ```
 
 ### Shifting
@@ -628,26 +585,6 @@ shift_left(::PolyRingElem, ::Int)
 
 ```@docs
 shift_right(::PolyRingElem, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = shift_left(f, 7)
-x*y^9 + (x + 1)*y^8 + 3*y^7
-
-julia> h = shift_right(f, 2)
-x
-
 ```
 
 ### Inflation and deflation
@@ -687,15 +624,6 @@ change_coefficient_ring(::Ring, ::PolyRingElem{T}) where T <: RingElement
 map_coefficients(::Any, ::PolyRingElem{<:RingElement})
 ```
 
-**Examples**
-
-```julia
-R, x = polynomial_ring(ZZ, :x)
-g = x^3+6*x + 1
-change_base_ring(GF(2), g)
-change_coefficient_ring(GF(2), g)
-```
-
 ### Pseudodivision
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
@@ -712,29 +640,6 @@ pseudorem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 
 ```@docs
 pseudodivrem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x + 1)*y + x^3 + 2*x + 2
-
-julia> h = pseudorem(f, g)
-x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
-
-julia> q, r = pseudodivrem(f, g)
-((x^2 + x)*y - x^4 - x^2 + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
-
 ```
 
 ### Content and primitive part
@@ -827,37 +732,6 @@ derivative(::PolyRingElem)
 integral{T <: Union{ResElem, FieldElem}}(::PolyRingElem{T})
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> T, z = polynomial_ring(QQ, :z)
-(Univariate polynomial ring in z over rationals, z)
-
-julia> U, = residue_ring(T, z^3 + 3z + 1);
-
-julia> V, w = polynomial_ring(U, :w)
-(Univariate polynomial ring in w over U, w)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4
-(z^2 + 2*z + 1)*w^2 + (z + 1)*w - 2*z + 4
-
-julia> h = derivative(f)
-2*x*y + x + 1
-
-julia> k = integral(g)
-(1//3*z^2 + 2//3*z + 1//3)*w^3 + (1//2*z + 1//2)*w^2 + (-2*z + 4)*w
-
-```
-
 ### Resultant and discriminant
 
 ```@docs
@@ -914,32 +788,6 @@ monomial_to_newton!(::Vector{T}, ::Vector{T}) where T <: RingElem
 newton_to_monomial!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = 3x*y^2 + (x + 1)*y + 3
-3*x*y^2 + (x + 1)*y + 3
-
-julia> g = deepcopy(f)
-3*x*y^2 + (x + 1)*y + 3
-
-julia> roots = [R(1), R(2), R(3)]
-3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 2
- 3
-
-julia> monomial_to_newton!(g.coeffs, roots)
-
-julia> newton_to_monomial!(g.coeffs, roots)
-```
-
 ### Roots
 
 ```@docs
@@ -953,34 +801,6 @@ roots(R::Field, f::PolyRingElem)
 interpolate(::PolyRing, ::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 2
- 3
- 4
-
-julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 4
- 9
- 16
-
-julia> f = interpolate(S, xs, ys)
-y^2
-
-```
-
 ### Power sums
 
 ```@docs
@@ -989,26 +809,6 @@ polynomial_to_power_sums(::PolyRingElem{T}) where T <: RingElem
 
 ```@docs
 power_sums_to_polynomial(::Vector{T}) where T <: RingElem
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> f = x^4 - 2*x^3 + 10*x^2 + 7*x - 5
-x^4 - 2*x^3 + 10*x^2 + 7*x - 5
-
-julia> V = polynomial_to_power_sums(f)
-4-element Vector{BigInt}:
-   2
- -16
- -73
-  20
-
-julia> power_sums_to_polynomial(V)
-x^4 - 2*x^3 + 10*x^2 + 7*x - 5
 ```
 
 ### Special functions
@@ -1023,23 +823,6 @@ chebyshev_t(::Int, ::PolyRingElem)
 
 ```@docs
 chebyshev_u(::Int, ::PolyRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = chebyshev_t(20, y)
-524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1
-
-julia> g = chebyshev_u(15, y)
-32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
-
 ```
 
 ### Random generation

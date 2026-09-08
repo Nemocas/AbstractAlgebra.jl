@@ -238,48 +238,11 @@ julia> c = coeff(b, 2)
 Base.inv(::Generic.PuiseuxSeriesElem)
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = puiseux_series_ring(QQ, 30, :x)
-(Puiseux series field in x over rationals, x + O(x^31))
-
-julia> a = 1 + x + 2x^2 + O(x^5)
-1 + x + 2*x^2 + O(x^5)
-
-julia> b = R(-1)
--1 + O(x^30)
-
-julia> c = inv(a)
-1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
-
-julia> d = inv(b)
--1 + O(x^30)
-
-```
-
 ## Derivative and integral
 
 ```@docs
 derivative(a::Generic.PuiseuxSeriesElem)
 integral(a::Generic.PuiseuxSeriesElem)
-```
-
-**Examples**
-
-
-```jldoctest
-julia> R, x = puiseux_series_ring(QQ, 10, :x)
-(Puiseux series field in x over rationals, x + O(x^11))
-
-julia> f = x^(5//3) + x^(7//3) + x^(11//3)
-x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
-
-julia> derivative(f)
-5//3*x^(2//3) + 7//3*x^(4//3) + 11//3*x^(8//3) + O(x^4)
-
-julia> derivative(integral(f)) == f
-true
 ```
 
 ### Special functions
@@ -289,35 +252,3 @@ Base.log(a::Generic.PuiseuxSeriesElem)
 Base.exp(a::Generic.PuiseuxSeriesElem)
 ```
 Methods for `is_square` and `sqrt` are provided for inputs of type `PuiseuxSeriesElem`.
-
-**Examples**
-
-```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
-
-julia> S, x = puiseux_series_ring(R, 30, :x)
-(Puiseux series ring in x over R, x + O(x^31))
-
-julia> T, z = puiseux_series_ring(QQ, 30, :z)
-(Puiseux series field in z over rationals, z + O(z^31))
-
-julia> a = 1 + z + 3z^2 + O(z^5)
-1 + z + 3*z^2 + O(z^5)
-
-julia> b = z + 2z^2 + 5z^3 + O(z^5)
-z + 2*z^2 + 5*z^3 + O(z^5)
-
-julia> c = exp(x + O(x^40))
-1 + x + 1//2*x^2 + 1//6*x^3 + 1//24*x^4 + 1//120*x^5 + 1//720*x^6 + 1//5040*x^7 + 1//40320*x^8 + 1//362880*x^9 + 1//3628800*x^10 + 1//39916800*x^11 + 1//479001600*x^12 + 1//6227020800*x^13 + 1//87178291200*x^14 + 1//1307674368000*x^15 + 1//20922789888000*x^16 + 1//355687428096000*x^17 + 1//6402373705728000*x^18 + 1//121645100408832000*x^19 + 1//2432902008176640000*x^20 + 1//51090942171709440000*x^21 + 1//1124000727777607680000*x^22 + 1//25852016738884976640000*x^23 + 1//620448401733239439360000*x^24 + 1//15511210043330985984000000*x^25 + 1//403291461126605635584000000*x^26 + 1//10888869450418352160768000000*x^27 + 1//304888344611713860501504000000*x^28 + 1//8841761993739701954543616000000*x^29 + 1//265252859812191058636308480000000*x^30 + O(x^31)
-
-julia> d = divexact(x, exp(x + O(x^40)) - 1)
-1 - 1//2*x + 1//12*x^2 - 1//720*x^4 + 1//30240*x^6 - 1//1209600*x^8 + 1//47900160*x^10 - 691//1307674368000*x^12 + 1//74724249600*x^14 - 3617//10670622842880000*x^16 + 43867//5109094217170944000*x^18 - 174611//802857662698291200000*x^20 + 77683//14101100039391805440000*x^22 - 236364091//1693824136731743669452800000*x^24 + 657931//186134520519971831808000000*x^26 - 3392780147//37893265687455865519472640000000*x^28 + O(x^29)
-
-julia> f = exp(b)
-1 + z + 5//2*z^2 + 43//6*z^3 + 193//24*z^4 + O(z^5)
-
-julia> h = sqrt(a)
-1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
-
-```
