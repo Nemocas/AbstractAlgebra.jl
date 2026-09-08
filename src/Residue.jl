@@ -415,18 +415,22 @@ function rand(rng::AbstractRNG,
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResidueRing, vs...)
+function RandomExtensions.make(S::ResidueRing, v, vs...)
    R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
+   if isempty(vs) && elem_type(R) == Random.gentype(v)
+      Make(S, v)
    else
-      Make(S, make(R, vs...))
+      Make(S, make(R, v, vs...))
    end
 end
 
-rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
+# `v, vs...` describe how to sample from the base ring. With no such
+# specification at all, `rand(S)` and `rand(S, dims...)` keep their `Base`
+# meaning -- one resp. an array of uniformly random elements -- which is served
+# by whatever `Random.Sampler` the concrete residue ring provides.
+rand(rng::AbstractRNG, S::ResidueRing, v, vs...) = rand(rng, make(S, v, vs...))
 
-rand(S::ResidueRing, v...) = rand(Random.default_rng(), S, v...)
+rand(S::ResidueRing, v, vs...) = rand(Random.default_rng(), S, v, vs...)
 
 ###############################################################################
 #
