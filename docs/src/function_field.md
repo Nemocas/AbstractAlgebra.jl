@@ -34,6 +34,7 @@ following constructors.
 
 ```@docs
 rational_function_field
+@rational_function_field
 ```
 
 ## Basic rational function field functionality

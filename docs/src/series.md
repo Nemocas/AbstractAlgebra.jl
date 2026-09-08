@@ -66,28 +66,12 @@ respectively.
 In order to construct series in AbstractAlgebra.jl, one must first construct the ring
 itself. This is accomplished with any of the following constructors.
 
-```julia
-power_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true, model::Symbol=:capped_relative)
+```@docs
+power_series_ring(::Ring, ::Int, ::VarName)
+@power_series_ring
+laurent_series_ring
+laurent_series_field
 ```
-
-```julia
-laurent_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-```julia
-laurent_series_ring(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-Given a base ring `R`, a maximum precision (relative or absolute, depending on the
-model) and a string `s` specifying how the generator (variable) should be
-printed, return a tuple `S, x` representing the series ring and its generator.
-
-By default, `S` will depend only on `S`, `x` and the maximum precision and will be
-cached. Setting the optional argument `cached` to `false` will prevent this.
-
-In the case of power series, the optional argument `model` can be set to either
-`:capped_absolute` or `:capped_relative`, depending on which power series model is
-required.
 
 It is also possible to construct absolute and relative power series with a
 default variable. These are lightweight constructors and should be used in

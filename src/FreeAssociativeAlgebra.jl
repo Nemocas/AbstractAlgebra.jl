@@ -371,6 +371,25 @@ end
 
 @varnames_interface free_associative_algebra(R::Ring, s)
 
+"""
+    @free_associative_algebra(R::Ring, varnames...; cached=true)
+
+Return the algebra from [`free_associative_algebra(::Ring, ::Vector{Symbol})`](@ref)
+and introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @free_associative_algebra(ZZ, "z#" => 1:3)
+Free associative algebra on 3 indeterminates z1, z2, z3
+  over integers
+
+julia> z1*z2*z3
+z1*z2*z3
+```
+"""
+:(@free_associative_algebra)
+
 @doc raw"""
     free_associative_algebra(R::Ring, n::Int, s::VarName=:x; cached::Bool=true)
 
