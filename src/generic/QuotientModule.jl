@@ -28,8 +28,6 @@ number_of_generators(N::QuotientModule{T}) where T <: RingElement = length(N.gen
 
 gens(N::QuotientModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
-rank(M::QuotientModule{T}) where T <: FieldElement = dim(M)
-
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
@@ -43,8 +41,8 @@ end
 
 Return the dimension of the given vector quotient space.
 """
-dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
+rank(M::QuotientModule{T}) where T <: FieldElement = vector_space_dim(M)
 
 @doc raw"""
     supermodule(M::QuotientModule{T}) where T <: RingElement

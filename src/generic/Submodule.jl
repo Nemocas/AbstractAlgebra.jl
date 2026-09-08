@@ -35,8 +35,8 @@ end
 
 Return the dimension of the given vector subspace.
 """
-dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
 vector_space_dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
+rank(M::Submodule{T}) where T <: FieldElement = vector_space_dim(M)
 
 # Generators as elements of supermodule. Used internally.
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}

@@ -43,8 +43,8 @@ rank(M::FreeModule{T}) where T <: NCRingElement = M.rank
 
 Return the dimension of the given vector space.
 """
-dim(M::FreeModule{T}) where T <: FieldElement = M.rank
-vector_space_dim(M::FreeModule{T}) where T <: FieldElement = M.rank
+dim(M::FPModule{T}) where T <: FieldElement = vector_space_dim(M)
+vector_space_dim(M::FreeModule{T}) where T <: FieldElement = rank(M)
 
 order(M::FreeModule) = order(base_ring(M))^rank(M)
 
