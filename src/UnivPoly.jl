@@ -178,7 +178,7 @@ function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)
       while l > 0 && iszero(v[l])
          l -= 1
       end
-      b = xor(b, xor(Base.hash(v[1:l], h), h))
+      b = xor(b, xor(Base.hash(view(v, 1:l), h), h))
       b = xor(b, xor(hash(c, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
