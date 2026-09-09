@@ -710,50 +710,50 @@ function evaluation_points(K::RationalFunctionField, n::Int)
    return v
 end
 
-function rank_interpolation(M::MatrixElem{<: RationalFunctionFieldElem})
-   n = nrows(M)
-   m = ncols(M)
+function rank_interpolation(A::MatrixElem{<: RationalFunctionFieldElem})
+   n = nrows(A)
+   m = ncols(A)
    if is_zero(n) || is_zero(m)
       return 0
    end
-   Kx = base_ring(underlying_fraction_field(base_ring(M)))
-   A = deepcopy(M)
+   Kx = base_ring(underlying_fraction_field(base_ring(A)))
+   B = deepcopy(A)
    #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
    #Then M can be considered as a matrix over a polynomial ring. 
    for i = 1:n
       for j = 1:m
-         if !is_one(denominator(A[i, j]))
+         if !is_one(denominator(B[i, j]))
             if n < m
-               multiply_column!(A, denominator(A[i, j]), j)
+               multiply_column!(B, denominator(B[i, j]), j)
             else
-               multiply_row!(A, denominator(A[i, j]), i)
+               multiply_row!(B, denominator(B[i, j]), i)
             end
          end
       end
    end
-   return rank_interpolation(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]))
+   return rank_interpolation(matrix(Kx, n, m, [numerator(B[i, j]) for i in 1:n, j in 1:m]))
 end
 
-function rank_interpolation_mc(M::MatrixElem{<: RationalFunctionFieldElem}, err::Float64)
-   n = nrows(M)
-   m = ncols(M)
+function rank_interpolation_mc(A::MatrixElem{<: RationalFunctionFieldElem}, err::Float64)
+   n = nrows(A)
+   m = ncols(A)
    if is_zero(n) || is_zero(m)
       return 0
    end
-   Kx = base_ring(underlying_fraction_field(base_ring(M)))
-   A = deepcopy(M)
+   Kx = base_ring(underlying_fraction_field(base_ring(A)))
+   B = deepcopy(A)
    #All rows/columns of M are multiplied with polynomials such that all entries of M have denominator 1.
    #Then M can be considered as a matrix over some polynomial ring.
    for i = 1:n
       for j = 1:m
-         if is_one(denominator(A[i, j]))
+         if is_one(denominator(B[i, j]))
             if n < m
-               multiply_column!(A, denominator(A[i, j]), j)
+               multiply_column!(B, denominator(B[i, j]), j)
             else
-               multiply_row!(A, denominator(A[i, j]), i)
+               multiply_row!(B, denominator(B[i, j]), i)
             end
          end
       end
    end
-   return rank_interpolation_mc(matrix(Kx, n, m, [numerator(A[i, j]) for i in 1:n, j in 1:m]), err)
+   return rank_interpolation_mc(matrix(Kx, n, m, [numerator(B[i, j]) for i in 1:n, j in 1:m]), err)
 end

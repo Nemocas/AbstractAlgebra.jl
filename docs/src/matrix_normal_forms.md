@@ -22,8 +22,8 @@ fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 ## Reduced row-echelon form
 
 ```@docs
-rref_rational(M::MatrixElem{T}) where {T <: RingElement}
-rref(M::MatrixElem{T}) where {T <: FieldElement}
+rref_rational(A::MatrixElem{T}) where {T <: RingElement}
+rref(A::MatrixElem{T}) where {T <: FieldElement}
 ```
 
 

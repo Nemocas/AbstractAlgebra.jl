@@ -201,7 +201,7 @@ end
     is_square(a::NCRingElement)
 
 Return `true` iff `a` is the square of a value in its own ring.
-See also `is_square(M::MatElem)` which tests whether a matrix has square shape.
+See also `is_square(A::MatElem)` which tests whether a matrix has square shape.
 """
 is_square(::NCRingElement)
 
