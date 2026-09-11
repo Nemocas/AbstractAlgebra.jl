@@ -160,6 +160,33 @@ Return a pair `M, f` consisting of the invariant factor decomposition $M$ of
 the module `m` and a module homomorphism (isomorphisms) $f : M \to m$. The
 module `M` is itself a module which can be manipulated as any other module
 in the system.
+
+# Examples
+
+```jldoctest; setup = :(import Random; Random.seed!(42))
+julia> M = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> m1 = rand(M, -10:10)
+(3, -1, 0)
+
+julia> m2 = rand(M, -10:10)
+(4, 4, -7)
+
+julia> S, f = sub(M, [m1, m2])
+(Submodule over integers with 2 generators and no relations, Hom: S -> M)
+
+julia> Q, g = quo(M, S)
+(Quotient module over integers with 2 generators and relations:
+[16 -21], Hom: M -> Q)
+
+julia> I, f = snf(Q)
+(Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: I -> Q)
+
+julia> invs = invariant_factors(Q)
+1-element Vector{BigInt}:
+ 0
+```
 """
 function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    R = base_ring(m)

@@ -609,6 +609,40 @@ end
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 2x + x^3
+2*x + x^3 + O(x^31)
+
+julia> b = O(x^4)
+O(x^4)
+
+julia> c = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> d = 2x + x^3 + O(x^4)
+2*x + x^3 + O(x^4)
+
+julia> f = shift_left(a, 2)
+2*x^3 + x^5 + O(x^33)
+
+julia> g = shift_left(b, 2)
+O(x^6)
+
+julia> h = shift_right(c, 1)
+1 + 2*x + O(x^4)
+
+julia> k = shift_right(d, 3)
+1 + O(x^1)
+```
 """
 function shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -667,6 +701,40 @@ end
     truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to (absolute) precision $n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 2x + x^3
+2*x + x^3 + O(x^31)
+
+julia> b = O(x^4)
+O(x^4)
+
+julia> c = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> d = 2x + x^3 + O(x^4)
+2*x + x^3 + O(x^4)
+
+julia> f = truncate(a, 3)
+2*x + O(x^3)
+
+julia> g = truncate(b, 2)
+O(x^2)
+
+julia> h = truncate(c, 7)
+1 + x + 2*x^2 + O(x^5)
+
+julia> k = truncate(d, 5)
+2*x + x^3 + O(x^4)
+```
 """
 function truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    return truncate!(deepcopy(a), n)
@@ -967,6 +1035,28 @@ end
     Base.inv(a::RelPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> b = S(-1)
+-1 + O(x^30)
+
+julia> c = inv(a)
+1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
+
+julia> d = inv(b)
+-1 + O(x^30)
+```
 """
 function Base.inv(a::RelPowerSeriesRingElem)
    iszero(a) && throw(DivideError())

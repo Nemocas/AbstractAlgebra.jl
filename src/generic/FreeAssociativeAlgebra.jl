@@ -220,6 +220,35 @@ end
 Return a vector of variable indices corresponding to the monomial of the
 $i$-th term of $a$. Term numbering begins at $1$, and the variable
 indices are given in the order of the variables for the ring.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y, z) = free_associative_algebra(ZZ, [:x, :y, :z])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
+
+julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
+(-1, 0, 7)
+
+julia> leading_term(-x^2*y^2*z^2*x + z*y)
+-x^2*y^2*z^2*x
+
+julia> leading_monomial(-x^2*y^2*z^2*x + z*y)
+x^2*y^2*z^2*x
+
+julia> leading_coefficient(-x^2*y^2*z^2*x + z*y)
+-1
+
+julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
+7-element Vector{Int64}:
+ 1
+ 1
+ 2
+ 2
+ 3
+ 3
+ 1
+```
 """
 function exponent_word(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))

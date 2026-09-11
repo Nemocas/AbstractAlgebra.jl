@@ -3438,6 +3438,28 @@ end
     lcm(a::AbstractAlgebra.MPolyRingElem{T}, a::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 
 Return the least common multiple of a and b in parent(a).
+
+# Examples
+
+```jldoctest
+julia> R,(x,y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> a = x*y + 2*y
+x*y + 2*y
+
+julia> b = x^3*y + y
+x^3*y + y
+
+julia> gcd(a,b)
+y
+
+julia> lcm(a,b)
+x^4*y + 2*x^3*y + x*y + 2*y
+
+julia> lcm(a,b) == a * b // gcd(a,b)
+true
+```
 """
 function lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(a, b)
