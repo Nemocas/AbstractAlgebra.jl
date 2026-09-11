@@ -104,7 +104,10 @@ provide the first such term.
 leading_coefficient(a::FreeAssociativeAlgebraElem)
 leading_monomial(a::FreeAssociativeAlgebraElem)
 leading_term(a::FreeAssociativeAlgebraElem)
-leading_exponent_word(a::FreeAssociativeAlgebraElem)
+```
+
+```@docs
+leading_exponent_word
 ```
 
 For types that allow constant time access to coefficients, the following are

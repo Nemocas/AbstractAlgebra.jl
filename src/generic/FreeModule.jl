@@ -67,6 +67,11 @@ function gen(N::FreeModule{T}, i::Int) where T <: NCRingElement
    return N(m)
 end
 
+@doc raw"""
+    basis(M::FreeModule{T}) where T <: FieldElement
+
+Return the standard basis of the given vector space, i.e. its generators.
+"""
 basis(N::FreeModule) = gens(N)
 
 Base.hash(a::FreeModuleElem, h::UInt) = hash(_matrix(a), h)
