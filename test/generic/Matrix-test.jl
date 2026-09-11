@@ -4397,7 +4397,13 @@ end
       end
    end
 
+   @test_throws ErrorException("InjProjMat is read-only") (M[1, 1] = 1)
+   @test_throws ErrorException("InjProjMat is read-only") (M[:, :] = zero_matrix(QQ, 4, 2))
+
    # Multiplication
+   @test !Base.isambiguous(
+      which(*, Tuple{typeof(M), MatElem{eltype(M)}}),
+      which(*, Tuple{MatElem{eltype(M)}, typeof(M)}))
    @test_throws AssertionError M*identity_matrix(QQ, 1)
    @test_throws AssertionError identity_matrix(QQ, 1)*M
    for iter in 1:10
