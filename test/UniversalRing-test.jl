@@ -1111,9 +1111,9 @@ end
       g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
       h = 3y^2 + 2y + 1
 
-      f1 = change_base_ring(U, f)
-      g1 = change_base_ring(U, g)
-      h1 = change_base_ring(U, h)
+      f1 = change_coefficient_ring(U, f)
+      g1 = change_coefficient_ring(U, g)
+      h1 = change_coefficient_ring(U, h)
 
       @test length(f) == length(f1)
       @test length(g) == length(g1)
