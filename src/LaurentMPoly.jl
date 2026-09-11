@@ -200,7 +200,36 @@ new ring is returned, and will also prevent it from being cached.
 
 For information about the many ways to specify `varnames...` refer to [`polynomial_ring`](@ref) or the
 specification in [`AbstractAlgebra.@varnames_interface`](@ref).
+
+# Examples
+
+```jldoctest
+julia> S, (x, y) = laurent_polynomial_ring(ZZ, [:x, :y])
+(Multivariate Laurent polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}[x, y])
+
+julia> (x + y)*x^-1
+1 + x^-1*y
+```
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
 
 @varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
+
+"""
+    @laurent_polynomial_ring(R::Ring, varnames...; cached=true)
+
+Return the ring from [`laurent_polynomial_ring`](@ref laurent_polynomial_ring(::Ring, ::Vector{Symbol}))
+and introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @laurent_polynomial_ring(ZZ, [:u, :v])
+Multivariate Laurent polynomial ring in 2 variables u, v
+  over integers
+
+julia> u*v^-1
+u*v^-1
+```
+"""
+:(@laurent_polynomial_ring)
