@@ -228,12 +228,18 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   error("Element $a does not have a square root")
 end
 
-# assumes the existence of is_square and sqrt for input
+@doc raw"""
+    is_square_with_sqrt(a::T) where T <: RingElement
+
+Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
+return `(false, ...)` where `...` is some element of `parent(a)`.
+"""
 function is_square_with_sqrt(a::RingElem)
+  # assumes the existence of is_square and sqrt for input
   if is_square(a)
      return true, sqrt(a)
   else
-     return false, parent(a)()
+     return false, a
   end
 end
 
