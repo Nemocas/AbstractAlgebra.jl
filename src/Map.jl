@@ -13,14 +13,38 @@
 Map(::Type{T}) where T <: Map = supertype(T)
 Map(::Type{S}) where S <: SetMap = Map{D, C, <:S, T} where {D, C, T}
 
+@doc raw"""
+    domain(f::Map)
+
+Return the parent object `f` maps from.
+"""
 function domain end
+
+@doc raw"""
+    codomain(f::Map)
+
+Return the parent object `f` maps to.
+"""
 function codomain end
+
+@doc raw"""
+    image_fn(f::Map)
+
+Return the Julia function or closure that evaluates `f`. Only maps of class
+`FunctionalMap` are guaranteed to provide it.
+"""
 function image_fn end
 
 function coimage(h::Map)
   return quo(domain(h), kernel(h)[1])
 end
 
+@doc raw"""
+    check_composable(f::Map, g::Map)
+
+Raise an exception unless the codomain of `f` equals the domain of `g`, i.e.
+unless the composition `f*g` is defined.
+"""
 function check_composable(a::Map, b::Map)
    codomain(a) !== domain(b) && error("Incompatible maps")
 end
