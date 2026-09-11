@@ -52,32 +52,6 @@ puiseux_series_ring
 puiseux_series_field
 ```
 
-Here are some examples of constructing various kinds of Puiseux series rings and coercing
-various elements into those rings.
-
-**Examples**
-
-```jldoctest
-julia> R, x = puiseux_series_ring(ZZ, 10, :x)
-(Puiseux series ring in x over integers, x + O(x^11))
-
-julia> S, y = puiseux_series_field(QQ, 10, :y)
-(Puiseux series field in y over rationals, y + O(y^11))
-
-julia> f = R()
-O(x^10)
-
-julia> g = S(123)
-123 + O(y^10)
-
-julia> h = R(BigInt(1234))
-1234 + O(x^10)
-
-julia> k = S(y + 1)
-1 + y + O(y^10)
-
-```
-
 ## Big-oh notation
 
 Series elements can be given a precision using the big-oh notation. This is provided

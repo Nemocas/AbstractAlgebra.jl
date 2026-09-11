@@ -467,6 +467,9 @@ the fly with maximum relative precision `max_precision`; setting `cached` to
 ```jldoctest
 julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2)
 1 + 2*x^2 + 3*x^4 + O(x^5)
+
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
 ```
 """
 function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
