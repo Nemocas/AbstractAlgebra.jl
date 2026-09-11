@@ -51,5 +51,5 @@ a Julia function/closure implementing the map.
 Such maps can be constructed using the following function:
 
 ```@docs
-map_from_func(f::Function, R, S)
+map_from_func(R, S, f::Function)
 ```
