@@ -77,8 +77,11 @@ end
    @test Z.fill !== Y.fill
 
    M = matrix_repr(Y)
-   @test M isa SparseMatrixCSC{Int}
+   @test M isa Matrix{Int}
    @test M == [1 2 3 4; 5 6 7 0; 8 0 0 0]
+   @test matrix_repr(Matrix{Int8}, Y) isa Matrix{Int8}
+   @test matrix_repr(SparseMatrixCSC, Y) isa SparseMatrixCSC{Int}
+   @test matrix_repr(SparseMatrixCSC, Y) == M
 end
 
 @testset "youngtabs.conjugation" begin
@@ -207,6 +210,9 @@ end
 
    @test matrix_repr(Partition([1], false)/Partition(Int[], false)) == ones(Int, 1,1)
    @test matrix_repr(xi) == [((i,j) in xi ? 1 : 0) for i in 1:size(xi.lam,1), j in 1:maximum(xi.lam)]
+   @test matrix_repr(xi) isa Matrix{Int}
+   @test matrix_repr(SparseMatrixCSC, xi) isa SparseMatrixCSC{Int}
+   @test matrix_repr(SparseMatrixCSC, xi) == matrix_repr(xi)
 
    @test has_left_neighbor(xi, 1, 5) == true
    @test has_left_neighbor(xi, 1, 3) == false
