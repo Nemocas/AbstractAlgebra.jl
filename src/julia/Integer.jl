@@ -277,12 +277,6 @@ function sqrt(a::T; check::Bool=true) where T <: Integer
    return s
 end
 
-@doc raw"""
-    is_square_with_sqrt(a::T) where T <: Integer
-
-Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
-return `(false, 0)`.
-"""
 function is_square_with_sqrt(a::T) where T <: Integer
    if a < 0
       return false, zero(T)
