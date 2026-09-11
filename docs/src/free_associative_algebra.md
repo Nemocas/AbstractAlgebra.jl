@@ -30,22 +30,10 @@ parent(a::FreeAssociativeAlgebraElem)
 
 ## Free associative algebra constructors
 
-```julia
-free_associative_algebra(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
-free_associative_algebra(R::Ring, n::Int, s::VarName; cached::Bool = false)
+```@docs
+free_associative_algebra(::Ring, ::Vector{Symbol})
+free_associative_algebra(::Ring, ::Int)
 ```
-
-The first constructor, given a base ring `R` and an array `s` of variables,
-will return a tuple `S, (x, ...)` representing the new algebra
-$S = R \left<x, \ldots \right>$ and a tuple of generators $(x, ...)$.
-
-The second constructor given a string `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered as, `s1`, `s2`, ..., `sn`.
-
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and
-will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
 
 **Examples**
 

@@ -397,6 +397,23 @@ zero(p::PolyRingElem, var::VarName=var(parent(p)); cached::Bool=true) =
 #
 ###############################################################################
 
+@doc raw"""
+    polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
+
+Return the polynomial over `R` in the variable `var` with coefficients `arr`,
+where `arr[1]` is the constant coefficient. The polynomial ring is created on
+the fly; setting `cached` to `false` prevents it from being cached.
+
+# Examples
+
+```jldoctest
+julia> polynomial(ZZ, [1, 2, 3])
+3*x^2 + 2*x + 1
+
+julia> polynomial(ZZ, [1, 2, 3], :y)
+3*y^2 + 2*y + 1
+```
+"""
 function polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    TT = elem_type(R)
    coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
