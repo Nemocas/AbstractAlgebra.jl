@@ -567,9 +567,9 @@ rand(rng::AbstractRNG,
         sp[][1](rand(rng, sp[][2]))
 
 
-rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
+rand(rng::AbstractRNG, R::Integers, n::AbstractArray) = R(rand(rng, n))
 
-rand(R::Integers, n) = rand(Random.default_rng(), R, n)
+rand(R::Integers, n::AbstractArray) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #

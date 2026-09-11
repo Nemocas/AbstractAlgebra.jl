@@ -703,7 +703,8 @@ end
 rand(rng::AbstractRNG, S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
-rand(S::NCPolyRing, deg_range, v...) = rand(Random.default_rng(), S, deg_range, v...)
+rand(S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
+   rand(Random.default_rng(), S, deg_range, v...)
 
 
 ###############################################################################

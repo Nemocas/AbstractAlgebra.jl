@@ -1587,7 +1587,7 @@ function rand(rng::AbstractRNG, S::MPolyRing,
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::MPolyRing, term_range, exp_bound, v...)
+function rand(S::MPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 

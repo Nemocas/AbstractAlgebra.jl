@@ -270,7 +270,9 @@ function rand(rng::AbstractRNG, S::FreeAssociativeAlgebra,
    rand(rng, m)
 end
 
-function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
+function rand(S::FreeAssociativeAlgebra,
+              term_range::AbstractUnitRange{Int},
+              exp_bound::AbstractUnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 
