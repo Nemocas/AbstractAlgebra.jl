@@ -64,8 +64,6 @@ abstract type ModuleElem{T<:NCRingElement} <: AdditiveGroupElem end
 
 abstract type FPModuleElem{T} <: ModuleElem{T} end
 
-abstract type IdealElem{T} <: SetElem end
-
 abstract type Map{D, C, S, T} <: SetElem end
 
 abstract type SetMap end
