@@ -1,144 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1042" height="984" viewBox="0 0 1042 984">
+<svg xmlns="http://www.w3.org/2000/svg" width="1042" height="942" viewBox="0 0 1042 942">
 <g fill="none" stroke="#808080" stroke-width="1.2">
-<polyline points="93.2,439 116.2,439 116.2,19 130.2,19"/>
+<polyline points="93.2,418 116.2,418 116.2,19 130.2,19"/>
 <polyline points="247.6,19 270.6,19 270.6,19 284.6,19"/>
-<polyline points="93.2,439 116.2,439 116.2,61 130.2,61"/>
-<polyline points="93.2,439 116.2,439 116.2,124 130.2,124"/>
-<polyline points="324.4,124 347.4,124 347.4,124 361.4,124"/>
-<polyline points="517.2,124 540.2,124 540.2,103 554.2,103"/>
-<polyline points="517.2,124 540.2,124 540.2,145 554.2,145"/>
-<polyline points="93.2,439 116.2,439 116.2,360.25 130.2,360.25"/>
-<polyline points="257.2,360.25 280.2,360.25 280.2,187 294.2,187"/>
-<polyline points="257.2,360.25 280.2,360.25 280.2,229 294.2,229"/>
-<polyline points="257.2,360.25 280.2,360.25 280.2,271 294.2,271"/>
-<polyline points="257.2,360.25 280.2,360.25 280.2,533.5 294.2,533.5"/>
-<polyline points="402,533.5 425,533.5 425,313 439,313"/>
-<polyline points="402,533.5 425,533.5 425,355 439,355"/>
-<polyline points="402,533.5 425,533.5 425,397 439,397"/>
-<polyline points="402,533.5 425,533.5 425,439 439,439"/>
-<polyline points="604.4,439 627.4,439 627.4,439 641.4,439"/>
-<polyline points="402,533.5 425,533.5 425,481 439,481"/>
-<polyline points="402,533.5 425,533.5 425,523 439,523"/>
-<polyline points="402,533.5 425,533.5 425,565 439,565"/>
-<polyline points="402,533.5 425,533.5 425,628 439,628"/>
-<polyline points="594.8,628 617.8,628 617.8,607 631.8,607"/>
-<polyline points="594.8,628 617.8,628 617.8,649 631.8,649"/>
-<polyline points="402,533.5 425,533.5 425,754 439,754"/>
-<polyline points="556.4,754 579.4,754 579.4,691 593.4,691"/>
-<polyline points="556.4,754 579.4,754 579.4,733 593.4,733"/>
-<polyline points="556.4,754 579.4,754 579.4,775 593.4,775"/>
-<polyline points="768.4,775 791.4,775 791.4,775 805.4,775"/>
-<polyline points="556.4,754 579.4,754 579.4,817 593.4,817"/>
-<polyline points="93.2,439 116.2,439 116.2,859 130.2,859"/>
-<polyline points="218.8,944 241.8,944 241.8,923 255.8,923"/>
-<polyline points="411.6,923 434.6,923 434.6,923 448.6,923"/>
-<polyline points="218.8,944 241.8,944 241.8,965 255.8,965"/>
-<polyline points="179,874 179,929" stroke-dasharray="5 4"/>
+<polyline points="93.2,418 116.2,418 116.2,82 130.2,82"/>
+<polyline points="324.4,82 347.4,82 347.4,82 361.4,82"/>
+<polyline points="517.2,82 540.2,82 540.2,61 554.2,61"/>
+<polyline points="517.2,82 540.2,82 540.2,103 554.2,103"/>
+<polyline points="93.2,418 116.2,418 116.2,318.25 130.2,318.25"/>
+<polyline points="257.2,318.25 280.2,318.25 280.2,145 294.2,145"/>
+<polyline points="257.2,318.25 280.2,318.25 280.2,187 294.2,187"/>
+<polyline points="257.2,318.25 280.2,318.25 280.2,229 294.2,229"/>
+<polyline points="257.2,318.25 280.2,318.25 280.2,491.5 294.2,491.5"/>
+<polyline points="402,491.5 425,491.5 425,271 439,271"/>
+<polyline points="402,491.5 425,491.5 425,313 439,313"/>
+<polyline points="402,491.5 425,491.5 425,355 439,355"/>
+<polyline points="402,491.5 425,491.5 425,397 439,397"/>
+<polyline points="604.4,397 627.4,397 627.4,397 641.4,397"/>
+<polyline points="402,491.5 425,491.5 425,439 439,439"/>
+<polyline points="402,491.5 425,491.5 425,481 439,481"/>
+<polyline points="402,491.5 425,491.5 425,523 439,523"/>
+<polyline points="402,491.5 425,491.5 425,586 439,586"/>
+<polyline points="594.8,586 617.8,586 617.8,565 631.8,565"/>
+<polyline points="594.8,586 617.8,586 617.8,607 631.8,607"/>
+<polyline points="402,491.5 425,491.5 425,712 439,712"/>
+<polyline points="556.4,712 579.4,712 579.4,649 593.4,649"/>
+<polyline points="556.4,712 579.4,712 579.4,691 593.4,691"/>
+<polyline points="556.4,712 579.4,712 579.4,733 593.4,733"/>
+<polyline points="768.4,733 791.4,733 791.4,733 805.4,733"/>
+<polyline points="556.4,712 579.4,712 579.4,775 593.4,775"/>
+<polyline points="93.2,418 116.2,418 116.2,817 130.2,817"/>
+<polyline points="218.8,902 241.8,902 241.8,881 255.8,881"/>
+<polyline points="411.6,881 434.6,881 434.6,881 448.6,881"/>
+<polyline points="218.8,902 241.8,902 241.8,923 255.8,923"/>
+<polyline points="179,832 179,887" stroke-dasharray="5 4"/>
 </g>
 <g fill="#808080" stroke="none">
 <polygon points="139.2,19 130.2,15.5 130.2,22.5"/>
 <polygon points="293.6,19 284.6,15.5 284.6,22.5"/>
-<polygon points="139.2,61 130.2,57.5 130.2,64.5"/>
-<polygon points="139.2,124 130.2,120.5 130.2,127.5"/>
-<polygon points="370.4,124 361.4,120.5 361.4,127.5"/>
+<polygon points="139.2,82 130.2,78.5 130.2,85.5"/>
+<polygon points="370.4,82 361.4,78.5 361.4,85.5"/>
+<polygon points="563.2,61 554.2,57.5 554.2,64.5"/>
 <polygon points="563.2,103 554.2,99.5 554.2,106.5"/>
-<polygon points="563.2,145 554.2,141.5 554.2,148.5"/>
-<polygon points="139.2,360.25 130.2,356.75 130.2,363.75"/>
+<polygon points="139.2,318.25 130.2,314.75 130.2,321.75"/>
+<polygon points="303.2,145 294.2,141.5 294.2,148.5"/>
 <polygon points="303.2,187 294.2,183.5 294.2,190.5"/>
 <polygon points="303.2,229 294.2,225.5 294.2,232.5"/>
-<polygon points="303.2,271 294.2,267.5 294.2,274.5"/>
-<polygon points="303.2,533.5 294.2,530 294.2,537"/>
+<polygon points="303.2,491.5 294.2,488 294.2,495"/>
+<polygon points="448,271 439,267.5 439,274.5"/>
 <polygon points="448,313 439,309.5 439,316.5"/>
 <polygon points="448,355 439,351.5 439,358.5"/>
 <polygon points="448,397 439,393.5 439,400.5"/>
+<polygon points="650.4,397 641.4,393.5 641.4,400.5"/>
 <polygon points="448,439 439,435.5 439,442.5"/>
-<polygon points="650.4,439 641.4,435.5 641.4,442.5"/>
 <polygon points="448,481 439,477.5 439,484.5"/>
 <polygon points="448,523 439,519.5 439,526.5"/>
-<polygon points="448,565 439,561.5 439,568.5"/>
-<polygon points="448,628 439,624.5 439,631.5"/>
+<polygon points="448,586 439,582.5 439,589.5"/>
+<polygon points="640.8,565 631.8,561.5 631.8,568.5"/>
 <polygon points="640.8,607 631.8,603.5 631.8,610.5"/>
-<polygon points="640.8,649 631.8,645.5 631.8,652.5"/>
-<polygon points="448,754 439,750.5 439,757.5"/>
+<polygon points="448,712 439,708.5 439,715.5"/>
+<polygon points="602.4,649 593.4,645.5 593.4,652.5"/>
 <polygon points="602.4,691 593.4,687.5 593.4,694.5"/>
 <polygon points="602.4,733 593.4,729.5 593.4,736.5"/>
+<polygon points="814.4,733 805.4,729.5 805.4,736.5"/>
 <polygon points="602.4,775 593.4,771.5 593.4,778.5"/>
-<polygon points="814.4,775 805.4,771.5 805.4,778.5"/>
-<polygon points="602.4,817 593.4,813.5 593.4,820.5"/>
-<polygon points="139.2,859 130.2,855.5 130.2,862.5"/>
+<polygon points="139.2,817 130.2,813.5 130.2,820.5"/>
+<polygon points="264.8,881 255.8,877.5 255.8,884.5"/>
+<polygon points="457.6,881 448.6,877.5 448.6,884.5"/>
 <polygon points="264.8,923 255.8,919.5 255.8,926.5"/>
-<polygon points="457.6,923 448.6,919.5 448.6,926.5"/>
-<polygon points="264.8,965 255.8,961.5 255.8,968.5"/>
 </g>
 <rect x="293.6" y="4" width="137.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
 <text x="304.6" y="23.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="115.2" lengthAdjust="spacing" fill="#000000">AbstractPerm</text>
 <rect x="139.2" y="4" width="108.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
 <text x="150.2" y="23.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="86.4" lengthAdjust="spacing" fill="#000000">GroupElem</text>
-<rect x="139.2" y="46" width="137.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="150.2" y="65.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="115.2" lengthAdjust="spacing" fill="#000000">IdealElem{T}</text>
-<rect x="563.2" y="88" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="574.2" y="107.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">FPModuleElem{T}</text>
-<rect x="563.2" y="130" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="574.2" y="149.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">MatElem{T}</text>
-<rect x="370.4" y="109" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="381.4" y="128.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">ModuleElem{T}</text>
-<rect x="139.2" y="109" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="150.2" y="128.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">AdditiveGroupElem</text>
-<rect x="303.2" y="172" width="300.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="314.2" y="191.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="278.4" lengthAdjust="spacing" fill="#000000">FreeAssociativeAlgebraElem{T}</text>
-<rect x="303.2" y="214" width="156.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="314.2" y="233.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="134.4" lengthAdjust="spacing" fill="#000000">MatRingElem{T}</text>
-<rect x="303.2" y="256" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="314.2" y="275.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">NCPolyRingElem{T}</text>
-<rect x="448" y="298" width="242.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="317.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="220.8" lengthAdjust="spacing" fill="#000000">LaurentMPolyRingElem{T}</text>
-<rect x="448" y="340" width="233.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="211.2" lengthAdjust="spacing" fill="#000000">LaurentPolyRingElem{T}</text>
-<rect x="448" y="382" width="175.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="401.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="153.6" lengthAdjust="spacing" fill="#000000">MPolyRingElem{T}</text>
-<rect x="650.4" y="424" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="661.4" y="443.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">AbsMSeriesElem{T}</text>
-<rect x="448" y="424" width="156.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="443.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="134.4" lengthAdjust="spacing" fill="#000000">MSeriesElem{T}</text>
-<rect x="448" y="466" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="485.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">PolyRingElem{T}</text>
+<rect x="563.2" y="46" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="574.2" y="65.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">FPModuleElem{T}</text>
+<rect x="563.2" y="88" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="574.2" y="107.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">MatElem{T}</text>
+<rect x="370.4" y="67" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="381.4" y="86.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">ModuleElem{T}</text>
+<rect x="139.2" y="67" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="150.2" y="86.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">AdditiveGroupElem</text>
+<rect x="303.2" y="130" width="300.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="314.2" y="149.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="278.4" lengthAdjust="spacing" fill="#000000">FreeAssociativeAlgebraElem{T}</text>
+<rect x="303.2" y="172" width="156.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="314.2" y="191.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="134.4" lengthAdjust="spacing" fill="#000000">MatRingElem{T}</text>
+<rect x="303.2" y="214" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="314.2" y="233.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">NCPolyRingElem{T}</text>
+<rect x="448" y="256" width="242.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="275.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="220.8" lengthAdjust="spacing" fill="#000000">LaurentMPolyRingElem{T}</text>
+<rect x="448" y="298" width="233.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="317.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="211.2" lengthAdjust="spacing" fill="#000000">LaurentPolyRingElem{T}</text>
+<rect x="448" y="340" width="175.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="153.6" lengthAdjust="spacing" fill="#000000">MPolyRingElem{T}</text>
+<rect x="650.4" y="382" width="185.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="661.4" y="401.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="163.2" lengthAdjust="spacing" fill="#000000">AbsMSeriesElem{T}</text>
+<rect x="448" y="382" width="156.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="401.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="134.4" lengthAdjust="spacing" fill="#000000">MSeriesElem{T}</text>
+<rect x="448" y="424" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="443.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">PolyRingElem{T}</text>
+<rect x="448" y="466" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="485.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">ResElem{T}</text>
 <rect x="448" y="508" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="527.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">ResElem{T}</text>
-<rect x="448" y="550" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="569.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">TotFrac{T}</text>
+<text x="459" y="527.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">TotFrac{T}</text>
+<rect x="640.8" y="550" width="262" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="651.8" y="569.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="240" lengthAdjust="spacing" fill="#000000">AbsPowerSeriesRingElem{T}</text>
 <rect x="640.8" y="592" width="262" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="651.8" y="611.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="240" lengthAdjust="spacing" fill="#000000">AbsPowerSeriesRingElem{T}</text>
-<rect x="640.8" y="634" width="262" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="651.8" y="653.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="240" lengthAdjust="spacing" fill="#000000">RelPowerSeriesRingElem{T}</text>
-<rect x="448" y="613" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="632.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">SeriesElem{T}</text>
-<rect x="602.4" y="676" width="137.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="613.4" y="695.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="115.2" lengthAdjust="spacing" fill="#000000">FinFieldElem</text>
-<rect x="602.4" y="718" width="127.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="613.4" y="737.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="105.6" lengthAdjust="spacing" fill="#000000">FracElem{T}</text>
-<rect x="814.4" y="760" width="223.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="825.4" y="779.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="201.6" lengthAdjust="spacing" fill="#000000">SimpleNumFieldElem{T}</text>
+<text x="651.8" y="611.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="240" lengthAdjust="spacing" fill="#000000">RelPowerSeriesRingElem{T}</text>
+<rect x="448" y="571" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="590.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">SeriesElem{T}</text>
+<rect x="602.4" y="634" width="137.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="613.4" y="653.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="115.2" lengthAdjust="spacing" fill="#000000">FinFieldElem</text>
+<rect x="602.4" y="676" width="127.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="613.4" y="695.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="105.6" lengthAdjust="spacing" fill="#000000">FracElem{T}</text>
+<rect x="814.4" y="718" width="223.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="825.4" y="737.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="201.6" lengthAdjust="spacing" fill="#000000">SimpleNumFieldElem{T}</text>
+<rect x="602.4" y="718" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="613.4" y="737.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">NumFieldElem{T}</text>
 <rect x="602.4" y="760" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="613.4" y="779.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">NumFieldElem{T}</text>
-<rect x="602.4" y="802" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="613.4" y="821.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">ResFieldElem{T}</text>
-<rect x="448" y="739" width="108.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="459" y="758.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="86.4" lengthAdjust="spacing" fill="#000000">FieldElem</text>
-<rect x="303.2" y="518.5" width="98.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="314.2" y="538.3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="76.8" lengthAdjust="spacing" fill="#000000">RingElem</text>
-<rect x="139.2" y="345.25" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="150.2" y="365.05" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">NCRingElem</text>
-<rect x="139.2" y="844" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="150.2" y="863.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">Map{D, C, S, T}</text>
-<rect x="4" y="424" width="89.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="15" y="443.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="67.2" lengthAdjust="spacing" fill="#000000">SetElem</text>
-<rect x="457.6" y="908" width="214" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="468.6" y="927.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="192" lengthAdjust="spacing" fill="#000000">FPModuleHomomorphism</text>
-<rect x="264.8" y="908" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="275.8" y="927.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">FunctionalMap</text>
-<rect x="264.8" y="950" width="127.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="275.8" y="969.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="105.6" lengthAdjust="spacing" fill="#000000">IdentityMap</text>
-<rect x="139.2" y="929" width="79.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
-<text x="150.2" y="948.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="57.6" lengthAdjust="spacing" fill="#000000">SetMap</text>
+<text x="613.4" y="779.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">ResFieldElem{T}</text>
+<rect x="448" y="697" width="108.4" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="459" y="716.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="86.4" lengthAdjust="spacing" fill="#000000">FieldElem</text>
+<rect x="303.2" y="476.5" width="98.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="314.2" y="496.3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="76.8" lengthAdjust="spacing" fill="#000000">RingElem</text>
+<rect x="139.2" y="303.25" width="118" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="150.2" y="323.05" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="96" lengthAdjust="spacing" fill="#000000">NCRingElem</text>
+<rect x="139.2" y="802" width="166" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="150.2" y="821.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="144" lengthAdjust="spacing" fill="#000000">Map{D, C, S, T}</text>
+<rect x="4" y="403" width="89.2" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="15" y="422.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="67.2" lengthAdjust="spacing" fill="#000000">SetElem</text>
+<rect x="457.6" y="866" width="214" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="468.6" y="885.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="192" lengthAdjust="spacing" fill="#000000">FPModuleHomomorphism</text>
+<rect x="264.8" y="866" width="146.8" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="275.8" y="885.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="124.8" lengthAdjust="spacing" fill="#000000">FunctionalMap</text>
+<rect x="264.8" y="908" width="127.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="275.8" y="927.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="105.6" lengthAdjust="spacing" fill="#000000">IdentityMap</text>
+<rect x="139.2" y="887" width="79.6" height="30" rx="8" fill="#F8F8F8" stroke="#383838" stroke-width="1.5"/>
+<text x="150.2" y="906.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" textLength="57.6" lengthAdjust="spacing" fill="#000000">SetMap</text>
 </svg>
