@@ -19,8 +19,13 @@ get_html_as_latex
 
 ## Updating the type diagrams
 
-Updating the diagrams of the documentation can be done by modifying and running
-the script `docs/create_type_diagrams.jl`. Note that this requires the package `Kroki`.
+The diagrams of the documentation are derived from the abstract types
+AbstractAlgebra defines. Regenerate them after adding, removing or renaming such
+a type by running
+
+```
+julia --project=docs docs/create_type_diagrams.jl
+```
 
 
 ## Attributes

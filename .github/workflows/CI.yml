@@ -107,6 +107,11 @@ jobs:
         run: |
           julia --color=yes --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
           julia --color=yes --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+      - name: Check type diagrams are up to date
+        run: |
+          julia --color=yes --project=docs/ docs/create_type_diagrams.jl
+          git diff --exit-code -- docs/src/assets ||
+            { echo "::error::Type diagrams are stale: rerun docs/create_type_diagrams.jl and commit the result"; exit 1; }
       - name: Build docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
