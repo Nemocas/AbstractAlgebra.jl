@@ -742,7 +742,7 @@ end
 Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 $p$.
 """
-function remove(z::FracElem{T}, p) where {T}
+function remove(z::FracElem{T}, p::T) where {T}
    p = convert(T, p)
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z, false), p)
@@ -755,7 +755,7 @@ end
 
 Return the valuation of $z$ at $p$.
 """
-function valuation(z::FracElem{T}, p) where {T}
+function valuation(z::FracElem{T}, p::T) where {T}
    p = convert(T, p)
    v, _ = remove(z, p)
    return v
