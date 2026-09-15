@@ -234,6 +234,8 @@ end
 Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
 return `(false, ...)` where `...` is some element of `parent(a)`.
 """
+is_square_with_sqrt(::RingElement)
+
 function is_square_with_sqrt(a::RingElem)
   # assumes the existence of is_square and sqrt for input
   if is_square(a)
