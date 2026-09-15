@@ -456,11 +456,13 @@ zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
     laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
 
 Return the Laurent series over `R` in the variable `var` of valuation `val`
-whose first `len` coefficients are given by `arr`, with absolute precision
-`prec`. Consecutive coefficients are `scale` exponents apart, i.e. `arr[i]` is
-the coefficient of `var^(val + (i - 1)*scale)`. The series ring is created on
-the fly with maximum relative precision `max_precision`; setting `cached` to
-`false` prevents it from being cached.
+whose first `len` coefficients are given by the first `len` entries of `arr`.
+The entry `arr[i]` is the coefficient of `var^(val + (i - 1)*scale)`, so
+consecutive coefficients are `scale` exponents apart. The input must satisfy
+`0 <= len <= length(arr)`, `scale > 0`, and
+`prec >= val + (len - 1)*scale + 1`, where `prec` is the absolute precision.
+The series ring is created on the fly with maximum relative precision
+`max_precision`; setting `cached` to `false` prevents it from being cached.
 
 # Examples
 
