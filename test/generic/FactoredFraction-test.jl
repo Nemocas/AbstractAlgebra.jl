@@ -75,6 +75,10 @@ end
     @test remove(X//(X+Y)^2, x)   == (1, 1//(X+Y)^2)
     @test remove(X//(X+Y)^2, x+y) == (-2, X)
     @test remove(X//(X+Y)^2, x-y) == (0, X//(X+Y)^2)
+
+    FF = factored_fraction_field(ZZ)
+    @test remove(FF(12)//FF(5), BigInt(2)) == (2, FF(3)//FF(5))
+    @test valuation(FF(12)//FF(5), BigInt(2)) == 2
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ._bases_are_nice" begin

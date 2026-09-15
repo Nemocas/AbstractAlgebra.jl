@@ -737,13 +737,12 @@ end
 ################################################################################
 
 @doc raw"""
-    remove(z::FracElem{T}, p::T) where {T <: RingElem}
+    remove(z::FracElem{T}, p::T) where {T <: RingElement}
 
 Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 $p$.
 """
-function remove(z::FracElem{T}, p::T) where {T}
-   p = convert(T, p)
+function remove(z::FracElem{T}, p::T) where {T <: RingElement}
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z, false), p)
    w, n = remove(numerator(z, false), p)
@@ -751,12 +750,11 @@ function remove(z::FracElem{T}, p::T) where {T}
 end
 
 @doc raw"""
-    valuation(z::FracElem{T}, p::T) where {T <: RingElem}
+    valuation(z::FracElem{T}, p::T) where {T <: RingElement}
 
 Return the valuation of $z$ at $p$.
 """
-function valuation(z::FracElem{T}, p::T) where {T}
-   p = convert(T, p)
+function valuation(z::FracElem{T}, p::T) where {T <: RingElement}
    v, _ = remove(z, p)
    return v
 end

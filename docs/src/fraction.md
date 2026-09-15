@@ -322,11 +322,11 @@ When working over a Euclidean domain, it is convenient to extend valuations to t
 fraction field. To facilitate this, we define the following functions.
 
 ```@docs
-remove(::FracElem{T}, ::T) where T <: RingElem
+remove(::FracElem{T}, ::T) where T <: RingElement
 ```
 
 ```@docs
-valuation(::FracElem{T}, ::T) where T <: RingElem
+valuation(::FracElem{T}, ::T) where T <: RingElement
 ```
 
 **Examples**
