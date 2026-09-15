@@ -3451,9 +3451,6 @@ x*y + 2*y
 julia> b = x^3*y + y
 x^3*y + y
 
-julia> gcd(a,b)
-y
-
 julia> lcm(a,b)
 x^4*y + 2*x^3*y + x*y + 2*y
 

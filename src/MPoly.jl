@@ -303,11 +303,8 @@ julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:deglex);
 julia> p = 2*x*y + 3*y^3 + 1
 3*y^3 + 2*x*y + 1
 
-julia> leading_term(p), leading_monomial(p), leading_coefficient(p)
-(3*y^3, y^3, 3)
-
-julia> constant_coefficient(p), tail(p)
-(1, 2*x*y + 1)
+julia> leading_coefficient(p)
+3
 ```
 """
 function leading_coefficient(p::MPolyRingElem{T}) where T <: RingElement

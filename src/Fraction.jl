@@ -775,6 +775,9 @@ julia> v, q = remove(f^3*g, x + 1)
 
 julia> v = valuation(f^3*g, x + 1)
 3
+
+julia> v = valuation(q, x + 1)
+0
 ```
 """
 function remove(z::FracElem{T}, p) where {T}
