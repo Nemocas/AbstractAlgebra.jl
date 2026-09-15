@@ -627,23 +627,11 @@ julia> a = 2x + x^3
 julia> b = O(x^4)
 O(x^4)
 
-julia> c = 1 + x + 2x^2 + O(x^5)
-1 + x + 2*x^2 + O(x^5)
-
-julia> d = 2x + x^3 + O(x^4)
-2*x + x^3 + O(x^4)
-
 julia> f = shift_left(a, 2)
 2*x^3 + x^5 + O(x^33)
 
 julia> g = shift_left(b, 2)
 O(x^6)
-
-julia> h = shift_right(c, 1)
-1 + 2*x + O(x^4)
-
-julia> k = shift_right(d, 3)
-1 + O(x^1)
 ```
 """
 function shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
@@ -670,6 +658,22 @@ end
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> shift_right(1 + x + 2x^2 + O(x^5), 1)
+1 + 2*x + O(x^4)
+
+julia> shift_right(2x + x^3 + O(x^4), 3)
+1 + O(x^1)
+```
 """
 function shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))

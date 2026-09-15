@@ -182,10 +182,6 @@ julia> Q, g = quo(M, S)
 
 julia> I, f = snf(Q)
 (Invariant factor decomposed module over integers with invariant factors BigInt[0], Hom: I -> Q)
-
-julia> invs = invariant_factors(Q)
-1-element Vector{BigInt}:
- 0
 ```
 """
 function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement

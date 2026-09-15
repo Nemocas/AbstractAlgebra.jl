@@ -686,9 +686,6 @@ x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
 
 julia> derivative(f)
 5//3*x^(2//3) + 7//3*x^(4//3) + 11//3*x^(8//3) + O(x^4)
-
-julia> derivative(integral(f)) == f
-true
 ```
 """
 function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
@@ -705,6 +702,16 @@ end
     integral(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
 
 Return the integral of the given Puiseux series $a$.
+
+# Examples
+
+```jldoctest
+julia> R, x = puiseux_series_ring(QQ, 10, :x)
+(Puiseux series field in x over rationals, x + O(x^11))
+
+julia> integral(x^(5//3) + x^(7//3) + x^(11//3))
+3//8*x^(8//3) + 3//10*x^(10//3) + 3//14*x^(14//3) + O(x^6)
+```
 """
 function integral(a::PuiseuxSeriesElem{T}) where T <: RingElement
    S = parent(a)
