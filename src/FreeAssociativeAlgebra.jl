@@ -300,21 +300,21 @@ end
 ###############################################################################
 
 @doc raw"""
-    free_associative_algebra(R::Ring, varnames::AbstractArray{<:VarName}; cached::Bool=true)
+    free_associative_algebra(R::Ring, varnames::Vector{Symbol}; cached::Bool=true)
 
 Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
-return a tuple `(S, [x1, x2, ...])` of the free associative algebra
+return a tuple `S, [x1, x2, ...]` of the free associative algebra
 $S = R \left< x1, x2, \dots \right>$ and its generators $x1, x2, \dots$.
-The richer variable-name specifications described for
-[`AbstractAlgebra.@varnames_interface`](@ref) are also supported; generator
-arrays are returned with the same shapes as their specifications.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if
 `free_associative_algebra` is invoked again with the same arguments, the same
 (*identical*) algebra is returned. Setting `cached` to `false` ensures a
 distinct new algebra is returned, and will also prevent it from being cached.
 
-# Example
+For the many ways to specify `varnames` refer to [`polynomial_ring`](@ref) or
+[`AbstractAlgebra.@varnames_interface`](@ref).
+
+# Examples
 
 ```jldoctest
 julia> S, (x, y) = free_associative_algebra(ZZ, [:x, :y])
@@ -336,11 +336,9 @@ end
 @doc raw"""
     free_associative_algebra(R::Ring, n::Int, s::VarName=:x; cached::Bool=true)
 
-Construct a free associative algebra on `n` generators whose names have prefix
-`s`. The generated names `Symbol.(s, 1:n)` are passed to
-[`free_associative_algebra(::Ring, ::Vector{Symbol})`](@ref).
+Same as [`free_associative_algebra(::Ring, ["s$i" for i in 1:n])`](@ref free_associative_algebra(::Ring, ::Vector{Symbol})).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, x = free_associative_algebra(ZZ, 3)

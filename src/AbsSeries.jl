@@ -158,7 +158,7 @@ zero(a::AbsPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 @doc raw"""
     abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
 
-Return the absolute power series over the ring `R` in the variable `var` whose first
+Return the absolute power series over `R` in the variable `var` whose first
 `len` coefficients are given by the first `len` entries of `arr`: `arr[i]` is
 the coefficient of `var^(i - 1)`. The input must satisfy
 `0 <= len <= length(arr)` and `prec >= len`, where `prec` is the absolute

@@ -1364,16 +1364,14 @@ end
 
 Given an irreducible polynomial `p` over a rational function field $k(x)$ and
 a variable name `s`, return a tuple `(S, z)` consisting of the function field
-$S = k(x)[z]/(p)$ and its generator `z`. The name `s` is required and determines
-how the generator and the variable of the displayed defining polynomial are
-printed.
+$S = k(x)[z]/(p)$ and its generator `z`, which is printed as `s`.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if
 `function_field` is invoked again with the same arguments, the same
 (*identical*) field is returned. Setting `cached` to `false` ensures a distinct
 new field is returned, and will also prevent it from being cached.
 
-# Example
+# Examples
 
 ```jldoctest
 julia> K, x = rational_function_field(QQ, :x);
