@@ -1362,9 +1362,11 @@ end
 @doc raw"""
     function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
 
-Given an irreducible polynomial `p` over a rational function field $k(x)$,
-return a tuple `(S, z)` consisting of the function field $S = k(x)[z]/(p)$ and
-its generator `z`.
+Given an irreducible polynomial `p` over a rational function field $k(x)$ and
+a variable name `s`, return a tuple `(S, z)` consisting of the function field
+$S = k(x)[z]/(p)$ and its generator `z`. The name `s` is required and determines
+how the generator and the variable of the displayed defining polynomial are
+printed.
 
 By default (`cached=true`), the output `S` will be cached, i.e. if
 `function_field` is invoked again with the same arguments, the same
