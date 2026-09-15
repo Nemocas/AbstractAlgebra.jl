@@ -141,7 +141,8 @@ function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <
 end
 
 # Special case for composing with the identity
-function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: IdentityMap{C}}
+function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where
+                {D, C, S <: AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){C, C}}
   codomain(F) === domain(G) || error("Incompatible (co)domain in composition")
   f = _coefficient_map(F)
   if typeof(codomain(f)) === C
