@@ -1360,7 +1360,7 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
 end
 
 @doc raw"""
-    function_field(p::PolyRingElem{<:RationalFunctionFieldElem}, s::VarName; cached::Bool=true)
+    function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
 
 Given an irreducible polynomial `p` over a rational function field $k(x)$,
 return a tuple `(S, z)` consisting of the function field $S = k(x)[z]/(p)$ and
