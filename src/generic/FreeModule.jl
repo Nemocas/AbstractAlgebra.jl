@@ -68,9 +68,9 @@ function gen(N::FreeModule{T}, i::Int) where T <: NCRingElement
 end
 
 @doc raw"""
-    basis(M::FreeModule{T}) where T <: FieldElement
+    basis(M::FreeModule)
 
-Return the standard basis of the given vector space, i.e. its generators.
+Return the standard basis of the given free module, i.e. its generators.
 """
 basis(N::FreeModule) = gens(N)
 

@@ -1496,7 +1496,7 @@ end
 @doc raw"""
     RelPowerSeriesRing(R::Ring, prec::Int)
 
-See [`AbsPowerSeriesRing`](@ref).
+See [`AbsPowerSeriesRing(::Ring, ::Int)`](@ref).
 """
 function RelPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
