@@ -15,8 +15,21 @@ domain(f::MapWithSection{D, C}) where {D, C} = domain(f.map)::D
 codomain(f::MapWithSection{D, C}) where {D, C} = codomain(f.map)::C
 image_fn(f::MapWithSection) = image_fn(f.map)
 inverse_fn(f::MapWithSection) = image_fn(f.section)
+@doc raw"""
+    image_map(f::Union{Generic.MapWithSection, Generic.MapWithRetraction})
+
+Return the underlying map of `f`, i.e. `f` stripped of its section resp.
+retraction.
+"""
 image_map(f::MapWithSection) = f.map
+
 preimage_map(f::MapWithSection) = f.section # for convenience only
+
+@doc raw"""
+    section_map(f::Generic.MapWithSection)
+
+Return the section stored in `f`. See [`map_with_section`](@ref).
+"""
 section_map(f::MapWithSection) = f.section
 
 (f::MapWithSection{D, C})(a) where {D, C} = image(f, a)::elem_type(C)
@@ -67,6 +80,11 @@ codomain(f::MapWithRetraction{D, C}) where {D, C} = codomain(f.map)::C
 image_fn(f::MapWithRetraction) = image_fn(f.map)
 inverse_fn(f::MapWithRetraction) = image_fn(f.retraction)
 image_map(f::MapWithRetraction) = f.map
+@doc raw"""
+    retraction_map(f::Generic.MapWithRetraction)
+
+Return the retraction stored in `f`. See [`map_with_retraction`](@ref).
+"""
 retraction_map(f::MapWithRetraction) = f.retraction
 
 retraction_map(f::MapCache) = retraction_map(f.map)
