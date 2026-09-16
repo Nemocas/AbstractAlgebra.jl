@@ -1387,7 +1387,7 @@ julia> S1, y1 = function_field(f, :y1)
 julia> S1((x1 + 1)//(x1 + 2))
 (x1 + 1)//(x1 + 2)
 
-julia> R2, x2 = rational_function_field(GF(23), :x2);  # characteristic p
+julia> R2, x2 = rational_function_field(GF(23), :x2);  # positive characteristic
 
 julia> U2, z2 = R2[:z2];
 
