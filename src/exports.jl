@@ -72,6 +72,8 @@ export MatrixElem
 export ModuleElem
 export ModuleHomomorphism
 export ModuleIsomorphism
+export Monoid
+export MonoidElem
 export NCPolyRingElem
 export NCRing
 export NCRingElem
@@ -101,6 +103,8 @@ export ResidueRing
 export Ring
 export RingElem
 export RingElement
+export Semigroup
+export SemigroupElem
 export SeriesElem
 export SeriesRing
 export SetElem
