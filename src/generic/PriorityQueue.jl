@@ -132,7 +132,7 @@ Base.isempty(pq::PriorityQueue) = isempty(pq.xs)
 
 Verify if priority queue `pq` has `key` in its keys.
 
-# Example
+# Examples
 
 ```jldoctest
 julia> pq = Generic.PriorityQueue("a" => 1, "b" => 2, "c" => 3)

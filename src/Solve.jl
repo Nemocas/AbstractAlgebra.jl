@@ -175,7 +175,7 @@ end
 Return a context object `C` that allows to efficiently solve linear systems
 $Ax = b$ or $xA = b$ for different $b$.
 
-# Example
+# Examples
 
 ```jldoctest
 julia> A = QQ[1 2 3; 0 3 0; 5 0 0];
@@ -559,7 +559,7 @@ If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> A = QQ[2 0 0;0 3 0;0 0 5]
@@ -596,7 +596,7 @@ If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
 See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> A = QQ[2 0 0;0 3 0;0 0 5]

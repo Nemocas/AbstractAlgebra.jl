@@ -175,7 +175,7 @@ Mimic usual keyword arguments for usage in macros.
 
 Return a copy of `default` with the key value pairs from `kvs` applied.
 
-# Example
+# Examples
 ```jldoctest
 julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:yes)),
        Dict(:a=>0, :b=>:no, :c=>0),
