@@ -96,6 +96,18 @@ series ring.
 """
 max_precision(R::SeriesRing) = R.prec_max
 
+@doc raw"""
+    set_length!(f::PolynomialElem, n::Int)
+    set_length!(f::SeriesElem, n::Int)
+
+Set the number of coefficients of the polynomial underlying `f` that are
+considered to belong to `f` to `n`, and return `f`. For polynomials, any
+coefficients beyond `n` are zeroed; for series, `n` must not exceed the length
+of the underlying polynomial. No normalisation takes place.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function set_length!(a::SeriesElem, len::Int)
    a.length = len
    return a
@@ -133,6 +145,15 @@ function set_precision!(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
    return f
 end
 
+@doc raw"""
+    set_valuation!(f::SeriesElem, val::Int)
+
+Set the valuation of the relative or Laurent series `f` to `val` and return
+`f`.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function set_valuation!(a::RelPowerSeriesRingElem, val::Int)
    a.val = val
    return a
@@ -176,6 +197,17 @@ Return the modulus of the coefficients of the given power series.
 """
 modulus(a::SeriesElem{T}) where {T <: Union{ResElem, FinFieldElem}} = modulus(base_ring(a))
 
+@doc raw"""
+    renormalize!(f::SeriesElem)
+
+Given a relative or Laurent series `f` whose underlying polynomial has zero
+constant term, say as the result of some internal computation, shift that
+polynomial so that its constant term is nonzero, adjusting the valuation and
+precision of `f` to compensate.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function renormalize!(z::RelPowerSeriesRingElem)
    i = 0
    zlen = pol_length(z)
