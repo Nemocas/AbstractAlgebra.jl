@@ -29,6 +29,11 @@ function puiseux_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true)
    return Generic.PuiseuxSeriesRing(R, prec, Symbol(s); cached)
 end
 
+@doc raw"""
+    puiseux_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true)
+
+See [`puiseux_series_ring`](@ref).
+"""
 function puiseux_series_field(R::Field, prec::Int, s::VarName; cached::Bool=true)
    return Generic.PuiseuxSeriesField(R, prec, Symbol(s); cached)
 end

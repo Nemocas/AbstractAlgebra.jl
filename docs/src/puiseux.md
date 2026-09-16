@@ -47,24 +47,10 @@ generic Puiseux series are stored in its parent object.
 In order to construct Puiseux series in AbstractAlgebra.jl, one must first construct the
 ring itself. This is accomplished with any of the following constructors.
 
-```julia
-puiseux_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
+```@docs
+puiseux_series_ring
+puiseux_series_field
 ```
-
-```julia
-puiseux_series_ring(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-```julia
-puiseux_series_field(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-Given a base ring `R`, a maximum relative precision and a string `s` specifying how the
-generator (variable) should be printed, return a tuple `S, x` representing the Puiseux
-series ring and its generator.
-
-By default, `S` will depend only on `S`, `x` and the maximum precision and will be
-cached. Setting the optional argument `cached` to `false` will prevent this.
 
 Here are some examples of constructing various kinds of Puiseux series rings and coercing
 various elements into those rings.
