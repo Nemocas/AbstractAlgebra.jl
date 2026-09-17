@@ -201,6 +201,60 @@ function rand(S::MSeriesRing, term_range, v...)
    rand(Random.default_rng(), S, term_range, v...)
 end
 
+@doc raw"""
+    power_series_ring(R::Ring, prec::Vector{Int}, varnames::Vector{Symbol}; cached::Bool=true)
+    power_series_ring(R::Ring, prec::Int, varnames::Vector{Symbol}; weights::Vector{Int}, cached::Bool=true)
+    power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, varnames::Vector{Symbol}; cached::Bool=true)
+
+Given a base ring `R` and variable names, say `varnames = [:x, :y, ...]`,
+return a tuple `S, [x, y, ...]` of the multivariate power series ring
+$S = R[[x, y, \dots]]$ and its generators.
+
+Precision is absolute and capped per variable by the matching entry of `prec`;
+a single `Int` caps every variable by the same value. Given `weights`, the cap
+is instead a single bound `prec` on the total weighted degree, where the $i$-th
+variable has weight `weights[i]`.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`power_series_ring` is invoked again with the same arguments, the same
+(*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
+new ring is returned, and will also prevent it from being cached.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = power_series_ring(ZZ, [2, 3], [:x, :y])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[x + O(y^3) + O(x^2), y + O(y^3) + O(x^2)])
+
+julia> x + y + O(y^2)
+y + x + O(y^2) + O(x^2)
+
+julia> power_series_ring(ZZ, [2, 3], 10, [:u, :v])
+(Multivariate power series ring in 2 variables over integers, AbstractAlgebra.Generic.AbsMSeries{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}}[u + O(10), v + O(10)])
+```
+"""
+power_series_ring(R::Ring, prec::Vector{Int}, s::Vector{Symbol})
+
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
 @varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
 @varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
+
+"""
+    @power_series_ring(R::Ring, prec::Int, varnames...; cached=true)
+
+Return the series ring from [`power_series_ring`](@ref power_series_ring(::Ring, ::Vector{Int}, ::Vector{Symbol}))
+and introduce the generators into the current scope. A single variable name
+gives the univariate ring of [`power_series_ring(::Ring, ::Int, ::VarName)`](@ref).
+
+# Examples
+
+```jldoctest
+julia> S = @power_series_ring(ZZ, 3, [:a, :b])
+Multivariate power series ring in 2 variables a, b
+  over integers
+
+julia> a*b
+b*a + O(b^3) + O(a^3)
+```
+"""
+:(@power_series_ring)

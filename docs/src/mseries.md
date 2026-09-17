@@ -60,34 +60,9 @@ In order to construct multivariate series in AbstractAlgebra.jl, one must first
 construct the series ring itself. This is accomplished with the following
 constructors.
 
-For the unweighted case:
-
-```julia
-power_series_ring(R::Ring, prec::Vector{Int}, s::AbstractVector{<:VarName}; cached::Bool = true)
+```@docs
+power_series_ring(::Ring, ::Vector{Int}, ::Vector{Symbol})
 ```
-
-Given a base ring `R` and a vector of strings `s` specifying how the generators
-(variables) should be printed, along with a vector of precisions, one for each
-variable, return a tuple `U, (x, y, ...)` representing the new series ring $S$
-and the generators $x, y, \ldots$ of the ring as a tuple. By default the parent
-object `S` will depend on `R`, the precision vector and the variable names
-`x, y, ...` and will be cached. Setting the optional argument `cached` to
-`false` will prevent the parent object `S` from being cached.
-
-In the weighted case:
-
-```
-power_series_ring(R::Ring, weights::Vector{Int}, s::AbstractVector{<:VarName}, prec::Int; cached::Bool = true)
-```
-
-Given a base ring `R` and a vector of strings `s` specifying how the generators
-(variables) should be printed, along with a vector of weights, one for each
-variable and a bound on the (weighted) precision, return a tuple
-`U, (x, y, ...)` representing the new series ring $S$ and the generators
-$x, y, \ldots$ of the ring as a tuple. By default the parent object `S` will
-depend on `R`, the precision, the vector of weights and the variable names
-`x, y, ...` and will be cached. Setting the optional argument `cached` to
-`false` will prevent the parent object `S` from being cached.
 
 Here are some examples of creating multivariate series rings and making use of
 the resulting parent objects to coerce various elements into the series ring.
