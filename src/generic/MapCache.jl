@@ -13,6 +13,15 @@ image_fn(M::MapCache{D, C}) where {D, C} = image_fn(M.map)
 
 Set the number of further values that may be stored in the cache of `M` to
 `limit`. Setting it to `0` prevents any further values from being cached.
+
+# Examples
+
+```jldoctest
+julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
+
+julia> set_limit!(f, 200)
+200
+```
 """
 function set_limit!(M::MapCache, limit::Int)
    limit < 0 && error("Limit must be non-negative")
@@ -49,6 +58,17 @@ end
 
 Switch the cache of `M` off, keeping the values it already stores. See
 [`enable_cache!`](@ref).
+
+# Examples
+
+```jldoctest
+julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
+
+julia> disable_cache!(f)
+
+julia> f(ZZ(1))
+2
+```
 """
 function disable_cache!(M::MapCache)
    M.enabled = false

@@ -167,6 +167,16 @@ And for absolute series:
 (S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int) where T <: RingElem
 ```
 
+**Examples**
+
+```jldoctest
+julia> S, x = power_series_ring(QQ, 10, :x; model=:capped_absolute)
+(Univariate power series ring over rationals, x + O(x^10))
+
+julia> S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+2*x + 3*x^2 + x^3 + O(x^6)
+```
+
 It is also possible to create series directly without having to create the
 corresponding series ring.
 
@@ -174,37 +184,6 @@ corresponding series ring.
 abs_series
 rel_series
 laurent_series
-```
-
-**Examples**
-
-```jldoctest
-julia> S, x = power_series_ring(QQ, 10, :x; model=:capped_absolute)
-(Univariate power series ring over rationals, x + O(x^10))
-
-julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
-2*x + 3*x^2 + x^3 + O(x^6)
-
-julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, :y)
-1 + 2*y + 3*y^2 + O(y^5)
-
-julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
-x^4 + 2*x^5 + 3*x^6 + O(x^7)
-
-julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
-1 + O(x^6)
-
-julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
-O(x^3)
-
-julia> q = abs_series(ZZ, [], 0, 6)
-O(x^6)
-
-julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
-1 + 2*x + 3*x^2 + O(x^5)
-
-julia> s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
-1 + 2*x^2 + 3*x^4 + O(x^5)
 ```
 
 ## Big-oh notation

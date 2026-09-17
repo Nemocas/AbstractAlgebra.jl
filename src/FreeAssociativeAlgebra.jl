@@ -317,8 +317,14 @@ For the many ways to specify `varnames` refer to [`polynomial_ring`](@ref) or
 # Examples
 
 ```jldoctest
-julia> S, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+julia> R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
 (Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y])
+
+julia> (x + y + 1)^2
+x^2 + x*y + y*x + y^2 + 2*x + 2*y + 1
+
+julia> (x*y*x*x)^4
+x*y*x^3*y*x^3*y*x^3*y*x^2
 ```
 """
 function free_associative_algebra(
