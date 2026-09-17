@@ -510,6 +510,25 @@ end
 
 Return the inverse of the power series $a$, i.e. $1/a$, if it exists.
 Otherwise an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> R, x = puiseux_series_ring(QQ, 30, :x)
+(Puiseux series field in x over rationals, x + O(x^31))
+
+julia> a = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> b = R(-1)
+-1 + O(x^30)
+
+julia> c = inv(a)
+1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
+
+julia> d = inv(b)
+-1 + O(x^30)
+```
 """
 function Base.inv(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(inv(a.data), a.scale)
@@ -601,6 +620,16 @@ end
 Return the square root of the given Puiseux series $a$. By default the function
 will throw an exception if the input is not square. If `check=false` this test
 is omitted.
+
+# Examples
+
+```jldoctest
+julia> T, z = puiseux_series_ring(QQ, 30, :z)
+(Puiseux series field in z over rationals, z + O(z^31))
+
+julia> sqrt(1 + z + 3z^2 + O(z^5))
+1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
+```
 """
 function sqrt_classical(a::PuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElement
    val = valuation(a.data)
@@ -645,6 +674,19 @@ end
     derivative(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
 
 Return the derivative of the given Puiseux series $a$.
+
+# Examples
+
+```jldoctest
+julia> R, x = puiseux_series_ring(QQ, 10, :x)
+(Puiseux series field in x over rationals, x + O(x^11))
+
+julia> f = x^(5//3) + x^(7//3) + x^(11//3)
+x^(5//3) + x^(7//3) + x^(11//3) + O(x^5)
+
+julia> derivative(f)
+5//3*x^(2//3) + 7//3*x^(4//3) + 11//3*x^(8//3) + O(x^4)
+```
 """
 function derivative(a::PuiseuxSeriesElem{T}) where T <: RingElement
    S = parent(a)
@@ -660,6 +702,16 @@ end
     integral(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
 
 Return the integral of the given Puiseux series $a$.
+
+# Examples
+
+```jldoctest
+julia> R, x = puiseux_series_ring(QQ, 10, :x)
+(Puiseux series field in x over rationals, x + O(x^11))
+
+julia> integral(x^(5//3) + x^(7//3) + x^(11//3))
+3//8*x^(8//3) + 3//10*x^(10//3) + 3//14*x^(14//3) + O(x^6)
+```
 """
 function integral(a::PuiseuxSeriesElem{T}) where T <: RingElement
    S = parent(a)
@@ -681,6 +733,16 @@ end
     exp(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
 
 Return the exponential of the given Puiseux series $a$.
+
+# Examples
+
+```jldoctest
+julia> T, z = puiseux_series_ring(QQ, 30, :z)
+(Puiseux series field in z over rationals, z + O(z^31))
+
+julia> exp(z + 2z^2 + 5z^3 + O(z^5))
+1 + z + 5//2*z^2 + 43//6*z^3 + 193//24*z^4 + O(z^5)
+```
 """
 function Base.exp(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(exp(a.data), a.scale)
@@ -692,6 +754,16 @@ end
     log(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
 
 Return the logarithm of the given Puiseux series $a$.
+
+# Examples
+
+```jldoctest
+julia> T, z = puiseux_series_ring(QQ, 30, :z)
+(Puiseux series field in z over rationals, z + O(z^31))
+
+julia> log(1 + z + 3z^2 + O(z^5))
+z + 5//2*z^2 - 8//3*z^3 - 7//4*z^4 + O(z^5)
+```
 """
 function Base.log(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(log(a.data), a.scale)

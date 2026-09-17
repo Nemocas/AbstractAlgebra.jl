@@ -1076,6 +1076,19 @@ Transform the series `p` by applying `f` on each non-zero coefficient.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+
+julia> map_coefficients(AbstractAlgebra.sqrt, f)
+2*x^6 + x^7 + 3*x^8 + 4*x^9 + 5*x^10 + O(x^11)
+```
 """
 function map_coefficients(g::T, p::AbsPowerSeriesRingElem{<:RingElement};
                     cached::Bool = true,
@@ -1113,6 +1126,19 @@ into `R`.
 If the optional `parent` keyword is provided, the series will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+
+julia> change_base_ring(QQ, f)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+```
 """
 function change_base_ring(R::Ring, p::AbsPowerSeriesRingElem{T};
                     cached::Bool = true, parent::Ring =

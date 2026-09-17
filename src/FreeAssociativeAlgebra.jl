@@ -131,6 +131,41 @@ the next iteration step. This may result in significantly fewer memory allocatio
 However, using the in-place version is only meaningful, if just one element of
 the iterator is needed at any time. For example, calling `collect` on this
 iterator will not give useful results.
+
+# Examples
+
+```jldoctest
+julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
+
+julia> collect(terms(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+ 3*b*a*c
+ -b
+ c
+ 2
+
+julia> collect(coefficients(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+  3
+ -1
+  1
+  2
+
+julia> collect(monomials(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+ b*a*c
+ b
+ c
+ 1
+
+julia> collect(exponent_words(3*b*a*c - b + c + 2))
+4-element Vector{Vector{Int64}}:
+ [2, 1, 3]
+ [2]
+ [3]
+ []
+```
 """
 function exponent_words(a::FreeAssociativeAlgebraElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a; inplace)
@@ -338,6 +373,25 @@ function free_associative_algebra(
 end
 
 @varnames_interface free_associative_algebra(R::Ring, s)
+
+"""
+    @free_associative_algebra(R::Ring, varnames...; cached=true)
+
+Return the algebra from [`free_associative_algebra(::Ring, ::Vector{Symbol})`](@ref)
+and introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @free_associative_algebra(ZZ, "z#" => 1:3)
+Free associative algebra on 3 indeterminates z1, z2, z3
+  over integers
+
+julia> z1*z2*z3
+z1*z2*z3
+```
+"""
+:(@free_associative_algebra)
 
 @doc raw"""
     free_associative_algebra(R::Ring, n::Int, s::VarName=:x; cached::Bool=true)

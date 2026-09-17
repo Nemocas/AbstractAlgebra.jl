@@ -42,6 +42,22 @@ end
     dim(N::QuotientModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector quotient space.
+
+# Examples
+
+```jldoctest
+julia> V = vector_space(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> N, f = sub(V, [V([QQ(1), QQ(2)])])
+(Subspace over rationals with 1 generator and no relations, Hom: N -> V)
+
+julia> Q, g = quo(V, N)
+(Quotient space over rationals with 1 generator and no relations, Hom: V -> Q)
+
+julia> dim(Q)
+1
+```
 """
 dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
 vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
@@ -50,6 +66,26 @@ vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_co
     supermodule(M::QuotientModule{T}) where T <: RingElement
 
 Return the module that this module is a quotient of.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 2)
+Free module of rank 2 over integers
+
+julia> m = M([ZZ(2), ZZ(3)])
+(2, 3)
+
+julia> N, g = sub(M, [m])
+(Submodule over integers with 1 generator and no relations, Hom: N -> M)
+
+julia> Q, h = quo(M, N)
+(Quotient module over integers with 2 generators and relations:
+[2 3], Hom: M -> Q)
+
+julia> supermodule(Q) == M
+true
+```
 """
 supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 

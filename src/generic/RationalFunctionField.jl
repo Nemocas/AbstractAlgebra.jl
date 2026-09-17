@@ -470,6 +470,22 @@ end
 
 Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
 the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
+
+# Examples
+
+```jldoctest
+julia> R, x = rational_function_field(QQ, :x)
+(Rational function field over rationals, x)
+
+julia> f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
+(x^2 + 2*x + 1)//(x^2 + x + 1)
+
+julia> h = gcd(f, g)
+(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
+```
 """
 function gcd(a::RationalFunctionFieldElem{T, U}, b::RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
    check_parent(a, b)

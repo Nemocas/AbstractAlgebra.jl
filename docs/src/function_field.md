@@ -34,6 +34,7 @@ following constructors.
 
 ```@docs
 rational_function_field
+@rational_function_field
 ```
 
 ## Basic rational function field functionality
@@ -103,23 +104,6 @@ The following functionality is provided for rational function fields.
 
 ```@docs
 gcd(::Generic.RationalFunctionFieldElem{T, U}, ::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = rational_function_field(QQ, :x)
-(Rational function field over rationals, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2 + 2*x + 1)//(x^2 + x + 1)
-
-julia> h = gcd(f, g)
-(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
-
 ```
 
 ### Square root
@@ -340,4 +324,3 @@ julia> norm(f)
 julia> tr(f)
 (2*x^4 + 38//9*x^3 + 85//9*x^2 + 24*x + 25)//(x^2 - 4)
 ```
-
