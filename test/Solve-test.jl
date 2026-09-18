@@ -103,13 +103,17 @@ end
 
   if is_default
     C = solve_init(M)
+    @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(C)) === NFTrait()
     @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === NFTrait()
+    @test C isa AbstractAlgebra.solve_context_type(typeof(R))
     @test C isa AbstractAlgebra.solve_context_type(R)
+    @test C isa AbstractAlgebra.solve_context_type(typeof(M))
     @test C isa AbstractAlgebra.solve_context_type(M)
   end
 
   C = solve_init(NFTrait(), M)
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(C)) === NFTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === NFTrait()
   @test C isa AbstractAlgebra.solve_context_type(NFTrait(), elem_type(R))
   @test C isa AbstractAlgebra.solve_context_type(NFTrait(), R(1))
