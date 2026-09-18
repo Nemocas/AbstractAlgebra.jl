@@ -414,7 +414,7 @@ Base.eltype(::Type{S}) where {S <: FPModule} = elem_type(S)
 
 function Base.iterate(M::FPModule{T}) where T
   k = base_ring(M)
-  d = M isa Generic.FreeModule ? rank(M) : dim(M)
+  d = rank(M)
   if d == 0
     return zero(M), iterate([1])
   end
@@ -429,7 +429,7 @@ function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.Produc
   if n === nothing
     return n
   end
-  d = M isa Generic.FreeModule ? rank(M) : dim(M)
+  d = rank(M)
   return M(elem_type(base_ring(M))[n[1][i] for i=1:d]), (n[2], st[2])
 end
 

@@ -49,6 +49,7 @@ julia> rank(M)
 rank(M::FreeModule{T}) where T <: NCRingElement = M.rank
 
 @doc raw"""
+    vector_space_dim(M::FreeModule{T}) where T <: FieldElement
     dim(M::FreeModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector space.
@@ -63,8 +64,7 @@ julia> dim(V)
 2
 ```
 """
-dim(M::FreeModule{T}) where T <: FieldElement = M.rank
-vector_space_dim(M::FreeModule{T}) where T <: FieldElement = M.rank
+vector_space_dim(M::FreeModule{T}) where T <: FieldElement = rank(M)
 
 order(M::FreeModule) = order(base_ring(M))^rank(M)
 

@@ -65,7 +65,7 @@ Vector space of dimension 2 over rationals
 
 ```@docs
 rank(::Generic.FreeModule{T}) where T <: NCRingElement
-dim(::Generic.FreeModule{T}) where T <: FieldElement
+vector_space_dim(::Generic.FreeModule{T}) where T <: FieldElement
 basis(::Generic.FreeModule)
 ```
 
