@@ -33,6 +33,27 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
     gens(I::Ideal{T}) where T <: RingElement
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3*x^3 + 2*x^2 + 1
+ 5*x^4 + 1
+ 2*x - 1
+
+julia> I = Generic.Ideal(R, V)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1])
+
+julia> gens(I)
+2-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3
+ x + 1
+```
 """
 gens(I::Ideal) = I.gens
 
@@ -2087,6 +2108,25 @@ end
     normal_form(p::U, I::Ideal{U}) where {U}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:degrevlex)
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
+2-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ 3*x^2*y - 3*y^2
+ 9*x^2*y + 7*x*y
+
+julia> I = Generic.Ideal(R, V)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2])
+
+
+julia> normal_form(30x^5*y + 2x + 1, I)
+135*y^4 + 138*y^3 - 147*y^2 + 2*x + 1
+```
 """
 function normal_form(p::U, I::Ideal{U}) where {U}
    is_zero(p) && return deepcopy(p)

@@ -35,13 +35,12 @@ domain and codomain objects are known.
 
 The following functions must be defined for all functional map types or classes:
 
-```julia
-image_fn(M::Map(MyFunctionalMap))
+```@docs
+image_fn
 ```
 
-Return the Julia function or closure that corresponds to application of the map $M$. This
-function only needs to be provided if this function is not stored in an `image_fn`
-field of the `MyFunctionalMap` type.
+This function only needs to be provided if the Julia function is not stored in
+an `image_fn` field of the `MyFunctionalMap` type.
 
 ## Generic functional maps
 

@@ -144,28 +144,5 @@ julia> dim(N)
 ### Intersection
 
 ```@docs
-intersect(M::FPModule{T}, N::FPModule{T}) where
-T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> M = free_module(ZZ, 2)
-Free module of rank 2 over integers
-
-julia> m = M([ZZ(2), ZZ(3)])
-(2, 3)
-
-julia> n = M([ZZ(1), ZZ(4)])
-(1, 4)
-
-julia> N1 = sub(M, [m, n])
-(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> M)
-
-julia> N2 = sub(M, [m])
-(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
-
-julia> I = intersect(N1, N2)
-Any[]
+intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
 ```

@@ -568,23 +568,6 @@ change_coefficient_ring(::Ring, p::MPolyRingElem{T}) where {T <: RingElement}
 map_coefficients(::Any, p::MPolyRingElem)
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> fz = x^2*y^2 + x + 1
-x^2*y^2 + x + 1
-
-julia> fq = change_base_ring(QQ, fz)
-x^2*y^2 + x + 1
-
-julia> fq = change_coefficient_ring(QQ, fz)
-x^2*y^2 + x + 1
-
-```
-
 In case a specific parent ring is constructed, it can also be passed to the function.
 
 **Examples**
@@ -615,20 +598,6 @@ coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: Ring
 coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: MPolyRingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
-(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
-
-julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
-x^4*y^2*z^2 - 2*x^4*y*z^2 + 4*x^4*z^2 + 2*x^2*y^2 + x + 1
-
-julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
-true
-
-```
-
 ### Inflation/deflation
 
 ```@docs
@@ -650,62 +619,10 @@ inflate(f::MPolyRingElem, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{In
 inflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
-x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
-
-julia> def, shift = deflation(f)
-([1, 2], [3, 3])
-
-julia> f1 = deflate(f, def, shift)
-x^2*y^2 + 3*x*y^2 - x + 5*y - 1
-
-julia> f2 = inflate(f1, def, shift)
-x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
-
-julia> f2 == f
-true
-
-julia> g = (x+y+1)^2
-x^2 + 2*x*y + 2*x + y^2 + 2*y + 1
-
-julia> g0 = coeff(g, [y], [0])
-x^2 + 2*x + 1
-
-julia> g1 = deflate(g - g0, [y], [1], [1])
-2*x + y + 2
-
-julia> g == g0 + y * g1
-true
-
-```
-
 ### Conversions
 
 ```@docs
 to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> S, z = polynomial_ring(ZZ, :z)
-(Univariate polynomial ring in z over integers, z)
-
-julia> f = 2x^5 + 3x^4 - 2x^2 - 1
-2*x^5 + 3*x^4 - 2*x^2 - 1
-
-julia> g = to_univariate(S, f)
-2*z^5 + 3*z^4 - 2*z^2 - 1
-
 ```
 
 ### Evaluation
@@ -740,69 +657,6 @@ not necessarily commutative ring, e.g. elements of a matrix algebra.
 evaluate(::MPolyRingElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = 2x^2*y^2 + 3x + y + 1
-2*x^2*y^2 + 3*x + y + 1
-
-julia> evaluate(f, BigInt[1, 2])
-14
-
-julia> evaluate(f, [QQ(1), QQ(2)])
-14//1
-
-julia> evaluate(f, [1, 2])
-14
-
-julia> f(1, 2) == 14
-true
-
-julia> evaluate(f, [x + y, 2y - x])
-2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
-
-julia> f(x + y, 2y - x)
-2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
-
-julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
-(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
-
-julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
-x^2*y^2 + 2*x*z + 3*y*z + z + 1
-
-julia> evaluate(f, [1, 3], [3, 4])
-9*y^2 + 12*y + 29
-
-julia> evaluate(f, [x, z], [3, 4])
-9*y^2 + 12*y + 29
-
-julia> evaluate(f, [1, 2], [x + z, x - z])
-x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
-
-julia> S = matrix_ring(ZZ, 2)
-Matrix ring of degree 2
-  over integers
-
-julia> M1 = S([1 2; 3 4])
-[1   2]
-[3   4]
-
-julia> M2 = S([2 3; 1 -1])
-[2    3]
-[1   -1]
-
-julia> M3 = S([-1 1; 1 1])
-[-1   1]
-[ 1   1]
-
-julia> evaluate(f, [M1, M2, M3])
-[ 64    83]
-[124   149]
-```
-
 ### Leading and constant coefficients, leading monomials and leading terms
 
 The leading and trailing coefficient, constant coefficient, leading monomial
@@ -815,21 +669,6 @@ leading_monomial(::MPolyRingElem{T}) where T <: RingElement
 leading_term(::MPolyRingElem{T}) where T <: RingElement
 constant_coefficient(::MPolyRingElem{T}) where T <: RingElement
 tail(::MPolyRingElem{T}) where T <: RingElement
-```
-
-**Examples**
-
-
-```julia
-using AbstractAlgebra
-R,(x,y) = polynomial_ring(ZZ, [:x, :y], internal_ordering=:deglex)
-p = 2*x*y + 3*y^3 + 1
-leading_term(p)
-leading_monomial(p)
-leading_coefficient(p)
-leading_term(p) == leading_coefficient(p) * leading_monomial(p)
-constant_coefficient(p)
-tail(p)
 ```
 
 ### Least common multiple, greatest common divisor
@@ -851,57 +690,10 @@ polynomials a and b is returned by
 lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
 ```
 
-**Examples**
-
-```jldoctest
-julia> using AbstractAlgebra
-
-julia> R,(x,y) = polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> a = x*y + 2*y
-x*y + 2*y
-
-julia> b = x^3*y + y
-x^3*y + y
-
-julia> gcd(a,b)
-y
-
-julia> lcm(a,b)
-x^4*y + 2*x^3*y + x*y + 2*y
-
-julia> lcm(a,b) == a * b // gcd(a,b)
-true
-
-```
-
 ### Derivations
 
 ```@docs
 derivative(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = AbstractAlgebra.polynomial_ring(ZZ, [:x, :y])
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> f = x*y + x + y + 1
-x*y + x + y + 1
-
-julia> derivative(f, x)
-y + 1
-
-julia> derivative(f, y)
-x + 1
-
-julia> derivative(f, 1)
-y + 1
-
-julia> derivative(f, 2)
-x + 1
 ```
 
 ### Homogeneous polynomials

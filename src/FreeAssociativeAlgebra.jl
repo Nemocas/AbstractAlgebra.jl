@@ -131,6 +131,41 @@ the next iteration step. This may result in significantly fewer memory allocatio
 However, using the in-place version is only meaningful, if just one element of
 the iterator is needed at any time. For example, calling `collect` on this
 iterator will not give useful results.
+
+# Examples
+
+```jldoctest
+julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
+
+julia> collect(terms(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+ 3*b*a*c
+ -b
+ c
+ 2
+
+julia> collect(coefficients(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+  3
+ -1
+  1
+  2
+
+julia> collect(monomials(3*b*a*c - b + c + 2))
+4-element Vector{Any}:
+ b*a*c
+ b
+ c
+ 1
+
+julia> collect(exponent_words(3*b*a*c - b + c + 2))
+4-element Vector{Vector{Int64}}:
+ [2, 1, 3]
+ [2]
+ [3]
+ []
+```
 """
 function exponent_words(a::FreeAssociativeAlgebraElem{T}; inplace::Bool = false) where T <: RingElement
    return Generic.FreeAssAlgExponentWords(a; inplace)
@@ -299,6 +334,34 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    free_associative_algebra(R::Ring, varnames::Vector{Symbol}; cached::Bool=true)
+
+Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`,
+return a tuple `S, [x1, x2, ...]` of the free associative algebra
+$S = R \left< x1, x2, \dots \right>$ and its generators $x1, x2, \dots$.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`free_associative_algebra` is invoked again with the same arguments, the same
+(*identical*) algebra is returned. Setting `cached` to `false` ensures a
+distinct new algebra is returned, and will also prevent it from being cached.
+
+For the many ways to specify `varnames` refer to [`polynomial_ring`](@ref) or
+[`AbstractAlgebra.@varnames_interface`](@ref).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+(Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y])
+
+julia> (x + y + 1)^2
+x^2 + x*y + y*x + y^2 + 2*x + 2*y + 1
+
+julia> (x*y*x*x)^4
+x*y*x^3*y*x^3*y*x^3*y*x^2
+```
+"""
 function free_associative_algebra(
   R::Ring,
   s::Vector{Symbol};
@@ -310,6 +373,39 @@ function free_associative_algebra(
 end
 
 @varnames_interface free_associative_algebra(R::Ring, s)
+
+"""
+    @free_associative_algebra(R::Ring, varnames...; cached=true)
+
+Return the algebra from [`free_associative_algebra(::Ring, ::Vector{Symbol})`](@ref)
+and introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @free_associative_algebra(ZZ, "z#" => 1:3)
+Free associative algebra on 3 indeterminates z1, z2, z3
+  over integers
+
+julia> z1*z2*z3
+z1*z2*z3
+```
+"""
+:(@free_associative_algebra)
+
+@doc raw"""
+    free_associative_algebra(R::Ring, n::Int, s::VarName=:x; cached::Bool=true)
+
+Same as [`free_associative_algebra(::Ring, ["s$i" for i in 1:n])`](@ref free_associative_algebra(::Ring, ::Vector{Symbol})).
+
+# Examples
+
+```jldoctest
+julia> S, x = free_associative_algebra(ZZ, 3)
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x1, x2, x3])
+```
+"""
+free_associative_algebra(R::Ring, n::Int, s::VarName=:x)
 
 
 free_associative_algebra_type(::Type{T}) where T<:RingElement = Generic.FreeAssociativeAlgebra{T}

@@ -178,7 +178,7 @@ function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)
       while l > 0 && iszero(v[l])
          l -= 1
       end
-      b = xor(b, xor(Base.hash(v[1:l], h), h))
+      b = xor(b, xor(Base.hash(view(v, 1:l), h), h))
       b = xor(b, xor(hash(c, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
@@ -745,3 +745,21 @@ function universal_polynomial_ring(R::Ring; cached::Bool=true, internal_ordering
 end
 
 @varnames_interface universal_polynomial_ring(R::Ring, s)
+
+"""
+    @universal_polynomial_ring(R::Ring, varnames...; cached=true, internal_ordering=:lex)
+
+Return the ring from [`universal_polynomial_ring`](@ref) and introduce the
+generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @universal_polynomial_ring(ZZ, [:m, :n])
+Universal polynomial ring over Integers
+
+julia> m*n
+m*n
+```
+"""
+:(@universal_polynomial_ring)

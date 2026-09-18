@@ -18,7 +18,7 @@ number_of_columns(A::Matrix{T}) where {T} = size(A, 2)
     Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement}
 
 Convert `A` to a Julia `Matrix{U}` of the same dimensions with the same elements.
-If `U` is omitted then `eltype(M)` is used in its place.
+If `U` is omitted then `eltype(A)` is used in its place.
 
 # Examples
 ```jldoctest
@@ -37,8 +37,8 @@ julia> Matrix{Int}(A)
  4  5  6
 ```
 """
-Matrix(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix{eltype(M)}(M)
-Matrix{U}(M::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[M[i, j] for i = 1:nrows(M), j = 1:ncols(M)]
+Matrix(A::MatrixElem{T}) where {T<:NCRingElement} = Matrix{eltype(A)}(A)
+Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[A[i, j] for i = 1:nrows(A), j = 1:ncols(A)]
 
 
 """
@@ -58,7 +58,7 @@ julia> Array(A)
  x^2  x^3
 ```
 """
-Array(M::MatrixElem{T}) where {T<:NCRingElement} = Matrix(M)
+Array(A::MatrixElem{T}) where {T<:NCRingElement} = Matrix(A)
 
 ###############################################################################
 #

@@ -99,24 +99,74 @@ end
 #
 ###############################################################################
 
-# Type can only represent elements of an exact ring
-# true unless explicitly specified
-#
-# implementors should only implement this trait for RingElem subtypes, but for
-# convenience we support calling this also on Ring subtypes as well as Ring
-# and RingElem instances
+@doc raw"""
+    is_exact_type(T::Type) -> Bool
+    is_exact_type(x) -> Bool
+
+Return `true` if all elements of the given type are represented exactly, i.e.
+without approximation, and `false` otherwise. Integers, rationals, finite
+fields and polynomials and matrices over them are exact; floating point
+numbers, $p$-adic numbers and power series are not. As the type may be
+abstract or parameterised, `true` is only returned if every type it covers is
+exact.
+
+Here `T` may be a ring element type or a ring type, and `x` may be a ring
+element or a ring.
+
+# Examples
+
+```jldoctest
+julia> is_exact_type(BigInt)
+true
+
+julia> is_exact_type(ZZ)
+true
+
+julia> S, x = power_series_ring(QQ, 5, :x);
+
+julia> is_exact_type(S), is_exact_type(x)
+(false, false)
+```
+
+!!! note
+    Implementors only need to define this for their ring element types; the
+    variants taking a ring type or an instance delegate to those.
+"""
 is_exact_type(R::Type{T}) where T <: RingElem = true
 
 is_exact_type(x) = is_exact_type(typeof(x))
 is_exact_type(x::Type{<:Ring}) = is_exact_type(elem_type(x))
 is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
 
-# Type can only represent elements of domains, i.e. without zero divisors
-# false unless explicitly specified
-#
-# implementors should only implement this trait for RingElem subtypes, but for
-# convenience we support calling this also on Ring subtypes as well as Ring
-# and RingElem instances
+@doc raw"""
+    is_domain_type(T::Type) -> Bool
+    is_domain_type(x) -> Bool
+
+Return `true` if every element of the given type is guaranteed to have an
+integral domain as its parent, and `false` if this cannot be guaranteed. For
+example elements of generic residue rings do not qualify, as the answer
+depends on the modulus, which is not part of the type.
+
+Here `T` may be a ring element type or a ring type, and `x` may be a ring
+element or a ring.
+
+# Examples
+
+```jldoctest
+julia> is_domain_type(BigInt)
+true
+
+julia> is_domain_type(ZZ)
+true
+
+julia> is_domain_type(residue_ring(ZZ, 6)[1])
+false
+```
+
+!!! note
+    Implementors only need to define this for their ring element types; the
+    variants taking a ring type or an instance delegate to those.
+"""
 is_domain_type(R::Type{T}) where T <: NCRingElem = false
 
 is_domain_type(x) = is_domain_type(typeof(x))

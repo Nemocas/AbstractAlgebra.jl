@@ -184,6 +184,19 @@ indices raised to the given exponents (note that not all variables need to
 appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
 the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 $x, y, z$ in that order).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+
+julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+x^4*y^2*z^2 - 2*x^4*y*z^2 + 4*x^4*z^2 + 2*x^2*y^2 + x + 1
+
+julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+true
+```
 """
 function coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
    @req allunique(vars) "Variables not unique"
@@ -281,6 +294,18 @@ end
     leading_coefficient(p::MPolyRingElem)
 
 Return the leading coefficient of the polynomial $p$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:deglex);
+
+julia> p = 2*x*y + 3*y^3 + 1
+3*y^3 + 2*x*y + 1
+
+julia> leading_coefficient(p)
+3
+```
 """
 function leading_coefficient(p::MPolyRingElem{T}) where T <: RingElement
    @req !iszero(p) "Zero polynomial does not have a leading monomial"
@@ -692,6 +717,19 @@ the minimum exponent for each variable of the polynomial, and the second of
 which (the deflation) gives the gcds of all the exponents after subtracting
 the shift, again per variable. This functionality is used by gcd (and can be
 used by factorisation algorithms).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
+
+julia> shift, defl = deflation(f)
+([1, 2], [3, 3])
+```
 """
 function deflation(f::MPolyRingElem{T}) where T <: RingElement
    N = nvars(parent(f))
@@ -723,6 +761,16 @@ one for each variable), then deflated (divided) by the given exponents
 (again supplied as an array of deflation factors, one for each variable).
 The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
 division by $0$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> deflate(x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2, [1, 2], [3, 3])
+x^2*y^2 + 3*x*y^2 - x + 5*y - 1
+```
 """
 function deflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -806,6 +854,22 @@ the given variables have been reduced by the given shifts (supplied as an array
 of shifts), then deflated (divided) by the given exponents (again supplied as an
 array of deflation factors). The algorithm automatically replaces a deflation of
 $0$ by $1$, to avoid division by $0$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> g = (x + y + 1)^2
+x^2 + 2*x*y + 2*x + y^2 + 2*y + 1
+
+julia> g0 = coeff(g, [y], [0])
+x^2 + 2*x + 1
+
+julia> deflate(g - g0, [y], [1], [1])
+2*x + y + 2
+```
 """
 function deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
    varidx = [var_index(x) for x in vars]
@@ -821,6 +885,16 @@ have been inflated (multiplied) by the given deflation exponents (supplied
 as an array of inflation factors, one for each variable) and then increased
 by the given shifts (again supplied as an array of shifts, one for each
 variable).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> inflate(x^2*y^2 + 3*x*y^2 - x + 5*y - 1, [1, 2], [3, 3])
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
+```
 """
 function inflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -934,6 +1008,69 @@ Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = 2x^2*y^2 + 3x + y + 1
+2*x^2*y^2 + 3*x + y + 1
+
+julia> evaluate(f, BigInt[1, 2])
+14
+
+julia> evaluate(f, [QQ(1), QQ(2)])
+14//1
+
+julia> evaluate(f, [1, 2])
+14
+
+julia> f(1, 2) == 14
+true
+
+julia> evaluate(f, [x + y, 2y - x])
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+
+julia> f(x + y, 2y - x)
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+
+julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+
+julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
+x^2*y^2 + 2*x*z + 3*y*z + z + 1
+
+julia> evaluate(f, [1, 3], [3, 4])
+9*y^2 + 12*y + 29
+
+julia> evaluate(f, [x, z], [3, 4])
+9*y^2 + 12*y + 29
+
+julia> evaluate(f, [1, 2], [x + z, x - z])
+x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
+
+julia> S = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> M1 = S([1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> M2 = S([2 3; 1 -1])
+[2    3]
+[1   -1]
+
+julia> M3 = S([-1 1; 1 1])
+[-1   1]
+[ 1   1]
+
+julia> evaluate(f, [M1, M2, M3])
+[ 64    83]
+[124   149]
+```
 """
 function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
    @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
@@ -1197,6 +1334,28 @@ end
 
 Return the partial derivative of `f` with respect to `x`. The value `x` must
 be a generator of the polynomial ring of `f`.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = AbstractAlgebra.polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x*y + x + y + 1
+x*y + x + y + 1
+
+julia> derivative(f, x)
+y + 1
+
+julia> derivative(f, y)
+x + 1
+
+julia> derivative(f, 1)
+y + 1
+
+julia> derivative(f, 2)
+x + 1
+```
 """
 function derivative(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
    return derivative(f, var_index(x))
@@ -1216,6 +1375,22 @@ Assuming the polynomial $p$ is actually a univariate polynomial, convert the
 polynomial to a univariate polynomial in the given univariate polynomial ring
 $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> S, z = polynomial_ring(ZZ, :z)
+(Univariate polynomial ring in z over integers, z)
+
+julia> f = 2x^5 + 3x^4 - 2x^2 - 1
+2*x^5 + 3*x^4 - 2*x^2 - 1
+
+julia> g = to_univariate(S, f)
+2*z^5 + 3*z^4 - 2*z^2 - 1
+```
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
    if is_zero(p)
@@ -1420,6 +1595,19 @@ into `R`.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> fz = x^2*y^2 + x + 1
+x^2*y^2 + x + 1
+
+julia> fq = change_base_ring(QQ, fz)
+x^2*y^2 + x + 1
+```
 """
 function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
@@ -1435,6 +1623,16 @@ into `R`.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> change_coefficient_ring(QQ, x^2*y^2 + x + 1)
+x^2*y^2 + x + 1
+```
 """
 function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
   return change_base_ring(R, p, cached = cached, parent = parent)
@@ -1632,7 +1830,7 @@ set with `internal_ordering` and must be one of `:lex`, `:deglex` or `:degrevlex
 
 See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
@@ -1691,7 +1889,7 @@ polynomial_ring(R::Ring, varnames...)
 
 Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, x = polynomial_ring(ZZ, 3)

@@ -56,6 +56,19 @@ end
     @test evaluate(f, 2//3) == 2//5
     @test f(2//3) == 2//5
 
+    # a point in a ring that is not a field: the factor (x+1)^-1 must become a
+    # denominator, not a negative power. Integer points additionally sit in the
+    # ambiguity between evaluate(::FracElem{<:PolyRingElem}, ::Integer) and
+    # evaluate(::FactoredFracFieldElem, ::RingElement).
+    @test evaluate(f, 2) == 2//3
+    @test f(2) == 2//3
+    @test evaluate(f, big(2)) == 2//3
+    @test evaluate(f, ZZ(2)) == 2//3
+
+    # only non-negative exponents, so nothing lands in the denominator
+    @test evaluate(x*(x+1), 2) == 6
+    @test evaluate(x*(x+1), 2//3) == 10//9
+
     # multivariate
     Zxy, (x, y) = polynomial_ring(ZZ, ["x", "y"])
     F = factored_fraction_field(Zxy)
@@ -66,6 +79,15 @@ end
 
     @test evaluate(f, [1//3, 1//2]) == 12//25
     @test f(1//3, 1//2) == 12//25
+
+    # a point in a ring that is not a field
+    @test evaluate(f, [2, 3]) == 2//25
+    @test f(2, 3) == 2//25
+    @test evaluate(f, [ZZ(2), ZZ(3)]) == 2//25
+
+    # a unit other than one, and a denominator dividing the numerator
+    @test evaluate(-2*x^2//(x+y), [2, 3]) == -8//5
+    @test evaluate(x^2//x, [2, 3]) == 2
 end
 
 @testset "Generic.FactoredFracFieldElem.ZZ.valuation" begin

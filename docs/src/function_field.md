@@ -32,46 +32,9 @@ In order to construct rational functions in AbstractAlgebra.jl, one can first
 construct the function field itself. This is accomplished with one of the
 following constructors.
 
-```julia
-rational_function_field(k::Field, s::VarName; cached::Bool = true)
-rational_function_field(k::Field, s::Vector{<:VarName}; cached::Bool = true)
-```
-
-Given a coefficient field `k` return a tuple `(S, x)` consisting of the parent
-object of the rational function field over $k$ and the generator(s) `x`. By
-default the parent object `S` will depend only on `R` and `s` and will be cached.
-Setting the optional argument `cached` to `false` will prevent the parent object
-`S` from being cached.
-
-Here are some examples of creating rational function fields and making use of the
-resulting parent objects to coerce various elements into the function field.
-
-**Examples**
-
-```jldoctest
-julia> S, x = rational_function_field(QQ, :x)
-(Rational function field over rationals, x)
-
-julia> f = S()
-0
-
-julia> g = S(123)
-123
-
-julia> h = S(BigInt(1234))
-1234
-
-julia> k = S(x + 1)
-x + 1
-
-julia> m = S(numerator(x + 1, false), numerator(x + 2, false))
-(x + 1)//(x + 2)
-
-julia> R, (x, y) = rational_function_field(QQ, [:x, :y])
-(Rational function field over rationals, AbstractAlgebra.Generic.RationalFunctionFieldElem{Rational{BigInt}, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}}[x, y])
-
-julia> (x + y)//y^2
-(x + y)//y^2
+```@docs
+rational_function_field
+@rational_function_field
 ```
 
 ## Basic rational function field functionality
@@ -143,23 +106,6 @@ The following functionality is provided for rational function fields.
 gcd(::Generic.RationalFunctionFieldElem{T, U}, ::Generic.RationalFunctionFieldElem{T, U}) where {T <: FieldElement, U <: Union{PolyRingElem, MPolyRingElem}}
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = rational_function_field(QQ, :x)
-(Rational function field over rationals, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2 + 2*x + 1)//(x^2 + x + 1)
-
-julia> h = gcd(f, g)
-(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
-
-```
-
 ### Square root
 
 Methods for `is_square` and `sqrt` are provided for inputs of type `RationalFunctionFieldElem`.
@@ -209,61 +155,8 @@ In order to construct function fields in AbstractAlgebra.jl, one first
 constructs the rational function field they are an extension of, then supplies
 a polynomial over this field to the following constructor:
 
-```julia
-function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::AbstractString; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem{T}}
-```
-
-Given an irreducible polynomial `p` over a rational function field return a
-tuple `(S, z)` consisting of the parent object of the function field defined by
-that polynomial over $k(x)$ and the generator `z`. By default the parent object
-`S` will depend only on `p` and `s` and will be cached. Setting the optional
-argument `cached` to `false` will prevent the parent object `S` from being
-cached.
-
-Here are some examples of creating function fields and making use of the
-resulting parent objects to coerce various elements into the function field.
-
-**Examples**
-
-```jldoctest
-julia> R1, x1 = rational_function_field(QQ, "x1") # characteristic 0
-(Rational function field over rationals, x1)
-
-julia> U1, z1 = R1["z1"]
-(Univariate polynomial ring in z1 over R1, z1)
-
-julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
-(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
-
-julia> S1, y1 = function_field(f, "y1")
-(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
-
-julia> a = S1()
-0
-
-julia> b = S1((x1 + 1)//(x1 + 2))
-(x1 + 1)//(x1 + 2)
-
-julia> c = S1(1//3)
-1//3
-
-julia> R2, x2 = rational_function_field(GF(23), "x1") # characteristic p
-(Rational function field over finite field F_23, x1)
-
-julia> U2, z2 = R2["z2"]
-(Univariate polynomial ring in z2 over R2, z2)
-
-julia> g = z2^2 + 3z2 + 1
-z2^2 + 3*z2 + 1
-
-julia> S2, y2 = function_field(g, "y2")
-(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
-
-julia> d = S2(R2(5))
-5
-
-julia> e = S2(y2)
-y2
+```@docs
+function_field
 ```
 
 ## Basic function field functionality
@@ -431,4 +324,3 @@ julia> norm(f)
 julia> tr(f)
 (2*x^4 + 38//9*x^3 + 85//9*x^2 + 24*x + 25)//(x^2 - 4)
 ```
-
