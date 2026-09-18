@@ -1830,7 +1830,7 @@ set with `internal_ordering` and must be one of `:lex`, `:deglex` or `:degrevlex
 
 See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
@@ -1889,7 +1889,7 @@ polynomial_ring(R::Ring, varnames...)
 
 Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, x = polynomial_ring(ZZ, 3)
