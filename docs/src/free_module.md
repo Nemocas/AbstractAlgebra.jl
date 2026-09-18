@@ -65,6 +65,7 @@ Vector space of dimension 2 over rationals
 
 ```julia
 rank(M::Generic.FreeModule{T}) where T <: RingElem
+vector_space_dim(V::Generic.FreeModule{T}) where T <: FieldElem
 dim(V::Generic.FreeModule{T}) where T <: FieldElem
 basis(V::Generic.FreeModule{T}) where T <: FieldElem
 ```

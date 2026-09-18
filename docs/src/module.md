@@ -70,6 +70,20 @@ relations(M::FPModule{T}) where T <: RingElement
 Return a Julia vector of all the relations between the generators of `M`. Each
 relation is given as an AbstractAlgebra row matrix.
 
+```@docs
+vector_space_dim
+dim(M::FPModule{T}) where T <: FieldElement
+```
+
+```julia
+rank(M::FPModule{T}) where T <: FieldElement
+```
+
+Return the rank of the module `M`. For a finitely presented module over a
+field this is the same as `dim(M)`. For a free module over an arbitrary ring
+see the section on free modules. For all other modules `rank` is not
+implemented and throws an error.
+
 **Examples**
 
 ```jldoctest

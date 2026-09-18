@@ -95,7 +95,7 @@ is_compatible(::FPModule{T}, ::FPModule{T}) where T <: RingElement
 ```
 
 ```@docs
-dim(N::Generic.Submodule{T}) where T <: FieldElement
+vector_space_dim(N::Generic.Submodule{T}) where T <: FieldElement
 ```
 
 **Examples**

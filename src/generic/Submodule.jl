@@ -31,12 +31,14 @@ function gen(N::Submodule{T}, i::Int) where T <: RingElement
 end
 
 @doc raw"""
+    vector_space_dim(N::Submodule{T}) where T <: FieldElement
     dim(N::Submodule{T}) where T <: FieldElement
+    rank(N::Submodule{T}) where T <: FieldElement
 
 Return the dimension of the given vector subspace.
 """
 vector_space_dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
-rank(M::Submodule{T}) where T <: FieldElement = vector_space_dim(M)
+rank(N::Submodule{T}) where T <: FieldElement = vector_space_dim(N)
 
 # Generators as elements of supermodule. Used internally.
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}

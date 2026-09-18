@@ -37,12 +37,14 @@ function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
 end
 
 @doc raw"""
+    vector_space_dim(N::QuotientModule{T}) where T <: FieldElement
     dim(N::QuotientModule{T}) where T <: FieldElement
+    rank(N::QuotientModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector quotient space.
 """
 vector_space_dim(N::QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
-rank(M::QuotientModule{T}) where T <: FieldElement = vector_space_dim(M)
+rank(N::QuotientModule{T}) where T <: FieldElement = vector_space_dim(N)
 
 @doc raw"""
     supermodule(M::QuotientModule{T}) where T <: RingElement

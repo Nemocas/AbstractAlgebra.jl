@@ -82,7 +82,7 @@ following functionality.
 ```@docs
 supermodule(M::Generic.QuotientModule{T}) where T <: RingElement
 
-dim(N::Generic.QuotientModule{T}) where T <: FieldElement
+vector_space_dim(N::Generic.QuotientModule{T}) where T <: FieldElement
 ```
 
 **Examples**
