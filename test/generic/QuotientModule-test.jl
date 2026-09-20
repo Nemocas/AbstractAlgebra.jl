@@ -100,7 +100,17 @@ end
         S, _ = sub(F, gens)
         Q, _ = quo(F, S)
         @test rank(Q) == n - dim(S)
+        @test dim(Q) == rank(Q)
+        @test vector_space_dim(Q) == rank(Q)
     end
+
+    # not implemented over non-fields
+    F = free_module(ZZ, 2)
+    S, _ = sub(F, [2 * gen(F, 1)])
+    Q, _ = quo(F, S)
+    @test_throws MethodError rank(Q)
+    @test_throws MethodError dim(Q)
+    @test_throws MethodError vector_space_dim(Q)
 end
 
 @testset "Generic.QuotientModule.manipulation" begin

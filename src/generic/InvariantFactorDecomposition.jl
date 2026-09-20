@@ -32,6 +32,9 @@ end
 
 invariant_factors(N::SNFModule{T}) where T <: RingElement = N.invariant_factors
 
+vector_space_dim(N::SNFModule{T}) where T <: FieldElement = ngens(N)
+rank(N::SNFModule{T}) where T <: FieldElement = vector_space_dim(N)
+
 function rels(N::SNFModule{T}) where T <: RingElement
    T1 = dense_matrix_type(T)
    R = base_ring(N)

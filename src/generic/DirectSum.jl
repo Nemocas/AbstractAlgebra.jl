@@ -20,14 +20,12 @@ base_ring_type(::Type{DirectSumModule{T}}) where T <: RingElement = parent_type(
 
 base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])::base_ring_type(N)
 
-dim(M::DirectSumModule{<:FieldElem}) = sum(dim(x) for x = M.m)
-
 @attr Int number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 
 gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
 rank(M::DirectSumModule{T}) where T = sum(rank, summands(M); init=0)
-vector_space_dim(M::DirectSumModule{<:FieldElem}) = rank(M)
+vector_space_dim(M::DirectSumModule{<:FieldElement}) = sum(vector_space_dim, summands(M); init=0)
 
 function gen(N::DirectSumModule{T}, i::Int) where T <: RingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index is out of range"))

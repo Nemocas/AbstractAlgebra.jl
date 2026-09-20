@@ -113,7 +113,7 @@ end
 
 Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
 
-AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), dim(domain(phi)))
+AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), ngens(domain(phi)))
 
 ################################################################################
 #
