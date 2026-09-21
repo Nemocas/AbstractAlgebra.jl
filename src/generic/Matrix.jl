@@ -59,20 +59,20 @@ function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingEl
    return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
+   return MatSpaceView(view(A.entries, rows, cols), A.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
+   return MatSpaceVecView(view(A.entries, rows, cols), A.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
+   return MatSpaceVecView(view(A.entries, rows, cols), A.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Int, cols::Int) where T <: NCRingElement
-   return MatSpacePointView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Int, cols::Int) where T <: NCRingElement
+   return MatSpacePointView(view(A.entries, rows, cols), A.base_ring)
 end
 
 ################################################################################
@@ -82,12 +82,12 @@ end
 ################################################################################
 
 @doc raw"""
-    is_square(M::MatElem)
+    is_square(A::MatElem)
 
-Return `true` iff the matrix `M` has square shape.
+Return `true` iff the matrix `A` has square shape.
 See also `is_square(a::T)  where {T <: NCRingElement}` which tests whether the given value `a` is a square in its own ring.
 """
-is_square(a::MatElem) = (nrows(a) == ncols(a))
+is_square(A::MatElem) = (nrows(A) == ncols(A))
 
 ###############################################################################
 #
@@ -185,7 +185,7 @@ function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
   return zero(base_ring(K))::T
 end
 
-function Base.setindex!(K::InjProjMat, i::Any, j::Any, val::Any)
+function Base.setindex!(K::InjProjMat, ::NCRingElement, ::Int, ::Int)
   error("InjProjMat is read-only")
 end
 
@@ -216,7 +216,7 @@ function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   end
 end
 
-function *(a::InjProjMat, b::InjProjMat)
+function *(a::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement}
    @assert base_ring(a) === base_ring(b)
    R = base_ring(a)
    @assert ncols(a) == nrows(b)

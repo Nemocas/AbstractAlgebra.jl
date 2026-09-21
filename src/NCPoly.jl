@@ -425,6 +425,29 @@ Return `true` if $x = y$.
     mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
 
 Return $a\times b$ truncated to $n$ terms.
+
+# Examples
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + [2 0; 0 2]*x + [2 0; 0 2]
+
+julia> mullow(f, g, 4)
+(x^2 + x)*y^3 + (x^4 + [3 0; 0 3]*x^2 + [4 0; 0 4]*x + 1)*y^2 + (x^4 + x^3 + [2 0; 0 2]*x^2 + [7 0; 0 7]*x + [5 0; 0 5])*y + [3 0; 0 3]*x^3 + [6 0; 0 6]*x + [6 0; 0 6]
+```
 """
 function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
    check_parent(a, b)

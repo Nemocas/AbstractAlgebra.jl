@@ -472,7 +472,8 @@ end
 
 # TODO: add tests
 
-promote_rule(::Type{L}, ::Type{L}) where {L <: LaurentPolyWrap} = L
+promote_rule(::Type{LaurentPolyWrap{S, T, V}},
+             ::Type{LaurentPolyWrap{S, T, V}}) where {S, T, V} = LaurentPolyWrap{S, T, V}
 
 function promote_rule(::Type{LaurentPolyWrap{S, T, V}}, ::Type{U}) where {S, T, U, V}
    promote_rule(T, U) == T ? LaurentPolyWrap{S, T, V} : Union{}

@@ -452,6 +452,30 @@ zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
 #
 ###############################################################################
 
+@doc raw"""
+    laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+    laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the Laurent series over `R` in the variable `var` of valuation `val`
+whose first `len` coefficients are given by the first `len` entries of `arr`.
+The entry `arr[i]` is the coefficient of `var^(val + (i - 1)*scale)`, so
+consecutive coefficients are `scale` exponents apart. The input must satisfy
+`0 <= len <= length(arr)`, `scale > 0`, and
+`prec >= val + (len - 1)*scale + 1`, where `prec` is the absolute precision.
+The Laurent series parent is created on the fly with maximum relative precision
+`max_precision`. It is a field when `R` is a field and a ring otherwise. Setting
+`cached` to `false` prevents the parent from being cached.
+
+# Examples
+
+```jldoctest
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+```
+"""
 function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
