@@ -36,14 +36,14 @@ import AbstractAlgebra.PrettyPrinting
 
    @test isa(t, Map(Generic.MapWithRetraction))
 
-   u = map_with_section_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
+   u = map_with_section_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
    @test u(ZZ(1)) == 2
 
    @test image(u, ZZ(1)) == 2
    @test preimage(u, ZZ(1)) == 0
 
-   v = map_with_section_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
+   v = map_with_section_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
    @test u(ZZ(1)) == 2
 
@@ -119,7 +119,7 @@ end
 
 @testset "Generic.MapWithInverse.printing" begin
   F = GF(5)
-  u = map_with_section_from_func(x -> F(x + 1), x -> lift(x - 1), ZZ, F)
+  u = map_with_section_from_func(ZZ, F, x -> F(x + 1), x -> lift(x - 1))
   str = """
         Map with section
           from integers
@@ -128,7 +128,7 @@ end
   @test PrettyPrinting.repr_oneline(u) == "Map: integers -> finite field F_5"
   @test PrettyPrinting.repr_terse(u) == "Map with section"
 
-  v = map_with_retraction_from_func(x -> QQ(x + 1), x -> ZZ(x - 1), ZZ, QQ)
+  v = map_with_retraction_from_func(ZZ, QQ, x -> QQ(x + 1), x -> ZZ(x - 1))
   str = """
         Map with retraction
           from integers
