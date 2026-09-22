@@ -621,10 +621,6 @@ function change_coefficient_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, 
   return _map(R, p, parent)
 end
 
-function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where T
-  return change_coefficient_ring(R, p, cached = cached, parent = parent)
-end
-
 ################################################################################
 #
 #  Map
