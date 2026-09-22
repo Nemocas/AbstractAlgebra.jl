@@ -824,9 +824,33 @@ function _merge!(z::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-
     return z
 end
 
+# a = a op b in place
+function _merge!(a::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-)}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    lb == 0 && return a
+    fit!(a, la + lb)
+    for i in la:-1:1
+        a.coeffs[lb + i] = a.coeffs[i]
+        a.exps[lb + i] = a.exps[i]
+    end
+    return _merge!(a, op, a.coeffs, a.exps, lb + 1, la + lb, b)
+end
+
 function add!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return add!(zero(a), a, b)
+    if a === b
+        k = 1
+        for i in 1:a.length
+            s = a.coeffs[i] + a.coeffs[i]
+            iszero(s) && continue
+            a.coeffs[k] = s
+            a.exps[k] = a.exps[i]
+            k += 1
+        end
+        a.length = k - 1
+        return a
+    end
+    return _merge!(a, +, b)
 end
 
 function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
@@ -840,15 +864,18 @@ function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
 end
 
 function sub!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return sub!(zero(a), a, b)
+    if a === b
+        return zero!(a)
+    end
+    return _merge!(a, -, b)
 end
 
 function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     if z === a
         return sub!(z, b)
     elseif z === b
-        return sub!(zero(a), a, b)
+        z = neg!(z)
+        return add!(z, a)
     end
     fit!(z, a.length + b.length)
     return _merge!(z, -, a.coeffs, a.exps, 1, a.length, b)
