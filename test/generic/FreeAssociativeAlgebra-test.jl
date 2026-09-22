@@ -283,6 +283,19 @@ end
    @test f * 1//2 == f * QQ(1//2)
 end
 
+@testset "Generic.FreeAssociativeAlgebra.mutating_ops" begin
+   # coefficients with in-place arithmetic, see #2531
+   R, (s,) = polynomial_ring(QQ, [:s])
+   S, (x, y) = free_associative_algebra(R, [:x, :y])
+   a = x^2 + y
+   b = a + 1
+   b = neg!(b)
+   @test a == x^2 + y
+   b = a + 1
+   b = mul!(b, 3)
+   @test a == x^2 + y
+end
+
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    S, = free_associative_algebra(ZZ, 3)
    ConformanceTests.test_NCRing_interface_recursive(S)
