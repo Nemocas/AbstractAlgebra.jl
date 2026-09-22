@@ -413,8 +413,8 @@ function sort_terms!(z::FreeAssociativeAlgebraElem{T}) where T
     n = length(z)
     if n > 1
         p = sortperm(view(z.exps, 1:n), lt = word_gt)
-        z.coeffs = [z.coeffs[p[i]] for i in 1:n]
-        z.exps = [z.exps[p[i]] for i in 1:n]
+        permute!(view(z.coeffs, 1:n), p)
+        permute!(view(z.exps, 1:n), p)
     end
     return z
 end
@@ -879,6 +879,46 @@ function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     end
     fit!(z, a.length + b.length)
     return _merge!(z, -, a.coeffs, a.exps, 1, a.length, b)
+end
+
+function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    if la == 0 || lb == 0
+        return zero!(z)
+    end
+    n = la * lb
+    fit!(z, n)
+    # An input aliased with z is moved to the tail of z's storage. Product
+    # (i, j) is written to slot (i-1)*lb + j, which reaches the slot of a_i
+    # (or b_j) only at that term's last use.
+    ia = ib = 0
+    if z === a
+        ia = n - la
+        for i in la:-1:1
+            z.coeffs[ia + i] = z.coeffs[i]
+            z.exps[ia + i] = z.exps[i]
+        end
+    end
+    if z === b
+        ib = n - lb
+        if a !== b
+            for j in lb:-1:1
+                z.coeffs[ib + j] = z.coeffs[j]
+                z.exps[ib + j] = z.exps[j]
+            end
+        end
+    end
+    k = 1
+    for i in 1:la, j in 1:lb
+        c = a.coeffs[ia + i] * b.coeffs[ib + j]
+        w = vcat(a.exps[ia + i], b.exps[ib + j])
+        z.coeffs[k] = c
+        z.exps[k] = w
+        k += 1
+    end
+    z.length = n
+    return combine_like_terms!(sort_terms!(z))
 end
 
 function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
