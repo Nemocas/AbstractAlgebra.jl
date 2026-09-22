@@ -764,28 +764,14 @@ function one!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     return a
 end
 
-function neg!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    for i in 1:length(a)
-        a.coeffs[i] = neg!(a.coeffs[i])
-    end
-    return a
-end
-
 function neg!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    if z === a
-        return neg!(a)
-    end
-    z.length = length(a)
     fit!(z, length(a))
     for i in 1:length(a)
-        if isassigned(z.coeffs, i)
-            z.coeffs[i] = neg!(z.coeffs[i], a.coeffs[i])
-        else
-            z.coeffs[i] = -a.coeffs[i]
-        end
-        # mutating z.exps[i] is not allowed since it could be aliased
+        # coefficient objects and words may be shared with other elements, so neither is mutated
+        z.coeffs[i] = -a.coeffs[i]
         z.exps[i] = a.exps[i]
     end
+    z.length = length(a)
     return z
 end
 
@@ -885,29 +871,15 @@ function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     return z
 end
 
-function mul!(a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
-    for i in 1:length(a)
-        a.coeffs[i] = mul!(a.coeffs[i], n)
-    end
-    return a
-end
-
 function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
-    if z === a
-        return mul!(a, n)
-    end
     fit!(z, length(a))
     j = 1
-    for i = 1:length(a)
-        if isassigned(z.coeffs, j)
-            z.coeffs[j] = mul!(z.coeffs[j], a.coeffs[i], n)
-        else
-            z.coeffs[j] = a.coeffs[i] * n
-        end
-        if !iszero(z.coeffs[j])
-            z.exps[j] = a.exps[i]
-            j += 1
-        end
+    for i in 1:length(a)
+        c = a.coeffs[i] * n
+        iszero(c) && continue
+        z.coeffs[j] = c
+        z.exps[j] = a.exps[i]
+        j += 1
     end
     z.length = j - 1
     return z
