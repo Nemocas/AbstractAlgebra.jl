@@ -120,7 +120,8 @@ having to create make instances.
 rand(rng::AbstractRNG, S::PolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
-rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
+rand(S::PolyRing, degs::Union{Int, AbstractUnitRange{Int}}, v...) =
+   rand(Random.default_rng(), S, degs, v...)
 ```
 
 To test whether a random generator is working properly, the `test_rand` function
@@ -140,3 +141,8 @@ random instance to be, e.g. the range of degrees a polynomial could take,
 the range random integers could lie in, etc. The objective is to make it
 easy for the user to control the 'size' of random values in test code.
 
+Give those parameters concrete types, as in the `rand` method above. `Random`
+and `RandomExtensions` both provide methods of the form `rand(X, args...)` with
+`X` untyped -- `rand(X, ::Type{<:Array}, ::Integer...)`, `rand(X, ::Integer,
+::Integer...)` and so on -- so an untyped parameter makes the two sets of
+methods ambiguous for calls such as `rand(R, 3)`.
