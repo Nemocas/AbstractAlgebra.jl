@@ -509,6 +509,8 @@ end
 function *(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
+    sizehint!(zcoeffs, a.length * b.length)
+    sizehint!(zexps, a.length * b.length)
     for i in 1:a.length, j in 1:b.length
         push!(zcoeffs, a.coeffs[i] * b.coeffs[j])
         push!(zexps, vcat(a.exps[i], b.exps[j]))
