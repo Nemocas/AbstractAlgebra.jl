@@ -413,8 +413,8 @@ function sort_terms!(z::FreeAssociativeAlgebraElem{T}) where T
     n = length(z)
     if n > 1
         p = sortperm(view(z.exps, 1:n), lt = word_gt)
-        z.coeffs = [z.coeffs[p[i]] for i in 1:n]
-        z.exps = [z.exps[p[i]] for i in 1:n]
+        permute!(view(z.coeffs, 1:n), p)
+        permute!(view(z.exps, 1:n), p)
     end
     return z
 end
@@ -777,9 +777,80 @@ function neg!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     return z
 end
 
+# z = a op b, where a is given by its coefficients ac[i:n] and words ae[i:n]
+# instead of as an element.
+# ac/ae may be z.coeffs/z.exps themselves (in-place case). Then the caller
+# must first move the a-terms to the tail, i.e. choose i > length(b): the
+# write index k advances at most once per consumed term, so k <= i holds
+# throughout and no unread term is overwritten.
+function _merge!(z::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-)}, ac::Vector{T}, ae::Vector{Vector{Int}}, i::Int, n::Int, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    j = k = 1
+    while i <= n && j <= b.length
+        c = word_cmp(ae[i], b.exps[j])
+        if c < 0
+            z.coeffs[k] = op === (+) ? b.coeffs[j] : -b.coeffs[j]
+            z.exps[k] = b.exps[j]
+            j += 1
+            k += 1
+        elseif c > 0
+            z.coeffs[k] = ac[i]
+            z.exps[k] = ae[i]
+            i += 1
+            k += 1
+        else
+            s = op(ac[i], b.coeffs[j])
+            if !iszero(s)
+                z.coeffs[k] = s
+                z.exps[k] = ae[i]
+                k += 1
+            end
+            i += 1
+            j += 1
+        end
+    end
+    while i <= n
+        z.coeffs[k] = ac[i]
+        z.exps[k] = ae[i]
+        i += 1
+        k += 1
+    end
+    while j <= b.length
+        z.coeffs[k] = op === (+) ? b.coeffs[j] : -b.coeffs[j]
+        z.exps[k] = b.exps[j]
+        j += 1
+        k += 1
+    end
+    z.length = k - 1
+    return z
+end
+
+# a = a op b in place
+function _merge!(a::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-)}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    lb == 0 && return a
+    fit!(a, la + lb)
+    for i in la:-1:1
+        a.coeffs[lb + i] = a.coeffs[i]
+        a.exps[lb + i] = a.exps[i]
+    end
+    return _merge!(a, op, a.coeffs, a.exps, lb + 1, la + lb, b)
+end
+
 function add!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return add!(zero(a), a, b)
+    if a === b
+        k = 1
+        for i in 1:a.length
+            s = a.coeffs[i] + a.coeffs[i]
+            iszero(s) && continue
+            a.coeffs[k] = s
+            a.exps[k] = a.exps[i]
+            k += 1
+        end
+        a.length = k - 1
+        return a
+    end
+    return _merge!(a, +, b)
 end
 
 function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
@@ -788,89 +859,66 @@ function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     elseif z === b
         return add!(z, a)
     end
-    z.coeffs = empty!(z.coeffs)
-    z.exps = empty!(z.exps)
-    i = j = 1
-    while i <= a.length && j <= b.length
-        c = word_cmp(a.exps[i], b.exps[j])
-        if c < 0
-            push!(z.coeffs, b.coeffs[j])
-            push!(z.exps, b.exps[j])
-            j += 1
-        elseif c > 0
-            push!(z.coeffs, a.coeffs[i])
-            push!(z.exps, a.exps[i])
-            i += 1
-        else
-            s = a.coeffs[i] + b.coeffs[j]
-            if !iszero(s)
-                push!(z.coeffs, s)
-                push!(z.exps, a.exps[i])
-            end
-            i += 1
-            j += 1
-        end
-    end
-    while i <= a.length
-        push!(z.coeffs, a.coeffs[i])
-        push!(z.exps, a.exps[i])
-        i += 1
-    end
-    while j <= b.length
-        push!(z.coeffs, b.coeffs[j])
-        push!(z.exps, b.exps[j])
-        j += 1
-    end
-    z.length = length(z.coeffs)
-    return z
+    fit!(z, a.length + b.length)
+    return _merge!(z, +, a.coeffs, a.exps, 1, a.length, b)
 end
 
 function sub!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return sub!(zero(a), a, b)
+    if a === b
+        return zero!(a)
+    end
+    return _merge!(a, -, b)
 end
 
 function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     if z === a
         return sub!(z, b)
     elseif z === b
-        return sub!(zero(a), a, b)
+        z = neg!(z)
+        return add!(z, a)
     end
-    z.coeffs = empty!(z.coeffs)
-    z.exps = empty!(z.exps)
-    i = j = 1
-    while i <= a.length && j <= b.length
-        c = word_cmp(a.exps[i], b.exps[j])
-        if c < 0
-            push!(z.coeffs, -b.coeffs[j])
-            push!(z.exps, b.exps[j])
-            j += 1
-        elseif c > 0
-            push!(z.coeffs, a.coeffs[i])
-            push!(z.exps, a.exps[i])
-            i += 1
-        else
-            s = a.coeffs[i] - b.coeffs[j]
-            if !iszero(s)
-                push!(z.coeffs, s)
-                push!(z.exps, a.exps[i])
-            end
-            i += 1
-            j += 1
+    fit!(z, a.length + b.length)
+    return _merge!(z, -, a.coeffs, a.exps, 1, a.length, b)
+end
+
+function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    if la == 0 || lb == 0
+        return zero!(z)
+    end
+    n = la * lb
+    fit!(z, n)
+    # An input aliased with z is moved to the tail of z's storage. Product
+    # (i, j) is written to slot (i-1)*lb + j, which reaches the slot of a_i
+    # (or b_j) only at that term's last use.
+    ia = ib = 0
+    if z === a
+        ia = n - la
+        for i in la:-1:1
+            z.coeffs[ia + i] = z.coeffs[i]
+            z.exps[ia + i] = z.exps[i]
         end
     end
-    while i <= a.length
-        push!(z.coeffs, a.coeffs[i])
-        push!(z.exps, a.exps[i])
-        i += 1
+    if z === b
+        ib = n - lb
+        if a !== b
+            for j in lb:-1:1
+                z.coeffs[ib + j] = z.coeffs[j]
+                z.exps[ib + j] = z.exps[j]
+            end
+        end
     end
-    while j <= b.length
-        push!(z.coeffs, -b.coeffs[j])
-        push!(z.exps, b.exps[j])
-        j += 1
+    k = 1
+    for i in 1:la, j in 1:lb
+        c = a.coeffs[ia + i] * b.coeffs[ib + j]
+        w = vcat(a.exps[ia + i], b.exps[ib + j])
+        z.coeffs[k] = c
+        z.exps[k] = w
+        k += 1
     end
-    z.length = length(z.coeffs)
-    return z
+    z.length = n
+    return combine_like_terms!(sort_terms!(z))
 end
 
 function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
