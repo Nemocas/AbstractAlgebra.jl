@@ -257,3 +257,50 @@ end
   # @test_throws AbstractAlgebra.rank_interpolation(A)
   # @test_throws AbstractAlgebra.rank_interpolation_mc(A, 0.01)
 end
+
+@testset "hnf_via_popov! doesn't mutate matrix entries" begin
+  R, x = polynomial_ring(QQ, "x")
+
+  A = matrix(R, [x+1 0 0; 0 x+1 0; -1 1 1]); Asaved = deepcopy(A)
+  M = vcat(A, zero_matrix(R, 1, 3))
+
+  # vcat copies references. If we ever stop doing this, this test will fail
+  @test M[1, 1] === A[1, 1]
+
+  AbstractAlgebra.hnf_via_popov!(M, similar(M, 0, 0), false)
+
+  # if hnf_via_popov! mutates matrix elements in place it will mutate
+  #   A (since M contains references to the elements of A)
+  @test A == Asaved
+end
+
+@testset "popov! doesn't mutate matrix entries" begin
+  R, x = polynomial_ring(QQ, "x")
+
+  # Already in weak-Popov form, so only popov! itself does actual work
+  A = matrix(R, [x^3 x^2; R(1) x]);  Asaved = deepcopy(A)
+  M = vcat(A, zero_matrix(R, 1, 2))
+
+  # vcat copies references. If we ever stop doing this, this test will fail
+  @test M[1, 1] === A[1, 1]
+
+  # if popov! mutates matrix elements in place it will mutate A
+  #   (since M contains references to the elements of A)
+  AbstractAlgebra.popov!(M, similar(M, 0, 0), false)
+  @test A == Asaved
+end
+
+@testset "hnf_cohen! doesn't mutate matrix entries" begin
+  R, x = polynomial_ring(QQ, "x")
+
+  A = matrix(R, [x x; R(0) R(1)]); Asaved = deepcopy(A)
+  M = vcat(A, zero_matrix(R, 1, 2))
+
+  # vcat copies references. If we ever stop doing this, this test will fail
+  @test M[1, 1] === A[1, 1]
+
+  # if hnf_cohen! mutates matrix elements in place it will mutate A
+  #   (since M contains references to the elements of A)
+  AbstractAlgebra.hnf_cohen!(M, identity_matrix(R, nrows(M)))
+  @test A == Asaved
+end
