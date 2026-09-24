@@ -666,17 +666,10 @@ function show(io::IO, mime::MIME"text/plain", p::MPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Multivariate polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(p))
   print(io, Dedent())
