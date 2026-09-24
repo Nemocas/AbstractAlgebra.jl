@@ -14,9 +14,11 @@ module MyMapMod
    (f::MyMap)(x) =  a(f)*(x + 1)
 end
 
+# Generic.FunctionalMap is being deprecated,
+# but we should still test it
 @testset "Generic.Map.FunctionalMap" begin
-   f = map_from_func(x -> x + 1, ZZ, ZZ)
-   g = map_from_func(x -> QQ(x), ZZ, QQ)
+   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+   g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
 
    @test isa(f, Map(FunctionalMap))
    @test isa(g, Map(FunctionalMap))
@@ -34,8 +36,8 @@ end
 end
 
 @testset "Generic.Map.FunctionalCompositeMap" begin
-   f = map_from_func(x -> x + 1, ZZ, ZZ)
-   g = map_from_func(x -> QQ(x), ZZ, QQ)
+   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+   g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
 
    h = compose(f, g)
 
@@ -60,7 +62,7 @@ end
 end
 
 @testset "Generic.Map.CompositeMap" begin
-   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
 
    s = MyMapMod.MyMap(2)
 
@@ -88,7 +90,7 @@ end
 end
 
 @testset "Generic.Map.IdentityMap" begin
-   f = map_from_func(x -> QQ(x + 1), ZZ, QQ)
+   f = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x + 1))
    g = identity_map(ZZ)
    h = identity_map(QQ)
 
@@ -126,7 +128,7 @@ end
   @test PrettyPrinting.repr_oneline(id) == "Identity map of integers"
   @test PrettyPrinting.repr_terse(id) == "Identity map"
 
-  u = map_from_func(x -> QQ(x + 1), ZZ, QQ)
+  u = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x + 1))
   str = """
         Map defined by a Julia function
           from integers
@@ -135,8 +137,8 @@ end
   @test PrettyPrinting.repr_oneline(u) == "Map: integers -> rationals"
   @test PrettyPrinting.repr_terse(u) == "Map defined by a Julia function"
 
-  f = map_from_func(x -> x + 1, ZZ, ZZ)
-  g = map_from_func(x -> QQ(x), ZZ, QQ)
+  f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
+  g = Generic.FunctionalMap(ZZ, QQ, x -> QQ(x))
   v = compose(f, g)
   str = """
         Functional composite map
@@ -149,7 +151,7 @@ end
   @test PrettyPrinting.repr_oneline(v) == "Map: integers -> integers -> rationals"
   @test PrettyPrinting.repr_terse(v) == "Functional composite map"
 
-  f = map_from_func(x -> x + 1, ZZ, ZZ)
+  f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
   s = MyMapMod.MyMap(2)
   t = compose(f, s)
   str = """
@@ -170,7 +172,7 @@ end
    @test id.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(1), ZZ(2), ZZ(3)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> id == [ZZ(1), ZZ(2), ZZ(3)]
 
-   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   f = Generic.FunctionalMap(ZZ, ZZ, x -> x + 1)
    @test f.([ZZ(1), ZZ(2), ZZ(3)]) == [ZZ(2), ZZ(3), ZZ(4)]
    @test [ZZ(1), ZZ(2), ZZ(3)] .|> f == [ZZ(2), ZZ(3), ZZ(4)]
 
