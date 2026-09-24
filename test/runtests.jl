@@ -1,6 +1,7 @@
 using AbstractAlgebra
 
 using Test
+using SparseArrays  # loads the SparseArraysExt extension
 
 
 # disable until we encounter GC problems again
