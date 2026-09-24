@@ -1,5 +1,3 @@
-using REPL # needed due to https://github.com/JuliaLang/julia/issues/53349
-
 module Bla
     using AbstractAlgebra
     const sfsdf = 1
