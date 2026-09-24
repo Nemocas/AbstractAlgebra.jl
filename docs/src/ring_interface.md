@@ -558,6 +558,9 @@ to types. It is the coercions themselves that must deal with the mathematical
 situation at the level of rings, including checking that the object can even
 be coerced into the given ring.
 
+Note that `AbstractAlgebra.promote_rule` is a separate function from
+`Base.promote_rule` and is the one that must be extended.
+
 We now describe the required AbstractAlgebra type promotion rules.
 
 For every ring, one wants to be able to coerce integers into the ring. And for
@@ -968,10 +971,10 @@ rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.default_rng(), R
 
 # Promotion rules
 
-promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
+AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
 
-function promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? ConstPoly{T} : Union{}
+function AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   AbstractAlgebra.promote_rule(T, U) == T ? ConstPoly{T} : Union{}
 end
 
 # Constructors
