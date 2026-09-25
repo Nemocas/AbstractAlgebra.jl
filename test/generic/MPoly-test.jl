@@ -104,6 +104,13 @@
 
    @test q == 5x^5*y^5
 
+   @test term(R1, 2, [3, 4]) == 2*x^3*y^4
+   @test term(R1, QQ(2), [3, 4]) == 2*x^3*y^4
+
+   @test monomial(R1, [1, 2]) == x*y^2
+   @test monomial(R1, [2, 2]) == x^2*y^2
+   @test monomial(R1, [0, 2]) == y^2
+
    # test "getindex" syntax
    S, (y, z) = R["y", "z"]
    @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
