@@ -555,6 +555,24 @@ function monomial!(m::T, a::T, i::Int) where {T <: MPolyRingElem}
    return monomial(a, i)
 end
 
+@doc raw"""
+    term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+
+Return the term in `R` corresponding to the given exponent vector with coefficient `c`.
+"""
+function term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+   M = Generic.MPolyBuildCtx(R)
+   push_term!(M, c, exps)
+   return finish(M)
+end
+
+@doc raw"""
+    monomial(R::MPolyRing, exps::Vector{Int})
+
+Return the monomial in `R` corresponding to the given exponent vector.
+"""
+monomial(R::MPolyRing, exps::Vector{Int}) = term(R, one(coefficient_ring(R)), exps)
+
 ###############################################################################
 #
 #   Iterators
