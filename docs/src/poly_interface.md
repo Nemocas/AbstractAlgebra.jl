@@ -205,18 +205,9 @@ Note that this function is not required to normalise the polynomial and is not
 necessarily useful to the user, but is used extensively by the generic functionality in
 AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
-```julia
-normalise(f::MyPoly{T}, n::Int) where T <: RingElem
+```@docs
+normalise(::PolynomialElem, ::Int)
 ```
-
-Return the length of $f$ after discarding its coefficients of degree $n$ or more and then
-any leading zeros, i.e. the largest $m \le n$ such that the coefficient of degree $m - 1$
-is nonzero, or $0$ if there is no such $m$. The polynomial must have space for at least
-$n$ coefficients; it is not modified.
-
-A default implementation based on `coeff` is provided. Implement this function only if
-that is too slow, or if code for your type stores coefficients that `coeff` does not
-return (e.g. past the current length) before calling `normalise`.
 
 ```julia
 fit!(f::MyPoly{T}, n::Int) where T <: RingElem
