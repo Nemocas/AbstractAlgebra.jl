@@ -152,3 +152,16 @@ function ordinal_number_string(number::Int)
         return "$(number)th"
     end
 end
+
+# Print `syms` separated by commas, replacing the entries from position
+# `max_vars` up to the second to last by "..." if that shortens the output.
+function print_abbreviated_list(io::IO, syms::AbstractVector, max_vars::Int = 5)
+  n = length(syms)
+  # omitting a single entry only pays off if it is wider than "..."
+  if n > max_vars + 1 || (n == max_vars + 1 && textwidth(string(syms[max_vars])) > 3)
+    join(io, @view(syms[1:max_vars - 1]), ", ")
+    print(io, ", ..., ", syms[n])
+  else
+    join(io, syms, ", ")
+  end
+end

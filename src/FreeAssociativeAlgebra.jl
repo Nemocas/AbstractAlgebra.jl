@@ -73,17 +73,10 @@ function show(io::IO, mime::MIME"text/plain", a::FreeAssociativeAlgebra)
   @show_name(io, a)
   @show_special(io, mime, a)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(a)
   print(io, "Free associative algebra")
   print(io, " on ", ItemQuantity(nvars(a), "indeterminate"), " ")
-  if n > max_vars
-    join(io, symbols(a)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(a)[n])
-  else
-    join(io, symbols(a), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(a))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(a))
   print(io, Dedent())
