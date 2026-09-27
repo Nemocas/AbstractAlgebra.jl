@@ -210,6 +210,7 @@ import ..AbstractAlgebra: mul_karatsuba
 import ..AbstractAlgebra: mullow
 import ..AbstractAlgebra: mutable_copy
 import ..AbstractAlgebra: neg!
+import ..AbstractAlgebra: normalise
 import ..AbstractAlgebra: number_of_columns
 import ..AbstractAlgebra: number_of_generators
 import ..AbstractAlgebra: number_of_rows

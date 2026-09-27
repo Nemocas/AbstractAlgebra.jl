@@ -372,6 +372,13 @@ end
 
    @test length(h) == 3
 
+   # normalise returns a length and ignores coefficients of degree >= n
+   k = x^3 + 2x
+   for (n, len) in [(4, 4), (3, 2), (2, 2), (1, 0), (0, 0)]
+      @test normalise(k, n) == len
+      @test invoke(normalise, Tuple{PolynomialElem, Int}, k, n) == len
+   end
+
    @test canonical_unit(-x*y + x + 1) == -1
 
    @test deepcopy(h) == h

@@ -58,17 +58,6 @@ function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: Integer
    return c
 end
 
-@doc raw"""
-    normalise(f::PolynomialElem, n::Int)
-    normalise(f::SeriesElem, n::Int)
-
-Given `f` whose underlying polynomial has length at most `n`, including any
-leading zero coefficients, return the length that polynomial has once those
-are discarded. The polynomial itself is not modified.
-
-This function is part of the internal interface for polynomials and series;
-user code should normally not need to invoke it.
-"""
 function normalise(a::Poly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
       n -= 1
