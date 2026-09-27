@@ -45,7 +45,7 @@ AbstractAlgebra.jl.
 
 In parentheses we put the types of the corresponding parent objects.
 
-  - `Perm{<:Integer}` (`SymmetricGroup{<:Integer}`)
+  - `Perm{<:Integer}` (`Generic.SymmetricGroup{<:Integer}`)
   - `GFElem{<:Integer}` (`GFField{<:Integer}`)
 
 We also think of various Julia types as though they were AbstractAlgebra.jl types:
@@ -65,4 +65,4 @@ are defined over.
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
   - `Generic.EuclideanRingResidueRingElem{T}` (`Generic.EuclideanRingResidueRing{T}`)
   - `Generic.FracFieldElem{T}` (`Generic.FracField{T}`)
-  - `Generic.Mat{T}` (`MatSpace{T}`)
+  - `Generic.MatSpaceElem{T}` (`MatSpace{T}`)
