@@ -762,7 +762,7 @@ function rank_interpolation_mc(A::MatrixElem{<: RationalFunctionFieldElem}, err:
    #Then M can be considered as a matrix over some polynomial ring.
    for i = 1:n
       for j = 1:m
-         if is_one(denominator(B[i, j]))
+         if !is_one(denominator(B[i, j]))
             if n < m
                multiply_column!(B, denominator(B[i, j]), j)
             else

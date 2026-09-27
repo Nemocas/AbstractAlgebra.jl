@@ -272,6 +272,11 @@ end
   @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 0; x 0])) == 1
   @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 x; 0 0; 0 0])) == 1
 
+  # clearing denominators gives [1 z; 1 z], which has rank 1 at every point,
+  # so the Monte Carlo result is exact
+  C = matrix(Qz, [1//z 1; 1 z])
+  @test AbstractAlgebra.rank_interpolation_mc(C, 0.01) == 1
+
   # A = rand(matrix_space(Fx, 10, 10), 0:5)
   # @test_throws AbstractAlgebra.rank_interpolation(A)
   # @test_throws AbstractAlgebra.rank_interpolation_mc(A, 0.01)
