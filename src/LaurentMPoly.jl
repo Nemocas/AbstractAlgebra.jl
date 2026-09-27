@@ -26,6 +26,9 @@ is_known(::typeof(is_finite), R::LaurentMPolyRing) =
   is_known(is_trivial, coefficient_ring(R)) &&
     (is_trivial(coefficient_ring(R)) || nvars(R) > 0 || is_known(is_finite, coefficient_ring(R)))
 
+is_domain_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_domain_type(T)
+is_exact_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_exact_type(T)
+
 ###############################################################################
 #
 #   String I/O

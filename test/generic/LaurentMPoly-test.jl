@@ -13,6 +13,9 @@ end
     @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
     @test is_domain_type(L)
+    @test is_domain_type(elem_type(L))
+    @test is_exact_type(elem_type(L))
+    @test !is_exact_type(elem_type(laurent_polynomial_ring(RealField, ["a"])[1]))
     @test !is_univariate(L)
     @test is_univariate(laurent_polynomial_ring(GF(5), ["x"])[1])
 
