@@ -277,6 +277,12 @@ end
   C = matrix(Qz, [1//z 1; 1 z])
   @test AbstractAlgebra.rank_interpolation_mc(C, 0.01) == 1
 
+  # Schwartz-Zippel needs the total degree of the minors, not the degree in
+  # each variable. 2000 runs with err = 0.01 expect 19 wrong ranks, 147 with
+  # the per-variable bound; P(>= 60 wrong) < 1e-13.
+  M = matrix(Qy, 1, 1, [y[1]*y[2]*y[3]])
+  @test count(_ -> AbstractAlgebra.rank_interpolation_mc(M, 0.01) != 1, 1:2000) < 60
+
   # A = rand(matrix_space(Fx, 10, 10), 0:5)
   # @test_throws AbstractAlgebra.rank_interpolation(A)
   # @test_throws AbstractAlgebra.rank_interpolation_mc(A, 0.01)
