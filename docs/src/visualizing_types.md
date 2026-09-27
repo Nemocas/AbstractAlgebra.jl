@@ -9,8 +9,7 @@ AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 
 ## Abstract parents
 
-The following diagram shows a complete list of all abstract types in
-AbstractAlgebra.jl.
+The following diagram shows all abstract parent types of AbstractAlgebra.jl.
 
 ```@raw html
 <img src="../assets/parents_diagram.svg" alt="Diagram of parent types"/>
@@ -24,8 +23,9 @@ AbstractAlgebra.jl.
 ```
 ## Abstract elements
 
-Similarly the following diagram shows a complete list of all abstract types in
-AbstractAlgebra.jl.
+Similarly the following diagram shows all abstract element types. `SetMap` and
+its subtypes form a hierarchy of their own: they are not elements, but serve as
+the third parameter `S` of `Map{D, C, S, T}`, which the dashed line indicates.
 
 ```@raw html
 <img src="../assets/elements_diagram.svg" alt="Diagram of element types"/>
