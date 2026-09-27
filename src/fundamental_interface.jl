@@ -13,7 +13,7 @@
 @doc raw"""
     parent(a)
 
-Return parent object of given element $a$.
+Return the parent object of the given element `a`.
 
 # Examples
 ```jldoctest
@@ -33,10 +33,11 @@ true
 function parent end
 
 @doc raw"""
-    elem_type(parent)
-    elem_type(parent_type)
+    elem_type(T::Type) -> Type
+    elem_type(x) -> Type
 
-Given a parent object (or its type), return the type of its elements.
+Return the type of the elements of the parent `x`, resp. of parents of type
+`T`. This is the counterpart to [`parent_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -52,10 +53,11 @@ elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 elem_type(T::Type{Union{}}) = throw(MethodError(elem_type, (T,)))
 
 @doc raw"""
-    parent_type(element)
-    parent_type(element_type)
+    parent_type(T::Type) -> Type
+    parent_type(x) -> Type
 
-Given an element (or its type), return the type of its parent object.
+Return the type of the parent of the element `x`, resp. of elements of type
+`T`. This is the counterpart to [`elem_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -79,7 +81,10 @@ parent_type(T::Type{Union{}}) = throw(MethodError(parent_type, (T,)))
 @doc raw"""
     base_ring(a)
 
-Return the internal base ring of the given element or parent $a$.
+Return the base ring of the given element or parent `a`. For generic
+constructions over a base ring, e.g. polynomials over a coefficient ring, this
+is the parent object of that ring. Not every parent has a base ring; in that
+case a `MethodError` is raised.
 
 # Examples
 ```jldoctest
@@ -103,7 +108,8 @@ base_ring(x::NCRingElement) = base_ring(parent(x))
 @doc raw"""
     base_ring_type(a)
 
-Return the type of the internal base ring of the given element, element type, parent or parent type $a$.
+Return the type of the [`base_ring`](@ref) of the given element, element type,
+parent or parent type `a`. If there is no base ring, `Union{}` is returned.
 
 # Examples
 ```jldoctest

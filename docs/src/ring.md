@@ -33,28 +33,13 @@ RingElement <: NCRingElement
 
 ## Functions for types and parents of rings
 
-```julia
-parent_type(::Type{T}) where T <: NCRingElement
-elem_type(::Type{T}) where T <: NCRing
+```@docs; canonical=false
+parent
+parent_type
+elem_type
+base_ring
+base_ring_type
 ```
-
-Return the type of the parent (resp. element) type corresponding to the given
-ring element (resp. parent) type.
-
-```julia
-base_ring(R::NCRing)
-base_ring(a::NCRingElement)
-```
-
-For generic ring constructions over a base ring (e.g. polynomials over a
-coefficient ring), return the parent object of that base ring.
-
-
-```julia
-parent(a::NCRingElement)
-```
-
-Return the parent of the given ring element.
 
 ```@docs
 is_domain_type
