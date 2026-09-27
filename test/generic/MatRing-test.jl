@@ -486,6 +486,17 @@ end
 
    @test divexact_right(M*N, N) == M
    @test divexact_left(N*M, N) == M
+
+   # not implemented over a noncommutative base ring
+   R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+   S = matrix_ring(R, 2)
+   M = S([x y; y x])
+   N = S([x one(R); zero(R) y])
+
+   @test_throws NotImplementedError divexact_right(M*N, N)
+   @test_throws NotImplementedError divexact_left(N*M, N)
+   @test_throws NotImplementedError (M*N) / N
+   @test_throws NotImplementedError N \ (N*M)
 end
 
 @testset "Generic.MatRing.adhoc_exact_division" begin

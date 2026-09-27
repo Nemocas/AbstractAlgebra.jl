@@ -174,7 +174,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                      @test equality(b*t, b*a)
                      t = b \ (b*a)
                      @test equality(b*t, b*a)
-                  catch
+                  catch e
+                     # division may fail in many ways, but not by recursing forever
+                     e isa StackOverflowError && rethrow()
                   end
                   try
                      t = divexact_right(a*b, b)
@@ -185,7 +187,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                      @test equality(t*b, a*b)
                      t = (a*b) / b
                      @test equality(t*b, a*b)
-                  catch
+                  catch e
+                     e isa StackOverflowError && rethrow()
                   end
                end
                @test A == a
@@ -262,7 +265,8 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                      t = (b*a) / b
                      @test equality(t*b, a*b)
                   end
-               catch
+               catch e
+                  e isa StackOverflowError && rethrow()
                end
             end
             try
