@@ -97,6 +97,20 @@ series ring.
 max_precision(R::SeriesRing) = R.prec_max
 
 @doc raw"""
+    normalise(f::SeriesElem, n::Int)
+
+Return the length the polynomial underlying `f` would have if its terms of
+degree `n` and higher were removed: the largest `m <= n` such that its
+coefficient of degree `m - 1` is nonzero, or `0` if there is none. `f` itself
+is not modified. Callers guarantee that the underlying polynomial has space for
+at least `n` coefficients.
+
+This function is part of the internal interface for series; user code should
+normally not need to invoke it.
+"""
+normalise(f::SeriesElem, n::Int)
+
+@doc raw"""
     set_length!(f::PolynomialElem, n::Int)
     set_length!(f::SeriesElem, n::Int)
 

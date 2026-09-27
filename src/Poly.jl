@@ -96,16 +96,22 @@ degree(a::PolynomialElem) = length(a) - 1
 
 @doc raw"""
     normalise(f::PolynomialElem, n::Int)
-    normalise(f::SeriesElem, n::Int)
 
-Return the length of the polynomial underlying `f` after discarding its
-coefficients of degree `n` or more and then any leading zeros. That is, return
-the largest `m <= n` such that the coefficient of degree `m - 1` is nonzero, or
-`0` if there is no such `m`. The polynomial must have space for at least `n`
-coefficients; it is not modified.
+Return the length `f` would have if its terms of degree `n` and higher were
+removed: the largest `m <= n` such that the coefficient of degree `m - 1` is
+nonzero, or `0` if there is none. `f` itself is not modified.
 
-This function is part of the internal interface for polynomials and series;
-user code should normally not need to invoke it.
+Generic code sets the coefficients of a polynomial with `setcoeff!`, which need
+not normalise it, and then calls `set_length!(f, normalise(f, n))`. It
+guarantees that `f` has space for at least `n` coefficients, so a method may
+read them directly from its internal storage.
+
+The default method uses `coeff`. A type needs its own method only if that is
+too slow, or if its code writes coefficients past the current length, where
+`coeff` does not see them, before calling `normalise`.
+
+This function is part of the internal interface for polynomials; user code
+should normally not need to invoke it.
 """
 function normalise(a::PolynomialElem, n::Int)
    while n > 0 && iszero(coeff(a, n - 1))
