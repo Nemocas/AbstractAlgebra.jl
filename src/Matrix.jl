@@ -3389,10 +3389,11 @@ function rank_interpolation(A::MatElem{T}) where {T <: PolyRingElem}
    K = base_ring(Kx)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    min_ = min(n, m)
+   #A zero row or column has degree -1 but lies in no nonzero minor, so it contributes 0.
    if (min_ == n)
-      maxdetdeg = sum(maximum(degree(A[i, j]) for j in 1:m) for i in 1:n)
+      maxdetdeg = sum(maximum(degree(A[i, j]) for j in 1:m; init = 0) for i in 1:n)
    else 
-      maxdetdeg = sum(maximum(degree(A[i, j]) for i in 1:n) for j in 1:m)
+      maxdetdeg = sum(maximum(degree(A[i, j]) for i in 1:n; init = 0) for j in 1:m)
    end
    r = 0
    eval_set = evaluation_points(K, maxdetdeg+1)
@@ -3433,9 +3434,9 @@ function rank_interpolation(A::MatElem{T}) where {T <: MPolyRingElem}
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    min_ = min(n, m)
    if min_ == n
-      maxdetdeg = [sum(maximum(degree(A[i, j], k) for j in 1:m) for i in 1:n) for k in 1:num_vars]
+      maxdetdeg = [sum(maximum(degree(A[i, j], k) for j in 1:m; init = 0) for i in 1:n) for k in 1:num_vars]
    else
-      maxdetdeg = [sum(maximum(degree(A[i, j], k) for i in 1:n) for j in 1:m) for k in 1:num_vars] 
+      maxdetdeg = [sum(maximum(degree(A[i, j], k) for i in 1:n; init = 0) for j in 1:m) for k in 1:num_vars]
    end
    r = 0
    eval_set = Vector{Vector{elem_type(K)}}(undef, num_vars)
@@ -3501,8 +3502,9 @@ function rank_interpolation_mc(A::MatElem{T}, err::Float64) where {T <: PolyRing
    K = base_ring(Kx)
    min_ = min(n, m)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
-   maxdetdeg = min_*maximum(degree(A[i, j]) for i in 1:n, j in 1:n)
-   S = evaluation_points(K, 10*maxdetdeg)
+   maxdetdeg = min_*maximum(degree(A[i, j]) for i in 1:n, j in 1:m)
+   #A constant matrix needs a single evaluation point.
+   S = evaluation_points(K, max(10*maxdetdeg, 1))
    #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
    k = ceil(Base.log(10, 1/err))
    r = 0
@@ -3544,7 +3546,7 @@ function rank_interpolation_mc(A::MatElem{T}, err::Float64) where {T <: MPolyRin
    min_ = min(n, m)
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    maxdetdeg = min_*maximum(degree(A[i, j], k) for i in 1:n, j in 1:m, k in 1:num_vars)
-   S = evaluation_points(K, 10*maxdetdeg)
+   S = evaluation_points(K, max(10*maxdetdeg, 1))
    #k is the minimum amount of evaluations of M needed to compute the correct rank of M with error probability < err
    k = ceil(Base.log(10, 1/err))
    r = 0

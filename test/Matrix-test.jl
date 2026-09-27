@@ -253,6 +253,24 @@ end
   @test rank(C) == AbstractAlgebra.rank_interpolation(C)
   @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C, 0.01)
 
+  # zero rows and columns; every evaluation has rank r, so mc is exact
+  for (M, r) in [(zero_matrix(Fx, 2, 2), 0),
+                 (matrix(Fx, [0 0; 1 2]), 1),
+                 (matrix(Fx, [0 0; x 1]), 1),
+                 (matrix(Fx, [1 x; 0 1; 0 0]), 2),
+                 (zero_matrix(Qy, 2, 2), 0),
+                 (matrix(Qy, [0 0; 1 2]), 1),
+                 (matrix(Qy, [0 0; y[1] 1]), 1),
+                 (zero_matrix(Qz, 2, 2), 0),
+                 (matrix(Qz, [0 0; 1 2]), 1)]
+    @test AbstractAlgebra.rank_interpolation(M) == r
+    @test AbstractAlgebra.rank_interpolation_mc(M, 0.01) == r
+  end
+
+  # x vanishes at the first evaluation point
+  @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 0; x 0])) == 1
+  @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 x; 0 0; 0 0])) == 1
+
   # A = rand(matrix_space(Fx, 10, 10), 0:5)
   # @test_throws AbstractAlgebra.rank_interpolation(A)
   # @test_throws AbstractAlgebra.rank_interpolation_mc(A, 0.01)
