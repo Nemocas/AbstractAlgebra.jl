@@ -246,7 +246,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                @test iszero(b) || equality(divexact(b*a, b), a)
                @test iszero(b) || equality(divexact(b*a, b, check = true), a)
                @test iszero(b) || equality(divexact(b*a, b, check = false), a)
-               if T isa RingElem
+               if T <: RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
                iszero(b) || test_mutating_op_like_add(divexact, divexact!, b*a, b)
@@ -258,7 +258,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                   @test equality(t*b, a*b)
                   t = divexact(b*a, b, check = false)
                   @test equality(t*b, a*b)
-                  if T isa RingElem
+                  if T <: RingElem
                      t = (b*a) / b
                      @test equality(t*b, a*b)
                   end
