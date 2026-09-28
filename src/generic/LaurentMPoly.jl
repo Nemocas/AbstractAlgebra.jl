@@ -426,6 +426,18 @@ function coefficients(a::LaurentMPolyWrap)
     return coefficients(a.mpoly)
 end
 
+function trailing_coefficient(a::LaurentMPolyWrap)
+    return trailing_coefficient(a.mpoly)
+end
+
+content(a::LaurentMPolyWrap) = content(a.mpoly)
+
+# the monomial ordering is invariant under multiplication by a monomial, so
+# the terms of a.mpoly are in the same order as those of a
+tail(a::LaurentMPolyWrap) = LaurentMPolyWrap(parent(a), tail(a.mpoly), copy(a.mindegs))
+
+is_homogeneous(a::LaurentMPolyWrap) = is_homogeneous(a.mpoly)
+
 function constant_coefficient(a::LaurentMPolyWrap)
     e = -a.mindegs
     any(x -> x < 0, e) && return zero(coefficient_ring(parent(a)))
@@ -682,6 +694,64 @@ function inflate(f::LaurentMPolyWrap, vars::Vector{Int}, shifts::Vector{Int}, de
       mindegs[var] += shift
    end
    return LaurentMPolyWrap(parent(f), inflate(f.mpoly, vars, zeros(Int, length(shifts)), defls), mindegs)
+end
+
+function deflation(f::LaurentMPolyWrap)
+   shift, defl = deflation(f.mpoly)
+   iszero(f) && return shift, defl
+   return shift .+ f.mindegs, defl
+end
+
+function deflate(f::LaurentMPolyWrap, shift::Vector{Int}, defl::Vector{Int})
+   defl = [iszero(d) ? 1 : d for d in defl]
+   B = MPolyBuildCtx(parent(f))
+   for (c, e) in zip(coefficients(f), exponent_vectors(f))
+      push_term!(B, c, div.(e .- shift, defl))
+   end
+   return finish(B)
+end
+
+deflate(f::LaurentMPolyWrap, defl::Vector{Int}) = deflate(f, zeros(Int, length(defl)), defl)
+
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+# Over a domain, a square s^2 with s = m*r for a monomial m and a polynomial r
+# not divisible by any variable normalizes to m^2 and r^2.
+function is_square_with_sqrt(a::LaurentMPolyWrap)
+   R = parent(a)
+   iszero(a) && return true, zero(R)
+   ap, ad = _normalize(a)
+   all(iseven, ad) || return false, zero(R)
+   flag, r = is_square_with_sqrt(ap)
+   flag || return false, zero(R)
+   return true, LaurentMPolyWrap(R, r, div.(ad, 2))
+end
+
+is_square(a::LaurentMPolyWrap) = is_square_with_sqrt(a)[1]
+
+function Base.sqrt(a::LaurentMPolyWrap; check::Bool = true)
+   flag, q = is_square_with_sqrt(a)
+   check && !flag && error("Not a square in square root")
+   return q
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function Base.isless(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+   check_parent(a, b)
+   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
+   # shift both to polynomials; the monomial ordering is invariant under this
+   m = min.(a.mindegs, b.mindegs)
+   return isless(_divexact_by_exponent_vector(a.mpoly, m .- a.mindegs),
+                 _divexact_by_exponent_vector(b.mpoly, m .- b.mindegs))
 end
 
 ###############################################################################
