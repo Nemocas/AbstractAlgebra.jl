@@ -12,7 +12,20 @@
 
 domain(f::CompositeMap{D, C}) where {D, C} = domain(f.map1)::D
 codomain(f::CompositeMap{D, C}) where {D, C} = codomain(f.map2)::C
+@doc raw"""
+    map1(f::Map)
+
+Return the first of the two maps a composite map was built from, i.e. the one
+applied first. See also [`map2`](@ref).
+"""
 map1(f::CompositeMap) = f.map1
+
+@doc raw"""
+    map2(f::Map)
+
+Return the second of the two maps a composite map was built from, i.e. the one
+applied last. See also [`map1`](@ref).
+"""
 map2(f::CompositeMap) = f.map2
 
 function (f::CompositeMap{D, C})(a) where {D, C}
@@ -100,7 +113,7 @@ end
 
 Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
 
-AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), dim(domain(phi)))
+AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), ngens(domain(phi)))
 
 ################################################################################
 #

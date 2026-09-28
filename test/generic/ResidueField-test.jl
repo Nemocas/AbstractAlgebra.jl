@@ -85,6 +85,14 @@ end
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
+
+   # Carrying no sampling specification, `rand(R)` and `rand(R, dims...)` keep
+   # their `Base` meaning and must not be forwarded to the base ring: they ask
+   # `R` itself for a `Random.Sampler` (which AbstractAlgebra does not provide).
+   @test make(R) isa RandomExtensions.MakeWrap
+   @test which(rand, Tuple{typeof(R), Int}) isa Method       # i.e. unambiguous
+   @test which(rand, Tuple{typeof(R), Int, Int}) isa Method
+   @test which(rand, Tuple{typeof(R), Tuple{Int, Int}}) isa Method
 end
 
 @testset "EuclideanRingResidueFieldElem.manipulation" begin

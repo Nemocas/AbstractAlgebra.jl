@@ -44,6 +44,7 @@ import Base: isequal
 import Base: isless
 import Base: isone
 import Base: iszero
+import Base: iterate
 import Base: lcm
 import Base: length
 import Base: mod

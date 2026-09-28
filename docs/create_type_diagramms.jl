@@ -104,10 +104,18 @@ hide circle
 """
 
 
-open(joinpath(@__DIR__, "src", "parents_diagram.svg"), "w") do io
+open(joinpath(@__DIR__, "src", "assets", "parents_diagram.svg"), "w") do io
   write(io, sprint(show, "image/svg+xml", parents))
 end
 
-open(joinpath(@__DIR__, "src", "elements_diagram.svg"), "w") do io
+open(joinpath(@__DIR__, "src", "assets", "elements_diagram.svg"), "w") do io
   write(io, sprint(show, "image/svg+xml", elements))
+end
+
+open(joinpath(@__DIR__, "src", "assets", "parents_diagram.pdf"), "w") do io
+  write(io, sprint(show, "application/pdf", parents))
+end
+
+open(joinpath(@__DIR__, "src", "assets", "elements_diagram.pdf"), "w") do io
+  write(io, sprint(show, "application/pdf", elements))
 end

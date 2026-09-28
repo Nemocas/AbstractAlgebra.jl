@@ -596,13 +596,11 @@ end
 
    function EuclideanRingResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
-      if !isone(c)
-        modulus = divexact(modulus, c)
-      end
-      R = parent(modulus)
+      m = isone(c) ? modulus : divexact(modulus, c)
+      R = parent(m)
 
-      return get_cached!(ModulusDict, (R, modulus), cached) do
-         new{T}(R, modulus)
+      return get_cached!(ModulusDict, (R, m), cached) do
+         new{T}(R, m)
       end::EuclideanRingResidueRing{T}
    end
 end
@@ -628,12 +626,10 @@ end
 
    function EuclideanRingResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
-      if !isone(c)
-        modulus = divexact(modulus, c)
-      end
-      R = parent(modulus)
-      return get_cached!(ModulusFieldDict, (R, modulus), cached) do
-         new{T}(R, modulus)
+      m = isone(c) ? modulus : divexact(modulus, c)
+      R = parent(m)
+      return get_cached!(ModulusFieldDict, (R, m), cached) do
+         new{T}(R, m)
       end::EuclideanRingResidueField{T}
    end
 end

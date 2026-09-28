@@ -1359,6 +1359,45 @@ function traces_precompute(pol::Poly{W}, d::W) where {T <: FieldElement, W <: Po
    return P, Pden
 end
 
+@doc raw"""
+    function_field(p::PolyRingElem{<:RationalFunctionFieldElem}, s::VarName; cached::Bool=true)
+
+Given an irreducible polynomial `p` over a rational function field $k(x)$ and
+a variable name `s`, return a tuple `(S, z)` consisting of the function field
+$S = k(x)[z]/(p)$ and its generator `z`, which is printed as `s`.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if
+`function_field` is invoked again with the same arguments, the same
+(*identical*) field is returned. Setting `cached` to `false` ensures a distinct
+new field is returned, and will also prevent it from being cached.
+
+# Examples
+
+```jldoctest
+julia> R1, x1 = rational_function_field(QQ, :x1);  # characteristic 0
+
+julia> U1, z1 = R1[:z1];
+
+julia> f = (x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+(x1^2 + 1)//(x1 + 1)*z1^3 + 4*z1 + 1//(x1 + 1)
+
+julia> S1, y1 = function_field(f, :y1)
+(Function Field over rationals with defining polynomial (x1^2 + 1)*y1^3 + (4*x1 + 4)*y1 + 1, y1)
+
+julia> S1((x1 + 1)//(x1 + 2))
+(x1 + 1)//(x1 + 2)
+
+julia> R2, x2 = rational_function_field(GF(23), :x2);  # positive characteristic
+
+julia> U2, z2 = R2[:z2];
+
+julia> S2, y2 = function_field(z2^2 + 3z2 + 1, :y2)
+(Function Field over finite field F_23 with defining polynomial y2^2 + 3*y2 + 1, y2)
+
+julia> S2(R2(5))
+5
+```
+"""
 function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; cached::Bool=true) where {T <: FieldElement, U <: PolyRingElem}
    length(p) < 2 && error("Polynomial must have degree at least 1")
    pol, den = _rat_poly(p, Symbol(s))

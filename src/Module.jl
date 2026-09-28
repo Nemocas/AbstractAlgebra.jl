@@ -151,6 +151,28 @@ end
 Return the intersection of the modules $M$ as a submodule of $M$. Note that
 $M$ and $N$ must be (constructed as) submodules (transitively) of some common
 module $P$.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 2)
+Free module of rank 2 over integers
+
+julia> m = M([ZZ(2), ZZ(3)])
+(2, 3)
+
+julia> n = M([ZZ(1), ZZ(4)])
+(1, 4)
+
+julia> N1 = sub(M, [m, n])
+(Submodule over integers with 2 generators and no relations, Hom: submodule over integers with 2 generators and no relations -> M)
+
+julia> N2 = sub(M, [m])
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
+
+julia> I = intersect(N1, N2)
+Any[]
+```
 """
 function intersect(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    check_parent(M, N)
@@ -222,6 +244,16 @@ Return `true` if the modules are (constructed to be) the same module
 elementwise. This is not object equality and it is not isomorphism. In fact,
 each method of constructing modules (submodules, quotient modules, products,
 etc.) must extend this notion of equality to the modules they create.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> M == M
+true
+```
 """
 function ==(M::FPModule{T}, N::FPModule{T}) where T <: RingElement
    M === N && return true  #object equality is sufficient
@@ -313,6 +345,19 @@ end
     getindex(v::FPModuleElem{T}, i::Int) where T <: RingElement
 
 Return the $i$-th coefficient of the module element $v$.
+
+# Examples
+
+```jldoctest
+julia> F = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> m = F(BigInt[2, -5, 4])
+(2, -5, 4)
+
+julia> m[1]
+2
+```
 """
 function getindex(v::FPModuleElem{T}, i::Int) where T <: RingElement
    return Generic._matrix(v)[1, i]
@@ -363,27 +408,31 @@ rand(M::FPModule, vals...) = rand(Random.default_rng(), M, vals...)
 #
 ###############################################################################
 
-Base.length(M::FPModule{T}) where T <: FinFieldElem = Int(order(M))
+Base.length(M::FPModule{T}) where T = Int(order(M))
 
-function Base.iterate(M::FPModule{T}) where T <: FinFieldElem
+Base.eltype(::Type{S}) where {S <: FPModule} = elem_type(S)
+
+function Base.iterate(M::FPModule{T}) where T
   k = base_ring(M)
-  if dim(M) == 0
+  d = rank(M)
+  if d == 0
     return zero(M), iterate([1])
   end
-  p = Base.Iterators.ProductIterator(Tuple([k for i=1:dim(M)]))
+  p = Base.Iterators.ProductIterator(Tuple([k for i=1:d]))
   f = iterate(p)
   @assert f !== nothing
-  return M(elem_type(k)[f[1][i] for i=1:dim(M)]), (f[2], p)
+  return M(elem_type(k)[f[1][i] for i=1:d]), (f[2], p)
 end
 
-function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.ProductIterator}) where T <: FinFieldElem
+function Base.iterate(M::FPModule{T}, st::Tuple{<:Tuple, <:Base.Iterators.ProductIterator}) where T
   n = iterate(st[2], st[1])
   if n === nothing
     return n
   end
-  return M(elem_type(base_ring(M))[n[1][i] for i=1:dim(M)]), (n[2], st[2])
+  d = rank(M)
+  return M(elem_type(base_ring(M))[n[1][i] for i=1:d]), (n[2], st[2])
 end
 
-function Base.iterate(::FPModule{<:FinFieldElem}, ::Tuple{Int64, Int64})
+function Base.iterate(::FPModule, ::Tuple{Int64, Int64})
   return nothing
 end

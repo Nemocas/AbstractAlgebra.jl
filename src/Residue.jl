@@ -313,6 +313,21 @@ end
 
 Return the inverse of the element $a$ in the residue ring. If an impossible
 inverse is encountered, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = inv(f)
+1//3*x^2 - 1//3*x + 4//3
+```
 """
 function Base.inv(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
@@ -366,6 +381,24 @@ end
 Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 by taking the greatest common divisor of the data associated with the
 supplied residues and taking its greatest common divisor with the modulus.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = S(x^2 + 2x + 1)
+x^2 + 2*x + 1
+
+julia> h = gcd(f, g)
+1
+```
 """
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -415,18 +448,32 @@ function rand(rng::AbstractRNG,
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResidueRing, vs...)
+function RandomExtensions.make(S::ResidueRing, v, vs...)
    R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
+   if isempty(vs) && elem_type(R) == Random.gentype(v)
+      Make(S, v)
    else
-      Make(S, make(base_ring(S), vs...))
+      Make(S, make(R, v, vs...))
    end
 end
 
-rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
+# `v, vs...` describe how to sample from the base ring. With no such
+# specification at all, `rand(S)` and `rand(S, dims...)` keep their `Base`
+# meaning -- one resp. an array of uniformly random elements -- which is served
+# by whatever `Random.Sampler` the concrete residue ring provides.
+rand(rng::AbstractRNG, S::ResidueRing, v, vs...) = rand(rng, make(S, v, vs...))
 
-rand(S::ResidueRing, v...) = rand(Random.default_rng(), S, v...)
+rand(S::ResidueRing, v, vs...) = rand(Random.default_rng(), S, v, vs...)
+
+# An integer (or tuple of integers) is an array size, never a sampling
+# specification; saying so resolves the ambiguity with `Base.rand(X, dims...)`.
+rand(rng::AbstractRNG, S::ResidueRing, dims::Dims) = rand(rng, make(S), dims)
+
+rand(S::ResidueRing, dims::Dims) = rand(Random.default_rng(), S, dims)
+
+rand(rng::AbstractRNG, S::ResidueRing, d::Integer, dims::Integer...) = rand(rng, S, Dims((d, dims...)))
+
+rand(S::ResidueRing, d::Integer, dims::Integer...) = rand(Random.default_rng(), S, Dims((d, dims...)))
 
 ###############################################################################
 #

@@ -519,7 +519,7 @@ function Base.inv(a::AbsMSeries)
         # Therefore, with max_n = sum(a.prec), we are done if cur_n >= max_n
         while true
             cur_n *= 2
-            trunc = [min(a.prec[i], cur_n) for i in 1:nvars(R)]
+            trunc = min.(a.prec, cur_n)
             set_precision!(ainv, trunc)
             e = 2 - truncate(a, trunc)*ainv
             (trunc == a.prec && isone(e)) && break

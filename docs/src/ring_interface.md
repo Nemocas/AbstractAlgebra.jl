@@ -348,20 +348,13 @@ components.
 To obtain best results when printing composed types derived from other types, e.g., polynomials,
 the following method should be implemented.
 
-```julia
-expressify(f::MyElem; context = nothing)
+```@docs
+expressify
+@enable_all_show_via_expressify
 ```
 
-which must return either `Expr`, `Symbol`, `Integer` or `String`.
-
-For a type which implements  `expressify`, one can automatically derive `show` methods
-supporting output as plain text, LaTeX and `html` by using the following:
-
-```julia
-@enable_all_show_via_expressify MyElem
-```
-
-This defines the following show methods for the specified type `MyElem`:
+`@enable_all_show_via_expressify MyElem` defines the following show methods for
+the specified type `MyElem`:
 
 ```julia
 function Base.show(io::IO, a::MyElem)
@@ -564,6 +557,9 @@ As for Julia, AbstractAlgebra's promotion system only specifies what happens
 to types. It is the coercions themselves that must deal with the mathematical
 situation at the level of rings, including checking that the object can even
 be coerced into the given ring.
+
+Note that `AbstractAlgebra.promote_rule` is a separate function from
+`Base.promote_rule` and is the one that must be extended.
 
 We now describe the required AbstractAlgebra type promotion rules.
 
@@ -975,10 +971,10 @@ rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.default_rng(), R
 
 # Promotion rules
 
-promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
+AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
 
-function promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? ConstPoly{T} : Union{}
+function AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   AbstractAlgebra.promote_rule(T, U) == T ? ConstPoly{T} : Union{}
 end
 
 # Constructors

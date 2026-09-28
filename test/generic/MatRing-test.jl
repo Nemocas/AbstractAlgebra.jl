@@ -1148,6 +1148,11 @@ end # of @testset "Generic.MatRing.inversion"
          A = hessenberg(M)
 
          @test is_hessenberg(A)
+
+         B = deepcopy(M)
+         @test hessenberg!(B) === B
+         @test is_hessenberg(B)
+         @test B == A
       end
    end
 end

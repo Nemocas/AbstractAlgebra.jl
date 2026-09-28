@@ -103,14 +103,13 @@ functions (getters and setters) in the manner described above.
 
 The required accessors for map types of class `SetMap` are as follows.
 
-```julia
-domain(M::Map(MyMap))
-codomain(M::Map(MyMap))
+```@docs
+domain
+codomain
 ```
 
-Return the domain and codomain parent objects respectively, for the map $M$. It is only
-necessary to define these functions if the map type `MyMap` does not contain fields
-`domain` and `codomain` containing these parent objects.
+It is only necessary to define these functions if the map type `MyMap` does not
+contain fields `domain` and `codomain` containing these parent objects.
 
 It is also necessary to be able to apply a map. This amounts to overloading the call
 method for objects belonging to `Map(MyMap)`.
@@ -219,17 +218,16 @@ By default, `compose` will check that the two maps are composable, i.e. the codo
 of the first map matches the domain of the second map. This is implemented by the
 following function:
 
-```julia
-check_composable(f::Map{D, U}, g::Map{U, C})
+```@docs
+check_composable
 ```
-Raise an exception if the codomain of $f$ doesn't match the domain of $g$.
 
 Note that composite maps should keep track of the two maps they were constructed from. To
 access these maps, the following functions are provided:
 
-```julia
-map1(f::CompositeMap)
-map2(f::CompositeMap)
+```@docs
+map1
+map2
 ```
 
 Any custom composite map type must also provide these functions for that map type, even

@@ -25,8 +25,21 @@ end
          invs = invariant_factors(M)
 
          @test invariant_factors(I) == invs
+         if R == QQ
+            @test rank(I) == ngens(I)
+            @test dim(I) == ngens(I)
+            @test vector_space_dim(I) == ngens(I)
+         end
       end
    end
+
+   F = free_module(ZZ, 1)
+   S, _ = sub(F, [2 * gen(F, 1)])
+   Q, _ = quo(F, S)
+   I, _ = snf(Q)
+   @test invariant_factors(I) == BigInt[2]
+   @test_throws MethodError rank(I)
+   @test_throws MethodError dim(I)
 end
 
 @testset "Generic.InvariantFactorDecomposition.isomorphism" begin

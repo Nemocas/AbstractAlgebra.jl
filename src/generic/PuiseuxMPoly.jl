@@ -242,17 +242,10 @@ function show(io::IO, mime::MIME"text/plain", p::PuiseuxMPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Puiseux polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  AbstractAlgebra.print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
@@ -378,7 +371,7 @@ end
 function divexact(f::PuiseuxMPolyRingElem{T}, a::T; check::Bool = true) where {T <: RingElement}
     @req !iszero(a) "division by zero"
     @req parent(a) === coefficient_ring(f) "coefficient rings must agree"
-    return puiseux_polynomial_ring_elem(parent(f), poly(f)*1//a, scale(f); skip_normalization=true)
+    return puiseux_polynomial_ring_elem(parent(f), divexact(poly(f), a; check = check), scale(f); skip_normalization=true)
 end
 
 function divexact(f::PuiseuxMPolyRingElem, a::Integer; check::Bool = true)

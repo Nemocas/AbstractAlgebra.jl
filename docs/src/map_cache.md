@@ -30,73 +30,22 @@ original map will also accept the cached version.
 
 To construct a cached map from an existing map object, we have the following function:
 
-```julia
-cached(M::Map; enabled=true, limit=100)
+```@docs
+cached
 ```
 
-Return a cached map with the same supertype as $M$, caching up to `limit` values of the
-map `M` in a dictionary, assuming that the cache is enabled.
-
-Caches can be disabled by setting the value of the parameter `enabled` to `false`. This
-allows for the user to quickly go through code and completely disable caches of maps that
-were previously enabled, for testing purposes, etc.
+Constructing a map with its cache disabled allows the user to quickly go through
+code and completely disable caches of maps that were previously enabled, for
+testing purposes, etc.
 
 Caches can also be turned on and off at run time (see below).
-
-**Examples**
-
-```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
-Map defined by a Julia function
-  from integers
-  to integers
-
-julia> g = cached(f);
-
-julia> f(ZZ(1)) == g(ZZ(1))
-true
-```
 
 ## Functionality for cached maps
 
 The following functions are provided for cached maps.
 
-```julia
-enable_cache!(M::MapCache)
-disable_cache!(M::MapCache)
-```
-
-Temporarily enable or disable the cache for the given map. The values stored in the cache
-are not lost when it is disabled.
-
-```julia
-set_limit!(M::MapCache, limit::Int)
-```
-
-Set the limit on the number of values that can be cached in the dictionary, to the given
-value. Setting the value to 0 will effectively disable further caching for this map.
-
-**Examples**
-
-```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
-
-julia> a = f(ZZ(1))
-2
-
-julia> disable_cache!(f)
-
-julia> b = f(ZZ(1))
-2
-
-julia> enable_cache!(f)
-
-julia> c = f(ZZ(1))
-2
-
-julia> set_limit!(f, 200)
-200
-
-julia> d = f(ZZ(1))
-2
+```@docs
+enable_cache!
+disable_cache!
+set_limit!
 ```

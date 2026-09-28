@@ -26,6 +26,9 @@ is_known(::typeof(is_finite), R::LaurentMPolyRing) =
   is_known(is_trivial, coefficient_ring(R)) &&
     (is_trivial(coefficient_ring(R)) || nvars(R) > 0 || is_known(is_finite, coefficient_ring(R)))
 
+is_domain_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_domain_type(T)
+is_exact_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_exact_type(T)
+
 ###############################################################################
 #
 #   String I/O
@@ -58,17 +61,10 @@ function show(io::IO, mime::MIME"text/plain", p::LaurentMPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Multivariate Laurent polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
@@ -200,7 +196,36 @@ new ring is returned, and will also prevent it from being cached.
 
 For information about the many ways to specify `varnames...` refer to [`polynomial_ring`](@ref) or the
 specification in [`AbstractAlgebra.@varnames_interface`](@ref).
+
+# Examples
+
+```jldoctest
+julia> S, (x, y) = laurent_polynomial_ring(ZZ, [:x, :y])
+(Multivariate Laurent polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}[x, y])
+
+julia> (x + y)*x^-1
+1 + x^-1*y
+```
 """
 laurent_polynomial_ring(R::Ring, s::Vector{Symbol})
 
 @varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
+
+"""
+    @laurent_polynomial_ring(R::Ring, varnames...; cached=true)
+
+Return the ring from [`laurent_polynomial_ring`](@ref laurent_polynomial_ring(::Ring, ::Vector{Symbol}))
+and introduce the generators into the current scope.
+
+# Examples
+
+```jldoctest
+julia> S = @laurent_polynomial_ring(ZZ, [:u, :v])
+Multivariate Laurent polynomial ring in 2 variables u, v
+  over integers
+
+julia> u*v^-1
+u*v^-1
+```
+"""
+:(@laurent_polynomial_ring)

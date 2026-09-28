@@ -27,6 +27,7 @@ base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::base_ring_type(a)
 function Base.numerator(a::FracFieldElem, canonicalise::Bool=true)
    if canonicalise
       u = canonical_unit(a.den)
+      isone(u) && return a.num
       return divexact(a.num, u)
    else
       return a.num
@@ -36,6 +37,7 @@ end
 function Base.denominator(a::FracFieldElem, canonicalise::Bool=true)
    if canonicalise
       u = canonical_unit(a.den)
+      isone(u) && return a.den
       return divexact(a.den, u)
    else
       return a.den

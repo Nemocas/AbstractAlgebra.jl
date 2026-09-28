@@ -491,7 +491,7 @@ function test_module(x, y)
    julia_exe = Base.julia_cmd()
    pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
-   test_file = test_file * "$y-test.jl";
+   test_file = test_file * "$y-test.jl"
    rand_file = joinpath(pkgdir, "test/rand.jl")
 
    cmd = """

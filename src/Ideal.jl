@@ -84,6 +84,39 @@ iszero(I::Ideal) = all(iszero, gens(I))
 
 Return `true` if the ideal `I` is a subset of the ideal `J`.
 An exception is thrown if the ideals are not defined over the same base ring.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3*x^3 + 2*x^2 + 1
+ 5*x^4 + 1
+ 2*x - 1
+
+julia> W = [1 + 2x^2 + 3x^3, 5x^4 + 1]
+2-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3*x^3 + 2*x^2 + 1
+ 5*x^4 + 1
+
+julia> I = Generic.Ideal(R, V)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1])
+
+julia> J = Generic.Ideal(R, W)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[282, 3*x + 255, x^2 + 107])
+
+julia> is_subset(I, J)
+false
+
+julia> is_subset(J, I)
+true
+
+julia> intersect(I, J) == J
+true
+```
 """
 function Base.issubset(I::T, J::T) where {T <: Ideal}
   I === J && return true

@@ -26,6 +26,14 @@ whose rows are the returned relations will be in reduced form (hnf/rref).
 relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
 
 @doc raw"""
+    dim(M::FPModule{T}) where T <: FieldElement
+
+Return the dimension of the given vector space `M` over `base_ring(M)`.
+This is an alias for [`vector_space_dim`](@ref).
+"""
+dim(M::AbstractAlgebra.FPModule{T}) where T <: FieldElement = vector_space_dim(M)
+
+@doc raw"""
     is_compatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 Return `true, P` if the given modules are compatible, i.e. that they are

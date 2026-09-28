@@ -28,7 +28,7 @@ symbols(R::LaurentMPolyWrapRing) = symbols(base_ring(R))
 number_of_variables(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
 number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R))
 
-is_domain_type(::Type{LaurentMPolyWrapRing{S, T}}) where {S, T} = is_domain_type(T)
+is_univariate(R::LaurentMPolyWrapRing) = is_univariate(base_ring(R))
 
 ###############################################################################
 #
@@ -132,7 +132,7 @@ end
 
 
 function is_nilpotent(f::T) where {T <: LaurentMPolyRingElem}
-  return is_nilpotent(f.mpoly);
+  return is_nilpotent(f.mpoly)
 end
 
 

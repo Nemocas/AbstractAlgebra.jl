@@ -118,12 +118,33 @@ end
    @test is_trivial(R)
 end
 
+@testset "EuclideanRingResidueRingElem.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+
+   @test order(R) == 4
+   @test length(R) == 4
+   @test collect(R) == [R(i) for i in 0:3]
+
+   R, = residue_ring(ZZ, 1)
+
+   @test order(R) == 1
+   @test collect(R) == [zero(R)]
+end
+
 @testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
+
+   # Carrying no sampling specification, `rand(R)` and `rand(R, dims...)` keep
+   # their `Base` meaning and must not be forwarded to the base ring: they ask
+   # `R` itself for a `Random.Sampler` (which AbstractAlgebra does not provide).
+   @test make(R) isa RandomExtensions.MakeWrap
+   @test which(rand, Tuple{typeof(R), Int}) isa Method       # i.e. unambiguous
+   @test which(rand, Tuple{typeof(R), Int, Int}) isa Method
+   @test which(rand, Tuple{typeof(R), Tuple{Int, Int}}) isa Method
 
    # make with 3 arguments
    P, x = polynomial_ring(RealField, "x")

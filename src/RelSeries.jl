@@ -96,6 +96,18 @@ series ring.
 """
 max_precision(R::SeriesRing) = R.prec_max
 
+@doc raw"""
+    set_length!(f::PolynomialElem, n::Int)
+    set_length!(f::SeriesElem, n::Int)
+
+Set the number of coefficients of the polynomial underlying `f` that are
+considered to belong to `f` to `n`, and return `f`. For polynomials, any
+coefficients beyond `n` are zeroed; for series, `n` must not exceed the length
+of the underlying polynomial. No normalisation takes place.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function set_length!(a::SeriesElem, len::Int)
    a.length = len
    return a
@@ -133,6 +145,15 @@ function set_precision!(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
    return f
 end
 
+@doc raw"""
+    set_valuation!(f::SeriesElem, val::Int)
+
+Set the valuation of the relative or Laurent series `f` to `val` and return
+`f`.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function set_valuation!(a::RelPowerSeriesRingElem, val::Int)
    a.val = val
    return a
@@ -176,6 +197,17 @@ Return the modulus of the coefficients of the given power series.
 """
 modulus(a::SeriesElem{T}) where {T <: Union{ResElem, FinFieldElem}} = modulus(base_ring(a))
 
+@doc raw"""
+    renormalize!(f::SeriesElem)
+
+Given a relative or Laurent series `f` whose underlying polynomial has zero
+constant term, say as the result of some internal computation, shift that
+polynomial so that its constant term is nonzero, adjusting the valuation and
+precision of `f` to compensate.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function renormalize!(z::RelPowerSeriesRingElem)
    i = 0
    zlen = pol_length(z)
@@ -274,6 +306,27 @@ zero(a::RelPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 #
 ###############################################################################
 
+@doc raw"""
+    rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the relative power series over `R` in the variable `var` of valuation
+`val` whose first `len` coefficients are given by the first `len` entries of
+`arr`: `arr[i]` is the coefficient of `var^(val + i - 1)`. The input must
+satisfy `0 <= len <= length(arr)` and `prec >= val + len`, where `prec` is the
+absolute precision. The series ring is created on the fly with maximum
+relative precision `max_precision`; setting `cached` to `false` prevents it
+from being cached.
+
+# Examples
+
+```jldoctest
+julia> rel_series(ZZ, [1, 2, 3], 3, 7, 4)
+x^4 + 2*x^5 + 3*x^6 + O(x^7)
+
+julia> rel_series(ZZ, BigInt[], 0, 3, 1)
+O(x^3)
+```
+"""
 function rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
    TT = elem_type(R)
@@ -558,6 +611,28 @@ end
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 2x + x^3
+2*x + x^3 + O(x^31)
+
+julia> b = O(x^4)
+O(x^4)
+
+julia> f = shift_left(a, 2)
+2*x^3 + x^5 + O(x^33)
+
+julia> g = shift_left(b, 2)
+O(x^6)
+```
 """
 function shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -583,6 +658,22 @@ end
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 $x^n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> shift_right(1 + x + 2x^2 + O(x^5), 1)
+1 + 2*x + O(x^4)
+
+julia> shift_right(2x + x^3 + O(x^4), 3)
+1 + O(x^1)
+```
 """
 function shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -616,6 +707,40 @@ end
     truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return $a$ truncated to (absolute) precision $n$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 2x + x^3
+2*x + x^3 + O(x^31)
+
+julia> b = O(x^4)
+O(x^4)
+
+julia> c = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> d = 2x + x^3 + O(x^4)
+2*x + x^3 + O(x^4)
+
+julia> f = truncate(a, 3)
+2*x + O(x^3)
+
+julia> g = truncate(b, 2)
+O(x^2)
+
+julia> h = truncate(c, 7)
+1 + x + 2*x^2 + O(x^5)
+
+julia> k = truncate(d, 5)
+2*x + x^3 + O(x^4)
+```
 """
 function truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    return truncate!(deepcopy(a), n)
@@ -916,6 +1041,28 @@ end
     Base.inv(a::RelPowerSeriesRingElem)
 
 Return the inverse of the power series $a$, i.e. $1/a$.
+
+# Examples
+
+```jldoctest
+julia> R, t = polynomial_ring(QQ, :t)
+(Univariate polynomial ring in t over rationals, t)
+
+julia> S, x = power_series_ring(R, 30, :x)
+(Univariate power series ring over R, x + O(x^31))
+
+julia> a = 1 + x + 2x^2 + O(x^5)
+1 + x + 2*x^2 + O(x^5)
+
+julia> b = S(-1)
+-1 + O(x^30)
+
+julia> c = inv(a)
+1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
+
+julia> d = inv(b)
+-1 + O(x^30)
+```
 """
 function Base.inv(a::RelPowerSeriesRingElem)
    iszero(a) && throw(DivideError())
@@ -1471,17 +1618,43 @@ generator of the power series ring will be printed. By default, the parent
 object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> S, y = power_series_ring(ZZ, 10, :y; model=:capped_absolute)
+(Univariate power series ring over integers, y + O(y^10))
+```
 """
 function power_series_ring(R::Ring, prec::Int, s::VarName; cached::Bool=true, model::Symbol=:capped_relative)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
    return Generic.power_series_ring(R, prec, Symbol(s); cached, model)
 end
 
+@doc raw"""
+    AbsPowerSeriesRing(R::Ring, prec::Int)
+    RelPowerSeriesRing(R::Ring, prec::Int)
+
+Return the absolute resp. relative power series ring over `R` with precision
+cap `prec` and the default variable `x`. Only the ring is returned, not a
+generator, and the ring is not cached.
+
+These are lightweight constructors meant for generic algorithms that need a
+series ring whose variable name does not matter.
+"""
 function AbsPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
    return Generic.AbsPowerSeriesRing{T}(R, prec, :x, false)
 end
 
+@doc raw"""
+    RelPowerSeriesRing(R::Ring, prec::Int)
+
+See [`AbsPowerSeriesRing(::Ring, ::Int)`](@ref).
+"""
 function RelPowerSeriesRing(R::Ring, prec::Int)
    T = elem_type(R)
    return Generic.RelPowerSeriesRing{T}(R, prec, :x, false)

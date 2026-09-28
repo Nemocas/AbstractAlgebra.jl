@@ -60,6 +60,7 @@ import AbstractAlgebra: Generic.normalize!
         @test QQ == coefficient_ring(Kp)
         @test ngens(Kp) == 3
         @test gens(Kp) == [tp1,tp2,tp3]
+        @test !is_univariate(Kp)
 
         g = tp1^(1//2)+tp3^(1//3)
         @test elem_type(Kp) == typeof(g)
@@ -75,6 +76,7 @@ import AbstractAlgebra: Generic.normalize!
         @test scale(g) == 2*3*7
 
         K, (t,) = puiseux_polynomial_ring(QQ,["t"])
+        @test is_univariate(K)
         @test valuation(K(0)) == PosInf()
         @test valuation(t^(-1)) == -1
         @test valuation(t^(-2//3)+t^(-1//2)) == -2//3
@@ -106,6 +108,9 @@ import AbstractAlgebra: Generic.normalize!
         @test (g)^0 == 1
 
         @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        @test divexact(g, QQ(2)) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
+        @test divexact(2*g, QQ(2)) == g
+        @test_throws ArgumentError divexact(g, QQ(0))
         # TODO: add some more divexact tests
 
         g = u^(1//2)*v^(2//3) + w^(1//4)
