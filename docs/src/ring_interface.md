@@ -310,28 +310,10 @@ to.
 
 ### Canonicalisation
 
-```julia
-canonical_unit(f::MyElem)
-```
-
-When fractions are created with two elements of the given type, it is nice to be able
-to represent them in some kind of canonical form. This is of course not always possible.
-But for example, fractions of integers can be canonicalised by first removing any common
-factors of the numerator and denominator, then making the denominator positive.
-
-In AbstractAlgebra.jl, the denominator would be made positive by dividing both the
-numerator and denominator by the canonical unit of the denominator. For a negative
-denominator, this would be $-1$.
-
-For non-zero elements of a field, `canonical_unit` simply returns the element itself.
-In general, `canonical_unit` of an invertible element should be that element.
-Finally, if $a = bc$, then `canonical_unit(a)*a = canonical_unit(b)*canonical_unit(c)*a`
-holds. Thus if $a$ is not a zero-divisor, then we even have
-`canonical_unit(a) = canonical_unit(b)*canonical_unit(c)`.
-
-For some rings, it is completely impractical to implement this function, in which case
-it may return $1$ in the given ring. The function must however always exist, and always
-return an element of the ring.
+- [`canonical_unit(f::MyElem)`](@ref canonical_unit). This must exist and
+  return an element of the ring. Where no useful normalisation is practical,
+  return `one(parent(f))`; otherwise the result must have the properties
+  listed in the docstring.
 
 ### String I/O
 
@@ -501,34 +483,15 @@ make sense but are passed to the function.
 
 ### Exact division
 
-```julia
-divexact(f::MyElem, g::MyElem; check::Bool=true)
-```
-
-Return $f/g$, though note that Julia uses `/` for floating point division. Here we
-mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
-should be thrown if $g$ is zero.
-
-If `check=true` the function should check that the division is exact and throw
-an exception if not.
-
-If `check=false` the check may be omitted for performance reasons. The behaviour
-is then undefined if a division is performed that is not exact. This may include
-throwing an exception, returning meaningless results, hanging or crashing. The
-function should only be called with `check=false` if it is already known that the
-division will be exact.
+- [`divexact(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact). Throw a
+  `DivideError` if `g` is zero. With `check=false` the exactness check may be
+  skipped; what happens on an inexact division is then undefined, including
+  meaningless results, hanging or crashing.
 
 ### Inverse
 
-```julia
-inv(f::MyElem)
-```
-
-Return the inverse of $f$, i.e. $1/f$, though note that Julia uses `/` for floating
-point division. Here we mean exact division in the ring.
-
-A fallback for this function is provided in terms of `divexact` so an implementation
-can be omitted if preferred.
+- [`inv(f::MyElem)`](@ref Base.inv(::RingElem)). Optional: the default calls
+  `divexact(one(parent(f)), f)`.
 
 ### Random generation
 

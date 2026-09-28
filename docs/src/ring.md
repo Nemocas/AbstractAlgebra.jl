@@ -134,14 +134,11 @@ the approximate equality test.
 
 ## Basic functionality for commutative rings only
 
-```julia
-divexact(a::T, b::T) where T <: RingElement
-inv(a::T)
+```@docs
+divexact
+Base.inv(::RingElem)
+canonical_unit
 ```
-
-Return `a/b` or `1/a` respectively, where the slash here refers to the
-mathematical notion of division in the ring, not Julia's floating point
-division operator.
 
 ## Basic functionality for noncommutative rings only
 
