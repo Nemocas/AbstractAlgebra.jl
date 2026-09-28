@@ -37,6 +37,7 @@ makedocs(
                  "universal_ring.md",
                  "laurent_polynomial.md",
                  "laurent_mpolynomial.md",
+                 "puiseux_mpolynomial.md",
                  "series.md",
                  "puiseux.md",
                  "mseries.md",
