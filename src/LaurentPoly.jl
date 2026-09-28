@@ -112,6 +112,25 @@ function trailing_coefficient(p::LaurentPolyRingElem)
    isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, first(dr))
 end
 
+# as for polynomials, entries with zero coefficient may occur
+coefficients(p::LaurentPolyRingElem) = (coeff(p, i) for i in degrees_range(p))
+
+exponent_vectors(p::LaurentPolyRingElem) = ([i] for i in degrees_range(p))
+
+function content(p::LaurentPolyRingElem)
+   z = zero(coefficient_ring(p))
+   for c in coefficients(p)
+      z = gcd(z, c)
+   end
+   return z
+end
+
+function tail(p::LaurentPolyRingElem)
+   dr = degrees_range(p)
+   isempty(dr) && return zero(parent(p))
+   return set_coefficient!(deepcopy(p), last(dr), zero(coefficient_ring(p)))
+end
+
 gens(R::LaurentPolyRing) = [gen(R)]
 
 is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))
@@ -189,6 +208,40 @@ Base.isapprox(q::T, p::LaurentPolyRingElem{T}; atol::Real=sqrt(eps())) where {T}
 ################################################################################
 
 change_base_ring(R::Ring, p::LaurentPolyRingElem) = map_coefficients(R, p)
+
+change_coefficient_ring(R::Ring, p::LaurentPolyRingElem; kwargs...) =
+   change_base_ring(R, p; kwargs...)
+
+###############################################################################
+#
+#   Inflation/deflation
+#
+###############################################################################
+
+function deflation(p::LaurentPolyRingElem)
+   dr = degrees_range(p)
+   isempty(dr) && return 0, 1
+   shift = first(dr)
+   defl = 0
+   for i in dr
+      iszero(coeff(p, i)) && continue
+      defl = gcd(defl, i - shift)
+      defl == 1 && break
+   end
+   return shift, iszero(defl) ? 1 : defl
+end
+
+function deflate(f::LaurentPolyRingElem, j::Int, n::Int)
+   g = zero(parent(f))
+   dr = degrees_range(f)
+   isempty(dr) && return g
+   for i in cld(first(dr) - j, n):fld(last(dr) - j, n)
+      g = set_coefficient!(g, i, coeff(f, n*i + j))
+   end
+   return g
+end
+
+deflate(f::LaurentPolyRingElem, n::Int) = deflate(f, 0, n)
 
 ###############################################################################
 #
