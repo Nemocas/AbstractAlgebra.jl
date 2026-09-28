@@ -120,6 +120,14 @@ end
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
 
+    @test @inferred is_constant(zero(L))
+    @test @inferred is_constant(L(5))
+    @test is_constant(3 * x * inv(x))
+    @test !is_constant(x)
+    @test !is_constant(inv(x))
+    @test !is_constant(x * inv(y))
+    @test !is_constant(1 + x)
+
     @test is_monomial(x^2*y^-2)
     @test !is_monomial(2*x^2*y^-2)
     @test !is_monomial(x+y)

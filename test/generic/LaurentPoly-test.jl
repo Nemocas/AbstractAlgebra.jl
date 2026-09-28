@@ -108,6 +108,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test is_term(y^-3)
       @test is_term(2y)
       @test !is_term(y^2+y)
+
+      @test @inferred is_constant(zero(L))
+      @test @inferred is_constant(L(5))
+      @test is_constant(3 * y^-2 * y^2)
+      @test !is_constant(y)
+      @test !is_constant(y^-1)
+      @test !is_constant(y + 1)
+
+      @test @inferred(constant_coefficient(zero(L))) == 0
+      @test @inferred(constant_coefficient(y^-1 + 5 + 2y)) == 5
+      @test constant_coefficient(3 * y^-2 * y^2) == 3
+      @test constant_coefficient(y) == 0
+      @test constant_coefficient(y^-1) == 0
       @test is_monomial(y)
       @test is_monomial(y^-3)
       @test !is_monomial(2y)
