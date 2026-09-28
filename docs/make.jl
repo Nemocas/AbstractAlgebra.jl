@@ -23,7 +23,6 @@ makedocs(
              "Fundamental interface of AbstractAlgebra.jl" => [
                  "types.md",
                  "visualizing_types.md",
-                 "extending_abstractalgebra.md",
              ],
              "constructors.md",
              "Rings" => [

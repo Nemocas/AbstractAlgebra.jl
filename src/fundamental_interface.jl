@@ -229,7 +229,7 @@ coefficient_type(x) = elem_type(coefficient_ring_type(x))
 @doc raw"""
     one(a)
 
-Return the multiplicative identity in the algebraic structure of $a$, which can
+Return the multiplicative identity in the algebraic structure of `a`, which can
 be either an element or parent.
 
 # Examples
@@ -260,7 +260,7 @@ function one end
 @doc raw"""
     zero(a)
 
-Return the additive identity in the algebraic structure of $a$, which can be
+Return the additive identity in the algebraic structure of `a`, which can be
 either an element or parent.
 
 # Examples
@@ -291,7 +291,7 @@ function zero end
 @doc raw"""
     isone(a)
 
-Return true if $a$ is the multiplicative identity, else return false.
+Return `true` if `a` is the multiplicative identity, else return `false`.
 
 # Examples
 ```jldoctest
@@ -318,7 +318,7 @@ function isone end
 @doc raw"""
     iszero(a)
 
-Return true if $a$ is the additive identity, else return false.
+Return `true` if `a` is the additive identity, else return `false`.
 
 # Examples
 ```jldoctest

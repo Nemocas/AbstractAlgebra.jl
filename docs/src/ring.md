@@ -33,12 +33,14 @@ RingElement <: NCRingElement
 
 ## Functions for types and parents of rings
 
-```@docs; canonical=false
+```@docs
 parent
 parent_type
 elem_type
 base_ring
 base_ring_type
+coefficient_ring
+coefficient_ring_type
 ```
 
 ```@docs
@@ -74,20 +76,20 @@ powering.
 In addition, the following are implemented for parents/elements just as they
 would be in Julia for types/objects.
 
-```julia
-zero(R::NCRing)
-one(R::NCRing)
-iszero(a::NCRingElement)
-isone(a::NCRingElement)
+```@docs
+zero
+one
+iszero
+isone
 ```
 
 In addition, the following are implemented where it is
 mathematically/algorithmically viable to do so.
 
-```julia
-is_unit(a::NCRingElement)
-is_zero_divisor(a::NCRingElement)
-is_zero_divisor_with_annihilator(a::NCRingElement)
+```@docs
+is_unit
+is_zero_divisor
+is_zero_divisor_with_annihilator
 ```
 
 The following standard Julia functions are also implemented for all ring

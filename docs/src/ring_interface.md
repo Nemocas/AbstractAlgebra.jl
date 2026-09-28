@@ -156,6 +156,14 @@ If the ring is not parameterised by another ring, calling this function should r
     does for any given type of ring, you need to consult its documentation.
 
 ```julia
+coefficient_ring(R::MyParent)
+coefficient_ring_type(::Type{MyParent})
+```
+
+If there is a well-defined notion of a coefficient ring, e.g. for polynomial
+rings, return it resp. its type.
+
+```julia
 parent(f::MyElem)
 ```
 
