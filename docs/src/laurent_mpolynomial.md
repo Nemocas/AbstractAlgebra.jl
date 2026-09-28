@@ -65,6 +65,9 @@ gens(S::LaurentMPolyRing)
 gen(S::LaurentMPolyRing, i::Int)
 is_gen(x::LaurentMPolyRingElem)
 var_index(p::LaurentMPolyRingElem)
+var_indices(p::LaurentMPolyRingElem)
+vars(p::LaurentMPolyRingElem)
+is_univariate(p::LaurentMPolyRingElem)
 length(f::LaurentMPolyRingElem)
 ```
 
@@ -77,6 +80,21 @@ leading_coefficient(p::LaurentMPolyRingElem)
 leading_monomial(p::LaurentMPolyRingElem)
 leading_term(p::LaurentMPolyRingElem)
 leading_exponent_vector(p::LaurentMPolyRingElem)
+trailing_coefficient(p::LaurentMPolyRingElem)
+tail(p::LaurentMPolyRingElem)
+content(p::LaurentMPolyRingElem)
+is_homogeneous(p::LaurentMPolyRingElem)
+```
+
+Degrees may be negative. Hence the zero polynomial has no degree, and
+`degree`, `degrees` and `total_degree` throw an error for it, where for
+polynomials they return $-1$.
+
+```julia
+degree(f::LaurentMPolyRingElem, i::Int)
+degree(f::LaurentMPolyRingElem, x::LaurentMPolyRingElem)
+degrees(f::LaurentMPolyRingElem)
+total_degree(f::LaurentMPolyRingElem)
 ```
 
 ```julia
@@ -87,11 +105,26 @@ map_coefficients(::Any, p::LaurentMPolyRingElem)
 
 ```julia
 evaluate(p::LaurentMPolyRingElem, ::Vector)
+evaluate(p::LaurentMPolyRingElem, vars::Vector{Int}, vals::Vector)
+evaluate(p::LaurentMPolyRingElem, vars::Vector{LaurentMPolyRingElem}, vals::Vector)
 ```
 
 ```julia
 derivative(p::LaurentMPolyRingElem, x::LaurentMPolyRingElem)
 derivative(p::LaurentMPolyRingElem, i::Int)
+```
+
+```julia
+deflation(p::LaurentMPolyRingElem)
+deflate(p::LaurentMPolyRingElem, shift::Vector{Int}, defl::Vector{Int})
+inflate(p::LaurentMPolyRingElem, shift::Vector{Int}, defl::Vector{Int})
+```
+
+```julia
+is_square(p::LaurentMPolyRingElem)
+is_square_with_sqrt(p::LaurentMPolyRingElem)
+sqrt(p::LaurentMPolyRingElem)
+isless(p::LaurentMPolyRingElem, q::LaurentMPolyRingElem)
 ```
 
 ```julia

@@ -134,6 +134,81 @@ end
     @test inflate(x*y^2+y, [1, 2], [2, 2]) == x^3*y^6+x*y^4
 end
 
+@testset "Generic.LaurentMPoly.more_mpoly" begin
+    L, (x, y, z) = laurent_polynomial_ring(ZZ, ["x", "y", "z"])
+    f = 2*x^-2*y + 3*x*y^-3 - 4
+
+    @test degree(f, 1) == 1
+    @test degree(f, y) == 1
+    @test degree(f, 3) == 0
+    @test degree(x^-2*y^-1 + x^-5, 1) == -2
+    @test degrees(f) == [1, 1, 0]
+    @test degrees(x^-2 + y^-3) == [0, 0, 0]
+    @test total_degree(f) == 0
+    @test total_degree(x^-2*y^-1 + x^-5) == -3
+    @test_throws ArgumentError degree(zero(L), 1)
+    @test_throws ArgumentError degrees(zero(L))
+    @test_throws ArgumentError total_degree(zero(L))
+
+    @test var_indices(f) == [1, 2]
+    @test vars(f) == [x, y]
+    @test vars(3*x*inv(x)) == []
+    @test is_univariate(x^-3 + 2x)
+    @test is_univariate(L(7))
+    @test !is_univariate(f)
+
+    @test tail(f) == f - leading_term(f)
+    @test iszero(tail(x^-1))
+    @test iszero(tail(zero(L)))
+    @test trailing_coefficient(f) == last(collect(coefficients(f)))
+    @test_throws ArgumentError trailing_coefficient(zero(L))
+
+    @test content(f) == 1
+    @test content(6*x^-1 - 9*y) == 3
+    @test is_homogeneous(x^-1*y^2 + z)
+    @test !is_homogeneous(f)
+
+    Q, (u, v, w) = laurent_polynomial_ring(QQ, ["u", "v", "w"])
+    g = u^-2*v + 3*u*v^-1*w
+    @test evaluate(g, [1], [QQ(2)]) == 1//4*v + 6*v^-1*w
+    @test evaluate(g, [2, 3], [QQ(1//2), QQ(3)]) == 1//2*u^-2 + 18*u
+    @test evaluate(g, [v], [u]) == u^-1 + 3*w
+    @test evaluate(g, [v, w], [w, v]) == u^-2*w + 3*u*w^-1*v
+    @test evaluate(g, Int[], elem_type(QQ)[]) == g
+    @test_throws ArgumentError evaluate(g, [1, 1], [QQ(1), QQ(2)])
+    @test_throws ArgumentError evaluate(g, [1], [QQ(1), QQ(2)])
+    @test_throws ArgumentError evaluate(g, [4], [QQ(1)])
+    @test_throws ErrorException evaluate(x^-1, [1], [ZZ(2)])
+
+    @test change_coefficient_ring(QQ, f) == change_base_ring(QQ, f)
+    @test change_coefficient_ring(QQ, f; parent = Q) == 2*u^-2*v + 3*u*v^-3 - 4
+
+    h = x^-3*y^2 + x*y^6 + x^5*y^-2
+    @test deflation(h) == ([-3, -2, 0], [4, 4, 0])
+    shift, defl = deflation(h)
+    @test inflate(deflate(h, shift, defl), shift, defl) == h
+    @test deflate(x^-2 + y^4, [2, 2, 1]) == x^-1 + y^2
+    @test deflation(zero(L)) == ([0, 0, 0], [0, 0, 0])
+
+    s = x^-1*y + 2 - z^3
+    @test is_square(s^2)
+    @test is_square(x^-2*y^4)
+    @test is_square(zero(L))
+    @test !is_square(x^-1)
+    @test !is_square(-x^2)
+    @test !is_square(s^2*x)
+    @test sqrt(s^2) == s || sqrt(s^2) == -s
+    @test sqrt(4*x^-2*y^4) == 2*x^-1*y^2 || sqrt(4*x^-2*y^4) == -2*x^-1*y^2
+    @test_throws ErrorException sqrt(x)
+    ok, r = is_square_with_sqrt(s^2*x^-4)
+    @test ok && r^2 == s^2*x^-4
+
+    @test isless(x^-1, x) == isless(one(L), x^2)
+    @test isless(y^-1, x^-1) == isless(x, y)
+    @test !isless(x^-1*y, x^-1*y)
+    @test_throws ErrorException isless(x + 1, y)
+end
+
 
 # -------------------------------------------------------
 

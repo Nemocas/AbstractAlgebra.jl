@@ -92,6 +92,47 @@ function gens(R::LaurentMPolyRing)
     return [gen(R, i) for i in 1:nvars(R)]
 end
 
+function var_indices(p::LaurentMPolyRingElem)
+    used = falses(nvars(parent(p)))
+    for e in exponent_vectors(p)
+        used .|= .!iszero.(e)
+    end
+    return findall(used)
+end
+
+vars(p::LaurentMPolyRingElem) = [gen(parent(p), i) for i in var_indices(p)]
+
+is_univariate(p::LaurentMPolyRingElem) = length(var_indices(p)) <= 1
+
+###############################################################################
+#
+#   Degrees
+#
+###############################################################################
+
+# Unlike for polynomials, -1 is a valid degree, so zero has no degree.
+
+function degree(f::LaurentMPolyRingElem, i::Int)
+    @req !iszero(f) "Zero polynomial does not have a degree"
+    return maximum(e[i] for e in exponent_vectors(f))
+end
+
+degree(f::T, x::T) where T <: LaurentMPolyRingElem = degree(f, var_index(x))
+
+function degrees(f::LaurentMPolyRingElem)
+    @req !iszero(f) "Zero polynomial does not have a degree"
+    d = copy(first(exponent_vectors(f)))
+    for e in exponent_vectors(f)
+        d .= max.(d, e)
+    end
+    return d
+end
+
+function total_degree(f::LaurentMPolyRingElem)
+    @req !iszero(f) "Zero polynomial does not have a degree"
+    return maximum(sum(e) for e in exponent_vectors(f))
+end
+
 ###############################################################################
 #
 #   Derivative
@@ -102,6 +143,45 @@ function derivative(a::LaurentMPolyRingElem{T}, x::LaurentMPolyRingElem{T}) wher
    check_parent(a, x)
    return derivative(a, var_index(x))
 end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+# The values are coerced into the parent of `a`; a variable occurring with a
+# negative exponent needs a unit value.
+function evaluate(a::LaurentMPolyRingElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+   R = parent(a)
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
+   @req all(i -> 1 <= i <= nvars(R), vars) "Variable index not in range"
+
+   subs = gens(R)
+   for (i, v) in zip(vars, vals)
+      subs[i] = R(v)
+   end
+
+   z = zero(R)
+   for (c, e) in zip(coefficients(a), exponent_vectors(a))
+      z += c * prod(subs[i]^e[i] for i in 1:nvars(R); init = one(R))
+   end
+   return z
+end
+
+function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where T <: LaurentMPolyRingElem
+   return evaluate(a, [var_index(x) for x in vars], vals)
+end
+
+###############################################################################
+#
+#   Change coefficient ring
+#
+###############################################################################
+
+change_coefficient_ring(R::Ring, p::LaurentMPolyRingElem; kwargs...) =
+   change_base_ring(R, p; kwargs...)
 
 ###############################################################################
 #
