@@ -566,6 +566,10 @@ function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing{T}) where T
     return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 
+function MPolyBuildCtx(R::AbstractAlgebra.UniversalRing{<:AbstractAlgebra.LaurentMPolyRingElem, T}) where T
+    return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
+end
+
 function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::U, expv::Vector{Int}) where {S, T, U}
     length(expv) == nvars(B.parent) || error("length of exponent vector should match the number of variables")
     push!(B.coeffs, c)
