@@ -145,6 +145,12 @@ import AbstractAlgebra: Generic.normalize!
         @test K(1) == one(K)
     end
 
+    @testset "Printing" begin
+        R, _ = puiseux_polynomial_ring(QQ, ["x", "y"])
+        @test sprint(show, R) == "Puiseux polynomial ring in 2 variables over rationals"
+        @test sprint(show, R; context = :supercompact => true) == "Puiseux polynomial ring"
+    end
+
     @testset "Conformance tests" begin
         K_p,(tp1,tp2,tp3) = puiseux_polynomial_ring(QQ, ["t1","t2","t3"])
         ConformanceTests.test_Ring_interface(K_p) # basic tests

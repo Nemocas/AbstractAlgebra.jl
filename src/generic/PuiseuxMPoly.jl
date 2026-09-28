@@ -255,11 +255,11 @@ function show(io::IO, p::PuiseuxMPolyRing)
   @show_name(io, p)
   @show_special(io, p)
   if is_terse(io)
-    print(io, "Multivariate polynomial ring")
+    print(io, "Puiseux polynomial ring")
   else
     io = pretty(io)
-    print(io, "Multivariate polynomial ring in ", ItemQuantity(nvars(p), "variable"))
-    print(terse(io), " over ", Lowercase(), base_ring(p))
+    print(io, "Puiseux polynomial ring in ", ItemQuantity(nvars(p), "variable"))
+    print(terse(io), " over ", Lowercase(), coefficient_ring(p))
   end
 end
 
