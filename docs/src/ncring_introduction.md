@@ -16,7 +16,9 @@ commutative". The union type `NCRingElement` adds Julia's number types to
 
 AbstractAlgebra provides univariate polynomials over a noncommutative ring,
 free associative algebras and matrix algebras, each described on its own page
-in this section.
+in this section. To implement a noncommutative ring, see
+[Noncommutative rings](@ref ring-interface-noncommutative) in the ring
+interface.
 
 ## Exact division
 

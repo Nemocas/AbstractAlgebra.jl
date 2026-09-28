@@ -30,7 +30,8 @@ types in generic/GenericTypes.jl:
 The parent type must belong to `Ring` and the element type must belong
 to `RingElem`. Of course, the types may belong to these abstract types
 transitively, e.g. `Poly{T}` actually belongs to `PolyRingElem{T}` which in
-turn belongs to `RingElem`.
+turn belongs to `RingElem`. For noncommutative rings, see
+[Noncommutative rings](@ref ring-interface-noncommutative).
 
 For parameterised rings, we advise that the types of both the parent objects and
 element objects to be parameterised by the types of the elements of the base ring
@@ -499,6 +500,19 @@ divexact(a::MyElem, b::Integer)
 In case $f$ cannot explode in size when powered by a very large integer, and it is
 practical to do so, one may provide this function to support powering with `BigInt`
 exponents (or for external modules, any other big integer type).
+
+## [Noncommutative rings](@id ring-interface-noncommutative)
+
+The same interface serves noncommutative rings, with these differences:
+
+- The parent type must belong to `NCRing` but not to `Ring`, and the element
+  type to `NCRingElem` but not to `RingElem`. Generic code for rings that need
+  not be commutative should accept `NCRingElement`, which adds Julia's number
+  types to `NCRingElem` as `RingElement` does to `RingElem`.
+- Instead of [`divexact`](@ref), implement
+  [`divexact_left(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact_left)
+  and [`divexact_right(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact_right).
+  Throw a `DivideError` if `g` is zero.
 
 ## Minimal example of ring implementation
 
