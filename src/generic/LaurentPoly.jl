@@ -406,6 +406,32 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+# Like sqrt for polynomials, this assumes the trailing degree of a square is
+# even, which holds over a domain.
+function is_square_with_sqrt(p::LaurentPolyWrap)
+   R = parent(p)
+   iszero(p) && return true, zero(R)
+   q = canonicalize(p)
+   isodd(q.mindeg) && return false, zero(R)
+   flag, r = is_square_with_sqrt(q.poly)
+   flag || return false, zero(R)
+   return true, LaurentPolyWrap(R, r, div(q.mindeg, 2))
+end
+
+is_square(p::LaurentPolyWrap) = is_square_with_sqrt(p)[1]
+
+function Base.sqrt(p::LaurentPolyWrap; check::Bool = true)
+   flag, q = is_square_with_sqrt(p)
+   check && !flag && error("Not a square in sqrt")
+   return q
+end
+
+###############################################################################
+#
 #   Inflation
 #
 ###############################################################################

@@ -469,6 +469,54 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test map_coefficients(one, fz) == z^2 + z + z^-2
       @test map_coefficients(x -> x+2, fz) == 3z^2 + z
       @test map_coefficients(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
+
+      @test change_coefficient_ring(QQ, fz) == q^2 - q - 2q^-2
+      @test change_coefficient_ring(QQ, fz; parent = Q) == q^2 - q - 2q^-2
+   end
+
+   @testset "coefficients, content, tail, deflation, square roots" begin
+      L, y = laurent_polynomial_ring(ZZ, "y")
+      f = 3y^-2 + 6y^2 - 9y^3
+
+      # entries with zero coefficient may occur, as for polynomials
+      @test sum(c*y^e[1] for (c, e) in zip(coefficients(f), exponent_vectors(f))) == f
+      @test all(e -> length(e) == 1, exponent_vectors(f))
+      @test first(coefficients(f)) == 3
+      @test first(exponent_vectors(f)) == [-2]
+      @test isempty(collect(coefficients(zero(L))))
+      @test isempty(collect(exponent_vectors(zero(L))))
+
+      @test content(f) == 3
+      @test content(-2y^-1) == 2
+      @test content(zero(L)) == 0
+
+      @test tail(f) == 3y^-2 + 6y^2
+      @test tail(y^-1) == 0
+      @test tail(zero(L)) == 0
+
+      @test deflation(f) == (-2, 1)
+      @test deflation(y^-3 + y + y^5) == (-3, 4)
+      @test deflation(y^-3 + y^3 + y^7) == (-3, 2)
+      @test deflation(7y^-4) == (-4, 1)
+      @test deflation(zero(L)) == (0, 1)
+      g = y^-3 + 2y + y^5
+      @test deflate(g, -3, 2) == y^0 + 2y^2 + y^4
+      @test inflate(deflate(g, -3, 2), -3, 2) == g
+      @test deflate(y^-4 + y^2, 2) == y^-2 + y
+
+      h = (y^-1 + 2 + 3y)^2
+      @test is_square(h)
+      @test is_square(y^-2)
+      @test is_square(zero(L))
+      @test !is_square(y)
+      @test !is_square(y^-1 + 1)
+      @test !is_square(-y^2)
+      @test sqrt(h)^2 == h
+      @test sqrt(4y^-6) == 2y^-3 || sqrt(4y^-6) == -2y^-3
+      @test_throws ErrorException sqrt(y)
+      ok, s = is_square_with_sqrt(h)
+      @test ok && s^2 == h
+      @test !is_square_with_sqrt(y^3)[1]
    end
 
    @testset "printing" begin
