@@ -17,6 +17,22 @@
 
 @nospecialize
 
+# Return whether `f` can be evaluated on every element of `elems`.
+#
+# `is_unit` and `is_nilpotent` are optional parts of the (NC)Ring interface, and
+# some rings implement them only for part of their elements: Oscar's
+# `is_unit(::PBWAlgQuoElem)` answers for zero and for units, but throws for
+# anything else. So probing a single element such as `one(R)` is not enough;
+# callers pass in exactly the elements they are about to test.
+function supports(f, elems)
+   try
+      foreach(f, elems)
+   catch
+      return false
+   end
+   return true
+end
+
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
    T = elem_type(R)
@@ -69,12 +85,56 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          end
       end
 
-      @testset "Basic functions" begin
+      @testset "Basic properties" begin
          @test iszero(R())       # R() is supposed to construct 0 ?
          @test iszero(zero(R))
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
+         if is_trivial(R)
+            @test isone(R(0))
+            @test iszero(R(1))
+            @test R(0) == R(1)
+         end
+
+         elems = T[generate_element(R)::T for _ in 1:reps]
+         squares = T[a^2 for a in elems]
+         probe = T[zero(R); one(R); elems; squares]
+         has_is_unit = supports(is_unit, probe)
+         has_is_nilpotent = supports(is_nilpotent, probe)
+
+         if has_is_unit
+            @test is_unit(R(1))
+            if is_trivial(R)
+               @test is_unit(R(0))
+            else
+               @test !is_unit(R(0))
+               for (a, a2) in zip(elems, squares)
+                  @test is_unit(a) == is_unit(a2)
+               end
+            end
+         end
+
+         if has_is_nilpotent
+            @test is_nilpotent(R(0))
+            if is_trivial(R)
+               @test is_nilpotent(R(1))
+            else
+               @test !is_nilpotent(R(1))
+               for (a, a2) in zip(elems, squares)
+                  @test is_nilpotent(a) == is_nilpotent(a2)
+                  if has_is_unit
+                     @test !(is_unit(a) && is_nilpotent(a))
+                  end
+                  if is_domain_type(T)
+                     @test is_nilpotent(a) == is_zero(a)
+                  end
+               end
+            end
+         end
+      end
+
+      @testset "hash, deepcopy, equality, printing, parent" begin
          for i in 1:reps
             a = generate_element(R)::T
             @test hash(a) isa UInt
@@ -82,11 +142,13 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             @test !ismutable(a) || a !== A
             @test equality(a, A)
             @test hash(a) == hash(A)
-            @test parent(a) === parent(A)
+            @test parent(a) === R
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
+      end
 
+      @testset "Basic arithmetic" begin
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
