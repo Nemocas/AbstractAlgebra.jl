@@ -1,107 +1,93 @@
+using AbstractAlgebra
+using InteractiveUtils: subtypes
 using Kroki
 
-parents = plantuml"""
+###############################################################################
+#
+#   The hierarchy, read off the loaded package
+#
+###############################################################################
+
+# `Module{T<:NCRingElement}` is drawn as `Module{T}`; the bounds would only add
+# noise to the picture.
+function type_label(T)
+  vars = String[]
+  while T isa UnionAll
+    push!(vars, string(T.var.name))
+    T = T.body
+  end
+
+  isempty(vars) && return string(nameof(T))
+  return string(nameof(T), "{", join(vars, ", "), "}")
+end
+
+# `IdealElem` is unused; drop this once #2524 has removed it.
+const IGNORED = ["IdealElem{T}"]
+
+# Only AbstractAlgebra's own abstract types.  `Generic`'s refinements and the
+# concrete types are covered by the prose in visualizing_types.md instead.
+is_shown(T) =
+  isabstracttype(T) && parentmodule(T) === AbstractAlgebra && !(type_label(T) in IGNORED)
+
+# Short branches first, so the long chains cascade towards one side instead of
+# splitting the picture down the middle.
+subtypes_shown(T) = sort!(filter(is_shown, subtypes(T)); by = S -> (leaves(S), type_label(S)))
+
+leaves(T) = (S = subtypes_shown(T); isempty(S) ? 1 : sum(leaves, S))
+
+###############################################################################
+#
+#   PlantUML
+#
+###############################################################################
+
+const PREAMBLE = """
 @startuml
 skinparam monochrome true
 skinparam defaultFontName Monospaced
 skinparam defaultFontSize 16
 skinparam objectArrowColor DarkGray
 skinparam RoundCorner 15
+left to right direction
+"""
 
-' Ideals
-"Set" -down-> "Ideal{T}"
-
-' Groups
-"Set" -down-> "Group"
-"Group" -down-> "AbstractPermutationGroup"
-
-' Additive groups
-"Set" -down-> "AdditiveGroup"
-"AdditiveGroup" -down-> "Module{T}"
-"Module{T}" -down-> "FPModule{T}"
-"Module{T}" -down-> "MatSpace{T}"
-
-' Non-commutative rings
-"Set" -down-> "NCRing"
-"NCRing" -down--> "MatRing{T}"
-"NCRing" -down--> "NCPolyRing{T}"
-"NCRing" -down-> "Ring"
-
-' Rings
-"Ring" -down---> "Field"
-"Ring" -down-> "PolyRing{T}"
-"PolyRing{T}" -down-> "LaurentPolyRing{T}"
-"PolyRing{T}" -down-> "SeriesRing{T}"
-"Ring" -down-> "ResidueRing{T}"
-
-' Fields
-"Field" -down-> "ResidueField{T}"
-"NumField{T}" -down-> "SimpleNumField{T}"
-"Field" -down-> "FracField{T}"
-"Field" -down-> "NumField{T}"
-"Field" -down-> "FinField"
-
+const EPILOGUE = """
 hide members
 hide circle
 
 @enduml
 """
 
-elements = plantuml"""
-@startuml
-skinparam monochrome true
-skinparam defaultFontName Monospaced
-skinparam defaultFontSize 16
-skinparam objectArrowColor DarkGray
-skinparam RoundCorner 15
+function emit_subtypes(io::IO, T)
+  for S in subtypes_shown(T)
+    println(io, "\"", type_label(T), "\" --> \"", type_label(S), "\"")
+    emit_subtypes(io, S)
+  end
+end
 
+# `extra` carries relations that are not subtyping, so cannot be discovered by
+# reflection.
+function diagram(roots::Vector; extra::String = "")
+  io = IOBuffer()
+  print(io, PREAMBLE)
 
-' Ideals
-"SetElem" -down-> "IdealElem{T}"
+  for T in roots
+    println(io)
+    emit_subtypes(io, T)
+  end
 
-' Maps
-' NOTE: Identity is
-"SetElem" -down----> "Map{D, C, S, T}"
-"Map{D, C, S, T}" .right. "SetMap"
-"SetMap" -down-> "IdentityMap"
-"SetMap" -down-> "FunctionalMap"
-"FunctionalMap" -down-> "FPModuleHomomorphism"
+  print(io, extra)
+  print(io, EPILOGUE)
 
-' Groups
-"SetElem" -down-> "GroupElem"
-"GroupElem" -down-> "AbstractPerm"
+  return Diagram(:plantuml, String(take!(io)))
+end
 
-' Additive groups
-"SetElem" -down-> "AdditiveGroupElem"
-"AdditiveGroupElem" -down-> "ModuleElem{T}"
-"ModuleElem{T}" -down-> "FPModuleElem{T}"
-"ModuleElem{T}" -down-> "MatElem{T}"
+parents = diagram([AbstractAlgebra.Set])
 
-' Non-commutative rings
-"SetElem" -down-> "NCRingElem"
-"NCRingElem" -down--> "MatRingElem{T}"
-"NCRingElem" -down--> "NCPolyRingElem{T}"
-"NCRingElem" -down-> "RingElem"
-
-' Rings
-"RingElem" -down-> "PolyRingElem{T}"
-"PolyRingElem{T}" -down-> "SeriesElem{T}"
-"PolyRingElem{T}" -down-> "LaurentPolyRingElem{T}"
-"RingElem" -down-> "ResElem{T}"
-"RingElem" -down---> "FieldElem"
-
-' Fields
-"FieldElem" -down-> "FinFieldElem"
-"FieldElem" -down-> "ResFieldElem{T}"
-"FieldElem" -down-> "NumFieldElem{T}"
-"NumFieldElem{T}" -down-> "SimpleNumFieldElem{T}"
-"FieldElem" -down-> "FracElem{T}"
-
-hide members
-hide circle
-
-@enduml
-"""
+# `SetMap` is a hierarchy of its own: its members are not elements, but the
+# third parameter `S` of `Map{D, C, S, T}`.
+elements = diagram([AbstractAlgebra.SetElem, AbstractAlgebra.SetMap];
+                   extra = "\n\"Map{D, C, S, T}\" .. \"SetMap\"\n")
 
 
 open(joinpath(@__DIR__, "src", "assets", "parents_diagram.svg"), "w") do io
