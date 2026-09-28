@@ -81,28 +81,37 @@ parent_type(T::Type{Union{}}) = throw(MethodError(parent_type, (T,)))
 @doc raw"""
     base_ring(a)
 
-Return the base ring of the given element or parent `a`. For generic
-constructions over a base ring, e.g. polynomials over a coefficient ring, this
-is the parent object of that ring. Not every parent has a base ring; in that
-case a `MethodError` is raised.
+Return the base ring of the given element or parent `a`.
 
-There is no general mathematical definition of a base ring, so consult the
-documentation of the ring at hand. For example, the base ring of
-$\mathbb{Z}/n\mathbb{Z}$ is $\mathbb{Z}$, of which it is a quotient; the
-modulus $n$ is a parameter, not a base ring.
+`base_ring` exposes an implementation detail: the ring that the parent of `a`
+is built on. What that is depends on the type, and there is no general
+mathematical definition. In particular, it need not be the coefficient ring;
+use [`coefficient_ring`](@ref) for that. For example, the base ring of $R[x]$
+is $R$, that of $\mathbb{Z}/n\mathbb{Z}$ is $\mathbb{Z}$, and that of a
+universal polynomial ring is the multivariate polynomial ring representing it.
+
+If the parent has no base ring, a `MethodError` is raised.
 
 # Examples
 ```jldoctest
-julia> S, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> base_ring(S) == QQ
-true
-
-julia> R = GF(7)
-Finite field F_7
+julia> R, x = polynomial_ring(QQ, :x);
 
 julia> base_ring(R)
+Rationals
+
+julia> base_ring(residue_ring(ZZ, 7)[1])
+Integers
+
+julia> S, (y, z) = universal_polynomial_ring(QQ, [:y, :z]);
+
+julia> base_ring(S)
+Multivariate polynomial ring in 2 variables y, z
+  over rationals
+
+julia> coefficient_ring(S)
+Rationals
+
+julia> base_ring(GF(7))
 ERROR: MethodError: no method matching base_ring(::AbstractAlgebra.GFField{Int64})
 ```
 """

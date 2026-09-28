@@ -98,9 +98,9 @@ object `R` and `MyElem` for the type of the elements of the ring.
 - [`parent_type(::Type{MyElem})`](@ref parent_type)
 - [`elem_type(::Type{MyParent})`](@ref elem_type)
 - [`base_ring_type(::Type{MyParent})`](@ref base_ring_type): return `Union{}`
-  if the ring is not parameterised by another ring.
-- [`base_ring(R::MyParent)`](@ref base_ring): only if the ring is
-  parameterised by another ring.
+  if the ring has no base ring.
+- [`base_ring(R::MyParent)`](@ref base_ring): only if the ring is built on
+  another ring.
 - [`coefficient_ring(R::MyParent)`](@ref coefficient_ring) and
   [`coefficient_ring_type(::Type{MyParent})`](@ref coefficient_ring_type): only
   if there is a well-defined notion of a coefficient ring, e.g. for polynomial
