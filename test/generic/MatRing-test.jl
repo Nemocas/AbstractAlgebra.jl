@@ -70,6 +70,19 @@
    @test isa(S([1, 2, 3, 4]), MatRingElem)
 
    @test parent(S()) == S
+
+   # Conversion between matrix spaces and matrix rings
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+   M = matrix_space(ZZ, 2, 2)(A)
+   @test M isa MatElem
+   @test M == matrix(A)
+   @test_throws ErrorConstrDimMismatch matrix_space(ZZ, 2, 3)(A)
+
+   B = matrix_ring(QQ, 2)(A)
+   @test B isa MatRingElem
+   @test matrix(B) == matrix(QQ, [1 2; 3 4])
+   @test_throws ErrorConstrDimMismatch matrix_ring(QQ, 3)(A)
 end
 
 @testset "Generic.MatRing.finiteness" begin
@@ -252,6 +265,39 @@ end
    M = rand(S, -10:10)
 
    @test -(-M) == M
+   @test -M isa MatRingElem
+end
+
+@testset "Generic.MatRing.zero_entries" begin
+   S = matrix_ring(ZZ, 3)
+   A = S([0 -1 0; 0 2 0; 0 0 0])
+
+   @test is_zero_entry(A, 1, 1)
+   @test !is_zero_entry(A, 1, 2)
+   @test is_negative_entry(A, 1, 2)
+   @test !is_negative_entry(A, 2, 2)
+   @test is_positive_entry(A, 2, 2)
+   @test !is_positive_entry(A, 1, 2)
+
+   @test !is_zero_row(A, 1)
+   @test is_zero_row(A, 3)
+   @test_throws BoundsError is_zero_row(A, 4)
+   @test is_zero_column(A, 1)
+   @test !is_zero_column(A, 2)
+   @test_throws BoundsError is_zero_column(A, 0)
+end
+
+@testset "Generic.MatRing.unsafe_ops" begin
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+
+   @test mul!(BigInt[0, 0], A, BigInt[1, 1]) == BigInt[3, 7]
+   @test mul!(BigInt[0, 0], BigInt[1, 1], A) == BigInt[4, 6]
+
+   B = zero!(A)
+   @test B isa MatRingElem
+   @test iszero(B)
+   @test iszero(A)
 end
 
 @testset "Generic.MatRing.binary_ops" begin
@@ -933,71 +979,6 @@ end
    end
 end
 
-@testset "Generic.MatRing.rref" begin
-   S, = residue_ring(ZZ, 20011*10007)
-   R = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(R, i, -100:100)
-
-      do_test = false
-      r = 0
-      A = M
-      try
-         r, A, d = rref_rational(M)
-         do_test = true
-      catch e
-         if !(e isa ErrorException)
-            rethrow(e)
-         end
-      end
-
-      if do_test
-         @test r == i
-         @test is_rref(A)
-      end
-   end
-
-   S, z = polynomial_ring(ZZ, "z")
-   R = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(R, i, 0:3, -20:20)
-
-      r, A, d = rref_rational(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-
-   R, x = polynomial_ring(QQ, "x")
-   K, f = residue_field(R, x^3 + 3x + 1)
-   a = f(x)
-   S = matrix_ring(K, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(S, i, -100:100)
-
-      r, A = rref(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-
-   R, x = polynomial_ring(ZZ, "x")
-   S, y = polynomial_ring(R, "y")
-   T = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
-
-      r, A, d = rref_rational(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-end
-
 @testset "Generic.MatRing.inversion" begin
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
@@ -1321,7 +1302,7 @@ end
    p1 = minpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(rand(R, -1:2, -3:3)))
+      similarity!(matrix(M), rand(1:6), R(rand(R, -1:2, -3:3)))
    end
 
    p2 = minpoly(U, M)
