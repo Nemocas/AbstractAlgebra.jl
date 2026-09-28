@@ -302,7 +302,7 @@ function Base.length(x::Union{UnivPolyCoeffs, UnivPolyExponentVectors, UnivPolyT
    return length(x.poly)
 end
 
-function Base.eltype(::Type{UnivPolyCoeffs{UniversalRingElem{<:MPolyRingElem, T}}}) where T <: RingElement
+function Base.eltype(::Type{<:UnivPolyCoeffs{<:UniversalRingElem{<:MPolyRingElem, T}}}) where T
    return T
 end
 
