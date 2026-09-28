@@ -33,6 +33,9 @@ RingElement <: NCRingElement
 
 ## Functions for types and parents of rings
 
+These functions are not specific to rings: `parent`, `parent_type` and
+`elem_type` apply to groups as well, and `base_ring` to modules.
+
 ```@docs
 parent
 parent_type
