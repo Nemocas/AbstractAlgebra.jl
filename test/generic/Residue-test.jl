@@ -479,6 +479,17 @@ end
          @test q*a2 == p
       end
    end
+
+   R, = residue_ring(ZZ, 6)
+   for check in (true, false)
+      @test_throws DivideError divexact(R(1), R(0); check)
+      @test_throws DivideError divexact(R(0), R(0); check)
+   end
+   @test_throws DivideError R(1) / R(0)
+
+   # in the zero ring, 0 is a unit
+   R, = residue_ring(ZZ, 1)
+   @test is_zero(divexact(R(0), R(0)))
 end
 
 @testset "EuclideanRingResidueRingElem.polynomials" begin
