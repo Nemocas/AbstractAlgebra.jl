@@ -86,6 +86,11 @@ constructions over a base ring, e.g. polynomials over a coefficient ring, this
 is the parent object of that ring. Not every parent has a base ring; in that
 case a `MethodError` is raised.
 
+There is no general mathematical definition of a base ring, so consult the
+documentation of the ring at hand. For example, the base ring of
+$\mathbb{Z}/n\mathbb{Z}$ is $\mathbb{Z}$, of which it is a quotient; the
+modulus $n$ is a parameter, not a base ring.
+
 # Examples
 ```jldoctest
 julia> S, x = polynomial_ring(QQ, :x)
