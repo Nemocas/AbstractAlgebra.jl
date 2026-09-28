@@ -6,7 +6,8 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 # Ring functionality
 
 AbstractAlgebra has both commutative and noncommutative rings. Together we
-refer to them below as rings.
+refer to them below as rings. What differs for noncommutative rings is
+described in the [introduction to noncommutative rings](ncring_introduction.md).
 
 ## [Abstract types for rings](@id ring-abstract-types)
 
@@ -153,16 +154,6 @@ divexact
 Base.inv(::RingElem)
 canonical_unit
 ```
-
-## Basic functionality for noncommutative rings only
-
-```julia
-divexact_left(a::T, b::T) where T <: NCRingElement
-divexact_right(a::T, b::T) where T <: NCRingElement
-```
-
-As per `divexact` above, except that division by `b` happens on the left or
-right, respectively, of `a`.
 
 ## Unsafe ring operators
 

@@ -31,7 +31,6 @@ makedocs(
                  "integer.md",
                  "total_fraction.md",
                  "polynomial.md",
-                 "ncpolynomial.md",
                  "mpolynomial.md",
                  "universal_ring.md",
                  "laurent_polynomial.md",
@@ -40,7 +39,12 @@ makedocs(
                  "puiseux.md",
                  "mseries.md",
                  "residue.md",
+             ],
+             "Non-commutative rings" => [
+                 "ncring_introduction.md",
+                 "ncpolynomial.md",
                  "free_associative_algebra.md",
+                 "matrix_algebras.md",
              ],
              "Fields" => [
                  "field_introduction.md",
@@ -78,7 +82,6 @@ makedocs(
                     "how_to_linear_solve.md", 
                  ],
                  "matrix_spaces.md",
-                 "matrix_algebras.md",
                  "Developer documentation" => [
                     "matrix_implementation.md"
                  ],
