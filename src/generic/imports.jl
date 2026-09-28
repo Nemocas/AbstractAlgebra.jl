@@ -169,6 +169,7 @@ import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_homogeneous
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_noetherian
 import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
