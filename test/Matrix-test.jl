@@ -261,6 +261,7 @@ end
                  (zero_matrix(Qy, 2, 2), 0),
                  (matrix(Qy, [0 0; 1 2]), 1),
                  (matrix(Qy, [0 0; y[1] 1]), 1),
+                 (matrix(Qy, [0 1; 0 2; 0 0]), 1),
                  (zero_matrix(Qz, 2, 2), 0),
                  (matrix(Qz, [0 0; 1 2]), 1)]
     @test AbstractAlgebra.rank_interpolation(M) == r

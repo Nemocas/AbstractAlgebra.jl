@@ -3391,9 +3391,9 @@ function rank_interpolation(A::MatElem{T}) where {T <: PolyRingElem}
    min_ = min(n, m)
    #A zero row or column has degree -1 but lies in no nonzero minor, so it contributes 0.
    if (min_ == n)
-      maxdetdeg = sum(maximum(degree(A[i, j]) for j in 1:m; init = 0) for i in 1:n)
+      maxdetdeg = sum(max(0, maximum(degree(A[i, j]) for j in 1:m)) for i in 1:n)
    else 
-      maxdetdeg = sum(maximum(degree(A[i, j]) for i in 1:n; init = 0) for j in 1:m)
+      maxdetdeg = sum(max(0, maximum(degree(A[i, j]) for i in 1:n)) for j in 1:m)
    end
    r = 0
    eval_set = evaluation_points(K, maxdetdeg+1)
@@ -3434,9 +3434,9 @@ function rank_interpolation(A::MatElem{T}) where {T <: MPolyRingElem}
    #The maximum degree of det(M') is calculated where M' is an arbitrary quadratic submatrix of M.
    min_ = min(n, m)
    if min_ == n
-      maxdetdeg = [sum(maximum(degree(A[i, j], k) for j in 1:m; init = 0) for i in 1:n) for k in 1:num_vars]
+      maxdetdeg = [sum(max(0, maximum(degree(A[i, j], k) for j in 1:m)) for i in 1:n) for k in 1:num_vars]
    else
-      maxdetdeg = [sum(maximum(degree(A[i, j], k) for i in 1:n; init = 0) for j in 1:m) for k in 1:num_vars]
+      maxdetdeg = [sum(max(0, maximum(degree(A[i, j], k) for i in 1:n)) for j in 1:m) for k in 1:num_vars]
    end
    r = 0
    eval_set = Vector{Vector{elem_type(K)}}(undef, num_vars)
