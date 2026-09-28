@@ -191,8 +191,8 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 (*identical*) ring is returned. Setting `cached` to `false` ensures a distinct
 new ring is returned, and will also prevent it from being cached.
 
-For information about the many ways to specify `varnames...` refer to [`polynomial_ring`](@ref) or the
-specification in [`AbstractAlgebra.@varnames_interface`](@ref).
+For information about the many ways to specify `varnames...` refer to [`polynomial_ring`](@ref) or
+[`variable_names`](@ref).
 
 # Examples
 

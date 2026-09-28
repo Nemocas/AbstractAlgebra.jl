@@ -88,10 +88,29 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 
 ## Parent objects with variable names
 
-The multivariate parent object constructors (`polynomial_ring`, `power_series_ring`, `free_associative_algebra`, `laurent_polynomial_ring`, and `rational_function_field`) share a common interface for specifying the variable names, which is provided by `@varnames_interface`.
+Constructors of parents with variables, such as `polynomial_ring`,
+`power_series_ring`, `free_associative_algebra`, `laurent_polynomial_ring`,
+`rational_function_field` and `universal_polynomial_ring`, accept the variable
+names in the forms described by [`variable_names`](@ref AbstractAlgebra.variable_names),
+and return the generators in the same shape. They also have macro forms, e.g.
+`@polynomial_ring`, which in addition define the generators as variables in the
+current scope.
+
+```jldoctest
+julia> R, x, (y, z) = polynomial_ring(QQ, "x#" => 1:2, [:y, :z]);
+
+julia> x, y
+(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2], y)
+
+julia> S, w = polynomial_ring(QQ, 3)
+(Multivariate polynomial ring in 3 variables over rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x1, x2, x3])
+
+julia> T = @polynomial_ring(QQ, [:u, :v]);
+
+julia> u*v
+u*v
+```
 
 ```@docs
-AbstractAlgebra.@varnames_interface
 AbstractAlgebra.variable_names
-AbstractAlgebra.reshape_to_varnames
 ```
