@@ -92,6 +92,11 @@ function gens(R::LaurentMPolyRing)
     return [gen(R, i) for i in 1:nvars(R)]
 end
 
+function is_constant(a::LaurentMPolyRingElem)
+    length(a) > 1 && return false
+    return iszero(a) || iszero(first(exponent_vectors(a)))
+end
+
 ###############################################################################
 #
 #   Derivative

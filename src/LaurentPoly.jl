@@ -112,6 +112,13 @@ function trailing_coefficient(p::LaurentPolyRingElem)
    isempty(dr) ? zero(coefficient_ring(p)) : coeff(p, first(dr))
 end
 
+constant_coefficient(p::LaurentPolyRingElem) = coeff(p, 0)
+
+function is_constant(p::LaurentPolyRingElem)
+   dr = degrees_range(p)
+   return isempty(dr) || dr == 0:0
+end
+
 gens(R::LaurentPolyRing) = [gen(R)]
 
 is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))

@@ -77,6 +77,8 @@ leading_coefficient(p::LaurentMPolyRingElem)
 leading_monomial(p::LaurentMPolyRingElem)
 leading_term(p::LaurentMPolyRingElem)
 leading_exponent_vector(p::LaurentMPolyRingElem)
+constant_coefficient(p::LaurentMPolyRingElem)
+is_constant(p::LaurentMPolyRingElem)
 ```
 
 ```julia

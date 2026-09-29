@@ -75,6 +75,17 @@ import AbstractAlgebra: Generic.normalize!
         @test poly(g) == t1^70*t2^21*t3^42 + t1^42*t2^42*t3^42 + t1^42*t2^21*t3^60
         @test scale(g) == 2*3*7
 
+        @test @inferred is_constant(zero(Kp))
+        @test @inferred is_constant(Kp(5))
+        @test is_constant(3 * tp1^(1//2) * tp1^(-1//2))
+        @test !is_constant(tp1^(1//2))
+        @test !is_constant(tp1^(-1//3))
+        @test !is_constant(1 + tp1)
+
+        @test @inferred(constant_coefficient(zero(Kp))) == 0
+        @test @inferred(constant_coefficient(tp1^(-1//2) + 5 + tp2^(1//3))) == 5
+        @test constant_coefficient(tp1^(1//2)) == 0
+
         K, (t,) = puiseux_polynomial_ring(QQ,["t"])
         @test is_univariate(K)
         @test valuation(K(0)) == PosInf()
