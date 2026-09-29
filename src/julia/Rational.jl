@@ -219,9 +219,9 @@ function rand(rng::AbstractRNG,
 end
 
 
-rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
+rand(rng::AbstractRNG, R::Rationals, n::AbstractArray) = rand(rng, make(R, n))
 
-rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
+rand(R::Rationals, n::AbstractArray) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #

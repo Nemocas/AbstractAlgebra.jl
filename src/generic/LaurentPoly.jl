@@ -442,10 +442,11 @@ function rand(rng::AbstractRNG,
    LaurentPolyWrap(R, rand(rng, v), m)
 end
 
-rand(rng::AbstractRNG, S::LaurentPolyWrapRing, degrees_range, v...) =
+rand(rng::AbstractRNG, S::LaurentPolyWrapRing,
+     degrees_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, degrees_range, v...))
 
-rand(S::LaurentPolyWrapRing, degrees_range, v...) =
+rand(S::LaurentPolyWrapRing, degrees_range::AbstractUnitRange{Int}, v...) =
    rand(Random.default_rng(), S, degrees_range, v...)
 
 ###############################################################################
