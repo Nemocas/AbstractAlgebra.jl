@@ -9,6 +9,31 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.50.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.3) - 2026-09-29
+
+### New or extended functionality
+
+- [#1947](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1947) Add conformance tests for `is_unit` and `is_nilpotent`
+- [#2483](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2483) More symbol based `evaluate` methods
+- [#2493](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2493) Add iterator for all free modules over finite rings
+- [#2533](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2533) More mutable arithmetic for `FreeAssociativeAlgebraElem`
+- [#2555](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2555) Add `is_constant` and `constant_coefficient` for Laurent and Puiseux polynomials
+
+### Fixed bugs that returned incorrect results
+
+- [#2532](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2532) Fix `neg!`/`mul!` of `FreeAssociativeAlgebraElem` mutating shared coefficients
+- [#2542](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2542) Fix `rank_interpolation` degree bound for zero rows
+- [#2544](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2544) Fix potentially wrong results in `rank_interpolation_mc`
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2521](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2521) Fix evaluate of factored fractions over non-fields
+- [#2530](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2530) Fix `rank`/`dim`/`vector_space_dim` to work for more FPModules over fields
+
+### Other fixed bugs
+
+- [#2477](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2477) Remove unusable method `evaluate(::MPolyRingElem, ::Integer)`
+
 ## [0.50.2](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.2) - 2026-07-31
 
 ### New or extended functionality
