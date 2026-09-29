@@ -142,7 +142,7 @@ end
 @doc raw"""
     (S::MatSpace{T})() where {T <: NCRingElement}
     (S::MatSpace)(a::NCRingElement)
-    (S::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+    (S::MatSpace{T})(a::MatElem{T}) where {T <: NCRingElement}
     (S::MatSpace{T})(a::AbstractVecOrMat) where {T <: NCRingElement}
 
 Construct an element of the matrix space `S`.
@@ -197,7 +197,7 @@ function (S::MatSpace{T})() where {T <: NCRingElement}
   return zero_matrix(base_ring(S), nrows(S), ncols(S))::eltype(S)
 end
 
-function (S::MatSpace{T})(a::MatrixElem{T}) where {T <: NCRingElement}
+function (S::MatSpace{T})(a::MatElem{T}) where {T <: NCRingElement}
   _check_dim(nrows(S), ncols(S), a)
   base_ring(S) == base_ring(a) || throw(DomainError((S, a), "Base rings do not match."))
   a isa eltype(S) && return a
@@ -308,7 +308,7 @@ julia> number_of_columns(M)
 number_of_columns(A::MatElem)
 
 @doc raw"""
-    length(A::MatrixElem{T}) where T <: NCRingElement
+    length(A::MatElem{T}) where T <: NCRingElement
 
 Return the number of entries in the matrix `A`.
 
@@ -326,7 +326,7 @@ julia> length(M)
 length(A::MatrixElem{T}) where T <: NCRingElement = nrows(A) * ncols(A)
 
 @doc raw"""
-    isempty(A::MatrixElem{T}) where {T <: NCRingElement}
+    isempty(A::MatElem{T}) where {T <: NCRingElement}
 
 Return `true` if `A` has no entries, that is, if either the number
 of rows or the number of columns is zero. Otherwise, return `false`.
@@ -353,7 +353,7 @@ isempty(A::MatrixElem{T}) where {T <: NCRingElement} = (nrows(A) == 0) || (ncols
 Base.eltype(::Type{<:MatrixElem{T}}) where {T <: NCRingElement} = T
 
 @doc raw"""
-    Base.isassigned(A::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
+    Base.isassigned(A::MatElem{T}, i::Int, j::Int) where {T <: NCRingElement}
 
 Return `true` if the matrix `A` has an entry at position `(i, j)`,
 and `false` otherwise.
@@ -372,7 +372,7 @@ julia> isassigned(M, 4, 4)
 false
 ```
 """
-function Base.isassigned(A::MatrixElem{T}, i, j) where {T <: NCRingElement}
+function Base.isassigned(A::MatElem{T}, i, j) where {T <: NCRingElement}
     try
         A[i, j]
         true
@@ -468,28 +468,28 @@ function isone(a::MatElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    is_zero_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int)
+    is_zero_entry(A::Union{Matrix,MatElem}, i::Int, j::Int)
 
 Return `is_zero(A[i,j])`, but possibly more efficiently.
 """
-@inline is_zero_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int) = iszero(A[i,j])
+@inline is_zero_entry(A::Union{Matrix,MatElem}, i::Int, j::Int) = iszero(A[i,j])
 
 @doc raw"""
-    is_positive_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int)
+    is_positive_entry(A::Union{Matrix,MatElem}, i::Int, j::Int)
 
 Return `is_positive(A[i,j])`, but possibly more efficiently.
 """
-@inline is_positive_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_positive(A[i,j])
+@inline is_positive_entry(A::Union{Matrix,MatElem}, i::Int, j::Int) = is_positive(A[i,j])
 
 @doc raw"""
-    is_negative_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int)
+    is_negative_entry(A::Union{Matrix,MatElem}, i::Int, j::Int)
 
 Return `is_negative(A[i,j])`, but possibly more efficiently.
 """
-@inline is_negative_entry(A::Union{Matrix,MatrixElem}, i::Int, j::Int) = is_negative(A[i,j])
+@inline is_negative_entry(A::Union{Matrix,MatElem}, i::Int, j::Int) = is_negative(A[i,j])
 
 @doc raw"""
-    is_zero_row(A::Union{Matrix,MatrixElem}, i::Int)
+    is_zero_row(A::Union{Matrix,MatElem}, i::Int)
 
 Return `true` if the $i$-th row of the matrix $A$ is zero, and `false`
 otherwise.
@@ -510,7 +510,7 @@ julia> is_zero_row(M, 2)
 true
 ```
 """
-function is_zero_row(A::Union{Matrix,MatrixElem}, i::Int)
+function is_zero_row(A::Union{Matrix,MatElem}, i::Int)
   @boundscheck 1 <= i <= nrows(A) || Base.throw_boundserror(A, (i, 1:ncols(A)))
   for j in 1:ncols(A)
     @inbounds if !is_zero_entry(A, i, j)
@@ -521,7 +521,7 @@ function is_zero_row(A::Union{Matrix,MatrixElem}, i::Int)
 end
 
 @doc raw"""
-    is_zero_column(A::Union{Matrix,MatrixElem}, j::Int)
+    is_zero_column(A::Union{Matrix,MatElem}, j::Int)
 
 Return `true` if the $j$-th column of the matrix $A$ is zero, and
 `false` otherwise.
@@ -543,7 +543,7 @@ julia> is_zero_column(M, 2)
 true
 ```
 """
-function is_zero_column(A::Union{Matrix,MatrixElem}, j::Int)
+function is_zero_column(A::Union{Matrix,MatElem}, j::Int)
   @boundscheck 1 <= j <= ncols(A) || Base.throw_boundserror(A, (1:nrows(A), j))
   for i in 1:nrows(A)
     @inbounds if !is_zero_entry(A, i, j)
@@ -1116,7 +1116,7 @@ end
 #
 ###############################################################################
 
-function -(x::MatrixElem{T}) where T <: NCRingElement
+function -(x::MatElem{T}) where T <: NCRingElement
    z = similar(x)
    for i in 1:nrows(x)
       for j in 1:ncols(x)
@@ -1177,7 +1177,7 @@ end
 #
 ###############################################################################
 
-function zero!(x::MatrixElem{T}) where T <: NCRingElement
+function zero!(x::MatElem{T}) where T <: NCRingElement
    R = base_ring(x)
    for i = 1:nrows(x), j = 1:ncols(x)
       x[i, j] = zero(R)
@@ -1390,7 +1390,7 @@ function -(x::MatElem{T}, y::T) where {T <: NCRingElem}
    return z
 end
 
-function mul!(z::Vector{T}, x::MatrixElem{T}, y::Vector{T}) where T <: NCRingElement
+function mul!(z::Vector{T}, x::MatElem{T}, y::Vector{T}) where T <: NCRingElement
    n = min(ncols(x), length(y))
    tmp = base_ring(x)()
    for i in 1:nrows(x)
@@ -1412,7 +1412,7 @@ function *(x::MatElem{T}, y::Vector{T}) where T <: NCRingElement
    return mul!(T[base_ring(x)() for i in 1:nrows(x)], x, y)
 end
 
-function mul!(z::Vector{T}, x::Vector{T}, y::MatrixElem{T}) where T <: NCRingElement
+function mul!(z::Vector{T}, x::Vector{T}, y::MatElem{T}) where T <: NCRingElement
    m = min(length(x), nrows(y))
    tmp = base_ring(y)()
    for j in 1:ncols(y)
@@ -1690,7 +1690,7 @@ otherwise return `false`.
 #
 ###############################################################################
 
-function divexact(x::MatrixElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
+function divexact(x::MatElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1700,7 +1700,7 @@ function divexact(x::MatrixElem{T}, y::JuliaRingElement; check::Bool=true) where
    return z
 end
 
-function divexact(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: RingElem}
+function divexact(x::MatElem{T}, y::T; check::Bool=true) where {T <: RingElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1710,7 +1710,7 @@ function divexact(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: RingElem
    return z
 end
 
-function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+function divexact_left(x::MatElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1720,7 +1720,7 @@ function divexact_left(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCR
    return z
 end
 
-function divexact_right(x::MatrixElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+function divexact_right(x::MatElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -1950,7 +1950,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    content(A::MatrixElem{T}) where T <: RingElement
+    content(A::MatElem{T}) where T <: RingElement
 
 Return the greatest common divisor of all entries of the matrix $A$,
 assuming such a greatest common divisor exists.
@@ -1974,7 +1974,7 @@ julia> b = content(A)
 1
 ```
 """
-function content(A::MatrixElem{T}) where T <: RingElement
+function content(A::MatElem{T}) where T <: RingElement
   d = zero(base_ring(A))
   for i = 1:nrows(A)
      for j = 1:ncols(A)
@@ -1991,7 +1991,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    *(P::Perm, A::MatrixElem{T}) where T <: NCRingElement
+    *(P::Perm, A::MatElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained by applying the permutation `P` to the rows of `A`.
 
@@ -2022,7 +2022,7 @@ julia> P*A
 [  t^2       t             t]
 ```
 """
-function *(P::Perm, A::MatrixElem{T}) where T <: NCRingElement
+function *(P::Perm, A::MatElem{T}) where T <: NCRingElement
    N = similar(A)
    m = nrows(A)
    n = ncols(A)
@@ -2035,7 +2035,7 @@ function *(P::Perm, A::MatrixElem{T}) where T <: NCRingElement
 end
 
 @doc raw"""
-    *(A::MatrixElem{T}, P::Perm) where T <: NCRingElement
+    *(A::MatElem{T}, P::Perm) where T <: NCRingElement
 
 Return a new matrix obtained by applying the permutation `P` to the columns of `A`.
 
@@ -2066,7 +2066,7 @@ julia> A*P
 [   -2   t^2 + t + 1   t + 2]
 ```
 """
-function *(A::MatrixElem{T}, P::Perm) where T <: NCRingElement
+function *(A::MatElem{T}, P::Perm) where T <: NCRingElement
    N = similar(A)
    m = nrows(A)
    n = ncols(A)
@@ -2141,7 +2141,7 @@ function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    lu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
+    lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElement}
 
 Return the LU decomposition of $A$.
 
@@ -2305,7 +2305,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResEle
 end
 
 @doc raw"""
-    fflu(A::MatrixElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
+    fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 
 Return the fraction-free LU decomposition of $A$.
 
@@ -4437,7 +4437,7 @@ end
 
 
 @doc raw"""
-    is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+    is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
 
 Return a tuple `(flag, B)` indicating whether the matrix $A$ has a one-sided
 inverse.
@@ -4490,7 +4490,7 @@ julia> A*B == one(parent(A*B))
 true
 ```
 """
-function is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+function is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
    if (side == :left && nrows(A) < ncols(A)) || (side == :right && ncols(A) < nrows(A))
       return (false, zero(A, 0, 0))
    end
@@ -7742,10 +7742,9 @@ end
 # like change_base_ring, but without initializing the entries
 # this function exists until a better API is implemented
 _change_base_ring(R::NCRing, a::MatElem) = dense_matrix_type(R)(R, undef, nrows(a), ncols(a))
-_change_base_ring(R::NCRing, a::MatRingElem) = matrix_ring(R, nrows(a))()
 
 @doc raw"""
-    change_base_ring(R::NCRing, A::MatrixElem{T}) where {T <: NCRingElement}
+    change_base_ring(R::NCRing, A::MatElem{T}) where {T <: NCRingElement}
 
 Return a new matrix over `R` by coercing each entry of `A` into `R`.
 
@@ -7766,7 +7765,7 @@ julia> base_ring(N)
 Rationals
 ```
 """
-function change_base_ring(R::NCRing, A::MatrixElem{T}) where {T <: NCRingElement}
+function change_base_ring(R::NCRing, A::MatElem{T}) where {T <: NCRingElement}
    N = _change_base_ring(R, A)
    for i = 1:nrows(A), j = 1:ncols(A)
       N[i,j] = R(A[i,j])
@@ -7815,14 +7814,14 @@ function map_entries!(f::S, dst::MatElem{T}, src::MatElem{U}) where {S, T <: NCR
 end
 
 @doc raw"""
-    map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
+    map!(f, dst::MatElem{T}, src::MatElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 
 Apply `f` to each entry of `src`, store the result in the given
 matrix `dst` and return the modified matrix `dst`.
 
 This is equivalent to `map_entries!(f, dst, src)`, see [`map_entries!`](@ref).
 """
-Base.map!(f::S, dst::MatrixElem{T}, src::MatrixElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
+Base.map!(f::S, dst::MatElem{T}, src::MatElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 @doc raw"""
     map_entries(f, A::MatElem{T}) where T <: NCRingElement
@@ -7855,14 +7854,14 @@ function map_entries(f::S, A::MatElem{T}) where {S, T <: NCRingElement}
 end
 
 @doc raw"""
-    map(f, A::MatrixElem{T}) where T <: NCRingElement
+    map(f, A::MatElem{T}) where T <: NCRingElement
 
 Return a new matrix obtained by applying `f` to each entry of the
 matrix `A`.
 
 This is equivalent to `map_entries(f, A)`, see [`map_entries`](@ref).
 """
-Base.map(f::S, A::MatrixElem{T}) where {S, T <: NCRingElement} = map_entries(f, A)
+Base.map(f::S, A::MatElem{T}) where {S, T <: NCRingElement} = map_entries(f, A)
 
 ###############################################################################
 #
