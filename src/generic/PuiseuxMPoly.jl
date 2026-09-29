@@ -255,7 +255,7 @@ function show(io::IO, p::PuiseuxMPolyRing)
   @show_name(io, p)
   @show_special(io, p)
   if is_terse(io)
-    print(io, "Puiseux polynomial ring")
+    print(io, LowercaseOff(), "Puiseux polynomial ring")
   else
     io = pretty(io)
     print(io, "Puiseux polynomial ring in ", ItemQuantity(nvars(p), "variable"))
