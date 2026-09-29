@@ -455,6 +455,12 @@ end
       f = 3x^3 + 2x^2 + x + 4
       g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
+      @test eltype(coefficients(f)) == elem_type(R)
+      @test collect(coefficients(f)) isa Vector{elem_type(R)}
+      @test eltype(exponent_vectors(f)) == Vector{Int}
+      @test eltype(monomials(f)) == elem_type(S)
+      @test eltype(terms(f)) == elem_type(S)
+
       @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
       @test collect(exponent_vectors(f)) == [[3], [2], [1], [0]]
       @test sum(terms(f)) == f
