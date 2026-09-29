@@ -14,6 +14,58 @@ universal_ring_name(R::UniversalRing{<:LaurentMPolyRingElem}) = "Laurent polynom
 
 ###############################################################################
 #
+#   Iterators
+#
+###############################################################################
+
+# Methods shared with universal polynomial rings live in UnivPoly.jl. Those
+# here differ because Laurent polynomials lack indexed access to their terms.
+
+coefficients(a::UniversalRingElem{<:LaurentMPolyRingElem}) = coefficients(data(a))
+
+exponent_vectors(a::UniversalRingElem{<:LaurentMPolyRingElem}) = exponent_vectors(data(a))
+
+function monomials(a::UniversalRingElem{<:LaurentMPolyRingElem})
+   return (UniversalRingElem(m, parent(a)) for m in monomials(data(a)))
+end
+
+function terms(a::UniversalRingElem{<:LaurentMPolyRingElem})
+   return (UniversalRingElem(t, parent(a)) for t in terms(data(a)))
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(a::UniversalRingElem{<:LaurentMPolyRingElem}, A::Vector{<:RingElement})
+   isempty(A) && error("Evaluating at an empty list of values is not allowed")
+   a2 = data(a)
+   n = nvars(parent(a2))
+   k = length(A)
+   if k < n
+      # variables without a value must not occur; evaluate them at one
+      for e in exponent_vectors(a2)
+         iszero(view(e, k+1:n)) || error("Number of variables does not match number of values")
+      end
+      A = vcat(A, [one(parent(A[1])) for _ in k+1:n])
+   end
+   return evaluate(a2, A[1:n])
+end
+
+###############################################################################
+#
+#   Change base ring
+#
+###############################################################################
+
+function _change_univ_poly_ring(R, Rx::UniversalRing{<:LaurentMPolyRingElem}, cached::Bool)
+   return universal_laurent_polynomial_ring(R, symbols(Rx); cached)[1]
+end
+
+###############################################################################
+#
 #   constructors
 #
 ###############################################################################

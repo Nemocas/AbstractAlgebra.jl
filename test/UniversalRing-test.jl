@@ -162,6 +162,75 @@ end
    ConformanceTests.test_Ring_interface(S)
 end
 
+@testset "UniversalLaurentPolynomial.basic_manipulation" begin
+   S = universal_laurent_polynomial_ring(QQ; cached = false)
+   x = gen(S, :x)
+   f = 2*x^-1 + 3    # its data has one variable only
+   y = gen(S, :y)
+   g = x*y^-2 - 5
+
+   @test length(f) == 2
+   @test length(zero(S)) == 0
+   @test Set(coefficients(g)) == Set(QQ.([1, -5]))
+   @test Set(exponent_vectors(g)) == Set([[1, -2], [0, 0]])
+   @test Set(exponent_vectors(f)) == Set([[-1], [0]])
+   @test all(m -> parent(m) === S, monomials(g))
+   @test sum(terms(g)) == g
+   @test sum(coefficients(g) .* monomials(g)) == g
+
+   @test coeff(g, [1, -2]) == 1
+   @test coeff(g, [1]) == 0
+   @test coeff(f, [-1]) == 2
+   @test coeff(f, [-1, 0]) == 2
+   @test coeff(f, [-1, 1]) == 0
+
+   @test leading_term(g) == leading_coefficient(g)*leading_monomial(g)
+   @test parent(leading_term(g)) === S
+   @test leading_monomial(g) in (x*y^-2, one(S))
+   @test constant_coefficient(f) == 3
+   @test constant_coefficient(g) == -5
+   @test constant_coefficient(x) == 0
+
+   @test is_constant(S(3))
+   @test is_constant(2*x*inv(x))
+   @test !is_constant(f)
+   @test is_monomial(x*y^-2)
+   @test !is_monomial(2*x)
+   @test is_term(2*x^-1)
+   @test !is_term(f)
+   @test var_index(x) == 1
+   @test var_index(y) == 2
+
+   @test derivative(f, 1) == -2*x^-2
+   @test derivative(f, y) == 0
+   @test derivative(g, y) == -2*x*y^-3
+   @test_throws ErrorException derivative(f, 3)
+
+   @test evaluate(f, [QQ(2)]) == 4
+   @test evaluate(f, [QQ(2), QQ(5)]) == 4
+   @test evaluate(g, [QQ(2), QQ(1//2)]) == 3
+   @test_throws ErrorException evaluate(g, [QQ(2)])
+
+   h = map_coefficients(c -> 2*c, g; parent = S)
+   @test parent(h) === S
+   @test h == 2*g
+   h = map_coefficients(c -> 2*c, g)
+   @test coefficient_ring(h) == QQ
+   @test Set(exponent_vectors(h)) == Set(exponent_vectors(g))
+
+   h = change_base_ring(ZZ, g)
+   T = parent(h)
+   @test coefficient_ring(T) == ZZ
+   @test h == gen(T, :x)*gen(T, :y)^-2 - 5
+   @test change_coefficient_ring(ZZ, g) == h
+
+   @test S(QQ.([2, 3]), [[-1], [0]]) == f
+   B = MPolyBuildCtx(S)
+   push_term!(B, QQ(1), [1, -2])
+   push_term!(B, QQ(-5), [0, 0])
+   @test finish(B) == g
+end
+
 @testset "UnivPoly.conformance" begin
    S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1]; cached = false)
    gen(S, "x")

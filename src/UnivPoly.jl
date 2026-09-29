@@ -6,6 +6,10 @@
 
 internal_ordering(p::UniversalRing{<:MPolyRingElem}) = internal_ordering(base_ring(p))
 
+# methods for these also serve universal Laurent polynomial rings
+const UnivPolyOrLaurentRing = UniversalRing{<:Union{MPolyRingElem, LaurentMPolyRingElem}}
+const UnivPolyOrLaurentElem = UniversalRingElem{<:Union{MPolyRingElem, LaurentMPolyRingElem}}
+
 ###############################################################################
 #
 #   Manipulating terms and monomials
@@ -32,7 +36,7 @@ function set_exponent_vector!(p::UniversalRingElem{<:MPolyRingElem}, i::Int, exp
    return p
 end
 
-function coeff(p::UniversalRingElem{<:MPolyRingElem}, exps::Vector{Int})
+function coeff(p::UnivPolyOrLaurentElem, exps::Vector{Int})
    S = parent(p)
    len = length(exps)
    n = nvars(parent(data(p)))
@@ -74,11 +78,11 @@ end
 
 is_homogeneous(p::UniversalRingElem{<:MPolyRingElem}) = is_homogeneous(data(p))
 
-is_monomial(p::UniversalRingElem{<:MPolyRingElem}) = is_monomial(data(p))
+is_monomial(p::UnivPolyOrLaurentElem) = is_monomial(data(p))
 
-is_constant(p::UniversalRingElem{<:MPolyRingElem}) = is_constant(data(p))
+is_constant(p::UnivPolyOrLaurentElem) = is_constant(data(p))
 
-is_term(p::UniversalRingElem{<:MPolyRingElem}) = is_term(data(p))
+is_term(p::UnivPolyOrLaurentElem) = is_term(data(p))
 
 coeff(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = coeff(data(p), i)
 
@@ -112,7 +116,7 @@ function term(p::UniversalRingElem{<:MPolyRingElem}, i::Int)
    return UniversalRingElem(t, S)
 end
 
-leading_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = leading_coefficient(data(p))
+leading_coefficient(p::UnivPolyOrLaurentElem) = leading_coefficient(data(p))
 
 trailing_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = trailing_coefficient(data(p))
 
@@ -121,14 +125,14 @@ function tail(p::UniversalRingElem{<:MPolyRingElem})
    return UniversalRingElem(tail(data(p)), S)
 end
 
-constant_coefficient(p::UniversalRingElem{<:MPolyRingElem}) = constant_coefficient(data(p))
+constant_coefficient(p::UnivPolyOrLaurentElem) = constant_coefficient(data(p))
 
-function leading_monomial(p::UniversalRingElem{<:MPolyRingElem})
+function leading_monomial(p::UnivPolyOrLaurentElem)
    S = parent(p)
    return UniversalRingElem(leading_monomial(data(p)), S)
 end
 
-function leading_term(p::UniversalRingElem{<:MPolyRingElem})
+function leading_term(p::UnivPolyOrLaurentElem)
    S = parent(p)
    return UniversalRingElem(leading_term(data(p)), S)
 end
@@ -159,9 +163,9 @@ end
 
 total_degree(p::UniversalRingElem{<:MPolyRingElem}) = total_degree(data(p))
 
-length(p::UniversalRingElem{<:MPolyRingElem}) = length(data(p))
+length(p::UnivPolyOrLaurentElem) = length(data(p))
 
-var_index(x::UniversalRingElem{<:MPolyRingElem}) = var_index(data(x))
+var_index(x::UnivPolyOrLaurentElem) = var_index(data(x))
 
 var_indices(p::UniversalRingElem{<:MPolyRingElem}) = var_indices(data(p))
 
@@ -442,7 +446,7 @@ end
 #
 ###############################################################################
 
-function derivative(p::T, j::Int) where {T <: UniversalRingElem{<:MPolyRingElem}}
+function derivative(p::T, j::Int) where {T <: UnivPolyOrLaurentElem}
    j > nvars(parent(p)) && error("No such variable")
    if j > nvars(parent(data(p)))
       return zero(parent(p))
@@ -450,7 +454,7 @@ function derivative(p::T, j::Int) where {T <: UniversalRingElem{<:MPolyRingElem}
    return T(derivative(data(p), j), parent(p))
 end
 
-function derivative(p::T, x::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
+function derivative(p::T, x::T) where {T <: UnivPolyOrLaurentElem}
    return derivative(p, var_index(x))
 end
 
@@ -599,7 +603,7 @@ end
 
 _change_univ_poly_ring(R, Rx, cached::Bool) = universal_polynomial_ring(R, symbols(Rx); internal_ordering=internal_ordering(Rx), cached)[1]
 
-function _map(f::Any, p::UniversalRingElem{<:MPolyRingElem}, S::UniversalRing{<:MPolyRingElem})
+function _map(f::Any, p::UnivPolyOrLaurentElem, S::UnivPolyOrLaurentRing)
   q = data(p)
   old_R = parent(q)
   symbols_map = _ensure_variables(S, symbols(old_R))
@@ -617,11 +621,11 @@ function _map(f::Any, p::UniversalRingElem{<:MPolyRingElem}, S::UniversalRing{<:
   return UniversalRingElem(finish(M), S)
 end
 
-function change_coefficient_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where T
+function change_coefficient_ring(R::Ring, p::UnivPolyOrLaurentElem; cached::Bool=true, parent::UnivPolyOrLaurentRing = _change_univ_poly_ring(R, parent(p), cached))
   return _map(R, p, parent)
 end
 
-function change_base_ring(R::Ring, p::UniversalRingElem{<:MPolyRingElem, T}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(R, parent(p), cached)) where T
+function change_base_ring(R::Ring, p::UnivPolyOrLaurentElem; cached::Bool=true, parent::UnivPolyOrLaurentRing = _change_univ_poly_ring(R, parent(p), cached))
   return change_coefficient_ring(R, p, cached = cached, parent = parent)
 end
 
@@ -631,7 +635,7 @@ end
 #
 ################################################################################
 
-function map_coefficients(f::Any, p::UniversalRingElem{<:MPolyRingElem}; cached::Bool=true, parent::UniversalRing{<:MPolyRingElem} = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached))
+function map_coefficients(f::Any, p::UnivPolyOrLaurentElem; cached::Bool=true, parent::UnivPolyOrLaurentRing = _change_univ_poly_ring(parent(f(zero(coefficient_ring(p)))), parent(p), cached))
    return _map(f, p, parent)
 end
 
@@ -667,7 +671,7 @@ end
 #
 ###############################################################################
 
-function (a::UniversalRing{<:MPolyRingElem, T})(b::Vector{T}, m::Vector{Vector{Int}}) where T
+function (a::UniversalRing{<:Union{MPolyRingElem, LaurentMPolyRingElem}, T})(b::Vector{T}, m::Vector{Vector{Int}}) where T
    if length(m) != 0
       len = length(m[1])
       num = nvars(base_ring(a))
