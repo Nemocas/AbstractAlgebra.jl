@@ -4,7 +4,6 @@ import LinearAlgebra: tr
 
 using Random: Random, AbstractRNG, randperm!, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-using SparseArrays: sparse, spzeros
 
 import Base: !=
 import Base: &
