@@ -4692,10 +4692,10 @@ function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_domain_type(T) || error("Only supported over integral domains")
   !is_square(A) && error("Dimensions don't match in is_nilpotent")
   is_zero(tr(A)) || return false
+  is_zero(A) && return true
   n = nrows(A)
   A = deepcopy(A)
   i = 1
-  is_zero(A) && return true
   while i < n
     i *= 2
     A = mul!(A, A, A)
