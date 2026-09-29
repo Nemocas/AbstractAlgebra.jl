@@ -55,10 +55,6 @@ skinparam defaultFontSize 16
 skinparam objectArrowColor DarkGray
 skinparam RoundCorner 15
 
-
-' Ideals
-"SetElem" -down-> "IdealElem{T}"
-
 ' Maps
 ' NOTE: Identity is
 "SetElem" -down----> "Map{D, C, S, T}"
