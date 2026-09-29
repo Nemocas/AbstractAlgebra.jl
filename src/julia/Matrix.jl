@@ -14,8 +14,8 @@ number_of_columns(A::Matrix{T}) where {T} = size(A, 2)
 ###############################################################################
 
 """
-    Matrix(A::MatrixElem{T}) where {T<:NCRingElement}
-    Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement}
+    Matrix(A::MatElem{T}) where {T<:NCRingElement}
+    Matrix{U}(A::MatElem{T}) where {U<:NCRingElement, T<:NCRingElement}
 
 Convert `A` to a Julia `Matrix{U}` of the same dimensions with the same elements.
 If `U` is omitted then `eltype(A)` is used in its place.
@@ -42,7 +42,7 @@ Matrix{U}(A::MatrixElem{T}) where {U<:NCRingElement, T<:NCRingElement} = U[A[i, 
 
 
 """
-    Array(A::MatrixElem{T}) where T <: NCRingElement
+    Array(A::MatElem{T}) where T <: NCRingElement
 
 Convert `A` to a Julia `Matrix` of the same dimensions with the same elements.
 

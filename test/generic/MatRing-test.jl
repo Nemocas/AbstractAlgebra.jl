@@ -70,6 +70,19 @@
    @test isa(S([1, 2, 3, 4]), MatRingElem)
 
    @test parent(S()) == S
+
+   # Conversion between matrix spaces and matrix rings
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+   M = matrix_space(ZZ, 2, 2)(A)
+   @test M isa MatElem
+   @test M == matrix(A)
+   @test_throws ErrorConstrDimMismatch matrix_space(ZZ, 2, 3)(A)
+
+   B = matrix_ring(QQ, 2)(A)
+   @test B isa MatRingElem
+   @test matrix(B) == matrix(QQ, [1 2; 3 4])
+   @test_throws ErrorConstrDimMismatch matrix_ring(QQ, 3)(A)
 end
 
 @testset "Generic.MatRing.finiteness" begin
@@ -252,6 +265,39 @@ end
    M = rand(S, -10:10)
 
    @test -(-M) == M
+   @test -M isa MatRingElem
+end
+
+@testset "Generic.MatRing.zero_entries" begin
+   S = matrix_ring(ZZ, 3)
+   A = S([0 -1 0; 0 2 0; 0 0 0])
+
+   @test is_zero_entry(A, 1, 1)
+   @test !is_zero_entry(A, 1, 2)
+   @test is_negative_entry(A, 1, 2)
+   @test !is_negative_entry(A, 2, 2)
+   @test is_positive_entry(A, 2, 2)
+   @test !is_positive_entry(A, 1, 2)
+
+   @test !is_zero_row(A, 1)
+   @test is_zero_row(A, 3)
+   @test_throws BoundsError is_zero_row(A, 4)
+   @test is_zero_column(A, 1)
+   @test !is_zero_column(A, 2)
+   @test_throws BoundsError is_zero_column(A, 0)
+end
+
+@testset "Generic.MatRing.unsafe_ops" begin
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+
+   @test mul!(BigInt[0, 0], A, BigInt[1, 1]) == BigInt[3, 7]
+   @test mul!(BigInt[0, 0], BigInt[1, 1], A) == BigInt[4, 6]
+
+   B = zero!(A)
+   @test B isa MatRingElem
+   @test iszero(B)
+   @test iszero(A)
 end
 
 @testset "Generic.MatRing.binary_ops" begin
