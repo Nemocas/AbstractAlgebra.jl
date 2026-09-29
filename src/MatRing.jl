@@ -123,14 +123,6 @@ end
 
 similar(A::MatRingElem, n::Int) = similar(A, base_ring(A), n)
 
-# TODO: deprecate these:
-function similar(A::MatRingElem{T}, R::NCRing, m::Int, n::Int) where T <: NCRingElement
-   m != n && error("Dimensions don't match in similar")
-   return similar(A, R, n)
-end
-
-similar(A::MatRingElem, m::Int, n::Int) = similar(A, base_ring(A), m, n)
-
 @doc raw"""
     zero(A::MatRingElem, R::NCRing, n::Int)
     zero(A::MatRingElem, R::NCRing)
@@ -142,10 +134,6 @@ with defaults based upon the given source matrix ring element `A`.
 """
 zero(A::MatRingElem, R::NCRing=base_ring(A), n::Int=degree(A)) = zero!(similar(A, R, n))
 zero(A::MatRingElem, n::Int) = zero!(similar(A, n))
-
-# TODO: deprecate these
-zero(A::MatRingElem, R::NCRing, r::Int, c::Int) = zero!(similar(A, R, r, c))
-zero(A::MatRingElem, r::Int, c::Int) = zero!(similar(A, r, c))
 
 iszero(A::MatRingElem{T}) where T <: NCRingElement = iszero(matrix(A))
 
