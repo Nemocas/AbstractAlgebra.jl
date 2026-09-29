@@ -98,5 +98,13 @@ end
 @deprecate polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing poly_ring(R, s; cached)
 @deprecate polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring poly_ring(R, s; internal_ordering, cached)
 
+# deprecated in 0.51.0
+@deprecate map_from_func(image_fn::Function, D, C) map_from_func(D, C, image_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn)
+@deprecate map_with_section_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_section_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_section_from_func(image_fn::Function, D, C) map_with_section_from_func(D, C, image_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn)
+
 # to be deprecated in a future release
-@deprecate map_from_func(image_fn::Function, D, C) MapFromFunc(D, C, image_fn)

@@ -20,27 +20,27 @@ map_with_section(f::Map{D, C}, g::Map{C, D}) where {D, C} = Generic.MapWithSecti
 
 # These two functions are provided for convenience only. Strictly speaking
 # preimage is not the correct name for this type of construction.
-function map_with_preimage_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_preimage_from_func(domain, codomain, image_fn, inverse_fn)
    return Generic.MapWithSection(map_from_func(domain, codomain, image_fn),
                           map_from_func(codomain, domain, inverse_fn))
 end
 
-function map_with_preimage_from_func(domain, codomain, image_fn::Function)
+function map_with_preimage_from_func(domain, codomain, image_fn)
    return Generic.MapWithSection(map_from_func(domain, codomain, image_fn))
 end
 
 @doc raw"""
-    map_with_section_from_func(f::Function, s::Function, R, S)
+    map_with_section_from_func(R, S, f::Function, s::Function)
 
 Return the map from `R` to `S` given by the Julia function `f`, together with
 the section given by the Julia function `s`. See [`map_with_section`](@ref).
 """
-function map_with_section_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_section_from_func(domain, codomain, image_fn, inverse_fn)
    return Generic.MapWithSection(map_from_func(domain, codomain, image_fn),
                           map_from_func(codomain, domain, inverse_fn))
 end
 
-function map_with_section_from_func(domain, codomain, image_fn::Function)
+function map_with_section_from_func(domain, codomain, image_fn)
    return Generic.MapWithSection(map_from_func(domain, codomain, image_fn))
 end
 
@@ -77,11 +77,11 @@ julia> f(ZZ(1))
 2
 ```
 """
-function map_with_retraction_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_retraction_from_func(domain, codomain, image_fn, inverse_fn)
    return Generic.MapWithRetraction(map_from_func(domain, codomain, image_fn),
                           map_from_func(codomain, domain, inverse_fn))
 end
 
-function map_with_retraction_from_func(domain, codomain, image_fn::Function)
+function map_with_retraction_from_func(domain, codomain, image_fn)
    return Generic.MapWithRetraction(map_from_func(domain, codomain, image_fn))
 end

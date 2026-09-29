@@ -73,40 +73,10 @@ end
 ###########################################################
 
 """
-    MapFromFunc(D, C, f, [g])
+    MapFromFunc{D, C}
 
-Creates the map `D -> C, x -> f(x)` given the callable
-object `f`. If `g` is provided, it is assumed to satisfy
-`f(g(x)) = x` and will be used as the preimage function.
-
-# Example
-
-```jldoctest
-julia> F = GF(2);
-
-julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))))
-Map defined by a Julia function
-  from rationals
-  to finite field F_2
-
-julia> f(QQ(1//3))
-1
-
-julia> println(f)
-Map: rationals -> F
-
-julia> f = MapFromFunc(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(y)),)
-Map defined by a Julia function with inverse
-  from rationals
-  to finite field F_2
-
-julia> preimage(f, F(1))
-1//1
-
-julia> println(f)
-Map: rationals -> F
-
-```
+Type of maps `D -> C` given by a Julia function, optionally together with a
+preimage function. See [`map_from_func`](@ref) for construction.
 """
 mutable struct MapFromFunc{R, T} <: Map{R, T, MapWithHeader, MapFromFunc}
   header::MapHeader{R, T}
@@ -193,6 +163,6 @@ end
 
 function show(io::IO, M::InverseMap)
   @show_name(io, M)
-  println(io, "inverse of")
+  println(io, "Inverse of")
   print(io, " ", M.origin)
 end

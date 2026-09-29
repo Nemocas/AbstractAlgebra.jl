@@ -174,9 +174,6 @@ Creates the map `D -> C, x -> image_fn(x)` of type `MapFromFunc` given the calla
 object `image_fn`. If `inverse_fn` is provided, it is assumed to satisfy
 `image_fn(inverse_fn(x)) = x` and will be used as the preimage function.
 
-Construct the MapFromFunc with domain and codomain given by the parent objects
-$R$ and $S$ corresponding to the Julia function $f$.
-
 # Examples
 ```jldoctest
 julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
@@ -186,6 +183,16 @@ Map defined by a Julia function
 
 julia> f(ZZ(2))
 3
+
+julia> F = GF(2);
+
+julia> g = map_from_func(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(y)))
+Map defined by a Julia function with inverse
+  from rationals
+  to finite field F_2
+
+julia> preimage(g, F(1))
+1//1
 ```
 """
 map_from_func(D, C, image_fn) = MapFromFunc(D, C, image_fn)
@@ -199,7 +206,7 @@ map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_
 ################################################################################
 
 
-# Hecke maps store attributes in the header object
+# MapWithHeader objects store attributes in the header object
 _get_attributes(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes(G.header)
 _get_attributes!(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes!(G.header)
 _is_attribute_storing_type(::Type{<:Map(MapWithHeader)}) = true
