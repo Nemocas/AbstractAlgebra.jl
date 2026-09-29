@@ -1,0 +1,4 @@
+coverage:
+  precision: 2
+  round: down
+  range: 85...95 # FIXME: We should set this one to about 90...95
