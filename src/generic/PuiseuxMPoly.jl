@@ -258,7 +258,7 @@ function show(io::IO, p::PuiseuxMPolyRing)
     print(io, LowercaseOff(), "Puiseux polynomial ring")
   else
     io = pretty(io)
-    print(io, "Puiseux polynomial ring in ", ItemQuantity(nvars(p), "variable"))
+    print(io, LowercaseOff(), "Puiseux polynomial ring in ", ItemQuantity(nvars(p), "variable"))
     print(terse(io), " over ", Lowercase(), coefficient_ring(p))
   end
 end
