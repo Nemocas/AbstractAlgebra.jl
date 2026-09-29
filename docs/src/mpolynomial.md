@@ -302,50 +302,19 @@ The following functionality is also provided for all multivariate polynomials.
 
 ```@docs
 is_univariate(::MPolyRing{T}) where T <: RingElement
-```
-
-```@docs
 var_indices(p::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 vars(p::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 var_index(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 degree(::MPolyRingElem{T}, ::Int) where T <: RingElement
-```
-
-```@docs
 degree(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 degrees(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 is_constant(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 is_term(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 is_monomial(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 is_univariate(::MPolyRingElem{T}) where T <: RingElement
-```
-
-```@docs
 coeff(::MPolyRingElem{T}, ::MPolyRingElem{T}) where T <: RingElement
+monomial(::MPolyRing, ::Vector{Int})
+term(::MPolyRing, ::RingElement, ::Vector{Int})
 ```
 
 **Examples**
