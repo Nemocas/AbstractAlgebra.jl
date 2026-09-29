@@ -58,7 +58,7 @@ matrix(R::NCRing, entries::AbstractVector{<:AbstractVector})
 Matrices can be converted to another base ring using `change_base_ring`.
 
 ```@docs
-change_base_ring(R::NCRing, A::MatrixElem{T}) where {T <: NCRingElement}
+change_base_ring(R::NCRing, A::MatElem{T}) where {T <: NCRingElement}
 ```
 
 The same conversion of `A` can also be performed using the following

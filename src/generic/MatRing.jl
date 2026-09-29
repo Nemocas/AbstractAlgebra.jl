@@ -144,6 +144,10 @@ end
 #
 ###############################################################################
 
+function zero!(A::MatRingElem)
+   return MatRingElem(zero!(matrix(A)))
+end
+
 function add!(A::T, B::T) where T <: MatRingElem
    return MatRingElem(add!(matrix(A), matrix(B)))
 end
@@ -172,6 +176,14 @@ function mul!(c::MatRingElem{T}, a::MatRingElem{T}, b::T) where T <: NCRingEleme
   return MatRingElem(mul!(matrix(c), matrix(a), b))
 end
 
+function mul!(z::Vector{T}, x::MatRingElem{T}, y::Vector{T}) where T <: NCRingElement
+  return mul!(z, matrix(x), y)
+end
+
+function mul!(z::Vector{T}, x::Vector{T}, y::MatRingElem{T}) where T <: NCRingElement
+  return mul!(z, x, matrix(y))
+end
+
 ###############################################################################
 #
 #   Promotion rules
@@ -195,7 +207,7 @@ end
     (a::MatRing{T})(b::S) where {S <: NCRingElement, T <: NCRingElement}
     (a::MatRing{T})(b::T) where {S <: NCRingElement, T <: MatRingElem{S}}
     (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
-    (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+    (a::MatRing{T})(b::MatElem{S}) where {S <: NCRingElement, T <: NCRingElement}
     (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
     (a::MatRing{T})(b::Vector{S}) where {S <: NCRingElement, T <: NCRingElement}
 
@@ -283,12 +295,14 @@ function (a::MatRing{T})(b::MatRingElem{T}) where {T <: NCRingElement}
    return b
 end
 
-function (a::MatRing{T})(b::MatrixElem{S}) where {S <: NCRingElement, T <: NCRingElement}
+function (a::MatRing{T})(b::MatElem{S}) where {S <: NCRingElement, T <: NCRingElement}
    R = base_ring(a)
    _check_dim(nrows(a), ncols(a), b)
    z = MatRingElem(matrix(R, b))
    return z
 end
+
+(a::MatRing{T})(b::MatRingElem{S}) where {S <: NCRingElement, T <: NCRingElement} = a(matrix(b))
 
 function (a::MatRing{T})(b::Matrix{S}) where {S <: NCRingElement, T <: NCRingElement}
    _check_dim(a.n, a.n, b)

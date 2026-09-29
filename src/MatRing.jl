@@ -141,6 +141,16 @@ one(A::MatRingElem{T}) where T <: NCRingElement = one(parent(A))
 
 isone(A::MatRingElem{T}) where T <: NCRingElement = isone(matrix(A))
 
+@inline is_zero_entry(A::MatRingElem, i::Int, j::Int) = is_zero_entry(matrix(A), i, j)
+
+@inline is_positive_entry(A::MatRingElem, i::Int, j::Int) = is_positive_entry(matrix(A), i, j)
+
+@inline is_negative_entry(A::MatRingElem, i::Int, j::Int) = is_negative_entry(matrix(A), i, j)
+
+Base.@propagate_inbounds is_zero_row(A::MatRingElem, i::Int) = is_zero_row(matrix(A), i)
+
+Base.@propagate_inbounds is_zero_column(A::MatRingElem, j::Int) = is_zero_column(matrix(A), j)
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -215,6 +225,8 @@ end
 #
 ###############################################################################
 
+-(x::MatRingElem) = Generic.MatRingElem(-matrix(x))
+
 *(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) * matrix(y))
 
 +(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) + matrix(y))
@@ -280,6 +292,10 @@ end
 function -(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
   return Generic.MatRingElem(matrix(x) - y)
 end
+
+*(P::Perm, A::MatRingElem) = Generic.MatRingElem(P * matrix(A))
+
+*(A::MatRingElem, P::Perm) = Generic.MatRingElem(matrix(A) * P)
 
 function *(x::MatRingElem{T}, y::Vector{T}) where T <: NCRingElement
   return matrix(x) * y
@@ -353,6 +369,22 @@ end
 #   pseudo_inv(M) gives error, but copuld give matrix(ZZ4, 2,2, [1,-1,0,2]) with denom=2
 # HINT: Consider using solve(f,g;side=:right)  or side=:left
 # The unused kwargs in the field cases are necessary for generic code to compile.
+
+function divexact(x::MatRingElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
+   return Generic.MatRingElem(divexact(matrix(x), y; check=check))
+end
+
+function divexact(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: RingElem}
+   return Generic.MatRingElem(divexact(matrix(x), y; check=check))
+end
+
+function divexact_left(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+   return Generic.MatRingElem(divexact_left(matrix(x), y; check=check))
+end
+
+function divexact_right(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
+   return Generic.MatRingElem(divexact_right(matrix(x), y; check=check))
+end
 
 function divexact_left(f::MatRingElem{T},
                        g::MatRingElem{T}; check::Bool=true) where T <: RingElement
@@ -428,14 +460,26 @@ function tr(x::MatRingElem{T}) where T <: NCRingElement
   return tr(matrix(x))
 end
 
+(S::MatSpace{T})(A::MatRingElem{T}) where {T <: NCRingElement} = S(matrix(A))
+
+content(A::MatRingElem{T}) where T <: RingElement = content(matrix(A))
+
+function change_base_ring(R::NCRing, A::MatRingElem{T}) where {T <: NCRingElement}
+  return Generic.MatRingElem(change_base_ring(R, matrix(A)))
+end
+
 function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
   map_entries!(f, matrix(dst), matrix(src))
   return dst
 end
 
-function map_entries(f::S, A::MatrixElem{T}) where {S, T <: NCRingElement}
+Base.map!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
+
+function map_entries(f::S, A::MatRingElem{T}) where {S, T <: NCRingElement}
   return Generic.MatRingElem(map_entries(f, matrix(A)))
 end
+
+Base.map(f::S, A::MatRingElem{T}) where {S, T <: NCRingElement} = map_entries(f, A)
 
 function pseudo_inv(A::MatRingElem{T}) where {T <: RingElement}
   X,d = pseudo_inv(matrix(A))

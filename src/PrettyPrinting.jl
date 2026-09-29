@@ -2,7 +2,7 @@ module PrettyPrinting
 
 using ..AbstractAlgebra
 
-import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: MatElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: RingElem
 
@@ -115,19 +115,19 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
-function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
     return !AbstractAlgebra.is_ijulia_inited()
 end
 
-function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
    show_via_expressify(io, mi, x)
 end
 
-function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
    return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
 end
 
-function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
