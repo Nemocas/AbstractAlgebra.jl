@@ -561,9 +561,8 @@ end
 Return the term in `R` corresponding to the given exponent vector with coefficient `c`.
 """
 function term(R::MPolyRing, c::RingElement, exps::Vector{Int})
-   M = Generic.MPolyBuildCtx(R)
-   push_term!(M, c, exps)
-   return finish(M)
+   @req length(exps) == nvars(R) "length of exponent vector should match the number of variables"
+   return setcoeff!(zero(R), exps, coefficient_ring(R)(c))
 end
 
 @doc raw"""
