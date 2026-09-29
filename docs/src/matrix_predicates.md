@@ -60,9 +60,9 @@ is_nilpotent(A::MatElem{T}) where {T <: RingElement}
 ## Normal forms
 
 ```@docs
-is_rref(A::MatrixElem{T}) where {T <: RingElement}
+is_rref(A::MatElem{T}) where {T <: RingElement}
 is_hnf(A::MatElem{T}) where {T <: RingElement}
 is_snf(A::MatElem{T}) where {T <: RingElement}
-is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
-is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+is_weak_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
+is_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
 ```

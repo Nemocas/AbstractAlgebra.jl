@@ -2084,7 +2084,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, A::MatrixElem{T}) where {T <: FieldElement}
+function lu!(P::Perm, A::MatElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -2191,7 +2191,7 @@ function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElemen
    return rank, p, L, U
 end
 
-function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
+function fflu!(P::Perm, A::MatElem{T}) where {T <: RingElement}
    if !is_domain_type(T)
       error("Not implemented")
    end
@@ -2249,7 +2249,7 @@ function fflu!(P::Perm, A::MatrixElem{T}) where {T <: RingElement}
    return rank, d2
 end
 
-function fflu!(P::Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
+function fflu!(P::Perm, A::MatElem{T}) where {T <: Union{FieldElement, ResElem}}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -2382,7 +2382,7 @@ end
 #
 ###############################################################################
 
-function rref_rational!(A::MatrixElem{T}) where {T <: RingElement}
+function rref_rational!(A::MatElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    R = base_ring(A)
@@ -2440,7 +2440,7 @@ end
 
 
 @doc raw"""
-    rref_rational(A::MatrixElem{T}) where {T <: RingElement}
+    rref_rational(A::MatElem{T}) where {T <: RingElement}
 
 Return the reduced row echelon form of $A$ using fraction-free
 arithmetic.
@@ -2471,13 +2471,13 @@ julia> A/d
 [0   0   1]
 ```
 """
-function rref_rational(A::MatrixElem{T}) where {T <: RingElement}
+function rref_rational(A::MatElem{T}) where {T <: RingElement}
    B = deepcopy(A)
    r, d = rref_rational!(B)
    return r, B, d
 end
 
-function rref!(A::MatrixElem{T}) where {T <: FieldElement}
+function rref!(A::MatElem{T}) where {T <: FieldElement}
    m = nrows(A)::Int
    n = ncols(A)::Int
    R = base_ring(A)
@@ -2538,7 +2538,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc raw"""
-    rref(A::MatrixElem{T}) where {T <: FieldElement}
+    rref(A::MatElem{T}) where {T <: FieldElement}
 
 Return the reduced row echelon form of $A$.
 
@@ -2560,15 +2560,15 @@ julia> is_rref(A)
 true
 ```
 """
-function rref(A::MatrixElem{T}) where {T <: FieldElement}
+function rref(A::MatElem{T}) where {T <: FieldElement}
    B = deepcopy(A)
    r = rref!(B)
    return r, B
 end
 
 @doc raw"""
-    is_rref(A::MatrixElem{T}) where {T <: RingElement}
-    is_rref(A::MatrixElem{T}) where {T <: FieldElement}
+    is_rref(A::MatElem{T}) where {T <: RingElement}
+    is_rref(A::MatElem{T}) where {T <: FieldElement}
 
 Return `true` if $A$ is in reduced row echelon form, and `false`
 otherwise.
@@ -2604,7 +2604,7 @@ julia> is_rref(C)
 true
 ```
 """
-function is_rref(A::MatrixElem{T}) where {T <: RingElement}
+function is_rref(A::MatElem{T}) where {T <: RingElement}
    m = nrows(A)
    n = ncols(A)
    c = 1
@@ -2628,7 +2628,7 @@ function is_rref(A::MatrixElem{T}) where {T <: RingElement}
    return true
 end
 
-function is_rref(A::MatrixElem{T}) where {T <: FieldElement}
+function is_rref(A::MatElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    c = 1
@@ -2666,7 +2666,7 @@ end
 # that A is chambered on the right. Otherwise the entries can all be set to
 # the number of columns of A. The entries of L must be monotonic increasing.
 
-function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: FieldElement}
+function reduce_row!(A::MatElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: FieldElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -2702,7 +2702,7 @@ function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) w
    return 0
 end
 
-function reduce_row!(A::MatrixElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: RingElement}
+function reduce_row!(A::MatElem{T}, P::Vector{Int}, L::Vector{Int}, m::Int) where {T <: RingElement}
    R = base_ring(A)
    n = ncols(A)
    t = R()
@@ -3819,7 +3819,7 @@ function _solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: F
    return y
 end
 
-function _solve_ff(A::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
+function _solve_ff(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in solve")
    nrows(A) != nrows(b) && error("Dimensions don't match in solve")
    m = nrows(A)
@@ -4861,7 +4861,7 @@ function charpoly_hessenberg!(S::Ring, A::MatElem{T}) where {T <: RingElement}
    return P[n + 1]
 end
 
-function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
+function charpoly_danilevsky_ff!(S::Ring, A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -4979,7 +4979,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    return pol*b
 end
 
-function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement}
+function charpoly_danilevsky!(S::Ring, A::MatElem{T}) where {T <: RingElement}
    !is_square(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -5426,12 +5426,12 @@ end
 #
 ###############################################################################
 
-function hnf_cohen(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_cohen(A::MatElem{T}) where {T <: RingElement}
    H, U = hnf_cohen_with_transform(A)
    return H
 end
 
-function hnf_cohen_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_cohen_with_transform(A::MatElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    m = nrows(H)
    U = identity_matrix(A, m)
@@ -5439,7 +5439,7 @@ function hnf_cohen_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    return H, U
 end
 
-function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
+function hnf_cohen!(H::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    m = nrows(H)
    n = ncols(H)
    l = min(m, n)
@@ -5513,32 +5513,32 @@ end
 #  Vol. 8, No. 4, pp. 499-507.
 
 @doc raw"""
-    hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form of $A$ using the algorithm of
 Kannan-Bachem. The input must have full column rank.
 """
-function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_minors(A::MatElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    _hnf_minors!(H, similar(A, 0, 0), Val(false))
    return H
 end
 
 @doc raw"""
-    hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors_with_transform(A::MatElem{T}) where {T <: RingElement}
 
 Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 have full column rank.
 """
-function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_minors_with_transform(A::MatElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    U = similar(A, nrows(A), nrows(A))
    _hnf_minors!(H, U, Val(true))
    return H, U
 end
 
-function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
+function _hnf_minors!(H::MatElem{T}, U::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
    m = nrows(H)
    n = ncols(H)
 
@@ -6358,7 +6358,7 @@ end
 ################################################################################
 
 @doc raw"""
-    is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+    is_weak_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
 
 Return `true` if $P$ is in weak Popov form with the given rank, and
 `false` otherwise.
@@ -6382,7 +6382,7 @@ julia> is_weak_popov(P, 3)
 false
 ```
 """
-function is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+function is_weak_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
    pivots = zeros(ncols(P))
    for r = 1:nrows(P)
@@ -6404,7 +6404,7 @@ function is_weak_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
 end
 
 @doc raw"""
-    is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+    is_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
 
 Return `true` if $P$ is in Popov form with the given rank, and `false`
 otherwise.
@@ -6428,7 +6428,7 @@ julia> is_popov(P, 2)
 true
 ```
 """
-function is_popov(P::MatrixElem{T}, rank::Int) where {T <: PolyRingElem}
+function is_popov(P::MatElem{T}, rank::Int) where {T <: PolyRingElem}
    zero_rows = 0
    for r = 1:nrows(P)
       p = find_pivot_popov(P, r)
@@ -7123,7 +7123,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+    similarity!(A::MatElem{T}, r::Int, d::T) where {T <: RingElement}
 
 Apply a similarity transformation to the square matrix $A$ in-place.
 
@@ -7152,7 +7152,7 @@ julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
 julia> similarity!(M, 1, R(3))
 ```
 """
-function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+function similarity!(A::MatElem{T}, r::Int, d::T) where {T <: RingElement}
    n = nrows(A)
    t = base_ring(A)()
    for i = 1:n
@@ -7336,7 +7336,7 @@ end
 ################################################################################
 
 @doc raw"""
-    add_column!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+    add_column!(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
 
 Add `s` times the `i`-th column to the `j`-th column of `A` and return the
 modified matrix `A`.
@@ -7369,7 +7369,7 @@ julia> add_column!(M, 2, 3, 1, 1:1)
 [14   5   5]
 ```
 """
-function add_column!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+function add_column!(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
    v = base_ring(A)(s)
    nc = ncols(A)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
@@ -7383,7 +7383,7 @@ function add_column!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:
 end
 
 @doc raw"""
-    add_column(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+    add_column(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
 
 Return a new matrix obtained from `A` by adding `s` times the `i`-th
 column to the `j`-th column.
@@ -7416,13 +7416,13 @@ julia> add_column(M, 2, 3, 1, 1:1)
 [4   5   5]
 ```
 """
-function add_column(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+function add_column(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
    b = deepcopy(A)
    return add_column!(b, s, i, j, rows)
 end
 
 @doc raw"""
-    add_row!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+    add_row!(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
 
 Add `s` times the `i`-th row to the `j`-th row of `A` and return the modified
 matrix `A`.
@@ -7431,7 +7431,7 @@ By default, this operation modifies all entries of the `j`-th row.
 An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function add_row!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+function add_row!(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
    v = base_ring(A)(s)
    nr = nrows(A)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
@@ -7445,7 +7445,7 @@ function add_row!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:nco
 end
 
 @doc raw"""
-    add_row(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+    add_row(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
 
 Return a new matrix obtained from `A` by adding `s` times the `i`-th
 row to the `j`-th row.
@@ -7454,7 +7454,7 @@ By default, this operation changes all entries of the `j`-th row in the returned
 matrix. An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function add_row(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+function add_row(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
    b = deepcopy(A)
    return add_row!(b, s, i, j, cols)
 end
@@ -7462,7 +7462,7 @@ end
 # Multiply column
 
 @doc raw"""
-    multiply_column!(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+    multiply_column!(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
 
 Multiply the `i`-th column of `A` by `s` and return the modified matrix `A`.
 
@@ -7470,7 +7470,7 @@ By default, this operation modifies all entries of the `i`-th column.
 An optional final argument restricts the operation to entries in the
 specified rows.
 """
-function multiply_column!(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+function multiply_column!(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
    c = base_ring(A)(s)
    nc = ncols(A)
    !_checkbounds(nc, i) && error("Column index ($i) must be between 1 and $nc")
@@ -7482,7 +7482,7 @@ function multiply_column!(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nro
 end
 
 @doc raw"""
-    multiply_column(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+    multiply_column(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
 
 Return a new matrix obtained from `A` by multiplying the `i`-th column by `s`.
 
@@ -7490,7 +7490,7 @@ By default, this operation changes all entries of the `i`-th column in the retur
 matrix. An optional final argument restricts the operation to entries in the
 specified rows.
 """
-function multiply_column(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+function multiply_column(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
    b = deepcopy(A)
    return multiply_column!(b, s, i, rows)
 end
@@ -7498,7 +7498,7 @@ end
 # Multiply row
 
 @doc raw"""
-    multiply_row!(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+    multiply_row!(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
 
 Multiply the `i`-th row of `A` by `s` and return the modified matrix `A`.
 
@@ -7506,7 +7506,7 @@ By default, this operation modifies all entries of the `i`-th row.
 An optional final argument restricts the operation to entries in the
 specified columns.
 """
-function multiply_row!(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+function multiply_row!(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
    c = base_ring(A)(s)
    nr = nrows(A)
    !_checkbounds(nr, i) && error("Row index ($i) must be between 1 and $nr")
@@ -7518,7 +7518,7 @@ function multiply_row!(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(
 end
 
 @doc raw"""
-    multiply_row(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+    multiply_row(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
 
 Return a new matrix obtained from `A` by multiplying the `i`-th row by `s`.
 
@@ -7550,7 +7550,7 @@ julia> multiply_row(M, 2, 3, 2:2)
 [4   10   5]
 ```
 """
-function multiply_row(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+function multiply_row(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
    b = deepcopy(A)
    return multiply_row!(b, s, i, cols)
 end
