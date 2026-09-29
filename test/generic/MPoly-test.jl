@@ -104,6 +104,7 @@
 
    @test q == 5x^5*y^5
 
+   @term is_zero(term(R1, 0, [3, 4]))
    @test term(R1, 2, [3, 4]) == 2*x^3*y^4
    @test term(R1, QQ(2), [3, 4]) == 2*x^3*y^4
 
