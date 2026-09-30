@@ -205,6 +205,14 @@ import AbstractAlgebra: Generic.normalize!
         @test K(1) == one(K)
     end
 
+    @testset "Ordering" begin
+        R, (t,) = puiseux_series_ring(QQ, [:t])
+        @test isless(t^2, t)
+        @test isless(t^2-t,0)
+        K = fraction_field(R)
+        @test isless(K(-t),0)
+    end
+
     @testset "Printing" begin
         R, _ = puiseux_polynomial_ring(QQ, ["x", "y"])
         @test sprint(show, R) == "Puiseux polynomial ring in 2 variables over rationals"
