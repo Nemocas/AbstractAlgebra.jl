@@ -514,3 +514,20 @@ function ConformanceTests.generate_element(R::PuiseuxMPolyRing)
     scale = Int(rand(ZZ, 1:10))
     return puiseux_polynomial_ring_elem(R, f_laurent, scale)
 end
+
+
+######################################################
+#
+# Function for Field of Fractions (prototype)
+#
+######################################################
+
+is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
+
+function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    N = lcm(scale(f), scale(g))
+    return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
+end
+
+canonical_unit(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
