@@ -531,3 +531,15 @@ function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
 end
 
 canonical_unit(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
+
+
+## `divides` is for inv / solve of matrices over Puiseux polynomials
+
+function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    iszero(f) && return true, zero(parent(f))
+    iszero(g) && return false, zero(parent(f))
+    N = lcm(scale(f), scale(g))
+    flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
+    return flag, flag ? puiseux_polynomial_ring_elem(parent(f), q, N) : zero(parent(f))
+end
