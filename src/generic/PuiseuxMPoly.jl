@@ -522,24 +522,31 @@ end
 #
 ######################################################
 
+# is_domain_type(T): true if every ring with elements of type T is a domain, which is decided just from the type
 is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
 
+
+# gcd(f, g): a greatest common divisor of f and g
 function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     check_parent(f, g)
     N = lcm(scale(f), scale(g))
     return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
 end
 
+
+# canonical_unit(f): a unit `u` such that divexact(f, u) is the preferred representative of f among
+#   the others: f times any unit. This is used for normalising fraction denominators
 canonical_unit(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
 
 
-## `divides` is for inv / solve of matrices over Puiseux polynomials
-
+# divides(f, g): returns (true, q) if g divides f where f == q*g, and (false, 0) otherwise
 function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     check_parent(f, g)
     iszero(f) && return true, zero(parent(f))
     iszero(g) && return false, zero(parent(f))
     N = lcm(scale(f), scale(g))
     flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
+
+    # is ternary operator this best way to do this? We can eliminate a branch by removing it but maybe this is faster?
     return flag, flag ? puiseux_polynomial_ring_elem(parent(f), q, N) : zero(parent(f))
 end
