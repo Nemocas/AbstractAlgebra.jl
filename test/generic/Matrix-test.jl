@@ -4187,7 +4187,7 @@ end
          M = algebra ? matrix_ring(R, u) : matrix_space(R, u, v)
          m0 = M(mat)
          for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
-            for f = (f0, map_from_func(f0, R, R))
+            for f = (f0, map_from_func(R, R, f0))
                m = deepcopy(m0)
                n0 = similar(m)
                n = map_entries!(f, n0, m)
@@ -4195,7 +4195,7 @@ end
                if !isempty(mat)
                   # when empty, it may happen that the result of map below has Any
                   # as eltype, and calling M on it fails, cf. issue #423
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
             end
          end
@@ -4204,13 +4204,13 @@ end
       m = deepcopy(m0)
       for S = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
          for f0 = (x -> S(x), x -> S(x + 1))
-            for f = (f0, map_from_func(f0, ZZ, S))
+            for f = (f0, map_from_func(ZZ, S, f0))
                n = map_entries(f, m)
                @test n !== m
                @test m == m0 # map's input must not be mutated
                M = algebra ? matrix_ring(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
                @test n isa (algebra ? MatRingElem : MatElem)
             end

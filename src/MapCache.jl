@@ -15,7 +15,7 @@ later with [`enable_cache!`](@ref).
 # Examples
 
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ);
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 
 julia> g = cached(f);
 
