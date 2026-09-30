@@ -132,21 +132,21 @@ julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
 (Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
 
 julia> collect(terms(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}}:
  3*b*a*c
  -b
  c
  2
 
 julia> collect(coefficients(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{BigInt}:
   3
  -1
   1
   2
 
 julia> collect(monomials(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}}:
  b*a*c
  b
  c
