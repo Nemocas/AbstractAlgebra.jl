@@ -17,7 +17,7 @@ Set the number of further values that may be stored in the cache of `M` to
 # Examples
 
 ```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
+julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1));
 
 julia> set_limit!(f, 200)
 200
@@ -37,7 +37,7 @@ are kept.
 # Examples
 
 ```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ); enabled=false);
+julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1); enabled=false);
 
 julia> enable_cache!(f)
 
@@ -62,7 +62,7 @@ Switch the cache of `M` off, keeping the values it already stores. See
 # Examples
 
 ```jldoctest
-julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ));
+julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1));
 
 julia> disable_cache!(f)
 
@@ -95,4 +95,3 @@ function image(M::MapCache{D, C, S, T, De, Ce}, a::De) where {D, C, S, T, De, Ce
 end
 
 show(io::IO, M::MapCache) = show(M.map)
-
