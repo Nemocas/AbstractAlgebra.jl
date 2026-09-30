@@ -60,6 +60,7 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
 
+# Document this once #2559 is merged. Refer to https://link.springer.com/chapter/10.1007/978-3-319-32859-1_37 for defintion of ordering of fraction field
 function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
     R = parent(f)
     @req ngens(R) == 1 "isless only defined in the univariate case"
