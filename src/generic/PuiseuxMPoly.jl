@@ -336,8 +336,8 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
 
     return puiseux_polynomial_ring_elem(
         parent(f),
-        poly(f)^numerator(a),
-        scale(f)*denominator(a)
+        poly(f)^Int(numerator(a)),
+        scale(f)*Int(denominator(a))
     )
 end
 

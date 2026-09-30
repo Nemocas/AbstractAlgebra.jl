@@ -114,9 +114,9 @@ import AbstractAlgebra: Generic.normalize!
         @test h+g == u^(1//2) + 2*v^(1//3) + w^(1//3)
         @test h-g == w^(1//3)-u^(1//2)
         @test h*g == u^(1//2)*v^(1//3) + u^(1//2)*w^(1//3) + v^(2//3) + v^(1//3)*w^(1//3)
-        @test (g)^3 == u^(3//2) + 3*u*v^(1//3) + 3*u^(1//2)*v^(2//3) + v
-        @test (g)^1 == g
-        @test (g)^0 == 1
+        @test (g)^QQ(3) == u^(3//2) + 3*u*v^(1//3) + 3*u^(1//2)*v^(2//3) + v
+        @test (g)^QQ(1) == g
+        @test (g)^QQ(0) == 1
 
         @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
         @test divexact(g, QQ(2)) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
