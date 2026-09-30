@@ -889,7 +889,7 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T <: AbstractAlgebra.MPolyRingElem, S <: RingElement}
+function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T, S}
    return S
 end
 
@@ -897,11 +897,11 @@ function Base.eltype(::Type{MPolyExponentVectors{T, V}}) where {V, T <: Abstract
    return V
 end
 
-function Base.eltype(::Type{MPolyMonomials{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyMonomials{T}}) where T
    return T
 end
 
-function Base.eltype(::Type{MPolyTerms{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyTerms{T}}) where T
    return T
 end
 
