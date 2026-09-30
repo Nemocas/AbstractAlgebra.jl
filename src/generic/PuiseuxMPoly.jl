@@ -60,6 +60,39 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
 
+function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
+    R = parent(f)
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
+    return last(collect(coefficients(f-g))) < 0
+end
+
+isless(f::PuiseuxMPolyRingElem, g::Integer) = isless(f, parent(f)(g))
+isless(g::Integer, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
+
+function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElement
+    R = base_ring(parent(f))
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
+    denom_f = denominator(f)
+    num_f = numerator(f)
+    if denom_f < 0
+        denom_f *= -1
+        num_f *= -1
+    end
+    denom_g = denominator(g)
+    num_g = numerator(g)
+    if denom_g < 0
+        denom_g *= -1
+        num_g *= -1
+    end
+    return is_less(num_f*denom_g, num_g*denom_f)
+end
+
+isless(f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}, g::Integer) = isless(f, parent(f)(g))
+isless(g::Integer, f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}) = isless(parent(f)(g), f)
+
+
 #################################################################################
 #
 # Getters
