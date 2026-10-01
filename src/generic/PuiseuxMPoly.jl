@@ -60,6 +60,40 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
 
+# Document this once #2559 is merged. Refer to https://link.springer.com/chapter/10.1007/978-3-319-32859-1_37 for defintion of ordering of fraction field
+function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
+    R = parent(f)
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
+    return last(collect(coefficients(f-g))) < 0
+end
+
+isless(f::PuiseuxMPolyRingElem, g::Integer) = isless(f, parent(f)(g))
+isless(g::Integer, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
+
+function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElement
+    R = base_ring(parent(f))
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
+    denom_f = denominator(f)
+    num_f = numerator(f)
+    if denom_f < 0
+        denom_f *= -1
+        num_f *= -1
+    end
+    denom_g = denominator(g)
+    num_g = numerator(g)
+    if denom_g < 0
+        denom_g *= -1
+        num_g *= -1
+    end
+    return is_less(num_f*denom_g, num_g*denom_f)
+end
+
+isless(f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}, g::Integer) = isless(f, parent(f)(g))
+isless(g::Integer, f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}) = isless(parent(f)(g), f)
+
+
 #################################################################################
 #
 # Getters
@@ -336,8 +370,8 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
 
     return puiseux_polynomial_ring_elem(
         parent(f),
-        poly(f)^numerator(a),
-        scale(f)*denominator(a)
+        poly(f)^Int(numerator(a)),
+        scale(f)*Int(denominator(a))
     )
 end
 
@@ -411,4 +445,42 @@ function ConformanceTests.generate_element(R::PuiseuxMPolyRing)
     f_laurent = base_ring(R)(f)
     scale = Int(rand(ZZ, 1:10))
     return puiseux_polynomial_ring_elem(R, f_laurent, scale)
+end
+
+
+######################################################
+#
+# Function for Field of Fractions (prototype)
+#
+######################################################
+
+# is_domain_type(T): true if every ring with elements of type T is a domain, which is decided just from the type
+is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
+
+
+# gcd(f, g): a greatest common divisor of f and g
+function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    N = lcm(scale(f), scale(g))
+    return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
+end
+
+
+# canonical_unit(f): a unit `u` such that divexact(f, u) is the preferred representative of f among
+#   the others: f times any unit. This is used for normalising fraction denominators
+canonical_unit(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
+
+
+# divides(f, g): returns (true, q) if g divides f where f == q*g, and (false, 0) otherwise
+function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    iszero(f) && return true, zero(parent(f))
+    iszero(g) && return false, zero(parent(f))
+    N = lcm(scale(f), scale(g))
+    flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
+
+    if !flag
+        return false, zero(parent(f))
+    end
+    return true, puiseux_polynomial_ring_elem(parent(f), q, N)
 end
