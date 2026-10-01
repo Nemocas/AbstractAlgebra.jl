@@ -206,7 +206,7 @@ import AbstractAlgebra: Generic.normalize!
     end
 
     @testset "Ordering" begin
-        R, (t,) = puiseux_series_ring(QQ, [:t])
+        R, (t,) = puiseux_polynomial_ring(QQ, [:t])
         @test isless(t^2, t)
         @test isless(t^2-t,0)
         K = fraction_field(R)
