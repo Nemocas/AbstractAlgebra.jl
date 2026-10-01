@@ -101,6 +101,54 @@ function ==(x::NCRingElem, y::NCRingElem)
 
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
 
+@doc raw"""
+    divexact_left(f, g; check::Bool=true)
+
+Return `a` such that `f == g*a`, i.e. the exact quotient of `f` by `g` on the
+left; `g \ f` is a shorthand. If there is no such `a`, an exception is raised;
+with `check=false` this check may be skipped, and the result is then
+undefined. See also [`divexact_right`](@ref), and [`divexact`](@ref) for
+commutative rings.
+
+# Examples
+```jldoctest
+julia> M = matrix_ring(QQ, 2);
+
+julia> a = M([1 2; 3 4]); g = M([0 1; 1 1]);
+
+julia> divexact_left(g*a, g) == a
+true
+
+julia> g \ (g*a) == a
+true
+```
+"""
+function divexact_left end
+
+@doc raw"""
+    divexact_right(f, g; check::Bool=true)
+
+Return `a` such that `f == a*g`, i.e. the exact quotient of `f` by `g` on the
+right; `f / g` is a shorthand. If there is no such `a`, an exception is
+raised; with `check=false` this check may be skipped, and the result is then
+undefined. See also [`divexact_left`](@ref), and [`divexact`](@ref) for
+commutative rings.
+
+# Examples
+```jldoctest
+julia> M = matrix_ring(QQ, 2);
+
+julia> a = M([1 2; 3 4]); g = M([0 1; 1 1]);
+
+julia> divexact_right(a*g, g) == a
+true
+
+julia> (a*g) / g == a
+true
+```
+"""
+function divexact_right end
+
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    xx, yy = promote(x, y)
    # if divexact_left is not implemented, we need to break the recursion;

@@ -22,7 +22,7 @@ end
 @doc raw"""
     parent(a)
 
-Return parent object of given element $a$.
+Return the parent object of the given element `a`.
 
 # Examples
 ```jldoctest
@@ -42,10 +42,11 @@ true
 function parent end
 
 @doc raw"""
-    elem_type(parent)
-    elem_type(parent_type)
+    elem_type(T::Type) -> Type
+    elem_type(x) -> Type
 
-Given a parent object (or its type), return the type of its elements.
+Return the type of the elements of the parent `x`, resp. of parents of type
+`T`. This is the counterpart to [`parent_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -61,10 +62,11 @@ elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
 elem_type(T::Type{Union{}}) = throw(MethodError(elem_type, (T,)))
 
 @doc raw"""
-    parent_type(element)
-    parent_type(element_type)
+    parent_type(T::Type) -> Type
+    parent_type(x) -> Type
 
-Given an element (or its type), return the type of its parent object.
+Return the type of the parent of the element `x`, resp. of elements of type
+`T`. This is the counterpart to [`elem_type`](@ref).
 
 # Examples
 ```jldoctest
@@ -88,20 +90,37 @@ parent_type(T::Type{Union{}}) = throw(MethodError(parent_type, (T,)))
 @doc raw"""
     base_ring(a)
 
-Return the internal base ring of the given element or parent $a$.
+Return the base ring of the given element or parent `a`.
+
+`base_ring` exposes an implementation detail: the ring that the parent of `a`
+is built on. What that is depends on the type, and there is no general
+mathematical definition. In particular, it need not be the coefficient ring;
+use [`coefficient_ring`](@ref) for that. For example, the base ring of $R[x]$
+is $R$, that of $\mathbb{Z}/n\mathbb{Z}$ is $\mathbb{Z}$, and that of a
+universal polynomial ring is the multivariate polynomial ring representing it.
+
+If the parent has no base ring, a `MethodError` is raised.
 
 # Examples
 ```jldoctest
-julia> S, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> base_ring(S) == QQ
-true
-
-julia> R = GF(7)
-Finite field F_7
+julia> R, x = polynomial_ring(QQ, :x);
 
 julia> base_ring(R)
+Rationals
+
+julia> base_ring(residue_ring(ZZ, 7)[1])
+Integers
+
+julia> S, (y, z) = universal_polynomial_ring(QQ, [:y, :z]);
+
+julia> base_ring(S)
+Multivariate polynomial ring in 2 variables y, z
+  over rationals
+
+julia> coefficient_ring(S)
+Rationals
+
+julia> base_ring(GF(7))
 ERROR: MethodError: no method matching base_ring(::AbstractAlgebra.GFField{Int64})
 ```
 """
@@ -112,7 +131,8 @@ base_ring(x::NCRingElement) = base_ring(parent(x))
 @doc raw"""
     base_ring_type(a)
 
-Return the type of the internal base ring of the given element, element type, parent or parent type $a$.
+Return the type of the [`base_ring`](@ref) of the given element, element type,
+parent or parent type `a`. If there is no base ring, `Union{}` is returned.
 
 # Examples
 ```jldoctest
@@ -232,7 +252,7 @@ coefficient_type(x) = elem_type(coefficient_ring_type(x))
 @doc raw"""
     one(a)
 
-Return the multiplicative identity in the algebraic structure of $a$, which can
+Return the multiplicative identity in the algebraic structure of `a`, which can
 be either an element or parent.
 
 # Examples
@@ -263,7 +283,7 @@ function one end
 @doc raw"""
     zero(a)
 
-Return the additive identity in the algebraic structure of $a$, which can be
+Return the additive identity in the algebraic structure of `a`, which can be
 either an element or parent.
 
 # Examples
@@ -294,7 +314,7 @@ function zero end
 @doc raw"""
     isone(a)
 
-Return true if $a$ is the multiplicative identity, else return false.
+Return `true` if `a` is the multiplicative identity, else return `false`.
 
 # Examples
 ```jldoctest
@@ -321,7 +341,7 @@ function isone end
 @doc raw"""
     iszero(a)
 
-Return true if $a$ is the additive identity, else return false.
+Return `true` if `a` is the additive identity, else return `false`.
 
 # Examples
 ```jldoctest
