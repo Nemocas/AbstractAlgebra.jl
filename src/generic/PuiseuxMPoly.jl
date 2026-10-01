@@ -479,6 +479,8 @@ function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     N = lcm(scale(f), scale(g))
     flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
 
-    # is ternary operator this best way to do this? We can eliminate a branch by removing it but maybe this is faster?
-    return flag, flag ? puiseux_polynomial_ring_elem(parent(f), q, N) : zero(parent(f))
+    if !flag
+        return false, zero(parent(f))
+    end
+    return true, puiseux_polynomial_ring_elem(parent(f), q, N)
 end
