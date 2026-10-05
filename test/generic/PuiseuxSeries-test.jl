@@ -156,6 +156,11 @@ end
 
    @test modulus(T) == 7
 
+   K, z = puiseux_series_field(GF(7), 10, "z")
+
+   @test characteristic(K) == 7
+   @test AbstractAlgebra.is_known(characteristic, K)
+
    R, x = puiseux_series_ring(QQ, 10, "x")
 
    for iter = 1:100

@@ -59,12 +59,12 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
            @test base_ring_type(T) == typeof(base_ring(zero(R)))
         end
 
-         # some rings don't support characteristic and raise an exception (see issue #993)
-         try ch = characteristic(R)
+         # characteristic is optional for rings (see issue #993); a ring that
+         # cannot provide it cheaply must make is_known return false
+         if AbstractAlgebra.is_known(characteristic, R)
             @test iszero(R(characteristic(R)))
             @test iszero(characteristic(R) * one(R))
             @test iszero(one(R) * characteristic(R))
-         catch
          end
       end
 

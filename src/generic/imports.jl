@@ -167,6 +167,7 @@ import ..AbstractAlgebra: is_exact_type
 import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_homogeneous
+import ..AbstractAlgebra: is_known
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
 import ..AbstractAlgebra: is_perfect
