@@ -366,6 +366,8 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 15)
 
       test_Ring_interface(R, reps = reps)
 
+      # unlike for rings, characteristic is required for fields
+      @test AbstractAlgebra.is_known(characteristic, R)
       @test iszero(R(characteristic(R)))
       @test iszero(characteristic(R) * one(R))
       @test iszero(one(R) * characteristic(R))
