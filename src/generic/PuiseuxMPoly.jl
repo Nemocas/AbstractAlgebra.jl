@@ -422,10 +422,9 @@ function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
 
     # over a domain, a quotient of two Laurent polynomials in t^(1//d) that is
     # a Puiseux polynomial is itself a Laurent polynomial in t^(1//d)
-    vars = gens(base_ring(R))
-    ok, q = divides(evaluate(poly(f), vars.^scale(g)), evaluate(poly(g), vars.^scale(f)))
-    ok || return false, zero(R)
-    return true, puiseux_polynomial_ring_elem(R, q, scale(f)*scale(g))
+    N = lcm(scale(f), scale(g))
+    flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
+    return flag, flag ? puiseux_polynomial_ring_elem(R, q, N) : zero(R)
 end
 
 #################################################################################

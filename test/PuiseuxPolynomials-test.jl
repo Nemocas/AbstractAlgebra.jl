@@ -190,6 +190,7 @@ import AbstractAlgebra: Generic.normalize!
         @test ok && q == u^(1//6)
         @test !divides(1 + u^(1//2), 1 + u)[1]
         @test divides(zero(K), g) == (true, zero(K))
+        @test divides(zero(K), zero(K)) == (true, zero(K))
         @test !divides(g, zero(K))[1]
     end
 
