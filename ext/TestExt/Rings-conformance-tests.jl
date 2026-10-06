@@ -602,6 +602,8 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          @test length(gens(Rxy)) == ngens(Rxy)
          @test gens(Rxy) == [gen(Rxy, i) for i in 1:ngens(Rxy)]
          @test all(is_gen, gens(Rxy)) || is_trivial(Rxy)
+         @test number_of_variables(Rxy) == ngens(Rxy)
+         @test internal_ordering(Rxy) in (:lex, :deglex, :degrevlex)
       end
 
       @testset "Polynomial Constructors" begin
