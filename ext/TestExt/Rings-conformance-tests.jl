@@ -626,6 +626,18 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
          R = base_ring(Rxy)
          @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
+
+         # unsorted terms, repeated exponents and zero coefficients
+         B = MPolyBuildCtx(Rxy)
+         push_term!(B, R(2), [0, 1])
+         push_term!(B, R(3), [2, 0])
+         push_term!(B, R(0), [1, 1])
+         push_term!(B, R(1), [3, 3])
+         push_term!(B, R(-1), [0, 1])
+         push_term!(B, R(5), [0, 0])
+         push_term!(B, R(-1), [3, 3])
+         @test finish(B) == 3*x^2 + y + 5
+         @test is_zero(finish(B))
       end
 
       # skip trivial rings after this, it is not worth the bother
