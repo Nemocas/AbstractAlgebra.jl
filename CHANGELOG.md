@@ -9,6 +9,29 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.51.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.0) - 2026-10-06
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2538](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2538) Add methods to construct multivariate terms
+
+#### Miscellaneous changes
+
+- [#1853](https://github.com/Nemocas/AbstractAlgebra.jl/pull/1853) Change `==` to error by default (instead of returning `false`) when comparing elements for which no equality test has been implemented
+- [#2283](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2283) Remove `similar` and `zero` methods for `MatRingElem` which took a row and column count as argument, despite matrix ring elements being square
+- [#2443](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2443) Change `map_from_func` to return a `MapFromFunc` (migrated from Hecke.jl) instead of a `Generic.FunctionalMap`. This results in a changed argument order.
+- [#2478](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2478) Remove `change_base_ring` for universal rings
+- [#2499](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2499) Change `matrix_repr` for `Perm` and `YoungTableau` to return a dense matrix by default (can be overridden with new first argument); make SparseArrays a weak dependency
+- [#2524](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2524) Remove unused `IdealElem` type
+
+### Other fixed bugs
+
+- [#2569](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2569) Fix `eltype` of coefficient/term/monomial iterators for FreeAssociativeAlgebras
+
 ## [0.50.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.3) - 2026-09-29
 
 ### New or extended functionality
