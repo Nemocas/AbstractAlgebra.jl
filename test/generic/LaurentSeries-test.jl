@@ -172,6 +172,11 @@ end
    U, y = laurent_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
+
+   K, z = laurent_series_field(GF(7), 10, "z")
+
+   @test characteristic(K) == 7
+   @test AbstractAlgebra.is_known(characteristic, K)
 end
 
 @testset "Generic.LaurentSeries.similar" begin

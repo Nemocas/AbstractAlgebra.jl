@@ -267,8 +267,8 @@ function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: Ri
     return parent(a)(deepcopy_internal(a.data, dict), a.scale)
 end
 
-characteristic(R::PuiseuxSeriesRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::PuiseuxSeriesRing) = is_known(characteristic, base_ring(R))
+characteristic(R::Union{PuiseuxSeriesRing, PuiseuxSeriesField}) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::Union{PuiseuxSeriesRing, PuiseuxSeriesField}) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

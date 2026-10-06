@@ -373,8 +373,8 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-characteristic(R::LaurentSeriesRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::LaurentSeriesRing) = is_known(characteristic, base_ring(R))
+characteristic(R::Union{LaurentSeriesRing, LaurentSeriesField}) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::Union{LaurentSeriesRing, LaurentSeriesField}) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #

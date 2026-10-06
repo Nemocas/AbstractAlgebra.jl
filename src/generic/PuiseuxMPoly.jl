@@ -50,6 +50,7 @@ base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.Lau
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
 characteristic(R::PuiseuxMPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::PuiseuxMPolyRing) = is_known(characteristic, base_ring(R))
 
 symbols(R::PuiseuxMPolyRing) = symbols(base_ring(R))
 
