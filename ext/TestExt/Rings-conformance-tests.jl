@@ -729,6 +729,42 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
       end
 
+      @testset "Term access" begin
+         R = base_ring(Rxy)
+         x, y = gens(Rxy)
+         for i in 1:reps
+            f = generate_element(Rxy)
+            F = deepcopy(f)
+            cs = collect(coefficients(f))
+            es = collect(exponent_vectors(f))
+            ms = collect(monomials(f))
+            ts = collect(terms(f))
+            @test length(cs) == length(es) == length(ms) == length(ts) == length(f)
+            @test sum(ts; init = zero(Rxy)) == f
+            for k in 1:length(f)
+               @test coeff(f, k) == cs[k]
+               @test coeff(f, es[k]) == cs[k]
+               @test exponent_vector(f, k) == es[k]
+               @test [exponent(f, k, j) for j in 1:2] == es[k]
+               @test monomial(f, k) == ms[k]
+               @test monomial!(zero(Rxy), f, k) == ms[k]
+               @test is_monomial(ms[k])
+               @test exponent_vector(ms[k], 1) == es[k]
+               @test term(f, k) == ts[k]
+               @test ts[k] == cs[k]*ms[k]
+            end
+            @test f == F
+
+            # an exponent vector not occurring in f
+            e = [total_degree(f) + 1, 0]
+            @test is_zero(coeff(f, e))
+            @test setcoeff!(deepcopy(f), e, R(3)) == f + 3*x^e[1]
+            if length(f) > 0
+               @test setcoeff!(deepcopy(f), es[1], R(0)) == f - ts[1]
+            end
+         end
+      end
+
       # TODO: add more tests, covering everything described in the manual, see
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
