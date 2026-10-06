@@ -765,6 +765,30 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          end
       end
 
+      @testset "Derivative and evaluation" begin
+         R = base_ring(Rxy)
+         x, y = gens(Rxy)
+         @test derivative(x, 1) == 1
+         @test derivative(x, 2) == 0
+         @test derivative(x^3*y^2, 2) == 2*x^3*y
+         for i in 1:reps
+            f = generate_element(Rxy)
+            g = generate_element(Rxy)
+            for j in 1:2
+               @test derivative(f*g, j) == derivative(f, j)*g + f*derivative(g, j)
+            end
+
+            v = rand(-10:10, 2)
+            vals = R.(v)
+            @test evaluate(f, vals) isa elem_type(R)
+            @test evaluate(f*g, vals) == evaluate(f, vals)*evaluate(g, vals)
+            @test evaluate(f + g, vals) == evaluate(f, vals) + evaluate(g, vals)
+            @test evaluate(f, v) == evaluate(f, vals)
+            @test f(vals...) == evaluate(f, vals)
+            @test evaluate(f, [x, y]) == f
+         end
+      end
+
       # TODO: add more tests, covering everything described in the manual, see
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
