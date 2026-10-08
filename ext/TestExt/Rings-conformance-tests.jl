@@ -761,6 +761,34 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          end
       end
 
+      @testset "Unsafe functions" begin
+         for i in 1:reps
+            f = generate_element(Rxy)
+            cs = collect(coefficients(f))
+            es = collect(exponent_vectors(f))
+            n = length(f)
+            # terms of `f` in reverse order, each split as `(c - 1) + 1`,
+            # between two cancelling terms with an exponent not in `f`
+            e = [total_degree(f) + 1, 0]
+            g = zero(Rxy)
+            fit!(g, 2*n + 2)
+            g = set_exponent_vector!(g, 1, e)
+            g = setcoeff!(g, 1, 1)
+            for k in 1:n
+               j = n + 1 - k
+               g = set_exponent_vector!(g, 2*k, es[j])
+               g = setcoeff!(g, 2*k, cs[j] - 1)
+               g = set_exponent_vector!(g, 2*k + 1, es[j])
+               g = setcoeff!(g, 2*k + 1, 1)
+            end
+            g = set_exponent_vector!(g, 2*n + 2, e)
+            g = setcoeff!(g, 2*n + 2, -R(1))
+            g = sort_terms!(g)
+            g = combine_like_terms!(g)
+            @test g == f
+         end
+      end
+
       @testset "Derivative and evaluation" begin
          @test derivative(x, 1) == 1
          @test derivative(x, 2) == 0
