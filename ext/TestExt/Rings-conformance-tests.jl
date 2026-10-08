@@ -789,6 +789,33 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          end
       end
 
+      if is_domain_type(base_ring(Rxy)) && is_exact_type(base_ring(Rxy))
+         @testset "Exact division" begin
+            R = base_ring(Rxy)
+            x, y = gens(Rxy)
+            nonzero_element() = (g = generate_element(Rxy); is_zero(g) ? one(Rxy) : g)
+            @test divides(x + 1, x) == (false, zero(Rxy))
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               @test divides(f*g, g) == (true, f)
+               flag, q = divides(f, g)
+               @test flag ? q*g == f : is_zero(q)
+               if !is_zero(R(3))
+                  @test divexact(3*f, 3) == f
+                  @test divexact(R(3)*f, R(3)) == f
+               end
+               if !is_zero(f) && !is_unit(g)
+                  v, q = remove(f*g^2, g)
+                  @test v >= 2
+                  @test q*g^v == f*g^2
+                  @test !divides(q, g)[1]
+                  @test valuation(f*g^2, g) == v
+               end
+            end
+         end
+      end
+
       # TODO: add more tests, covering everything described in the manual, see
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
