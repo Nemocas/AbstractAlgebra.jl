@@ -807,6 +807,43 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          end
       end
 
+      if R isa Field
+         # no term of `r` is divisible by a leading monomial in `G`
+         is_reduced(r, G) = !any(all(e .>= leading_exponent_vector(g)) for e in exponent_vectors(r) for g in G)
+
+         @testset "Division with remainder" begin
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               h = nonzero_element()
+               @test divrem(f*g, g) == (f, zero(Rxy))
+               @test div(f*g, g) == f
+
+               q, r = divrem(f, g)
+               @test f == q*g + r
+               @test is_reduced(r, [g])
+               @test div(f, g) == q
+
+               qs, r = divrem(f, [g, h])
+               @test f == qs[1]*g + qs[2]*h + r
+               @test is_reduced(r, [g, h])
+            end
+         end
+
+         # random input makes `gcd` too slow
+         @testset "GCD" begin
+            f = x + 1
+            g = y - 2
+            h = x*y + 3
+            d = gcd(f*h, g*h)
+            @test divides(d, h)[1] && divides(h, d)[1]
+            @test is_unit(gcd(f, g))
+            @test is_zero(gcd(zero(Rxy), zero(Rxy)))
+            d = gcd(f*h, zero(Rxy))
+            @test divides(d, f*h)[1] && divides(f*h, d)[1]
+         end
+      end
+
       # TODO: add more tests, covering everything described in the manual, see
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
