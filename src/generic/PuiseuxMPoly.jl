@@ -205,9 +205,18 @@ is_term(f::PuiseuxMPolyRingElem) = is_term(poly(f))
 is_constant(f::PuiseuxMPolyRingElem) = is_constant(poly(f))
 constant_coefficient(f::PuiseuxMPolyRingElem) = constant_coefficient(poly(f))
 is_monomial(f::PuiseuxMPolyRingElem) = is_monomial(poly(f).mpoly)
-is_unit(f::PuiseuxMPolyRingElem) = is_monomial(f) && is_unit(leading_coefficient(poly(f)))
+is_unit(f::PuiseuxMPolyRingElem) = is_term(f) && is_unit(leading_coefficient(poly(f)))
 
 is_nilpotent(f::PuiseuxMPolyRingElem) = is_nilpotent(poly(f))
+is_zero_divisor(f::PuiseuxMPolyRingElem) = is_zero_divisor(poly(f))
+
+leading_coefficient(f::PuiseuxMPolyRingElem) = leading_coefficient(poly(f))
+
+canonical_unit(f::PuiseuxMPolyRingElem) =
+    puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
+
+# the ideals (1 - t^(1//2^k)) form a strictly ascending chain
+is_noetherian(R::PuiseuxMPolyRing) = nvars(R) == 0 && is_noetherian(coefficient_ring(R))
 
 #################################################################################
 #
@@ -403,6 +412,50 @@ function divexact(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem; check::Bool 
     # newPoly = divexact(inflate(poly(f), [Int(scale(g)) for i in 1:nvars(parent(f))]), inflate(poly(g), [Int(scale(f)) for i in 1:nvars(parent(f))]))
 
     return puiseux_polynomial_ring_elem(parent(f), newPoly, newScale)
+end
+
+function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    R = parent(f)
+    iszero(f) && return true, zero(R)
+    iszero(g) && return false, zero(R)
+
+    # over a domain, a quotient of two Laurent polynomials in t^(1//d) that is
+    # a Puiseux polynomial is itself a Laurent polynomial in t^(1//d)
+    N = lcm(scale(f), scale(g))
+    flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
+    return flag, flag ? puiseux_polynomial_ring_elem(R, q, N) : zero(R)
+end
+
+#################################################################################
+#
+# Change base ring / map_coefficients
+#
+#################################################################################
+
+function _change_puiseux_ring(K::Ring, R::PuiseuxMPolyRing, cached::Bool)
+    L = base_ring(R)
+    return PuiseuxMPolyRing(LaurentMPolyWrapRing(
+        AbstractAlgebra._change_mpoly_ring(K, L.mpolyring, cached), cached))
+end
+
+function change_base_ring(
+    K::Ring,
+    f::PuiseuxMPolyRingElem;
+    cached::Bool = true,
+    parent::PuiseuxMPolyRing = _change_puiseux_ring(K, AbstractAlgebra.parent(f), cached))
+    p = change_base_ring(K, poly(f); parent = base_ring(parent))
+    return puiseux_polynomial_ring_elem(parent, p, scale(f))
+end
+
+function map_coefficients(
+    g::T,
+    f::PuiseuxMPolyRingElem;
+    cached::Bool = true,
+    parent::PuiseuxMPolyRing = _change_puiseux_ring(
+        AbstractAlgebra.parent(g(zero(coefficient_ring(f)))), AbstractAlgebra.parent(f), cached)) where T
+    p = map_coefficients(g, poly(f); parent = base_ring(parent))
+    return puiseux_polynomial_ring_elem(parent, p, scale(f))
 end
 
 # The following function is required for running the Conformance Tests

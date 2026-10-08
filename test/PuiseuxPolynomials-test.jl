@@ -118,6 +118,12 @@ import AbstractAlgebra: Generic.normalize!
         @test (g)^1 == g
         @test (g)^0 == 1
 
+        @test is_unit(u^(1//2))
+        @test is_unit(K(2))
+        @test is_unit(2*u^(-1//2)*v)
+        @test !is_unit(zero(K))
+        @test !is_unit(g)
+
         @test divexact(g, 2) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
         @test divexact(g, QQ(2)) == (1//2)*u^(1//2) + (1//2)*v^(1//3)
         @test divexact(2*g, QQ(2)) == g
@@ -143,6 +149,49 @@ import AbstractAlgebra: Generic.normalize!
         @test poly(g_c) == up^5*vp^10*wp^20*(1+up^10 - vp^15 + wp^25)
         @test collect(exponent_vectors(g_c)) == [[3//2, 1, 2], [1//2, 5//2, 2], [1//2, 1, 9//2], [1//2, 1, 2]]
         @test normalize!(K(0)) == false
+    end
+
+    @testset "Ring properties and delegations" begin
+        K, (u,v) = puiseux_polynomial_ring(QQ,["u","v"])
+        g = 2*u^(-1//2)*v + 3*v^(1//3)
+
+        @test !is_noetherian(K)
+        @test is_noetherian(puiseux_polynomial_ring(QQ, String[])[1])
+
+        @test leading_coefficient(g) in (2, 3)
+        @test leading_coefficient(g) == first(coefficients(g))
+        @test_throws ArgumentError leading_coefficient(zero(K))
+
+        @test !is_zero_divisor(g)
+        @test is_zero_divisor(zero(K))
+
+        cu = canonical_unit(g)
+        @test is_unit(cu)
+        @test canonical_unit(divexact(g, cu)) == 1
+        @test canonical_unit(-g) == -cu
+
+        h = @inferred map_coefficients(c -> 2*c, g)
+        @test parent(h) === K
+        @test h == 2*g
+        @test iszero(map_coefficients(c -> 0*c, g))
+        h = map_coefficients(c -> c == 2 ? zero(c) : c, 2*u^(1//2) + v)
+        @test h == v
+        @test scale(h) == 1
+
+        L, (x, y) = puiseux_polynomial_ring(RealField, ["u","v"])
+        h = change_base_ring(RealField, g)
+        @test parent(h) === L
+        @test h == 2*x^(-1//2)*y + 3*y^(1//3)
+        @test map_coefficients(c -> RealField(c), g; parent = L) == h
+
+        ok, q = divides(g*(u^(1//5) - v), u^(1//5) - v)
+        @test ok && q == g
+        ok, q = divides(u^(1//2), u^(1//3))
+        @test ok && q == u^(1//6)
+        @test !divides(1 + u^(1//2), 1 + u)[1]
+        @test divides(zero(K), g) == (true, zero(K))
+        @test divides(zero(K), zero(K)) == (true, zero(K))
+        @test !divides(g, zero(K))[1]
     end
 
     @testset "Conversions" begin
