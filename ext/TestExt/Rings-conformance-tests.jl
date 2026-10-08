@@ -591,6 +591,9 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
    @assert ngens(Rxy) == 2
 
    T = elem_type(Rxy)
+   R = base_ring(Rxy)
+   x, y = gens(Rxy)
+   nonzero_element() = (g = generate_element(Rxy); is_zero(g) ? one(Rxy) : g)
 
    @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
 
@@ -620,11 +623,9 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             end
             @test finish(B) == a
          end
-         x, y = gens(Rxy)
          f = 13*x^3*y^4 + 2*x - 7
          #@test Rxy([2,-7,13], [[1,0],[0,0],[3,4]]) == f   # FIXME: interface spec does not say this is required?
 
-         R = base_ring(Rxy)
          @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
 
          # unsorted terms, repeated exponents and zero coefficients
@@ -644,9 +645,6 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
       is_trivial(Rxy) && return
 
       @testset "Element properties" begin
-         R = base_ring(Rxy)
-         x, y = gens(Rxy)
-
          a = zero(Rxy)
          @test !is_monomial(a)
          @test !is_term(a)
@@ -730,8 +728,6 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
       end
 
       @testset "Term access" begin
-         R = base_ring(Rxy)
-         x, y = gens(Rxy)
          for i in 1:reps
             f = generate_element(Rxy)
             F = deepcopy(f)
@@ -766,8 +762,6 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
       end
 
       @testset "Derivative and evaluation" begin
-         R = base_ring(Rxy)
-         x, y = gens(Rxy)
          @test derivative(x, 1) == 1
          @test derivative(x, 2) == 0
          @test derivative(x^3*y^2, 2) == 2*x^3*y
@@ -789,11 +783,8 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          end
       end
 
-      if is_domain_type(base_ring(Rxy)) && is_exact_type(base_ring(Rxy))
+      if is_domain_type(R) && is_exact_type(R)
          @testset "Exact division" begin
-            R = base_ring(Rxy)
-            x, y = gens(Rxy)
-            nonzero_element() = (g = generate_element(Rxy); is_zero(g) ? one(Rxy) : g)
             @test divides(x + 1, x) == (false, zero(Rxy))
             for i in 1:reps
                f = generate_element(Rxy)
