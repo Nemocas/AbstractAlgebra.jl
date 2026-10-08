@@ -1321,7 +1321,7 @@ end
     shift_left(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+$x^n$, where $x$ is the variable of the ring.
 
 # Examples
 
@@ -1388,7 +1388,7 @@ end
     shift_right(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+$x^n$, where $x$ is the variable of the ring.
 
 # Examples
 
