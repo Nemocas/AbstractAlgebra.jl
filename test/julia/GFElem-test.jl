@@ -299,13 +299,13 @@ end
       for i = 1:1000
           a = rand(R)
 
-          f1, s = is_square_with_sqrt(a^2)
+          f1, s = @inferred is_square_with_sqrt(a^2)
 
           @test f1 && s^2 == a^2
 
           @test is_square(a^2)
 
-          @test sqrt(a^2)^2 == a^2
+          @test (@inferred sqrt(a^2))^2 == a^2
 
           if p != 2 && !iszero(a)
              @test !is_square(z*a^2)
