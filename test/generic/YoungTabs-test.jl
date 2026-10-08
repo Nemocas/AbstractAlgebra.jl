@@ -185,6 +185,13 @@ end
    @test isa(psi, Generic.SkewDiagram)
    @test xi == psi
 
+   # mixed eltypes promote instead of recursing
+   chi = SkewDiagram(Partition([3,2]), Partition(BigInt[1]))
+   @test chi isa Generic.SkewDiagram{BigInt}
+   @test chi == SkewDiagram(Partition(BigInt[3,2]), Partition(BigInt[1]))
+   @test Partition([3,2])/Partition(BigInt[1]) == chi
+   @test Generic.SkewDiagram([3,2], BigInt[1]) == chi
+
    # 7×5 AbstractAlgebra.Generic.SkewDiagram:
    #  ⋅  ⋅  1  1  1
    #  ⋅  ⋅  1
