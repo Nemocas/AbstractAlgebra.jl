@@ -591,6 +591,9 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
    @assert ngens(Rxy) == 2
 
    T = elem_type(Rxy)
+   R = base_ring(Rxy)
+   x, y = gens(Rxy)
+   nonzero_element() = (g = generate_element(Rxy); is_zero(g) ? one(Rxy) : g)
 
    @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
 
@@ -602,6 +605,8 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          @test length(gens(Rxy)) == ngens(Rxy)
          @test gens(Rxy) == [gen(Rxy, i) for i in 1:ngens(Rxy)]
          @test all(is_gen, gens(Rxy)) || is_trivial(Rxy)
+         @test number_of_variables(Rxy) == ngens(Rxy)
+         @test internal_ordering(Rxy) in (:lex, :deglex, :degrevlex)
       end
 
       @testset "Polynomial Constructors" begin
@@ -618,21 +623,28 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             end
             @test finish(B) == a
          end
-         x, y = gens(Rxy)
          f = 13*x^3*y^4 + 2*x - 7
          #@test Rxy([2,-7,13], [[1,0],[0,0],[3,4]]) == f   # FIXME: interface spec does not say this is required?
 
-         R = base_ring(Rxy)
          @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
+
+         # unsorted terms, repeated exponents and zero coefficients
+         B = MPolyBuildCtx(Rxy)
+         push_term!(B, R(2), [0, 1])
+         push_term!(B, R(3), [2, 0])
+         push_term!(B, R(0), [1, 1])
+         push_term!(B, R(1), [3, 3])
+         push_term!(B, R(-1), [0, 1])
+         push_term!(B, R(5), [0, 0])
+         push_term!(B, R(-1), [3, 3])
+         @test finish(B) == 3*x^2 + y + 5
+         @test is_zero(finish(B))
       end
 
       # skip trivial rings after this, it is not worth the bother
       is_trivial(Rxy) && return
 
       @testset "Element properties" begin
-         R = base_ring(Rxy)
-         x, y = gens(Rxy)
-
          a = zero(Rxy)
          @test !is_monomial(a)
          @test !is_term(a)
@@ -713,6 +725,123 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             @test sum(degrees(a)) >= total_degree(a)
          end
 
+      end
+
+      @testset "Term access" begin
+         for i in 1:reps
+            f = generate_element(Rxy)
+            F = deepcopy(f)
+            cs = collect(coefficients(f))
+            es = collect(exponent_vectors(f))
+            ms = collect(monomials(f))
+            ts = collect(terms(f))
+            @test length(cs) == length(es) == length(ms) == length(ts) == length(f)
+            @test sum(ts; init = zero(Rxy)) == f
+            for k in 1:length(f)
+               @test coeff(f, k) == cs[k]
+               @test coeff(f, es[k]) == cs[k]
+               @test exponent_vector(f, k) == es[k]
+               @test [exponent(f, k, j) for j in 1:2] == es[k]
+               @test monomial(f, k) == ms[k]
+               @test monomial!(zero(Rxy), f, k) == ms[k]
+               @test is_monomial(ms[k])
+               @test exponent_vector(ms[k], 1) == es[k]
+               @test term(f, k) == ts[k]
+               @test ts[k] == cs[k]*ms[k]
+            end
+            @test f == F
+
+            # an exponent vector not occurring in f
+            e = [total_degree(f) + 1, 0]
+            @test is_zero(coeff(f, e))
+            @test setcoeff!(deepcopy(f), e, R(3)) == f + 3*x^e[1]
+            if length(f) > 0
+               @test setcoeff!(deepcopy(f), es[1], R(0)) == f - ts[1]
+            end
+         end
+      end
+
+      @testset "Derivative and evaluation" begin
+         @test derivative(x, 1) == 1
+         @test derivative(x, 2) == 0
+         @test derivative(x^3*y^2, 2) == 2*x^3*y
+         for i in 1:reps
+            f = generate_element(Rxy)
+            g = generate_element(Rxy)
+            for j in 1:2
+               @test derivative(f*g, j) == derivative(f, j)*g + f*derivative(g, j)
+            end
+
+            v = rand(-10:10, 2)
+            vals = R.(v)
+            @test evaluate(f, vals) isa elem_type(R)
+            @test evaluate(f*g, vals) == evaluate(f, vals)*evaluate(g, vals)
+            @test evaluate(f + g, vals) == evaluate(f, vals) + evaluate(g, vals)
+            @test evaluate(f, v) == evaluate(f, vals)
+            @test f(vals...) == evaluate(f, vals)
+            @test evaluate(f, [x, y]) == f
+         end
+      end
+
+      if is_domain_type(R) && is_exact_type(R)
+         @testset "Exact division" begin
+            @test divides(x + 1, x) == (false, zero(Rxy))
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               @test divides(f*g, g) == (true, f)
+               flag, q = divides(f, g)
+               @test flag ? q*g == f : is_zero(q)
+               if !is_zero(R(3))
+                  @test divexact(3*f, 3) == f
+                  @test divexact(R(3)*f, R(3)) == f
+               end
+               if !is_zero(f) && !is_unit(g)
+                  v, q = remove(f*g^2, g)
+                  @test v >= 2
+                  @test q*g^v == f*g^2
+                  @test !divides(q, g)[1]
+                  @test valuation(f*g^2, g) == v
+               end
+            end
+         end
+      end
+
+      if R isa Field
+         # no term of `r` is divisible by a leading monomial in `G`
+         is_reduced(r, G) = !any(all(e .>= leading_exponent_vector(g)) for e in exponent_vectors(r) for g in G)
+
+         @testset "Division with remainder" begin
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               h = nonzero_element()
+               @test divrem(f*g, g) == (f, zero(Rxy))
+               @test div(f*g, g) == f
+
+               q, r = divrem(f, g)
+               @test f == q*g + r
+               @test is_reduced(r, [g])
+               @test div(f, g) == q
+
+               qs, r = divrem(f, [g, h])
+               @test f == qs[1]*g + qs[2]*h + r
+               @test is_reduced(r, [g, h])
+            end
+         end
+
+         # random input makes `gcd` too slow
+         @testset "GCD" begin
+            f = x + 1
+            g = y - 2
+            h = x*y + 3
+            d = gcd(f*h, g*h)
+            @test divides(d, h)[1] && divides(h, d)[1]
+            @test is_unit(gcd(f, g))
+            @test is_zero(gcd(zero(Rxy), zero(Rxy)))
+            d = gcd(f*h, zero(Rxy))
+            @test divides(d, f*h)[1] && divides(f*h, d)[1]
+         end
       end
 
       # TODO: add more tests, covering everything described in the manual, see
