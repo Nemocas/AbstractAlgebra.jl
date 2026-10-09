@@ -70,7 +70,41 @@ base_ring(R::PuiseuxMPolyRing{T}) where T = R.baseRing::laurent_mpoly_ring_type(
 coefficient_ring(R::PuiseuxMPolyRing) = coefficient_ring(base_ring(R))
 
 Base.parent(f::PuiseuxMPolyRingElem) = f.parent
+
+@doc raw"""
+    poly(f::PuiseuxMPolyRingElem)
+
+Return the Laurent polynomial $g$ in `base_ring(parent(f))` with
+$f(x_1, \dots, x_n) = g(x_1^{1/d}, \dots, x_n^{1/d})$, where $d$ is
+[`scale(f)`](@ref scale(::PuiseuxMPolyRingElem)).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = puiseux_polynomial_ring(QQ, ["x", "y"]);
+
+julia> poly(x^(1//2) + 2*y^(1//3))
+x^3 + 2*y^2
+```
+"""
 poly(f::PuiseuxMPolyRingElem{T}) where {T} = f.poly::laurent_mpoly_type(T)
+
+@doc raw"""
+    scale(f::PuiseuxMPolyRingElem)
+
+Return the least common denominator $d > 0$ of the exponents of `f`, so that
+`f` is the Laurent polynomial [`poly(f)`](@ref poly(::PuiseuxMPolyRingElem))
+evaluated at $x_1^{1/d}, \dots, x_n^{1/d}$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = puiseux_polynomial_ring(QQ, ["x", "y"]);
+
+julia> scale(x^(1//2) + 2*y^(1//3))
+6
+```
+"""
 scale(f::PuiseuxMPolyRingElem) = f.scale
 
 #################################################################################
@@ -191,6 +225,21 @@ monomials(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem.(Ref(parent(f)
 
 Base.length(f::PuiseuxMPolyRingElem) = length(poly(f))
 
+@doc raw"""
+    valuation(f::PuiseuxMPolyRingElem)
+
+Return the smallest exponent occurring in the univariate Puiseux polynomial
+`f`, or `PosInf()` if `f` is zero.
+
+# Examples
+
+```jldoctest
+julia> R, (t,) = puiseux_polynomial_ring(QQ, ["t"]);
+
+julia> valuation(t^(-2//3) + t^(1//2))
+-2//3
+```
+"""
 function valuation(f::PuiseuxMPolyRingElem)
     @req nvars(parent(f)) == 1 "valuation is only defined for univariate Puiseux polynomials"
     if iszero(f)
