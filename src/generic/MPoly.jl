@@ -536,8 +536,13 @@ end
 
 function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    b = 0x53dd43cd511044d1%UInt
-   b = xor(b, xor(Base.hash(x.exps, h), h))
+   N = size(x.exps, 1)
+   # columns of x.exps beyond length(x) are unused capacity
    for i in 1:length(x)
+      for k in 1:N
+         b = xor(b, hash(x.exps[k, i], h))
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      end
       b = xor(b, xor(hash(x.coeffs[i], h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
