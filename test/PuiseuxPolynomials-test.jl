@@ -114,9 +114,12 @@ import AbstractAlgebra: Generic.normalize!
         @test h+g == u^(1//2) + 2*v^(1//3) + w^(1//3)
         @test h-g == w^(1//3)-u^(1//2)
         @test h*g == u^(1//2)*v^(1//3) + u^(1//2)*w^(1//3) + v^(2//3) + v^(1//3)*w^(1//3)
-        @test (g)^QQ(3) == u^(3//2) + 3*u*v^(1//3) + 3*u^(1//2)*v^(2//3) + v
-        @test (g)^QQ(1) == g
-        @test (g)^QQ(0) == 1
+        @test (g)^3 == u^(3//2) + 3*u*v^(1//3) + 3*u^(1//2)*v^(2//3) + v
+        @test (g)^1 == g
+        @test (g)^0 == 1
+        @test (g)^3 == g^QQ(3)
+        @test (g)^1 == g^QQ(1)
+        @test (g)^0 == g^QQ(0)
 
         @test is_unit(u^(1//2))
         @test is_unit(K(2))
