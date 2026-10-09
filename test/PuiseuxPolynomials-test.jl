@@ -117,6 +117,9 @@ import AbstractAlgebra: Generic.normalize!
         @test (g)^3 == u^(3//2) + 3*u*v^(1//3) + 3*u^(1//2)*v^(2//3) + v
         @test (g)^1 == g
         @test (g)^0 == 1
+        @test (g)^3 == g^QQ(3)
+        @test (g)^1 == g^QQ(1)
+        @test (g)^0 == g^QQ(0)
 
         @test is_unit(u^(1//2))
         @test is_unit(K(2))
@@ -203,6 +206,17 @@ import AbstractAlgebra: Generic.normalize!
         @test K(4//5) == puiseux_polynomial_ring_elem(K,F(4//5))
         @test K(0) == zero(K)
         @test K(1) == one(K)
+    end
+
+    @testset "Ordering" begin
+        R, (t,) = puiseux_polynomial_ring(QQ, [:t])
+        @test isless(t^2-t,0)
+        @test !isless(0,t^2-t)
+        K = fraction_field(R)
+        @test isless(K(-t),0)
+        @test !isless(0,K(-t))
+        @test isless(K(t)/K(-1),0)
+        @test !isless(0,K(t)/K(-1))
     end
 
     @testset "Printing" begin
