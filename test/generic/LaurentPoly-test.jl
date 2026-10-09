@@ -25,7 +25,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test laurent_polynomial_ring(P2, "y")[1] !==
                laurent_polynomial_ring(P, "y")[1]
 
-         x = y.poly
+         x = gen(base_ring(L))
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}
          @test y isa LaurentPolyWrap{elem_type(R)}
@@ -72,7 +72,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "basic manipulation" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
       Z, z = laurent_polynomial_ring(L, "z")
       T, t = laurent_polynomial_ring(L.polyring, "t")
 
@@ -259,7 +259,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "comparisons" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test y == y
 
@@ -275,7 +275,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "unary & binary & adhoc arithmetic operations" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test -(-y) == y
       @test iszero(y + (-y))
@@ -343,7 +343,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "powering" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == L(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
 
@@ -380,7 +380,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test evaluate(p, a) == evaluate(p.poly, a)
       end
       q = p - y^-2
-      x = y.poly
+      x = gen(base_ring(L))
       t = -x^0 + 2x^3 + 3x^6
       for a = -10.0:3.3:10
          @test evaluate(q, a) == evaluate(t, a) * a^-2

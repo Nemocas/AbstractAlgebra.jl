@@ -84,7 +84,7 @@ isone(p::LaurentPolyWrap) = is_monomial(p, 0)
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(base_ring(R)))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(base_ring(R)))
 
-gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, gen(base_ring(R)))
+gen(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(base_ring(R)), 1)
 
 is_gen(p::LaurentPolyWrap) = is_monomial(p, 1)
 
@@ -528,8 +528,8 @@ end
 
 function laurent_polynomial_ring(R::AbstractAlgebra.Ring, s::Symbol; cached::Bool = true)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
+   P = AbstractAlgebra.poly_ring(R, s, cached = cached)
    R = LaurentPolyWrapRing(P, cached)
-   R, LaurentPolyWrap(R, x)
+   R, gen(R)
 end
 
