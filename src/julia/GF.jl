@@ -286,7 +286,7 @@ function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
    q = div(q, T(1) << s)
    if isone(s)
       r = powermod(n, div(p + 1, 4), p)
-      return true, r
+      return true, R(r)
    end
    # find a quadratic nonresidue mod p
    z = T(2)
@@ -317,7 +317,7 @@ function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
       t = mulmod(t, c, p)
       m = i
    end
-   return true, r
+   return true, R(r)
 end
 
 function Base.sqrt(a::GFElem{T}; check::Bool=true) where T <: Integer

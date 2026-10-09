@@ -853,8 +853,7 @@ end
    end
 
    # Field of characteristic p
-   for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)]
-      R, = residue_field(ZZ, p)
+   for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)], R in [residue_field(ZZ, p)[1], GF(p)]
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
@@ -862,7 +861,11 @@ end
          S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
          for iter = 1:10
-            f = rand(S, 0:5, 0:100, 0:Int(p))
+            if R isa AbstractAlgebra.GFField
+               f = rand(S, 0:5, 0:100)
+            else
+               f = rand(S, 0:5, 0:100, 0:Int(p))
+            end
 
             s = f^2
 
