@@ -16,7 +16,7 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :inv, :log, :exp, :sqrt, :div, :divrem,
                   :numerator, :denominator,
                   :promote_rule,
-                  :Set, :Module, :Group,
+                  :Set, :Module, :Semigroup, :Monoid, :Group,
                   :InfiniteDimensionError, # remove in next breaking release, see #2135
                   :identity_map, # see #5188 in Oscar.jl
                  ]
@@ -254,6 +254,7 @@ end
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
 
+include("Semigroups.jl")
 include("Groups.jl")
 include("Rings.jl")
 include("NCRings.jl")
