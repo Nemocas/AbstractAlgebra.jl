@@ -49,6 +49,8 @@ parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPo
 base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
+is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
+
 characteristic(R::PuiseuxMPolyRing) = characteristic(base_ring(R))
 
 symbols(R::PuiseuxMPolyRing) = symbols(base_ring(R))
@@ -435,14 +437,6 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
     )
 end
 
-#
-# The next function converts the exponent to a Rational{BigInt}, which
-# is not compatible with exponentiating LaurentMPolyRingElems
-
-# function Base.:^(f::PuiseuxMPolyRingElem, a::Rational{Int})
-#     return f^(QQ(a))
-# end
-
 function Base.:^(f::PuiseuxMPolyRingElem, a::Int)
     if a == 0
         return one(parent(f))
@@ -512,6 +506,12 @@ function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     return flag, flag ? puiseux_polynomial_ring_elem(R, q, N) : zero(R)
 end
 
+function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    N = lcm(scale(f), scale(g))
+    return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
+end
+
 #################################################################################
 #
 # Change base ring / map_coefficients
@@ -549,42 +549,4 @@ function ConformanceTests.generate_element(R::PuiseuxMPolyRing)
     f_laurent = base_ring(R)(f)
     scale = Int(rand(ZZ, 1:10))
     return puiseux_polynomial_ring_elem(R, f_laurent, scale)
-end
-
-
-######################################################
-#
-# Function for Field of Fractions (prototype)
-#
-######################################################
-
-# is_domain_type(T): true if every ring with elements of type T is a domain, which is decided just from the type
-is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
-
-
-# gcd(f, g): a greatest common divisor of f and g
-function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
-    check_parent(f, g)
-    N = lcm(scale(f), scale(g))
-    return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
-end
-
-
-# canonical_unit(f): a unit `u` such that divexact(f, u) is the preferred representative of f among
-#   the others: f times any unit. This is used for normalising fraction denominators
-canonical_unit(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem(parent(f), canonical_unit(poly(f)), scale(f))
-
-
-# divides(f, g): returns (true, q) if g divides f where f == q*g, and (false, 0) otherwise
-function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
-    check_parent(f, g)
-    iszero(f) && return true, zero(parent(f))
-    iszero(g) && return false, zero(parent(f))
-    N = lcm(scale(f), scale(g))
-    flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
-
-    if !flag
-        return false, zero(parent(f))
-    end
-    return true, puiseux_polynomial_ring_elem(parent(f), q, N)
 end
