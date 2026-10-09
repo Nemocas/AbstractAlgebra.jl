@@ -7,3 +7,7 @@
   @test_throws MethodError AbstractAlgebra.is_known(dim, R)
   @test_throws MethodError AbstractAlgebra.is_known(dim, 5, 7, 8; dummy=true)
 end
+
+@testset "known properties: methods defined in Generic" begin
+  @test AbstractAlgebra.is_known(is_finite, SymmetricGroup(3))
+end
