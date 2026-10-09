@@ -64,7 +64,11 @@ end
 function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
     R = parent(f)
     @req ngens(R) == 1 "isless only defined in the univariate case"
-    return last(collect(coefficients(f-g))) < 0
+    d = f - g
+    if iszero(d)
+        return false
+    end
+    return last(collect(coefficients(d))) < 0
 end
 
 isless(f::PuiseuxMPolyRingElem, g::Integer) = isless(f, parent(f)(g))
