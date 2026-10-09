@@ -1139,9 +1139,19 @@ end
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
    test_Ring_interface(R; reps = reps)
    test_NCRing_interface_recursive(R; reps = reps)
+
    Rx, _ = polynomial_ring(R, :x)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+
    Rxy, _ = polynomial_ring(R, [:x, :y])
+   @testset "MPoly ring constructor over $(R)" begin
+      @test polynomial_ring(R, [:x, :y])[1] === Rxy
+      @test polynomial_ring(R, [:x, :y]; cached = false)[1] !== Rxy
+      @test polynomial_ring(R, [:x, :y]; internal_ordering = :deglex)[1] !== Rxy
+      @test mpoly_ring_type(R) == typeof(Rxy)
+      @test mpoly_type(R) == elem_type(Rxy)
+      @test mpoly_type(elem_type(R)) == elem_type(Rxy)
+   end
    test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
 end
 
