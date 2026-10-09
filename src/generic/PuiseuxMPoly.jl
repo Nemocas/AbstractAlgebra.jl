@@ -64,7 +64,6 @@ end
 function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
     R = parent(f)
     @req ngens(R) == 1 "isless only defined in the univariate case"
-    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
     return last(collect(coefficients(f-g))) < 0
 end
 
@@ -74,7 +73,6 @@ isless(g::Integer, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
 function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElement
     R = base_ring(parent(f))
     @req ngens(R) == 1 "isless only defined in the univariate case"
-    @req hasmethod(isless, Tuple{T, T}) "is less only defined over ordered coefficient rings"
     denom_f = denominator(f)
     num_f = numerator(f)
     if denom_f < 0
