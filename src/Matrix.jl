@@ -833,7 +833,8 @@ Base.ndims(::MatrixElem{T}) where T <: NCRingElement = 2
 
 # Cartesian indexing
 
-Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a), ncols(a)))
+# `::Int`: with `T` abstract, inference loses the return type of `nrows`
+Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a)::Int, ncols(a)::Int))
 
 Base.@propagate_inbounds Base.getindex(a::MatrixElem{T}, I::CartesianIndex) where T <: NCRingElement =
    a[I[1], I[2]]
