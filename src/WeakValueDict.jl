@@ -158,7 +158,7 @@ function _setindex!(h::WeakValueCache, v, key, index)
    return h
 end
 
-function rehash!(h::WeakValueCache{K, V}, newsz = length(h.keys)) where {K, V}
+function rehash!(h::WeakValueCache{K, V}, newsz::Int = length(h.keys)) where {K, V}
    olds = h.slots
    oldk = h.keys
    oldv = h.vals
