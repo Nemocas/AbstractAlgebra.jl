@@ -543,7 +543,7 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
          b = xor(b, hash(x.exps[k, i], h))
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
       end
-      b = xor(b, xor(hash(x.coeffs[i], h), h))
+      b = xor(b, hash(x.coeffs[i], h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
