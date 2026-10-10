@@ -1013,7 +1013,7 @@ function Base.iterate(A::MatSpace)
    if d == 0
       # handle this carefully to preserve type stability
       a = elem_type(R)[]
-      state_type = typeof(iterate(R)[2])
+      state_type = typeof((iterate(R)::Tuple)[2])  # rings are nonempty
       st = (elem_type(R)[], state_type[])
    else
       a, st = iterate(p)::Tuple{Any, Any} # R is presumably not empty
