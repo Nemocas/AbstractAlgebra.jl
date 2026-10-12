@@ -785,13 +785,13 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
       if is_domain_type(R) && is_exact_type(R)
          @testset "Exact division" begin
-            @test divides(x + 1, x) == (false, zero(Rxy))
+            @test !divides(x + 1, x)[1]
             for i in 1:reps
                f = generate_element(Rxy)
                g = nonzero_element()
                @test divides(f*g, g) == (true, f)
                flag, q = divides(f, g)
-               @test flag ? q*g == f : is_zero(q)
+               @test !flag || q*g == f
                if !is_zero(R(3))
                   @test divexact(3*f, 3) == f
                   @test divexact(R(3)*f, R(3)) == f
