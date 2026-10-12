@@ -250,7 +250,7 @@ divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a tuple `(flag, q)` where `flag` is `true` if $g$ divides $f$, in which case
-$q$ will be the exact quotient, or `flag` is false and $q$ is set to zero.
+$q$ will be the exact quotient, or `flag` is false and $q$ is undefined.
 
 ```julia
 remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
