@@ -32,6 +32,12 @@ which we think might affect some users directly.
 
 - [#2569](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2569) Fix `eltype` of coefficient/term/monomial iterators for FreeAssociativeAlgebras
 
+## [0.50.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.4) - 2026-10-13
+
+### Other fixed bugs
+
+- [#2589](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2589) Some internal changes for compatibility with Julia 1.13.2
+
 ## [0.50.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.50.3) - 2026-09-29
 
 ### New or extended functionality
