@@ -42,8 +42,9 @@ lazy_transpose(A::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(A)}(A)
 lazy_transpose(M::LazyTransposeMatElem) = data(M)
 
 # Change the order of rows and columns in nrows, ncols, getindex and setindex!
-AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))
-AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))
+# `::Int` breaks the inference cycle with `nrows(::MatElem)`
+AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))::Int
+AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))::Int
 
 Base.getindex(M::LazyTransposeMatElem, r::Int, c::Int) = data(M)[c, r]
 function Base.setindex!(M::LazyTransposeMatElem{T}, d::T, r::Int, c::Int) where T

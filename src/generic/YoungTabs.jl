@@ -665,7 +665,7 @@ julia> Generic.collength(y, 2,4)
 0
 ```
 """
-collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
+collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, Int(i)+1:lastindex(Y.part)))
 
 @doc raw"""
     hooklength(Y::YoungTableau, i, j)

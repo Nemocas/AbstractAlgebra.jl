@@ -41,7 +41,7 @@ Base.:*(a::T, b::ModuleIsomorphism{T}) where {T <: RingElement} = hom(domain(b),
 Base.:+(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) + matrix(b))
 Base.:-(a::ModuleHomomorphism, b::ModuleHomomorphism) = hom(domain(a), codomain(a), matrix(a) - matrix(b))
 
-function AbstractAlgebra.compose(f::Map(ModuleHomomorphism), g::Map(ModuleHomomorphism))
+function AbstractAlgebra.compose(f::ModuleHomomorphism, g::ModuleHomomorphism)
    check_composable(f, g)
    @assert f.is_left == g.is_left
    m1 = f.matrix

@@ -833,7 +833,8 @@ Base.ndims(::MatrixElem{T}) where T <: NCRingElement = 2
 
 # Cartesian indexing
 
-Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a), ncols(a)))
+# `::Int`: with `T` abstract, inference loses the return type of `nrows`
+Base.eachindex(a::MatrixElem{T}) where T <: NCRingElement = CartesianIndices((nrows(a)::Int, ncols(a)::Int))
 
 Base.@propagate_inbounds Base.getindex(a::MatrixElem{T}, I::CartesianIndex) where T <: NCRingElement =
    a[I[1], I[2]]
@@ -1012,7 +1013,7 @@ function Base.iterate(A::MatSpace)
    if d == 0
       # handle this carefully to preserve type stability
       a = elem_type(R)[]
-      state_type = typeof(iterate(R)[2])
+      state_type = typeof((iterate(R)::Tuple)[2])  # rings are nonempty
       st = (elem_type(R)[], state_type[])
    else
       a, st = iterate(p)::Tuple{Any, Any} # R is presumably not empty
