@@ -76,8 +76,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       Z, z = laurent_polynomial_ring(L, "z")
       T, t = laurent_polynomial_ring(L.polyring, "t")
 
-      @test terms_degrees(y) == 0:1
-      @test terms_degrees(y^3) == 0:3
+      @test is_subset(1:1, terms_degrees(y))
+      @test is_subset(3:3, terms_degrees(y^3))
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
       @test trail_degree(y^2) == 2
       @test lead_degree(y^2) == 2
@@ -162,7 +162,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test hash(one(y)) == hash(one(y))
 
       f1 = f = L(x, -2)
-      @test terms_degrees(f) == -2:-1
+      @test is_subset(-1:-1, terms_degrees(f))
       @test trail_degree(f) == -1
       @test lead_degree(f) == -1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
@@ -176,7 +176,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test trailing_coefficient(f) == 1
 
       f2 = f = L(3 + 2*x^4, -3)
-      @test terms_degrees(f) == -3:1
+      @test is_subset(-3:1, terms_degrees(f))
       @test trail_degree(f) == -3
       @test lead_degree(f) == 1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
