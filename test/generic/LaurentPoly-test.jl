@@ -374,13 +374,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "evaluate" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
+      x = gen(base_ring(L))
       p = 2y+3y^4
-      @assert p.mindeg == 0
+      p_poly = 2x+3x^4
       for a = Any[-3:3; -10.0:3.3:10;]
-         @test evaluate(p, a) == evaluate(p.poly, a)
+         @test evaluate(p, a) == evaluate(p_poly, a)
       end
       q = p - y^-2
-      x = gen(base_ring(L))
       t = -x^0 + 2x^3 + 3x^6
       for a = -10.0:3.3:10
          @test evaluate(q, a) == evaluate(t, a) * a^-2
@@ -488,7 +488,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = laurent_polynomial_ring(ZZ, "y")
       @test sprint(show, "text/plain", y) == "y"
       @test sprint(show, "text/plain", L) == "Univariate Laurent polynomial ring in y\n  over integers"
-      p = y^1; p.mindeg = -3
+      p = y^(-2)
       @test sprint(show, "text/plain", p) == "y^-2"
       R, z = polynomial_ring(L, "z")
       @test sprint(show, "text/plain", (y^2)*z) == "y^2*z"
