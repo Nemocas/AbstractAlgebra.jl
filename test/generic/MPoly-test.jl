@@ -495,6 +495,13 @@ end
    @test is_univariate_with_data(y) == (true, 2)
    @test is_univariate_with_data(R()) == (true, 0)
    @test is_univariate_with_data(x + y) == (false, 0)
+
+   # equal polynomials with different unused capacity in exps
+   f = (x + y) - y
+
+   @test size(f.exps, 2) != size(x.exps, 2)
+   @test f == x
+   @test hash(f) == hash(x)
 end
 
 
