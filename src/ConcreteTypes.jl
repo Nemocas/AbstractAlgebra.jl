@@ -23,7 +23,7 @@ end
 #
 ###############################################################################
 
-struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
+struct MatRing{T <: NCRingElement} <: NCRing
    n::Int
    base_ring::NCRing
 
@@ -32,7 +32,7 @@ struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
    end
 end
 
-struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
+struct MatRingElem{T <: NCRingElement} <: NCRingElem
    data::MatElem{T}
 
   function MatRingElem{TT}(A::MatElem{TT}) where TT <: NCRingElement

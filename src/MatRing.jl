@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-base_ring_type(::Type{<:MatRing{T}}) where T <: NCRingElement = parent_type(T)
+base_ring_type(::Type{MatRing{T}}) where T <: NCRingElement = parent_type(T)
 
-base_ring_type(::Type{<:MatRingElem{T}}) where T <: NCRingElement = parent_type(T)
+base_ring_type(::Type{MatRingElem{T}}) where T <: NCRingElement = parent_type(T)
 
 parent_type(::Type{MatRingElem{T}}) where T <: NCRingElement = MatRing{T}
 
@@ -174,7 +174,7 @@ with defaults based upon the given source matrix ring element `A`.
 function similar(A::MatRingElem, R::NCRing=base_ring(A), n::Int=degree(A))
    @req (n >= 0)  "Matrix dimension must be non-negative"
    @req (n < 2^30)  "Matrix dimension is excessively large"
-   return Generic.MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
+   return MatRingElem(R, n, fill(0,n^2)) # n^2 cannot overflow given check in line above
 end
 
 similar(A::MatRingElem, n::Int) = similar(A, base_ring(A), n)
@@ -281,15 +281,15 @@ end
 #
 ###############################################################################
 
--(x::MatRingElem) = Generic.MatRingElem(-matrix(x))
+-(x::MatRingElem) = MatRingElem(-matrix(x))
 
-*(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) * matrix(y))
+*(x::T, y::T) where {T <: MatRingElem} = MatRingElem(matrix(x) * matrix(y))
 
-+(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) + matrix(y))
++(x::T, y::T) where {T <: MatRingElem} = MatRingElem(matrix(x) + matrix(y))
 
--(x::T, y::T) where {T <: MatRingElem} = Generic.MatRingElem(matrix(x) - matrix(y))
+-(x::T, y::T) where {T <: MatRingElem} = MatRingElem(matrix(x) - matrix(y))
 
-^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
+^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = MatRingElem(matrix(a)^b)
 
 ==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
 
@@ -302,56 +302,56 @@ isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
 ###############################################################################
 
 function *(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
-  return Generic.MatRingElem(x * matrix(y))
+  return MatRingElem(x * matrix(y))
 end
 
 function *(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
-  return Generic.MatRingElem(x * matrix(y))
+  return MatRingElem(x * matrix(y))
 end
 
 function *(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
-  return Generic.MatRingElem(matrix(x) * y)
+  return MatRingElem(matrix(x) * y)
 end
 
 function *(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
-  return Generic.MatRingElem(matrix(x) * y)
+  return MatRingElem(matrix(x) * y)
 end
 
 function +(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
-  return Generic.MatRingElem(x + matrix(y))
+  return MatRingElem(x + matrix(y))
 end
 
 function +(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
-  return Generic.MatRingElem(x + matrix(y))
+  return MatRingElem(x + matrix(y))
 end
 
 function +(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
-  return Generic.MatRingElem(matrix(x) + y)
+  return MatRingElem(matrix(x) + y)
 end
 
 function +(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
-  return Generic.MatRingElem(matrix(x) + y)
+  return MatRingElem(matrix(x) + y)
 end
 
 function -(x::JuliaRingElement, y::MatRingElem{T}) where T <: NCRingElement
-  return Generic.MatRingElem(x - matrix(y))
+  return MatRingElem(x - matrix(y))
 end
 
 function -(x::T, y::MatRingElem{T}) where {T <: NCRingElem}
-  return Generic.MatRingElem(x - matrix(y))
+  return MatRingElem(x - matrix(y))
 end
 
 function -(x::MatRingElem{T}, y::JuliaRingElement) where T <: NCRingElement
-  return Generic.MatRingElem(matrix(x) - y)
+  return MatRingElem(matrix(x) - y)
 end
 
 function -(x::MatRingElem{T}, y::T) where {T <: NCRingElem}
-  return Generic.MatRingElem(matrix(x) - y)
+  return MatRingElem(matrix(x) - y)
 end
 
-*(P::Perm, A::MatRingElem) = Generic.MatRingElem(P * matrix(A))
+*(P::Perm, A::MatRingElem) = MatRingElem(P * matrix(A))
 
-*(A::MatRingElem, P::Perm) = Generic.MatRingElem(matrix(A) * P)
+*(A::MatRingElem, P::Perm) = MatRingElem(matrix(A) * P)
 
 function *(x::MatRingElem{T}, y::Vector{T}) where T <: NCRingElement
   return matrix(x) * y
@@ -427,19 +427,19 @@ end
 # The unused kwargs in the field cases are necessary for generic code to compile.
 
 function divexact(x::MatRingElem{T}, y::JuliaRingElement; check::Bool=true) where T <: NCRingElement
-   return Generic.MatRingElem(divexact(matrix(x), y; check=check))
+   return MatRingElem(divexact(matrix(x), y; check=check))
 end
 
 function divexact(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: RingElem}
-   return Generic.MatRingElem(divexact(matrix(x), y; check=check))
+   return MatRingElem(divexact(matrix(x), y; check=check))
 end
 
 function divexact_left(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
-   return Generic.MatRingElem(divexact_left(matrix(x), y; check=check))
+   return MatRingElem(divexact_left(matrix(x), y; check=check))
 end
 
 function divexact_right(x::MatRingElem{T}, y::T; check::Bool=true) where {T <: NCRingElem}
-   return Generic.MatRingElem(divexact_right(matrix(x), y; check=check))
+   return MatRingElem(divexact_right(matrix(x), y; check=check))
 end
 
 function divexact_left(f::MatRingElem{T},
@@ -509,7 +509,7 @@ is_lower_triangular(A::MatRingElem) = is_lower_triangular(matrix(A))
 is_diagonal(A::MatRingElem) = is_diagonal(matrix(A))
 
 function kronecker_product(x::MatRingElem{T}, y::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(kronecker_product(matrix(x), matrix(y)))
+  return MatRingElem(kronecker_product(matrix(x), matrix(y)))
 end
 
 function tr(x::MatRingElem{T}) where T <: NCRingElement
@@ -521,7 +521,7 @@ end
 content(A::MatRingElem{T}) where T <: RingElement = content(matrix(A))
 
 function change_base_ring(R::NCRing, A::MatRingElem{T}) where {T <: NCRingElement}
-  return Generic.MatRingElem(change_base_ring(R, matrix(A)))
+  return MatRingElem(change_base_ring(R, matrix(A)))
 end
 
 function map_entries!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement}
@@ -532,23 +532,23 @@ end
 Base.map!(f::S, dst::MatRingElem{T}, src::MatRingElem{U}) where {S, T <: NCRingElement, U <: NCRingElement} = map_entries!(f, dst, src)
 
 function map_entries(f::S, A::MatRingElem{T}) where {S, T <: NCRingElement}
-  return Generic.MatRingElem(map_entries(f, matrix(A)))
+  return MatRingElem(map_entries(f, matrix(A)))
 end
 
 Base.map(f::S, A::MatRingElem{T}) where {S, T <: NCRingElement} = map_entries(f, A)
 
 function pseudo_inv(A::MatRingElem{T}) where {T <: RingElement}
   X,d = pseudo_inv(matrix(A))
-  return Generic.MatRingElem(X), d
+  return MatRingElem(X), d
 end
 
 function Base.inv(A::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(inv(matrix(A)))
+  return MatRingElem(inv(matrix(A)))
 end
 
 function is_invertible_with_inverse(A::MatRingElem{T}; side::Symbol = :left) where {T <: RingElement}
   flag, inv = is_invertible_with_inverse(matrix(A); side = side)
-  return flag, Generic.MatRingElem(inv)
+  return flag, MatRingElem(inv)
 end
 
 is_invertible(A::MatRingElem{T}) where {T <: RingElement} = is_unit(det(A))
@@ -565,7 +565,7 @@ function hessenberg!(A::MatRingElem{T}) where {T <: RingElement}
 end
 
 function hessenberg(A::MatRingElem{T}) where {T <: RingElement}
-  return Generic.MatRingElem(hessenberg(matrix(A)))
+  return MatRingElem(hessenberg(matrix(A)))
 end
 
 function is_hessenberg(A::MatRingElem{T}) where {T <: RingElement}
@@ -619,7 +619,7 @@ function _can_solve_with_solution_lu(A::MatRingElem{T}, B::MatRingElem{T}) where
    return flag, SA
 end
 
-function AbstractAlgebra.can_solve_with_solution(A::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
+function can_solve_with_solution(A::MatRingElem{T}, B::MatRingElem{T}) where {T <: RingElement}
    check_parent(A, B)
    R = base_ring(A)
    MS = matrix(A)
@@ -891,7 +891,7 @@ function identity_matrix(A::MatRingElem{T}, n::Int) where T <: NCRingElement
   @req (n >= 0)  "Matrix dimension must be non-negative"
   @req (n < 2^30)  "Matrix dimension is excessively large"
   R = base_ring(A)
-  return Generic.MatRingElem(identity_matrix(R,n))
+  return MatRingElem(identity_matrix(R,n))
 end
 
 @doc raw"""
@@ -1051,11 +1051,7 @@ Matrix ring of degree 3
   over univariate polynomial ring in t over rationals
 ```
 """
-function matrix_ring(R::NCRing, n::Int)
-   Generic.matrix_ring(R, n)
-end
-
-function matrix_ring(R::AbstractAlgebra.NCRing, n::Int; cached::Bool = true)
+function matrix_ring(R::NCRing, n::Int; cached::Bool = true)
    # TODO: the 'cached' argument is ignored and mainly here for backwards compatibility
    # (and perhaps future compatibility, in case we need it again)
    @req n >= 0 "n must be a non-negative integer"

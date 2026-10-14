@@ -108,8 +108,6 @@ abstract type FracField{T<:RingElement} <: Field end
 
 abstract type TotFracRing{T<:RingElement} <: Ring end
 
-abstract type MatRing{T<:NCRingElement} <: NCRing end
-
 abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
 
 # Abstract types for number fields, parmeterised by the element type of
@@ -154,8 +152,6 @@ abstract type AbsPowerSeriesRingElem{T} <: SeriesElem{T} end
 abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
 abstract type MatElem{T} <: ModuleElem{T} end
-
-abstract type MatRingElem{T<:NCRingElement} <: NCRingElem end
 
 abstract type FreeAssociativeAlgebraElem{T<:RingElement} <: NCRingElem end
 
