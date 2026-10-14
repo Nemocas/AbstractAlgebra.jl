@@ -54,8 +54,6 @@ include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
 
-include("generic/MatRing.jl")
-
 include("generic/FreeAssociativeAlgebra.jl")
 
 include("generic/Fraction.jl")
