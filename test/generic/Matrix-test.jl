@@ -607,7 +607,7 @@ end
       @test elem_type(base_ring(m3)) == ET
       @test !isempty(m3)
       @test !iszero(m3)
-      @test m3 isa Generic.MatRingElem
+      @test m3 isa MatRingElem
       @test parent(m3) == M3
    end
 
