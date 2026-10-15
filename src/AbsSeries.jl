@@ -19,7 +19,7 @@ can be used to set the precision of a power series when constructing it.
 """
 function O(a::AbsPowerSeriesRingElem{T}) where T <: RingElement
    if iszero(a)
-      return deepcopy(a)    # 0 + O(x^n)
+      return mutable_copy(a)    # 0 + O(x^n)
    end
    prec = length(a) - 1
    return parent(a)(Vector{T}(undef, 0), 0, prec)
@@ -265,11 +265,11 @@ function +(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(b, i - 1)))
       i += 1
    end
    z = set_length!(z, normalise(z, i - 1))
@@ -293,7 +293,7 @@ function -(a::AbsPowerSeriesRingElem{T}, b::AbsPowerSeriesRingElem{T}) where T <
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
@@ -451,7 +451,7 @@ end
 Return $a$ truncated to $n$ terms.
 """
 function truncate(a::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   return truncate!(deepcopy(a), n)
+   return truncate!(mutable_copy(a), n)
 end
 
 ###############################################################################
@@ -474,13 +474,13 @@ function ^(a::AbsPowerSeriesRingElem{T}, b::Int) where T <: RingElement
       return z
    elseif precision(a) > 0 && is_gen(a) && b > 0
       # arithmetic operators must not introduce new aliasing
-      return deepcopy(shift_left(a, b - 1))
+      return mutable_copy(shift_left(a, b - 1))
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
       z = _set_precision_raw!(z, precision(a))
       return z
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -624,7 +624,7 @@ function divexact(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}; ch
       x = shift_right(x, v2)
       y = shift_right(y, v2)
    else
-      x = deepcopy(x)
+      x = mutable_copy(x)
    end
    y = truncate(y, precision(x))
    res = parent(x)()
@@ -655,7 +655,7 @@ function divexact(x::AbsPowerSeriesRingElem{T}, y::AbsPowerSeriesRingElem{T}; ch
       x = shift_right(x, v2)
       y = shift_right(y, v2)
    else
-      x = deepcopy(x)
+      x = mutable_copy(x)
    end
    y = truncate(y, precision(x))
    return x*inv(y)
@@ -867,7 +867,7 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    end
    !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if iszero(a)
-      return true, deepcopy(a)
+      return true, mutable_copy(a)
    end
    if characteristic(R) == 2
       return sqrt_classical_char2(a; check=check)
@@ -1026,7 +1026,7 @@ function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
    R = base_ring(a)
    c = one(R)
    if valuation(a) == 0
-      a = deepcopy(a)
+      a = mutable_copy(a)
       c = exp(coeff(a, 0))
       a = setcoeff!(a, 0, R())
    end

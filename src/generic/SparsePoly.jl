@@ -434,14 +434,14 @@ end
 
 function divexact(a::SparsePoly{T}, b::T; check::Bool=true) where {T <: RingElem}
    len = length(a)
-   exps = deepcopy(a.exps)
+   exps = mutable_copy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
 
 function divexact(a::SparsePoly, b::JuliaRingElement; check::Bool=true)
    len = length(a)
-   exps = deepcopy(a.exps)
+   exps = mutable_copy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
@@ -459,7 +459,7 @@ function pseudorem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    n = length(b)
    n == 0 && throw(DivideError())
    if a.exps[a.length] < b.exps[b.length]
-      return deepcopy(a)
+      return mutable_copy(a)
    end
    k = reinterpret(Int, a.exps[a.length] - b.exps[b.length]) + 1
    l = leading_coefficient(b)
@@ -482,7 +482,7 @@ function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElement, T <: RingElem
    if a.length == 0
       return base_ring(a)()
    end
-   r = deepcopy(a.coeffs[a.length])
+   r = mutable_copy(a.coeffs[a.length])
    for i = 1:a.length - 1
       r = mul!(r, r, b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
       r = add!(r, r, a.coeffs[a.length - i])
@@ -497,7 +497,7 @@ function evaluate(a::SparsePoly{T}, b::Rational{S}) where {S <: Integer, T <: Ri
    if a.length == 0
       return base_ring(a)()
    end
-   r = deepcopy(a.coeffs[a.length])
+   r = mutable_copy(a.coeffs[a.length])
    for i = 1:a.length - 1
       r = mul!(r, r, b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
       r = add!(r, r, a.coeffs[a.length - i])
@@ -513,7 +513,7 @@ function evaluate(a::SparsePoly{T}, b::Integer) where {T <: RingElement}
       return base_ring(a)()
    end
    R = base_ring(a)
-   r = deepcopy(a.coeffs[a.length])
+   r = mutable_copy(a.coeffs[a.length])
    for i = 1:a.length - 1
       r = mul!(r, r, R(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i])))
       r = add!(r, r, a.coeffs[a.length - i])
@@ -536,10 +536,10 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       (a, b) = (b, a)
    end
    if iszero(b)
-      return deepcopy(a)
+      return mutable_copy(a)
    end
    if isone(b)
-      return deepcopy(b)
+      return mutable_copy(b)
    end
    # compute gcd of contents and divide content out
    if !ignore_content

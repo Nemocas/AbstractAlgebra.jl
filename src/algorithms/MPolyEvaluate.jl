@@ -62,7 +62,7 @@ function _horner_lex_rec(
       first = false
     end
     if first
-      res[var] = deepcopy(ctxA(Bcoeffs[Bstart]))  # res[.] should be mutable
+      res[var] = mutable_copy(ctxA(Bcoeffs[Bstart]))  # res[.] should be mutable
       first = false
     end
     return (ta, tc)
@@ -485,7 +485,7 @@ end
 function look_up(PC::PowerCache, e::Vector{Int})
   all(x->(x==0), e) && return one(PC.p[1])
   haskey(PC.power_cache, e) && return PC.power_cache[e]
-  e = deepcopy(e)   # !!
+  e = mutable_copy(e)   # !!
   if all(x->(x<=1), e)
     power = prod([PC.p[i] for i in 1:length(PC.p) if e[i] == 1])
     PC.power_cache[e] = power

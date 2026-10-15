@@ -683,12 +683,12 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
             pb += sb
             k += 1
          else
-            z = setcoeff!(z, i, deepcopy(polcoeff(a, j)))
+            z = setcoeff!(z, i, mutable_copy(polcoeff(a, j)))
          end
          j += 1
          pa += sa
       elseif pi == pb && pi < minb
-         z = setcoeff!(z, i, deepcopy(polcoeff(b, k)))
+         z = setcoeff!(z, i, mutable_copy(polcoeff(b, k)))
          k += 1
          pb += sb
       else
@@ -739,7 +739,7 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
             pb += sb
             k += 1
          else
-            z = setcoeff!(z, i, deepcopy(polcoeff(a, j)))
+            z = setcoeff!(z, i, mutable_copy(polcoeff(a, j)))
          end
          j += 1
          pa += sa
@@ -871,7 +871,7 @@ Return the Laurent series $x$ shifted left by $n$ terms, i.e. multiplied by
 $t^n$, where $t$ is the variable of the ring.
 """
 function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
-   z = deepcopy(x)
+   z = mutable_copy(x)
    z = set_precision!(z, precision(x) + n)
    z = set_valuation!(z, valuation(x) + n)
    return z
@@ -884,7 +884,7 @@ Return the Laurent series $x$ shifted right by $n$ terms, i.e. divided by
 $t^n$, where $t$ is the variable of the ring.
 """
 function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
-   z = deepcopy(x)
+   z = mutable_copy(x)
    z = set_precision!(z, precision(x) - n)
    z = set_valuation!(z, valuation(x) - n)
    return z
@@ -976,11 +976,11 @@ end
 ###############################################################################
 
 function inflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
-    return parent(a)(deepcopy(a.coeffs), pol_length(a), b*a.prec, b*a.val, b*a.scale)
+    return parent(a)(mutable_copy(a.coeffs), pol_length(a), b*a.prec, b*a.val, b*a.scale)
 end
 
 function deflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
-    return parent(a)(deepcopy(a.coeffs), pol_length(a), div(a.prec, b), div(a.val, b), div(a.scale, b))
+    return parent(a)(mutable_copy(a.coeffs), pol_length(a), div(a.prec, b), div(a.val, b), div(a.scale, b))
 end
 
 ###############################################################################
@@ -1011,7 +1011,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       fit!(z, 1)
       z = set_precision!(z, b + precision(a) - 1)
       z = set_valuation!(z, b)
-      z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
+      z = setcoeff!(z, 0, mutable_copy(polcoeff(a, 0)))
       z = set_scale!(z, 1)
       z = set_length!(z, 1)
       return z
@@ -1023,7 +1023,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       z = set_scale!(z, 1)
       return z
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    elseif b == -1
       return inv(a)
    end
@@ -1196,7 +1196,7 @@ function divexact(x::LaurentSeriesElem{T},
       x = shift_right(x, v2)
       y = shift_right(y, v2)
    else
-      x = deepcopy(x)
+      x = mutable_copy(x)
    end
    res = parent(x)()
    y = truncate(y, precision(x) - valuation(x))
@@ -1553,7 +1553,7 @@ function Base.exp(a::LaurentSeriesElem{T}) where T <: FieldElement
    R = base_ring(a)
    c = one(R)
    if valuation(a) == 0
-      a = deepcopy(a)
+      a = mutable_copy(a)
       c = exp(coeff(a, 0))
       a = setcoeff!(a, 0, R())
    end
@@ -1648,8 +1648,8 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    db = div(sb, sz)
    a2 = downscale(a, da)
    b2 = downscale(b, db)
-   a = a === c && a2 === a ? deepcopy(a2) : a2
-   b = b === c && b2 === b ? deepcopy(b2) : b2
+   a = a === c && a2 === a ? mutable_copy(a2) : a2
+   b = b === c && b2 === b ? mutable_copy(b2) : b2
    lena = pol_length(a)
    lenb = pol_length(b)
    lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
@@ -1684,7 +1684,7 @@ end
 
 function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: RingElement}
    # TODO: write a version which doesn't make a copy
-   b = deepcopy(c)
+   b = mutable_copy(c)
    return add!(c, b, a)
 end
 
@@ -1731,12 +1731,12 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
             pb += sb
             k += 1
          else
-            c.coeffs[i + 1] = deepcopy(polcoeff(a, j))
+            c.coeffs[i + 1] = mutable_copy(polcoeff(a, j))
          end
          j += 1
          pa += sa
       elseif pi == pb && pi < minb
-         c.coeffs[i + 1] = deepcopy(polcoeff(b, k))
+         c.coeffs[i + 1] = mutable_copy(polcoeff(b, k))
          k += 1
          pb += sb
       else

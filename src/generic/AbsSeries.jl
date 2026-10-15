@@ -283,11 +283,11 @@ function add!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where T <: Ring
       i += 1
    end
    while i <= lena
-      c.coeffs[i] = deepcopy(coeff(a, i - 1))
+      c.coeffs[i] = mutable_copy(coeff(a, i - 1))
       i += 1
    end
    while i <= lenb
-      c.coeffs[i] = deepcopy(coeff(b, i - 1))
+      c.coeffs[i] = mutable_copy(coeff(b, i - 1))
       i += 1
    end
    c.length = normalise(c, i - 1)

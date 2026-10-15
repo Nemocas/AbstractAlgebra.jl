@@ -295,7 +295,7 @@ function _init_reduce(C::SolveCtx{T, LUTrait}) where T
     return nothing
   end
 
-  B = deepcopy(matrix(C))
+  B = mutable_copy(matrix(C))
   p = Perm(1:nrows(B))
   r = lu!(p, B)
   set_rank!(C, r)
@@ -389,7 +389,7 @@ function _init_reduce_transpose(C::SolveCtx{T, LUTrait}) where T
     return nothing
   end
 
-  B = lazy_transpose(deepcopy(matrix(C)))
+  B = lazy_transpose(mutable_copy(matrix(C)))
   p = Perm(1:nrows(B))
   r = lu!(p, B)
   set_rank!(C, r)
@@ -1035,7 +1035,7 @@ function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T},
     return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
-  mu = hcat(deepcopy(A), deepcopy(b))
+  mu = hcat(mutable_copy(A), mutable_copy(b))
 
   rk = echelon_form!(mu)
   p = pivot_and_non_pivot_cols(mu, rk)
@@ -1330,7 +1330,7 @@ end
 function _can_solve_with_hnf(b::MatElem{T}, H::MatElem{T}, U::MatElem{T}, task::Symbol) where T <: RingElement
   sol = lazy_transpose(zero(b, nrows(H), ncols(b)))
   l = min(nrows(H), ncols(H))
-  b = deepcopy(b)
+  b = mutable_copy(b)
   for i = 1:ncols(b)
     for j = 1:l
       k = 1

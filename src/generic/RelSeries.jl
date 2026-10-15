@@ -267,13 +267,13 @@ function add!(c::RelSeries{T}, a::RelSeries{T}) where T <: RingElement
          c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
       end
       for i = 1:min(lenr, lena, valc - vala)
-         c.coeffs[i] = deepcopy(a.coeffs[i])
+         c.coeffs[i] = mutable_copy(a.coeffs[i])
       end
       for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
       end
       for i = lenc + valc - vala + 1:min(lenr, lena)
-         c.coeffs[i] = deepcopy(a.coeffs[i])
+         c.coeffs[i] = mutable_copy(a.coeffs[i])
       end
    else
       for i = lenc + 1:min(vala - valc, lenr)
@@ -283,7 +283,7 @@ function add!(c::RelSeries{T}, a::RelSeries{T}) where T <: RingElement
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
       for i = max(lenc, vala - valc) + 1:min(lena + vala - valc, lenr)
-         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
+         c.coeffs[i] = mutable_copy(a.coeffs[i - vala + valc])
       end
    end
    c.length = normalise(c, lenr)
@@ -316,7 +316,7 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
    c.val = valr
    if vala > valb
       for i = 1:min(lenr, min(lenb, vala - valb))
-         c.coeffs[i] = deepcopy(b.coeffs[i])
+         c.coeffs[i] = mutable_copy(b.coeffs[i])
       end
       for i = lenb + 1:min(lenr, vala - valb)
          c.coeffs[i] = R()
@@ -325,14 +325,14 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          c.coeffs[i] = add!(c.coeffs[i], polcoeff(a, i - vala + valb - 1), b.coeffs[i])
       end
       for i = max(lenb, vala - valb) + 1:min(lenr, lena + vala - valb)
-         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valb])
+         c.coeffs[i] = mutable_copy(a.coeffs[i - vala + valb])
       end
       for i = lena + vala - valb + 1:min(lenr, lenb)
-         c.coeffs[i] = deepcopy(b.coeffs[i])
+         c.coeffs[i] = mutable_copy(b.coeffs[i])
       end
    else
       for i = 1:min(lenr, min(lena, valb - vala))
-         c.coeffs[i] = deepcopy(a.coeffs[i])
+         c.coeffs[i] = mutable_copy(a.coeffs[i])
       end
       for i = lena + 1:min(lenr, valb - vala)
          c.coeffs[i] = R()
@@ -341,10 +341,10 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where T <: Ring
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], polcoeff(b, i - valb + vala - 1))
       end
       for i = max(lena, valb - vala) + 1:min(lenr, lenb + valb - vala)
-         c.coeffs[i] = deepcopy(b.coeffs[i - valb + vala])
+         c.coeffs[i] = mutable_copy(b.coeffs[i - valb + vala])
       end
       for i = lenb + valb - vala + 1:min(lenr, lena)
-         c.coeffs[i] = deepcopy(a.coeffs[i])
+         c.coeffs[i] = mutable_copy(a.coeffs[i])
       end
    end
    c = set_length!(c, normalise(c, lenr))

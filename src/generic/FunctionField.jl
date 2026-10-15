@@ -16,11 +16,11 @@ function _rat_add(n1::PolyRingElem{T}, d1::PolyRingElem{T},
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
-         rden = deepcopy(d1)
+         rden = mutable_copy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = deepcopy(d1)
+            rden = mutable_copy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -28,10 +28,10 @@ function _rat_add(n1::PolyRingElem{T}, d1::PolyRingElem{T},
       end
    elseif isone(d1)
       rnum = n1*d2 + n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 + n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)
@@ -59,11 +59,11 @@ function _rat_sub(n1::PolyRingElem{T}, d1::PolyRingElem{T},
    if d1 == d2
       rnum = n1 - n2
       if isone(d1)
-         rden = deepcopy(d1)
+         rden = mutable_copy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = deepcopy(d1)
+            rden = mutable_copy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -71,10 +71,10 @@ function _rat_sub(n1::PolyRingElem{T}, d1::PolyRingElem{T},
       end
    elseif isone(d1)
       rnum = n1*d2 - n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 - n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)
@@ -106,7 +106,7 @@ function _rat_mul(n1::PolyRingElem{T}, d1::PolyRingElem{T},
       gd = gcd(n1, d2)
       if isone(gd)
          n = n1*n2
-         d = deepcopy(d2)
+         d = mutable_copy(d2)
       else
          n = divexact(n1, gd)*n2
          d = divexact(d2, gd)
@@ -115,7 +115,7 @@ function _rat_mul(n1::PolyRingElem{T}, d1::PolyRingElem{T},
       gd = gcd(n2, d1)
       if isone(gd)
          n = n2*n1
-         d = deepcopy(d1)
+         d = mutable_copy(d1)
       else
          n = divexact(n2, gd)*n1
          d = divexact(d1, gd)
@@ -167,7 +167,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
       rpoly = poly1 + poly2
 
       if isone(den1)
-         rden = deepcopy(den1)
+         rden = mutable_copy(den1)
       else
          d = content(rpoly)
 
@@ -176,7 +176,7 @@ function _rat_poly_add(poly1::Poly{S}, den1::S,
          end
 
          if isone(d)
-            rden = deepcopy(den1)
+            rden = mutable_copy(den1)
          else
             rpoly = divexact(rpoly, d)
             rden = divexact(den1, d)
@@ -231,7 +231,7 @@ function _rat_poly_sub(poly1::Poly{S}, den1::S,
       rpoly = poly1 - poly2
 
       if isone(den1)
-         rden = deepcopy(den1)
+         rden = mutable_copy(den1)
       else
          d = content(rpoly)
 
@@ -240,7 +240,7 @@ function _rat_poly_sub(poly1::Poly{S}, den1::S,
          end
 
          if isone(d)
-            rden = deepcopy(den1)
+            rden = mutable_copy(den1)
          else
             rpoly = divexact(rpoly, d)
             rden = divexact(den1, d)
@@ -348,8 +348,8 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
    len2 = length(poly2)
 
    if len1 < len2
-      rpoly = deepcopy(poly1)
-      rden = deepcopy(den1)
+      rpoly = mutable_copy(poly1)
+      rden = mutable_copy(den1)
       return rpoly, rden
    end
 
@@ -366,7 +366,7 @@ function _rat_poly_rem(poly1::Poly{S}, den1::S,
    lead = leading_coefficient(poly2)
 
    if isone(lead)
-      rden = deepcopy(den1)
+      rden = mutable_copy(den1)
    elseif isone(-lead)
       rden = -den1
       rpoly = -rpoly
@@ -503,7 +503,7 @@ function _rat_poly(p::Poly{RationalFunctionFieldElem{T, U}}, var=parent(p).S; ca
       c = coeff(p, i - 1)
       den_i = denominator(c, false)
       if den_i == d
-         V[i] = deepcopy(numerator(c, false))
+         V[i] = mutable_copy(numerator(c, false))
       else
          V[i] = divexact(d, den_i)*numerator(c, false)
       end
@@ -661,8 +661,8 @@ function gen(S::AbsSimpleFunctionField{T, U}) where {T, U}
    if degree(S) == 1
       return S(-coeff(modulus(S), 0)//coeff(modulus(S), 1))
    else
-      return AbsSimpleFunctionFieldElem{T, U}(S, deepcopy(power_precomp(S, 1)),
-                                        deepcopy(power_precomp_den(S, 1)))
+      return AbsSimpleFunctionFieldElem{T, U}(S, mutable_copy(power_precomp(S, 1)),
+                                        mutable_copy(power_precomp_den(S, 1)))
    end
 end
 
@@ -871,8 +871,8 @@ function ^(a::AbsSimpleFunctionFieldElem{T, U}, b::Int) where {T, U}
    b < 0 && error("Not implemented")
    R = parent(a)
    if is_gen(a) && b < 2*length(numerator(R)) - 3 # special case powers of generator
-      return R(deepcopy(power_precomp(R, b)),
-               deepcopy(power_precomp_den(R, b)))
+      return R(mutable_copy(power_precomp(R, b)),
+               mutable_copy(power_precomp_den(R, b)))
    elseif b == 0
       return one(R)
    elseif iszero(a)
@@ -880,7 +880,7 @@ function ^(a::AbsSimpleFunctionFieldElem{T, U}, b::Int) where {T, U}
    elseif length(numerator(a, false)) == 1
       return R(coeff(a, 0)^b)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0

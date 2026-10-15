@@ -723,7 +723,7 @@ function term!(y::T, x::T, i::Int) where T <: MPoly
    N = size(x.exps, 1)
    fit!(y, 1)
    monomial_set!(y.exps, 1, x.exps, i, N)
-   y.coeffs[1] = deepcopy(x.coeffs[i])
+   y.coeffs[1] = mutable_copy(x.coeffs[i])
    y.length = 1
    return y
 end
@@ -847,7 +847,7 @@ function mutable_copy(a::MPoly{T}) where {T <: RingElement}
    return parent(a)(Rc, copy(a.exps))
 end
 
-Base.copy(f::MPoly) = deepcopy(f)
+Base.copy(f::MPoly) = mutable_copy(f)
 
 ###############################################################################
 #
@@ -2267,7 +2267,7 @@ function pow_rmul(a::MPoly{T}, b::Int) where {T <: RingElement}
    elseif b == 0
       return one(a)
    end
-   z = deepcopy(a)
+   z = mutable_copy(a)
    for i = 2:b
       z = mul!(z, z, a)
    end
@@ -2298,7 +2298,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    elseif b == 0
       return one(a)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    elseif b == 2
       return a*a
    elseif !is_exact_type(T) || !iszero(characteristic(base_ring(a)))
@@ -2364,7 +2364,7 @@ function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
       coeffs = [coeff(f, i) for i in 1:length(f)]
       return parent(f)(coeffs, exps) # performs sorting
    else
-      r = deepcopy(f)
+      r = mutable_copy(f)
       exps = r.exps
       for i = 1:length(r)
          for j = 1:N
@@ -2387,7 +2387,7 @@ function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
       coeffs = [coeff(f, i) for i in 1:length(f)]
       return parent(f)(coeffs, exps)
    else
-      r = deepcopy(f)
+      r = mutable_copy(f)
       exps = r.exps
       for i = 1:length(r)
          for j = 1:N
@@ -3342,17 +3342,17 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    check_parent(a, b)
    if iszero(a)
       if b.length == 0
-         return deepcopy(a)
+         return mutable_copy(a)
       end
       return divexact(b, canonical_unit(coeff(b, 1)))
    elseif length(b) == 0
       return divexact(a, canonical_unit(coeff(a, 1)))
    end
    if isone(a)
-      return deepcopy(a)
+      return mutable_copy(a)
    end
    if isone(b)
-      return deepcopy(b)
+      return mutable_copy(b)
    end
    # compute deflation and deflate
    shifta, defla = deflation(a)

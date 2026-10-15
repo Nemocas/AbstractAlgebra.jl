@@ -471,7 +471,7 @@ function ^(g::Perm{T}, n::Integer) where T
    elseif n == 0
       return Perm(T(length(g.d)))
    elseif n == 1
-      return deepcopy(g)
+      return mutable_copy(g)
    elseif n == 2
       return Perm(g.d[g.d], false)
    elseif n == 3
@@ -498,7 +498,7 @@ function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    elseif n == 0
       return Perm(I(length(g.d)))
    elseif n == 1
-      return deepcopy(g)
+      return mutable_copy(g)
    elseif n == 2
       return Perm(g.d[g.d], false)
    elseif n == 3
@@ -508,8 +508,8 @@ function power_by_squaring(g::Perm{I}, n::Integer) where {I}
       while (UInt(bit) & n) == 0
          bit >>= 1
       end
-      cache1 = deepcopy(g.d)
-      cache2 = deepcopy(g.d)
+      cache1 = mutable_copy(g.d)
+      cache2 = mutable_copy(g.d)
       bit >>= 1
       while bit != 0
          cache2 = cache1[cache1]

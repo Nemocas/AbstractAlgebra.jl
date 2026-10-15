@@ -319,7 +319,7 @@ function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)
    if p == 2 # special case, cannot find a quadratic nonresidue mod 2
-      return deepcopy(a)
+      return mutable_copy(a)
    end
    # Compute Q, S such that p - 1 = Q*2^S
    Q = p - 1

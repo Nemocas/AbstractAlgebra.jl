@@ -452,7 +452,7 @@ function ^(a::AbsMSeries, b::Int)
     elseif is_constant(poly(a))
         return R(poly(a)^b, a.prec)
     elseif b == 1
-        return deepcopy(a)
+        return mutable_copy(a)
     end
     bit = ~((~UInt(0)) >> 1)
     while (UInt(bit) & b) == 0
