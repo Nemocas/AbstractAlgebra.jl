@@ -435,7 +435,7 @@ end
 
 ###############################################################################
 #
-#   Inflation
+#   Inflation/deflation
 #
 ###############################################################################
 
@@ -444,6 +444,12 @@ function inflate(f::LaurentPolyWrap, shift::Int64, defl::Int64)
 end
 
 inflate(f::LaurentPolyWrap, defl::Int64) = inflate(f, 0, defl)
+
+function deflation(f::LaurentPolyWrap)
+   iszero(f) && return 0, 1
+   shift, defl = deflation(f.poly)
+   return shift + f.mindeg, defl
+end
 
 ###############################################################################
 #

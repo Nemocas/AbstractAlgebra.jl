@@ -217,19 +217,6 @@ change_coefficient_ring(R::Ring, p::LaurentPolyRingElem; kwargs...) =
 #
 ###############################################################################
 
-function deflation(p::LaurentPolyRingElem)
-   dr = degrees_range(p)
-   isempty(dr) && return 0, 1
-   shift = first(dr)
-   defl = 0
-   for i in dr
-      iszero(coeff(p, i)) && continue
-      defl = gcd(defl, i - shift)
-      defl == 1 && break
-   end
-   return shift, iszero(defl) ? 1 : defl
-end
-
 function deflate(f::LaurentPolyRingElem, j::Int, n::Int)
    g = zero(parent(f))
    dr = degrees_range(f)

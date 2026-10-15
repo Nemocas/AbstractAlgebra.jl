@@ -512,6 +512,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test deflation(y^-3 + y^3 + y^7) == (-3, 2)
       @test deflation(7y^-4) == (-4, 1)
       @test deflation(zero(L)) == (0, 1)
+      t = gen(base_ring(L))
+      @test deflation(LaurentPolyWrap(L, t^2 + t^4, -3)) == (-1, 2)
       g = y^-3 + 2y + y^5
       @test deflate(g, -3, 2) == y^0 + 2y^2 + y^4
       @test inflate(deflate(g, -3, 2), -3, 2) == g
