@@ -115,6 +115,37 @@ function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
 end
 
+function var_indices(a::LaurentMPolyWrap)
+    iszero(a) && return Int[]
+    lo, _ = _mindegs(a.mpoly)
+    hi = degrees(a.mpoly)
+    # variable i is absent iff it has exponent 0 in every term
+    return [i for i in 1:nvars(parent(a)) if lo[i] != hi[i] || lo[i] != -a.mindegs[i]]
+end
+
+###############################################################################
+#
+#   Degrees
+#
+###############################################################################
+
+# Unlike for polynomials, -1 is a valid degree, so zero has no degree.
+
+function degree(a::LaurentMPolyWrap, i::Int)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return degree(a.mpoly, i) + a.mindegs[i]
+end
+
+function degrees(a::LaurentMPolyWrap)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return degrees(a.mpoly) .+ a.mindegs
+end
+
+function total_degree(a::LaurentMPolyWrap)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return total_degree(a.mpoly) + sum(a.mindegs)
+end
+
 function Base.inv(a::LaurentMPolyWrap)
     (ap, ad) = _normalize(a)
     return LaurentMPolyWrap(parent(a), inv(ap), neg!(ad, ad))
@@ -722,9 +753,11 @@ deflate(f::LaurentMPolyWrap, defl::Vector{Int}) = deflate(f, zeros(Int, length(d
 ###############################################################################
 
 # Over a domain, a square s^2 with s = m*r for a monomial m and a polynomial r
-# not divisible by any variable normalizes to m^2 and r^2.
+# not divisible by any variable normalizes to m^2 and r^2. Over a non-domain
+# this fails, e.g. (3 + x)^2 = 6x + x^2 over ZZ/9.
 function is_square_with_sqrt(a::LaurentMPolyWrap)
    R = parent(a)
+   is_domain_type(coefficient_ring(R)) || throw(NotImplementedError(:is_square_with_sqrt, a))
    iszero(a) && return true, zero(R)
    ap, ad = _normalize(a)
    all(iseven, ad) || return false, zero(R)

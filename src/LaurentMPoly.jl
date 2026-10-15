@@ -97,46 +97,11 @@ function is_constant(a::LaurentMPolyRingElem)
     return iszero(a) || iszero(first(exponent_vectors(a)))
 end
 
-function var_indices(p::LaurentMPolyRingElem)
-    used = falses(nvars(parent(p)))
-    for e in exponent_vectors(p)
-        used .|= .!iszero.(e)
-    end
-    return findall(used)
-end
-
 vars(p::LaurentMPolyRingElem) = [gen(parent(p), i) for i in var_indices(p)]
 
 is_univariate(p::LaurentMPolyRingElem) = length(var_indices(p)) <= 1
 
-###############################################################################
-#
-#   Degrees
-#
-###############################################################################
-
-# Unlike for polynomials, -1 is a valid degree, so zero has no degree.
-
-function degree(f::LaurentMPolyRingElem, i::Int)
-    @req !iszero(f) "Zero polynomial does not have a degree"
-    return maximum(e[i] for e in exponent_vectors(f))
-end
-
 degree(f::T, x::T) where T <: LaurentMPolyRingElem = degree(f, var_index(x))
-
-function degrees(f::LaurentMPolyRingElem)
-    @req !iszero(f) "Zero polynomial does not have a degree"
-    d = copy(first(exponent_vectors(f)))
-    for e in exponent_vectors(f)
-        d .= max.(d, e)
-    end
-    return d
-end
-
-function total_degree(f::LaurentMPolyRingElem)
-    @req !iszero(f) "Zero polynomial does not have a degree"
-    return maximum(sum(e) for e in exponent_vectors(f))
-end
 
 ###############################################################################
 #
@@ -167,12 +132,7 @@ function evaluate(a::LaurentMPolyRingElem, vars::Vector{Int}, vals::Vector{<:Rin
    for (i, v) in zip(vars, vals)
       subs[i] = R(v)
    end
-
-   z = zero(R)
-   for (c, e) in zip(coefficients(a), exponent_vectors(a))
-      z += c * prod(subs[i]^e[i] for i in 1:nvars(R); init = one(R))
-   end
-   return z
+   return evaluate(a, subs)
 end
 
 function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where T <: LaurentMPolyRingElem

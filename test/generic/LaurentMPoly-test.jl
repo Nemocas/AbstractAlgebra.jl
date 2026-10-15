@@ -165,6 +165,15 @@ end
     @test is_univariate(L(7))
     @test !is_univariate(f)
 
+    # y, represented as x^-1 * x*y with a polynomial divisible by x
+    P = base_ring(L)
+    n = Generic.LaurentMPolyWrap(L, gen(P, 1)*gen(P, 2), [-1, 0, 0])
+    @test n == y
+    @test var_indices(n) == [2]
+    @test degree(n, 1) == 0
+    @test degrees(n) == [0, 1, 0]
+    @test total_degree(n) == 1
+
     @test tail(f) == f - leading_term(f)
     @test iszero(tail(x^-1))
     @test iszero(tail(zero(L)))
@@ -210,6 +219,10 @@ end
     @test_throws ErrorException sqrt(x)
     ok, r = is_square_with_sqrt(s^2*x^-4)
     @test ok && r^2 == s^2*x^-4
+
+    L9, (a, b) = laurent_polynomial_ring(residue_ring(ZZ, 9)[1], ["a", "b"])
+    @test_throws NotImplementedError is_square((3 + a)^2)
+    @test_throws NotImplementedError sqrt(b^2)
 
     @test isless(x^-1, x) == isless(one(L), x^2)
     @test isless(y^-1, x^-1) == isless(x, y)
