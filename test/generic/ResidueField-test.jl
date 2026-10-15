@@ -125,6 +125,7 @@ end
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
+   @test mutable_copy(h) == h
 
    S, = residue_field(zz, 23)
 

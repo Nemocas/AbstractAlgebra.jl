@@ -242,9 +242,9 @@ documentation on how to implement `deepcopy_internal`.
 mutable_copy(f::MyElem)
 ```
 
-Return a copy of `f` that may be mutated in place without affecting `f`, by
-applying `mutable_copy` recursively to all components, so that no two of them
-alias each other. The parent is not copied. The default calls `deepcopy`.
+Return a copy of `f` that may be mutated in place by the
+[Unsafe ring operators](@ref) without affecting `f`. The parent is not copied.
+The default calls `deepcopy`.
 
 ### Constructors
 

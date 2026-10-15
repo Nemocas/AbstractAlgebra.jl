@@ -182,6 +182,8 @@ end
    J = Generic.Ideal(ZZ)
 
    @test parent(J) == S
+
+   @test mutable_copy(I) == I
 end
 
 @testset "Generic.Ideal.ideal_reduction(multivariate)" begin
