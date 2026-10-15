@@ -392,10 +392,8 @@ const VarName = Union{Symbol, AbstractString, Char}
 @doc raw"""
     mutable_copy(a)
 
-Return a copy of `a` that may be mutated in place without affecting `a`.
-Unlike `deepcopy`, no two mutable components of the result alias each other,
-e.g. a matrix whose entries are all the same object is copied into one with
-distinct entries. The parent of `a` is not copied.
+Return a copy of `a` that may be mutated in place by unsafe operators such as
+`add!` and `mul!` without affecting `a`. The parent of `a` is not copied.
 """
 mutable_copy(a) = deepcopy(a)
 
