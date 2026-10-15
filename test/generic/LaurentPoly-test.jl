@@ -461,9 +461,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = laurent_polynomial_ring(ZZ, "y")
 
       test_rand(L, -5:5, -10:10) do f
-         @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
-         for i = -5:5
-            @test coeff(f, i) ∈ -10:10
+         @test issubset(AbstractAlgebra.degrees_range(f), -5:5)
+         for i in -5:5
+            @test coeff(f, i) in -10:10
          end
       end
    end

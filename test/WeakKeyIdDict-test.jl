@@ -41,16 +41,16 @@
     @test getkey(wkd, C, 123) === C
     res = pop!(wkd, C)
     @test res == 4
-    @test C ∉ keys(wkd)
-    @test 4 ∉ values(wkd)
+    @test !(C in keys(wkd))
+    @test !(4 in values(wkd))
     @test !haskey(wkd, C)
     @test length(wkd) == 2
     @test !isempty(wkd)
     @test 47 == pop!(wkd, C, 47)
     @test getkey(wkd, C, 123) == 123
     wkd = filter!( p -> p.first != B, wkd)
-    @test B ∉ keys(wkd)
-    @test 3 ∉ values(wkd)
+    @test !(B in keys(wkd))
+    @test !(3 in values(wkd))
     @test length(wkd) == 1
     @test WeakKeyIdDict(Pair(A, 2)) == wkd
     @test !isempty(wkd)
