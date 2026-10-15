@@ -17,7 +17,7 @@ nullspaces, polynomials, and related constructions.
 ```@docs
 number_of_rows(A::MatElem)
 number_of_columns(A::MatElem)
-length(A::MatrixElem{T}) where T <: NCRingElement
+length(A::MatElem{T}) where T <: NCRingElement
 ```
 
 
@@ -64,7 +64,7 @@ gram(A::MatElem)
 ## Content
 
 ```@docs
-content(A::MatrixElem{T}) where T <: RingElement
+content(A::MatElem{T}) where T <: RingElement
 ```
 
 
