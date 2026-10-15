@@ -1762,7 +1762,7 @@ end
    @test_throws ArgumentError trace_of_product(ZZ[1 2; 3 4], ZZ[1 2 3; 4 5 6])
    @test_throws ArgumentError trace_of_product(ZZ[1 2 3; 4 5 6], ZZ[1 2 3; 4 5 6])
    S, _ = polynomial_ring(QQ, :s)
-   @test_throws ArgumentError trace_of_product(identity_matrix(R, 2), identity_matrix(S, 2))
+   @test_throws ErrorException trace_of_product(identity_matrix(R, 2), identity_matrix(S, 2))
 
    for (R, args) in ((ZZ, (-10:10,)), (QQ, (-10:10,)), (GF(7), ()),
                      (polynomial_ring(ZZ, :x)[1], (0:3, -10:10)))
