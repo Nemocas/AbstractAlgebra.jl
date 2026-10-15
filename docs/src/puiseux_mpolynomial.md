@@ -36,7 +36,7 @@ scale, operates on the underlying Laurent polynomials and normalizes the result.
 ## Constructor
 
 ```@docs
-puiseux_polynomial_ring(::Field, ::Vector{String})
+puiseux_polynomial_ring(::Field, ::Vector{Symbol})
 ```
 
 Elements can be created from the generators by the usual arithmetic

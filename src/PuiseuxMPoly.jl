@@ -5,7 +5,7 @@
 #################################################################################
 
 @doc raw"""
-    puiseux_polynomial_ring(K::Field, variableName::Vector{String})
+    puiseux_polynomial_ring(K::Field, variableSymbols::Vector{Symbol})
 
 Return a tuple `(R, x)` consisting of the ring `R` of Puiseux polynomials over
 `K` in the given variables and the vector `x` of its generators.
