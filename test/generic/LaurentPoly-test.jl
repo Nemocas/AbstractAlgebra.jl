@@ -530,6 +530,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       ok, s = is_square_with_sqrt(h)
       @test ok && s^2 == h
       @test !is_square_with_sqrt(y^3)[1]
+
+      L9, t = laurent_polynomial_ring(residue_ring(ZZ, 9)[1], "t")
+      @test_throws NotImplementedError is_square((3 + t)^2)
+      @test_throws NotImplementedError sqrt(t^2)
    end
 
    @testset "printing" begin

@@ -124,14 +124,6 @@ coefficients(p::LaurentPolyRingElem) = (coeff(p, i) for i in degrees_range(p))
 
 exponent_vectors(p::LaurentPolyRingElem) = ([i] for i in degrees_range(p))
 
-function content(p::LaurentPolyRingElem)
-   z = zero(coefficient_ring(p))
-   for c in coefficients(p)
-      z = gcd(z, c)
-   end
-   return z
-end
-
 function tail(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    isempty(dr) && return zero(parent(p))

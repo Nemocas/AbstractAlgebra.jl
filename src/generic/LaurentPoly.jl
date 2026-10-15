@@ -81,6 +81,8 @@ iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
 isone(p::LaurentPolyWrap) = is_monomial(p, 0)
 
+content(p::LaurentPolyWrap) = content(p.poly)
+
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(base_ring(R)))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(base_ring(R)))
 
@@ -410,10 +412,11 @@ end
 #
 ###############################################################################
 
-# Like sqrt for polynomials, this assumes the trailing degree of a square is
-# even, which holds over a domain.
+# Over a non-domain a square may have odd trailing degree, e.g. (3 + y)^2 =
+# 6y + y^2 over ZZ/9.
 function is_square_with_sqrt(p::LaurentPolyWrap)
    R = parent(p)
+   is_domain_type(coefficient_ring(R)) || throw(NotImplementedError(:is_square_with_sqrt, p))
    iszero(p) && return true, zero(R)
    q = canonicalize(p)
    isodd(q.mindeg) && return false, zero(R)
