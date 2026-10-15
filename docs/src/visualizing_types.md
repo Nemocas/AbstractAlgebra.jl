@@ -61,6 +61,8 @@ are defined over.
   - `Generic.MPoly{T}` (`Generic.MPolyRing{T}`)
   - `Generic.RelSeries{T}` (`Generic.RelPowerSeriesRing{T}`)
   - `Generic.AbsSeries{T}` (`Generic.AbsPowerSeriesRing{T}`)
+  - `LaurentPolyRingElem{T}` (`LaurentPolyRing{T}`)
+  - `LaurentMPolyRingElem{T}` (`LaurentMPolyRing{T}`)
   - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
   - `Generic.EuclideanRingResidueRingElem{T}` (`Generic.EuclideanRingResidueRing{T}`)

@@ -46,7 +46,7 @@ end
 elem_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = PuiseuxMPolyRingElem{T}
 parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPolyRing{T}
 
-base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}
+base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = LaurentMPolyRing{T, mpoly_ring_type(T)}
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
 characteristic(R::PuiseuxMPolyRing) = characteristic(coefficient_ring(R))
