@@ -39,6 +39,7 @@ export extra_name
 export get_current_module
 export get_html_as_latex
 export get_name
+export get_prefer_latex
 export get_syntactic_sign_abs
 export indent_string!
 export is_syntactic_one
@@ -55,6 +56,7 @@ export printer
 export set_current_module
 export set_html_as_latex
 export set_name!
+export set_prefer_latex
 export show_obj
 export show_via_expressify
 export terse
@@ -124,7 +126,7 @@ function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, 
 end
 
 function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
-   return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
+   return AbstractAlgebra.is_ijulia_inited() ? AbstractAlgebra.get_html_as_latex() : !AbstractAlgebra.get_prefer_latex()
 end
 
 function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
@@ -167,6 +169,31 @@ that this is a global option. The return value is the old value.
 function set_html_as_latex(fl::Bool)
   old = get_html_as_latex()
   _html_as_latex[] = fl
+  return old
+end
+
+const _prefer_latex = Ref{Bool}(false)
+
+@doc raw"""
+    get_prefer_latex()
+
+Return whether AbstractAlgebra objects prefer native `text/latex` over `text/html`
+during MIME negotiation. This option does not change explicit MIME rendering or
+override AbstractAlgebra's special IJulia handling.
+"""
+get_prefer_latex() = _prefer_latex[]
+
+@doc raw"""
+    set_prefer_latex(fl::Bool)
+
+Set whether display frontends that otherwise prefer HTML should select native
+`text/latex` for AbstractAlgebra objects. This global option affects MIME
+negotiation, not the LaTeX renderer, and does not override IJulia handling.
+Return the old value.
+"""
+function set_prefer_latex(fl::Bool)
+  old = get_prefer_latex()
+  _prefer_latex[] = fl
   return old
 end
 
@@ -293,7 +320,7 @@ macro enable_all_show_via_expressify(T)
     end
 
     function Base.showable(mi::MIME"text/html", x::$(esc(T)))
-       return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
+       return AbstractAlgebra.is_ijulia_inited() ? AbstractAlgebra.get_html_as_latex() : !AbstractAlgebra.get_prefer_latex()
     end
 
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))

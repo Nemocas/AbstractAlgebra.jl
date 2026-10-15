@@ -312,6 +312,21 @@ import AbstractAlgebra.PrettyPrinting
    @test AbstractAlgebra.obj_to_string_wrt_times(x + y) == "(x + y)"
 end
 
+@testset "PrettyPrinting: MIME preference" begin
+   old = AbstractAlgebra.get_prefer_latex()
+   try
+      R, x = QQ["x"]
+      AbstractAlgebra.set_prefer_latex(false)
+      @test showable(MIME"text/html"(), x)
+      @test showable(MIME"text/latex"(), x)
+      AbstractAlgebra.set_prefer_latex(true)
+      @test !showable(MIME"text/html"(), x)
+      @test showable(MIME"text/latex"(), x)
+   finally
+      AbstractAlgebra.set_prefer_latex(old)
+   end
+end
+
 @testset "PrettyPrinting: Special printing macros" begin
   # TODO
 
