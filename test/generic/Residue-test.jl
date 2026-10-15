@@ -287,6 +287,41 @@ end
    @test gcd(T(x + 1), T(x + 1)) == T(1)
 end
 
+@testset "EuclideanRingResidueRingElem.divrem" begin
+   # the Euclidean function is x -> nu(gcd(data(x), modulus)), with nu the
+   # Euclidean function of the base ring
+   function test_divrem(a, b, nu)
+      phi(x) = nu(gcd(data(x), modulus(x)))
+      q, r = divrem(a, b)
+      @test a == q*b + r
+      @test iszero(r) || phi(r) < phi(b)
+      @test iszero(r) == divides(a, b)[1]
+
+      d, s, t = gcdx(a, b)
+      @test d == gcd(a, b)
+      @test d == s*a + t*b
+   end
+
+   R, = residue_ring(ZZ, 36)
+   for A in 0:35, B in 1:35
+      test_divrem(R(A), R(B), abs)
+   end
+   @test_throws DivideError divrem(R(1), R(0))
+
+   S, x = polynomial_ring(QQ, "x")
+   T, = residue_ring(S, x^3*(x + 1)^2)
+   for i in 1:100
+      a = rand(T, 0:4, -5:5)
+      b = rand(T, 0:4, -5:5)
+      iszero(b) && continue
+      test_divrem(a, b, degree)
+   end
+
+   # oscar-system/Oscar.jl#4340
+   T, = residue_ring(S, x^2)
+   test_divrem(T(x), T(-x), degree)
+end
+
 @testset "EuclideanRingResidueRingElem.adhoc_binary" begin
    R, = Generic.residue_ring(ZZ, 7)
 
