@@ -1741,6 +1741,39 @@ end
    @test tr(A) == t^2 + 3t + 2
 end
 
+@testset "Generic.Mat.trace_of_product" begin
+   R, t = polynomial_ring(QQ, :t)
+   A = R[t + 1 t 1; t^2 t t; -2 t + 2 t^2 + t + 1]
+   B = R[1 t 0; 0 1 t; t 0 1]
+   @test trace_of_product(A, B) == tr(A * B)
+
+   M = ZZ[1 2 3; 4 5 6]
+   N = ZZ[1 0; 0 1; 1 1]
+   @test trace_of_product(M, N) == 15
+   @test trace_of_product(N, M) == 15
+
+   M = QQ[1//2 2; 3 -1//3]
+   N = QQ[1 1; 0 2]
+   @test trace_of_product(M, N) == tr(M * N)
+
+   @test trace_of_product(zero_matrix(ZZ, 0, 3), zero_matrix(ZZ, 3, 0)) == 0
+   @test trace_of_product(zero_matrix(ZZ, 2, 0), zero_matrix(ZZ, 0, 2)) == 0
+
+   @test_throws ArgumentError trace_of_product(ZZ[1 2; 3 4], ZZ[1 2 3; 4 5 6])
+   @test_throws ArgumentError trace_of_product(ZZ[1 2 3; 4 5 6], ZZ[1 2 3; 4 5 6])
+   S, _ = polynomial_ring(QQ, :s)
+   @test_throws ArgumentError trace_of_product(identity_matrix(R, 2), identity_matrix(S, 2))
+
+   for (R, args) in ((ZZ, (-10:10,)), (QQ, (-10:10,)), (GF(7), ()),
+                     (polynomial_ring(ZZ, :x)[1], (0:3, -10:10)))
+      for (m, n) in ((0, 0), (3, 3), (2, 5), (5, 2))
+         M = rand(matrix_space(R, m, n), args...)
+         N = rand(matrix_space(R, n, m), args...)
+         @test trace_of_product(M, N) == tr(M * N)
+      end
+   end
+end
+
 @testset "Generic.Mat.content" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_space(R, 3, 3)
