@@ -12,7 +12,7 @@ and form a ring denoted by $R[x, x^{-1}]$ where `R` is the coefficient ring.
 ## Generic Laurent polynomial types
 
 AbstractAlgebra.jl provides a generic implementation of Laurent polynomials,
-built in terms of regular polynomials in the file `src/generic/LaurentPoly.jl`.
+built in terms of regular polynomials in the file `src/LaurentPoly.jl`.
 
 The type `LaurentPolyRingElem{T, ...}` implements generic Laurent
 polynomials by wrapping regular polynomials: a Laurent polynomial `l` wraps a
