@@ -102,3 +102,45 @@ Base.promote(x::CopyPromoteRingElem, y::CopyPromoteRingElem) =
 @testset "divexact fallback" begin
    @test_throws NotImplementedError divexact(CopyPromoteRingElem(), CopyPromoteRingElem())
 end
+
+@testset "equality across parents" begin
+   # pairs of elements with the same representation in two incompatible
+   # parents, so that their hashes may collide
+   twice(f) = (f(), f())
+   Zx, = polynomial_ring(ZZ, :x)
+   U = universal_polynomial_ring(QQ; cached = false)
+   V = universal_polynomial_ring(QQ; cached = false)
+
+   pairs = [
+      "Poly" => twice(() -> gen(polynomial_ring(QQ, :x; cached = false)[1])),
+      "NCPoly" => twice(() -> gen(polynomial_ring(matrix_ring(QQ, 2), :x; cached = false)[1])),
+      "MPoly" => twice(() -> gen(polynomial_ring(QQ, [:x, :y]; cached = false)[1], 1)),
+      "LaurentPoly" => twice(() -> gen(laurent_polynomial_ring(QQ, :x; cached = false)[1])),
+      "LaurentMPoly" => twice(() -> gen(laurent_polynomial_ring(QQ, [:x, :y]; cached = false)[1], 1)),
+      "SparsePoly" => twice(() -> Generic.SparsePolynomialRing(QQ, :x; cached = false)[2]),
+      "AbsSeries" => twice(() -> gen(power_series_ring(QQ, 10, :t; model = :capped_absolute, cached = false)[1])),
+      "RelSeries" => twice(() -> gen(power_series_ring(QQ, 10, :t; cached = false)[1])),
+      "LaurentSeriesRing" => twice(() -> gen(laurent_series_ring(ZZ, 10, :t; cached = false)[1])),
+      "LaurentSeriesField" => twice(() -> gen(laurent_series_field(QQ, 10, :t; cached = false)[1])),
+      "PuiseuxSeries" => twice(() -> gen(puiseux_series_ring(ZZ, 10, :t; cached = false)[1])),
+      "AbsMSeries" => twice(() -> gen(power_series_ring(QQ, [5, 5], [:x, :y]; cached = false)[1], 1)),
+      "Fraction" => twice(() -> fraction_field(Zx; cached = false)(gen(Zx))),
+      "FactoredFraction" => twice(() -> Generic.FactoredFractionField(ZZ; cached = false)(3)),
+      "TotFrac" => twice(() -> total_ring_of_fractions(Zx; cached = false)(gen(Zx))),
+      "Residue" => (residue_ring(ZZ, 7)[1](3), residue_ring(ZZ, 11)[1](3)),
+      "ResidueField" => (residue_field(ZZ, 7)[1](3), residue_field(ZZ, 11)[1](3)),
+      "RationalFunctionField" => twice(() -> gen(rational_function_field(QQ, :x; cached = false)[1])),
+      "FreeAssociativeAlgebra" => twice(() -> gen(free_associative_algebra(QQ, [:x, :y]; cached = false)[1], 1)),
+      "MatRing" => (one(matrix_ring(ZZ, 2)), one(matrix_ring(ZZ, 3))),
+      "GF" => (GF(7)(3), GF(11)(3)),
+      "UnivPoly" => (gen(U, :x), gen(V, :x)),
+   ]
+
+   @testset "$name" for (name, (a, b)) in pairs
+      @test a == a
+      @test isequal(a, a)
+      @test !isequal(a, b)
+      @test !isequal(b, a)
+      @test length(Dict(a => 1, b => 2)) == 2
+   end
+end
