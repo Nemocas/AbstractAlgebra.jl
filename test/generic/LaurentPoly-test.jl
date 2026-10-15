@@ -25,7 +25,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test laurent_polynomial_ring(P2, "y")[1] !==
                laurent_polynomial_ring(P, "y")[1]
 
-         x = y.poly
+         x = gen(base_ring(L))
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}
          @test y isa LaurentPolyWrap{elem_type(R)}
@@ -72,12 +72,12 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "basic manipulation" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
       Z, z = laurent_polynomial_ring(L, "z")
       T, t = laurent_polynomial_ring(L.polyring, "t")
 
-      @test terms_degrees(y) == 0:1
-      @test terms_degrees(y^3) == 0:3
+      @test is_subset(1:1, terms_degrees(y))
+      @test is_subset(3:3, terms_degrees(y^3))
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
       @test trail_degree(y^2) == 2
       @test lead_degree(y^2) == 2
@@ -162,7 +162,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test hash(one(y)) == hash(one(y))
 
       f1 = f = L(x, -2)
-      @test terms_degrees(f) == -2:-1
+      @test is_subset(-1:-1, terms_degrees(f))
       @test trail_degree(f) == -1
       @test lead_degree(f) == -1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
@@ -176,7 +176,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test trailing_coefficient(f) == 1
 
       f2 = f = L(3 + 2*x^4, -3)
-      @test terms_degrees(f) == -3:1
+      @test is_subset(-3:1, terms_degrees(f))
       @test trail_degree(f) == -3
       @test lead_degree(f) == 1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
@@ -259,7 +259,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "comparisons" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test y == y
 
@@ -275,7 +275,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "unary & binary & adhoc arithmetic operations" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test -(-y) == y
       @test iszero(y + (-y))
@@ -343,7 +343,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "powering" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == L(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
 
@@ -374,13 +374,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "evaluate" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
+      x = gen(base_ring(L))
       p = 2y+3y^4
-      @assert p.mindeg == 0
+      p_poly = 2x+3x^4
       for a = Any[-3:3; -10.0:3.3:10;]
-         @test evaluate(p, a) == evaluate(p.poly, a)
+         @test evaluate(p, a) == evaluate(p_poly, a)
       end
       q = p - y^-2
-      x = y.poly
       t = -x^0 + 2x^3 + 3x^6
       for a = -10.0:3.3:10
          @test evaluate(q, a) == evaluate(t, a) * a^-2
@@ -488,7 +488,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = laurent_polynomial_ring(ZZ, "y")
       @test sprint(show, "text/plain", y) == "y"
       @test sprint(show, "text/plain", L) == "Univariate Laurent polynomial ring in y\n  over integers"
-      p = y^1; p.mindeg = -3
+      p = y^(-2)
       @test sprint(show, "text/plain", p) == "y^-2"
       R, z = polynomial_ring(L, "z")
       @test sprint(show, "text/plain", (y^2)*z) == "y^2*z"

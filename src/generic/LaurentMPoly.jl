@@ -69,7 +69,9 @@ function one(R::LaurentMPolyWrapRing)
 end
 
 function gen(R::LaurentMPolyWrapRing, i::Int)
-    return LaurentMPolyWrap(R, gen(base_ring(R), i))
+    mindegs = zeros(Int, nvars(R))
+    mindegs[i] = 1
+    return LaurentMPolyWrap(R, one(base_ring(R)), mindegs)
 end
 
 function iszero(a::LaurentMPolyWrap)
@@ -721,8 +723,8 @@ end
 
 function laurent_polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
+   P = AbstractAlgebra.poly_ring(R, s, cached = cached)
    R = LaurentMPolyWrapRing(P, cached)
-   R, map(p -> LaurentMPolyWrap(R, p), x)
+   R, gens(R)
 end
 
