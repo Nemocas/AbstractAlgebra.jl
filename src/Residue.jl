@@ -113,6 +113,8 @@ annihilator(a::ResElem) = is_zero_divisor_with_annihilator(a)[2]
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy_internal(data(a), dict))
 
+mutable_copy(a::ResElem) = parent(a)(mutable_copy(data(a)))
+
 characteristic(R::ResidueRing{T}) where T <: Integer = modulus(R)
 is_known(::typeof(characteristic), R::ResidueRing{T}) where T <: Integer = true
 

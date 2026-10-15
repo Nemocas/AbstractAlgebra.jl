@@ -145,6 +145,8 @@ end
 
 deepcopy_internal(a::LocalizedEuclideanRingElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
 
+mutable_copy(a::LocalizedEuclideanRingElem) = parent(a)(mutable_copy(data(a)))
+
 ###############################################################################
 #
 #   AbstractString I/O

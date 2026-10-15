@@ -86,6 +86,10 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs)
 end
 
+function mutable_copy(a::Poly{T}) where T <: RingElement
+   return parent(a)(T[mutable_copy(a.coeffs[i]) for i in 1:length(a)])
+end
+
 Base.copy(f::Poly) = deepcopy(f)
 
 ###############################################################################

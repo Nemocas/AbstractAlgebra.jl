@@ -99,6 +99,10 @@ function deepcopy_internal(a::GFElem{T}, dict::IdDict) where T <: Integer
    return GFElem{T}(deepcopy_internal(a.d, dict), R)
 end
 
+function mutable_copy(a::GFElem{T}) where T <: Integer
+   return GFElem{T}(mutable_copy(a.d), parent(a))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

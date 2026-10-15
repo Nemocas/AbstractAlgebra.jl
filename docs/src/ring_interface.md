@@ -238,6 +238,14 @@ may be ignored.
 In the case that internal self-references are possible, please consult the Julia
 documentation on how to implement `deepcopy_internal`.
 
+```julia
+mutable_copy(f::MyElem)
+```
+
+Return a copy of `f` that may be mutated in place without affecting `f`, by
+applying `mutable_copy` recursively to all components, so that no two of them
+alias each other. The parent is not copied. The default calls `deepcopy`.
+
 ### Constructors
 
 Outer constructors for most AbstractAlgebra types are provided by overloading the call
@@ -780,7 +788,7 @@ using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!,
-       get_cached!, is_unit, characteristic, Ring, RingElem, expressify,
+       mutable_copy, get_cached!, is_unit, characteristic, Ring, RingElem, expressify,
        @show_name, @show_special, is_terse, pretty, terse, Lowercase,
        promote_rule
 
@@ -832,6 +840,12 @@ end
 function deepcopy_internal(f::ConstPoly{T}, dict::IdDict) where T <: RingElement
    r = ConstPoly{T}(deepcopy_internal(f.c, dict))
    r.parent = f.parent # parent should not be deepcopied
+   return r
+end
+
+function mutable_copy(f::ConstPoly{T}) where T <: RingElement
+   r = ConstPoly{T}(mutable_copy(f.c))
+   r.parent = f.parent
    return r
 end
 
