@@ -66,6 +66,8 @@ function deepcopy_internal(I::Ideal, dict::IdDict)
    return Ideal(base_ring(I), elms)
 end
 
+mutable_copy(I::Ideal) = Ideal(base_ring(I), mutable_copy(I.gens))
+
 ###############################################################################
 #
 #   Heap and nodes

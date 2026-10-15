@@ -213,6 +213,10 @@ function deepcopy_internal(a::AbsMSeries, dict::IdDict)
     return parent(a)(deepcopy_internal(poly(a), dict), a.prec)
 end
 
+function mutable_copy(a::AbsMSeries)
+    return parent(a)(mutable_copy(poly(a)), a.prec)
+end
+
 function Base.hash(a::AbsMSeries, h::UInt)
     b = 0xf7f073b6c9e1d560
     return xor(b, hash(poly(a), h))

@@ -184,16 +184,17 @@ mutated in-place.
 To make use of these functions, one must be certain that no other references are held
 to the object being mutated, otherwise those values will also be changed!
 
-The results of `deepcopy` and all arithmetic operations, including powering and division
+The results of `mutable_copy` and all arithmetic operations, including powering and division
 can be assumed to be new objects without other references being held, as can objects
 returned from constructors.
 
 !!! note
 
     It is important to recognise that `R(a)` where `R` is the ring `a` belongs
-    to, does not create a new value. For this case, use `deepcopy(a)`.
+    to, does not create a new value. For this case, use `mutable_copy(a)`.
 
 ```@docs
+mutable_copy
 zero!
 one!
 add!

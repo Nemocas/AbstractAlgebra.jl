@@ -83,6 +83,11 @@ function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingEleme
    return parent(a)(Rc, Re)
 end
 
+function mutable_copy(a::SparsePoly{T}) where {T <: RingElement}
+   Rc = T[mutable_copy(a.coeffs[i]) for i in 1:a.length]
+   return parent(a)(Rc, copy(a.exps))
+end
+
 characteristic(R::SparsePolyRing) = characteristic(base_ring(R))
 is_known(::typeof(characteristic), R::SparsePolyRing) = is_known(characteristic, base_ring(R))
 
