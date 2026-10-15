@@ -21,13 +21,9 @@ function type_label(T)
   return string(nameof(T), "{", join(vars, ", "), "}")
 end
 
-# `IdealElem` is unused; drop this once #2524 has removed it.
-const IGNORED = ["IdealElem{T}"]
-
 # Only AbstractAlgebra's own abstract types.  `Generic`'s refinements and the
 # concrete types are covered by the prose in visualizing_types.md instead.
-is_shown(T) =
-  isabstracttype(T) && parentmodule(T) === AbstractAlgebra && !(type_label(T) in IGNORED)
+is_shown(T) = isabstracttype(T) && parentmodule(T) === AbstractAlgebra
 
 # Short branches first, so the long chains cascade towards one side instead of
 # splitting the picture down the middle.
