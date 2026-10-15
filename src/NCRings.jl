@@ -62,7 +62,7 @@ end
 #
 ###############################################################################
 
-+(x::NCRingElem) = deepcopy(x)
++(x::NCRingElem) = mutable_copy(x)
 
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
@@ -76,7 +76,7 @@ end
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
 
-*(x::NCRingElem) = deepcopy(x)
+*(x::NCRingElem) = mutable_copy(x)
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
@@ -244,7 +244,7 @@ zero(x::NCRingElem) = zero(parent(x))
 #
 ################################################################################
 
-transpose(x::T) where {T <: NCRingElem} = deepcopy(x)
+transpose(x::T) where {T <: NCRingElem} = mutable_copy(x)
 
 ###############################################################################
 #

@@ -134,7 +134,7 @@ pretty_eq(x::GFElem, y::GFElem) = (x == y)
 
 function -(x::GFElem{T}) where T <: Integer
    if x.d == 0
-      return deepcopy(x)
+      return mutable_copy(x)
    else
       R = parent(x)
       return GFElem{T}(R.p - x.d, R)
@@ -195,13 +195,13 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
    if x.d == 0
       y == 0 && return one(R)
       y < 0 && throw(DivideError())
-      return deepcopy(x)
+      return mutable_copy(x)
    end
    y = convert(T, mod(y, p - 1))::T
    if y == 0
       return one(R)
    elseif y == 1
-      return deepcopy(x)
+      return mutable_copy(x)
    end
    return internal_power_left_to_right(x, y)
 end

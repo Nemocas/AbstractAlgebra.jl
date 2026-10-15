@@ -1571,7 +1571,7 @@ end
 # reduce a polynomials coefficients by a resultant `res` that
 # is in the ideal
 function reduce_by_resultant(f::T, res::U) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
-   f = deepcopy(f)
+   f = mutable_copy(f)
    len = 0
    for i = 1:length(f)
       c = coeff(f, i - 1)
@@ -2131,18 +2131,18 @@ julia> normal_form(30x^5*y + 2x + 1, I)
 ```
 """
 function normal_form(p::U, I::Ideal{U}) where {U}
-   is_zero(p) && return deepcopy(p)
-   is_zero(I) && return deepcopy(p)
+   is_zero(p) && return mutable_copy(p)
+   is_zero(I) && return mutable_copy(p)
    return normal_form(p, gens(I))
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: FieldElem}
-   iszero(I) && return deepcopy(p)
+   iszero(I) && return mutable_copy(p)
    return zero(p)
 end
 
 function normal_form(p::U, I::Ideal{U}) where {U <: Integer}
-   iszero(I) && return deepcopy(p)
+   iszero(I) && return mutable_copy(p)
    m = only(gens(I))
    return rem(p, m, RoundDown)
 end
@@ -2173,8 +2173,8 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
-   isempty(G1) && return deepcopy(I)
-   isempty(G2) && return deepcopy(J)
+   isempty(G1) && return mutable_copy(I)
+   isempty(G2) && return mutable_copy(J)
    return Ideal(R, lcm(only(G1), only(G2)))
 end
 
@@ -2183,8 +2183,8 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: Abst
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
-   isempty(G1) && return deepcopy(I)
-   isempty(G2) && return deepcopy(J)
+   isempty(G1) && return mutable_copy(I)
+   isempty(G2) && return mutable_copy(J)
    return Ideal(R, lcm(only(G1), only(G2)))
 end
 

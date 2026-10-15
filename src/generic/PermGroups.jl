@@ -473,7 +473,7 @@ function ^(g::Perm{T}, n::Integer) where T
    elseif n == 0
       return Perm(T(length(g.d)))
    elseif n == 1
-      return deepcopy(g)
+      return mutable_copy(g)
    elseif n == 2
       return Perm(g.d[g.d], false)
    elseif n == 3
@@ -502,7 +502,7 @@ function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    elseif n == 0
       return Perm(I(length(g.d)))
    elseif n == 1
-      return deepcopy(g)
+      return mutable_copy(g)
    elseif n == 2
       return Perm(g.d[g.d], false)
    elseif n == 3

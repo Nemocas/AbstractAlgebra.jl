@@ -21,7 +21,7 @@ Return a row echelon form $R$ of $A$.
 See also [`echelon_form_with_transformation`](@ref).
 """
 function echelon_form(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper, trim::Bool = false)
-  R = deepcopy(A)
+  R = mutable_copy(A)
   r = echelon_form!(R, reduced = reduced, shape = shape)
   if trim
     if shape === :upper
@@ -42,9 +42,9 @@ See [`echelon_form`](@ref) for the keyword arguments.
 """
 function echelon_form_with_transformation(A::MatElem{<:FieldElement}; reduced::Bool = true, shape::Symbol = :upper)
   if shape === :upper
-    R = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
+    R = hcat(mutable_copy(A), identity_matrix(base_ring(A), nrows(A)))
   else
-    R = hcat(identity_matrix(base_ring(A), nrows(A)), deepcopy(A))
+    R = hcat(identity_matrix(base_ring(A), nrows(A)), mutable_copy(A))
   end
   echelon_form!(R, reduced = reduced, shape = shape)
   if shape === :upper
@@ -328,7 +328,7 @@ function howell_form(A::MatElem{<:RingElement}; reduced::Bool = true, shape::Sym
     throw(ArgumentError("Unsupported argument :$shape for shape: Must be :upper or :lower."))
   end
 
-  H = deepcopy(A)
+  H = mutable_copy(A)
   if shape === :lower
     H = reverse_cols!(H)
   end
@@ -372,7 +372,7 @@ function howell_form_with_transformation(A::MatElem{<:RingElement}; reduced::Boo
   if shape === :lower
     B = hcat(reverse_cols(A), identity_matrix(A, nrows(A)))
   else
-    B = hcat(deepcopy(A), identity_matrix(A, nrows(A)))
+    B = hcat(mutable_copy(A), identity_matrix(A, nrows(A)))
   end
   if nrows(B) < ncols(B)
     B = vcat(B, zero(A, ncols(B) - nrows(B), ncols(B)))

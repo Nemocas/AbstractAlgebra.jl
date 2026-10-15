@@ -220,12 +220,12 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
           out = similar(g)
 
           @test isone(one!(g))
-          g = deepcopy(old_g)
+          g = mutable_copy(old_g)
 
           @test inv!(out, g) == inv(old_g)
           @test g == old_g
           @test inv!(out, g) == inv(old_g)
-          g = deepcopy(old_g)
+          g = mutable_copy(old_g)
 
           @testset "mul!" begin
               @test mul!(out, g, h) == old_g * old_h
@@ -236,14 +236,14 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
               @test mul!(g, g, h) == old_g * old_h
               @test h == old_h
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
               @test mul!(h, g, h) == old_g * old_h
               @test g == old_g
-              h = deepcopy(old_h)
+              h = mutable_copy(old_h)
 
               @test mul!(g, g, g) == old_g * old_g
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
           end
 
           @testset "conj!" begin
@@ -253,14 +253,14 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
               @test conj!(g, g, h) == res
               @test h == old_h
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
               @test conj!(h, g, h) == res
               @test g == old_g
-              h = deepcopy(old_h)
+              h = mutable_copy(old_h)
 
               @test conj!(g, g, g) == old_g
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
           end
 
           @testset "comm!" begin
@@ -274,11 +274,11 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
               @test comm!(g, g, h) == res
               @test h == old_h
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
               @test comm!(h, g, h) == res
               @test g == old_g
-              h = deepcopy(old_h)
+              h = mutable_copy(old_h)
           end
 
           @testset "div_[left|right]!" begin
@@ -288,14 +288,14 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
               @test div_right!(g, g, h) == res
               @test h == old_h
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
               @test div_right!(h, g, h) == res
               @test g == old_g
-              h = deepcopy(old_h)
+              h = mutable_copy(old_h)
 
               @test div_right!(g, g, g) == one(g)
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
 
               res = h^-1 * g
@@ -304,14 +304,14 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
 
               @test div_left!(g, g, h) == res
               @test h == old_h
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
 
               @test div_left!(h, g, h) == res
               @test g == old_g
-              h = deepcopy(old_h)
+              h = mutable_copy(old_h)
 
               @test div_left!(g, g, g) == one(g)
-              g = deepcopy(old_g)
+              g = mutable_copy(old_g)
           end
       end
 
