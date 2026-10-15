@@ -188,6 +188,7 @@ import ..AbstractAlgebra: isreduced_form
 import ..AbstractAlgebra: JuliaRingElement
 import ..AbstractAlgebra: laurent_mpoly_type
 import ..AbstractAlgebra: laurent_mpoly_ring_type
+import ..AbstractAlgebra: lead_degree
 import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial
@@ -258,6 +259,7 @@ import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: total_degree
+import ..AbstractAlgebra: trail_degree
 import ..AbstractAlgebra: trailing_coefficient
 import ..AbstractAlgebra: transpose
 import ..AbstractAlgebra: transpose!

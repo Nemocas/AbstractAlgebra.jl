@@ -19,6 +19,68 @@ end
 
 ###############################################################################
 #
+#   Laurent polynomial ring
+#
+###############################################################################
+
+@attributes mutable struct LaurentPolyRing{T <: RingElement, PR <: PolyRing{T}} <: Ring
+  polyring::PR
+
+  function LaurentPolyRing(pr::PR, cached::Bool = true) where {T <: RingElement, PR <: PolyRing{T}}
+    return get_cached!(LaurentPolyRingID, pr, cached) do
+      new{T, PR}(pr)
+    end::LaurentPolyRing{T, PR}
+  end
+end
+
+const LaurentPolyRingID = CacheDictType{Ring, LaurentPolyRing}()
+
+mutable struct LaurentPolyRingElem{T <: RingElement, PE <: PolyRingElem{T}, LR <: LaurentPolyRing{T}} <: RingElem
+  parent::LR
+  poly::PE
+  mindeg::Int
+
+  # Represents `poly * x^mindeg`, where `x` is the generator of the parent.
+  # Not normalized: `LaurentPolyRingElem(parent, poly*x^i, mindeg-i)` is the
+  # same Laurent polynomial for every integer `i`.
+
+  function LaurentPolyRingElem(parent::LR, poly::PE, mindeg::Int = 0) where {
+                               T <: RingElement, PE <: PolyRingElem{T}, LR <: LaurentPolyRing{T}}
+    return new{T, PE, LR}(parent, poly, mindeg)
+  end
+end
+
+###############################################################################
+#
+#   Multivariate Laurent polynomial ring
+#
+###############################################################################
+
+@attributes mutable struct LaurentMPolyRing{T <: RingElement, PR <: MPolyRing{T}} <: Ring
+  mpolyring::PR
+
+  function LaurentMPolyRing(pr::PR, cached::Bool = true) where {T <: RingElement, PR <: MPolyRing{T}}
+    return get_cached!(LaurentMPolyRingID, pr, cached) do
+      new{T, PR}(pr)
+    end::LaurentMPolyRing{T, PR}
+  end
+end
+
+const LaurentMPolyRingID = CacheDictType{Ring, LaurentMPolyRing}()
+
+mutable struct LaurentMPolyRingElem{T <: RingElement, PE <: MPolyRingElem{T}, LR <: LaurentMPolyRing{T}} <: RingElem
+  parent::LR
+  mpoly::PE            # not necessarily owned by object
+  mindegs::Vector{Int} # meaning ditto, vector not necessarily owned by object
+
+  function LaurentMPolyRingElem(parent::LR, poly::PE, mindegs::Vector{Int} = zeros(Int, nvars(parent))) where {
+                                T <: RingElement, PE <: MPolyRingElem{T}, LR <: LaurentMPolyRing{T}}
+    return new{T, PE, LR}(parent, poly, mindegs)
+  end
+end
+
+###############################################################################
+#
 #   Universal ring
 #
 ###############################################################################
