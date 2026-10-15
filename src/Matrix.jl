@@ -1963,7 +1963,7 @@ julia> trace_of_product(M, N)
 """
 function trace_of_product(M::MatElem{T}, N::MatElem{T}) where T <: NCRingElement
    @req ncols(M) == nrows(N) && nrows(M) == ncols(N) "Incompatible matrix dimensions"
-   @req base_ring(M) === base_ring(N) "Base rings do not match"
+   check_base_ring(M, N)
    d = zero(base_ring(M))
    for i in 1:nrows(M)
       d = add!(d, (view(M, i:i, :) * view(N, :, i:i))[1, 1])
