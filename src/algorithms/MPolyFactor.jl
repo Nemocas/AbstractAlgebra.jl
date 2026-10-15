@@ -801,9 +801,9 @@ function mfactor_irred_univar(a::E, var::Int) where {E <: MPolyRingElem}
   F = factor(to_univar(a, var, Kx))
   res = E[]
   ok = true
-  for f in F.fac
-    ok = ok && (f[2] == 1)
-    push!(res, make_monic(from_univar(f[1], var, R)))
+  for (p, e) in F
+    ok = ok && e == 1
+    push!(res, make_monic(from_univar(p, var, R)))
   end
   return ok, res
 end
