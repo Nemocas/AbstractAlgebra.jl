@@ -842,6 +842,11 @@ function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    return parent(a)(Rc, Re)
 end
 
+function mutable_copy(a::MPoly{T}) where {T <: RingElement}
+   Rc = T[mutable_copy(a.coeffs[i]) for i in 1:a.length]
+   return parent(a)(Rc, copy(a.exps))
+end
+
 Base.copy(f::MPoly) = deepcopy(f)
 
 ###############################################################################

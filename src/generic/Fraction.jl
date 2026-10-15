@@ -51,6 +51,13 @@ function deepcopy_internal(a::FracFieldElem{T}, dict::IdDict) where {T <: RingEl
    return v
 end
 
+function mutable_copy(a::FracFieldElem{T}) where {T <: RingElem}
+   v = FracFieldElem{T}(mutable_copy(numerator(a, false)),
+                        mutable_copy(denominator(a, false)))
+   v.parent = parent(a)
+   return v
+end
+
 number_of_generators(F::FracField) = number_of_generators(base_ring(F))
 
 gen(F::FracField) = F(gen(base_ring(F)))
