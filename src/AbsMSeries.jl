@@ -13,7 +13,7 @@
 
 function O(a::AbsMSeriesElem{T}) where T <: RingElement
     if iszero(a)
-       return deepcopy(a)
+       return mutable_copy(a)
     end
     R = parent(a)
     p = poly(a)

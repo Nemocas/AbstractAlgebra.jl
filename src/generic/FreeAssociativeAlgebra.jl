@@ -197,7 +197,7 @@ function term!(
     i::Int,
 ) where T <: RingElement
     fit!(t, 1)
-    t.coeffs[1] = deepcopy(a.coeffs[i])
+    t.coeffs[1] = mutable_copy(a.coeffs[i])
     t.exps[1] = copy(a.exps[i])
     t.length = 1
     return t
@@ -615,7 +615,7 @@ function ^(a::FreeAssociativeAlgebraElem{T}, b::Integer) where T <: RingElement
     if b == 0
         return one(parent(a))
     elseif b == 1
-        return deepcopy(a)
+        return mutable_copy(a)
     elseif a.length == 1
         if isempty(a.exps[1])
             e = [Int[]]

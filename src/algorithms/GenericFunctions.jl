@@ -24,7 +24,7 @@ function ^(a::T, n::Integer) where T <: RingElem
    if n > 1
       return internal_power(a, n)
    elseif isone(n)
-      return deepcopy(a)
+      return mutable_copy(a)
    elseif iszero(n)
       return one(parent(a))
    elseif n == -1

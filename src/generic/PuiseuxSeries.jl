@@ -556,7 +556,7 @@ function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    elseif pol_length(a.data) == 1
       return parent(a)(a.data^b, a.scale)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    elseif b == -1
       return inv(a)
    end

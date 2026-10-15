@@ -762,7 +762,7 @@ function getindex(A::MatElem, i::Int, cols::AbstractVector{Int})
    _checkbounds(A, i, cols)
    v = Vector{elem_type(base_ring(A))}(undef, length(cols))
    for j in eachindex(cols)
-     v[j] = deepcopy(A[i, cols[j]])
+     v[j] = mutable_copy(A[i, cols[j]])
    end
    return v
 end
@@ -771,7 +771,7 @@ function getindex(A::MatElem, rows::AbstractVector{Int}, j::Int)
    _checkbounds(A, rows, j)
    v = Vector{elem_type(base_ring(A))}(undef, length(rows))
    for i in eachindex(rows)
-     v[i] = deepcopy(A[rows[i], j])
+     v[i] = mutable_copy(A[rows[i], j])
    end
    return v
  end
@@ -787,7 +787,7 @@ function sub(A::MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
    N = similar(A, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
-         N[i, j] = deepcopy(A[rows[i], cols[j]])
+         N[i, j] = mutable_copy(A[rows[i], cols[j]])
       end
    end
    return N
@@ -1284,7 +1284,7 @@ function +(x::JuliaRingElement, y::MatElem{T}) where T <: NCRingElement
    for i = 1:nrows(y)
       for j = 1:ncols(y)
          if i != j
-            z[i, j] = deepcopy(y[i, j])
+            z[i, j] = mutable_copy(y[i, j])
          else
             z[i, j] = y[i, j] + R(x)
          end
@@ -1305,7 +1305,7 @@ function +(x::T, y::MatElem{T}) where {T <: NCRingElem}
    for i = 1:nrows(y)
       for j = 1:ncols(y)
          if i != j
-            z[i, j] = deepcopy(y[i, j])
+            z[i, j] = mutable_copy(y[i, j])
          else
             z[i, j] = y[i, j] + x
          end
@@ -1342,7 +1342,7 @@ function -(x::MatElem{T}, y::JuliaRingElement) where T <: NCRingElement
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          if i != j
-            z[i, j] = deepcopy(x[i, j])
+            z[i, j] = mutable_copy(x[i, j])
          else
             z[i, j] = x[i, j] - R(y)
          end
@@ -1382,7 +1382,7 @@ function -(x::MatElem{T}, y::T) where {T <: NCRingElem}
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          if i != j
-            z[i, j] = deepcopy(x[i, j])
+            z[i, j] = mutable_copy(x[i, j])
          else
             z[i, j] = x[i, j] - y
          end
@@ -1565,7 +1565,7 @@ function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    if b == 0
       return identity_matrix(a)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -2196,7 +2196,7 @@ function lu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: FieldElemen
    P.n != m && error("Permutation does not match matrix")
    p = one(P)
    R = base_ring(A)
-   U = deepcopy(A)
+   U = mutable_copy(A)
    L = similar(A, m, m)
    rank = lu!(p, U)
    for i = 1:m
@@ -2368,7 +2368,7 @@ function fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingEleme
    P.n != m && error("Permutation does not match matrix")
    p = one(P)
    R = base_ring(A)
-   U = deepcopy(A)
+   U = mutable_copy(A)
    L = similar(A, m, m)
    rank, d = fflu!(p, U)
    i = 1
@@ -2500,7 +2500,7 @@ julia> A/d
 ```
 """
 function rref_rational(A::MatrixElem{T}) where {T <: RingElement}
-   B = deepcopy(A)
+   B = mutable_copy(A)
    r, d = rref_rational!(B)
    return r, B, d
 end
@@ -2589,7 +2589,7 @@ true
 ```
 """
 function rref(A::MatrixElem{T}) where {T <: FieldElement}
-   B = deepcopy(A)
+   B = mutable_copy(A)
    r = rref!(B)
    return r, B
 end
@@ -2844,7 +2844,7 @@ end
 function det_fflu(A::MatElem{T}) where {T <: RingElement}
    n = nrows(A)
    n == 0 && return one(base_ring(A))
-   B = deepcopy(A)
+   B = mutable_copy(A)
    P = one(SymmetricGroup(n))
    r, d = fflu!(P, B)
    return r < n ? base_ring(A)() : (parity(P) == 0 ? d : -d)
@@ -3271,13 +3271,13 @@ function pfaffian_bfl(A::MatElem)
    n == 0 && return one(R)
    isodd(n) && return R()
    n == 2 && return A[1, 2]
-   N = deepcopy(A)
+   N = mutable_copy(A)
    for i in 1:2:n
       for j in 1:n
          N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
       end
    end
-   P = deepcopy(N)
+   P = mutable_copy(N)
    half_n = div(n, 2)
    for i in 1:half_n - 1
       P -= inv(R(2i)) * tr(P)
@@ -3304,7 +3304,7 @@ function pfaffian_bfl_bsgs(A::MatElem)
    n == 0 && return one(R)
    isodd(n) && return zero(R)
    n == 2 && return A[1, 2]
-   N = deepcopy(A)
+   N = mutable_copy(A)
    for i in 1:2:n
       for j in 1:n
          N[j, i], N[j, i + 1] = N[j, i + 1], -N[j, i]
@@ -3370,7 +3370,7 @@ function rank(A::MatElem{T}) where {T <: RingElement}
    if n == 0
       return 0
    end
-   B = deepcopy(A)
+   B = mutable_copy(A)
    P = one(SymmetricGroup(n))
    r, d = fflu!(P, B)
    return r
@@ -3381,7 +3381,7 @@ function rank(A::MatElem{T}) where {T <: FieldElement}
    if n == 0
       return 0
    end
-   B = deepcopy(A)
+   B = mutable_copy(A)
    P = one(SymmetricGroup(n))
    return lu!(P, B)
 end
@@ -3629,7 +3629,7 @@ end
 function _can_solve_with_solution_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    base_ring(A) != base_ring(b) && error("Base rings don't match in _can_solve_with_solution_fflu")
    nrows(A) != nrows(b) && error("Dimensions don't match in _can_solve_with_solution_fflu")
-   FFLU = deepcopy(A)
+   FFLU = mutable_copy(A)
    p = one(SymmetricGroup(nrows(A)))
    rank, d = fflu!(p, FFLU)
    flag, y = _solve_fflu_precomp(p, FFLU, b)
@@ -3687,7 +3687,7 @@ function _solve_fflu_precomp(p::Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T 
                   x[j, k] = mul_red!(x[j, k], x[j, k], diag[i], false)
                end
             else
-               x[j, k] = deepcopy(x[j, k])
+               x[j, k] = mutable_copy(x[j, k])
             end
             if i <= c && piv[i] <= c
                s = mul_red!(s, FFLU[j, piv[i]], t, false)
@@ -3711,7 +3711,7 @@ function _solve_fflu_precomp(p::Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T 
             if rnk != 0
                y[i, k] = x[l, k]*diag[rnk]
             else
-               y[i, k] = deepcopy(x[l, k])
+               y[i, k] = mutable_copy(x[l, k])
             end
             for j in (piv[l] + 1):c
                t = mul!(t, y[j, k], FFLU[l, j])
@@ -3755,7 +3755,7 @@ function _can_solve_with_solution_lu(A::MatElem{T}, b::MatElem{T}) where {T <: F
       return iszero(b), zero_matrix(base_ring(A), ncols(A), ncols(b))
    end
 
-   LU = deepcopy(A)
+   LU = mutable_copy(A)
    p = one(SymmetricGroup(nrows(A)))
    rank = lu!(p, LU)
 
@@ -3805,7 +3805,7 @@ function _solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: F
    end
 
    for k in 1:m
-      x[1, k] = deepcopy(x[1, k])
+      x[1, k] = mutable_copy(x[1, k])
       for i in 2:n
          for j in 1:(i - 1)
             # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
@@ -3817,7 +3817,7 @@ function _solve_lu_precomp(p::Perm, LU::MatElem{T}, b::MatElem{T}) where {T <: F
                   x[i, k] = add!(x[i, k], t)
                end
             else
-               x[i, k] = deepcopy(x[i, k])
+               x[i, k] = mutable_copy(x[i, k])
             end
          end
          x[i, k] = reduce!(x[i, k])
@@ -3868,7 +3868,7 @@ function _can_solve_with_solution_with_det(A::MatElem{T}, b::MatElem{T}) where {
    # We cannot use _solve_fflu directly, since it forgot about the (parity of
    # the) permutation.
    R = base_ring(A)
-   FFLU = deepcopy(A)
+   FFLU = mutable_copy(A)
    p = one(SymmetricGroup(nrows(A)))
    rank, d = fflu!(p, FFLU)
    pivots = zeros(Int, nrows(A))
@@ -4725,7 +4725,7 @@ function is_nilpotent(A::MatElem{T}) where {T <: RingElement}
   is_zero(tr(A)) || return false
   is_zero(A) && return true
   n = nrows(A)
-  A = deepcopy(A)
+  A = mutable_copy(A)
   i = 1
   while i < n
     i *= 2
@@ -4815,7 +4815,7 @@ true
 """
 function hessenberg(A::MatElem{T}) where {T <: RingElement}
    check_square(A)
-   M = deepcopy(A)
+   M = mutable_copy(A)
    hessenberg!(M)
    return M
 end
@@ -4942,7 +4942,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
       end
       for j = 1:n
          V[j] = -A[n - i + 1, j]
-         W[j] = deepcopy(A[n - i + 1, j])
+         W[j] = mutable_copy(A[n - i + 1, j])
       end
       for j = 1:n - i
          for kk = 1:n - i - 1
@@ -4969,7 +4969,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
             A[j, kk] = mul!(A[j, kk], A[j, kk], d)
          end
       end
-      A[n - i + 1, n - i] = deepcopy(h)
+      A[n - i + 1, n - i] = mutable_copy(h)
       for j = 1:n - i - 1
          s = R()
          for kk = 1:n - i
@@ -5060,7 +5060,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       h = -inv(h)
       for j = 1:n
          V[j] = A[n - i + 1, j]*h
-         W[j] = deepcopy(A[n - i + 1, j])
+         W[j] = mutable_copy(A[n - i + 1, j])
       end
       h = -h
       for j = 1:n - i
@@ -5262,7 +5262,7 @@ function minpoly(S::PolyRing{T}, A::MatElem{T}, charpoly_only::Bool = false) whe
          r2 = indep ? r2 + 1 : r2
          v = A*v
          for j = 1:n
-            W[r1, j] = deepcopy(v[j, 1])
+            W[r1, j] = mutable_copy(v[j, 1])
          end
          for j = n + 1:n + r1 - 1
             W[r1, j] = zero(R)
@@ -5271,7 +5271,7 @@ function minpoly(S::PolyRing{T}, A::MatElem{T}, charpoly_only::Bool = false) whe
          c1 = reduce_row!(W, P1, L1, r1)
          if indep && r2 <= n && !first_poly
             for j = 1:n
-               B[r2, j] = deepcopy(v[j, 1])
+               B[r2, j] = mutable_copy(v[j, 1])
             end
             c = reduce_row!(B, P2, L2, r2)
             indep = c != 0
@@ -5392,7 +5392,7 @@ function minpoly(S::PolyRing{T}, A::MatElem{T}, charpoly_only::Bool = false) whe
          r2 = indep ? r2 + 1 : r2
          v = A*v
          for j = 1:n
-            W[r1, j] = deepcopy(v[j, 1])
+            W[r1, j] = mutable_copy(v[j, 1])
          end
          for j = n + 1:n + r1 - 1
             W[r1, j] = zero(R)
@@ -5401,7 +5401,7 @@ function minpoly(S::PolyRing{T}, A::MatElem{T}, charpoly_only::Bool = false) whe
          c1 = reduce_row!(W, P1, L1, r1)
          if indep && r2 <= n && !first_poly
             for j = 1:n
-               B[r2, j] = deepcopy(v[j, 1])
+               B[r2, j] = mutable_copy(v[j, 1])
             end
             c = reduce_row!(B, P2, L2, r2)
             indep = c != 0
@@ -5463,7 +5463,7 @@ function hnf_cohen(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 function hnf_cohen_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
+   H = mutable_copy(A)
    m = nrows(H)
    U = identity_matrix(A, m)
    hnf_cohen!(H, U)
@@ -5487,7 +5487,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          a = divexact(H[k, i], d)
          b = -divexact(H[j, i], d)
          for c = i:n
-            t = deepcopy(H[j, c])
+            t = mutable_copy(H[j, c])
             t1 = mul_red!(t1, a, H[j, c], false)
             t2 = mul_red!(t2, b, H[k, c], false)
             H[j, c] = t1 + t2
@@ -5498,7 +5498,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
             H[k, c] = reduce!(H[k, c])
          end
          for c = 1:m
-            t = deepcopy(U[j,c])
+            t = mutable_copy(U[j,c])
             t1 = mul_red!(t1, a, U[j, c], false)
             t2 = mul_red!(t2, b, U[k, c], false)
             U[j, c] = t1 + t2
@@ -5550,7 +5550,7 @@ Compute the upper right row Hermite normal form of $A$ using the algorithm of
 Kannan-Bachem. The input must have full column rank.
 """
 function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
+   H = mutable_copy(A)
    _hnf_minors!(H, similar(A, 0, 0), Val(false))
    return H
 end
@@ -5563,7 +5563,7 @@ matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 have full column rank.
 """
 function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
-   H = deepcopy(A)
+   H = mutable_copy(A)
    U = similar(A, nrows(A), nrows(A))
    _hnf_minors!(H, U, Val(true))
    return H, U
@@ -5602,7 +5602,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} 
       k = k + 1
       if k == 1 && !is_zero_entry(H, k, k)
          for j2 in 1:n
-            H[k, j2] = deepcopy(H[k, j2])
+            H[k, j2] = mutable_copy(H[k, j2])
          end
       end
 
@@ -5617,7 +5617,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} 
          # Since we want to mutate the k-th row, first make a copy
          if j == 1
             for j2 in j:n
-               H[k, j2] = deepcopy(H[k, j2])
+               H[k, j2] = mutable_copy(H[k, j2])
             end
          end
 
@@ -5729,7 +5729,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, ::Val{with_transform} 
       for j in 1:n
          if j == 1
             for j2 in 1:n
-               H[k, j2] = deepcopy(H[k, j2])
+               H[k, j2] = mutable_copy(H[k, j2])
             end
          end
 
@@ -5829,7 +5829,7 @@ function hnf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
 end
 
 function _hnf_kb(A, ::Val{with_transform} = Val(false)) where {with_transform}
-   H = deepcopy(A)
+   H = mutable_copy(A)
    m = nrows(H)
    if with_transform
       U = identity_matrix(A, m)
@@ -5979,7 +5979,7 @@ function hnf_kb!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false, start_e
             a = divexact(H[p, j], d)
             b = -divexact(H[i, j], d)
             for c = j:n
-               t = deepcopy(H[i, c])
+               t = mutable_copy(H[i, c])
                t1 = mul_red!(t1, a, H[i, c], false)
                t2 = mul_red!(t2, b, H[p, c], false)
                H[i, c] = reduce!(t1 + t2)
@@ -5989,7 +5989,7 @@ function hnf_kb!(H::MatElem{T}, U::MatElem{T}, with_trafo::Bool = false, start_e
             end
             if with_trafo
                for c = 1:m
-                  t = deepcopy(U[i, c])
+                  t = mutable_copy(U[i, c])
                   t1 = mul_red!(t1, a, U[i, c], false)
                   t2 = mul_red!(t2, b, U[p, c], false)
                   U[i, c] = reduce!(t1 + t2)
@@ -6213,7 +6213,7 @@ function snf_kb_with_transform(A::MatElem{T}) where {T <: RingElement}
 end
 
 function _snf_kb(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: RingElement, with_transform}
-   S = deepcopy(A)
+   S = mutable_copy(A)
    m = nrows(S)
    n = ncols(S)
    if with_transform
@@ -6243,7 +6243,7 @@ function kb_clear_row!(S::MatElem{T}, K::MatElem{T}, i::Int, with_trafo::Bool) w
       a = divexact(S[i ,i], d)
       b = -divexact(S[i, j], d)
       for r = i:m
-         t = deepcopy(S[r, j])
+         t = mutable_copy(S[r, j])
          t1 = mul_red!(t1, a, S[r, j], false)
          t2 = mul_red!(t2, b, S[r, i], false)
          S[r, j] = reduce!(t1 + t2)
@@ -6253,7 +6253,7 @@ function kb_clear_row!(S::MatElem{T}, K::MatElem{T}, i::Int, with_trafo::Bool) w
       end
       if with_trafo
          for r = 1:n
-            t = deepcopy(K[r,j])
+            t = mutable_copy(K[r,j])
             t1 = mul_red!(t1, a, K[r, j], false)
             t2 = mul_red!(t2, b, K[r, i], false)
             K[r, j] = reduce!(t1 + t2)
@@ -6299,7 +6299,7 @@ function snf_kb!(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, with_trafo::Bool =
             q = -divexact(S[j, j], d)
             t1 = mul!(t1, q, v)
             for c = 1:m
-               t = deepcopy(U[i, c])
+               t = mutable_copy(U[i, c])
                U[i, c] += U[j, c]
                t2 = mul_red!(t2, t1, U[j, c], false)
                U[j, c] += t2
@@ -6309,7 +6309,7 @@ function snf_kb!(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, with_trafo::Bool =
             q1 = -divexact(S[j, j], d)
             q2 = divexact(S[i, i], d)
             for r = 1:n
-               t = deepcopy(K[r, i])
+               t = mutable_copy(K[r, i])
                t1 = mul_red!(t1, K[r, i], u, false)
                t2 = mul_red!(t2, K[r, j], v, false)
                K[r, i] = reduce!(t1 + t2)
@@ -6574,7 +6574,7 @@ function weak_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 end
 
 function _weak_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   P = deepcopy(A)
+   P = mutable_copy(A)
    m = nrows(P)
    W = similar(A, 0, 0)
    if with_transform
@@ -6613,8 +6613,8 @@ end
 
 function _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
    @assert nrows(V) == nrows(A) && ncols(V) == 1
-   P = deepcopy(A)
-   W = deepcopy(V)
+   P = mutable_copy(A)
+   W = mutable_copy(V)
    m = nrows(P)
    if with_transform
       U = identity_matrix(A)
@@ -6727,7 +6727,7 @@ Return an array of $r$ row indices such that these rows of $A$ are linearly
 independent, where $r$ is the rank of $A$.
 """
 function rank_profile_popov(A::MatElem{T}) where {T <: PolyRingElem}
-   B = deepcopy(A)
+   B = mutable_copy(A)
    m = nrows(A)
    n = ncols(A)
    U = similar(A, 0, 0)
@@ -6764,7 +6764,7 @@ end
 
 function det_popov(A::MatElem{T}) where {T <: PolyRingElem}
    check_square(A)
-   B = deepcopy(A)
+   B = mutable_copy(A)
    n = ncols(B)
    R = base_ring(B)
    det = one(R)
@@ -6891,7 +6891,7 @@ function popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 end
 
 function _popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   P = deepcopy(A)
+   P = mutable_copy(A)
    m = nrows(P)
    if with_transform
       U = identity_matrix(A, m)
@@ -7026,7 +7026,7 @@ function hnf_via_popov_with_transform(A::MatElem{T}) where {T <: PolyRingElem}
 end
 
 function _hnf_via_popov(A::MatElem{T}, ::Val{with_transform} = Val(false)) where {T <: PolyRingElem, with_transform}
-   H = deepcopy(A)
+   H = mutable_copy(A)
    m = nrows(H)
    if with_transform
       U = identity_matrix(A, m)
@@ -7242,7 +7242,7 @@ julia> M
 """
 function swap_rows(A::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= nrows(A) && 1 <= j <= nrows(A)) || throw(BoundsError())
-   b = deepcopy(A)
+   b = mutable_copy(A)
    swap_rows!(b, i, j)
    return b
 end
@@ -7290,7 +7290,7 @@ columns.
 """
 function swap_cols(A::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= ncols(A) && 1 <= j <= ncols(A)) || throw(BoundsError())
-   b = deepcopy(A)
+   b = mutable_copy(A)
    swap_cols!(b, i, j)
    return b
 end
@@ -7332,7 +7332,7 @@ end
 Return a new matrix obtained from `A` by reversing the order of its rows.
 """
 function reverse_rows(A::MatElem{T}) where T <: NCRingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return reverse_rows!(b)
 end
 
@@ -7356,7 +7356,7 @@ end
 Return a new matrix obtained from `A` by reversing the order of its columns.
 """
 function reverse_cols(A::MatElem{T}) where T <: NCRingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return reverse_cols!(b)
 end
 
@@ -7448,7 +7448,7 @@ julia> add_column(M, 2, 3, 1, 1:1)
 ```
 """
 function add_column(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return add_column!(b, s, i, j, rows)
 end
 
@@ -7486,7 +7486,7 @@ matrix. An optional final argument restricts the operation to entries in the
 specified columns.
 """
 function add_row(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return add_row!(b, s, i, j, cols)
 end
 
@@ -7522,7 +7522,7 @@ matrix. An optional final argument restricts the operation to entries in the
 specified rows.
 """
 function multiply_column(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return multiply_column!(b, s, i, rows)
 end
 
@@ -7582,7 +7582,7 @@ julia> multiply_row(M, 2, 3, 2:2)
 ```
 """
 function multiply_row(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
-   b = deepcopy(A)
+   b = mutable_copy(A)
    return multiply_row!(b, s, i, cols)
 end
 
@@ -8065,7 +8065,7 @@ function matrix(R::NCRing, A::MatRingElem)
 end
 
 function matrix(A::MatElem{T}) where {T<:NCRingElement}
-   return deepcopy(A)
+   return mutable_copy(A)
 end
 
 function matrix(entries::AbstractMatrix{T}) where {T<:NCRingElement}

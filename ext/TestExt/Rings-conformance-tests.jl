@@ -1020,7 +1020,7 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
 
             if nrows(S) == ncols(S)
               # in-place transpose! only supported for square matrices
-              t = transpose!(deepcopy(a))
+              t = transpose!(mutable_copy(a))
               @test t isa ST
               @test base_ring(t) == base_ring(a)
               @test t == transpose(a)
