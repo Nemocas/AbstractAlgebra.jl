@@ -219,6 +219,10 @@ function Base.deepcopy_internal(f::PuiseuxMPolyRingElem, dict::IdDict)
     return puiseux_polynomial_ring_elem(parent(f), deepcopy_internal(poly(f), dict), deepcopy_internal(scale(f), dict); skip_normalization=true)
 end
 
+function mutable_copy(f::PuiseuxMPolyRingElem)
+    return puiseux_polynomial_ring_elem(parent(f), mutable_copy(poly(f)), scale(f); skip_normalization=true)
+end
+
 coefficients(f::PuiseuxMPolyRingElem) = coefficients(poly(f))
 exponent_vectors(f::PuiseuxMPolyRingElem) = [ e .// scale(f) for e in exponent_vectors(poly(f)) ]
 monomials(f::PuiseuxMPolyRingElem) = puiseux_polynomial_ring_elem.(Ref(parent(f)), monomials(poly(f)), Ref(scale(f)))

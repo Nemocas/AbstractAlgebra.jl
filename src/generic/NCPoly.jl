@@ -55,6 +55,10 @@ function deepcopy_internal(a::NCPoly{T}, dict::IdDict) where T <: NCRingElem
    return parent(a)(coeffs)
 end
 
+function mutable_copy(a::NCPoly{T}) where T <: NCRingElem
+   return parent(a)(T[mutable_copy(a.coeffs[i]) for i in 1:length(a)])
+end
+
 ###############################################################################
 #
 #   Unsafe functions

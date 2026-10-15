@@ -80,6 +80,13 @@ function deepcopy_internal(a::TotFrac{T}, dict::IdDict) where {T <: RingElem}
    return v
 end
 
+function mutable_copy(a::TotFrac{T}) where {T <: RingElem}
+   v = TotFrac{T}(mutable_copy(numerator(a, false)),
+                  mutable_copy(denominator(a, false)))
+   v.parent = parent(a)
+   return v
+end
+
 function Base.hash(a::TotFrac, h::UInt)
    # Elements cannot be canonicalised
    0xcdd13b94adbec4bc%UInt

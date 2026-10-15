@@ -148,6 +148,22 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          @test sprint(show, "text/plain", R) isa String
       end
 
+      @testset "mutable_copy" begin
+         for i in 1:reps
+            a = generate_element(R)::T
+            A = deepcopy(a)
+            b = mutable_copy(a)
+            @test b isa T
+            @test parent(b) === R
+            @test equality(a, b)
+            @test !ismutable(a) || a !== b
+
+            # mutating the copy leaves the original intact
+            b = add!(b, b, one(R))
+            @test equality(a, A)
+         end
+      end
+
       @testset "Basic arithmetic" begin
          for i in 1:reps
             a = generate_element(R)::T
@@ -800,6 +816,28 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
          N1 = @view M[1:2, :]
          N2 = @view M[:, 1:2]
          @test N1*N2 == matrix(R, 2, 2, BigInt[14, 20, 20, 29])
+      end
+
+      @testset "mutable_copy" begin
+         for k in 1:reps
+            a = generate_element(S)::ST
+            b = mutable_copy(a)
+            @test b isa ST
+            @test b == a
+         end
+
+         # entries sharing one object become distinct objects
+         pos = [(i, j) for i in 1:nrows(S) for j in 1:ncols(S)]
+         if length(pos) >= 2
+            (i1, j1), (i2, j2) = pos[1], pos[2]
+            c = generate_element(R)::T
+            a = zero(S)
+            a[i1, j1] = c
+            a[i2, j2] = c
+            b = mutable_copy(a)
+            @test b == a
+            @test !ismutable(c) || b[i1, j1] !== b[i2, j2]
+         end
       end
 
       @testset "Basic manipulation of matrices" begin

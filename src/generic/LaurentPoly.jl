@@ -92,6 +92,10 @@ function deepcopy_internal(p::LaurentPolyWrap, dict::IdDict)
    return LaurentPolyWrap(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
 end
 
+function mutable_copy(p::LaurentPolyWrap)
+   return LaurentPolyWrap(p.parent, mutable_copy(p.poly), p.mindeg)
+end
+
 ###############################################################################
 #
 #   String I/O

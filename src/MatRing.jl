@@ -175,6 +175,16 @@ function deepcopy_internal(d::MatRingElem{T}, dict::IdDict) where T <: NCRingEle
    return z
 end
 
+function mutable_copy(d::MatRingElem{T}) where T <: NCRingElement
+   z = similar(d)
+   for i = 1:nrows(d)
+      for j = 1:ncols(d)
+         z[i, j] = mutable_copy(d[i, j])
+      end
+   end
+   return z
+end
+
 ################################################################################
 #
 #   is_square
