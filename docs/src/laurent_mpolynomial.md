@@ -16,7 +16,7 @@ feature that exponents can be negative.
 
 AbstractAlgebra.jl provides a generic implementation of multivariate Laurent
 polynomials, built in terms of regular multivariate polynomials, in the file
-`src/generic/LaurentMPoly.jl`.
+`src/LaurentMPoly.jl`.
 
 The type `LaurentMPolyRingElem{T, ...}` implements generic
 multivariate Laurent polynomials by wrapping regular polynomials:
