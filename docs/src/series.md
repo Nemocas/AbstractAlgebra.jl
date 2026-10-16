@@ -257,6 +257,9 @@ then $f == g$, $f == h$ and $g == h$, but `isequal(f, g)`, `isequal(f, h)` and
 `isequal(g, h)` would all return `false`. However, if $k = x^2 + O(x^7)$ then
 `isequal(f, k)` would return `true`.
 
+As for all ring elements, `isequal` returns `false` for series from different
+rings, while `==` throws an error for them; see [Equality and hashing](@ref).
+
 There are further difficulties if we construct polynomial over power series.
 For example, consider the polynomial in $y$ over the power series ring in $x$
 over the rationals. Normalisation of such polynomials is problematic. For

@@ -115,6 +115,47 @@ show(io::IO, R::NCRing)
 show(io::IO, a::NCRingElement)
 ```
 
+## Equality and hashing
+
+`a == b` compares ring elements arithmetically. If `a` and `b` have different
+parents, they are compared in a common parent if there is one, e.g. for an
+element of $R$ and an element of $R[x]$, or for a ring element and a Julia
+integer. Otherwise `==` throws an error; it never returns `false` just because
+the parents differ.
+
+`isequal(a, b)` does not throw for ring elements of different parents but
+returns `false`, without looking for a common parent. For elements of the same
+parent it agrees with `==` for exact rings; for inexact rings it also compares
+precisions, see below. `Dict` and `Set` compare keys with `isequal`.
+
+`isequal(a, b)` implies `hash(a) == hash(b)`, as Julia requires. But `hash` is
+not compatible with `==` across parents: `one(R) == 1` holds, while
+`hash(one(R))` and `hash(1)` differ. So elements equal under `==` may be
+distinct keys of a `Dict`; keys should come from a single parent. Whether
+`isequal` holds between a ring element and a Julia number is unspecified.
+
+`x in v` compares with `==` and thus may throw if `v` contains elements of
+other parents; `any(isequal(x), v)` does not.
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> S, y = polynomial_ring(QQ, :y);
+
+julia> x == y
+ERROR: parents do not match
+[...]
+
+julia> isequal(x, y)
+false
+
+julia> length(Dict(x => 1, y => 2))
+2
+
+julia> one(R) == 1
+true
+```
+
 ## Basic functionality for inexact rings only
 
 By default, inexact ring elements in AbstractAlgebra compare equal if they are
