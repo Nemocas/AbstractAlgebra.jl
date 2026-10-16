@@ -555,6 +555,21 @@ function test_Poly_interface(Rx::AbstractAlgebra.PolyRing; reps = 10)
          end
       end
 
+      @testset "normalise" begin
+         for i in 1:reps
+            a = generate_element(Rx)
+            for n in 0:length(a)
+               @test normalise(a, n) == length(truncate(a, n))
+            end
+
+            iszero(a) && continue
+            # setcoeff! may leave a leading zero for normalise to discard
+            b = setcoeff!(deepcopy(a), degree(a), zero(R))
+            b = set_length!(b, normalise(b, length(b)))
+            @test b == truncate(a, degree(a))
+         end
+      end
+
       @testset "reverse" begin
         p = x^2 + 2*x + 3
         @test reverse(p) !== p
