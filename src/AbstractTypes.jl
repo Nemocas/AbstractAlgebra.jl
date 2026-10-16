@@ -80,6 +80,8 @@ abstract type MapWithHeader <: SetMap end
 
 abstract type FPModuleHomomorphism <: FunctionalMap end
 
+abstract type SkewDerivation{D,S} <: Map{D,D,Map,SkewDerivation} where {S<:Map{D,D}} end
+
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
 # mathematical rings/fields/etc, which have a base ring,
@@ -111,6 +113,8 @@ abstract type TotFracRing{T<:RingElement} <: Ring end
 abstract type MatRing{T<:NCRingElement} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
+
+abstract type OrePolyRing{T<:RingElement,S<:SkewDerivation} <: NCPolyRing{T} end
 
 # Abstract types for number fields, parmeterised by the element type of
 # the base field.
@@ -158,6 +162,8 @@ abstract type MatElem{T} <: ModuleElem{T} end
 abstract type MatRingElem{T<:NCRingElement} <: NCRingElem end
 
 abstract type FreeAssociativeAlgebraElem{T<:RingElement} <: NCRingElem end
+
+abstract type OrePolyRingElem{T<:RingElem,S<:SkewDerivation} <: NCPolyRingElem{T} end
 
 abstract type NumFieldElem{T<:RingElement} <: FieldElem end
 
