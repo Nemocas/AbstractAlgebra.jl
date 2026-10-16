@@ -470,7 +470,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "change_base_ring & map_coefficients" begin
       Z, z = laurent_polynomial_ring(ZZ, "z")
-      Q, q = laurent_polynomial_ring(QQ, "q")
+      Q, q = laurent_polynomial_ring(QQ, "z")
 
       fz = z^2 - z - 2z^-2
 

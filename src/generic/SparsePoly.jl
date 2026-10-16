@@ -299,6 +299,7 @@ end
 ###############################################################################
 
 function ==(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+   check_parent(a, b)
    if length(a) != length(b)
       return false
    end

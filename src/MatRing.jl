@@ -235,7 +235,10 @@ end
 
 ^(a::MatRingElem{T}, b::Int) where T <: NCRingElement = Generic.MatRingElem(matrix(a)^b)
 
-==(x::T, y::T) where {T <: MatRingElem} = matrix(x) == matrix(y)
+function ==(x::T, y::T) where {T <: MatRingElem}
+   check_parent(x, y)
+   return matrix(x) == matrix(y)
+end
 
 isequal(x::T, y::T) where {T <: MatRingElem} = isequal(matrix(x), matrix(y))
 

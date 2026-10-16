@@ -350,13 +350,11 @@ end
 @doc raw"""
     ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
 
-Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
-that power series to different precisions may still be arithmetically
-equal to the minimum of the two precisions.
+Return `true` if $x == y$ arithmetically, otherwise return `false`. Throw an
+error if the parents differ.
 """
 function ==(x::NCPolyRingElem{T}, y::NCPolyRingElem{T}) where T <: NCRingElem
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
    if length(x) != length(y)
       return false
    else

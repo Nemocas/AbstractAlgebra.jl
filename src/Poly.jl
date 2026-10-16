@@ -911,13 +911,11 @@ end
 @doc raw"""
     ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
 
-Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
-that power series to different precisions may still be arithmetically
-equal to the minimum of the two precisions.
+Return `true` if $x == y$ arithmetically, otherwise return `false`. Throw an
+error if the parents differ.
 """
 function ==(x::PolyRingElem{T}, y::PolyRingElem{T}) where T <: RingElement
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
    if length(x) != length(y)
       return false
    else

@@ -139,6 +139,8 @@ end
    @testset "$name" for (name, (a, b)) in pairs
       @test a == a
       @test isequal(a, a)
+      @test_throws ErrorException a == b
+      @test_throws ErrorException b == a
       @test !isequal(a, b)
       @test !isequal(b, a)
       @test length(Dict(a => 1, b => 2)) == 2
