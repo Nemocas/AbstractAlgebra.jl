@@ -393,6 +393,17 @@ function ==(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    return true
 end
 
+function isequal(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
+   check_parent(a, b, false) || return false
+   p, q = data(a), data(b)
+   if parent(p) !== parent(q)
+      # lift both into the current ring, without mutating `a` and `b`
+      R = base_ring(parent(a))
+      p, q = _upgrade(p, R), _upgrade(q, R)
+   end
+   return isequal(p, q)
+end
+
 function isless(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    univ_promote!(a, b)
    return isless(data(a), data(b))

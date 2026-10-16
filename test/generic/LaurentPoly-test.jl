@@ -273,6 +273,18 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test f != L(x^3 + 2x^2 - 1, -2)
    end
 
+   @testset "isequal" begin
+      # `==` compares series coefficients to the lower precision, `isequal` not
+      S, t = power_series_ring(QQ, 10, :t)
+      L, y = laurent_polynomial_ring(S, :y)
+      f = (1 + O(t^2))*y^-1
+      g = (1 + O(t^3))*y^-1
+
+      @test f == g
+      @test !isequal(f, g)
+      @test isequal(f, deepcopy(f))
+   end
+
    @testset "unary & binary & adhoc arithmetic operations" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
       x = gen(base_ring(L))

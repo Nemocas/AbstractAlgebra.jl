@@ -659,6 +659,30 @@ end
    end
 end
 
+@testset "UnivPoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S = universal_polynomial_ring(R; cached=false)
+   x = gen(S, :x)
+   a = 1 + O(t^2)
+   b = 1 + O(t^3)
+
+   @test a*x == b*x
+   @test !isequal(a*x, b*x)
+   @test isequal(a*x, deepcopy(a*x))
+
+   # elements whose underlying polynomial rings differ
+   f = a*x
+   y = gen(S, :y)
+   x = gen(S, :x)
+   @test parent(data(f)) !== parent(data(x))
+
+   @test f == b*x
+   @test !isequal(f, b*x)
+   @test isequal(f, a*x)
+   @test hash(f) == hash(a*x)
+end
+
 @testset "UnivPoly.adhoc_comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100

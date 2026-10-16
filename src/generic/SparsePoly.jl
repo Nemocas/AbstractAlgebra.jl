@@ -310,6 +310,19 @@ function ==(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    return true
 end
 
+function isequal(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+   check_parent(a, b, false) || return false
+   if length(a) != length(b)
+      return false
+   end
+   for i = 1:length(a)
+      if a.exps[i] != b.exps[i] || !isequal(a.coeffs[i], b.coeffs[i])
+         return false
+      end
+   end
+   return true
+end
+
 ###############################################################################
 #
 #   Ad hoc comparison

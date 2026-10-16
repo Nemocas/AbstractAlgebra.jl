@@ -191,6 +191,15 @@ function ==(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     return x == y
 end
 
+function isequal(a::T, b::T) where T <: LaurentMPolyWrap
+    check_parent(a, b, false) || return false
+    if a.mindegs == b.mindegs
+        return isequal(a.mpoly, b.mpoly)
+    end
+    g, x, y = _gcdhelper(a, b)
+    return isequal(x, y)
+end
+
 function +(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
     check_parent(a, b)
     if a.mindegs == b.mindegs

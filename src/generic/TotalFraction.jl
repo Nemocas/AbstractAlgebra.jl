@@ -314,6 +314,12 @@ function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
            denominator(x, false)*numerator(y, false))
 end
 
+function isequal(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
+   check_parent(x, y, false) || return false
+   return isequal(numerator(x, false)*denominator(y, false),
+                  denominator(x, false)*numerator(y, false))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
