@@ -25,6 +25,7 @@ length(A::MatElem{T}) where T <: NCRingElement
 
 ```@docs
 tr(A::MatElem{T}) where T <: NCRingElement
+trace_of_product(M::MatElem{T}, N::MatElem{T}) where T <: NCRingElement
 det(A::MatElem{T}) where {T <: RingElement}
 rank(A::MatElem{T}) where T <: RingElem
 ```
