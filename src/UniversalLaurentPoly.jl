@@ -49,7 +49,8 @@ function evaluate(a::UniversalRingElem{<:LaurentMPolyRingElem}, A::Vector{<:Ring
       for e in exponent_vectors(a2)
          iszero(view(e, k+1:n)) || error("Number of variables does not match number of values")
       end
-      A = vcat(A, [one(parent(A[1])) for _ in k+1:n])
+      R = parent(A[1])
+      A = vcat(A, [one(R) for _ in k+1:n])
    end
    return evaluate(a2, A[1:n])
 end
