@@ -342,7 +342,7 @@ By default (`cached=true`), the output `S` will be cached, i.e. if
 distinct new algebra is returned, and will also prevent it from being cached.
 
 For the many ways to specify `varnames` refer to [`polynomial_ring`](@ref) or
-[`AbstractAlgebra.@varnames_interface`](@ref).
+[`variable_names`](@ref).
 
 # Examples
 
