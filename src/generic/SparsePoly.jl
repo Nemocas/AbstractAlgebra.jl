@@ -324,7 +324,7 @@ end
 ==(a::JuliaRingElement, b::SparsePoly) = b == a
 
 function ==(a::SparsePoly{T}, b::T) where T <: RingElem
-   return length(a) == 0 ? iszero(b) : a.length == 1 &
+   return length(a) == 0 ? iszero(b) : a.length == 1 &&
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
