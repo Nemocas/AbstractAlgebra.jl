@@ -213,9 +213,15 @@ function deepcopy_internal(a::AbsMSeries, dict::IdDict)
     return parent(a)(deepcopy_internal(poly(a), dict), a.prec)
 end
 
+# In an unweighted ring the polynomial may hold terms beyond the precision
+function _truncated_poly(a::AbsMSeries)
+    parent(a).weighted_prec == -1 || return poly(a)
+    return truncate_poly(poly(a), a.prec)
+end
+
 function Base.hash(a::AbsMSeries, h::UInt)
     b = 0xf7f073b6c9e1d560
-    return xor(b, hash(poly(a), h))
+    return xor(b, hash(_truncated_poly(a), h))
 end
 
 ###############################################################################
@@ -488,14 +494,10 @@ end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
     check_parent(x, y)
-    R = parent(x)
-    if R.weighted_prec == -1
-        prec = x.prec
-        prec == y.prec || return false
-        return truncate_poly(poly(x), prec) == truncate_poly(poly(y), prec)
-    else
-        return x == y
+    if parent(x).weighted_prec == -1
+        x.prec == y.prec || return false
     end
+    return isequal(_truncated_poly(x), _truncated_poly(y))
 end
 
 ###############################################################################
