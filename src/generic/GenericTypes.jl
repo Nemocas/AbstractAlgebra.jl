@@ -1109,39 +1109,6 @@ end
 
 ###############################################################################
 #
-#   MatRing / MatRingElem
-#
-###############################################################################
-
-struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
-   n::Int
-   base_ring::NCRing
-
-   function MatRing{T}(R::NCRing, n::Int) where T <: NCRingElement
-      new{T}(n, R)
-   end
-end
-
-struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
-   data::MatElem{T}
-
-  function MatRingElem{TT}(A::MatElem{TT}) where TT <: NCRingElement
-    nrows(A) == ncols(A) || error("Matrix must be square")
-    return new{TT}(A)
-   end
-end
-
-MatRingElem(A::MatElem{TT}) where TT <: NCRingElement = MatRingElem{TT}(A)
-
-function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
-   t = matrix(R, n, n, A)
-   return MatRingElem(t)
-end
-
-matrix(A::MatRingElem{T}) where {T <: NCRingElement} = A.data::dense_matrix_type(T)
-
-###############################################################################
-#
 #   FreeAssociativeAlgebra / FreeAssociativeAlgebraElem
 #
 ###############################################################################
