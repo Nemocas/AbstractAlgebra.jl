@@ -81,6 +81,8 @@ iszero(p::LaurentPolyWrap) = iszero(p.poly)
 
 isone(p::LaurentPolyWrap) = is_monomial(p, 0)
 
+content(p::LaurentPolyWrap) = content(p.poly)
+
 zero(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, zero(base_ring(R)))
 one(R::LaurentPolyWrapRing) = LaurentPolyWrap(R, one(base_ring(R)))
 
@@ -406,7 +408,34 @@ end
 
 ###############################################################################
 #
-#   Inflation
+#   Square root
+#
+###############################################################################
+
+# Over a non-domain a square may have odd trailing degree, e.g. (3 + y)^2 =
+# 6y + y^2 over ZZ/9.
+function is_square_with_sqrt(p::LaurentPolyWrap)
+   R = parent(p)
+   is_domain_type(coefficient_ring(R)) || throw(NotImplementedError(:is_square_with_sqrt, p))
+   iszero(p) && return true, zero(R)
+   q = canonicalize(p)
+   isodd(q.mindeg) && return false, zero(R)
+   flag, r = is_square_with_sqrt(q.poly)
+   flag || return false, zero(R)
+   return true, LaurentPolyWrap(R, r, div(q.mindeg, 2))
+end
+
+is_square(p::LaurentPolyWrap) = is_square_with_sqrt(p)[1]
+
+function Base.sqrt(p::LaurentPolyWrap; check::Bool = true)
+   flag, q = is_square_with_sqrt(p)
+   check && !flag && error("Not a square in sqrt")
+   return q
+end
+
+###############################################################################
+#
+#   Inflation/deflation
 #
 ###############################################################################
 
@@ -415,6 +444,12 @@ function inflate(f::LaurentPolyWrap, shift::Int64, defl::Int64)
 end
 
 inflate(f::LaurentPolyWrap, defl::Int64) = inflate(f, 0, defl)
+
+function deflation(f::LaurentPolyWrap)
+   iszero(f) && return 0, 1
+   shift, defl = deflation(f.poly)
+   return shift + f.mindeg, defl
+end
 
 ###############################################################################
 #
