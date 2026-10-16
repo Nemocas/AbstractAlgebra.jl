@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-laurent_mpoly_type(::Type{T}) where T<:RingElement = Generic.LaurentMPolyWrap{T, mpoly_type(T), Generic.LaurentMPolyWrapRing{T, mpoly_ring_type(T)}}
+laurent_mpoly_type(::Type{T}) where T<:RingElement = LaurentMPolyRingElem{T, mpoly_type(T), LaurentMPolyRing{T, mpoly_ring_type(T)}}
 laurent_mpoly_type(::Type{S}) where S<:Ring = laurent_mpoly_type(elem_type(S))
 laurent_mpoly_type(x) = laurent_mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 laurent_mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
@@ -248,7 +248,7 @@ specification in [`AbstractAlgebra.@varnames_interface`](@ref).
 
 ```jldoctest
 julia> S, (x, y) = laurent_polynomial_ring(ZZ, [:x, :y])
-(Multivariate Laurent polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}[x, y])
+(Multivariate Laurent polynomial ring in 2 variables over integers, LaurentMPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, LaurentMPolyRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}[x, y])
 
 julia> (x + y)*x^-1
 1 + x^-1*y

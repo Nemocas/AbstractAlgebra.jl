@@ -132,8 +132,6 @@ end
 
 gens(R::LaurentPolyRing) = [gen(R)]
 
-is_gen(p::LaurentPolyRingElem) = p == gen(parent(p))
-
 length(p::LaurentPolyRingElem) = length(degrees_range(p))
 
 is_term(p::LaurentPolyRingElem) = isone(length(p))
@@ -206,8 +204,6 @@ Base.isapprox(q::T, p::LaurentPolyRingElem{T}; atol::Real=sqrt(eps())) where {T}
 #
 ################################################################################
 
-change_base_ring(R::Ring, p::LaurentPolyRingElem) = map_coefficients(R, p)
-
 change_coefficient_ring(R::Ring, p::LaurentPolyRingElem; kwargs...) =
    change_base_ring(R, p; kwargs...)
 
@@ -228,14 +224,6 @@ function deflate(f::LaurentPolyRingElem, j::Int, n::Int)
 end
 
 deflate(f::LaurentPolyRingElem, n::Int) = deflate(f, 0, n)
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(x::LaurentPolyRingElem) = canonical_unit(leading_coefficient(x))
 
 ###############################################################################
 #

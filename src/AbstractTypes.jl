@@ -92,10 +92,6 @@ abstract type NCPolyRing{T<:NCRingElement} <: NCRing end
 
 abstract type MPolyRing{T<:RingElement} <: Ring end
 
-abstract type LaurentPolyRing{T<:RingElement} <: Ring end
-
-abstract type LaurentMPolyRing{T<:RingElement} <: Ring end
-
 abstract type SeriesRing{T<:RingElement} <: Ring end
 
 abstract type MSeriesRing{T<:RingElement} <: Ring end
@@ -128,10 +124,6 @@ abstract type PolyRingElem{T<:RingElement} <: RingElem end
 abstract type NCPolyRingElem{T<:NCRingElement} <: NCRingElem end
 
 abstract type MPolyRingElem{T<:RingElement} <: RingElem end
-
-abstract type LaurentPolyRingElem{T<:RingElement} <: RingElem end
-
-abstract type LaurentMPolyRingElem{T<:RingElement} <: RingElem end
 
 abstract type ResElem{T<:RingElement} <: RingElem end
 
