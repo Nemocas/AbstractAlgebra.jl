@@ -109,11 +109,22 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational, b::Integer; check::Bool=true) = a//b
+# `a//0` is `±1//0` for nonzero `a`, not an error
 
-divexact(a::Integer, b::Rational; check::Bool=true) = a//b
+function divexact(a::Rational, b::Integer; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
-divexact(a::Rational, b::Rational; check::Bool=true) = a//b
+function divexact(a::Integer, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
+
+function divexact(a::Rational, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
 function divides(a::T, b::T) where T <: Rational
    if iszero(b)

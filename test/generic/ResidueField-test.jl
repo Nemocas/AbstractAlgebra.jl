@@ -299,6 +299,13 @@ end
    g = T(x^4 + x + 2)
 
    @test divexact(f, g) == T(7*x^2+25*x+26)
+
+   R, = residue_field(ZZ, 7)
+   for check in (true, false)
+      @test_throws DivideError divexact(R(1), R(0); check)
+      @test_throws DivideError divexact(R(0), R(0); check)
+   end
+   @test_throws DivideError R(1) / R(0)
 end
 
 @testset "EuclideanRingResidueFieldElem.square_root" begin
