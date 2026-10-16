@@ -181,6 +181,11 @@ end
 ==(p::LaurentPolyRingElem, q::LaurentPolyRingElem) =
    all(i -> coeff(p, i) == coeff(q, i), terms_degrees(p, q))
 
+function isequal(p::T, q::T) where T <: LaurentPolyRingElem
+   check_parent(p, q, false) || return false
+   return all(i -> isequal(coeff(p, i), coeff(q, i)), terms_degrees(p, q))
+end
+
 ###############################################################################
 #
 #   Approximation

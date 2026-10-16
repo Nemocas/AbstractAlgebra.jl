@@ -1759,6 +1759,18 @@ end
     @test R(1) != R(2)
 end
 
+@testset "Generic.MPoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   S, t = power_series_ring(QQ, 10, :t)
+   R, (x, y) = polynomial_ring(S, [:x, :y])
+   f = (1 + O(t^2))*x*y
+   g = (1 + O(t^3))*x*y
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
+end
+
 @testset "Generic.MPoly.exceptions" begin
    @test_throws MethodError polynomial_ring(Char, [:x])
    @test_throws Exception mpoly_ring_type(Char)

@@ -46,6 +46,30 @@ end
    @test !occursin("\n", sprint(show, R))
 end
 
+@testset "Generic.LaurentMPoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   S, t = power_series_ring(QQ, 10, :t)
+   L, (x, y) = laurent_polynomial_ring(S, [:x, :y])
+   P = parent(x.mpoly)
+   X = gen(P, 1)
+   a = 1 + O(t^2)
+   b = 1 + O(t^3)
+
+   @test a*x == b*x
+   @test !isequal(a*x, b*x)
+   @test isequal(a*x, deepcopy(a*x))
+
+   # the same elements, stored with different `mindegs`
+   f = Generic.LaurentMPolyWrap(L, a*X, [0, 0])
+   g = Generic.LaurentMPolyWrap(L, b*one(P), [1, 0])
+   h = Generic.LaurentMPolyWrap(L, a*one(P), [1, 0])
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, h)
+   @test hash(f) == hash(h)
+end
+
 @testset "Generic.LaurentMPoly.derivative" begin
     L, (x, y) = laurent_polynomial_ring(ZZ, ["x", "y"])
 

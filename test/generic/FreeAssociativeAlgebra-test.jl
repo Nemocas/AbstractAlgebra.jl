@@ -128,6 +128,18 @@
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S, (x, y) = free_associative_algebra(R, [:x, :y])
+   f = (1 + O(t^2))*x*y
+   g = (1 + O(t^3))*x*y
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
+end
+
 @testset "Generic.FreeAssociativeAlgebra.printing" begin
    R, x = ZZ["y"]
    S = free_associative_algebra(R, 5)

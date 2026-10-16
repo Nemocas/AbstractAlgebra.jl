@@ -160,6 +160,16 @@ end
    @test S(10, 5) == S(2, 7)
 
    @test isequal(a, S(3, 7))
+
+   # `==` compares series to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S = total_ring_of_fractions(R)
+   f = S(1 + O(t^2))
+   g = S(1 + O(t^3))
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end
 
 @testset "Generic.TotFrac.adhoc_comparison" begin
