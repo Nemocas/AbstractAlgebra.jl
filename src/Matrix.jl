@@ -1798,7 +1798,7 @@ julia> transpose(A)
 ```
 """
 function transpose(A::MatElem)
-  N = similar(base_ring(A), ncols(A), nrows(A))
+  N = similar(A, ncols(A), nrows(A))
   return transpose!(N, A)
 end
 
