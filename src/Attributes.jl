@@ -181,7 +181,8 @@ end
 # attribute computations would otherwise share that higher-order frame, so
 # inference widens the inner call and marks every frame in between as
 # limited; these uncached results keep their backedges, which piles up and
-# overflows the stack during method invalidation.
+# overflows the stack during method invalidation. See
+# https://github.com/JuliaLang/julia/issues/63933
 struct _AttrNotSet end
 
 """
