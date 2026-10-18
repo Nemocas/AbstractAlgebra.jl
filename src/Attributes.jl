@@ -176,6 +176,14 @@ function has_attribute(G::Any, attr::Symbol)
    return D isa Dict && haskey(D, attr)
 end
 
+# The do-block methods of `get_attribute` and `get_attribute!` look the key up
+# inline instead of calling `get(f, D, attr)` or `get!(f, D, attr)`. Nested
+# attribute computations would otherwise share that higher-order frame, so
+# inference widens the inner call and marks every frame in between as
+# limited; these uncached results keep their backedges, which piles up and
+# overflows the stack during method invalidation.
+struct _AttrNotSet end
+
 """
     get_attribute(f::Function, G::Any, attr::Symbol)
 
@@ -193,7 +201,9 @@ end
 """
 function get_attribute(f, G::Any, attr::Symbol)
    D = _get_attributes(G)
-   D isa Dict && return get(f, D, attr)
+   D isa Dict || return f()
+   v = get(D, attr, _AttrNotSet())
+   v isa _AttrNotSet || return v
    return f()
 end
 
@@ -234,7 +244,11 @@ end
 """
 function get_attribute!(f, G::Any, attr::Symbol)
    D = _get_attributes!(G)
-   return Base.get!(f, D, attr)
+   v = get(D, attr, _AttrNotSet())
+   v isa _AttrNotSet || return v
+   v = f()
+   D[attr] = v
+   return v
 end
 
 """
