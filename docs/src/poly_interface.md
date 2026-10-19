@@ -205,10 +205,6 @@ Note that this function is not required to normalise the polynomial and is not
 necessarily useful to the user, but is used extensively by the generic functionality in
 AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
-```@docs
-normalise(::PolynomialElem, ::Int)
-```
-
 ```julia
 fit!(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
