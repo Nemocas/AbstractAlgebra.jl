@@ -373,8 +373,8 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-characteristic(R::LaurentSeriesRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::LaurentSeriesRing) = is_known(characteristic, base_ring(R))
+characteristic(R::Union{LaurentSeriesRing, LaurentSeriesField}) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::Union{LaurentSeriesRing, LaurentSeriesField}) = is_known(characteristic, coefficient_ring(R))
 
 ###############################################################################
 #
@@ -862,8 +862,8 @@ end
 @doc raw"""
     shift_left(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+Return the Laurent series $x$ shifted left by $n$ terms, i.e. multiplied by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
@@ -875,8 +875,8 @@ end
 @doc raw"""
     shift_right(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+Return the Laurent series $x$ shifted right by $n$ terms, i.e. divided by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)

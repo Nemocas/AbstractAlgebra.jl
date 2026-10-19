@@ -44,7 +44,7 @@ The base ring can be queried using `base_ring`.
 ### Calling a matrix algebra
 
 ```@docs
-Generic.MatRing
+MatRing
 ```
 
 

@@ -1,4 +1,4 @@
-include("generic/MatRing-test.jl")
+include("MatRing-test.jl")
 include("generic/NCPoly-test.jl")
 include("generic/FreeAssociativeAlgebra-test.jl")
 include("generic/FreeAssociativeAlgebraGroebner-test.jl")

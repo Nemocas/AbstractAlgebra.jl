@@ -665,7 +665,7 @@ julia> Generic.collength(y, 2,4)
 0
 ```
 """
-collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
+collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, Int(i)+1:lastindex(Y.part)))
 
 @doc raw"""
     hooklength(Y::YoungTableau, i, j)
@@ -739,6 +739,13 @@ end
 ##############################################################################
 
 SkewDiagram(lambda::AbstractVector{<:Integer}, mu::AbstractVector{<:Integer}) = SkewDiagram(Partition(lambda), Partition(mu))
+
+# mixed eltypes: promote so the inner constructor matches
+function SkewDiagram(lambda::Partition{S}, mu::Partition{T}) where {S, T}
+   R = promote_type(S, T)
+   return SkewDiagram(Partition(lambda.n, convert(Vector{R}, lambda.part), false),
+                      Partition(mu.n, convert(Vector{R}, mu.part), false))
+end
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
 @doc raw"""

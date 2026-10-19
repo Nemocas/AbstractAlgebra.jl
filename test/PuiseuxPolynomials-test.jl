@@ -50,6 +50,10 @@ import AbstractAlgebra: Generic.normalize!
         K, _ = laurent_polynomial_ring(QQ, ["t1","t2","t3"])
         Kt, _ = puiseux_polynomial_ring(QQ,["t1","t2","t3"])
         @test Kt.baseRing == K
+
+        Kt, _ = puiseux_polynomial_ring(GF(7), ["t"])
+        @test characteristic(Kt) == 7
+        @test AbstractAlgebra.is_known(characteristic, Kt)
     end
 
     @testset "Getters" begin

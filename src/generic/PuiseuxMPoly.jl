@@ -51,7 +51,8 @@ coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
 is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
 
-characteristic(R::PuiseuxMPolyRing) = characteristic(base_ring(R))
+characteristic(R::PuiseuxMPolyRing) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::PuiseuxMPolyRing) = is_known(characteristic, coefficient_ring(R))
 
 symbols(R::PuiseuxMPolyRing) = symbols(base_ring(R))
 

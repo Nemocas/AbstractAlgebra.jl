@@ -23,8 +23,9 @@ base_ring(a::MatSpaceView{T}) where T = a.base_ring::parent_type(T)
 number_of_rows(a::MatSpaceElem) = size(a.entries, 1)
 number_of_columns(a::MatSpaceElem) = size(a.entries, 2)
 
-number_of_rows(a::MatSpaceView) = size(a.entries, 1)
-number_of_columns(a::MatSpaceView) = size(a.entries, 2)
+# `::Int`: `size` of a `SubArray` with abstract index types does not infer
+number_of_rows(a::MatSpaceView) = size(a.entries, 1)::Int
+number_of_columns(a::MatSpaceView) = size(a.entries, 2)::Int
 
 
 Base.@propagate_inbounds getindex(a::Mat, r::Int, c::Int) = a.entries[r, c]

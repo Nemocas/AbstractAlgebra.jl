@@ -97,6 +97,12 @@ function is_constant(a::LaurentMPolyRingElem)
     return iszero(a) || iszero(first(exponent_vectors(a)))
 end
 
+vars(p::LaurentMPolyRingElem) = [gen(parent(p), i) for i in var_indices(p)]
+
+is_univariate(p::LaurentMPolyRingElem) = length(var_indices(p)) <= 1
+
+degree(f::T, x::T) where T <: LaurentMPolyRingElem = degree(f, var_index(x))
+
 ###############################################################################
 #
 #   Derivative
@@ -107,6 +113,40 @@ function derivative(a::LaurentMPolyRingElem{T}, x::LaurentMPolyRingElem{T}) wher
    check_parent(a, x)
    return derivative(a, var_index(x))
 end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+# The values are coerced into the parent of `a`; a variable occurring with a
+# negative exponent needs a unit value.
+function evaluate(a::LaurentMPolyRingElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+   R = parent(a)
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
+   @req all(i -> 1 <= i <= nvars(R), vars) "Variable index not in range"
+
+   subs = gens(R)
+   for (i, v) in zip(vars, vals)
+      subs[i] = R(v)
+   end
+   return evaluate(a, subs)
+end
+
+function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where T <: LaurentMPolyRingElem
+   return evaluate(a, [var_index(x) for x in vars], vals)
+end
+
+###############################################################################
+#
+#   Change coefficient ring
+#
+###############################################################################
+
+change_coefficient_ring(R::Ring, p::LaurentMPolyRingElem; kwargs...) =
+   change_base_ring(R, p; kwargs...)
 
 ###############################################################################
 #

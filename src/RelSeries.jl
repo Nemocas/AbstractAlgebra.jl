@@ -610,7 +610,7 @@ end
     shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 
 # Examples
 
@@ -657,7 +657,7 @@ end
     shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 
 # Examples
 

@@ -205,7 +205,7 @@ The available algorithms/normal forms are
 
 To select a normal form type for rings of type `NewRing`, implement the function
 ```julia
-Solve.matrix_normal_form_type(::NewRing) = Bla()
+Solve.matrix_normal_form_type(::Type{<:NewRing}) = Bla()
 ```
 where `Bla <: MatrixNormalFormTrait`.
 A new type trait can be added via
@@ -265,8 +265,8 @@ object.
 First of all, one needs to implement the function
 
 ```julia
-function Solve.solve_context_type(::NewRing)
-  return Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+function Solve.solve_context_type(T::Type{<:NewRing})
+  return Solve.solve_context_type(::NormalFormTrait, elem_type(T))
 end
 ```
 

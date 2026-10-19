@@ -1,3 +1,13 @@
+# Nemo's univariate `factor` returns a `Fac` in arr form; stub one so its
+# consumers can be tested without Nemo. Only monomials are factored for real.
+function AbstractAlgebra.factor(p::Generic.Poly{Rational{BigInt}})
+   Kx = parent(p)
+   lc = leading_coefficient(p)
+   q = divexact(p, lc)
+   fac = is_monomial(q) ? [gen(Kx) => degree(q)] : [q => 1]
+   return Fac(Kx(lc), fac)
+end
+
 @testset "MPolyFactor" begin
    # not much to test because we would need working univariate factorization
    @testset "hlift_have_lcs" begin
@@ -39,6 +49,46 @@
       @test ok
       @test degrees(content) == [0, 1]
       @test p == content*prod(fac)
+   end
+
+   @testset "make_bases_coprime!" begin
+
+      R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
+      P = Pair{elem_type(R), Int}
+
+      # a, b: squarefree factorizations. Afterwards the bases across a and b
+      # must be equal or coprime, those within each pairwise coprime, and the
+      # products unchanged.
+      function check(a, b)
+         A = prod(p^e for (p, e) in a)
+         B = prod(p^e for (p, e) in b)
+         AbstractAlgebra.MPolyFactor.make_bases_coprime!(a, b)
+         @test A == prod(p^e for (p, e) in a)
+         @test B == prod(p^e for (p, e) in b)
+         for (p, _) in a, (q, _) in b
+            @test p == q || is_constant(gcd(p, q))
+         end
+         for c in (a, b), i in 1:length(c), j in i+1:length(c)
+            @test is_constant(gcd(c[i].first, c[j].first))
+         end
+      end
+
+      check(P[x*(x + y) => 1, y => 1], P[x => 2])
+      check(P[y => 1, x*(x + y) => 1], P[x => 2])
+      check(P[y => 1, x*(x + y) => 1], P[x => 2, y + 1 => 3])
+      check(P[x*(x + y) => 1, y*(y + 1) => 2], P[(x + y)*(y + 1) => 3, x*y => 1])
+   end
+
+   @testset "mfactor_irred_univar" begin
+
+      R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+
+      ok, f = AbstractAlgebra.MPolyFactor.mfactor_irred_univar(2*y^2 + 1, 2)
+      @test ok
+      @test f == [y^2 + 1//2]
+
+      ok, f = AbstractAlgebra.MPolyFactor.mfactor_irred_univar(3*y^2, 2)
+      @test !ok
    end
 
    R, (x, y) = ZZ[:x,:y]
