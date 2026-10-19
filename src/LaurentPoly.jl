@@ -127,7 +127,7 @@ exponent_vectors(p::LaurentPolyRingElem) = ([i] for i in degrees_range(p))
 function tail(p::LaurentPolyRingElem)
    dr = degrees_range(p)
    isempty(dr) && return zero(parent(p))
-   return set_coefficient!(deepcopy(p), last(dr), zero(coefficient_ring(p)))
+   return set_coefficient!(mutable_copy(p), last(dr), zero(coefficient_ring(p)))
 end
 
 gens(R::LaurentPolyRing) = [gen(R)]

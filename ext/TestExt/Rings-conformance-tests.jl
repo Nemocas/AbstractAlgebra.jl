@@ -770,9 +770,9 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             # an exponent vector not occurring in f
             e = [total_degree(f) + 1, 0]
             @test is_zero(coeff(f, e))
-            @test setcoeff!(deepcopy(f), e, R(3)) == f + 3*x^e[1]
+            @test setcoeff!(mutable_copy(f), e, R(3)) == f + 3*x^e[1]
             if length(f) > 0
-               @test setcoeff!(deepcopy(f), es[1], R(0)) == f - ts[1]
+               @test setcoeff!(mutable_copy(f), es[1], R(0)) == f - ts[1]
             end
          end
       end
