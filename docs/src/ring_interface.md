@@ -210,7 +210,10 @@ Base.hash(f::MyElem, h::UInt)
 ```
 
 Return a hash for the object $f$ of type `UInt`. This is used as a hopefully cheap way
-to distinguish objects that differ arithmetically.
+to distinguish objects that differ arithmetically. It must satisfy Julia's requirement
+that `isequal(f, g)` implies `hash(f) == hash(g)`. It need not depend on the parent,
+and need not agree with the hash of an element of another ring that `f` is equal to
+under `==`.
 
 If the object has components, e.g. the coefficients of a polynomial or elements of a
 matrix, these should be hashed recursively, passing the same parameter `h` to all
@@ -472,15 +475,22 @@ Return $f + g$, $f - g$ or $fg$, respectively.
 
 Return `true` if $f$ and $g$ are arithmetically equal. In the case where the two
 elements are inexact, the function returns `true` if they agree to the minimum precision
-of the two.
+of the two. If the parents of $f$ and $g$ differ, throw an error, e.g. via
+`check_parent(f, g)`, rather than returning `false`.
 
 ```
 isequal(f::MyElem, g::MyElem)
 ```
 
-For exact rings, this should return the same thing as `==` above. For inexact rings,
-this returns `true` only if the two elements are arithmetically equal and have the same
-precision.
+If the parents of $f$ and $g$ differ, return `false` (e.g. via
+`check_parent(f, g, false)`) and do not throw: `Dict` and `Set` compare keys with
+`isequal`. Otherwise, for exact rings, this should return the same thing as `==` above;
+the generic fallback does that, so exact rings need not implement `isequal`. For inexact
+rings, this returns `true` only if the two elements are arithmetically equal and have the
+same precision; components such as coefficients are compared with `isequal`.
+
+`isequal` must be an equivalence relation, and `isequal(f, g)` must imply
+`hash(f) == hash(g)`.
 
 ### Powering
 
@@ -915,7 +925,7 @@ function ==(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
 end
 
 function isequal(f::ConstPoly{T}, g::ConstPoly{T}) where T <: RingElement
-   check_parent(f, g)
+   check_parent(f, g, false) || return false
    return isequal(f.c, g.c)
 end
 

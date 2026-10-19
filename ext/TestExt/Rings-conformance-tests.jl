@@ -141,6 +141,7 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             A = deepcopy(a)
             @test !ismutable(a) || a !== A
             @test equality(a, A)
+            @test isequal(a, A)
             @test hash(a) == hash(A)
             @test parent(a) === R
             @test sprint(show, "text/plain", a) isa String

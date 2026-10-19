@@ -111,6 +111,9 @@ then $f == g$, $f == h$ and $g == h$, but `isequal(f, g)`, `isequal(f, h)` and
 `isequal(g, h)` would all return `false`. However, if $k = x^2 + O(x^7)$ then
 `isequal(f, k)` would return `true`.
 
+As for all ring elements, `isequal` returns `false` for series from different
+rings, while `==` throws an error for them; see [Equality and hashing](@ref).
+
 There are a number of technicalities that must be observed when working with Puiseux
 series. As these are the same as for the other series rings in AbstractAlgebra.jl,
 we refer the reader to the documentation of series rings for information about these

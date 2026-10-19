@@ -215,6 +215,7 @@ end
 ###############################################################################
 
 function ==(a::FactoredFracFieldElem{T}, b::FactoredFracFieldElem{T}) where T
+    check_parent(a, b)
     (g, x, y) = _gcdhelper(a, b)
     return x == y
 end

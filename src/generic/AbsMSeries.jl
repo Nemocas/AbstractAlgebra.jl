@@ -487,7 +487,7 @@ function ==(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
 end
 
 function isequal(x::AbsMSeries{T}, y::AbsMSeries{T}) where T <: RingElement
-    check_parent(x, y)
+    check_parent(x, y, false) || return false
     R = parent(x)
     if R.weighted_prec == -1
         prec = x.prec

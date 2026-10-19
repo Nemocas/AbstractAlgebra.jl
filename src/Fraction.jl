@@ -416,13 +416,11 @@ end
 @doc raw"""
     ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
 
-Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
-that power series to different precisions may still be arithmetically
-equal to the minimum of the two precisions.
+Return `true` if $x == y$ arithmetically, otherwise return `false`. Throw an
+error if the parents differ.
 """
 function ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   b  = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    return (denominator(x, false) == denominator(y, false) &&
            numerator(x, false) == numerator(y, false)) ||
@@ -435,15 +433,14 @@ end
 @doc raw"""
     isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
 
-Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-useful in cases where the numerators and denominators of the fractions are
-inexact, e.g. power series. Only if the power series are precisely the same,
-to the same precision, are they declared equal by this function.
+Return `true` if $x == y$ exactly, otherwise return `false`. Elements with
+different parents are not equal. This function is useful in cases where the
+numerators and denominators of the fractions are inexact, e.g. power series.
+Only if the power series are precisely the same, to the same precision, are
+they declared equal by this function.
 """
 function isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
-   if parent(x) != parent(y)
-      return false
-   end
+   check_parent(x, y, false) || return false
    return isequal(numerator(x, false)*denominator(y, false),
                   denominator(x, false)*numerator(y, false))
 end

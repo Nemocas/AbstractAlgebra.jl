@@ -193,26 +193,25 @@ end
 @doc raw"""
     ==(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
 
-Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
-that power series to different precisions may still be arithmetically
-equal to the minimum of the two precisions.
+Return `true` if $a == b$ arithmetically, otherwise return `false`. Throw an
+error if the moduli differ.
 """
 function ==(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
+   check_parent(a, b)
    return data(a) == data(b)
 end
 
 @doc raw"""
     isequal(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
 
-Return `true` if $a == b$ exactly, otherwise return `false`. This function is
-useful in cases where the data of the residues are inexact, e.g. power series
-Only if the power series are precisely the same, to the same precision, are
-they declared equal by this function.
+Return `true` if $a == b$ exactly, otherwise return `false`. Elements with
+different parents are not equal. This function is useful in cases where the
+data of the residues are inexact, e.g. power series. Only if the power series
+are precisely the same, to the same precision, are they declared equal by this
+function.
 """
 function isequal(a::ResFieldElem{T}, b::ResFieldElem{T}) where {T <: RingElement}
-   check_parent(a, b)
+   check_parent(a, b, false) || return false
    return isequal(data(a), data(b))
 end
 

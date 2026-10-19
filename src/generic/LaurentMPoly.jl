@@ -182,8 +182,8 @@ end
 #
 ###############################################################################
 
-function ==(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
-    check_parent(a, b, false) || return false
+function ==(a::T, b::T) where T <: LaurentMPolyWrap
+    check_parent(a, b)
     if a.mindegs == b.mindegs
         return a.mpoly == b.mpoly
     end

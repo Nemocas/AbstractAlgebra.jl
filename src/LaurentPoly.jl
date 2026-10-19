@@ -178,8 +178,10 @@ end
 #
 ###############################################################################
 
-==(p::LaurentPolyRingElem, q::LaurentPolyRingElem) =
-   all(i -> coeff(p, i) == coeff(q, i), terms_degrees(p, q))
+function ==(p::T, q::T) where T <: LaurentPolyRingElem
+   check_parent(p, q)
+   return all(i -> coeff(p, i) == coeff(q, i), terms_degrees(p, q))
+end
 
 ###############################################################################
 #

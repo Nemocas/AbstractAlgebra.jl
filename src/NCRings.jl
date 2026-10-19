@@ -101,6 +101,10 @@ function ==(x::NCRingElem, y::NCRingElem)
 
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
 
+# `isequal` is what `Dict` and `Set` compare keys with, so it returns `false`
+# for elements with incompatible parents instead of throwing like `==`
+isequal(x::NCRingElem, y::NCRingElem) = check_parent(x, y, false) && x == y
+
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
    xx, yy = promote(x, y)
    # if divexact_left is not implemented, we need to break the recursion;

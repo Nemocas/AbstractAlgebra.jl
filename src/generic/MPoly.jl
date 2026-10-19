@@ -1990,8 +1990,7 @@ end
 ###############################################################################
 
 function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   fl = check_parent(a, b, false)
-   !fl && return false
+   check_parent(a, b)
    if a.length != b.length
       return false
    end

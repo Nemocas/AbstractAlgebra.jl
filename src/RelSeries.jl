@@ -851,13 +851,12 @@ end
 @doc raw"""
     ==(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
 
-Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
-that power series to different precisions may still be arithmetically
-equal to the minimum of the two precisions.
+Return `true` if $x == y$ arithmetically, otherwise return `false`. Throw an
+error if the parents differ. Recall that power series to different precisions
+may still be arithmetically equal to the minimum of the two precisions.
 """
 function ==(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
-   b = check_parent(x, y, false)
-   !b && return false
+   check_parent(x, y)
 
    xval = valuation(x)
    xprec = precision(x)
@@ -886,14 +885,12 @@ end
 @doc raw"""
     isequal(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
 
-Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
-power series are precisely the same, to the same precision, are they declared
-equal by this function.
+Return `true` if $x == y$ exactly, otherwise return `false`. Elements with
+different parents are not equal. Only if the power series are precisely the
+same, to the same precision, are they declared equal by this function.
 """
 function isequal(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}) where T <: RingElement
-   if parent(x) != parent(y)
-      return false
-   end
+   check_parent(x, y, false) || return false
    if precision(x) != precision(y) || pol_length(x) != pol_length(y) ||
       valuation(x) != valuation(y)
       return false
