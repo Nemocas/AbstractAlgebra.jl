@@ -1160,7 +1160,7 @@ end
          M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
-         p2 = charpoly_danilevsky!(U, M)
+         p2 = AbstractAlgebra.charpoly_danilevsky!(U, M)
 
          @test p1 == p2
       end
@@ -1169,7 +1169,7 @@ end
          M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
-         p2 = charpoly_danilevsky_ff!(U, M)
+         p2 = AbstractAlgebra.charpoly_danilevsky_ff!(U, M)
 
          @test p1 == p2
       end
