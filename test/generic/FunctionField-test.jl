@@ -409,6 +409,17 @@ end
          @test f != g + h
       end
    end
+
+   # elements are stored with a denominator that need not be monic
+   S, y = function_field(P2[3], "y")
+   num, den = numerator(y, false), denominator(y, false)
+   t = gen(parent(den))
+   f = S(num*(t + 1), den*(2t + 2))
+   g = S(num*(t + 1)*3, den*(2t + 2)*3)
+
+   @test f == g
+   @test isequal(f, g)
+   @test hash(f) == hash(g)
 end
 
 @testset "Generic.AbsSimpleFunctionField.adhoc_comparison" begin
