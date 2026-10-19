@@ -132,6 +132,8 @@ function deepcopy_internal(a::RationalFunctionFieldElem, dict::IdDict)
    return R(deepcopy_internal(data(a), dict))
 end
 
+mutable_copy(a::RationalFunctionFieldElem) = parent(a)(mutable_copy(data(a)))
+
 characteristic(R::RationalFunctionField) = characteristic(base_ring(R))
 is_known(::typeof(characteristic), R::RationalFunctionField) = is_known(characteristic, base_ring(R))
 

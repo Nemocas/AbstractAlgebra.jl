@@ -4107,6 +4107,13 @@ end
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
 
+   # writing to a copy of a view leaves the viewed matrix intact
+   V = mutable_copy(N1)
+   @test V isa typeof(N1)
+   @test V == N1
+   V[1, 1] = 100
+   @test M2 == M
+
    for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
      v = @view M[i,j]
      @test v isa Generic.MatSpaceView

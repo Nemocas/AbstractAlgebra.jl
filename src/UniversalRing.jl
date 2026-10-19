@@ -127,6 +127,10 @@ function deepcopy_internal(p::UniversalRingElem, dict::IdDict)
    return UniversalRingElem(deepcopy_internal(data(p), dict), parent(p))
 end
 
+function mutable_copy(p::UniversalRingElem)
+   return UniversalRingElem(mutable_copy(data(p)), parent(p))
+end
+
 Base.copy(f::UniversalRingElem) = UniversalRingElem(copy(data(f)), parent(f))
 
 ###############################################################################

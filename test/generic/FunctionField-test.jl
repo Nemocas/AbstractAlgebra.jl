@@ -155,6 +155,7 @@ end
       h = rand(S, 1:10, -10:10)
 
       @test deepcopy(h) == h
+      @test mutable_copy(h) == h
 
       @test S(numerator(h), denominator(h)) == h
    end

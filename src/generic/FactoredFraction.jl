@@ -83,6 +83,11 @@ function deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <:
                           a.parent)
 end
 
+function mutable_copy(a::FactoredFracFieldElem{T}) where T <: RingElement
+   terms = [FactoredFracTerm{T}(mutable_copy(t.base), t.exp) for t in a.terms]
+   return FactoredFracFieldElem{T}(mutable_copy(a.unit), terms, a.parent)
+end
+
 # the non-expanding hash function would have to normalise the bases, and then
 # either sort the bases or combine the hashes of the bases in a commutative way
 

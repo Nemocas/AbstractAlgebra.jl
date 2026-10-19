@@ -267,6 +267,10 @@ function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: Ri
     return parent(a)(deepcopy_internal(a.data, dict), a.scale)
 end
 
+function mutable_copy(a::PuiseuxSeriesElem{T}) where {T <: RingElement}
+    return parent(a)(mutable_copy(a.data), a.scale)
+end
+
 characteristic(R::Union{PuiseuxSeriesRing, PuiseuxSeriesField}) = characteristic(coefficient_ring(R))
 is_known(::typeof(characteristic), R::Union{PuiseuxSeriesRing, PuiseuxSeriesField}) = is_known(characteristic, coefficient_ring(R))
 

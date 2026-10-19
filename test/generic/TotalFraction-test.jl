@@ -83,6 +83,7 @@ end
    @test is_zero(h*a)
 
    @test deepcopy(S(5, 7)) == S(5, 7)
+   @test mutable_copy(S(5, 7)) == S(5, 7)
 
    @test characteristic(S) == 12
 end

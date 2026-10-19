@@ -390,6 +390,27 @@ const VarName = Union{Symbol, AbstractString, Char}
 ###############################################################################
 
 @doc raw"""
+    mutable_copy(a)
+
+Return a copy of `a` that may be mutated in place by unsafe operators such as
+`add!` and `mul!` without affecting `a`. The parent of `a` is not copied.
+"""
+mutable_copy(a) = deepcopy(a)
+
+# Entries are copied one by one so that aliased entries become distinct.
+function mutable_copy(a::Array{T}) where T
+   isbitstype(T) && return copy(a)
+
+   b = similar(a)
+   for i in eachindex(a)
+      # e.g. matrices created by `similar` have unassigned entries
+      isassigned(a, i) || continue
+      b[i] = mutable_copy(a[i])
+   end
+   return b
+end
+
+@doc raw"""
     zero!(a)
 
 Return `zero(parent(a))`, possibly modifying the object `a` in the process.

@@ -50,4 +50,5 @@ end
 
    @test is_zero(x^15 - 1 - x^15 + 1)
    @test content(24*x + 15) == 3
+   @test mutable_copy(24*x + 15) == 24*x + 15
 end

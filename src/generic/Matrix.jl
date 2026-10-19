@@ -60,6 +60,16 @@ function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingEl
    return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
+function mutable_copy(d::MatSpaceElem{T}) where T <: NCRingElement
+   return MatSpaceElem{T}(base_ring(d), mutable_copy(d.entries))
+end
+
+# A view into a copy of the whole underlying matrix, like `deepcopy`
+function mutable_copy(d::MatSpaceView{T}) where T <: NCRingElement
+   entries = view(mutable_copy(parent(d.entries)), parentindices(d.entries)...)
+   return MatSpaceView(entries, d.base_ring)
+end
+
 function Base.view(A::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
    return MatSpaceView(view(A.entries, rows, cols), A.base_ring)
 end
