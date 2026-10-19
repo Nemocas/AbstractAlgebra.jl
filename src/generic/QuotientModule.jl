@@ -155,7 +155,7 @@ end
 # Reduce the vector v by the relations vrels starting at column start of v
 function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}, start::Int) where T <: RingElement
    R = base_ring(v)
-   v = deepcopy(v) # don't destroy input
+   v = mutable_copy(v) # don't destroy input
    i = 1
    t1 = R()
    for k = 1:length(vrels) # for each relation

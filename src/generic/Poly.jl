@@ -90,7 +90,7 @@ function mutable_copy(a::Poly{T}) where T <: RingElement
    return parent(a)(T[mutable_copy(a.coeffs[i]) for i in 1:length(a)])
 end
 
-Base.copy(f::Poly) = deepcopy(f)
+Base.copy(f::Poly) = mutable_copy(f)
 
 ###############################################################################
 #
@@ -258,10 +258,10 @@ function mul!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where T <: RingElement
       c = set_length!(c, 0)
    else
       if a === c
-         a = deepcopy(a)
+         a = mutable_copy(a)
       end
       if b === c
-         b = deepcopy(b)
+         b = mutable_copy(b)
       end
 
       t = base_ring(a)()
@@ -313,12 +313,12 @@ function add!(c::Poly{T}, a::Poly{T}, b::Poly{T}) where T <: RingElement
    end
    while i <= lena
       # mutating operators must ensure they don't introduce new aliasing
-      c = setcoeff!(c, i - 1, deepcopy(coeff(a, i - 1)))
+      c = setcoeff!(c, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
       # mutating operators must ensure they don't introduce new aliasing
-      c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
+      c = setcoeff!(c, i - 1, mutable_copy(coeff(b, i - 1)))
       i += 1
    end
    c = set_length!(c, normalise(c, len))

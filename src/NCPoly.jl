@@ -184,11 +184,11 @@ function +(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(b, i - 1)))
       i += 1
    end
    z = set_length!(z, normalise(z, i - 1))
@@ -208,7 +208,7 @@ function -(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
@@ -274,7 +274,7 @@ function *(a::NCPolyRingElem{T}, b::T) where T <: NCRingElem
 end
 
 function +(a::T, b::NCPolyRingElem{T}) where {T <: NCRingElem}
-   z = deepcopy(b)
+   z = mutable_copy(b)
    len = length(z)
    z = setcoeff!(z, 0, a + coeff(b, 0))
    z = set_length!(z, normalise(z, len))
@@ -309,9 +309,9 @@ function ^(a::NCPolyRingElem{T}, b::Int) where T <: NCRingElem
    if is_gen(a)
       z = R()
       fit!(z, b + 1)
-      z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
+      z = setcoeff!(z, b, mutable_copy(coeff(a, 1)))
       for i = 1:b
-         z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
+         z = setcoeff!(z, i - 1, mutable_copy(coeff(a, 0)))
       end
       z = set_length!(z, b + 1)
       return z
@@ -322,7 +322,7 @@ function ^(a::NCPolyRingElem{T}, b::Int) where T <: NCRingElem
    elseif length(a) == 1
       return R(coeff(a, 0)^b)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0

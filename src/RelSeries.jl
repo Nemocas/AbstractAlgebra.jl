@@ -47,7 +47,7 @@ this is returned as a `Symbol` not a `String`.
 """
 var(a::SeriesRing) = a.S
 
-Base.copy(a::SeriesElem) = deepcopy(a)
+Base.copy(a::SeriesElem) = mutable_copy(a)
 
 ###############################################################################
 #
@@ -128,7 +128,7 @@ function _set_precision_raw!(a::SeriesElem, prec::Int)
    return a
 end
 
-set_precision(a::SeriesElem, i::Int) = set_precision!(deepcopy(a), i)
+set_precision(a::SeriesElem, i::Int) = set_precision!(mutable_copy(a), i)
 
 function set_precision(f::PolyRingElem{T}, n::Int) where {T<:SeriesElem}
    g = parent(f)()
@@ -434,7 +434,7 @@ function +(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
    z = set_valuation!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(b, i - 1)))
       end
       for i = lenb + 1:min(vala - valb, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -443,14 +443,14 @@ function +(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
          z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) + polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - vala + valb - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - vala + valb - 1)))
       end
       for i = lena + vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(b, i - 1)))
       end
    else
       for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - 1)))
       end
       for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -459,10 +459,10 @@ function +(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1) + polcoeff(b, i - valb + vala - 1))
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(b, i - valb + vala - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(b, i - valb + vala - 1)))
       end
       for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - 1)))
       end
    end
    z = set_length!(z, normalise(z, lenz))
@@ -497,14 +497,14 @@ function -(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
          z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) - polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - vala + valb - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - vala + valb - 1)))
       end
       for i = lena + vala - valb + 1:lenb
          z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
       end
    else
       for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - 1)))
       end
       for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
@@ -516,7 +516,7 @@ function -(a::RelPowerSeriesRingElem{T}, b::RelPowerSeriesRingElem{T}) where T <
          z = setcoeff!(z, i - 1, -polcoeff(b, i - valb + vala - 1))
       end
       for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, deepcopy(polcoeff(a, i - 1)))
+         z = setcoeff!(z, i - 1, mutable_copy(polcoeff(a, i - 1)))
       end
    end
    z = set_length!(z, normalise(z, lenz))
@@ -743,7 +743,7 @@ julia> k = truncate(d, 5)
 ```
 """
 function truncate(a::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
-   return truncate!(deepcopy(a), n)
+   return truncate!(mutable_copy(a), n)
 end
 
 # Intended only for internal use, does not renormalize, assumes n >= 0
@@ -807,7 +807,7 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
       fit!(z, 1)
       z = _set_precision_raw!(z, b + precision(a) - 1)
       z = set_valuation!(z, b)
-      z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
+      z = setcoeff!(z, 0, mutable_copy(polcoeff(a, 0)))
       z = set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
@@ -817,7 +817,7 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
       z = set_valuation!(z, iszero(c) ? precision(z) : b*valuation(a))
       return z
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -961,7 +961,7 @@ function divexact(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}; ch
       x = shift_right(x, v2)
       y = shift_right(y, v2)
    else
-      x = deepcopy(x)
+      x = mutable_copy(x)
    end
    y = truncate(y, precision(x))
    res = parent(x)()
@@ -993,7 +993,7 @@ function divexact(x::RelPowerSeriesRingElem{T}, y::RelPowerSeriesRingElem{T}; ch
       x = shift_right(x, v2)
       y = shift_right(y, v2)
    else
-      x = deepcopy(x)
+      x = mutable_copy(x)
    end
    y = truncate(y, precision(x))
    return x*inv(y)
@@ -1464,7 +1464,7 @@ function Base.exp(a::RelPowerSeriesRingElem{T}) where T <: FieldElement
    R = base_ring(a)
    c = one(R)
    if valuation(a) == 0
-      a = deepcopy(a)
+      a = mutable_copy(a)
       c = exp(coeff(a, 0))
       a = setcoeff!(a, 0, R())
    end

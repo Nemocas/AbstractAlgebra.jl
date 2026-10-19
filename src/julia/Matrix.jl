@@ -68,7 +68,7 @@ Array(A::MatrixElem{T}) where {T<:NCRingElement} = Matrix(A)
 
 function swap_rows(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= nrows(a) && 1 <= j <= nrows(a)) || throw(BoundsError())
-   b = deepcopy(a)
+   b = mutable_copy(a)
    swap_rows!(b, i, j)
    return b
 end
@@ -84,7 +84,7 @@ end
 
 function swap_cols(a::Matrix{T}, i::Int, j::Int) where T <: NCRingElement
    (1 <= i <= ncols(a) && 1 <= j <= ncols(a)) || throw(BoundsError())
-   b = deepcopy(a)
+   b = mutable_copy(a)
    swap_cols!(b, i, j)
    return b
 end

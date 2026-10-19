@@ -222,7 +222,7 @@ function mul!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) whe
       gd = gcd(n1, d2)
       if isone(gd)
          c.num = n1*n2
-         c.den = deepcopy(d2)
+         c.den = mutable_copy(d2)
       else
          c.num = divexact(n1, gd)*n2
          c.den = divexact(d2, gd)
@@ -231,7 +231,7 @@ function mul!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) whe
       gd = gcd(n2, d1)
       if isone(gd)
          c.num = n2*n1
-         c.den = deepcopy(d1)
+         c.den = mutable_copy(d1)
       else
          c.num = divexact(n2, gd)*n1
          c.den = divexact(d1, gd)
@@ -261,11 +261,11 @@ function add!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) whe
    if d1 == d2
       c.num = n1 + n2
       if isone(d1)
-         c.den = deepcopy(d1)
+         c.den = mutable_copy(d1)
       else
          gd = gcd(c.num, d1)
          if isone(gd)
-            c.den = deepcopy(d1)
+            c.den = mutable_copy(d1)
          else
             c.num = divexact(c.num, gd)
             c.den = divexact(d1, gd)
@@ -273,10 +273,10 @@ function add!(c::FracFieldElem{T}, a::FracFieldElem{T}, b::FracFieldElem{T}) whe
       end
    elseif isone(d1)
       c.num = n1*d2 + n2
-      c.den = deepcopy(d2)
+      c.den = mutable_copy(d2)
    elseif isone(d2)
       c.num = n1 + n2*d1
-      c.den = deepcopy(d1)
+      c.den = mutable_copy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)

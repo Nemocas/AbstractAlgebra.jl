@@ -158,7 +158,7 @@ end
 ###############################################################################
 
 function -(a::FracElem)
-   return parent(a)(-numerator(a, false), deepcopy(denominator(a, false)))
+   return parent(a)(-numerator(a, false), mutable_copy(denominator(a, false)))
 end
 
 ###############################################################################
@@ -176,11 +176,11 @@ function +(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
-         rden = deepcopy(d1)
+         rden = mutable_copy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = deepcopy(d1)
+            rden = mutable_copy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -188,10 +188,10 @@ function +(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
       end
    elseif isone(d1)
       rnum = n1*d2 + n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 + n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)
@@ -223,11 +223,11 @@ function -(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    if d1 == d2
       rnum = n1 - n2
       if isone(d1)
-         rden = deepcopy(d1)
+         rden = mutable_copy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = deepcopy(d1)
+            rden = mutable_copy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -235,10 +235,10 @@ function -(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
       end
    elseif isone(d1)
       rnum = n1*d2 - n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 - n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)
@@ -274,7 +274,7 @@ function *(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
       gd = gcd(n1, d2)
       if isone(gd)
          n = n1*n2
-         d = deepcopy(d2)
+         d = mutable_copy(d2)
       else
          n = divexact(n1, gd)*n2
          d = divexact(d2, gd)
@@ -283,7 +283,7 @@ function *(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
       gd = gcd(n2, d1)
       if isone(gd)
          n = n2*n1
-         d = deepcopy(d1)
+         d = mutable_copy(d1)
       else
          n = divexact(n2, gd)*n1
          d = divexact(d1, gd)
@@ -364,7 +364,7 @@ end
 function +(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 +(a::FracElem, b::Rational) = return a + parent(a)(b)
@@ -372,7 +372,7 @@ end
 function -(a::FracElem, b::Union{Integer, AbstractFloat})
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 -(a::FracElem, b::Rational) = return a - parent(a)(b)
@@ -382,7 +382,7 @@ end
 function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
-   return parent(b)(n, deepcopy(d))
+   return parent(b)(n, mutable_copy(d))
 end
 
 -(a::Rational, b::FracElem) = return parent(b)(a) - b
@@ -390,13 +390,13 @@ end
 function +(a::FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 function -(a::FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 +(a::T, b::FracElem{T}) where {T <: RingElem} = b + a
@@ -404,7 +404,7 @@ end
 function -(a::T, b::FracElem{T}) where {T <: RingElem}
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
-   return parent(b)(n, deepcopy(d))
+   return parent(b)(n, mutable_copy(d))
 end
 
 ###############################################################################
@@ -496,8 +496,8 @@ Return the inverse of the fraction $a$.
 """
 function Base.inv(a::FracElem)
    iszero(numerator(a, false)) && throw(NotInvertibleError(a))
-   return parent(a)(deepcopy(denominator(a, false)),
-                    deepcopy(numerator(a, false)))
+   return parent(a)(mutable_copy(denominator(a, false)),
+                    mutable_copy(numerator(a, false)))
 end
 
 ###############################################################################
@@ -519,7 +519,7 @@ function divexact(a::FracElem{T}, b::FracElem{T}; check::Bool=true) where {T <: 
       gd = gcd(n1, n2)
       if isone(gd)
          n = n1*d2
-         d = deepcopy(n2)
+         d = mutable_copy(n2)
       else
          n = divexact(n1, gd; check=check)*d2
          d = divexact(n2, gd; check=check)
@@ -528,7 +528,7 @@ function divexact(a::FracElem{T}, b::FracElem{T}; check::Bool=true) where {T <: 
       gd = gcd(d2, d1)
       if isone(gd)
          n = d2*n1
-         d = deepcopy(d1)
+         d = mutable_copy(d1)
       else
          n = divexact(d2, gd; check=check)*n1
          d = divexact(d1, gd; check=check)
@@ -784,7 +784,7 @@ function remove(z::FracElem{T}, p::T) where {T <: RingElement}
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z, false), p)
    w, n = remove(numerator(z, false), p)
-   return w-v, parent(z)(deepcopy(n), deepcopy(d))
+   return w-v, parent(z)(mutable_copy(n), mutable_copy(d))
 end
 
 @doc raw"""

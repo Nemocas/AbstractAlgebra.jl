@@ -265,7 +265,7 @@ function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   @assert size(b) == size(c)
   R = base_ring(b)
   @assert base_ring(c) === R
-  a = deepcopy(b)
+  a = mutable_copy(b)
   if nrows(c) >= ncols(c)
     for i in 1:ncols(c)
       add_one!(a, c.s+i-1, i)

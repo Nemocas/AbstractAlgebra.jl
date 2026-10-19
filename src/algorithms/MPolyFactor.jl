@@ -236,7 +236,7 @@ function pfracinit(
   I = pfracinfo{E}(xalphas, betas, inv_prod_betas1, prod_betas_coeffs,
                                                           deltas, delta_coeffs)
   for i in 1:r
-    I.betas[1+l][i] = deepcopy(B[i])
+    I.betas[1+l][i] = mutable_copy(B[i])
   end
   for j in l:-1:1
     for i in 1:r

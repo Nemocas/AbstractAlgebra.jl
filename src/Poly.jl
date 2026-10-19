@@ -58,7 +58,7 @@ is_known(::typeof(characteristic), R::PolyRing) = is_known(characteristic, coeff
 is_finite(R::PolyRing) = is_trivial(R)
 is_known(::typeof(is_finite), R::PolyRing) = is_known(is_trivial, R)
 
-Base.copy(a::PolyRingElem) = deepcopy(a)
+Base.copy(a::PolyRingElem) = mutable_copy(a)
 
 ###############################################################################
 #
@@ -577,11 +577,11 @@ function +(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(b, i - 1)))
       i += 1
    end
    z = set_length!(z, normalise(z, i - 1))
@@ -601,7 +601,7 @@ function -(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
+      z = setcoeff!(z, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
@@ -860,9 +860,9 @@ function ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
    if is_gen(a)
       z = R()
       fit!(z, b + 1)
-      z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
+      z = setcoeff!(z, b, mutable_copy(coeff(a, 1)))
       for i = 1:b
-         z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
+         z = setcoeff!(z, i - 1, mutable_copy(coeff(a, 0)))
       end
       z = set_length!(z, b + 1)
       return z
@@ -873,7 +873,7 @@ function ^(a::PolyRingElem{T}, b::Int) where T <: RingElement
    elseif length(a) == 1
       return R(coeff(a, 0)^b)
    elseif b == 1
-      return deepcopy(a)
+      return mutable_copy(a)
    else
       if T <: FieldElement && characteristic(base_ring(R)) == 0
          zn = 0
@@ -1181,7 +1181,7 @@ function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: Rin
     r = parent(a)()
     n = degree(a) - degree(b) - n0
     fit!(r, degree(a) - degree(b) + 1)
-    a = deepcopy(a)
+    a = mutable_copy(a)
     da = degree(a)
     R = base_ring(a)
     t = R()
@@ -1375,7 +1375,7 @@ function shift_left!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where {
   len = length(x) + n
   fit!(z, len)
   for i in (length(x) - 1):-1:0
-    z = setcoeff!(z, i + n, deepcopy(coeff(x, i)))
+    z = setcoeff!(z, i + n, mutable_copy(coeff(x, i)))
   end
   for i in 0:(n - 1)
     z = setcoeff!(z, i, zero(coefficient_ring(z)))
@@ -1437,7 +1437,7 @@ function shift_right!(z::PolynomialElem{T}, x::PolynomialElem{T}, n::Int) where 
   len = max(0, length(x) - n)
   fit!(z, len)
   for i in 0:(len - 1)
-    z = setcoeff!(z, i, deepcopy(coeff(x, i + n)))
+    z = setcoeff!(z, i, mutable_copy(coeff(x, i + n)))
   end
   set_length!(z, len)
   return z
@@ -1674,7 +1674,7 @@ function mod(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
       throw(DivideError())
    end
    if length(f) >= length(g)
-      f = deepcopy(f)
+      f = mutable_copy(f)
       b = leading_coefficient(g)
       if !is_one(b)
         g = inv(b)*g
@@ -1706,7 +1706,7 @@ function Base.divrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElem
    if length(f) < length(g)
       return zero(parent(f)), f
    end
-   f = deepcopy(f)
+   f = mutable_copy(f)
    binv = inv(leading_coefficient(g))
    g = divexact(g, leading_coefficient(g))
    qlen = length(f) - length(g) + 1
@@ -1896,7 +1896,7 @@ function divides(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
   if length(f) < length(g)
      return false, parent(f)()
   end
-  f = deepcopy(f)
+  f = mutable_copy(f)
   g_lead = leading_coefficient(g)
   qlen = length(f) - length(g) + 1
   q = parent(f)()
@@ -3421,7 +3421,7 @@ julia> S, y = polynomial_ring(R, :y)
 julia> f = 3x*y^2 + (x + 1)*y + 3
 3*x*y^2 + (x + 1)*y + 3
 
-julia> g = deepcopy(f)
+julia> g = mutable_copy(f)
 3*x*y^2 + (x + 1)*y + 3
 
 julia> roots = [R(1), R(2), R(3)]
@@ -3549,7 +3549,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where T <: RingEle
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
    P = Vector{T}(undef, n)
    for i = 1:n
-      P[i] = deepcopy(y[i])
+      P[i] = mutable_copy(y[i])
    end
    for i = 2:n
       t = P[i - 1]
@@ -3577,7 +3577,7 @@ function interpolate(S::PolyRing, x::Vector{T}, y::Vector{T}) where {T <: ResEle
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
    P = Vector{T}(undef, n)
    for i = 1:n
-      P[i] = deepcopy(y[i])
+      P[i] = mutable_copy(y[i])
    end
    for i = 2:n
       t = P[i - 1]

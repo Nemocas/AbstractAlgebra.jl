@@ -151,7 +151,7 @@ end
 
 function -(a::TotFrac)
    R = parent(a)
-   return R(-numerator(a, false), deepcopy(denominator(a, false)), false)
+   return R(-numerator(a, false), mutable_copy(denominator(a, false)), false)
 end
 
 ###############################################################################
@@ -168,13 +168,13 @@ function +(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    n2 = numerator(b, false)
    if d1 == d2
       rnum = n1 + n2
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    elseif isone(d1)
       rnum = n1*d2 + n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 + n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       rnum = n1*d2 + n2*d1
       rden = d1*d2
@@ -190,13 +190,13 @@ function -(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    n2 = numerator(b, false)
    if d1 == d2
       rnum = n1 - n2
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    elseif isone(d1)
       rnum = n1*d2 - n2
-      rden = deepcopy(d2)
+      rden = mutable_copy(d2)
    elseif isone(d2)
       rnum = n1 - n2*d1
-      rden = deepcopy(d1)
+      rden = mutable_copy(d1)
    else
       rnum = n1*d2 - n2*d1
       rden = d1*d2
@@ -211,11 +211,11 @@ function *(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    n1 = numerator(a, false)
    n2 = numerator(b, false)
    if n1 == d2
-      n = deepcopy(n2)
-      d = deepcopy(d1)
+      n = mutable_copy(n2)
+      d = mutable_copy(d1)
    elseif n2 == d1
-      n = deepcopy(n1)
-      d = deepcopy(d2)
+      n = mutable_copy(n1)
+      d = mutable_copy(d2)
    else
       n = n1*n2
       d = d1*d2
@@ -233,48 +233,48 @@ function *(a::TotFrac, b::Union{Integer, Rational})
    n = numerator(a, false)
    d = denominator(a, false)
    if b == d
-      return parent(a)(deepcopy(n))
+      return parent(a)(mutable_copy(n))
    end
-   return parent(a)(n*b, deepcopy(d), false)
+   return parent(a)(n*b, mutable_copy(d), false)
 end
 
 function *(a::Union{Integer, Rational}, b::TotFrac)
    n = numerator(b, false)
    d = denominator(b, false)
    if a == d
-      return parent(b)(deepcopy(n))
+      return parent(b)(mutable_copy(n))
    end
-   return parent(b)(a*n, deepcopy(d), false)
+   return parent(b)(a*n, mutable_copy(d), false)
 end
 
 function *(a::TotFrac{T}, b::T) where {T <: RingElem}
    n = numerator(a, false)
    d = denominator(a, false)
    if b == d
-      return parent(a)(deepcopy(n))
+      return parent(a)(mutable_copy(n))
    end
-   return parent(a)(n*b, deepcopy(d), false)
+   return parent(a)(n*b, mutable_copy(d), false)
 end
 
 function *(a::T, b::TotFrac{T}) where {T <: RingElem}
    n = numerator(b, false)
    d = denominator(b, false)
    if a == d
-      return parent(a)(deepcopy(n))
+      return parent(a)(mutable_copy(n))
    end
-   return parent(b)(a*n, deepcopy(d), false)
+   return parent(b)(a*n, mutable_copy(d), false)
 end
 
 function +(a::TotFrac, b::Integer)
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 function -(a::TotFrac, b::Integer, Rational)
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d))
+   return parent(a)(n, mutable_copy(d))
 end
 
 +(a::Integer, b::TotFrac) = b + a
@@ -282,19 +282,19 @@ end
 function -(a::Integer, b::TotFrac)
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
-   return parent(b)(n, deepcopy(d))
+   return parent(b)(n, mutable_copy(d))
 end
 
 function +(a::TotFrac{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) + denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d), false)
+   return parent(a)(n, mutable_copy(d), false)
 end
 
 function -(a::TotFrac{T}, b::T) where {T <: RingElem}
    n = numerator(a, false) - denominator(a, false)*b
    d = denominator(a, false)
-   return parent(a)(n, deepcopy(d), false)
+   return parent(a)(n, mutable_copy(d), false)
 end
 
 +(a::T, b::TotFrac{T}) where {T <: RingElem} = b + a
@@ -302,7 +302,7 @@ end
 function -(a::T, b::TotFrac{T}) where {T <: RingElem}
    n = a*denominator(b, false) - numerator(b, false)
    d = denominator(b, false)
-   return parent(b)(n, deepcopy(d))
+   return parent(b)(n, mutable_copy(d))
 end
 
 ###############################################################################
@@ -355,8 +355,8 @@ exception.
 """
 function Base.inv(a::TotFrac)
    is_zero_divisor(numerator(a, false)) && throw(NotInvertibleError(a))
-   return parent(a)(deepcopy(denominator(a, false)),
-                    deepcopy(numerator(a, false)))
+   return parent(a)(mutable_copy(denominator(a, false)),
+                    mutable_copy(numerator(a, false)))
 end
 
 ###############################################################################
@@ -466,11 +466,11 @@ function mul!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    n1 = numerator(a, false)
    n2 = numerator(b, false)
    if n1 == d2
-      n = deepcopy(n2)
-      d = deepcopy(d1)
+      n = mutable_copy(n2)
+      d = mutable_copy(d1)
    elseif n2 == d1
-      n = deepcopy(n1)
-      d = deepcopy(d2)
+      n = mutable_copy(n1)
+      d = mutable_copy(d2)
    else
       n = n1*n2
       d = d1*d2
@@ -501,10 +501,10 @@ function add!(a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
       else
          a.num = n1*d2 + n2
       end
-      a.den = deepcopy(d2)
+      a.den = mutable_copy(d2)
    elseif isone(d2)
       a.num = add!(a.num, n2*d1)
-      a.den = deepcopy(d1)
+      a.den = mutable_copy(d1)
    else
       a.num = d1*n2 + d2*n1
       a.den = mul!(a.den, a.den, d2)
@@ -524,13 +524,13 @@ function add!(c::TotFrac{T}, a::TotFrac{T}, b::TotFrac{T}) where {T <: RingElem}
    n2 = numerator(b, false)
    if d1 == d2
       c.num = add!(c.num, n1, n2)
-      c.den = deepcopy(d1)
+      c.den = mutable_copy(d1)
    elseif isone(d1)
       c.num = add!(c.num, n1*d2, n2)
-      c.den = deepcopy(d2)
+      c.den = mutable_copy(d2)
    elseif isone(d2)
       c.num = add!(c.num, n1, n2*d1)
-      c.den = deepcopy(d1)
+      c.den = mutable_copy(d1)
    else
       c.num = add!(c.num, n1*d2, n2*d1)
       c.den = mul!(c.den, d1, d2)
