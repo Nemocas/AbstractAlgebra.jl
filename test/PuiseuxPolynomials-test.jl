@@ -54,6 +54,9 @@ import AbstractAlgebra: Generic.normalize!
         Kt, _ = puiseux_polynomial_ring(GF(7), ["t"])
         @test characteristic(Kt) == 7
         @test AbstractAlgebra.is_known(characteristic, Kt)
+
+        @test puiseux_polynomial_ring(QQ, [:t])[1] === puiseux_polynomial_ring(QQ, [:t])[1]
+        @test puiseux_polynomial_ring(QQ, [:t]; cached = false)[1] !== puiseux_polynomial_ring(QQ, [:t])[1]
     end
 
     @testset "Getters" begin
@@ -124,6 +127,8 @@ import AbstractAlgebra: Generic.normalize!
         @test (g)^3 == g^QQ(3)
         @test (g)^1 == g^QQ(1)
         @test (g)^0 == g^QQ(0)
+        @test u^QQ(1//2) == u^(1//2)
+        @test u^QQ(-2//3) == u^(-2//3)
 
         @test is_unit(u^(1//2))
         @test is_unit(K(2))
@@ -199,6 +204,13 @@ import AbstractAlgebra: Generic.normalize!
         @test divides(zero(K), g) == (true, zero(K))
         @test divides(zero(K), zero(K)) == (true, zero(K))
         @test !divides(g, zero(K))[1]
+
+        L, (t,) = puiseux_polynomial_ring(QQ, [:t])
+        @test is_domain_type(elem_type(L))
+        @test gcd(1 - t, 1 - t^(1//2)) == t^(1//2) - 1
+        @test gcd(zero(L), zero(L)) == 0
+        F = fraction_field(L)
+        @test (1 - F(t)) // (1 - F(t^(1//2))) == F(t^(1//2) + 1)
     end
 
     @testset "Conversions" begin
@@ -221,6 +233,21 @@ import AbstractAlgebra: Generic.normalize!
         @test !isless(0,K(-t))
         @test isless(K(t)/K(-1),0)
         @test !isless(0,K(t)/K(-1))
+
+        @test !isless(t, t)
+        @test t <= t
+        @test !isless(K(t), K(t))
+        @test K(t) <= K(t)
+        @test 0 < t^2 < t < t^(1//2) < 1//1000
+        @test t < QQ(1//2) && K(t) < QQ(1//2)
+        @test 1000 < K(1) // K(t)
+
+        # coefficients of type T <: RingElem
+        S, (s,) = puiseux_polynomial_ring(K, [:s])
+        @test 0 < s < K(t)
+
+        Rxy, (x, y) = puiseux_polynomial_ring(QQ, [:x, :y])
+        @test_throws ArgumentError x < y
     end
 
     @testset "Printing" begin

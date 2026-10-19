@@ -5,13 +5,15 @@
 #################################################################################
 
 @doc raw"""
-    puiseux_polynomial_ring(K::Field, variableSymbols::Vector{Symbol})
+    puiseux_polynomial_ring(K::Field, variableSymbols::Vector{Symbol}; cached::Bool = true)
 
 Return a tuple `(R, x)` consisting of the ring `R` of Puiseux polynomials over
 `K` in the given variables and the vector `x` of its generators.
 
 The elements of `R` are finite sums of terms $c x_1^{e_1} \cdots x_n^{e_n}$ with
-$c \in K$ and rational, possibly negative, exponents $e_i$.
+$c \in K$ and rational, possibly negative, exponents $e_i$. If `cached` is
+`false`, the underlying Laurent polynomial ring is not cached, so the result is
+distinct from all other Puiseux polynomial rings.
 
 # Examples
 
@@ -29,8 +31,8 @@ julia> f^2
 x + 4*x^(1//2)*y^(-1//3) + 4*y^(-2//3)
 ```
 """
-function puiseux_polynomial_ring(K::Field, variableSymbols::Vector{Symbol})
-    base_ring, _ = laurent_polynomial_ring(K, variableSymbols)
+function puiseux_polynomial_ring(K::Field, variableSymbols::Vector{Symbol}; cached::Bool = true)
+    base_ring, _ = laurent_polynomial_ring(K, variableSymbols; cached)
     Kt = Generic.PuiseuxMPolyRing(base_ring)
     return Kt, gens(Kt)
 end

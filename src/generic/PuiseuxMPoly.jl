@@ -63,7 +63,33 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
 
-# Document this once #2559 is merged. Refer to https://link.springer.com/chapter/10.1007/978-3-319-32859-1_37 for defintion of ordering of fraction field
+@doc raw"""
+    isless(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+
+Return whether $f < g$ in the ordering of univariate Puiseux polynomials over an
+ordered field in which the variable is positive and smaller than every positive
+element of the field: $f < g$ if and only if the lowest-order term of $g - f$
+has a positive coefficient. The ordering extends to the fraction field of the
+Puiseux polynomial ring; see
+[Joswig et al.](https://link.springer.com/chapter/10.1007/978-3-319-32859-1_37).
+
+Comparisons with integers, rationals and elements of the coefficient field are
+also supported.
+
+# Examples
+
+```jldoctest
+julia> R, (t,) = puiseux_polynomial_ring(QQ, [:t]);
+
+julia> 0 < t^2 < t < t^(1//2) < 1//1000
+true
+
+julia> K = fraction_field(R);
+
+julia> 1000 < K(1) // K(t)
+true
+```
+"""
 function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
     R = parent(f)
     @req ngens(R) == 1 "isless only defined in the univariate case"
@@ -74,8 +100,10 @@ function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <
     return last(collect(coefficients(d))) < 0
 end
 
-isless(f::PuiseuxMPolyRingElem, g::Integer) = isless(f, parent(f)(g))
-isless(g::Integer, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
+isless(f::PuiseuxMPolyRingElem, g::Union{Integer, Rational}) = isless(f, parent(f)(g))
+isless(g::Union{Integer, Rational}, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
+isless(f::PuiseuxMPolyRingElem{T}, g::T) where T <: RingElem = isless(f, parent(f)(g))
+isless(g::T, f::PuiseuxMPolyRingElem{T}) where T <: RingElem = isless(parent(f)(g), f)
 
 function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElement
     R = base_ring(parent(f))
@@ -95,8 +123,10 @@ function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.Fra
     return is_less(num_f*denom_g, num_g*denom_f)
 end
 
-isless(f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}, g::Integer) = isless(f, parent(f)(g))
-isless(g::Integer, f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}) = isless(parent(f)(g), f)
+isless(f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}, g::Union{Integer, Rational}) = isless(f, parent(f)(g))
+isless(g::Union{Integer, Rational}, f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}) = isless(parent(f)(g), f)
+isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}, g::T) where T <: RingElem = isless(f, parent(f)(g))
+isless(g::T, f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElem = isless(parent(f)(g), f)
 
 
 #################################################################################

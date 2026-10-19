@@ -148,12 +148,14 @@ ERROR: ArgumentError: only monomials can be exponentiated to non-integer powers
 divexact(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem; check::Bool = true)
 divexact(f::PuiseuxMPolyRingElem, a::RingElement; check::Bool = true)
 divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
 ```
 
 `divexact` returns the quotient of `f` by a nonzero Puiseux polynomial or
 constant `g`, provided the division is exact. `divides(f, g)` returns a tuple
 `(flag, q)` where `flag` is `true` if $f = qg$ for some Puiseux polynomial $q$;
-otherwise `q` is zero.
+otherwise `q` is zero. `gcd(f, g)` returns a greatest common divisor of `f`
+and `g`; with it, `fraction_field(R)` gives the field of Puiseux fractions.
 
 ```jldoctest
 julia> R, (x, y) = puiseux_polynomial_ring(QQ, ["x", "y"]);
@@ -171,6 +173,20 @@ julia> divides(f^2, f)
 
 julia> divides(x, f)
 (false, 0)
+
+julia> gcd(1 - x, 1 - x^(1//2))
+x^(1//2) - 1
+
+julia> K = fraction_field(R);
+
+julia> (1 - K(x)) // (1 - K(x^(1//2)))
+x^(1//2) + 1
+```
+
+## Ordering
+
+```@docs
+isless(::PuiseuxMPolyRingElem{T}, ::PuiseuxMPolyRingElem{T}) where T <: RingElement
 ```
 
 ## Changing the coefficient ring
