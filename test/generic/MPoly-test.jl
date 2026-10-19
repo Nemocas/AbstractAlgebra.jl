@@ -104,6 +104,14 @@
 
    @test q == 5x^5*y^5
 
+   @test is_zero(term(R1, 0, [3, 4]))
+   @test term(R1, 2, [3, 4]) == 2*x^3*y^4
+   @test term(R1, QQ(2), [3, 4]) == 2*x^3*y^4
+
+   @test monomial(R1, [1, 2]) == x*y^2
+   @test monomial(R1, [2, 2]) == x^2*y^2
+   @test monomial(R1, [0, 2]) == y^2
+
    # test "getindex" syntax
    S, (y, z) = R["y", "z"]
    @test S isa Generic.MPolyRing{Generic.Poly{BigInt}}
@@ -487,6 +495,13 @@ end
    @test is_univariate_with_data(y) == (true, 2)
    @test is_univariate_with_data(R()) == (true, 0)
    @test is_univariate_with_data(x + y) == (false, 0)
+
+   # equal polynomials with different unused capacity in exps
+   f = (x + y) - y
+
+   @test size(f.exps, 2) != size(x.exps, 2)
+   @test f == x
+   @test hash(f) == hash(x)
 end
 
 
@@ -845,8 +860,7 @@ end
    end
 
    # Field of characteristic p
-   for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)]
-      R, = residue_field(ZZ, p)
+   for p in [2, 7, 13, 65537, ZZ(2), ZZ(7), ZZ(37), ZZ(65537)], R in [residue_field(ZZ, p)[1], GF(p)]
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
@@ -854,7 +868,11 @@ end
          S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
          for iter = 1:10
-            f = rand(S, 0:5, 0:100, 0:Int(p))
+            if R isa AbstractAlgebra.GFField
+               f = rand(S, 0:5, 0:100)
+            else
+               f = rand(S, 0:5, 0:100, 0:Int(p))
+            end
 
             s = f^2
 

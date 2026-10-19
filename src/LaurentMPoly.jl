@@ -26,6 +26,9 @@ is_known(::typeof(is_finite), R::LaurentMPolyRing) =
   is_known(is_trivial, coefficient_ring(R)) &&
     (is_trivial(coefficient_ring(R)) || nvars(R) > 0 || is_known(is_finite, coefficient_ring(R)))
 
+is_domain_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_domain_type(T)
+is_exact_type(::Type{<:LaurentMPolyRingElem{T}}) where {T} = is_exact_type(T)
+
 ###############################################################################
 #
 #   String I/O
@@ -58,17 +61,10 @@ function show(io::IO, mime::MIME"text/plain", p::LaurentMPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Multivariate Laurent polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), coefficient_ring(p))
   print(io, Dedent())
@@ -96,6 +92,17 @@ function gens(R::LaurentMPolyRing)
     return [gen(R, i) for i in 1:nvars(R)]
 end
 
+function is_constant(a::LaurentMPolyRingElem)
+    length(a) > 1 && return false
+    return iszero(a) || iszero(first(exponent_vectors(a)))
+end
+
+vars(p::LaurentMPolyRingElem) = [gen(parent(p), i) for i in var_indices(p)]
+
+is_univariate(p::LaurentMPolyRingElem) = length(var_indices(p)) <= 1
+
+degree(f::T, x::T) where T <: LaurentMPolyRingElem = degree(f, var_index(x))
+
 ###############################################################################
 #
 #   Derivative
@@ -106,6 +113,40 @@ function derivative(a::LaurentMPolyRingElem{T}, x::LaurentMPolyRingElem{T}) wher
    check_parent(a, x)
    return derivative(a, var_index(x))
 end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+# The values are coerced into the parent of `a`; a variable occurring with a
+# negative exponent needs a unit value.
+function evaluate(a::LaurentMPolyRingElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+   R = parent(a)
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
+   @req all(i -> 1 <= i <= nvars(R), vars) "Variable index not in range"
+
+   subs = gens(R)
+   for (i, v) in zip(vars, vals)
+      subs[i] = R(v)
+   end
+   return evaluate(a, subs)
+end
+
+function evaluate(a::T, vars::Vector{T}, vals::Vector{<:RingElement}) where T <: LaurentMPolyRingElem
+   return evaluate(a, [var_index(x) for x in vars], vals)
+end
+
+###############################################################################
+#
+#   Change coefficient ring
+#
+###############################################################################
+
+change_coefficient_ring(R::Ring, p::LaurentMPolyRingElem; kwargs...) =
+   change_base_ring(R, p; kwargs...)
 
 ###############################################################################
 #
@@ -154,7 +195,9 @@ function rand(rng::AbstractRNG, S::LaurentMPolyRing,
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::LaurentMPolyRing, term_range, exp_bound, v...)
+function rand(S::LaurentMPolyRing,
+              term_range::AbstractUnitRange{Int},
+              exp_bound::AbstractUnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 

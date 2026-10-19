@@ -167,6 +167,27 @@ end
     @test get_attribute(x, :bar12) == :somesymbol
     @test get_attribute!(x, :bar13, :defaultsymbol) == :defaultsymbol
     @test get_attribute(x, :bar13) == :defaultsymbol
+
+    # test callbacks that set other attributes of the same object; 20 new
+    # entries force the attribute storage to rehash during the callback
+    v = get_attribute!(x, :nested1) do
+      for i in 1:20
+        set_attribute!(x, Symbol(:inner, i) => i)
+      end
+      return get_attribute!(() -> 41, x, :nested2) + 1
+    end
+    @test v == 42
+    @test get_attribute(x, :nested1) == 42
+    @test get_attribute(x, :nested2) == 41
+    @test all(i -> get_attribute(x, Symbol(:inner, i)) == i, 1:20)
+
+    v = get_attribute(x, :nested3) do
+      set_attribute!(x, :inner21 => 21)
+      return 43
+    end
+    @test v == 43
+    @test get_attribute(x, :nested3) === nothing
+    @test get_attribute(x, :inner21) == 21
 end
 
 

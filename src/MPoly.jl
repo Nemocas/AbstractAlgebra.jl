@@ -555,6 +555,23 @@ function monomial!(m::T, a::T, i::Int) where {T <: MPolyRingElem}
    return monomial(a, i)
 end
 
+@doc raw"""
+    term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+
+Return the term in `R` corresponding to the given exponent vector with coefficient `c`.
+"""
+function term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+   @req length(exps) == nvars(R) "length of exponent vector should match the number of variables"
+   return setcoeff!(zero(R), exps, coefficient_ring(R)(c))
+end
+
+@doc raw"""
+    monomial(R::MPolyRing, exps::Vector{Int})
+
+Return the monomial in `R` corresponding to the given exponent vector.
+"""
+monomial(R::MPolyRing, exps::Vector{Int}) = term(R, one(coefficient_ring(R)), exps)
+
 ###############################################################################
 #
 #   Iterators
@@ -666,17 +683,10 @@ function show(io::IO, mime::MIME"text/plain", p::MPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Multivariate polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(p))
   print(io, Dedent())
@@ -1785,7 +1795,7 @@ function rand(rng::AbstractRNG, S::MPolyRing,
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::MPolyRing, term_range, exp_bound, v...)
+function rand(S::MPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 

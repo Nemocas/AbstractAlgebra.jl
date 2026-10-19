@@ -1330,7 +1330,7 @@ end
     shift_left(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+$x^n$, where $x$ is the variable of the ring.
 
 # Examples
 
@@ -1397,7 +1397,7 @@ end
     shift_right(f::PolynomialElem, n::Int)
 
 Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+$x^n$, where $x$ is the variable of the ring.
 
 # Examples
 
@@ -1463,7 +1463,8 @@ end
 
 Return a tuple `(shift, defl)` where `shift` is the exponent of the trailing
 term of $p$ and `defl` is the gcd of the distance between the exponents of the
-nonzero terms of $p$. If $p = 0$, both `shift` and `defl` will be zero.
+nonzero terms of $p$. If $p$ has at most one term, `defl` is 1; if $p = 0$,
+`shift` is 0.
 """
 function deflation(p::PolyRingElem)
    if iszero(p)
@@ -3896,7 +3897,8 @@ rand(rng::AbstractRNG, S::PolyRing, deg_range::AbstractUnitRange{Int}, v...) =
 rand(rng::AbstractRNG, S::PolyRing, deg::Int, v...) =
    rand(rng, make(S, deg, v...))
 
-rand(S::PolyRing, degs, v...) = rand(Random.default_rng(), S, degs, v...)
+rand(S::PolyRing, degs::Union{Int, AbstractUnitRange{Int}}, v...) =
+   rand(Random.default_rng(), S, degs, v...)
 
 ###############################################################################
 #

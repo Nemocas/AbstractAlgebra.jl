@@ -188,13 +188,13 @@ end
     @test length(wkd) == 2
     res = pop!(wkd, 3, C)
     @test res == C
-    @test 3 ∉ keys(wkd)
-    @test B ∉ values(wkd)
+    @test !(3 in keys(wkd))
+    @test !(B in values(wkd))
     @test length(wkd) == 2
     @test !isempty(wkd)
     wkd = filter!( p -> p.first != 2, wkd)
-    @test 3 ∉ keys(wkd)
-    @test B ∉ values(wkd)
+    @test !(3 in keys(wkd))
+    @test !(B in values(wkd))
     @test length(wkd) == 1
     @test WeakValueDict(Pair(4, C)) == wkd
     @test !isempty(wkd)

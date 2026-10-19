@@ -61,7 +61,7 @@ Return the map with the two maps contained in $M$ swapped. In the first case, a
 **Examples**
 
 ```jldoctest
-julia> f = map_with_retraction_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
+julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 Map with retraction
   from integers
   to integers

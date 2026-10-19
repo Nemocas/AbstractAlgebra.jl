@@ -73,17 +73,10 @@ function show(io::IO, mime::MIME"text/plain", a::FreeAssociativeAlgebra)
   @show_name(io, a)
   @show_special(io, mime, a)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(a)
   print(io, "Free associative algebra")
   print(io, " on ", ItemQuantity(nvars(a), "indeterminate"), " ")
-  if n > max_vars
-    join(io, symbols(a)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(a)[n])
-  else
-    join(io, symbols(a), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(a))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(a))
   print(io, Dedent())
@@ -139,21 +132,21 @@ julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
 (Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
 
 julia> collect(terms(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}}:
  3*b*a*c
  -b
  c
  2
 
 julia> collect(coefficients(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{BigInt}:
   3
  -1
   1
   2
 
 julia> collect(monomials(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
+4-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}}:
  b*a*c
  b
  c
@@ -305,7 +298,9 @@ function rand(rng::AbstractRNG, S::FreeAssociativeAlgebra,
    rand(rng, m)
 end
 
-function rand(S::FreeAssociativeAlgebra, term_range, exp_bound, v...)
+function rand(S::FreeAssociativeAlgebra,
+              term_range::AbstractUnitRange{Int},
+              exp_bound::AbstractUnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
 end
 

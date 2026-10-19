@@ -42,8 +42,9 @@ lazy_transpose(A::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(A)}(A)
 lazy_transpose(M::LazyTransposeMatElem) = data(M)
 
 # Change the order of rows and columns in nrows, ncols, getindex and setindex!
-AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))
-AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))
+# `::Int` breaks the inference cycle with `nrows(::MatElem)`
+AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))::Int
+AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))::Int
 
 Base.getindex(M::LazyTransposeMatElem, r::Int, c::Int) = data(M)[c, r]
 function Base.setindex!(M::LazyTransposeMatElem{T}, d::T, r::Int, c::Int) where T
@@ -88,22 +89,25 @@ struct LUTrait <: MatrixNormalFormTrait end # LU factoring for fields
 struct FFLUTrait <: MatrixNormalFormTrait end # "fraction free" LU factoring for fraction fields
 struct MatrixInterpolateTrait <: MatrixNormalFormTrait end # interpolate in fraction fields of polynomial rings
 
-function matrix_normal_form_type(R::Ring)
-  if is_domain_type(elem_type(R))
+function matrix_normal_form_type(T::Type{<:Ring})
+  if is_domain_type(T)
     return HermiteFormTrait()
   else
     return HowellFormTrait()
   end
 end
 
-matrix_normal_form_type(::Field) = RREFTrait()
+matrix_normal_form_type(::Type{<:Field}) = RREFTrait()
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-matrix_normal_form_type(::FracField) = FFLUTrait()
-matrix_normal_form_type(::AbstractAlgebra.Rationals{BigInt}) = FFLUTrait()
-matrix_normal_form_type(::FracField{T}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
+matrix_normal_form_type(::Type{<:FracField}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:AbstractAlgebra.Rationals{BigInt}}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:FracField{T}}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
 
-matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
+matrix_normal_form_type(T::Type{<:MatElem}) = matrix_normal_form_type(base_ring_type(T))
+
+matrix_normal_form_type(x) = matrix_normal_form_type(typeof(x))
+matrix_normal_form_type(T::DataType) = throw(MethodError(matrix_normal_form_type, (T,)))
 
 ################################################################################
 #
@@ -207,34 +211,38 @@ function solve_init(NF::MatrixNormalFormTrait, A::MatElem)
   return solve_context_type(NF, base_ring(A))(A)
 end
 
-# For a ring R, the following signatures of `solve_context_type` need to be
+# For a ring R of type T, the following signatures of `solve_context_type` need to be
 # implemented:
-# 1) solve_context_type(R)
-# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(R))
+# 1) solve_context_type(::Type{<:T})
+# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(T))
 # Version 1 should pick a matrix_normal_form_type and call 2
 
-function solve_context_type(R::NCRing)
-  return solve_context_type(matrix_normal_form_type(R), elem_type(R))
+function solve_context_type(T::Type{<:NCRing})
+  return solve_context_type(matrix_normal_form_type(T), elem_type(T))
 end
 
-function solve_context_type(K::Field)
-  # matrix_normal_form_type(K) would be RREFTrait, but we want to use
+function solve_context_type(T::Type{<:Field})
+  # matrix_normal_form_type(T) would be RREFTrait, but we want to use
   # LU in solve contexts
-  return solve_context_type(LUTrait(), elem_type(K))
+  return solve_context_type(LUTrait(), elem_type(T))
 end
 
-function solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField})
+function solve_context_type(T::Type{<:Union{AbstractAlgebra.Rationals{BigInt}, FracField}})
   # In this case, we use FFLU
-  return solve_context_type(FFLUTrait(), elem_type(K))
+  return solve_context_type(FFLUTrait(), elem_type(T))
 end
 
-function solve_context_type(A::MatElem)
-  return solve_context_type(base_ring(A))
+function solve_context_type(T::Type{<:MatElem})
+  return solve_context_type(base_ring_type(T))
 end
 
 function solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRingElement}
   MatType = dense_matrix_type(T)
   return SolveCtx{T, typeof(NF), MatType, MatType, LazyTransposeMatElem{T, MatType}}
+end
+
+function solve_context_type(NF::MatrixNormalFormTrait, T::Type{<:MatElem})
+  return solve_context_type(NF, base_ring_type(T))
 end
 
 function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
@@ -246,13 +254,23 @@ function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
   return SolveCtx{T, FFLUTrait, dense_matrix_type(T), IntMatT, IntMatT}
 end
 
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRingElement} = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::Type{<: MatElem{T}}) where T = solve_context_type(NF, T)
-solve_context_type(NF::MatrixNormalFormTrait, ::MatElem{T}) where T = solve_context_type(NF, T)
 
-matrix_normal_form_type(C::SolveCtx{T, NF}) where {T, NF} = NF()
+solve_context_type(x) = solve_context_type(typeof(x))
+solve_context_type(NF::MatrixNormalFormTrait, x) = solve_context_type(NF, typeof(x))
+solve_context_type(T::DataType) = throw(MethodError(solve_context_type, (T,)))
+solve_context_type(NF::MatrixNormalFormTrait, T::DataType) = throw(MethodError(solve_context_type, (NF, T)))
+
+# Deprecated: instance-based dispatch, kept so downstream methods on ring
+# instances (e.g. `matrix_normal_form_type(::NumFieldOrder)`) are still reached.
+# Remove in the next breaking release.
+matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
+solve_context_type(A::MatElem) = solve_context_type(base_ring(A))
+solve_context_type(R::NCRing) = solve_context_type(matrix_normal_form_type(R), elem_type(R))
+solve_context_type(K::Field) = solve_context_type(typeof(K))
+solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField}) = solve_context_type(typeof(K))
+
+matrix_normal_form_type(::Type{<:SolveCtx{T, NF}}) where {T, NF} = NF()
 
 matrix(C::SolveCtx) = C.A
 

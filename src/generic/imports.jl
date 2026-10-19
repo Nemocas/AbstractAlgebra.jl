@@ -4,7 +4,6 @@ import LinearAlgebra: tr
 
 using Random: Random, AbstractRNG, randperm!, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-using SparseArrays: sparse, spzeros
 
 import Base: !=
 import Base: &
@@ -160,6 +159,7 @@ import ..AbstractAlgebra: integral
 import ..AbstractAlgebra: internal_ordering
 import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: inv!
+import ..AbstractAlgebra: inverse_fn
 import ..AbstractAlgebra: is_constant
 import ..AbstractAlgebra: is_divisible_by
 import ..AbstractAlgebra: is_domain_type
@@ -167,8 +167,10 @@ import ..AbstractAlgebra: is_exact_type
 import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_homogeneous
+import ..AbstractAlgebra: is_known
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_noetherian
 import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square

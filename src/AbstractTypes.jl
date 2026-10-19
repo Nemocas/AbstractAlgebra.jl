@@ -64,15 +64,19 @@ abstract type ModuleElem{T<:NCRingElement} <: AdditiveGroupElem end
 
 abstract type FPModuleElem{T} <: ModuleElem{T} end
 
-abstract type IdealElem{T} <: SetElem end
-
 abstract type Map{D, C, S, T} <: SetElem end
 
+
+#
+# The following types are only used as type parameters for `Map` subtypes
+#
 abstract type SetMap end
 
 abstract type FunctionalMap <: SetMap end
 
 abstract type IdentityMap <: SetMap end
+
+abstract type MapWithHeader <: SetMap end
 
 abstract type FPModuleHomomorphism <: FunctionalMap end
 
@@ -103,8 +107,6 @@ abstract type ResidueField{T<:RingElement} <: Field end
 abstract type FracField{T<:RingElement} <: Field end
 
 abstract type TotFracRing{T<:RingElement} <: Ring end
-
-abstract type MatRing{T<:NCRingElement} <: NCRing end
 
 abstract type FreeAssociativeAlgebra{T<:RingElement} <: NCRing end
 
@@ -150,8 +152,6 @@ abstract type AbsPowerSeriesRingElem{T} <: SeriesElem{T} end
 abstract type AbsMSeriesElem{T} <: MSeriesElem{T} end
 
 abstract type MatElem{T} <: ModuleElem{T} end
-
-abstract type MatRingElem{T<:NCRingElement} <: NCRingElem end
 
 abstract type FreeAssociativeAlgebraElem{T<:RingElement} <: NCRingElem end
 

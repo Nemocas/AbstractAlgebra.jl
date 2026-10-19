@@ -343,6 +343,8 @@ end
 
 function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
+   # in the zero ring, 0 is a unit
+   iszero(b) && !is_trivial(parent(b)) && throw(DivideError())
    fl, q = divides(a, b)
    check && !fl && error("Impossible inverse in divexact")
    return q

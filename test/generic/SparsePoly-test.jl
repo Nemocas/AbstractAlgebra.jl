@@ -32,6 +32,18 @@ end
    @test string(x+y+1) == "y + x + 1"
 end
 
+@testset "Generic.SparsePoly.adhoc_comparison" begin
+   F = GF(7)
+   R, x = SparsePolynomialRing(F, :x)
+
+   @test R(F(3)) == F(3)
+   @test F(3) == R(F(3))
+   @test R(F(3)) == 3
+   @test R() == F(0)
+   @test x != F(3)
+   @test x^2 != F(3)
+end
+
 @testset "Generic.SparsePoly.misc" begin
 
    R, x = SparsePolynomialRing(ZZ, "x")

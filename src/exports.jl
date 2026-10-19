@@ -64,6 +64,7 @@ export MPolyBuildCtx
 export MPolyRing
 export MPolyRingElem
 export Map
+export MapFromFunc
 export MatElem
 export MatRing
 export MatRingElem
@@ -598,6 +599,7 @@ export to_univariate
 export total_degree
 export total_ring_of_fractions
 export tr
+export trace_of_product
 export trailing_coefficient
 export transpose
 export transpose!

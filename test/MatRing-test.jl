@@ -1,4 +1,4 @@
-@testset "Generic.MatRing.constructors" begin
+@testset "MatRing.constructors" begin
    R, t = polynomial_ring(QQ, "t")
    @test_throws ArgumentError matrix_ring(R, -1)
 
@@ -6,11 +6,11 @@
 
    @test S === matrix_ring(R, 3)
 
-   @test elem_type(S) == Generic.MatRingElem{elem_type(R)}
-   @test elem_type(Generic.MatRing{elem_type(R)}) == Generic.MatRingElem{elem_type(R)}
-   @test parent_type(Generic.MatRingElem{elem_type(R)}) == Generic.MatRing{elem_type(R)}
+   @test elem_type(S) == MatRingElem{elem_type(R)}
+   @test elem_type(MatRing{elem_type(R)}) == MatRingElem{elem_type(R)}
+   @test parent_type(MatRingElem{elem_type(R)}) == MatRing{elem_type(R)}
 
-   @test S isa Generic.MatRing
+   @test S isa MatRing
 
    f = S(t^2 + 1)
 
@@ -56,9 +56,9 @@
 
    @test base_ring(S) == R
 
-   @test elem_type(S) == Generic.MatRingElem{elem_type(R)}
-   @test elem_type(Generic.MatRing{elem_type(R)}) == Generic.MatRingElem{elem_type(R)}
-   @test parent_type(Generic.MatRingElem{elem_type(R)}) == Generic.MatRing{elem_type(R)}
+   @test elem_type(S) == MatRingElem{elem_type(R)}
+   @test elem_type(MatRing{elem_type(R)}) == MatRingElem{elem_type(R)}
+   @test parent_type(MatRingElem{elem_type(R)}) == MatRing{elem_type(R)}
 
    @test is_exact_type(elem_type(S)) == true
    @test is_domain_type(elem_type(S)) == false
@@ -70,9 +70,22 @@
    @test isa(S([1, 2, 3, 4]), MatRingElem)
 
    @test parent(S()) == S
+
+   # Conversion between matrix spaces and matrix rings
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+   M = matrix_space(ZZ, 2, 2)(A)
+   @test M isa MatElem
+   @test M == matrix(A)
+   @test_throws ErrorConstrDimMismatch matrix_space(ZZ, 2, 3)(A)
+
+   B = matrix_ring(QQ, 2)(A)
+   @test B isa MatRingElem
+   @test matrix(B) == matrix(QQ, [1 2; 3 4])
+   @test_throws ErrorConstrDimMismatch matrix_ring(QQ, 3)(A)
 end
 
-@testset "Generic.MatRing.finiteness" begin
+@testset "MatRing.finiteness" begin
    S = matrix_ring(QQ, 3)
    @test !is_finite(S)
    @test !is_trivial(S)
@@ -91,13 +104,13 @@ end
 
 end
 
-@testset "Generic.MatRing.printing" begin
+@testset "MatRing.printing" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
    @test !occursin("\n", sprint(show, S))
 end
 
-@testset "Generic.MatRing.manipulation" begin
+@testset "MatRing.manipulation" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -185,8 +198,8 @@ end
    @test isempty(M) == false
    @test isassigned(M, 1, 1) == true
 
-   @test iszero(zero(M, 3, 3))
-   @test iszero(zero(M, QQ, 3, 3))
+   @test iszero(zero(M, 3))
+   @test iszero(zero(M, QQ, 3))
    @test iszero(zero(M, QQ))
 
    M = zero!(M)
@@ -202,7 +215,7 @@ end
    @test characteristic(matrix_ring(R, 0)) == 1
 end
 
-@testset "Generic.MatRing.size/axes" begin
+@testset "MatRing.size/axes" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -235,7 +248,7 @@ end
    @test axes(M, 1) == 1:2
 end
 
-@testset "Generic.MatRing.unary_ops" begin
+@testset "MatRing.unary_ops" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -252,9 +265,42 @@ end
    M = rand(S, -10:10)
 
    @test -(-M) == M
+   @test -M isa MatRingElem
 end
 
-@testset "Generic.MatRing.binary_ops" begin
+@testset "MatRing.zero_entries" begin
+   S = matrix_ring(ZZ, 3)
+   A = S([0 -1 0; 0 2 0; 0 0 0])
+
+   @test is_zero_entry(A, 1, 1)
+   @test !is_zero_entry(A, 1, 2)
+   @test is_negative_entry(A, 1, 2)
+   @test !is_negative_entry(A, 2, 2)
+   @test is_positive_entry(A, 2, 2)
+   @test !is_positive_entry(A, 1, 2)
+
+   @test !is_zero_row(A, 1)
+   @test is_zero_row(A, 3)
+   @test_throws BoundsError is_zero_row(A, 4)
+   @test is_zero_column(A, 1)
+   @test !is_zero_column(A, 2)
+   @test_throws BoundsError is_zero_column(A, 0)
+end
+
+@testset "MatRing.unsafe_ops" begin
+   S = matrix_ring(ZZ, 2)
+   A = S([1 2; 3 4])
+
+   @test mul!(BigInt[0, 0], A, BigInt[1, 1]) == BigInt[3, 7]
+   @test mul!(BigInt[0, 0], BigInt[1, 1], A) == BigInt[4, 6]
+
+   B = zero!(A)
+   @test B isa MatRingElem
+   @test iszero(B)
+   @test iszero(A)
+end
+
+@testset "MatRing.binary_ops" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -281,7 +327,7 @@ end
    @test M*(N + P) == M*N + M*P
 end
 
-@testset "Generic.MatRing.adhoc_binary" begin
+@testset "MatRing.adhoc_binary" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -334,7 +380,7 @@ end
    @test [r1, r2]*(M + N) == [r1, r2]*M + [r1, r2]*N
 end
 
-@testset "Generic.MatRing.promotion" begin
+@testset "MatRing.promotion" begin
    m = [1 2; 3 4]
    F, = residue_field(ZZ, 3)
    R, t = polynomial_ring(F, "t")
@@ -382,7 +428,7 @@ end
    @test_throws ErrorException Rational{BigInt}[1 ,2] * A
 end
 
-@testset "Generic.MatRing.permutation" begin
+@testset "MatRing.permutation" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -394,7 +440,7 @@ end
    @test A == inv(P)*(P*A)
 end
 
-@testset "Generic.MatRing.comparison" begin
+@testset "MatRing.comparison" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -422,7 +468,7 @@ end
    @test isequal(M, copy(M))
 end
 
-@testset "Generic.MatRing.adhoc_comparison" begin
+@testset "MatRing.adhoc_comparison" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -455,7 +501,7 @@ end
    @test m == S(m)
 end
 
-@testset "Generic.MatRing.powering" begin
+@testset "MatRing.powering" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -478,7 +524,7 @@ end
    @test M^3 == M*M*M
 end
 
-@testset "Generic.MatRing.exact_division" begin
+@testset "MatRing.exact_division" begin
    S = matrix_ring(QQ, 3)
 
    M = rand(S, -20:20)
@@ -486,9 +532,20 @@ end
 
    @test divexact_right(M*N, N) == M
    @test divexact_left(N*M, N) == M
+
+   # not implemented over a noncommutative base ring
+   R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+   S = matrix_ring(R, 2)
+   M = S([x y; y x])
+   N = S([x one(R); zero(R) y])
+
+   @test_throws NotImplementedError divexact_right(M*N, N)
+   @test_throws NotImplementedError divexact_left(N*M, N)
+   @test_throws NotImplementedError (M*N) / N
+   @test_throws NotImplementedError N \ (N*M)
 end
 
-@testset "Generic.MatRing.adhoc_exact_division" begin
+@testset "MatRing.adhoc_exact_division" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -530,7 +587,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.transpose" begin
+@testset "MatRing.transpose" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
    arr = [t + 1 t R(1); t^2 t t; t+1 t^2 R(-1)]
@@ -548,7 +605,7 @@ end
    @test is_symmetric(M + transpose(M))
 end
 
-@testset "Generic.MatRing.gram" begin
+@testset "MatRing.gram" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -557,7 +614,7 @@ end
    @test gram(A) == S([2*t^2 + 2*t + 2 t^3 + 2*t^2 + t 2*t^2 + t - 1; t^3 + 2*t^2 + t t^4 + 2*t^2 t^3 + 3*t; 2*t^2 + t - 1 t^3 + 3*t t^4 + 2*t^3 + 4*t^2 + 6*t + 9])
 end
 
-@testset "Generic.MatRing.tr" begin
+@testset "MatRing.tr" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -566,7 +623,7 @@ end
    @test tr(A) == t^2 + 3t + 2
 end
 
-@testset "Generic.MatRing.content" begin
+@testset "MatRing.content" begin
    R, t = polynomial_ring(QQ, "t")
    S = matrix_ring(R, 3)
 
@@ -575,7 +632,7 @@ end
    @test content((1 + t)*A) == 1 + t
 end
 
-@testset "Generic.MatRing.lu" begin
+@testset "MatRing.lu" begin
    R, x = polynomial_ring(QQ, "x")
    K, f = residue_field(R, x^3 + 3x + 1)
    a = f(x)
@@ -614,7 +671,7 @@ end
    @test P*A == L*U
 end
 
-@testset "Generic.MatRing.fflu" begin
+@testset "MatRing.fflu" begin
    R, x = polynomial_ring(QQ, "x")
    K, f = residue_field(R, x^3 + 3x + 1)
    a = f(x)
@@ -669,7 +726,7 @@ end
    @test P*A == L*D*U
 end
 
-@testset "Generic.MatRing.det" begin
+@testset "MatRing.det" begin
    S, x = polynomial_ring(residue_ring(ZZ, 1009*2003)[1], "x")
 
    for dim = 0:5
@@ -713,7 +770,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.block_replacement" begin
+@testset "MatRing.block_replacement" begin
    _test_block_replacement = function(a, b, r, c)
       rr = r isa Colon ? (1:nrows(a)) : r
       cc = c isa Colon ? (1:ncols(a)) : c
@@ -822,7 +879,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.rank" begin
+@testset "MatRing.rank" begin
    S, = residue_ring(ZZ, 20011*10007)
    R = matrix_ring(S, 5)
 
@@ -898,7 +955,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.solve_lu" begin
+@testset "MatRing.solve_lu" begin
    S = QQ
 
    for dim = 0:5
@@ -933,7 +990,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.rref" begin
+@testset "MatRing.rref" begin
    S, = residue_ring(ZZ, 20011*10007)
    R = matrix_ring(S, 5)
 
@@ -998,7 +1055,7 @@ end
    end
 end
 
-@testset "Generic.MatRing.inversion" begin
+@testset "MatRing.inversion" begin
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
    E(R::MatRing; vals=[1,-1]) = [E(R, i,j,val) for (i,j) in indexing(R.n) for val in vals]
@@ -1134,9 +1191,9 @@ end
       @test all(isone(m*inv(m)) for m in random_matrices)
    end
    end
-end # of @testset "Generic.MatRing.inversion"
+end # of @testset "MatRing.inversion"
 
-@testset "Generic.MatRing.hessenberg" begin
+@testset "MatRing.hessenberg" begin
    R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -1157,7 +1214,7 @@ end # of @testset "Generic.MatRing.inversion"
    end
 end
 
-@testset "Generic.MatRing.charpoly" begin
+@testset "MatRing.charpoly" begin
    R, = residue_ring(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -1219,7 +1276,7 @@ end
    @test p1 == evaluate(p3, gen(U))
 end
 
-@testset "Generic.MatRing.minpoly" begin
+@testset "MatRing.minpoly" begin
    R = GF(103)
    T, y = polynomial_ring(R, "y")
    S = matrix_ring(R, 3)
@@ -1335,7 +1392,7 @@ end
 
 
 if false # see bug 160
-    @testset "Generic.MatRing.hnf_minors" begin
+    @testset "MatRing.hnf_minors" begin
         R, x = polynomial_ring(QQ, "x")
 
         M = matrix_ring(R, 3)
@@ -1371,7 +1428,7 @@ if false # see bug 160
     end
 end
 
-@testset "Generic.MatRing.$sim_zero" for sim_zero in (similar, zero)
+@testset "MatRing.$sim_zero" for sim_zero in (similar, zero)
    test_zero = sim_zero === zero
    for R = (ZZ, GF(11))
       M = matrix_ring(R, rand(0:9))
@@ -1385,11 +1442,6 @@ end
       @test !test_zero || iszero(n)
       @test parent(n) == matrix_ring(R, r)
       @test size(n) == (r, r)
-      nn = sim_zero(m, r, r)
-      @test !test_zero || iszero(nn)
-      @test parent(nn) == matrix_ring(R, r)
-      @test size(nn) == (r, r)
-      @test_throws ErrorException sim_zero(m, r, r+1)
       for S = [QQ, ZZ, GF(2), GF(5)]
          n = sim_zero(m, S)
          @test !test_zero || iszero(n)
@@ -1400,16 +1452,11 @@ end
          @test !test_zero || iszero(n)
          @test parent(n) == matrix_ring(S, r)
          @test size(n) == (r, r)
-         n = sim_zero(m, S, r, r)
-         @test !test_zero || iszero(n)
-         @test parent(n) == matrix_ring(S, r)
-         @test size(n) == (r, r)
-         @test_throws ErrorException sim_zero(m, S, r, r+2)
       end
    end
 end
 
-@testset "Generic.MatRing.change_base_ring" begin
+@testset "MatRing.change_base_ring" begin
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
@@ -1422,7 +1469,7 @@ end
    @test isa(N, MatRingElem)
 end
 
-@testset "Generic.MatRing.map" begin
+@testset "MatRing.map" begin
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
@@ -1438,7 +1485,7 @@ end
    @test isa(Q, MatRingElem)
 end
 
-@testset "Generic.MatRing.rand" begin
+@testset "MatRing.rand" begin
    M = matrix_ring(ZZ, 3)
 
    test_rand(M, 1:9)
@@ -1454,7 +1501,7 @@ end
    @test all(x -> parent(x) == M, v)
 end
 
-@testset "Generic.MatRing.adhoc_equality" begin
+@testset "MatRing.adhoc_equality" begin
    R = matrix_ring(ZZ, 2)
    S = matrix_ring(QQ, 2)
    M = R(matrix(ZZ, 2,2, [1,2,3,4]))

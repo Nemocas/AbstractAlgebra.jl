@@ -4,6 +4,15 @@
 #
 ###############################################################################
 
+function Base.:(==)(x::SetElem, y::SetElem)
+  x === y && return true
+  throw(NotImplementedError(:(==), x, y))
+end
+
+function Base.hash(a::SetElem, h::UInt)
+  throw(NotImplementedError(:hash, a, h))
+end
+
 ###############################################################################
 #
 #   Parents, elements and data type methods

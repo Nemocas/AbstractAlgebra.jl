@@ -81,4 +81,7 @@ julia> change_base_ring(RealField, f)
 
 julia> leading_coefficient(f), trailing_coefficient(f)
 (5, 1)
+
+julia> constant_coefficient(f), is_constant(f)
+(0, false)
 ```

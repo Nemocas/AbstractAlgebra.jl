@@ -15,8 +15,8 @@ Many operations are available both as in-place and non-mutating variants.
 ```@docs
 map_entries(f, A::MatElem{T}) where T <: NCRingElement
 map_entries!(f, dst::MatElem{T}, src::MatElem{U}) where {T <: NCRingElement, U <: NCRingElement}
-Base.map(f, A::MatrixElem{T}) where T <: NCRingElement
-Base.map!(f, dst::MatrixElem{T}, src::MatrixElem{U}) where {T <: NCRingElement, U <: NCRingElement}
+Base.map(f, A::MatElem{T}) where T <: NCRingElement
+Base.map!(f, dst::MatElem{T}, src::MatElem{U}) where {T <: NCRingElement, U <: NCRingElement}
 ```
 
 
@@ -37,8 +37,8 @@ multiply_row!(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where
 ## Row and column permutations
 
 ```@docs
-*(P::Perm, A::MatrixElem{T}) where T <: NCRingElement
-*(A::MatrixElem{T}, P::Perm) where T <: NCRingElement
+*(P::Perm, A::MatElem{T}) where T <: NCRingElement
+*(A::MatElem{T}, P::Perm) where T <: NCRingElement
 swap_rows(A::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 swap_rows!(A::MatElem{T}, i::Int, j::Int) where T <: NCRingElement
 swap_cols(A::MatElem{T}, i::Int, j::Int) where T <: NCRingElement

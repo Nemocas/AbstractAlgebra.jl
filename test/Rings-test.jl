@@ -92,3 +92,13 @@ end
    @test !is_associated(0*f, f)
    @test !is_associated(f, 2x^2-x+2)
 end
+
+# `promote` returns copies although the operands already have a common type
+mutable struct CopyPromoteRingElem <: RingElem end
+
+Base.promote(x::CopyPromoteRingElem, y::CopyPromoteRingElem) =
+   CopyPromoteRingElem(), CopyPromoteRingElem()
+
+@testset "divexact fallback" begin
+   @test_throws NotImplementedError divexact(CopyPromoteRingElem(), CopyPromoteRingElem())
+end

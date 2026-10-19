@@ -270,6 +270,7 @@ end
 
 function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
+   iszero(b) && throw(DivideError())
    fl, q = divides(a, b)
    return q
 end

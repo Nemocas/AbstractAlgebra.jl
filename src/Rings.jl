@@ -37,11 +37,10 @@ function divexact end
 
 function divexact(x::RingElem, y::RingElem; check::Bool=true)
   xx, yy = promote(x, y)
-  # - if divexact is not implemented, we need to break the recursion
-  #   we assume that promotion returns identical operands if no proper
-  #   promotion can be performed
-  # - add type checks to make it constant-fold away in most cases
-  if typeof(xx) === typeof(x) && typeof(y) === typeof(yy) && (xx, yy) === (x, y)
+  # if divexact is not implemented, we need to break the recursion;
+  # compare types rather than operands, as dispatch only depends on the
+  # types and `promote` may return copies
+  if typeof(xx) === typeof(x) && typeof(y) === typeof(yy)
     throw(NotImplementedError(:divexact, x, y))
   end
   return divexact(xx, yy; check=check)

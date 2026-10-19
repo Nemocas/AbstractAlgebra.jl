@@ -183,7 +183,6 @@ end
 include("AbstractTypes.jl")
 
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
-const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
 pretty_lt(x::Number, y::Number) = isless(x, y)
 pretty_eq(x::Number, y::Number) = (x == y)
@@ -191,6 +190,8 @@ pretty_eq(x::Number, y::Number) = (x == y)
 include("julia/JuliaTypes.jl")
 
 include("ConcreteTypes.jl")
+
+const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
 ###############################################################################
 #
@@ -275,6 +276,7 @@ include("QuotientModule.jl")
 include("Module.jl")
 include("InvariantFactorDecomposition.jl")
 include("DirectSum.jl")
+include("MapTypes.jl")
 include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")

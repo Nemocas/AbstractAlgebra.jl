@@ -16,10 +16,10 @@ Matrices support `iszero` and `isone` for testing whether a matrix
 is the zero matrix or the identity matrix, respectively.
 
 ```@docs
-isempty(A::MatrixElem{T}) where {T <: NCRingElement}
-Base.isassigned(A::MatrixElem{T}, i::Int, j::Int) where {T <: NCRingElement}
-is_zero_row(M::Union{Matrix,MatrixElem}, i::Int)
-is_zero_column(M::Union{Matrix,MatrixElem}, j::Int)
+isempty(A::MatElem{T}) where {T <: NCRingElement}
+Base.isassigned(A::MatElem{T}, i::Int, j::Int) where {T <: NCRingElement}
+is_zero_row(M::Union{Matrix,MatElem}, i::Int)
+is_zero_column(M::Union{Matrix,MatElem}, j::Int)
 ```
 
 
@@ -36,7 +36,7 @@ is_hessenberg(A::MatElem{T}) where {T <: RingElement}
 ## Invertibility
 
 ```@docs
-is_invertible_with_inverse(A::MatrixElem{T}; side::Symbol = :left) where {T <: RingElement}
+is_invertible_with_inverse(A::MatElem{T}; side::Symbol = :left) where {T <: RingElement}
 is_invertible(A::MatElem{T}) where {T <: RingElement}
 ```
 

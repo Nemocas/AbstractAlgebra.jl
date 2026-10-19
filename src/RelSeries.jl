@@ -624,7 +624,7 @@ end
     shift_left(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 
 # Examples
 
@@ -671,7 +671,7 @@ end
     shift_right(x::RelPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 
 # Examples
 
@@ -1586,7 +1586,8 @@ end
 rand(rng::AbstractRNG, S::SeriesRing, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::SeriesRing, val_range, v...) = rand(Random.default_rng(), S, val_range, v...)
+rand(S::SeriesRing, val_range::AbstractUnitRange{Int}, v...) =
+   rand(Random.default_rng(), S, val_range, v...)
 
 ###############################################################################
 #

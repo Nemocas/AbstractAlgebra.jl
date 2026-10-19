@@ -158,7 +158,7 @@ The implementation uses a non-commutative version of the Buchberger algorithm as
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = @free_associative_algebra(GF(2), [:x, :y, :u, :v, :t, :s])
-Free associative algebra on 6 indeterminates x, y, u, v, ..., s
+Free associative algebra on 6 indeterminates x, y, u, v, t, s
   over finite field F_2
 
 julia> g = Generic.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y*x)^2*t + t + s])

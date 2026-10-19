@@ -109,11 +109,22 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational, b::Integer; check::Bool=true) = a//b
+# `a//0` is `±1//0` for nonzero `a`, not an error
 
-divexact(a::Integer, b::Rational; check::Bool=true) = a//b
+function divexact(a::Rational, b::Integer; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
-divexact(a::Rational, b::Rational; check::Bool=true) = a//b
+function divexact(a::Integer, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
+
+function divexact(a::Rational, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
 function divides(a::T, b::T) where T <: Rational
    if iszero(b)
@@ -140,11 +151,11 @@ end
 function is_square_with_sqrt(a::Rational{T}) where T <: Integer
    f1, s1 = is_square_with_sqrt(numerator(a))
    if !f1
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    f2, s2 = is_square_with_sqrt(denominator(a))
    if !f2
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    return true, s1//s2
 end
@@ -164,11 +175,11 @@ end
 function is_power(a::Rational{T}, n::Int) where T <: Integer
    f1, r1 = is_power(numerator(a), n)
    if !f1
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    f2, r2 = is_power(denominator(a), n)
    if !f2
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    return true, r1//r2
 end
@@ -219,9 +230,9 @@ function rand(rng::AbstractRNG,
 end
 
 
-rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
+rand(rng::AbstractRNG, R::Rationals, n::AbstractArray) = rand(rng, make(R, n))
 
-rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
+rand(R::Rationals, n::AbstractArray) = rand(Random.default_rng(), R, n)
 
 ###############################################################################
 #

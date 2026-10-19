@@ -30,8 +30,6 @@ number_of_generators(R::LaurentMPolyWrapRing) = number_of_variables(base_ring(R)
 
 is_univariate(R::LaurentMPolyWrapRing) = is_univariate(base_ring(R))
 
-is_domain_type(::Type{LaurentMPolyWrapRing{S, T}}) where {S, T} = is_domain_type(T)
-
 ###############################################################################
 #
 #   Basic manipulation
@@ -71,7 +69,9 @@ function one(R::LaurentMPolyWrapRing)
 end
 
 function gen(R::LaurentMPolyWrapRing, i::Int)
-    return LaurentMPolyWrap(R, gen(base_ring(R), i))
+    mindegs = zeros(Int, nvars(R))
+    mindegs[i] = 1
+    return LaurentMPolyWrap(R, one(base_ring(R)), mindegs)
 end
 
 function iszero(a::LaurentMPolyWrap)
@@ -113,6 +113,37 @@ end
 
 function is_gen(a::LaurentMPolyWrap)
     return !iszero(_var_index(a))
+end
+
+function var_indices(a::LaurentMPolyWrap)
+    iszero(a) && return Int[]
+    lo, _ = _mindegs(a.mpoly)
+    hi = degrees(a.mpoly)
+    # variable i is absent iff it has exponent 0 in every term
+    return [i for i in 1:nvars(parent(a)) if lo[i] != hi[i] || lo[i] != -a.mindegs[i]]
+end
+
+###############################################################################
+#
+#   Degrees
+#
+###############################################################################
+
+# Unlike for polynomials, -1 is a valid degree, so zero has no degree.
+
+function degree(a::LaurentMPolyWrap, i::Int)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return degree(a.mpoly, i) + a.mindegs[i]
+end
+
+function degrees(a::LaurentMPolyWrap)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return degrees(a.mpoly) .+ a.mindegs
+end
+
+function total_degree(a::LaurentMPolyWrap)
+    @req !iszero(a) "Zero polynomial does not have a degree"
+    return total_degree(a.mpoly) + sum(a.mindegs)
 end
 
 function Base.inv(a::LaurentMPolyWrap)
@@ -428,6 +459,18 @@ function coefficients(a::LaurentMPolyWrap)
     return coefficients(a.mpoly)
 end
 
+function trailing_coefficient(a::LaurentMPolyWrap)
+    return trailing_coefficient(a.mpoly)
+end
+
+content(a::LaurentMPolyWrap) = content(a.mpoly)
+
+# the monomial ordering is invariant under multiplication by a monomial, so
+# the terms of a.mpoly are in the same order as those of a
+tail(a::LaurentMPolyWrap) = LaurentMPolyWrap(parent(a), tail(a.mpoly), copy(a.mindegs))
+
+is_homogeneous(a::LaurentMPolyWrap) = is_homogeneous(a.mpoly)
+
 function constant_coefficient(a::LaurentMPolyWrap)
     e = -a.mindegs
     any(x -> x < 0, e) && return zero(coefficient_ring(parent(a)))
@@ -568,6 +611,10 @@ function MPolyBuildCtx(R::AbstractAlgebra.LaurentMPolyRing{T}) where T
     return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
 end
 
+function MPolyBuildCtx(R::AbstractAlgebra.UniversalRing{<:AbstractAlgebra.LaurentMPolyRingElem, T}) where T
+    return LaurentMPolyBuildCtx{T, typeof(R)}(T[], Vector{Int}[], R)
+end
+
 function push_term!(B::LaurentMPolyBuildCtx{T, S}, c::U, expv::Vector{Int}) where {S, T, U}
     length(expv) == nvars(B.parent) || error("length of exponent vector should match the number of variables")
     push!(B.coeffs, c)
@@ -686,6 +733,66 @@ function inflate(f::LaurentMPolyWrap, vars::Vector{Int}, shifts::Vector{Int}, de
    return LaurentMPolyWrap(parent(f), inflate(f.mpoly, vars, zeros(Int, length(shifts)), defls), mindegs)
 end
 
+function deflation(f::LaurentMPolyWrap)
+   shift, defl = deflation(f.mpoly)
+   iszero(f) && return shift, defl
+   return shift .+ f.mindegs, defl
+end
+
+function deflate(f::LaurentMPolyWrap, shift::Vector{Int}, defl::Vector{Int})
+   defl = [iszero(d) ? 1 : d for d in defl]
+   B = MPolyBuildCtx(parent(f))
+   for (c, e) in zip(coefficients(f), exponent_vectors(f))
+      push_term!(B, c, div.(e .- shift, defl))
+   end
+   return finish(B)
+end
+
+deflate(f::LaurentMPolyWrap, defl::Vector{Int}) = deflate(f, zeros(Int, length(defl)), defl)
+
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+# Over a domain, a square s^2 with s = m*r for a monomial m and a polynomial r
+# not divisible by any variable normalizes to m^2 and r^2. Over a non-domain
+# this fails, e.g. (3 + x)^2 = 6x + x^2 over ZZ/9.
+function is_square_with_sqrt(a::LaurentMPolyWrap)
+   R = parent(a)
+   is_domain_type(coefficient_ring(R)) || throw(NotImplementedError(:is_square_with_sqrt, a))
+   iszero(a) && return true, zero(R)
+   ap, ad = _normalize(a)
+   all(iseven, ad) || return false, zero(R)
+   flag, r = is_square_with_sqrt(ap)
+   flag || return false, zero(R)
+   return true, LaurentMPolyWrap(R, r, div.(ad, 2))
+end
+
+is_square(a::LaurentMPolyWrap) = is_square_with_sqrt(a)[1]
+
+function Base.sqrt(a::LaurentMPolyWrap; check::Bool = true)
+   flag, q = is_square_with_sqrt(a)
+   check && !flag && error("Not a square in square root")
+   return q
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function Base.isless(a::LaurentMPolyWrap, b::LaurentMPolyWrap)
+   check_parent(a, b)
+   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
+   # shift both to polynomials; the monomial ordering is invariant under this
+   m = min.(a.mindegs, b.mindegs)
+   return isless(_divexact_by_exponent_vector(a.mpoly, m .- a.mindegs),
+                 _divexact_by_exponent_vector(b.mpoly, m .- b.mindegs))
+end
+
 ###############################################################################
 #
 #  Universal laurent polynomial ring methods
@@ -723,8 +830,8 @@ end
 
 function laurent_polynomial_ring(R::AbstractAlgebra.Ring, s::Vector{Symbol}; cached::Bool = true)
    @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
-   P, x = AbstractAlgebra.polynomial_ring(R, s, cached = cached)
+   P = AbstractAlgebra.poly_ring(R, s, cached = cached)
    R = LaurentMPolyWrapRing(P, cached)
-   R, map(p -> LaurentMPolyWrap(R, p), x)
+   R, gens(R)
 end
 
