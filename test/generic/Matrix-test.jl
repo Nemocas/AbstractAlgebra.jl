@@ -2008,6 +2008,44 @@ end
    end
 end
 
+@testset "Generic.Mat.leading_principal_minors" begin
+   M = QQ[1 2 3; 4 5 6; 7 8 9]
+   @test leading_principal_minors(M) == QQ.([1, -3, 0]) # The rhs is obained as [det(M[1:k, 1:k]) for k in 1:3]
+
+   R, (x1, x2, x3, x4, x5) = polynomial_ring(QQ, [:x1, :x2, :x3, :x4, :x5])
+
+   A = matrix(R, [
+      x1 + 2*x2 + 1          x2^2 + x3           x3 + x4 + 2;
+      x1*x2 + x3             x2 + 3*x4 + 1       x1 + x5;
+      x3 + 2*x5              x1^2 + x4           x4 + 3;
+   ]) # Some dense matrix
+
+   expected_minors = [
+      # m_1 = det(A[1:1, 1:1])
+      x1 + 2*x2 + 1,
+
+      # m_2 = det(A[1:2, 1:2])
+      -x1*x2^3 - x1*x2*x3 + x1*x2 + 3*x1*x4 + x1 - x2^2*x3 + 2*x2^2 + 6*x2*x4 + 3*x2 - x3^2 + 3*x4 + 1,
+
+      # m_3 = det(A[1:3, 1:3])
+      -x1^4 + x1^3*x2*x3 + x1^3*x2*x4 - x1^3*x5 - x1^3 - 2*x1^2*x2*x5 + x1^2*x3^2 + x1^2*x3*x4 + 2*x1^2*x3 - x1^2*x4
+      - x1^2*x5 - x1*x2^3*x4 - 3*x1*x2^3 + x1*x2^2*x3 + 2*x1*x2^2*x5 - 3*x1*x2*x3 + x1*x2*x4^2 + x1*x2*x4 + 3*x1*x2
+      + x1*x3^2 + 2*x1*x3*x5 + 3*x1*x4^2 - x1*x4*x5 + 9*x1*x4 + 3*x1 - x2^2*x3*x4 + x2^2*x3*x5 - 3*x2^2*x3 + 2*x2^2*x4
+      + 2*x2^2*x5^2 + 6*x2^2 - x2*x3^2 - x2*x3*x4 - 2*x2*x3*x5 - 2*x2*x3 + 6*x2*x4^2 - 4*x2*x4*x5 + 21*x2*x4 - 4*x2*x5
+      + 9*x2 - 3*x3^2*x4 + x3^2*x5 - 4*x3^2 - 2*x3*x4^2 - 6*x3*x4*x5 - 5*x3*x4 + 2*x3*x5^2 - 2*x3*x5 - 2*x3 - 6*x4^2*x5
+      + 3*x4^2 - 15*x4*x5 + 10*x4 - 4*x5 + 3
+   ]
+   @test leading_principal_minors(A) == expected_minors
+
+   R, = residue_ring(ZZ, 4)
+   M = matrix(R, [
+      2 1 0;
+      1 2 1;
+      0 1 2
+   ])
+   @test leading_principal_minors(M) == R.([2, 3, 0])
+end
+
 @testset "Generic.Mat.exterior_power" begin
    S, z = polynomial_ring(ZZ,"z")
    n = 5

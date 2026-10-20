@@ -790,6 +790,219 @@ end
    @test x^5 == x*x*x*x*x
 end
 
+@testset "Generic.MPoly.pseudodivrem" begin
+   R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
+
+   p1 = x^2 + y
+   q1 = x - z
+
+   quot1, rem1 = pseudodivrem(p1, q1, x)
+   @test quot1 == x + z
+   @test rem1 == z^2 + y
+   @test pseudorem(p1, q1, x) == rem1
+   @test quot1 * q1 + rem1 == p1
+
+   p2 = x^2 + y
+   q2 = y * x - z
+
+   quot2, rem2 = pseudodivrem(p2, q2, 1)
+   @test quot2 == y * x + z
+   @test rem2 == z^2 + y^3
+   @test pseudorem(p2, q2, 1) == rem2
+   @test y^2 * p2 == quot2 * q2 + rem2
+
+   p3 = x * y + x
+   q3 = y + 1
+
+   quot3, rem3 = pseudodivrem(p3, q3, 2)
+   @test quot3 == x
+   @test iszero(rem3)
+   @test iszero(pseudorem(p3, q3, 2))
+   @test quot3 * q3 == p3
+
+   p4 = x^3 + 1
+   q4 = y * x^2 + 1
+
+   quot4, rem4 = pseudodivrem(p4, q4, x)
+   @test quot4 == y * x
+   @test rem4 == y * (y - x)
+   @test pseudorem(p4, q4, x) == rem4
+   @test y^2 * p4 == quot4 * q4 + rem4
+
+   @test pseudodivrem(x, x^2 + y, x) == (zero(R), x)
+   @test pseudorem(x, x^2 + y, x) == x
+
+   @test pseudodivrem(zero(R), x + y, x) == (zero(R), zero(R))
+   @test iszero(pseudorem(zero(R), x + y, x))
+
+   @test_throws DivideError pseudorem(x + y, zero(R), x)
+   @test_throws DivideError pseudodivrem(x + y, zero(R), x)
+
+   @testset "nonzero constant divisors" begin
+      Rzz, (x_zz, y_zz) = polynomial_ring(ZZ, [:x, :y])
+      c = Rzz(2)
+
+      @test pseudodivrem(x_zz, c, 1) == (2 * x_zz, zero(Rzz))
+      @test iszero(pseudorem(x_zz, c, 1))
+
+      @test pseudodivrem(Rzz(5), c, 1) == (Rzz(5), zero(Rzz))
+      @test iszero(pseudorem(Rzz(5), c, 1))
+    end
+end
+
+@testset "Genereic.subresultant_prs algorithms" begin
+   @testset "__kerber_S_and_H_matrices" begin
+      __kerber_S_matrix = AbstractAlgebra.__kerber_S_matrix
+      __kerber_H_matrix = AbstractAlgebra.__kerber_H_matrix
+
+      R, (x,) = polynomial_ring(QQ, [:x])
+      f = 3*x^4 - x^2 + 6*x + 1
+      g = 2*x^2 + 2*x + 3
+
+      expected_H = matrix(QQ, [
+         0   2   2   3;
+         2   2   3   0;
+         6  11 -12  -2;
+        11 -10 -14  -2
+      ])
+      H = __kerber_H_matrix(f, g, 1)
+      @test H == expected_H
+
+      expected_S_12_H = matrix(QQ, [
+         0   2  -2;
+         2   3  -2;
+         6 -12 -11
+      ])
+      @test __kerber_S_matrix(H, 1, 2) == expected_S_12_H
+
+      expected_S_22_H = matrix(QQ, [
+         2    0   3  -2;
+         2   -2   0  -3;
+        11   -6  -2  12;
+       -10  -11  -2  14
+      ])
+      @test __kerber_S_matrix(H, 2, 2) == expected_S_22_H
+
+      function __make_kerber_S(A::MatElem, cols::Vector{Int})
+         d = length(cols)
+         return matrix(base_ring(A), [sign(cols[c]) * A[r, abs(cols[c])] for r in 1:d, c in 1:d])
+      end
+
+      A = matrix(QQ, [10*r + c for r in 1:4, c in 1:4])
+      @test __kerber_S_matrix(A, 1, 4) == __make_kerber_S(A, [1])
+      @test __kerber_S_matrix(A, 2, 4) == __make_kerber_S(A, [2, -1])
+      @test __kerber_S_matrix(A, 3, 4) == __make_kerber_S(A, [3, -1, -2])
+      @test __kerber_S_matrix(A, 4, 4) == __make_kerber_S(A, [4, -1, -2, -3])
+
+      A9 = matrix(QQ, [10*r + c for r in 1:9, c in 1:9])
+      expected_cols = [3, -1, -2, 9, -4, -5, -6, -7, -8]
+      @test __kerber_S_matrix(A9, 3, 6) == __make_kerber_S(A9, expected_cols)
+   end
+   @testset "big subresultant example" begin
+      R, (x, a, b, c, d) = polynomial_ring(QQ, [:x, :a, :b, :c, :d])
+      p = x^5 + (a + b)*x^4 + (c - d)*x^3 + (a*c + 1)*x^2 + (b*d)*x + (a + c)
+      q = (b + 1)*x^4 + (a - c)*x^3 + (c*d)*x^2 + (a - b)*x + 1
+
+      # Test degree condition errors on index and generator
+      @test_throws ArgumentError subresultant_prs_ducos(q, p, x)
+      @test_throws ArgumentError subresultant_prs_kerber(q, p, x)
+
+      # Test zero divisor errors
+      @test subresultant_prs_ducos(p, zero(R), x) == [p, zero(R)]
+      @test subresultant_prs_kerber(p, zero(R), x) == [p, zero(R)]
+
+      # Test parent mismatch errors on variable generator
+      R_other, (v_other,) = polynomial_ring(QQ, [:v_other])
+      @test_throws ErrorException subresultant_prs_ducos(p, q, v_other)
+      @test_throws ErrorException subresultant_prs_kerber(p, q, v_other)
+
+      # Regular sequence in x
+      sprs_d = subresultant_prs_ducos(p, q, 1)
+      sprs_k = subresultant_prs_kerber(p, q, 1)
+
+      # Test that variable piping produces identical results
+      @test subresultant_prs_ducos(p, q, x) == sprs_d
+      @test subresultant_prs_kerber(p, q, x) == sprs_k
+
+      @test sprs_d[1] == p
+      @test sprs_k[1] == p
+      @test sprs_d[2] == q
+      @test sprs_k[2] == q
+      @test length(sprs_d) == 6
+      @test length(sprs_k) == 6
+      @test sprs_d == sprs_k
+
+      vars_list = [a, b, c, d]
+      for (idx, v) in enumerate(vars_list)
+         i = idx + 1
+
+         sprs_d_i = subresultant_prs_ducos(p, q, i)
+         sprs_k_i = subresultant_prs_kerber(p, q, i)
+
+         @test sprs_d_i == sprs_k_i
+
+         # Always have degree(p, i) == degree(q, i), so we can swap p and q
+         sprs_d_swp = subresultant_prs_ducos(q, p, v)
+         sprs_k_swp = subresultant_prs_kerber(q, p, v)
+
+         @test sprs_d_swp[3] == -sprs_d_i[3]
+         @test sprs_k_swp[3] == -sprs_k_i[3]
+         @test sprs_d_swp == sprs_k_swp
+      end
+   end
+   @testset "rational polyring in two vars" begin
+      R, (x, y) = polynomial_ring(QQ, [:x, :y])
+
+      p = x^4 + y*x + 1
+      q = x^4 + 1
+
+      sprs_d = subresultant_prs_ducos(p, q, 1)
+      sprs_k = subresultant_prs_kerber(p, q, 1)
+
+      # Ducos omits defective subresultants; Kerber computes the full chain
+      @test sprs_d == [p, q, -x*y^3, y^4]
+      @test sprs_k == [p, q, -x*y, 0, -x*y^3, y^4]
+
+      # Test in y variable
+      @test subresultant_prs_ducos(p, q, 2) == subresultant_prs_ducos(p, q, y)
+      @test subresultant_prs_kerber(p, q, 2) == subresultant_prs_kerber(p, q, y)
+
+      # Case 2: Unequal degrees with defective step
+      p = x^4 + y
+      q = x^3 + 1
+      res_ducos = subresultant_prs_ducos(p, q, x)
+      raw_kerber = subresultant_prs_kerber(p, q, x)
+
+      # Kerber contains the full chain, including the defective S_2
+      @test res_ducos == [p, q, x - y, y^3 + 1]
+      @test raw_kerber == [p, q, -x + y, x - y, y^3 + 1]
+
+      # Extracting regular subresultants from Kerber yields the Ducos PRS
+      regular_kerber = [poly for (idx, poly) in enumerate(raw_kerber) if idx <= 2 || degree(poly, 1) == degree(q, 1) - idx + 2]
+      @test regular_kerber == res_ducos
+
+      # Case 3: Common factor
+      g = x^2 + y
+      p = g * (x^2 + 2)
+      q = g * (x + y)
+      res_ducos = subresultant_prs_ducos(p, q, 1)
+      res_kerber = subresultant_prs_kerber(p, q, 1)
+
+      # last non-zero subresultant equals the multivariate gcd
+      @test res_ducos[end] == (y^2 + 2)*g
+      @test res_kerber[findlast(!is_zero, res_kerber)] == (y^2 + 2)*g
+   end
+   @testset "resultant formula verification" begin
+      R, (x, a, b) = polynomial_ring(QQ, [:x, :a, :b])
+      p = x^2 + a*x + b
+      q = 2*x + a
+      expected_resultant = 4*b - a^2
+
+      @test subresultant_prs_ducos(p, q, x)[end] == expected_resultant
+      @test subresultant_prs_kerber(p, q, x)[end] == expected_resultant
+   end
+end
+
 @testset "Generic.MPoly.divides" begin
    R, x = ZZ["y"]
 
