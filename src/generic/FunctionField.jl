@@ -722,8 +722,9 @@ end
 
 function Base.hash(a::AbsSimpleFunctionFieldElem, h::UInt)
    b = 0x52fd76bf2694aa02%UInt
-   b = xor(hash(denominator(a, false), h),
-                                          xor(hash(numerator(a, false), h), b))
+   # `==` compares canonical forms
+   b = xor(hash(denominator(a, true), h),
+                                          xor(hash(numerator(a, true), h), b))
    return b
 end
 

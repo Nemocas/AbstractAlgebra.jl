@@ -9,6 +9,34 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.51.1](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.1) - 2026-10-16
+
+### New or extended functionality
+
+- [#2101](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2101) Allow calling `solve_context_type` and `matrix_normal_form_type` on types
+- [#2552](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2552) Add `coefficients`, `exponent_vectors`, `content`, `deflate`, `is_square` and `sqrt` for univariate Laurent polynomials
+- [#2554](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2554) Add `degree`, `total_degree`, `vars`, `content`, `is_homogeneous`, `deflate` and `sqrt` for multivariate Laurent polynomials
+- [#2556](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2556) Add `coefficients`, `terms`, `coeff`, `derivative`, `evaluate`, `map_coefficients` and `MPolyBuildCtx` for universal Laurent polynomial rings
+- [#2593](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2593) Add `trace_of_product`
+- [#2599](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2599) Make `MatRing` and `MatRingElem` concrete types; `Generic.MatRing` remains as an alias
+- [#2553](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2553) Add `leading_coefficient`, `is_zero_divisor`, `canonical_unit`, `divides`, `map_coefficients`, `change_base_ring` and `is_noetherian` for Puiseux polynomials
+
+### Fixed bugs that returned incorrect results
+
+- [#2575](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2575) Fix `hash` for `Generic.MPoly` so that equal polynomials hash equally (broke `Dict` and `Set` lookups)
+- [#2580](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2580) Fix a bug in multivariate factorization that could lead to wrong results (due to an index mix-up in `make_bases_coprime!`)
+- [#2595](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2595) Consistently throw `DivideError` in `divexact` by zero
+- [#2553](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2553) Fix `is_unit` for Puiseux polynomials returning `false` for units such as `2` or `2*u^(1//2)`
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2577](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2577) Fix `sqrt` and `is_square` for multivariate polynomials over `GF(p)` for odd `p`
+- [#2596](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2596) Fix a potential unexpected error in multivariate factorization
+
+### Other fixed bugs
+
+- [#2576](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2576) Fix `SkewDiagram` for partitions of mixed eltype
+
 ## [0.51.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.0) - 2026-10-06
 
 ### Breaking changes

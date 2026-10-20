@@ -16,9 +16,9 @@ feature that exponents can be negative.
 
 AbstractAlgebra.jl provides a generic implementation of multivariate Laurent
 polynomials, built in terms of regular multivariate polynomials, in the file
-`src/generic/LaurentMPoly.jl`.
+`src/LaurentMPoly.jl`.
 
-The type `LaurentMPolyWrap{T, ...} <: LaurentMPolyRingElem{T}` implements generic
+The type `LaurentMPolyRingElem{T, ...}` implements generic
 multivariate Laurent polynomials by wrapping regular polynomials:
 a Laurent polynomial `l` wraps a polynomial `p` and a vector of integers $n_i$
 such that $l = \prod_i x_i^{n_i} * p$. The representation is said to be
@@ -26,13 +26,8 @@ normalized when each $n_i$ is as large as possible (or zero when `l` is zero),
 but the representation of a given element is not required to be normalized
 internally.
 
-The corresponding parent type is `LaurentMPolyWrapRing{T, ...} <: LaurentMPolyRing{T}`.
-
-## Abstract types
-
-Two abstract types `LaurentMPolyRingElem{T}` and `LaurentMPolyRing{T}`
-are defined to represent Laurent polynomials and rings thereof, parameterized
-on a base ring `T`.
+The corresponding parent type is `LaurentMPolyRing{T, ...}`. Both types are
+concrete; `T` is the type of the coefficients.
 
 ## Multivate Laurent polynomial operations
 

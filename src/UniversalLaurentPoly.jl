@@ -49,7 +49,8 @@ function evaluate(a::UniversalRingElem{<:LaurentMPolyRingElem}, A::Vector{<:Ring
       for e in exponent_vectors(a2)
          iszero(view(e, k+1:n)) || error("Number of variables does not match number of values")
       end
-      A = vcat(A, [one(parent(A[1])) for _ in k+1:n])
+      R = parent(A[1])
+      A = vcat(A, [one(R) for _ in k+1:n])
    end
    return evaluate(a2, A[1:n])
 end
@@ -89,7 +90,7 @@ ensures a distinct new ring is returned, and will also prevent it from being cac
 
 ```jldoctest
 julia> S, (x,y) = universal_laurent_polynomial_ring(ZZ, [:x,:y])
-(Universal Laurent polynomial ring over Integers, UniversalRingElem{AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}[x, y])
+(Universal Laurent polynomial ring over Integers, UniversalRingElem{LaurentMPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, LaurentMPolyRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}[x, y])
 
 julia> z = gen(S, :z)
 z
@@ -104,7 +105,7 @@ julia> x = gen(S, :x)
 x
 
 julia> y, z = gens(S, [:y, :z])
-2-element Vector{UniversalRingElem{AbstractAlgebra.Generic.LaurentMPolyWrap{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, AbstractAlgebra.Generic.LaurentMPolyWrapRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}}:
+2-element Vector{UniversalRingElem{LaurentMPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, LaurentMPolyRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}}:
  y
  z
 
