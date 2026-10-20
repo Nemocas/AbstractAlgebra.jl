@@ -850,7 +850,7 @@ end
     end
 end
 
-@testset "Genereic.subresultant_prs algorithms" begin
+@testset "Generic.subresultant_prs algorithms" begin
    @testset "__kerber_S_and_H_matrices" begin
       __kerber_S_matrix = AbstractAlgebra.__kerber_S_matrix
       __kerber_H_matrix = AbstractAlgebra.__kerber_H_matrix
