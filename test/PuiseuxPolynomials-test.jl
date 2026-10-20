@@ -242,9 +242,18 @@ import AbstractAlgebra: Generic.normalize!
         @test t < QQ(1//2) && K(t) < QQ(1//2)
         @test 1000 < K(1) // K(t)
 
+        # the denominator t - 1 is negative
+        f = K(1) // K(t - 1)
+        @test f < K(-1) // K(2)
+        @test !(0 < f)
+
         # coefficients of type T <: RingElem
         S, (s,) = puiseux_polynomial_ring(K, [:s])
         @test 0 < s < K(t)
+        @test !(K(t) < s)
+        FS = fraction_field(S)
+        @test FS(s) < K(t)
+        @test !(K(t) < FS(s))
 
         Rxy, (x, y) = puiseux_polynomial_ring(QQ, [:x, :y])
         @test_throws ArgumentError x < y
