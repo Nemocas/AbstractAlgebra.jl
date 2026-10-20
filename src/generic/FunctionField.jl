@@ -945,6 +945,7 @@ Base.inv(a::AbsSimpleFunctionFieldElem) = _inv_naive(a)
 
 # Generic fallback for downstream specializations of inv.
 function _inv_naive(a::AbsSimpleFunctionFieldElem)
+   iszero(a) && throw(NotInvertibleError(a))
    R = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
@@ -1010,30 +1011,35 @@ end
 function divexact(a::Union{Rational, Integer},
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T, U}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 
 function divexact(a::T,
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: Integer, U}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 
 function divexact(a::T,
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: Rational, U}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 
 function divexact(a::T,
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: FieldElem, U}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 
 function divexact(a::RationalFunctionFieldElem{T, U},
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T, U}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 

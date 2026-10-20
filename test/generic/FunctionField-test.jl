@@ -591,6 +591,8 @@ end
 
          @test isone(f*inv(f))
       end
+
+      @test_throws NotInvertibleError inv(zero(S))
    end
 end
 
@@ -633,6 +635,12 @@ end
       @test divexact(big(2), y) * y == 2
       @test divexact(1//2, y) * y == 1//2
       @test divexact(big(1)//2, y) * y == 1//2
+
+      for a in (2, big(2), 1//2, big(1)//2, x1)
+         for check in (true, false)
+            @test_throws DivideError divexact(a, zero(S); check)
+         end
+      end
 
       for iters = 1:10
          f = 0 # Int
@@ -686,6 +694,12 @@ end
 
       # characteristic p
       S, y = function_field(P2[i], "y")
+
+      for a in (2, base_ring(R2)(2), x2)
+         for check in (true, false)
+            @test_throws DivideError divexact(a, zero(S); check)
+         end
+      end
 
       for iters = 1:10
          f = 0 # Int
