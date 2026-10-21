@@ -9,6 +9,24 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.51.2](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.2) - 2026-10-21
+
+### New or extended functionality
+
+- [#2602](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2602) Make `LaurentPolyRing`, `LaurentMPolyRing` and their element types concrete types; the `Generic.Laurent(M)PolyWrap(Ring)` names remain as aliases
+
+### Performance improvements or improved testing
+
+- [#2616](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2616) Speed up attribute access
+
+### Fixed bugs that returned incorrect results
+
+- [#2612](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2612) Make `hash` of function field elements agree with `==`
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2619](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2619) Fix `transpose` throwing a `MethodError` for matrix types without their own method
+
 ## [0.51.1](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.1) - 2026-10-16
 
 ### New or extended functionality
