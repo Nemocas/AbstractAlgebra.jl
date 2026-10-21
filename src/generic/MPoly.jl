@@ -2011,19 +2011,13 @@ end
 
 function isequal(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    check_parent(a, b, false) || return false
-   if a.length != b.length
-      return false
-   end
+   length(a) == length(b) || return false
    N = size(a.exps, 1)
    for i = 1:a.length
       for j = 1:N
-         if a.exps[j, i] != b.exps[j, i]
-            return false
-         end
+         a.exps[j, i] == b.exps[j, i] || return false
       end
-      if !isequal(a.coeffs[i], b.coeffs[i])
-         return false
-      end
+      isequal(a.coeffs[i], b.coeffs[i]) || return false
    end
    return true
 end

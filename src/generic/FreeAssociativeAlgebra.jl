@@ -389,9 +389,10 @@ end
 
 function isequal(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T
     check_parent(a, b, false) || return false
-    return a.length == b.length &&
-           view(a.exps, 1:a.length) == view(b.exps, 1:b.length) &&
-           isequal(view(a.coeffs, 1:a.length), view(b.coeffs, 1:b.length))
+    length(a) == length(b) || return false
+    n = length(a)
+    view(a.exps, 1:n) == view(b.exps, 1:n) || return false
+    return isequal(view(a.coeffs, 1:n), view(b.coeffs, 1:n))
 end
 
 function word_cmp(a::Vector{Int}, b::Vector{Int})

@@ -312,13 +312,10 @@ end
 
 function isequal(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    check_parent(a, b, false) || return false
-   if length(a) != length(b)
-      return false
-   end
+   length(a) == length(b) || return false
    for i = 1:length(a)
-      if a.exps[i] != b.exps[i] || !isequal(a.coeffs[i], b.coeffs[i])
-         return false
-      end
+      a.exps[i] == b.exps[i] || return false
+      isequal(a.coeffs[i], b.coeffs[i]) || return false
    end
    return true
 end
