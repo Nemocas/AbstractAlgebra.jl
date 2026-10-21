@@ -1714,13 +1714,16 @@ end
    B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
-   # transpose input/output types are the same
    a = matrix(F2(), F2Elem[1 1 0; 0 0 1])
-   # not method (yet) for transpose(a)
-   at = transpose(a.m)
-   @test typeof(at) == typeof(a.m)
-   @test at[1, 1] == at[2, 1] == at[3, 2] == F2Elem(true)
-   @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
+   b = matrix(F2(), F2Elem[1 0; 1 0; 0 1])
+
+   # MatElem fallback; F2Matrix has no own transpose
+   @test transpose(a) isa F2Matrix
+   @test transpose(a) == b
+
+   # must not switch to dense_matrix_type(F2) == F2Matrix
+   @test transpose(a.m) isa Generic.MatSpaceElem{F2Elem}
+   @test transpose(a.m) == b.m
 end
 
 @testset "Generic.Mat.gram" begin
