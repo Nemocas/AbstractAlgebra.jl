@@ -278,6 +278,15 @@ function ==(a::LaurentMPolyRingElem, b::LaurentMPolyRingElem)
     return x == y
 end
 
+function isequal(a::LaurentMPolyRingElem, b::LaurentMPolyRingElem)
+    check_parent(a, b, false) || return false
+    if a.mindegs == b.mindegs
+        return isequal(a.mpoly, b.mpoly)
+    end
+    g, x, y = _gcdhelper(a, b)
+    return isequal(x, y)
+end
+
 function +(a::LaurentMPolyRingElem, b::LaurentMPolyRingElem)
     check_parent(a, b)
     if a.mindegs == b.mindegs

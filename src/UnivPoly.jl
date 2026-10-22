@@ -393,6 +393,12 @@ function ==(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    return true
 end
 
+function isequal(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
+   check_parent(a, b, false) || return false
+   univ_promote!(a, b)
+   return isequal(data(a), data(b))
+end
+
 function isless(a::T, b::T) where {T <: UniversalRingElem{<:MPolyRingElem}}
    univ_promote!(a, b)
    return isless(data(a), data(b))

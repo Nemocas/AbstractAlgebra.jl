@@ -2009,6 +2009,19 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return true
 end
 
+function isequal(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b, false) || return false
+   length(a) == length(b) || return false
+   N = size(a.exps, 1)
+   for i = 1:a.length
+      for j = 1:N
+         a.exps[j, i] == b.exps[j, i] || return false
+      end
+      isequal(a.coeffs[i], b.coeffs[i]) || return false
+   end
+   return true
+end
+
 @doc raw"""
     isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 
