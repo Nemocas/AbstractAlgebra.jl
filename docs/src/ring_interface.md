@@ -30,11 +30,12 @@ types in generic/GenericTypes.jl:
 The parent type must belong to `Ring` and the element type must belong
 to `RingElem`. Of course, the types may belong to these abstract types
 transitively, e.g. `Poly{T}` actually belongs to `PolyRingElem{T}` which in
-turn belongs to `RingElem`.
+turn belongs to `RingElem`. For noncommutative rings, see
+[Noncommutative rings](@ref ring-interface-noncommutative).
 
 For parameterised rings, we advise that the types of both the parent objects and
 element objects to be parameterised by the types of the elements of the base ring
-(see the function `base_ring` below for a definition).
+(see [`base_ring`](@ref)).
 
 There can be variations on this theme: e.g. in some areas of mathematics there is a
 notion of a coefficient domain, in which case it may make sense to parameterise all
@@ -43,18 +44,10 @@ implications for the ad hoc operators one might like to explicitly implement.
 
 ## RingElement type union
 
-Because of its lack of multiple inheritance, Julia does not allow Julia Base
-types to belong to `RingElem`. To allow us to work equally with
-AbstractAlgebra and Julia types that represent elements of rings we define a
-union type `RingElement` in `src/julia/JuliaTypes`.
-
-So far, in addition to `RingElem` the  union type
-`RingElement` includes the Julia types `Integer`, `Rational`
-and `AbstractFloat`.
-
-Most of the generic code in AbstractAlgebra makes use of the union type
-`RingElement` instead of `RingElem` so that the
-generic functions also accept the Julia Base ring types.
+Julia's own number types cannot be subtypes of `RingElem`, so AbstractAlgebra
+defines the union type `RingElement`; see [Abstract types for rings](@ref ring-abstract-types).
+Generic code should accept `RingElement` rather than `RingElem`, so that it
+also works for Julia's number types.
 
 !!! note
 
@@ -62,13 +55,6 @@ generic functions also accept the Julia Base ring types.
     types. It is often necessary to define separate versions of the functions for
     `RingElem` then for each of the Julia types separately in
     order to avoid ambiguity warnings.
-
-Note that even though `RingElement` is a union type we still
-have the following inclusion
-
-```julia
-RingElement <: NCRingElement
-```
 
 ## Parent object caches
 
@@ -110,238 +96,65 @@ object `R` and `MyElem` for the type of the elements of the ring.
 
 ### Data type and parent object methods
 
-```julia
-parent_type(::Type{MyElem})
-```
-
-Return the type of the corresponding parent object for the given element type. For
-example, `parent_type(Generic.Poly{T})` will return `Generic.PolyRing{T}`.
-
-```julia
-elem_type(::Type{MyParent})
-```
-
-Return the type of the elements of the ring whose parent object has the given type.
-This is the inverse of the `parent_type` function, i.e. `elem_type(Generic.PolyRing{T})`
-will return `Generic.Poly{T}`.
-
-```julia
-base_ring_type(::Type{MyParent})
-```
-
-Return the type of the of base rings for parent objects with the given parent type.
-For example, `base_ring_type(Generic.PolyRing{T})` will return `parent_type(T)`.
-
-If the rings of this type are not parameterised by another ring, this function must return `Union{}`.
-
-```julia
-base_ring(R::MyParent)
-```
-
-Given a parent object `R`, representing a ring, this function returns the parent object
-of any base ring that parameterises this ring. For example, the base ring of the ring
-of polynomials over the integers would be the integer ring.
-
-If the ring is not parameterised by another ring, calling this function should rais an error.
-
-!!! note
-
-    There is a distinction between a base ring and other kinds of parameters. For
-    example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
-    only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
-    been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
-    ideal.
-
-    There is no general mathematical definition for base ring, so to know what `base_ring`
-    does for any given type of ring, you need to consult its documentation.
-
-```julia
-parent(f::MyElem)
-```
-
-Return the parent object of the given element, i.e. return the ring to which the given
-element belongs.
-
-This is usually stored in a field `parent` in each ring element. (If the parent objects
-have `mutable struct` types, the internal overhead here is just an additional machine
-pointer stored in each element of the ring.)
-
-For some element types it isn't necessary to append the parent object as a field of
-every element. This is the case when the parent object can be reconstructed just given
-the type of the elements. For example, this is the case for the ring of integers and
-in fact for any ring element type that isn't parameterised or generic in any way.
-
-```julia
-is_domain_type(::Type{MyElem})
-```
-
-Return `true` if every element of the given element type (which may be parameterised
-or an abstract type) necessarily has a parent that is an integral domain, otherwise
-if this cannot be guaranteed, the function returns `false`.
-
-For example, if `MyElem` was the type of elements of generic residue rings of a
-polynomial ring, the answer to the question would depend on the modulus of the residue
-ring. Therefore `is_domain_type` would have to return `false`, since we cannot guarantee
-that we are dealing with elements of an integral domain in general. But if the given
-element type was for rational integers, the answer would be `true`, since every rational
-integer has as parent the ring of rational integers, which is an integral domain.
-
-Note that this function depends only on the type of an element and cannot access
-information about the object itself, or its parent.
-
-```julia
-is_exact_type(::Type{MyElem})
-```
-
-Return `true` if every element of the given type is represented exactly. For example,
-$p$-adic numbers, real and complex floating point numbers and power series are not
-exact, as we can only represent them in general with finite truncations. Similarly
-polynomials and matrices over inexact element types are themselves inexact.
-
-Integers, rationals, finite fields and polynomials and matrices over them are always
-exact.
-
-Note that `MyElem` may be parameterised or an abstract type, in which case every
-element of every type represented by `MyElem` must be exact, otherwise the function
-must return `false`.
-
-```julia
-Base.hash(f::MyElem, h::UInt)
-```
-
-Return a hash for the object $f$ of type `UInt`. This is used as a hopefully cheap way
-to distinguish objects that differ arithmetically.
-
-If the object has components, e.g. the coefficients of a polynomial or elements of a
-matrix, these should be hashed recursively, passing the same parameter `h` to all
-levels. Each component should then be xor'd with `h` before combining the individual
-component hashes to give the final hash.
-
-The hash functions in AbstractAlgebra.jl usually start from some fixed 64 bit
-hexadecimal  value that has been picked at random by the library author for that type.
-That is then truncated to fit a `UInt` (in case the latter is not 64 bits). This ensures
-that objects that are the same arithmetically (or that have the same components), but
-have different types (or structures), are unlikely to hash to the same value.
-
-```julia
-deepcopy_internal(f::MyElem, dict::IdDict)
-```
-
-Return a copy of the given element, recursively copying all components of the object.
-
-Obviously the parent, if it is stored in the element, should not be copied. The new
-element should have precisely the same parent as the old object.
-
-For types that cannot self-reference themselves anywhere internally, the `dict` argument
-may be ignored.
-
-In the case that internal self-references are possible, please consult the Julia
-documentation on how to implement `deepcopy_internal`.
+- [`parent_type(::Type{MyElem})`](@ref parent_type)
+- [`elem_type(::Type{MyParent})`](@ref elem_type)
+- [`base_ring_type(::Type{MyParent})`](@ref base_ring_type): return `Union{}`
+  if the ring has no base ring.
+- [`base_ring(R::MyParent)`](@ref base_ring): only if the ring is built on
+  another ring.
+- [`coefficient_ring(R::MyParent)`](@ref coefficient_ring) and
+  [`coefficient_ring_type(::Type{MyParent})`](@ref coefficient_ring_type): only
+  if there is a well-defined notion of a coefficient ring, e.g. for polynomial
+  rings.
+- [`parent(f::MyElem)`](@ref parent): usually returns a field `parent` stored
+  in each element. Element types whose parent can be reconstructed from the
+  type alone, e.g. types that are not parameterised, need not store it.
+- [`is_domain_type(::Type{MyElem})`](@ref is_domain_type) and
+  [`is_exact_type(::Type{MyElem})`](@ref is_exact_type): these see only the
+  type, never an element or its parent.
+- `Base.hash(f::MyElem, h::UInt)`: hash the components of `f`, e.g. the
+  coefficients of a polynomial, recursively, passing the same `h` to all
+  levels, and xor each component hash with `h` before combining them. The hash
+  functions in AbstractAlgebra start from a 64 bit constant picked at random
+  for each type and truncated to `UInt`, so that arithmetically equal objects
+  of different types are unlikely to hash to the same value.
+- `deepcopy_internal(f::MyElem, dict::IdDict)`: copy all components of `f`
+  recursively, but not its parent: the copy must have the identical parent.
+  For types that cannot reference themselves internally, `dict` may be
+  ignored; otherwise see the Julia documentation of `deepcopy_internal`.
 
 ### Constructors
 
-Outer constructors for most AbstractAlgebra types are provided by overloading the call
-syntax for parent objects.
+Elements are constructed by calling the parent object; see
+[Constructors](@ref ring-constructors) for what each call returns.
 
-If `R` is a parent object for a given ring we require the following constructors.
-
-```julia
-(R::MyParent)()
-```
-
-Return the zero object of the given ring.
-
-```julia
-(R::MyParent)(a::Integer)
-```
-
-Coerce the given integer into the given ring.
-
-```julia
-(R::MyParent)(a::MyElem)
-```
-
-If $a$ belongs to the given ring, the function returns it (without making a copy).
-Otherwise an error is thrown.
-
-For parameterised rings we also require a function to coerce from the base ring into
-the parent ring.
-
-```julia
-(R::MyParent{T})(a::T) where T <: RingElem
-```
-
-Coerce $a$ into the ring $R$ if $a$ belongs to the base ring of $R$.
+- `(R::MyParent)()`
+- `(R::MyParent)(a::Integer)`
+- `(R::MyParent)(a::MyElem)`: return `a` itself, without copying it, if its
+  parent is `R`; otherwise throw an exception.
+- `(R::MyParent{T})(a::T) where T <: RingElem`: for parameterised rings,
+  coerce `a` from the base ring.
 
 ### Basic manipulation of rings and elements
 
-```julia
-zero(R::MyParent)
-```
-
-Return the zero element of the given ring.
-
-```julia
-one(R::MyParent)
-```
-
-Return the multiplicative identity of the given ring.
-
-```julia
-iszero(f::MyElem)
-```
-
-Return `true` if the given element is the zero element of the ring it belongs to.
-
-```julia
-isone(f::MyElem)
-```
-
-Return `true` if the given element is the multiplicative identity of the ring it belongs
-to.
+- [`zero(R::MyParent)`](@ref zero)
+- [`one(R::MyParent)`](@ref one)
+- [`iszero(f::MyElem)`](@ref iszero)
+- [`isone(f::MyElem)`](@ref isone)
 
 ### Canonicalisation
 
-```julia
-canonical_unit(f::MyElem)
-```
-
-When fractions are created with two elements of the given type, it is nice to be able
-to represent them in some kind of canonical form. This is of course not always possible.
-But for example, fractions of integers can be canonicalised by first removing any common
-factors of the numerator and denominator, then making the denominator positive.
-
-In AbstractAlgebra.jl, the denominator would be made positive by dividing both the
-numerator and denominator by the canonical unit of the denominator. For a negative
-denominator, this would be $-1$.
-
-For non-zero elements of a field, `canonical_unit` simply returns the element itself.
-In general, `canonical_unit` of an invertible element should be that element.
-Finally, if $a = bc$, then `canonical_unit(a)*a = canonical_unit(b)*canonical_unit(c)*a`
-holds. Thus if $a$ is not a zero-divisor, then we even have
-`canonical_unit(a) = canonical_unit(b)*canonical_unit(c)`.
-
-For some rings, it is completely impractical to implement this function, in which case
-it may return $1$ in the given ring. The function must however always exist, and always
-return an element of the ring.
+- [`canonical_unit(f::MyElem)`](@ref canonical_unit). This must exist and
+  return an element of the ring. Where no useful normalisation is practical,
+  return `one(parent(f))`; otherwise the result must have the properties
+  listed in the docstring.
 
 ### String I/O
 
-```julia
-show(io::IO, R::MyParent)
-```
-
-This should print an English description of the parent ring (to the given IO object).
-If the ring is parameterised, it can call the corresponding `show` function for any
-rings it depends on.
-
-```julia
-show(io::IO, f::MyElem)
-```
-
-This should print a human readable, textual representation of the object (to the given
-IO object). It can recursively call the corresponding `show` functions for any of its
-components.
+- `show(io::IO, R::MyParent)`: print an English description of the ring. For a
+  parameterised ring, it can call `show` on the rings it depends on.
+- `show(io::IO, f::MyElem)`: print a human readable, textual representation of
+  `f`. It can call `show` on the components of `f`.
 
 ### Expressions
 
@@ -448,94 +261,44 @@ as they provide absolutely no precedence information on their contents.
 
 ### Unary operations
 
-```julia
--(f::MyElem)
-```
-
-Return $-f$.
+- `-(f::MyElem)`
 
 ### Binary operations
 
-```julia
-+(f::MyElem, g::MyElem)
--(f::MyElem, g::MyElem)
-*(f::MyElem, g::MyElem)
-```
-
-Return $f + g$, $f - g$ or $fg$, respectively.
+- `+(f::MyElem, g::MyElem)`
+- `-(f::MyElem, g::MyElem)`
+- `*(f::MyElem, g::MyElem)`
 
 ### Comparison
 
-```
-==(f::MyElem, g::MyElem)
-```
-
-Return `true` if $f$ and $g$ are arithmetically equal. In the case where the two
-elements are inexact, the function returns `true` if they agree to the minimum precision
-of the two.
-
-```
-isequal(f::MyElem, g::MyElem)
-```
-
-For exact rings, this should return the same thing as `==` above. For inexact rings,
-this returns `true` only if the two elements are arithmetically equal and have the same
-precision.
+- `==(f::MyElem, g::MyElem)`: for inexact elements, return `true` if `f` and
+  `g` agree to the minimum precision of the two.
+- `isequal(f::MyElem, g::MyElem)`: the same as `==` for exact rings; for
+  inexact rings, additionally require equal precision.
 
 ### Powering
 
-```julia
-^(f::MyElem, e::Int)
-```
-
-Return $f^e$. The function should throw a `DomainError()` if negative exponents don't
-make sense but are passed to the function.
+- `^(f::MyElem, e::Int)`: throw a `DomainError` if `e` is negative and that
+  makes no sense for `f`.
 
 ### Exact division
 
-```julia
-divexact(f::MyElem, g::MyElem; check::Bool=true)
-```
-
-Return $f/g$, though note that Julia uses `/` for floating point division. Here we
-mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
-should be thrown if $g$ is zero.
-
-If `check=true` the function should check that the division is exact and throw
-an exception if not.
-
-If `check=false` the check may be omitted for performance reasons. The behaviour
-is then undefined if a division is performed that is not exact. This may include
-throwing an exception, returning meaningless results, hanging or crashing. The
-function should only be called with `check=false` if it is already known that the
-division will be exact.
+- [`divexact(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact). Throw a
+  `DivideError` if `g` is zero. With `check=false` the exactness check may be
+  skipped; what happens on an inexact division is then undefined, including
+  meaningless results, hanging or crashing.
 
 ### Inverse
 
-```julia
-inv(f::MyElem)
-```
-
-Return the inverse of $f$, i.e. $1/f$, though note that Julia uses `/` for floating
-point division. Here we mean exact division in the ring.
-
-A fallback for this function is provided in terms of `divexact` so an implementation
-can be omitted if preferred.
+- [`inv(f::MyElem)`](@ref Base.inv(::RingElem)). Optional: the default calls
+  `divexact(one(parent(f)), f)`.
 
 ### Random generation
 
-The random functions are only used for test code to generate test data. They therefore
-don't need to provide any guarantees on uniformity, and in fact, test values that are
-known to be a good source of corner cases can be supplied.
-
-```julia
-rand(R::MyParent, v...)
-```
-
-Return a random element in the given ring of the specified size.
-
-There can be as many arguments as is necessary to specify the size of the test example
-which is being produced.
+- `rand(R::MyParent, v...)`: return a random element of `R`, of a size given by
+  the arguments `v`. It is only used to generate test data, so it need not be
+  uniform, and values known to be good sources of corner cases are welcome.
+  See the [Random interface](@ref).
 
 ### Promotion rules
 
@@ -648,34 +411,18 @@ The various operators described in [Unsafe ring operators](@ref) such as
 `add!` and `mul!` have default implementations which are not faster than their
 regular safe counterparts. Implementors may wish to implement some or all of
 them for their rings. Note that in general only the variants with the most
-arguments needs to be implemented. E.g. for `add!` only `add(z,a,b)` has to be
+arguments needs to be implemented. E.g. for `add!` only `add!(z,a,b)` has to be
 implemented for any new ring type, as `add!(a,b)` delegates to `add!(a,a,b)`.
 
 ### Optional basic manipulation functionality
 
-```julia
-is_unit(f::MyElem)
-```
-
-Return `true` if the given element is a unit in the ring it belongs to.
-
-```julia
-is_zero_divisor(f::MyElem)
-```
-
-Return `true` if the given element is a zero divisor in the ring it belongs to.
-When this function does not exist for a given ring then the total ring of
-fractions may not be usable over that ring. All fields in the system have a
-fallback defined for this function.
-
-
-```julia
-characteristic(R::MyParent)
-```
-
-Return the characteristic of the ring. The function should not be defined if
-it is not possible to unconditionally give the characteristic. AbstractAlgebra
-will raise an exception is such cases.
+- [`is_unit(f::MyElem)`](@ref is_unit)
+- [`is_zero_divisor(f::MyElem)`](@ref is_zero_divisor): without it, the total
+  ring of fractions may not be usable over the ring. All fields have a
+  fallback.
+- [`characteristic(R::MyParent)`](@ref characteristic): define it only if the
+  characteristic can be given unconditionally; otherwise the default raises an
+  exception.
 
 ### Optional binary ad hoc operators
 
@@ -754,16 +501,18 @@ In case $f$ cannot explode in size when powered by a very large integer, and it 
 practical to do so, one may provide this function to support powering with `BigInt`
 exponents (or for external modules, any other big integer type).
 
-### Optional unsafe operators
+## [Noncommutative rings](@id ring-interface-noncommutative)
 
-```julia
-addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem)
-```
+The same interface serves noncommutative rings, with these differences:
 
-Set $c = c + ab$ in-place. Return the mutated value. The value $t$ should be a temporary
-of the same type as $a$, $b$ and $c$, which can be used arbitrarily by the
-implementation to speed up the computation. Aliasing between $a$, $b$ and $c$ is
-permitted.
+- The parent type must belong to `NCRing` but not to `Ring`, and the element
+  type to `NCRingElem` but not to `RingElem`. Generic code for rings that need
+  not be commutative should accept `NCRingElement`, which adds Julia's number
+  types to `NCRingElem` as `RingElement` does to `RingElem`.
+- Instead of [`divexact`](@ref), implement
+  [`divexact_left(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact_left)
+  and [`divexact_right(f::MyElem, g::MyElem; check::Bool=true)`](@ref divexact_right).
+  Throw a `DivideError` if `g` is zero.
 
 ## Minimal example of ring implementation
 
