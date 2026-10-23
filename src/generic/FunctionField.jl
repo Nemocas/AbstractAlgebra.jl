@@ -1411,3 +1411,10 @@ function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; ca
 
    return par, gen(par)
 end
+
+# Only univariate base fields are supported. Hecke's fallback for
+# `PolyRingElem{<:RationalFunctionFieldElem}` forwards to `function_field`
+# and, without this method, calls itself until the stack overflows.
+function function_field(p::Poly{RationalFunctionFieldElem{T, U}}, s::VarName; kw...) where {T <: FieldElement, U <: MPolyRingElem}
+   throw(NotImplementedError(:function_field, p, s))
+end
