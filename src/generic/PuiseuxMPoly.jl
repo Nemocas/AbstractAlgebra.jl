@@ -49,6 +49,8 @@ parent_type(::Type{PuiseuxMPolyRingElem{T}}) where T <: RingElement = PuiseuxMPo
 base_ring_type(::Type{PuiseuxMPolyRing{T}}) where T <: RingElement = LaurentMPolyRing{T, mpoly_ring_type(T)}
 coefficient_ring_type(::Type{PuiseuxMPolyRing{T}}) where T = parent_type(T)
 
+is_domain_type(::Type{<:PuiseuxMPolyRingElem{T}}) where {T} = is_domain_type(T)
+
 characteristic(R::PuiseuxMPolyRing) = characteristic(coefficient_ring(R))
 is_known(::typeof(characteristic), R::PuiseuxMPolyRing) = is_known(characteristic, coefficient_ring(R))
 
@@ -60,6 +62,72 @@ function promote_rule(::Type{PuiseuxMPolyRingElem{S}}, ::Type{T}) where {S <: Ri
     end
     return promote_rule(S, T) === S ? PuiseuxMPolyRingElem{S} : Union{}
 end
+
+@doc raw"""
+    isless(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+
+Return whether $f < g$ in the ordering of univariate Puiseux polynomials over an
+ordered field in which the variable is positive and smaller than every positive
+element of the field: $f < g$ if and only if the lowest-order term of $g - f$
+has a positive coefficient. The ordering extends to the fraction field of the
+Puiseux polynomial ring; see
+[Joswig et al.](https://link.springer.com/chapter/10.1007/978-3-319-32859-1_37).
+
+Comparisons with integers, rationals and elements of the coefficient field are
+also supported.
+
+# Examples
+
+```jldoctest
+julia> R, (t,) = puiseux_polynomial_ring(QQ, [:t]);
+
+julia> 0 < t^2 < t < t^(1//2) < 1//1000
+true
+
+julia> K = fraction_field(R);
+
+julia> 1000 < K(1) // K(t)
+true
+```
+"""
+function isless(f::PuiseuxMPolyRingElem{T},g::PuiseuxMPolyRingElem{T}) where T <: RingElement
+    R = parent(f)
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    d = f - g
+    if iszero(d)
+        return false
+    end
+    return last(collect(coefficients(d))) < 0
+end
+
+isless(f::PuiseuxMPolyRingElem, g::Union{Integer, Rational}) = isless(f, parent(f)(g))
+isless(g::Union{Integer, Rational}, f::PuiseuxMPolyRingElem) = isless(parent(f)(g), f)
+isless(f::PuiseuxMPolyRingElem{T}, g::T) where T <: RingElem = isless(f, parent(f)(g))
+isless(g::T, f::PuiseuxMPolyRingElem{T}) where T <: RingElem = isless(parent(f)(g), f)
+
+function isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}},g::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElement
+    R = base_ring(parent(f))
+    @req ngens(R) == 1 "isless only defined in the univariate case"
+    denom_f = denominator(f)
+    num_f = numerator(f)
+    if denom_f < 0
+        denom_f *= -1
+        num_f *= -1
+    end
+    denom_g = denominator(g)
+    num_g = numerator(g)
+    if denom_g < 0
+        denom_g *= -1
+        num_g *= -1
+    end
+    return is_less(num_f*denom_g, num_g*denom_f)
+end
+
+isless(f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}, g::Union{Integer, Rational}) = isless(f, parent(f)(g))
+isless(g::Union{Integer, Rational}, f::Generic.FracFieldElem{<:PuiseuxMPolyRingElem}) = isless(parent(f)(g), f)
+isless(f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}, g::T) where T <: RingElem = isless(f, parent(f)(g))
+isless(g::T, f::Generic.FracFieldElem{PuiseuxMPolyRingElem{T}}) where T <: RingElem = isless(parent(f)(g), f)
+
 
 #################################################################################
 #
@@ -395,18 +463,10 @@ function Base.:^(f::PuiseuxMPolyRingElem, a::Rational)
 
     return puiseux_polynomial_ring_elem(
         parent(f),
-        poly(f)^numerator(a),
-        scale(f)*denominator(a)
+        poly(f)^Int(numerator(a)),
+        scale(f)*Int(denominator(a))
     )
 end
-
-#
-# The next function converts the exponent to a Rational{BigInt}, which
-# is not compatible with exponentiating LaurentMPolyRingElems
-
-# function Base.:^(f::PuiseuxMPolyRingElem, a::Rational{Int})
-#     return f^(QQ(a))
-# end
 
 function Base.:^(f::PuiseuxMPolyRingElem, a::Int)
     if a == 0
@@ -475,6 +535,12 @@ function divides(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
     N = lcm(scale(f), scale(g))
     flag, q = divides(poly(rescale(f, N)), poly(rescale(g, N)))
     return flag, flag ? puiseux_polynomial_ring_elem(R, q, N) : zero(R)
+end
+
+function gcd(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
+    check_parent(f, g)
+    N = lcm(scale(f), scale(g))
+    return puiseux_polynomial_ring_elem(parent(f), gcd(poly(rescale(f, N)), poly(rescale(g, N))), N)
 end
 
 #################################################################################
