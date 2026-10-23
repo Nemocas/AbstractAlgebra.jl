@@ -843,17 +843,26 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             @test divides(d, f*h)[1] && divides(f*h, d)[1]
          end
 
-         @testset "Square root" begin
-            @test !is_square(x)
-            for i in 1:reps
-               f = generate_element(Rxy)
-               @test is_square(f^2)
-               @test sqrt(f^2)^2 == f^2
-               @test sqrt(f^2; check = false)^2 == f^2
-               if !is_zero(f)
-                  # odd degree in `x`
-                  @test !is_square(x*f^2)
-                  @test_throws Exception sqrt(x*f^2)
+         # the generic MPoly `sqrt` needs these on the coefficients
+         cs = [c for i in 1:reps for c in coefficients(generate_element(Rxy))]
+         has_sqrt = supports([one(R); cs]) do c
+            is_square(c)
+            AbstractAlgebra.sqrt(c^2; check = true)
+         end
+
+         if has_sqrt
+            @testset "Square root" begin
+               @test !is_square(x)
+               for i in 1:reps
+                  f = generate_element(Rxy)
+                  @test is_square(f^2)
+                  @test sqrt(f^2)^2 == f^2
+                  @test sqrt(f^2; check = false)^2 == f^2
+                  if !is_zero(f)
+                     # odd degree in `x`
+                     @test !is_square(x*f^2)
+                     @test_throws Exception sqrt(x*f^2)
+                  end
                end
             end
          end
