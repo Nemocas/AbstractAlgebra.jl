@@ -683,6 +683,23 @@ end
    @test hash(f) == hash(a*x)
 end
 
+@testset "UnivPoly.hash" begin
+   for R in [ZZ, QQ]
+      S = universal_polynomial_ring(R; cached=false)
+      x, y = gens(S, [:x, :y])
+      f = 3*x^2*y - y + 1
+
+      gen(S, :z)
+      x, y = gens(S, [:x, :y])
+      g = 3*x^2*y - y + 1
+      @test parent(data(f)) !== parent(data(g))
+
+      @test f == g
+      @test hash(f) == hash(g)
+      @test hash(f, UInt(17)) == hash(g, UInt(17))
+   end
+end
+
 @testset "UnivPoly.adhoc_comparison" begin
    for R in [ZZ, QQ]
       for iters = 1:100
