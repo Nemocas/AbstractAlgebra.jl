@@ -55,8 +55,8 @@ show(io::IO, ::MIME"text/plain", p::Partition) = show(io, p)
 #
 ##############################################################################
 
-const _numPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
-const _numPartsTableBig = Dict{Int, BigInt}()
+const _numPartsTable = AbstractAlgebra.register_cache(Dict{Int, Int}())
+const _numPartsTableBig = AbstractAlgebra.register_cache(Dict{Int, BigInt}())
 
 @doc raw"""
     _numpart(n::Integer)
@@ -69,6 +69,8 @@ see OEIS sequence [A000041](https://oeis.org/A000041). Note that
 function _numpart(n::Integer)
    if n < 0
       return 0
+   elseif n == 0
+      return 1
    elseif n < 395
       return _numpart(Int(n), _numPartsTable)
    else

@@ -55,6 +55,18 @@ is_attribute_storing
 is_attribute_storing_type
 ```
 
+## Caches
+
+Module-level caches can be registered so that `AbstractAlgebra.clear_cache`
+empties them, for example to free memory. Packages building on AbstractAlgebra
+register their caches in their `__init__` function.
+
+```@docs
+AbstractAlgebra.register_cache
+AbstractAlgebra.register_cache_clearer
+AbstractAlgebra.clear_cache
+```
+
 ## Advanced printing
 
 ### Self-given names
