@@ -9,6 +9,26 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.51.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.3) - 2026-10-26
+
+### New or extended functionality
+
+- [#2570](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2570) Add `gcd` and `is_domain_type` for Puiseux polynomials, making `fraction_field` work over them
+- [#2570](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2570) Add `isless` for univariate Puiseux polynomials over ordered fields and their fractions
+- [#2631](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2631) Add `roots_with_multiplicities`
+
+### Performance improvements or improved testing
+
+- [#2630](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2630) Avoid wasted products in generic `GroupElem` power
+
+### Fixed bugs that returned incorrect results
+
+- [#2610](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2610) Make `isequal` of polynomials and fractions compare coefficients exactly
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2570](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2570) Fix exponentiation of Puiseux polynomials by non-integer rationals
+
 ## [0.51.2](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.2) - 2026-10-21
 
 ### New or extended functionality
