@@ -80,7 +80,8 @@ jobs:
 
   docs:
     name: Documentation
-    # Ubuntu 26's latexminted 0.6.0 is incompatible with Python 3.14
+    # latexminted in Ubuntu 26 fails on Python 3.14, see
+    # https://bugs.launchpad.net/ubuntu/+source/texlive-extra/+bug/2154292
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
