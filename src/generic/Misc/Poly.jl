@@ -77,6 +77,21 @@ function roots(R::Field, f::PolyRingElem)
     return roots(f1)
 end
 
+@doc raw"""
+    roots_with_multiplicities(f::PolyRingElem) -> Vector{Tuple{T, Int}}
+
+Return the roots of `f` in its base ring, whose element type is `T`, each with
+its multiplicity: the largest $e$ such that $(x - r)^e$ divides `f`. The order
+of the roots is not specified. The base ring must be exact, and `f` non-zero.
+"""
+function roots_with_multiplicities(f::PolyRingElem)
+    @req !iszero(f) "Argument must be non-zero"
+    @req is_exact_type(elem_type(base_ring(f))) "Multiplicities can only be computed over exact rings"
+    x = gen(parent(f))
+    # `roots` does not promise to list each root once
+    return [(r, valuation(f, x - r)) for r in unique(roots(f))]
+end
+
 function roots(a::FinFieldElem, i::Int)
   _, x = polynomial_ring(parent(a), cached = false)
   return roots(x^i-a)

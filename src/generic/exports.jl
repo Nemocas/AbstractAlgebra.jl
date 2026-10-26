@@ -111,6 +111,7 @@ export reverse
 export rising_factorial
 export rising_factorial2
 export roots
+export roots_with_multiplicities
 export rowlength
 export scale
 export section_map
