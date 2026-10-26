@@ -235,6 +235,13 @@ end
    @test p^5 == p*p*p*p*p
    @test p^-4 == inv(p)*inv(p)*inv(p)*inv(p)
    @test p^2 * p^-2 == one(G)
+
+   # generic `GroupElem` fallback, which `Perm` overrides
+   for n in -20:50
+      q = invoke(^, Tuple{GroupElem, Integer}, p, n)
+      @test q == p^n
+      @test q.d !== p.d
+   end
 end
 
 @testset "Perm.mixed_binary_ops" begin
