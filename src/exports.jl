@@ -543,6 +543,7 @@ export rising_factorial
 export rising_factorial2
 export root
 export roots
+export roots_with_multiplicities
 export rowlength
 export rref
 export rref!

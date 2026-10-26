@@ -793,6 +793,7 @@ newton_to_monomial!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```@docs
 roots(f::PolyRingElem)
 roots(R::Field, f::PolyRingElem)
+roots_with_multiplicities(f::PolyRingElem)
 ```
 
 ### Interpolation
