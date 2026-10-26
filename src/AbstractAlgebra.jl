@@ -299,6 +299,7 @@ include("UniversalLaurentPoly.jl")
 include("UniversalRing.jl")
 include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
+include("OrePolyRing.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
 
