@@ -76,6 +76,12 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
    @test !is_perfect(S2)
 
    @test var(S1) == :y1
+
+   R3, (x3, y3) = rational_function_field(QQ, [:x3, :y3])
+   U3, z3 = R3[:z3]
+
+   @test_throws NotImplementedError function_field(z3^2 - x3, :w)
+   @test_throws NotImplementedError function_field(z3^2 - x3, :w; cached=false)
 end
 
 @testset "Generic.AbsSimpleFunctionField.printing" begin
