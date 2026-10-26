@@ -80,7 +80,8 @@ jobs:
 
   docs:
     name: Documentation
-    runs-on: ubuntu-latest
+    # Ubuntu 26's latexminted 0.6.0 is incompatible with Python 3.14
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v3
