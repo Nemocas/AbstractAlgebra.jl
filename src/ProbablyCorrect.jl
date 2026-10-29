@@ -23,7 +23,7 @@
 # extremely unlikely).
 
 # Dodgy mode for a particular function may be enabled/disabled individually.
-# For instance, we can set dodgy more for the ":is_prime" family by running:
+# For instance, we can set dodgy mode for the ":is_prime" family by running:
 
 #    AbstractAlgebra.set_dodgy_mode(:is_prime, true);   # ENABLE
 #    AbstractAlgebra.set_dodgy_mode(:is_prime, false);  # DISABLE
