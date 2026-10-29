@@ -197,6 +197,8 @@ end
 
    @test hash(a) == hash(1//(x - 1))
 
+   @test hash(x//(x + 1)) != hash((x + 1)//x)
+
    # stored parts that match only in part
    R, y = polynomial_ring(QQ, "y")
    b = 1//(2y + 2)

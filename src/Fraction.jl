@@ -78,7 +78,7 @@ function Base.hash(a::FracElem, h::UInt)
    b = 0x8a30b0d963237dd5%UInt
    # We canonicalise before hashing
    n, d = _canonical_num_den(a)
-   return xor(b, hash(n, h), hash(d, h), h)
+   return xor(b, hash(n, hash(d, h)))
 end
 
 _canonical_num_den(a::FracElem) = numerator(a, true), denominator(a, true)
