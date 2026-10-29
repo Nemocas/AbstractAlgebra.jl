@@ -502,22 +502,8 @@ function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    elseif n == 3
       return Perm(g.d[g.d[g.d]], false)
    else
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & n) == 0
-         bit >>= 1
-      end
-      cache1 = deepcopy(g.d)
-      cache2 = deepcopy(g.d)
-      bit >>= 1
-      while bit != 0
-         cache2 = cache1[cache1]
-         cache1 = cache2
-         if (UInt(bit) & n) != 0
-            cache1 = cache1[g.d]
-         end
-         bit >>= 1
-      end
-      return Perm(cache1, false)
+      d = AbstractAlgebra.internal_power_left_to_right(g.d, n, (x, y) -> x[y])
+      return Perm(d, false)
    end
 end
 

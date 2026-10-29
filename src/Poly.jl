@@ -1556,19 +1556,7 @@ function powermod(a::PolyRingElem{T}, b::Int, d::PolyRingElem{T}) where T <: Rin
          a = invmod(a, d)
          b = -b
       end
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
-         bit >>= 1
-      end
-      z = a
-      bit >>= 1
-      while bit !=0
-         z = mulmod(z, z, d)
-         if (UInt(bit) & b) != 0
-            z = mulmod(z, a, d)
-         end
-         bit >>= 1
-      end
+      z = isone(b) ? a : internal_power_left_to_right(a, b, (x, y) -> mulmod(x, y, d))
    end
    if length(z) >= length(d)
       z = mod(z, d)
