@@ -208,17 +208,7 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
    elseif y == 1
       return deepcopy(x)
    end
-   bit = T(1) << (ndigits(y, base = 2) - 1)
-   z = x
-   bit >>= 1
-   while bit != 0
-      z = z*z
-      if (bit & y) != 0
-         z *= x
-      end
-      bit >>= 1
-   end
-   return z
+   return internal_power_left_to_right(x, y)
 end
 
 ###############################################################################
