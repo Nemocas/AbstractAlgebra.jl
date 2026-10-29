@@ -32,10 +32,34 @@ end
    @test string(x+y+1) == "y + x + 1"
 end
 
+@testset "Generic.SparsePoly.adhoc_comparison" begin
+   F = GF(7)
+   R, x = SparsePolynomialRing(F, :x)
+
+   @test R(F(3)) == F(3)
+   @test F(3) == R(F(3))
+   @test R(F(3)) == 3
+   @test R() == F(0)
+   @test x != F(3)
+   @test x^2 != F(3)
+end
+
 @testset "Generic.SparsePoly.misc" begin
 
    R, x = SparsePolynomialRing(ZZ, "x")
 
    @test is_zero(x^15 - 1 - x^15 + 1)
    @test content(24*x + 15) == 3
+end
+
+@testset "Generic.SparsePoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S, x = SparsePolynomialRing(R, :x)
+   f = (1 + O(t^2))*x
+   g = (1 + O(t^3))*x
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end

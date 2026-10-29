@@ -319,7 +319,7 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
           @test g .* [g, h] == [g * g, g * h]
           G = parent(g)
           if has_gens(G)
-              @test g .* gens(G) == [g * x for x in gens(G)]
+              @test g .* gens(G) == map(Base.Fix1(*, g), gens(G))
           end
       end
   end

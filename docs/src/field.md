@@ -31,8 +31,8 @@ their elements.
 characteristic(R::MyParent)
 ```
 
-Return the characteristic of the field. If the characteristic is not known, an
-exception is raised.
+Return the characteristic of the field. This is optional for rings but required
+for fields.
 
 ## Basic functions
 

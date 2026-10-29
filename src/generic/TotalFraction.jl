@@ -314,6 +314,12 @@ function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
            denominator(x, false)*numerator(y, false))
 end
 
+function isequal(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
+   check_parent(x, y, false) || return false
+   return isequal(numerator(x, false)*denominator(y, false),
+                  denominator(x, false)*numerator(y, false))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -369,6 +375,10 @@ end
 
 # Division is not possible generically due to the possibility of non-units
 # that are also non-zero divisors
+
+function divexact(a::TotFrac{T}, b::TotFrac{T}; check::Bool=true)  where {T <: RingElem}
+  return a*inv(b)  # inv(b) will throw if b is a zero divisor
+end
 
 ##############################################################################
 #

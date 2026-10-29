@@ -38,7 +38,6 @@ include("generic/UniversalRing.jl")
 
 include("generic/SparsePoly.jl")
 
-include("generic/LaurentPoly.jl")
 
 include("generic/LaurentMPoly.jl")
 
@@ -53,8 +52,6 @@ include("generic/LaurentSeries.jl")
 include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
-
-include("generic/MatRing.jl")
 
 include("generic/FreeAssociativeAlgebra.jl")
 

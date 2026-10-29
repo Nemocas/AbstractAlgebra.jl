@@ -499,90 +499,15 @@ end
 
 ###############################################################################
 #
-#   LaurentPolyRing / LaurentPoly
+#   LaurentPolyRing / LaurentMPolyRing
 #
 ###############################################################################
 
-abstract type LaurentPolyRing{T} <: AbstractAlgebra.LaurentPolyRing{T} end
-
-@attributes mutable struct LaurentPolyWrapRing{T  <: RingElement,
-                                   PR <: AbstractAlgebra.PolyRing{T}
-                                  } <: LaurentPolyRing{T}
-   polyring::PR
-
-   function LaurentPolyWrapRing(pr::PR, cached::Bool = true) where {
-                                             T <: RingElement,
-                                             PR <: AbstractAlgebra.PolyRing{T}}
-
-      return get_cached!(LaurentPolyWrapRingID, pr, cached) do
-         new{T, PR}(pr)
-      end::LaurentPolyWrapRing{T, PR}
-   end
-end
-
-const LaurentPolyWrapRingID = CacheDictType{Ring, LaurentPolyWrapRing}()
-
-mutable struct LaurentPolyWrap{T  <: RingElement,
-                               PE <: AbstractAlgebra.PolyRingElem{T},
-                               LR <: LaurentPolyWrapRing{T}
-                              } <: AbstractAlgebra.LaurentPolyRingElem{T}
-   parent::LR
-   poly::PE
-   mindeg::Int
-
-   # A LaurentPolyWrap object is specified by a backing polynomial `poly` and
-   # an integer `mindeg`, and represents `poly * x^mindeg`, where `x` is a generator
-   # of the parent ring; no "normalization" is done, i.e.
-   # `LaurentPolyWrap(poly*x^i, mindeg-i)` is another valid representation for the same
-   # Laurent polynomial, where i is an integer.
-
-   function LaurentPolyWrap(parent::LR, poly::PE, mindeg::Int = 0) where {
-                                             T  <: RingElement,
-                                             PE <: AbstractAlgebra.PolyRingElem{T},
-                                             LR <: LaurentPolyWrapRing{T}}
-      new{T, PE, LR}(parent, poly, mindeg)
-   end
-end
-
-###############################################################################
-#
-#   LaurentMPolyRing / LaurentMPoly
-#
-###############################################################################
-
-@attributes mutable struct LaurentMPolyWrapRing{T  <: RingElement,
-                                                PR <: AbstractAlgebra.MPolyRing{T}
-                                               } <: AbstractAlgebra.LaurentMPolyRing{T}
-   mpolyring::PR
-
-   function LaurentMPolyWrapRing(pr::PR, cached::Bool = true) where {
-                                             T <: RingElement,
-                                             PR <: AbstractAlgebra.MPolyRing{T}}
-
-      return get_cached!(LaurentMPolyWrapRingID, pr, cached) do
-         new{T, PR}(pr)
-      end::LaurentMPolyWrapRing{T, PR}
-   end
-end
-
-const LaurentMPolyWrapRingID = CacheDictType{Ring, LaurentMPolyWrapRing}()
-
-mutable struct LaurentMPolyWrap{T  <: RingElement,
-                                PE <: AbstractAlgebra.MPolyRingElem{T},
-                                LR <: LaurentMPolyWrapRing{T}
-                               } <: AbstractAlgebra.LaurentMPolyRingElem{T}
-   parent::LR
-   mpoly::PE            # not necessarily owned by object
-   mindegs::Vector{Int} # meaning ditto, vector not necessarily owned by object
-   function LaurentMPolyWrap(parent::LR,
-                             poly::PE,
-                             mindegs::Vector{Int} = zeros(Int, nvars(parent))
-                            ) where {T  <: RingElement,
-                                     PE <: AbstractAlgebra.MPolyRingElem{T},
-                                     LR <: LaurentMPolyWrapRing{T}}
-      new{T, PE, LR}(parent, poly, mindegs)
-   end
-end
+# Former names of the concrete types in AbstractAlgebra, kept as aliases
+const LaurentPolyWrapRing = LaurentPolyRing
+const LaurentPolyWrap = LaurentPolyRingElem
+const LaurentMPolyWrapRing = LaurentMPolyRing
+const LaurentMPolyWrap = LaurentMPolyRingElem
 
 ###############################################################################
 #
@@ -596,13 +521,11 @@ end
 
    function EuclideanRingResidueRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
-      if !isone(c)
-        modulus = divexact(modulus, c)
-      end
-      R = parent(modulus)
+      m = isone(c) ? modulus : divexact(modulus, c)
+      R = parent(m)
 
-      return get_cached!(ModulusDict, (R, modulus), cached) do
-         new{T}(R, modulus)
+      return get_cached!(ModulusDict, (R, m), cached) do
+         new{T}(R, m)
       end::EuclideanRingResidueRing{T}
    end
 end
@@ -628,12 +551,10 @@ end
 
    function EuclideanRingResidueField{T}(modulus::T, cached::Bool = true) where T <: RingElement
       c = canonical_unit(modulus)
-      if !isone(c)
-        modulus = divexact(modulus, c)
-      end
-      R = parent(modulus)
-      return get_cached!(ModulusFieldDict, (R, modulus), cached) do
-         new{T}(R, modulus)
+      m = isone(c) ? modulus : divexact(modulus, c)
+      R = parent(m)
+      return get_cached!(ModulusFieldDict, (R, m), cached) do
+         new{T}(R, m)
       end::EuclideanRingResidueField{T}
    end
 end
@@ -1110,39 +1031,6 @@ struct MatSpacePointView{T <: NCRingElement, V, W} <: AbstractArray{T, 0}
    entries::SubArray{T, 0, Matrix{T}, V, W}
    base_ring::NCRing
 end
-
-###############################################################################
-#
-#   MatRing / MatRingElem
-#
-###############################################################################
-
-struct MatRing{T <: NCRingElement} <: AbstractAlgebra.MatRing{T}
-   n::Int
-   base_ring::NCRing
-
-   function MatRing{T}(R::NCRing, n::Int) where T <: NCRingElement
-      new{T}(n, R)
-   end
-end
-
-struct MatRingElem{T <: NCRingElement} <: AbstractAlgebra.MatRingElem{T}
-   data::MatElem{T}
-
-  function MatRingElem{TT}(A::MatElem{TT}) where TT <: NCRingElement
-    nrows(A) == ncols(A) || error("Matrix must be square")
-    return new{TT}(A)
-   end
-end
-
-MatRingElem(A::MatElem{TT}) where TT <: NCRingElement = MatRingElem{TT}(A)
-
-function MatRingElem(R::NCRing, n::Int, A::Vector{T}) where T <: NCRingElement
-   t = matrix(R, n, n, A)
-   return MatRingElem(t)
-end
-
-matrix(A::MatRingElem{T}) where {T <: NCRingElement} = A.data::dense_matrix_type(T)
 
 ###############################################################################
 #

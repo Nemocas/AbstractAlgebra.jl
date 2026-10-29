@@ -2,7 +2,7 @@ module PrettyPrinting
 
 using ..AbstractAlgebra
 
-import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: MatElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: RingElem
 
@@ -115,19 +115,19 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
-function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
     return !AbstractAlgebra.is_ijulia_inited()
 end
 
-function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
    show_via_expressify(io, mi, x)
 end
 
-function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
    return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
 end
 
-function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
+function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
@@ -219,6 +219,17 @@ end
 #        Expr(:hcat, a, b)       => a b
 
 
+@doc raw"""
+    expressify(a; context = nothing)
+
+Return an `Expr`, `Symbol`, `Integer` or `String` describing `a`, from which
+plain text, LaTeX and html output are derived. The fallback simply prints `a`.
+
+Implementing this for a new element type, and then applying
+[`@enable_all_show_via_expressify`](@ref) to that type, gives correctly
+bracketed output when values of the type appear inside composed types such as
+polynomials.
+"""
 function expressify(@nospecialize(a); context = nothing)
    return sprint(print, a; context = context)::String
 end
@@ -257,6 +268,12 @@ end
 #
 # Super easy!
 
+@doc raw"""
+    @enable_all_show_via_expressify(T)
+
+Define `Base.show` for the type `T` for plain text, LaTeX and html output, all
+derived from [`expressify`](@ref), which must already be implemented for `T`.
+"""
 macro enable_all_show_via_expressify(T)
   return quote
     function Base.show(io::IO, x::$(esc(T)))

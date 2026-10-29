@@ -34,6 +34,16 @@ function normalise(a::RelSeries, len::Int)
    return len
 end
 
+@doc raw"""
+    polcoeff(f::SeriesElem, n::Int)
+
+Return the coefficient of degree `n` of the polynomial underlying the series
+`f`, or zero if `n` exceeds the degree of that polynomial. Note that this
+ignores the valuation of `f`, unlike `coeff`.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function polcoeff(a::RelSeries, n::Int)
    n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]

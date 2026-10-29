@@ -441,7 +441,7 @@ function hlift_with_lcc(
     end
   end
 
-  lcs = [divs[j]*m for j in 1:r]
+  lcs = divs .* m
   ok, fac = hlift_have_lcs(A*m^(r - 1), Auf, lcs, mainvar, minorvars, alphas)
 
   if !ok
@@ -500,7 +500,7 @@ function hlift_have_lcs(
   liftdegs = [tdegs[minorvars[i]] for i in 1:n]
 
   for i in 2:n+1
-    tfac = [set_lc(fac[j], mainvar, lc_evals[i, j]) for j in 1:r]
+    tfac = [set_lc(f, mainvar, lc_evals[i, j]) for (j, f) in enumerate(fac)]
     ok, fac = hliftstep(tfac, mainvar, minorvars[1:i-1], liftdegs, alphas,
                                                               A_evals[i], true)
     if !ok
@@ -801,9 +801,9 @@ function mfactor_irred_univar(a::E, var::Int) where {E <: MPolyRingElem}
   F = factor(to_univar(a, var, Kx))
   res = E[]
   ok = true
-  for f in F.fac
-    ok = ok && (f[2] == 1)
-    push!(res, make_monic(from_univar(f[1], var, R)))
+  for (p, e) in F
+    ok = ok && e == 1
+    push!(res, make_monic(from_univar(p, var, R)))
   end
   return ok, res
 end
@@ -914,8 +914,11 @@ function hlift_bivar_combine(
 end
 
 #=
-  a and b are both factorizations. Make the bases coprime without changing
-  the values of factorizations. TODO this is probably done somewhere else.
+  a and b are both squarefree factorizations (bases squarefree and pairwise
+  coprime), as returned by factor_squarefree. Make each base of a coprime to
+  or equal to each base of b without changing the values of the
+  factorizations; one pass over the original entries suffices for such input.
+  TODO this is probably done somewhere else.
 =#
 function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) where {E <: Union{PolyRingElem, MPolyRingElem}}
   lena = length(a)
@@ -927,9 +930,9 @@ function make_bases_coprime!(a::Vector{Pair{E, Int}}, b::Vector{Pair{E, Int}}) w
       (g, ai, bi) = gcd_with_cofactors(ai, bj)
       if !is_constant(g)
         a[i] = ai => a[i].second
-        b[i] = bi => b[i].second
+        b[j] = bi => b[j].second
         push!(a, g => a[i].second)
-        push!(b, g => b[i].second)
+        push!(b, g => b[j].second)
       end
     end
   end

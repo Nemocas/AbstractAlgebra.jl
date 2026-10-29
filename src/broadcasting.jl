@@ -109,6 +109,20 @@ end
 
 Base.maybeview(A::MatElem, x...) = view(A, x...)
 
+function set!(dest::MatElem, src)
+  for I in eachindex(dest)
+    dest[I] = src[I]
+  end
+  return dest
+end
+
+set!(dest::MatElem, src::MatElem) = map_entries!(identity, dest, src)
+
+function Base.copyto!(dest::MatElem, src)
+  set!(dest, src)
+  return dest
+end
+
 ################################################################################
 #
 #  Similar functionality
@@ -132,7 +146,8 @@ Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted) = Base.copyto!(dest, conv
 function Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted{Nothing})
   axes(dest) == axes(bc) || Broadcast.throwdm(axes(dest), axes(bc))
   # Performance optimization: broadcast!(identity, dest, A) is equivalent to copyto!(dest, A) if indices match
-  if bc.f === identity && bc.args isa Tuple{AbstractArray} # only a single input argument to broadcast!
+  if bc.f === identity && bc.args isa Tuple{Union{AbstractArray, MatElem}} # only a single input argument to broadcast!
+    # this takes care of assignments of the form A .= B (in this case bc.args = (B, ))
     A = bc.args[1]
     if axes(dest) == axes(A)
       return copyto!(dest, A)

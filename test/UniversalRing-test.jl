@@ -162,6 +162,74 @@ end
    ConformanceTests.test_Ring_interface(S)
 end
 
+@testset "UniversalLaurentPolynomial.basic_manipulation" begin
+   S = universal_laurent_polynomial_ring(QQ; cached = false)
+   x = gen(S, :x)
+   f = 2*x^-1 + 3    # its data has one variable only
+   y = gen(S, :y)
+   g = x*y^-2 - 5
+
+   @test length(f) == 2
+   @test length(zero(S)) == 0
+   @test Set(coefficients(g)) == Set(QQ.([1, -5]))
+   @test Set(exponent_vectors(g)) == Set([[1, -2], [0, 0]])
+   @test Set(exponent_vectors(f)) == Set([[-1], [0]])
+   @test all(m -> parent(m) === S, monomials(g))
+   @test sum(terms(g)) == g
+   @test sum(coefficients(g) .* monomials(g)) == g
+
+   @test coeff(g, [1, -2]) == 1
+   @test coeff(g, [1]) == 0
+   @test coeff(f, [-1]) == 2
+   @test coeff(f, [-1, 0]) == 2
+   @test coeff(f, [-1, 1]) == 0
+
+   @test leading_term(g) == leading_coefficient(g)*leading_monomial(g)
+   @test parent(leading_term(g)) === S
+   @test leading_monomial(g) in (x*y^-2, one(S))
+   @test constant_coefficient(f) == 3
+   @test constant_coefficient(g) == -5
+   @test constant_coefficient(x) == 0
+
+   @test is_constant(S(3))
+   @test is_constant(2*x*inv(x))
+   @test !is_constant(f)
+   @test is_monomial(x*y^-2)
+   @test !is_monomial(2*x)
+   @test is_term(2*x^-1)
+   @test !is_term(f)
+   @test var_index(x) == 1
+   @test var_index(y) == 2
+
+   @test derivative(f, 1) == -2*x^-2
+   @test derivative(f, y) == 0
+   @test derivative(g, y) == -2*x*y^-3
+   @test_throws ErrorException derivative(f, 3)
+
+   @test evaluate(f, [QQ(2)]) == 4
+   @test evaluate(f, [QQ(2), QQ(5)]) == 4
+   @test evaluate(g, [QQ(2), QQ(1//2)]) == 3
+   @test_throws ErrorException evaluate(g, [QQ(2)])
+
+   h = map_coefficients(c -> 2*c, g; parent = S)
+   @test parent(h) === S
+   @test h == 2*g
+   h = map_coefficients(c -> 2*c, g)
+   @test coefficient_ring(h) == QQ
+   @test Set(exponent_vectors(h)) == Set(exponent_vectors(g))
+
+   h = change_coefficient_ring(ZZ, g)
+   T = parent(h)
+   @test coefficient_ring(T) == ZZ
+   @test h == gen(T, :x)*gen(T, :y)^-2 - 5
+
+   @test S(QQ.([2, 3]), [[-1], [0]]) == f
+   B = MPolyBuildCtx(S)
+   push_term!(B, QQ(1), [1, -2])
+   push_term!(B, QQ(-5), [0, 0])
+   @test finish(B) == g
+end
+
 @testset "UnivPoly.conformance" begin
    S = universal_polynomial_ring(residue_ring(ZZ, ZZ(6))[1]; cached = false)
    gen(S, "x")
@@ -455,6 +523,12 @@ end
       f = 3x^3 + 2x^2 + x + 4
       g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
 
+      @test eltype(coefficients(f)) == elem_type(R)
+      @test collect(coefficients(f)) isa Vector{elem_type(R)}
+      @test eltype(exponent_vectors(f)) == Vector{Int}
+      @test eltype(monomials(f)) == elem_type(S)
+      @test eltype(terms(f)) == elem_type(S)
+
       @test collect(coefficients(f)) == [R(v) for v in [3, 2, 1, 4]]
       @test collect(exponent_vectors(f)) == [[3], [2], [1], [0]]
       @test sum(terms(f)) == f
@@ -582,6 +656,47 @@ end
          @test x < x^2*y
          @test y^2 < y^2*z^3
       end
+   end
+end
+
+@testset "UnivPoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S = universal_polynomial_ring(R; cached=false)
+   x = gen(S, :x)
+   a = 1 + O(t^2)
+   b = 1 + O(t^3)
+
+   @test a*x == b*x
+   @test !isequal(a*x, b*x)
+   @test isequal(a*x, deepcopy(a*x))
+
+   # elements whose underlying polynomial rings differ
+   f = a*x
+   y = gen(S, :y)
+   x = gen(S, :x)
+   @test parent(data(f)) !== parent(data(x))
+
+   @test f == b*x
+   @test !isequal(f, b*x)
+   @test isequal(f, a*x)
+   @test hash(f) == hash(a*x)
+end
+
+@testset "UnivPoly.hash" begin
+   for R in [ZZ, QQ]
+      S = universal_polynomial_ring(R; cached=false)
+      x, y = gens(S, [:x, :y])
+      f = 3*x^2*y - y + 1
+
+      gen(S, :z)
+      x, y = gens(S, [:x, :y])
+      g = 3*x^2*y - y + 1
+      @test parent(data(f)) !== parent(data(g))
+
+      @test f == g
+      @test hash(f) == hash(g)
+      @test hash(f, UInt(17)) == hash(g, UInt(17))
    end
 end
 
@@ -1111,9 +1226,9 @@ end
       g = 3x^3*y^2 + 2x^3*y*z + 2x^2*y*z + 3x + 2y + 1
       h = 3y^2 + 2y + 1
 
-      f1 = change_base_ring(U, f)
-      g1 = change_base_ring(U, g)
-      h1 = change_base_ring(U, h)
+      f1 = change_coefficient_ring(U, f)
+      g1 = change_coefficient_ring(U, g)
+      h1 = change_coefficient_ring(U, h)
 
       @test length(f) == length(f1)
       @test length(g) == length(g1)

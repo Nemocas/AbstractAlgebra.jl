@@ -373,8 +373,8 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-characteristic(R::LaurentSeriesRing) = characteristic(base_ring(R))
-is_known(::typeof(characteristic), R::LaurentSeriesRing) = is_known(characteristic, base_ring(R))
+characteristic(R::Union{LaurentSeriesRing, LaurentSeriesField}) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::Union{LaurentSeriesRing, LaurentSeriesField}) = is_known(characteristic, coefficient_ring(R))
 
 ###############################################################################
 #
@@ -452,6 +452,30 @@ zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
 #
 ###############################################################################
 
+@doc raw"""
+    laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+    laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the Laurent series over `R` in the variable `var` of valuation `val`
+whose first `len` coefficients are given by the first `len` entries of `arr`.
+The entry `arr[i]` is the coefficient of `var^(val + (i - 1)*scale)`, so
+consecutive coefficients are `scale` exponents apart. The input must satisfy
+`0 <= len <= length(arr)`, `scale > 0`, and
+`prec >= val + (len - 1)*scale + 1`, where `prec` is the absolute precision.
+The Laurent series parent is created on the fly with maximum relative precision
+`max_precision`. It is a field when `R` is a field and a ring otherwise. Setting
+`cached` to `false` prevents the parent from being cached.
+
+# Examples
+
+```jldoctest
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+```
+"""
 function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
@@ -838,8 +862,8 @@ end
 @doc raw"""
     shift_left(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+Return the Laurent series $x$ shifted left by $n$ terms, i.e. multiplied by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
@@ -851,8 +875,8 @@ end
 @doc raw"""
     shift_right(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+Return the Laurent series $x$ shifted right by $n$ terms, i.e. divided by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
@@ -1756,7 +1780,7 @@ end
 rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::LaurentSeriesRingOrField, val_range, v...) =
+rand(S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(Random.default_rng(), S, val_range, v...)
 
 ###############################################################################

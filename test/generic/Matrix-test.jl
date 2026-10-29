@@ -607,7 +607,7 @@ end
       @test elem_type(base_ring(m3)) == ET
       @test !isempty(m3)
       @test !iszero(m3)
-      @test m3 isa Generic.MatRingElem
+      @test m3 isa MatRingElem
       @test parent(m3) == M3
    end
 
@@ -1714,13 +1714,16 @@ end
    B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
-   # transpose input/output types are the same
    a = matrix(F2(), F2Elem[1 1 0; 0 0 1])
-   # not method (yet) for transpose(a)
-   at = transpose(a.m)
-   @test typeof(at) == typeof(a.m)
-   @test at[1, 1] == at[2, 1] == at[3, 2] == F2Elem(true)
-   @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
+   b = matrix(F2(), F2Elem[1 0; 1 0; 0 1])
+
+   # MatElem fallback; F2Matrix has no own transpose
+   @test transpose(a) isa F2Matrix
+   @test transpose(a) == b
+
+   # must not switch to dense_matrix_type(F2) == F2Matrix
+   @test transpose(a.m) isa Generic.MatSpaceElem{F2Elem}
+   @test transpose(a.m) == b.m
 end
 
 @testset "Generic.Mat.gram" begin
@@ -1739,6 +1742,39 @@ end
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test tr(A) == t^2 + 3t + 2
+end
+
+@testset "Generic.Mat.trace_of_product" begin
+   R, t = polynomial_ring(QQ, :t)
+   A = R[t + 1 t 1; t^2 t t; -2 t + 2 t^2 + t + 1]
+   B = R[1 t 0; 0 1 t; t 0 1]
+   @test trace_of_product(A, B) == tr(A * B)
+
+   M = ZZ[1 2 3; 4 5 6]
+   N = ZZ[1 0; 0 1; 1 1]
+   @test trace_of_product(M, N) == 15
+   @test trace_of_product(N, M) == 15
+
+   M = QQ[1//2 2; 3 -1//3]
+   N = QQ[1 1; 0 2]
+   @test trace_of_product(M, N) == tr(M * N)
+
+   @test trace_of_product(zero_matrix(ZZ, 0, 3), zero_matrix(ZZ, 3, 0)) == 0
+   @test trace_of_product(zero_matrix(ZZ, 2, 0), zero_matrix(ZZ, 0, 2)) == 0
+
+   @test_throws ArgumentError trace_of_product(ZZ[1 2; 3 4], ZZ[1 2 3; 4 5 6])
+   @test_throws ArgumentError trace_of_product(ZZ[1 2 3; 4 5 6], ZZ[1 2 3; 4 5 6])
+   S, _ = polynomial_ring(QQ, :s)
+   @test_throws ErrorException trace_of_product(identity_matrix(R, 2), identity_matrix(S, 2))
+
+   for (R, args) in ((ZZ, (-10:10,)), (QQ, (-10:10,)), (GF(7), ()),
+                     (polynomial_ring(ZZ, :x)[1], (0:3, -10:10)))
+      for (m, n) in ((0, 0), (3, 3), (2, 5), (5, 2))
+         M = rand(matrix_space(R, m, n), args...)
+         N = rand(matrix_space(R, n, m), args...)
+         @test trace_of_product(M, N) == tr(M * N)
+      end
+   end
 end
 
 @testset "Generic.Mat.content" begin
@@ -4187,7 +4223,7 @@ end
          M = algebra ? matrix_ring(R, u) : matrix_space(R, u, v)
          m0 = M(mat)
          for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
-            for f = (f0, map_from_func(f0, R, R))
+            for f = (f0, map_from_func(R, R, f0))
                m = deepcopy(m0)
                n0 = similar(m)
                n = map_entries!(f, n0, m)
@@ -4195,7 +4231,7 @@ end
                if !isempty(mat)
                   # when empty, it may happen that the result of map below has Any
                   # as eltype, and calling M on it fails, cf. issue #423
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
             end
          end
@@ -4204,13 +4240,13 @@ end
       m = deepcopy(m0)
       for S = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
          for f0 = (x -> S(x), x -> S(x + 1))
-            for f = (f0, map_from_func(f0, ZZ, S))
+            for f = (f0, map_from_func(ZZ, S, f0))
                n = map_entries(f, m)
                @test n !== m
                @test m == m0 # map's input must not be mutated
                M = algebra ? matrix_ring(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
                @test n isa (algebra ? MatRingElem : MatElem)
             end
@@ -4397,7 +4433,13 @@ end
       end
    end
 
+   @test_throws ErrorException("InjProjMat is read-only") (M[1, 1] = 1)
+   @test_throws ErrorException("InjProjMat is read-only") (M[:, :] = zero_matrix(QQ, 4, 2))
+
    # Multiplication
+   @test !Base.isambiguous(
+      which(*, Tuple{typeof(M), MatElem{eltype(M)}}),
+      which(*, Tuple{MatElem{eltype(M)}, typeof(M)}))
    @test_throws AssertionError M*identity_matrix(QQ, 1)
    @test_throws AssertionError identity_matrix(QQ, 1)*M
    for iter in 1:10
@@ -4478,7 +4520,7 @@ end
   @test AbstractAlgebra.transpose!(x, x) == QQ[1 3; 2 4]
 
   # in-place transpose of non-square matrix does not work
-  @test_throws ArgumentError AbstractAlgebra.transpose!(a)
+  @test_throws DomainError AbstractAlgebra.transpose!(a)
 end
 
 @testset "Generic.Mat.MatSpace_iteration" begin

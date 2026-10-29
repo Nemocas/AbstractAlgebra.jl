@@ -118,12 +118,33 @@ end
    @test is_trivial(R)
 end
 
+@testset "EuclideanRingResidueRingElem.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+
+   @test order(R) == 4
+   @test length(R) == 4
+   @test collect(R) == [R(i) for i in 0:3]
+
+   R, = residue_ring(ZZ, 1)
+
+   @test order(R) == 1
+   @test collect(R) == [zero(R)]
+end
+
 @testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
+
+   # Carrying no sampling specification, `rand(R)` and `rand(R, dims...)` keep
+   # their `Base` meaning and must not be forwarded to the base ring: they ask
+   # `R` itself for a `Random.Sampler` (which AbstractAlgebra does not provide).
+   @test make(R) isa RandomExtensions.MakeWrap
+   @test which(rand, Tuple{typeof(R), Int}) isa Method       # i.e. unambiguous
+   @test which(rand, Tuple{typeof(R), Int, Int}) isa Method
+   @test which(rand, Tuple{typeof(R), Tuple{Int, Int}}) isa Method
 
    # make with 3 arguments
    P, x = polynomial_ring(RealField, "x")
@@ -458,6 +479,17 @@ end
          @test q*a2 == p
       end
    end
+
+   R, = residue_ring(ZZ, 6)
+   for check in (true, false)
+      @test_throws DivideError divexact(R(1), R(0); check)
+      @test_throws DivideError divexact(R(0), R(0); check)
+   end
+   @test_throws DivideError R(1) / R(0)
+
+   # in the zero ring, 0 is a unit
+   R, = residue_ring(ZZ, 1)
+   @test is_zero(divexact(R(0), R(0)))
 end
 
 @testset "EuclideanRingResidueRingElem.polynomials" begin

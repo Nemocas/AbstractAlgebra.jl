@@ -87,7 +87,25 @@ end
      N, f = sub(M, S)
 
      @test dim(N) == rank(matrix(QQ, [s[ix] for s in S, ix in 1:dim(M)]))
+     @test rank(N) == dim(N)
+     @test vector_space_dim(N) == dim(N)
    end
+end
+
+@testset "Generic.Submodule.rank" begin
+   F = free_module(QQ, 3)
+   S, _ = sub(F, [gen(F, 1), gen(F, 2)])
+   @test rank(S) == dim(S) == vector_space_dim(S) == 2
+
+   S, _ = sub(F, elem_type(F)[])
+   @test rank(S) == dim(S) == vector_space_dim(S) == 0
+
+   # not implemented over non-fields
+   F = free_module(ZZ, 2)
+   S, _ = sub(F, [2 * gen(F, 1)])
+   @test_throws MethodError rank(S)
+   @test_throws MethodError dim(S)
+   @test_throws MethodError vector_space_dim(S)
 end
 
 @testset "Generic.Submodule.unary_ops" begin

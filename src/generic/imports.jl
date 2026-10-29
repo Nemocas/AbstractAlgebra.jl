@@ -4,7 +4,6 @@ import LinearAlgebra: tr
 
 using Random: Random, AbstractRNG, randperm!, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-using SparseArrays: sparse, spzeros
 
 import Base: !=
 import Base: &
@@ -44,6 +43,7 @@ import Base: isequal
 import Base: isless
 import Base: isone
 import Base: iszero
+import Base: iterate
 import Base: lcm
 import Base: length
 import Base: mod
@@ -159,6 +159,7 @@ import ..AbstractAlgebra: integral
 import ..AbstractAlgebra: internal_ordering
 import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: inv!
+import ..AbstractAlgebra: inverse_fn
 import ..AbstractAlgebra: is_constant
 import ..AbstractAlgebra: is_divisible_by
 import ..AbstractAlgebra: is_domain_type
@@ -166,8 +167,10 @@ import ..AbstractAlgebra: is_exact_type
 import ..AbstractAlgebra: is_finite
 import ..AbstractAlgebra: is_gen
 import ..AbstractAlgebra: is_homogeneous
+import ..AbstractAlgebra: is_known
 import ..AbstractAlgebra: is_monomial
 import ..AbstractAlgebra: is_nilpotent
+import ..AbstractAlgebra: is_noetherian
 import ..AbstractAlgebra: is_perfect
 import ..AbstractAlgebra: is_power
 import ..AbstractAlgebra: is_square
@@ -185,6 +188,7 @@ import ..AbstractAlgebra: isreduced_form
 import ..AbstractAlgebra: JuliaRingElement
 import ..AbstractAlgebra: laurent_mpoly_type
 import ..AbstractAlgebra: laurent_mpoly_ring_type
+import ..AbstractAlgebra: lead_degree
 import ..AbstractAlgebra: leading_coefficient
 import ..AbstractAlgebra: leading_exponent_vector
 import ..AbstractAlgebra: leading_monomial
@@ -255,6 +259,7 @@ import ..AbstractAlgebra: terms_degrees
 import ..AbstractAlgebra: terse
 import ..AbstractAlgebra: to_univariate
 import ..AbstractAlgebra: total_degree
+import ..AbstractAlgebra: trail_degree
 import ..AbstractAlgebra: trailing_coefficient
 import ..AbstractAlgebra: transpose
 import ..AbstractAlgebra: transpose!

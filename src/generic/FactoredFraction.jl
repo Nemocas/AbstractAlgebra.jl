@@ -404,21 +404,33 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FactoredFracFieldElem, v::Vector{<:RingElement})
-    z = evaluate(unit(f), v)
+# Split the factors by the sign of their exponent, as `numerator` and
+# `denominator` do, and divide only at the end: the values need not be
+# invertible, so `b^e` with `e < 0` would throw. Thus x//(x+y)^2 at (2, 3)
+# evaluates as 2//5^2, not as 2*5^-2.
+function _evaluate(f::FactoredFracFieldElem, v)
+    n = evaluate(unit(f), v)
+    d = one(n)
     for (b, e) in f
-        z *= evaluate(b, v)^e
+        if e < 0
+            d *= evaluate(b, v)^Base.checked_neg(e)
+        else
+            n *= evaluate(b, v)^e
+        end
     end
-    return z
+    return n//d
 end
 
-function evaluate(f::FactoredFracFieldElem, v::RingElement)
-    z = evaluate(unit(f), v)
-    for (b, e) in f
-        z *= evaluate(b, v)^e
-    end
-    return z
-end
+evaluate(f::FactoredFracFieldElem, v::Vector{<:RingElement}) = _evaluate(f, v)
+
+evaluate(f::FactoredFracFieldElem, v::RingElement) = _evaluate(f, v)
+
+# Neither the method above nor `evaluate(::FracElem{<:PolyRingElem}, ::Integer)`
+# in Fraction.jl is more specific than the other, so their intersection needs
+# its own method. Route it through `_evaluate` too: going via
+# `numerator(f)//denominator(f)` instead would multiply the factorisation out,
+# which is precisely what this type exists to avoid.
+evaluate(f::FactoredFracFieldElem{<:PolyRingElem}, v::Integer) = _evaluate(f, v)
 
 function (a::FactoredFracFieldElem)(val::RingElement)
    return evaluate(a, val)

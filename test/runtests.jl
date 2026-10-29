@@ -1,6 +1,7 @@
 using AbstractAlgebra
 
 using Test
+using SparseArrays  # loads the SparseArraysExt extension
 
 
 # disable until we encounter GC problems again
@@ -28,5 +29,6 @@ end
 include("utils/Banners/banners.jl")
 
 include("Aqua.jl")
+include("ClosureBoxes.jl")
 include("rand.jl")
 include("AbstractAlgebra-test.jl")

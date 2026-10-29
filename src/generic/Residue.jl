@@ -133,6 +133,39 @@ end
 
 ###############################################################################
 #
+#   Some functions for residue rings of integers
+#
+###############################################################################
+
+function order(R::EuclideanRingResidueRing{BigInt})
+  return abs(modulus(R))
+end
+
+function length(R::EuclideanRingResidueRing{BigInt})
+  return order(R)
+end
+
+function Base.iterate(R::EuclideanRingResidueRing{BigInt})
+  I = big(0):(modulus(R) - 1)
+  _st = Base.iterate(I)
+  if _st === nothing
+    return nothing
+  end
+  x, st = _st
+  return R(x), (I, st)
+end
+
+function Base.iterate(R::EuclideanRingResidueRing{BigInt}, (I, st))
+  _st = Base.iterate(I, st)
+  if _st === nothing
+    return nothing
+  end
+  x, st = _st
+  return R(x), (I, st)
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################

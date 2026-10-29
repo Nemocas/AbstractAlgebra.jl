@@ -13,6 +13,11 @@ end
     @test L == laurent_polynomial_ring(GF(5), 2, :x, cached = true)[1]
 
     @test is_domain_type(L)
+    @test is_domain_type(elem_type(L))
+    @test is_exact_type(elem_type(L))
+    @test !is_exact_type(elem_type(laurent_polynomial_ring(RealField, ["a"])[1]))
+    @test !is_univariate(L)
+    @test is_univariate(laurent_polynomial_ring(GF(5), ["x"])[1])
 
     @test coefficient_ring(L) == GF(5)
     @test coefficient_ring_type(L) === typeof(GF(5))
@@ -39,6 +44,30 @@ end
 @testset "Generic.LaurentMPoly.printing" begin
    R, (x,) = laurent_polynomial_ring(residue_ring(ZZ, 6)[1], ["x"])
    @test !occursin("\n", sprint(show, R))
+end
+
+@testset "Generic.LaurentMPoly.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   S, t = power_series_ring(QQ, 10, :t)
+   L, (x, y) = laurent_polynomial_ring(S, [:x, :y])
+   P = parent(x.mpoly)
+   X = gen(P, 1)
+   a = 1 + O(t^2)
+   b = 1 + O(t^3)
+
+   @test a*x == b*x
+   @test !isequal(a*x, b*x)
+   @test isequal(a*x, deepcopy(a*x))
+
+   # the same elements, stored with different `mindegs`
+   f = Generic.LaurentMPolyWrap(L, a*X, [0, 0])
+   g = Generic.LaurentMPolyWrap(L, b*one(P), [1, 0])
+   h = Generic.LaurentMPolyWrap(L, a*one(P), [1, 0])
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, h)
+   @test hash(f) == hash(h)
 end
 
 @testset "Generic.LaurentMPoly.derivative" begin
@@ -115,6 +144,14 @@ end
     p = inv(inv(x))
     @test constant_coefficient(p) == 0
 
+    @test @inferred is_constant(zero(L))
+    @test @inferred is_constant(L(5))
+    @test is_constant(3 * x * inv(x))
+    @test !is_constant(x)
+    @test !is_constant(inv(x))
+    @test !is_constant(x * inv(y))
+    @test !is_constant(1 + x)
+
     @test is_monomial(x^2*y^-2)
     @test !is_monomial(2*x^2*y^-2)
     @test !is_monomial(x+y)
@@ -127,6 +164,94 @@ end
     @test inflate(y+y^-1, [2], [3], [2]) == y^5+y
     @test inflate(x*y^2+y, [2, 2]) == x^2*y^4+y^2
     @test inflate(x*y^2+y, [1, 2], [2, 2]) == x^3*y^6+x*y^4
+end
+
+@testset "Generic.LaurentMPoly.more_mpoly" begin
+    L, (x, y, z) = laurent_polynomial_ring(ZZ, ["x", "y", "z"])
+    f = 2*x^-2*y + 3*x*y^-3 - 4
+
+    @test degree(f, 1) == 1
+    @test degree(f, y) == 1
+    @test degree(f, 3) == 0
+    @test degree(x^-2*y^-1 + x^-5, 1) == -2
+    @test degrees(f) == [1, 1, 0]
+    @test degrees(x^-2 + y^-3) == [0, 0, 0]
+    @test total_degree(f) == 0
+    @test total_degree(x^-2*y^-1 + x^-5) == -3
+    @test_throws ArgumentError degree(zero(L), 1)
+    @test_throws ArgumentError degrees(zero(L))
+    @test_throws ArgumentError total_degree(zero(L))
+
+    @test var_indices(f) == [1, 2]
+    @test vars(f) == [x, y]
+    @test vars(3*x*inv(x)) == []
+    @test is_univariate(x^-3 + 2x)
+    @test is_univariate(L(7))
+    @test !is_univariate(f)
+
+    # y, represented as x^-1 * x*y with a polynomial divisible by x
+    P = base_ring(L)
+    n = Generic.LaurentMPolyWrap(L, gen(P, 1)*gen(P, 2), [-1, 0, 0])
+    @test n == y
+    @test var_indices(n) == [2]
+    @test degree(n, 1) == 0
+    @test degrees(n) == [0, 1, 0]
+    @test total_degree(n) == 1
+
+    @test tail(f) == f - leading_term(f)
+    @test iszero(tail(x^-1))
+    @test iszero(tail(zero(L)))
+    @test trailing_coefficient(f) == last(collect(coefficients(f)))
+    @test_throws ArgumentError trailing_coefficient(zero(L))
+
+    @test content(f) == 1
+    @test content(6*x^-1 - 9*y) == 3
+    @test is_homogeneous(x^-1*y^2 + z)
+    @test !is_homogeneous(f)
+
+    Q, (u, v, w) = laurent_polynomial_ring(QQ, ["u", "v", "w"])
+    g = u^-2*v + 3*u*v^-1*w
+    @test evaluate(g, [1], [QQ(2)]) == 1//4*v + 6*v^-1*w
+    @test evaluate(g, [2, 3], [QQ(1//2), QQ(3)]) == 1//2*u^-2 + 18*u
+    @test evaluate(g, [v], [u]) == u^-1 + 3*w
+    @test evaluate(g, [v, w], [w, v]) == u^-2*w + 3*u*w^-1*v
+    @test evaluate(g, Int[], elem_type(QQ)[]) == g
+    @test_throws ArgumentError evaluate(g, [1, 1], [QQ(1), QQ(2)])
+    @test_throws ArgumentError evaluate(g, [1], [QQ(1), QQ(2)])
+    @test_throws ArgumentError evaluate(g, [4], [QQ(1)])
+    @test_throws ErrorException evaluate(x^-1, [1], [ZZ(2)])
+
+    @test change_coefficient_ring(QQ, f) == change_base_ring(QQ, f)
+    @test change_coefficient_ring(QQ, f; parent = Q) == 2*u^-2*v + 3*u*v^-3 - 4
+
+    h = x^-3*y^2 + x*y^6 + x^5*y^-2
+    @test deflation(h) == ([-3, -2, 0], [4, 4, 0])
+    shift, defl = deflation(h)
+    @test inflate(deflate(h, shift, defl), shift, defl) == h
+    @test deflate(x^-2 + y^4, [2, 2, 1]) == x^-1 + y^2
+    @test deflation(zero(L)) == ([0, 0, 0], [0, 0, 0])
+
+    s = x^-1*y + 2 - z^3
+    @test is_square(s^2)
+    @test is_square(x^-2*y^4)
+    @test is_square(zero(L))
+    @test !is_square(x^-1)
+    @test !is_square(-x^2)
+    @test !is_square(s^2*x)
+    @test sqrt(s^2) == s || sqrt(s^2) == -s
+    @test sqrt(4*x^-2*y^4) == 2*x^-1*y^2 || sqrt(4*x^-2*y^4) == -2*x^-1*y^2
+    @test_throws ErrorException sqrt(x)
+    ok, r = is_square_with_sqrt(s^2*x^-4)
+    @test ok && r^2 == s^2*x^-4
+
+    L9, (a, b) = laurent_polynomial_ring(residue_ring(ZZ, 9)[1], ["a", "b"])
+    @test_throws NotImplementedError is_square((3 + a)^2)
+    @test_throws NotImplementedError sqrt(b^2)
+
+    @test isless(x^-1, x) == isless(one(L), x^2)
+    @test isless(y^-1, x^-1) == isless(x, y)
+    @test !isless(x^-1*y, x^-1*y)
+    @test_throws ErrorException isless(x + 1, y)
 end
 
 

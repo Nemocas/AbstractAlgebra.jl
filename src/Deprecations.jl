@@ -66,7 +66,7 @@ end
 @deprecate _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _extended_weak_popov(A, V, Val(S))
 @deprecate _popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _popov(A, Val(S))
 @deprecate _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _hnf_via_popov(A, Val(S))
-@deprecate gen(a::MPolyRing{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} gen(a, i, Val(ord))
+@deprecate gen(a::MPolyRing{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} gen(a, i)
 
 # deprecated in 0.43.0
 @deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
@@ -97,5 +97,14 @@ end
 
 @deprecate polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing poly_ring(R, s; cached)
 @deprecate polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring poly_ring(R, s; internal_ordering, cached)
+
+# deprecated in 0.51.0
+@deprecate map_from_func(image_fn::Function, D, C) map_from_func(D, C, image_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn)
+@deprecate map_with_section_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_section_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_section_from_func(image_fn::Function, D, C) map_with_section_from_func(D, C, image_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn)
 
 # to be deprecated in a future release

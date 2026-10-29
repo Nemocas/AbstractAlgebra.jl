@@ -160,6 +160,16 @@ end
    @test S(10, 5) == S(2, 7)
 
    @test isequal(a, S(3, 7))
+
+   # `==` compares series to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S = total_ring_of_fractions(R)
+   f = S(1 + O(t^2))
+   g = S(1 + O(t^3))
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end
 
 @testset "Generic.TotFrac.adhoc_comparison" begin
@@ -193,6 +203,26 @@ end
    @test inv(a)*a == 1
 
    @test_throws(NotInvertibleError, inv(S(3, 7)))
+end
+
+@testset "Generic.TotFrac.divexact" begin
+   R, = residue_ring(ZZ, 100)
+   S = total_ring_of_fractions(R)
+
+   ten = R(10);
+   @test_throws(ErrorException, 1//ten)
+
+   a = S(ten)
+   @test  ten == S(10)
+   @test_throws(NotInvertibleError, inv(a))
+   @test_throws(NotInvertibleError, 1/a)
+   @test_throws(NotInvertibleError, R(1)/a)
+   @test_throws(NotInvertibleError, S(1)/a)
+
+   b = S(9)
+   @test inv(b)*b == 1
+   @test is_one(inv(b)*b)
+   @test is_one(b/b)
 end
 
 @testset "Generic.TotFrac.promotion" begin

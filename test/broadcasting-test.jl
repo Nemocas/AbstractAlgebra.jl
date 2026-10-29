@@ -13,6 +13,15 @@
   @test_throws ErrorException [1, 2] .* A
   @test_throws ErrorException A .* 2 .* 2 .* [1, 2]
 
+  A = ZZ[1 2; 3 4]
+  B = ZZ[5 6; 7 8]
+  @test (A .= B) === A
+  @test A == B
+
+  B = [9 10; 11 12]
+  @test (A .= B) === A
+  @test A == ZZ[9 10; 11 12]
+
   let # fix assignment bug with views #2151
     R, (x, y) = polynomial_ring(QQ,[:x,:y])
     mr = ones_matrix(R,2,2)

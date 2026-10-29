@@ -9,8 +9,7 @@ AbstractAlgebra.jl implements a couple of abstract types which can be extended.
 
 ## Abstract parents
 
-The following diagram shows a complete list of all abstract types in
-AbstractAlgebra.jl.
+The following diagram shows all abstract parent types of AbstractAlgebra.jl.
 
 ```@raw html
 <img src="../assets/parents_diagram.svg" alt="Diagram of parent types"/>
@@ -24,8 +23,9 @@ AbstractAlgebra.jl.
 ```
 ## Abstract elements
 
-Similarly the following diagram shows a complete list of all abstract types in
-AbstractAlgebra.jl.
+Similarly the following diagram shows all abstract element types. `SetMap` and
+its subtypes form a hierarchy of their own: they are not elements, but serve as
+the third parameter `S` of `Map{D, C, S, T}`, which the dashed line indicates.
 
 ```@raw html
 <img src="../assets/elements_diagram.svg" alt="Diagram of element types"/>
@@ -45,7 +45,7 @@ AbstractAlgebra.jl.
 
 In parentheses we put the types of the corresponding parent objects.
 
-  - `Perm{<:Integer}` (`SymmetricGroup{<:Integer}`)
+  - `Perm{<:Integer}` (`Generic.SymmetricGroup{<:Integer}`)
   - `GFElem{<:Integer}` (`GFField{<:Integer}`)
 
 We also think of various Julia types as though they were AbstractAlgebra.jl types:
@@ -61,8 +61,10 @@ are defined over.
   - `Generic.MPoly{T}` (`Generic.MPolyRing{T}`)
   - `Generic.RelSeries{T}` (`Generic.RelPowerSeriesRing{T}`)
   - `Generic.AbsSeries{T}` (`Generic.AbsPowerSeriesRing{T}`)
+  - `LaurentPolyRingElem{T}` (`LaurentPolyRing{T}`)
+  - `LaurentMPolyRingElem{T}` (`LaurentMPolyRing{T}`)
   - `Generic.LaurentSeriesRingElem{T}` (`Generic.LaurentSeriesRing{T}`)
   - `Generic.LaurentSeriesFieldElem{T}` (`Generic.LaurentSeriesField{T}`)
   - `Generic.EuclideanRingResidueRingElem{T}` (`Generic.EuclideanRingResidueRing{T}`)
   - `Generic.FracFieldElem{T}` (`Generic.FracField{T}`)
-  - `Generic.Mat{T}` (`MatSpace{T}`)
+  - `Generic.MatSpaceElem{T}` (`MatSpace{T}`)

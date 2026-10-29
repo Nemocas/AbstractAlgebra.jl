@@ -2453,6 +2453,14 @@ end
    end
 end
 
+@testset "Generic.Poly.roots_with_multiplicities" begin
+   # the argument checks: the roots themselves need a univariate `factor`
+   R, x = polynomial_ring(QQ, "x")
+   @test_throws ArgumentError roots_with_multiplicities(R(0))
+   S, y = polynomial_ring(RealField, "y")
+   @test_throws ArgumentError roots_with_multiplicities(y^2 + 1)
+end
+
 @testset "Generic.Poly.interpolation" begin
    # Exact ring
    R, x = polynomial_ring(ZZ, "x")

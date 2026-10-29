@@ -25,7 +25,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
          @test laurent_polynomial_ring(P2, "y")[1] !==
                laurent_polynomial_ring(P, "y")[1]
 
-         x = y.poly
+         x = gen(base_ring(L))
 
          @test L isa LaurentPolyWrapRing{elem_type(R)}
          @test y isa LaurentPolyWrap{elem_type(R)}
@@ -72,12 +72,12 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "basic manipulation" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
       Z, z = laurent_polynomial_ring(L, "z")
       T, t = laurent_polynomial_ring(L.polyring, "t")
 
-      @test terms_degrees(y) == 0:1
-      @test terms_degrees(y^3) == 0:3
+      @test is_subset(1:1, terms_degrees(y))
+      @test is_subset(3:3, terms_degrees(y^3))
       @test [coeff(y, i) for i=-1:2] == [0, 0, 1, 0]
       @test trail_degree(y^2) == 2
       @test lead_degree(y^2) == 2
@@ -108,6 +108,19 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test is_term(y^-3)
       @test is_term(2y)
       @test !is_term(y^2+y)
+
+      @test @inferred is_constant(zero(L))
+      @test @inferred is_constant(L(5))
+      @test is_constant(3 * y^-2 * y^2)
+      @test !is_constant(y)
+      @test !is_constant(y^-1)
+      @test !is_constant(y + 1)
+
+      @test @inferred(constant_coefficient(zero(L))) == 0
+      @test @inferred(constant_coefficient(y^-1 + 5 + 2y)) == 5
+      @test constant_coefficient(3 * y^-2 * y^2) == 3
+      @test constant_coefficient(y) == 0
+      @test constant_coefficient(y^-1) == 0
       @test is_monomial(y)
       @test is_monomial(y^-3)
       @test !is_monomial(2y)
@@ -149,7 +162,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test hash(one(y)) == hash(one(y))
 
       f1 = f = L(x, -2)
-      @test terms_degrees(f) == -2:-1
+      @test is_subset(-1:-1, terms_degrees(f))
       @test trail_degree(f) == -1
       @test lead_degree(f) == -1
       @test [coeff(f, i) for i = -3:0] == [0, 0, 1, 0]
@@ -163,7 +176,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test trailing_coefficient(f) == 1
 
       f2 = f = L(3 + 2*x^4, -3)
-      @test terms_degrees(f) == -3:1
+      @test is_subset(-3:1, terms_degrees(f))
       @test trail_degree(f) == -3
       @test lead_degree(f) == 1
       @test [coeff(f, i) for i = -4:2] == [0, 3, 0, 0, 0, 2, 0]
@@ -246,7 +259,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "comparisons" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test y == y
 
@@ -260,9 +273,21 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test f != L(x^3 + 2x^2 - 1, -2)
    end
 
+   @testset "isequal" begin
+      # `==` compares series coefficients to the lower precision, `isequal` not
+      S, t = power_series_ring(QQ, 10, :t)
+      L, y = laurent_polynomial_ring(S, :y)
+      f = (1 + O(t^2))*y^-1
+      g = (1 + O(t^3))*y^-1
+
+      @test f == g
+      @test !isequal(f, g)
+      @test isequal(f, deepcopy(f))
+   end
+
    @testset "unary & binary & adhoc arithmetic operations" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test -(-y) == y
       @test iszero(y + (-y))
@@ -330,7 +355,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "powering" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
-      x = y.poly
+      x = gen(base_ring(L))
 
       @test 2y^-2 + 3y^-1 + 4y^0 + 5y + 6y^2 == L(2 + 3x + 4x^2 + 5x^3 + 6x^4, -2)
 
@@ -361,13 +386,13 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
 
    @testset "evaluate" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
+      x = gen(base_ring(L))
       p = 2y+3y^4
-      @assert p.mindeg == 0
+      p_poly = 2x+3x^4
       for a = Any[-3:3; -10.0:3.3:10;]
-         @test evaluate(p, a) == evaluate(p.poly, a)
+         @test evaluate(p, a) == evaluate(p_poly, a)
       end
       q = p - y^-2
-      x = y.poly
       t = -x^0 + 2x^3 + 3x^6
       for a = -10.0:3.3:10
          @test evaluate(q, a) == evaluate(t, a) * a^-2
@@ -448,9 +473,9 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       L, y = laurent_polynomial_ring(ZZ, "y")
 
       test_rand(L, -5:5, -10:10) do f
-         @test AbstractAlgebra.degrees_range(f) ⊆ -5:5
-         for i = -5:5
-            @test coeff(f, i) ∈ -10:10
+         @test issubset(AbstractAlgebra.degrees_range(f), -5:5)
+         for i in -5:5
+            @test coeff(f, i) in -10:10
          end
       end
    end
@@ -469,13 +494,67 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test map_coefficients(one, fz) == z^2 + z + z^-2
       @test map_coefficients(x -> x+2, fz) == 3z^2 + z
       @test map_coefficients(x -> x^2, q^2 - q - 2q^-2) == q^2 + q + 4q^-2
+
+      @test change_coefficient_ring(QQ, fz) == q^2 - q - 2q^-2
+      @test change_coefficient_ring(QQ, fz; parent = Q) == q^2 - q - 2q^-2
+   end
+
+   @testset "coefficients, content, tail, deflation, square roots" begin
+      L, y = laurent_polynomial_ring(ZZ, "y")
+      f = 3y^-2 + 6y^2 - 9y^3
+
+      # entries with zero coefficient may occur, as for polynomials
+      @test sum(c*y^e[1] for (c, e) in zip(coefficients(f), exponent_vectors(f))) == f
+      @test all(e -> length(e) == 1, exponent_vectors(f))
+      @test first(coefficients(f)) == 3
+      @test first(exponent_vectors(f)) == [-2]
+      @test isempty(collect(coefficients(zero(L))))
+      @test isempty(collect(exponent_vectors(zero(L))))
+
+      @test content(f) == 3
+      @test content(-2y^-1) == 2
+      @test content(zero(L)) == 0
+
+      @test tail(f) == 3y^-2 + 6y^2
+      @test tail(y^-1) == 0
+      @test tail(zero(L)) == 0
+
+      @test deflation(f) == (-2, 1)
+      @test deflation(y^-3 + y + y^5) == (-3, 4)
+      @test deflation(y^-3 + y^3 + y^7) == (-3, 2)
+      @test deflation(7y^-4) == (-4, 1)
+      @test deflation(zero(L)) == (0, 1)
+      t = gen(base_ring(L))
+      @test deflation(LaurentPolyWrap(L, t^2 + t^4, -3)) == (-1, 2)
+      g = y^-3 + 2y + y^5
+      @test deflate(g, -3, 2) == y^0 + 2y^2 + y^4
+      @test inflate(deflate(g, -3, 2), -3, 2) == g
+      @test deflate(y^-4 + y^2, 2) == y^-2 + y
+
+      h = (y^-1 + 2 + 3y)^2
+      @test is_square(h)
+      @test is_square(y^-2)
+      @test is_square(zero(L))
+      @test !is_square(y)
+      @test !is_square(y^-1 + 1)
+      @test !is_square(-y^2)
+      @test sqrt(h)^2 == h
+      @test sqrt(4y^-6) == 2y^-3 || sqrt(4y^-6) == -2y^-3
+      @test_throws ErrorException sqrt(y)
+      ok, s = is_square_with_sqrt(h)
+      @test ok && s^2 == h
+      @test !is_square_with_sqrt(y^3)[1]
+
+      L9, t = laurent_polynomial_ring(residue_ring(ZZ, 9)[1], "t")
+      @test_throws NotImplementedError is_square((3 + t)^2)
+      @test_throws NotImplementedError sqrt(t^2)
    end
 
    @testset "printing" begin
       L, y = laurent_polynomial_ring(ZZ, "y")
       @test sprint(show, "text/plain", y) == "y"
       @test sprint(show, "text/plain", L) == "Univariate Laurent polynomial ring in y\n  over integers"
-      p = y^1; p.mindeg = -3
+      p = y^(-2)
       @test sprint(show, "text/plain", p) == "y^-2"
       R, z = polynomial_ring(L, "z")
       @test sprint(show, "text/plain", (y^2)*z) == "y^2*z"

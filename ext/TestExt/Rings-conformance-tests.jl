@@ -17,6 +17,22 @@
 
 @nospecialize
 
+# Return whether `f` can be evaluated on every element of `elems`.
+#
+# `is_unit` and `is_nilpotent` are optional parts of the (NC)Ring interface, and
+# some rings implement them only for part of their elements: Oscar's
+# `is_unit(::PBWAlgQuoElem)` answers for zero and for units, but throws for
+# anything else. So probing a single element such as `one(R)` is not enough;
+# callers pass in exactly the elements they are about to test.
+function supports(f, elems)
+   try
+      foreach(f, elems)
+   catch
+      return false
+   end
+   return true
+end
+
 function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
 
    T = elem_type(R)
@@ -69,12 +85,56 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
          end
       end
 
-      @testset "Basic functions" begin
+      @testset "Basic properties" begin
          @test iszero(R())       # R() is supposed to construct 0 ?
          @test iszero(zero(R))
          @test isone(one(R))
          @test iszero(R(0))
          @test isone(R(1))
+         if is_trivial(R)
+            @test isone(R(0))
+            @test iszero(R(1))
+            @test R(0) == R(1)
+         end
+
+         elems = T[generate_element(R)::T for _ in 1:reps]
+         squares = T[a^2 for a in elems]
+         probe = T[zero(R); one(R); elems; squares]
+         has_is_unit = supports(is_unit, probe)
+         has_is_nilpotent = supports(is_nilpotent, probe)
+
+         if has_is_unit
+            @test is_unit(R(1))
+            if is_trivial(R)
+               @test is_unit(R(0))
+            else
+               @test !is_unit(R(0))
+               for (a, a2) in zip(elems, squares)
+                  @test is_unit(a) == is_unit(a2)
+               end
+            end
+         end
+
+         if has_is_nilpotent
+            @test is_nilpotent(R(0))
+            if is_trivial(R)
+               @test is_nilpotent(R(1))
+            else
+               @test !is_nilpotent(R(1))
+               for (a, a2) in zip(elems, squares)
+                  @test is_nilpotent(a) == is_nilpotent(a2)
+                  if has_is_unit
+                     @test !(is_unit(a) && is_nilpotent(a))
+                  end
+                  if is_domain_type(T)
+                     @test is_nilpotent(a) == is_zero(a)
+                  end
+               end
+            end
+         end
+      end
+
+      @testset "hash, deepcopy, equality, printing, parent" begin
          for i in 1:reps
             a = generate_element(R)::T
             @test hash(a) isa UInt
@@ -82,11 +142,13 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             @test !ismutable(a) || a !== A
             @test equality(a, A)
             @test hash(a) == hash(A)
-            @test parent(a) === parent(A)
+            @test parent(a) === R
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String
+      end
 
+      @testset "Basic arithmetic" begin
          for i in 1:reps
             a = generate_element(R)::T
             b = generate_element(R)::T
@@ -174,7 +236,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                      @test equality(b*t, b*a)
                      t = b \ (b*a)
                      @test equality(b*t, b*a)
-                  catch
+                  catch e
+                     # division may fail in many ways, but not by recursing forever
+                     e isa StackOverflowError && rethrow()
                   end
                   try
                      t = divexact_right(a*b, b)
@@ -185,7 +249,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                      @test equality(t*b, a*b)
                      t = (a*b) / b
                      @test equality(t*b, a*b)
-                  catch
+                  catch e
+                     e isa StackOverflowError && rethrow()
                   end
                end
                @test A == a
@@ -246,7 +311,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                @test iszero(b) || equality(divexact(b*a, b), a)
                @test iszero(b) || equality(divexact(b*a, b, check = true), a)
                @test iszero(b) || equality(divexact(b*a, b, check = false), a)
-               if T isa RingElem
+               if T <: RingElem
                   @test iszero(b) || equality((b*a) / b, a)
                end
                iszero(b) || test_mutating_op_like_add(divexact, divexact!, b*a, b)
@@ -258,11 +323,12 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                   @test equality(t*b, a*b)
                   t = divexact(b*a, b, check = false)
                   @test equality(t*b, a*b)
-                  if T isa RingElem
+                  if T <: RingElem
                      t = (b*a) / b
                      @test equality(t*b, a*b)
                   end
-               catch
+               catch e
+                  e isa StackOverflowError && rethrow()
                end
             end
             try
@@ -525,6 +591,9 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
    @assert ngens(Rxy) == 2
 
    T = elem_type(Rxy)
+   R = base_ring(Rxy)
+   x, y = gens(Rxy)
+   nonzero_element() = (g = generate_element(Rxy); is_zero(g) ? one(Rxy) : g)
 
    @testset "MPoly interface for $(Rxy) of type $(typeof(Rxy))" begin
 
@@ -536,6 +605,8 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
          @test length(gens(Rxy)) == ngens(Rxy)
          @test gens(Rxy) == [gen(Rxy, i) for i in 1:ngens(Rxy)]
          @test all(is_gen, gens(Rxy)) || is_trivial(Rxy)
+         @test number_of_variables(Rxy) == ngens(Rxy)
+         @test internal_ordering(Rxy) in (:lex, :deglex, :degrevlex)
       end
 
       @testset "Polynomial Constructors" begin
@@ -552,21 +623,28 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
             end
             @test finish(B) == a
          end
-         x, y = gens(Rxy)
          f = 13*x^3*y^4 + 2*x - 7
          #@test Rxy([2,-7,13], [[1,0],[0,0],[3,4]]) == f   # FIXME: interface spec does not say this is required?
 
-         R = base_ring(Rxy)
          @test Rxy(R.([2,-7,13]), [[1,0],[0,0],[3,4]]) == f
+
+         # unsorted terms, repeated exponents and zero coefficients
+         B = MPolyBuildCtx(Rxy)
+         push_term!(B, R(2), [0, 1])
+         push_term!(B, R(3), [2, 0])
+         push_term!(B, R(0), [1, 1])
+         push_term!(B, R(1), [3, 3])
+         push_term!(B, R(-1), [0, 1])
+         push_term!(B, R(5), [0, 0])
+         push_term!(B, R(-1), [3, 3])
+         @test finish(B) == 3*x^2 + y + 5
+         @test is_zero(finish(B))
       end
 
       # skip trivial rings after this, it is not worth the bother
       is_trivial(Rxy) && return
 
       @testset "Element properties" begin
-         R = base_ring(Rxy)
-         x, y = gens(Rxy)
-
          a = zero(Rxy)
          @test !is_monomial(a)
          @test !is_term(a)
@@ -649,6 +727,151 @@ function test_MPoly_interface(Rxy::AbstractAlgebra.MPolyRing; reps = 10)
 
       end
 
+      @testset "Term access" begin
+         for i in 1:reps
+            f = generate_element(Rxy)
+            F = deepcopy(f)
+            cs = collect(coefficients(f))
+            es = collect(exponent_vectors(f))
+            ms = collect(monomials(f))
+            ts = collect(terms(f))
+            @test length(cs) == length(es) == length(ms) == length(ts) == length(f)
+            @test sum(ts; init = zero(Rxy)) == f
+            for k in 1:length(f)
+               @test coeff(f, k) == cs[k]
+               @test coeff(f, es[k]) == cs[k]
+               @test exponent_vector(f, k) == es[k]
+               @test [exponent(f, k, j) for j in 1:2] == es[k]
+               @test monomial(f, k) == ms[k]
+               @test monomial!(zero(Rxy), f, k) == ms[k]
+               @test is_monomial(ms[k])
+               @test exponent_vector(ms[k], 1) == es[k]
+               @test term(f, k) == ts[k]
+               @test ts[k] == cs[k]*ms[k]
+            end
+            @test f == F
+
+            # an exponent vector not occurring in f
+            e = [total_degree(f) + 1, 0]
+            @test is_zero(coeff(f, e))
+            @test setcoeff!(deepcopy(f), e, R(3)) == f + 3*x^e[1]
+            if length(f) > 0
+               @test setcoeff!(deepcopy(f), es[1], R(0)) == f - ts[1]
+            end
+         end
+      end
+
+      @testset "Unsafe functions" begin
+         for i in 1:reps
+            f = generate_element(Rxy)
+            cs = collect(coefficients(f))
+            es = collect(exponent_vectors(f))
+            n = length(f)
+            # terms of `f` in reverse order, each split as `(c - 1) + 1`,
+            # between two cancelling terms with an exponent not in `f`
+            e = [total_degree(f) + 1, 0]
+            g = zero(Rxy)
+            fit!(g, 2*n + 2)
+            g = set_exponent_vector!(g, 1, e)
+            g = setcoeff!(g, 1, 1)
+            for k in 1:n
+               j = n + 1 - k
+               g = set_exponent_vector!(g, 2*k, es[j])
+               g = setcoeff!(g, 2*k, cs[j] - 1)
+               g = set_exponent_vector!(g, 2*k + 1, es[j])
+               g = setcoeff!(g, 2*k + 1, 1)
+            end
+            g = set_exponent_vector!(g, 2*n + 2, e)
+            g = setcoeff!(g, 2*n + 2, -R(1))
+            g = sort_terms!(g)
+            g = combine_like_terms!(g)
+            @test g == f
+         end
+      end
+
+      @testset "Derivative and evaluation" begin
+         @test derivative(x, 1) == 1
+         @test derivative(x, 2) == 0
+         @test derivative(x^3*y^2, 2) == 2*x^3*y
+         for i in 1:reps
+            f = generate_element(Rxy)
+            g = generate_element(Rxy)
+            for j in 1:2
+               @test derivative(f*g, j) == derivative(f, j)*g + f*derivative(g, j)
+            end
+
+            v = rand(-10:10, 2)
+            vals = R.(v)
+            @test evaluate(f, vals) isa elem_type(R)
+            @test evaluate(f*g, vals) == evaluate(f, vals)*evaluate(g, vals)
+            @test evaluate(f + g, vals) == evaluate(f, vals) + evaluate(g, vals)
+            @test evaluate(f, v) == evaluate(f, vals)
+            @test f(vals...) == evaluate(f, vals)
+            @test evaluate(f, [x, y]) == f
+         end
+      end
+
+      if is_domain_type(R) && is_exact_type(R)
+         @testset "Exact division" begin
+            @test !divides(x + 1, x)[1]
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               @test divides(f*g, g) == (true, f)
+               flag, q = divides(f, g)
+               @test !flag || q*g == f
+               if !is_zero(R(3))
+                  @test divexact(3*f, 3) == f
+                  @test divexact(R(3)*f, R(3)) == f
+               end
+               if !is_zero(f) && !is_unit(g)
+                  v, q = remove(f*g^2, g)
+                  @test v >= 2
+                  @test q*g^v == f*g^2
+                  @test !divides(q, g)[1]
+                  @test valuation(f*g^2, g) == v
+               end
+            end
+         end
+      end
+
+      if R isa Field
+         # no term of `r` is divisible by a leading monomial in `G`
+         is_reduced(r, G) = !any(all(e .>= leading_exponent_vector(g)) for e in exponent_vectors(r) for g in G)
+
+         @testset "Division with remainder" begin
+            for i in 1:reps
+               f = generate_element(Rxy)
+               g = nonzero_element()
+               h = nonzero_element()
+               @test divrem(f*g, g) == (f, zero(Rxy))
+               @test div(f*g, g) == f
+
+               q, r = divrem(f, g)
+               @test f == q*g + r
+               @test is_reduced(r, [g])
+               @test div(f, g) == q
+
+               qs, r = divrem(f, [g, h])
+               @test f == qs[1]*g + qs[2]*h + r
+               @test is_reduced(r, [g, h])
+            end
+         end
+
+         # random input makes `gcd` too slow
+         @testset "GCD" begin
+            f = x + 1
+            g = y - 2
+            h = x*y + 3
+            d = gcd(f*h, g*h)
+            @test divides(d, h)[1] && divides(h, d)[1]
+            @test is_unit(gcd(f, g))
+            @test is_zero(gcd(zero(Rxy), zero(Rxy)))
+            d = gcd(f*h, zero(Rxy))
+            @test divides(d, f*h)[1] && divides(f*h, d)[1]
+         end
+      end
+
       # TODO: add more tests, covering everything described in the manual, see
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpoly_interface/
       # https://nemocas.github.io/AbstractAlgebra.jl/dev/mpolynomial/
@@ -706,25 +929,25 @@ function test_MatSpace_interface(S::MatSpace; reps = 10)
          end
 
          # zero matrices
-         a = zero_matrix(R, nrows(S), ncols(S))
-         @test parent(a) === S
-         @test iszero(a)
-         a = zero(S)
-         @test parent(a) === S
-         @test iszero(a)
+         z = zero_matrix(R, nrows(S), ncols(S))
+         @test parent(z) === S
+         @test iszero(z)
+         z = zero(S)
+         @test parent(z) === S
+         @test iszero(z)
 
          # (truncated) identity matrices
          if nrows(S) == ncols(S)
-            a = diagonal_matrix(one(R), nrows(S), ncols(S))
-            @test parent(a) === S
-            @test isone(a)
-            a = one(S)
-            @test parent(a) === S
-            @test isone(a)
+            e = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(e) === S
+            @test isone(e)
+            e = one(S)
+            @test parent(e) === S
+            @test isone(e)
          else
-            a = diagonal_matrix(one(R), nrows(S), ncols(S))
-            @test parent(a) === S
-            @test !isone(a)
+            e = diagonal_matrix(one(R), nrows(S), ncols(S))
+            @test parent(e) === S
+            @test !isone(e)
             @test_throws DomainError one(S)
          end
       end
@@ -916,9 +1139,19 @@ end
 function test_Ring_interface_recursive(R::AbstractAlgebra.Ring; reps = 15)
    test_Ring_interface(R; reps = reps)
    test_NCRing_interface_recursive(R; reps = reps)
+
    Rx, _ = polynomial_ring(R, :x)
    test_Poly_interface(Rx, reps = 2 + fld(reps, 2))
+
    Rxy, _ = polynomial_ring(R, [:x, :y])
+   @testset "MPoly ring constructor over $(R)" begin
+      @test polynomial_ring(R, [:x, :y])[1] === Rxy
+      @test polynomial_ring(R, [:x, :y]; cached = false)[1] !== Rxy
+      @test polynomial_ring(R, [:x, :y]; internal_ordering = :deglex)[1] !== Rxy
+      @test mpoly_ring_type(R) == typeof(Rxy)
+      @test mpoly_type(R) == elem_type(Rxy)
+      @test mpoly_type(elem_type(R)) == elem_type(Rxy)
+   end
    test_MPoly_interface(Rxy, reps = 2 + fld(reps, 2))
 end
 

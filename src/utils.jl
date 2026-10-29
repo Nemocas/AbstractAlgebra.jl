@@ -53,10 +53,23 @@ function is_loaded_directly()
       # 1.12.0-DEV.896:   78 /  61 # ignored
       # 1.12.0-DEV.1322:  88 /  72 # ignored
       # 1.12.0-DEV.1506: 106 /  93
+      # 1.12.7:          106 /  93
+      # 1.13.0-rc3:      106 /  93
+      # 1.13.2-DEV.58:   115 / 102
+      # 1.13.3-DEV.13:   109 /  96
+      # 1.14.0-DEV.3081: 105 /  92
+      # 1.14.0-DEV.3083: 114 / 101
+      # 1.14.0-DEV.3089: 117 / 104
+      # 1.14.0-DEV.3446: 121 / 108
+      # 1.14.0-DEV.3586: 115 / 102
+      # 1.15.0-DEV.80:   120 / 107
+      # 1.15.0-DEV.124:  123 / 110
       @static if v"1.11.0-" < VERSION < v"1.12.0-DEV.1506"
         return line_difference >= 73
-      else # v"1.12.0-DEV.1506" <= VERSION
-        return line_difference >= 100
+      elseif VERSION < v"1.14.0-DEV.3083"
+        return line_difference >= 104
+      else
+        return line_difference >= 112
       end
     end
   catch e

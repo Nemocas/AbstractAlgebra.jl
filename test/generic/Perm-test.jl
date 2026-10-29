@@ -235,6 +235,13 @@ end
    @test p^5 == p*p*p*p*p
    @test p^-4 == inv(p)*inv(p)*inv(p)*inv(p)
    @test p^2 * p^-2 == one(G)
+
+   # generic `GroupElem` fallback, which `Perm` overrides
+   for n in -20:50
+      q = invoke(^, Tuple{GroupElem, Integer}, p, n)
+      @test q == p^n
+      @test q.d !== p.d
+   end
 end
 
 @testset "Perm.mixed_binary_ops" begin
@@ -290,6 +297,16 @@ end
    @test order(T, a) isa T
    @test order(a) == 6
    @test a^6 == one(G)
+
+   M = matrix_repr(a)
+   @test M isa Matrix{T}
+   @test all(M[i, a[i]] == 1 for i in 1:10)
+   @test count(!iszero, M) == 10
+   @test matrix_repr(Matrix{Int}, a) isa Matrix{Int}
+   @test matrix_repr(Matrix{Int}, a) == M
+   @test matrix_repr(SparseMatrixCSC, a) isa SparseMatrixCSC{T}
+   @test matrix_repr(SparseMatrixCSC, a) == M
+   @test matrix_repr(SparseMatrixCSC{Int}, a) isa SparseMatrixCSC{Int}
 
    p = G([9,5,4,7,3,8,2,10,1,6])
 

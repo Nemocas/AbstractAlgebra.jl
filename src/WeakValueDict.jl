@@ -83,7 +83,8 @@ Base.length(h::WeakValueCache) = h.nfilled
 function Base.show(io::IO, h::WeakValueCache)
    print(io, "\n")
    for i in 1:max(length(h.slots), length(h.keys), length(h.vals))
-      show(io, i); print(io,": ");
+      show(io, i)
+      print(io,": ")
       isassigned(h.slots, i) ? show(io,h.slots[i]) : print(io, Base.undef_ref_str); print(io, ", ")
       isassigned(h.keys, i) ? show(io, h.keys[i]) : print(io, Base.undef_ref_str); print(io, ", ")
       if isassigned(h.vals, i)
@@ -157,7 +158,7 @@ function _setindex!(h::WeakValueCache, v, key, index)
    return h
 end
 
-function rehash!(h::WeakValueCache{K, V}, newsz = length(h.keys)) where {K, V}
+function rehash!(h::WeakValueCache{K, V}, newsz::Int = length(h.keys)) where {K, V}
    olds = h.slots
    oldk = h.keys
    oldv = h.vals
@@ -544,20 +545,21 @@ function Base.get!(wvh::WeakValueDict{K, V}, key, default) where {K, V}
     return v::V
 end
 function Base.get!(default::Union{Function, Type}, wvh::WeakValueDict{K, V}, key) where {K, V}
-    v = lock(wvh) do
+    # explicit locking: a `lock(wvh) do` closure hides the type of `default`
+    # from inference
+    lock(wvh.lock)
+    try
         _cleanup_locked(wvh)
         if haskey(wvh.ht, key)
             x = wvh.ht[key].value
-            if x === nothing
-                wvh[key] = default()
-            else
-                x
-            end
-        else
-            wvh[key] = default()
+            x === nothing || return x::V
         end
+        v = default()
+        wvh[key] = v
+        return v::V
+    finally
+        unlock(wvh.lock)
     end
-    return v::V
 end
 
 function Base.getkey(wvh::WeakValueDict{K}, kk, default) where K

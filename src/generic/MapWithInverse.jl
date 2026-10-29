@@ -15,18 +15,31 @@ domain(f::MapWithSection{D, C}) where {D, C} = domain(f.map)::D
 codomain(f::MapWithSection{D, C}) where {D, C} = codomain(f.map)::C
 image_fn(f::MapWithSection) = image_fn(f.map)
 inverse_fn(f::MapWithSection) = image_fn(f.section)
+@doc raw"""
+    image_map(f::Union{Generic.MapWithSection, Generic.MapWithRetraction})
+
+Return the underlying map of `f`, i.e. `f` stripped of its section resp.
+retraction.
+"""
 image_map(f::MapWithSection) = f.map
+
 preimage_map(f::MapWithSection) = f.section # for convenience only
+
+@doc raw"""
+    section_map(f::Generic.MapWithSection)
+
+Return the section stored in `f`. See [`map_with_section`](@ref).
+"""
 section_map(f::MapWithSection) = f.section
 
 (f::MapWithSection{D, C})(a) where {D, C} = image(f, a)::elem_type(C)
 
 function preimage(f::MapWithSection{D, C}, a) where {D, C}
-  return inverse_fn(f)(a)::elem_type(D)
+  return preimage_map(f)(a)::elem_type(D)
 end
 
 function image(f::MapWithSection{D, C}, a) where {D, C}
-  return image_fn(f)(a)::elem_type(C)
+  return image_map(f)(a)::elem_type(C)
 end
 
 function Base.show(io::IO, M::MapWithSection)
@@ -67,6 +80,11 @@ codomain(f::MapWithRetraction{D, C}) where {D, C} = codomain(f.map)::C
 image_fn(f::MapWithRetraction) = image_fn(f.map)
 inverse_fn(f::MapWithRetraction) = image_fn(f.retraction)
 image_map(f::MapWithRetraction) = f.map
+@doc raw"""
+    retraction_map(f::Generic.MapWithRetraction)
+
+Return the retraction stored in `f`. See [`map_with_retraction`](@ref).
+"""
 retraction_map(f::MapWithRetraction) = f.retraction
 
 retraction_map(f::MapCache) = retraction_map(f.map)
@@ -74,11 +92,11 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 (f::MapWithRetraction{D, C})(a) where {D, C} = image(f, a)::elem_type(C)
 
 function preimage(f::MapWithRetraction{D, C}, a) where {D, C}
-  return inverse_fn(f)(a)::elem_type(D)
+  return retraction_map(f)(a)::elem_type(D)
 end
 
 function image(f::MapWithRetraction{D, C}, a) where {D, C}
-  return image_fn(f)(a)::elem_type(C)
+  return image_map(f)(a)::elem_type(C)
 end
 
 function Base.show(io::IO, M::MapWithRetraction)

@@ -536,9 +536,14 @@ end
 
 function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    b = 0x53dd43cd511044d1%UInt
-   b = xor(b, xor(Base.hash(x.exps, h), h))
+   N = size(x.exps, 1)
+   # columns of x.exps beyond length(x) are unused capacity
    for i in 1:length(x)
-      b = xor(b, xor(hash(x.coeffs[i], h), h))
+      for k in 1:N
+         b = xor(b, hash(x.exps[k, i], h))
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      end
+      b = xor(b, hash(x.coeffs[i], h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -889,7 +894,7 @@ function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPo
    return length(x.poly)
 end
 
-function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T <: AbstractAlgebra.MPolyRingElem, S <: RingElement}
+function Base.eltype(::Type{MPolyCoeffs{T, S}}) where {T, S}
    return S
 end
 
@@ -897,11 +902,11 @@ function Base.eltype(::Type{MPolyExponentVectors{T, V}}) where {V, T <: Abstract
    return V
 end
 
-function Base.eltype(::Type{MPolyMonomials{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyMonomials{T}}) where T
    return T
 end
 
-function Base.eltype(::Type{MPolyTerms{T}}) where T <: AbstractAlgebra.MPolyRingElem{S} where S <: RingElement
+function Base.eltype(::Type{MPolyTerms{T}}) where T
    return T
 end
 
@@ -2000,6 +2005,19 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       if a.coeffs[i] != b.coeffs[i]
          return false
       end
+   end
+   return true
+end
+
+function isequal(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b, false) || return false
+   length(a) == length(b) || return false
+   N = size(a.exps, 1)
+   for i = 1:a.length
+      for j = 1:N
+         a.exps[j, i] == b.exps[j, i] || return false
+      end
+      isequal(a.coeffs[i], b.coeffs[i]) || return false
    end
    return true
 end
@@ -3438,6 +3456,25 @@ end
     lcm(a::AbstractAlgebra.MPolyRingElem{T}, a::AbstractAlgebra.MPolyRingElem{T}) where {T <: RingElement}
 
 Return the least common multiple of a and b in parent(a).
+
+# Examples
+
+```jldoctest
+julia> R,(x,y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> a = x*y + 2*y
+x*y + 2*y
+
+julia> b = x^3*y + y
+x^3*y + y
+
+julia> lcm(a,b)
+x^4*y + 2*x^3*y + x*y + 2*y
+
+julia> lcm(a,b) == a * b // gcd(a,b)
+true
+```
 """
 function lcm(a::MPolyRingElem{T}, b::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(a, b)

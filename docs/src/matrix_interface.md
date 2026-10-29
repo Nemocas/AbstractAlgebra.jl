@@ -34,15 +34,14 @@ and for compatibility with in-place algorithms.
 
 ## Types and parents
 
-Matrix space implementations use the following abstract types:
+Matrix space implementations use the following types:
 
-- `MatSpace{T}`: parent type for matrix spaces,
+- `MatSpace{T}`: concrete parent type for matrix spaces,
 - `MatElem{T}`: abstract type for elements of matrix spaces.
 
-Matrix algebra implementations use:
-
-- `MatRing{T}`: abstract parent type for matrix algebras,
-- `MatRingElem{T}`: abstract type for elements of matrix algebras.
+Matrix algebras are provided by the concrete types `MatRing{T}` (parent) and
+`MatRingElem{T}` (element), which wrap a `MatElem{T}`. Implementing the
+matrix space interface makes them available for new matrix types.
 
 The parameter `T` is the type of the entries of the matrix.
 
