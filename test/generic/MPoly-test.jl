@@ -967,7 +967,7 @@ end
       @test subresultant_prs_ducos(p, q, 2) == subresultant_prs_ducos(p, q, y)
       @test subresultant_prs_kerber(p, q, 2) == subresultant_prs_kerber(p, q, y)
 
-      # Case 2: Unequal degrees with defective step
+      # Case 2a: Unequal degrees with defective step
       p = x^4 + y
       q = x^3 + 1
       res_ducos = subresultant_prs_ducos(p, q, x)
@@ -980,6 +980,12 @@ end
       # Extracting regular subresultants from Kerber yields the Ducos PRS
       regular_kerber = [poly for (idx, poly) in enumerate(raw_kerber) if idx <= 2 || degree(poly, 1) == degree(q, 1) - idx + 2]
       @test regular_kerber == res_ducos
+
+      # Case 2b: Larger defective gap (d = 5, e = 1 => n = 3) with intermediate terms
+      p = x^6 + x^3 + y
+      q = x^5 + x^2 + 1
+      @test subresultant_prs_ducos(p, q, x) == [p, q, x - y, y^5 + y^2 + 1]
+      @test subresultant_prs_kerber(p, q, x) == [p, q, -x + y, 0, 0, x - y, y^5 + y^2 + 1]
 
       # Case 3: Common factor
       g = x^2 + y
