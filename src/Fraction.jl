@@ -77,8 +77,11 @@ end
 function Base.hash(a::FracElem, h::UInt)
    b = 0x8a30b0d963237dd5%UInt
    # We canonicalise before hashing
-   return xor(b, hash(numerator(a, true), h), hash(denominator(a, true), h), h)
+   n, d = _canonical_num_den(a)
+   return xor(b, hash(n, h), hash(d, h), h)
 end
+
+_canonical_num_den(a::FracElem) = numerator(a, true), denominator(a, true)
 
 # Fall back method for all other fraction types in system
 function Base.numerator(a::FracElem, canonicalise::Bool=true)
@@ -424,12 +427,7 @@ function ==(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
    b  = check_parent(x, y, false)
    !b && return false
 
-   return (denominator(x, false) == denominator(y, false) &&
-           numerator(x, false) == numerator(y, false)) ||
-          (denominator(x, true) == denominator(y, true) &&
-           numerator(x, true) == numerator(y, true)) ||
-          (numerator(x, false)*denominator(y, false) ==
-           denominator(x, false)*numerator(y, false))
+   return _equal_fractions(==, x, y)
 end
 
 @doc raw"""
@@ -444,8 +442,33 @@ function isequal(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
    if parent(x) != parent(y)
       return false
    end
-   return isequal(numerator(x, false)*denominator(y, false),
-                  denominator(x, false)*numerator(y, false))
+   return _equal_fractions(isequal, x, y)
+end
+
+# Compare `x` and `y` with `eq`, which is `==` or `isequal`. Fractions are not
+# canonical, but in an exact domain a common denominator decides by the
+# numerators, and a common numerator by whether it is zero; this holds for
+# the stored parts and for the parts with the canonical unit removed.
+# Otherwise cross-multiply.
+function _equal_fractions(eq, x::FracElem{T}, y::FracElem{T}) where {T <: RingElem}
+   decisive = is_exact_type(T) && is_domain_type(T)
+   nx, dx = numerator(x, false), denominator(x, false)
+   ny, dy = numerator(y, false), denominator(y, false)
+
+   if eq(dx, dy)
+      eq(nx, ny) && return true
+      decisive && return false
+   elseif decisive && eq(nx, ny)
+      return iszero(nx)
+   end
+
+   if decisive
+      cnx, cdx = _canonical_num_den(x)
+      cny, cdy = _canonical_num_den(y)
+      eq(cdx, cdy) && return eq(cnx, cny)
+   end
+
+   return eq(nx*dy, dx*ny)
 end
 
 ###############################################################################

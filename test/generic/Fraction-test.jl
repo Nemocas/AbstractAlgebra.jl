@@ -190,6 +190,27 @@ end
    @test a == 1//(x - 1)
 
    @test isequal(a, 1//(x - 1))
+
+   @test isequal(a, -1//(-x + 1))
+
+   @test !isequal(a, 1//(x + 1))
+
+   @test hash(a) == hash(1//(x - 1))
+
+   # stored parts that match only in part
+   R, y = polynomial_ring(QQ, "y")
+   b = 1//(2y + 2)
+   z = b - b
+
+   @test denominator(z, false) != 1
+   @test z == zero(parent(b))
+   @test isequal(z, zero(parent(b)))
+   @test b != 2//(2y + 2)
+   @test !isequal(b, 2//(2y + 2))
+   @test b != 1//(2y + 1)
+   @test !isequal(b, 1//(2y + 1))
+   @test b == -1//(-2y - 2)
+   @test isequal(b, -1//(-2y - 2))
 end
 
 @testset "Generic.FracFieldElem.adhoc_comparison" begin

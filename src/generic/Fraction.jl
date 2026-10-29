@@ -44,6 +44,12 @@ function Base.denominator(a::FracFieldElem, canonicalise::Bool=true)
    end
 end
 
+function _canonical_num_den(a::FracFieldElem)
+   u = canonical_unit(a.den)
+   isone(u) && return a.num, a.den
+   return divexact(a.num, u), divexact(a.den, u)
+end
+
 function deepcopy_internal(a::FracFieldElem{T}, dict::IdDict) where {T <: RingElem}
    v = FracFieldElem{T}(deepcopy_internal(numerator(a, false), dict),
                deepcopy_internal(denominator(a, false), dict))

@@ -98,6 +98,7 @@ import ..AbstractAlgebra: RingElement
 import ..AbstractAlgebra: _add_gens
 import ..AbstractAlgebra: _can_solve_with_solution_fflu
 import ..AbstractAlgebra: _can_solve_with_solution_lu
+import ..AbstractAlgebra: _canonical_num_den
 import ..AbstractAlgebra: _upgrade
 import ..AbstractAlgebra: add!
 import ..AbstractAlgebra: addmul!
