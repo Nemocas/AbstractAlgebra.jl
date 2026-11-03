@@ -9,7 +9,24 @@
 
 abstract type Set end
 
-abstract type Group <: Set end # with * as operation
+"""
+    Semigroup <: Set
+
+Abstract parent type for nonempty sets with an associative multiplication `*`.
+The interface does not require an identity, generators, or finiteness.
+"""
+abstract type Semigroup <: Set end
+
+"""
+    Monoid <: Semigroup
+
+Abstract parent type for semigroups with an identity supplied by `one(M)`.
+The identity belongs to the specified parent and need not be an ambient
+identity. Elements of a monoid need not be invertible.
+"""
+abstract type Monoid <: Semigroup end
+
+abstract type Group <: Monoid end # with * as operation
 
 abstract type AdditiveGroup <: Set end # with + as operation
 
@@ -25,7 +42,25 @@ abstract type Field <: Ring end
 
 abstract type SetElem end
 
-abstract type GroupElem <: SetElem end # with * as operation
+"""
+    SemigroupElem <: SetElem
+
+Abstract element type for the semigroup interface. Implementations supply
+`parent`, the parent/element type correspondence, and associative, nonmutating
+multiplication. Generic positive integer powers do not require an identity.
+"""
+abstract type SemigroupElem <: SetElem end
+
+"""
+    MonoidElem <: SemigroupElem
+
+Abstract element type for the monoid interface. Its parent supplies an identity;
+generic nonnegative integer powers and `isone` use that parent's identity.
+No inverse operation is required or supplied by this interface.
+"""
+abstract type MonoidElem <: SemigroupElem end
+
+abstract type GroupElem <: MonoidElem end # with * as operation
 
 abstract type AdditiveGroupElem <: SetElem end # with + as operation
 
