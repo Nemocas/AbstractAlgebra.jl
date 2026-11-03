@@ -168,7 +168,7 @@ function mulpow!(a::Fac{T}, b::T, e::Int) where T
   end
 end
 
-
+# a *= b^e
 function mulpow!(a::Fac{T}, b::Fac{T}, e::Int) where T
   @assert !(a === b)
   @assert e >= 0
@@ -176,12 +176,8 @@ function mulpow!(a::Fac{T}, b::Fac{T}, e::Int) where T
     return
   end
   a.unit *= b.unit^e
-  if isempty(a.fac) && e == 1
-    a.fac = b.fac
-  else
-    for i in b.fac
-      mulpow!(a, i[1], i[2]*e)
-    end
+  for (p, k) in b
+    mulpow!(a, p, k*e)
   end
 end
 
