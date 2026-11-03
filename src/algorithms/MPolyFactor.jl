@@ -909,8 +909,8 @@ end
 # Return A/b^bexp
 function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where {E <: MPolyRingElem}
 
-  R = parent(A.unit)
-  a = collect(A.fac)
+  R = parent(unit(A))
+  a = collect(A)
   abases = E[t.first for t in a]
   aexps = Int[t.second for t in a]
 
@@ -941,11 +941,7 @@ function divexact_pow(A::Fac{E}, b::E, bexp::Int; check::Bool=true) where {E <: 
     error("Not an exact division")
   end
 
-  #return Fac{E}(one(R), Dict(abases .=> aexps))
-  f = Fac{E}()
-  f.unit = one(R)
-  f.fac = Dict(abases .=> aexps)
-  return f
+  return Fac(one(R), Dict{E, Int}(abases .=> aexps))
 end
 
 
@@ -958,7 +954,7 @@ function lcc_kaltofen_step!(
   alphas::Vector
 ) where {E <: MPolyRingElem}
 
-  R = parent(Af.unit)
+  R = parent(unit(Af))
   r = length(Au)
   @assert r == length(divs)
   Kx, _ = polynomial_ring(base_ring(R), string(gen(R,v)))
@@ -1197,8 +1193,7 @@ end
 function mfactor_sqrfree_char_zero(a::E) where {E <: MPolyRingElem}
   R = parent(a)
   @assert length(a) >= 1
-  res = Fac{E}()
-  res.unit = one(R)
+  res = Fac(one(R), Dict{E, Int}())
   for v in 1:nvars(R)
     Sp = derivative(a, v)
     if !iszero(Sp)
@@ -1225,12 +1220,9 @@ function mfactor_irred_char_zero(a::E) where {E <: MPolyRingElem}
   K = base_ring(R)
   @assert length(a) > 0
 
-  res = Fac{E}()
-  res.unit = one(R)
-
   lc = coeff(a, 1)
+  res = Fac(R(lc), Dict{E, Int}())
   if !isone(lc)
-    res.unit = lc
     a *= AbstractAlgebra.inv(lc)
   end
 
@@ -1277,32 +1269,28 @@ function mfactor_squarefree_char_zero(a::E) where {E <: MPolyRingElem}
   R = parent(a)
   K = base_ring(R)
 
-  res = Fac{E}()
-  tres = Fac{E}()
-
   if iszero(a)
-    res.unit = zero(R)   # not a unit :-(
-    return res
+    return Fac(zero(R), Dict{E, Int}())   # not a unit :-(
   end
 
   # start with a monic version of a
   lc = coeff(a, 1)
-  res.unit = R(lc)
   if !is_unit(lc)
     error("leading coefficient must be invertible")
   end
   # thus lc is invertible in K, which means that it is squarefree
   # don't use `Base.inv`, it is wrong for `BigInt`
-  res.fac = Dict{E, Int}(AbstractAlgebra.inv(lc) * a => 1)
+  res = Fac(R(lc), Dict{E, Int}(AbstractAlgebra.inv(lc) * a => 1))
+  tres = Fac{E}()
 
   # pure variable powers in the final factorization
   var_powers = zeros(Int, nvars(R))
 
   # ensure factors are primitive wrt any variable
   for v in 1:nvars(R)
-    tres.unit = res.unit
+    tres.unit = unit(res)
     empty!(tres.fac)
-    for p in res.fac
+    for p in res
       (content, primitive, power) = mfactor_primitive(p[1], v)
       var_powers[v] += power
       mulpow!(tres, content, 1)
@@ -1312,9 +1300,9 @@ function mfactor_squarefree_char_zero(a::E) where {E <: MPolyRingElem}
   end
 
   # ensure factors are squarefree
-  tres.unit = res.unit
+  tres.unit = unit(res)
   empty!(tres.fac)
-  for i in res.fac
+  for i in res
     mulpow!(tres, mfactor_sqrfree_char_zero(i[1]), i[2])
   end
   res, tres = tres, res
@@ -1331,9 +1319,7 @@ end
 function mfactor_char_zero(a::E) where {E <: MPolyRingElem}
   tres = mfactor_squarefree_char_zero(a)
   # ensure factors are irreducible
-  res = Fac{E}()
-  res.unit = tres.unit
-  empty!(res.fac)
+  res = Fac(unit(tres), Dict{E, Int}())
   for i in tres
     mulpow!(res, mfactor_irred_char_zero(i[1]), i[2])
   end
