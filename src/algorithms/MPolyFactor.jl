@@ -62,40 +62,6 @@ function taylor_set_coeff!(t::Vector{E}, i::Int, c::E) where {E <: MPolyRingElem
   end
 end
 
-#################### basic manipulation of Fac ################################
-
-# a *= b^e
-function mulpow!(a::Fac{T}, b::T, e::Int) where T
-  @assert e >= 0
-  if e == 0
-    return
-  end
-  if is_unit(b)
-    a.unit *= b^e
-  elseif haskey(a.fac, b)
-    a.fac[b] += e
-  else
-    a.fac[b] = e
-  end
-end
-
-
-function mulpow!(a::Fac{T}, b::Fac{T}, e::Int) where T
-  @assert !(a === b)
-  @assert e >= 0
-  if e == 0
-    return
-  end
-  a.unit *= b.unit^e
-  if isempty(a.fac) && e == 1
-    a.fac = b.fac
-  else
-    for i in b.fac
-      mulpow!(a, i[1], i[2]*e)
-    end
-  end
-end
-
 ################ basic manipulation of polys #################################
 
 function to_univar(a, var::Int, Kx)
