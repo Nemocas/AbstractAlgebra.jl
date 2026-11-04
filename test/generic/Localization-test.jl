@@ -25,6 +25,33 @@
     @test elem_type(L) == LocalizedEuclideanRingElem{elem_type(Qx)}
     @test base_ring(L) == Qx
     @test base_ring(L()) == Qx
+
+    # caching
+    @test localization(Qx, x^2 + 1) === localization(Qx, x^2 + 1)
+    @test localization(Qx, x^2 + 1, cached = false) !== localization(Qx, x^2 + 1)
+    @test localization(Qx, x^2 + 1, comp = true) !== localization(Qx, x^2 + 1)
+    @test localization(Qx, [x + 1, x + 2]) === localization(Qx, [x + 1, x + 2])
+  end
+
+  @testset "Caching with threads" begin
+    # tasks on several threads asking for the same localizations get the
+    # one cached parent each
+    code = """
+      using AbstractAlgebra
+      Qx, x = QQ["x"]
+      ps = [x - a for a in 1:50]
+      for _ in 1:20
+        empty!(AbstractAlgebra.Generic.LocDict)
+        Ls = Vector{Any}(undef, 400)
+        Threads.@threads for i in 1:400
+          Ls[i] = localization(Qx, ps[i % 50 + 1])
+        end
+        all(i -> Ls[i] === localization(Qx, ps[i % 50 + 1]), 1:400) || exit(1)
+      end
+      """
+    cmd = `$(Base.julia_cmd()) -t 4 --startup-file=no
+           --project=$(Base.active_project()) -e $code`
+    @test success(cmd)
   end
 
   @testset "Canonicalisation" begin

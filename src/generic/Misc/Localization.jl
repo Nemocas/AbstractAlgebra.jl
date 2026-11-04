@@ -16,35 +16,24 @@
 
    function LocalizedEuclideanRing{T}(prime::T, primes::Vector{T}, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
       length(primes) == 0 && error("No element to localize at since array of primes is empty")
-      if cached && haskey(LocDict, (parent(prime), prime, comp))
-         return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}
-      else
-         z = new(parent(prime), prime, primes, comp)
-         if cached
-            LocDict[parent(prime), prime, comp] = z
-         end
-         return z
-      end
+      return get_cached!(LocDict, (parent(prime), prime, comp), cached) do
+         new(parent(prime), prime, primes, comp)
+      end::LocalizedEuclideanRing{T}
    end
    function LocalizedEuclideanRing{T}(prime::T, cached::Bool = true, comp::Bool = false) where {T <: RingElem}
      is_unit(prime) && error("no-point")
-     if cached && haskey(LocDict, (parent(prime), prime, comp))
-       return LocDict[parent(prime), prime, comp]::LocalizedEuclideanRing{T}
-     else
+     return get_cached!(LocDict, (parent(prime), prime, comp), cached) do
        r = new()
        r.base_ring = parent(prime)
        r.prime = prime
        r.comp = comp
-       if cached
-          LocDict[parent(prime), prime, comp] = r
-       end
-       return r
-     end
+       r
+     end::LocalizedEuclideanRing{T}
    end
 end
 
 
-const LocDict = Dict{Tuple{AbstractAlgebra.Ring, RingElement, Bool}, AbstractAlgebra.Ring}()
+const LocDict = CacheDictType{Tuple{AbstractAlgebra.Ring, RingElement, Bool}, AbstractAlgebra.Ring}()
 
 function isin(a, L::LocalizedEuclideanRing{T}) where {T <: RingElem}
   iszero(a) && return true
