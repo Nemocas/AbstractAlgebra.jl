@@ -1235,7 +1235,7 @@ struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
 end
 
 @doc raw"""
-    InjProjMat{T<:RingElement}
+    InjProjMat{T<:NCRingElement}
 
 An `n` x `m` matrix over a ring `R`, all zero but:
 If `n > m`: `s` is a row starting from which an identity matrix is inserted.
@@ -1250,7 +1250,7 @@ julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 [0   0   0   1   0]
 ```
 """
-struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
+struct InjProjMat{T <: NCRingElement} <: AbstractAlgebra.MatElem{T}
    R::NCRing
    n::Int #Rows
    m::Int #Cols

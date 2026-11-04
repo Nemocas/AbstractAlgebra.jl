@@ -4490,6 +4490,13 @@ end
       X = Generic.inj_proj_mat(QQ, 4, 2, s)
       @test M + X == N + matrix(X)
    end
+
+   # Noncommutative base ring
+   S = matrix_ring(QQ, 2)
+   M = Generic.inj_proj_mat(S, 3, 2, 2)
+   N = matrix(M)
+   @test N == matrix(S, [0 0; 1 0; 0 1])
+   @test all(M[i, j] == N[i, j] for i in 1:3, j in 1:2)
 end
 
 @testset "Generic.Mat.unsafe" begin
