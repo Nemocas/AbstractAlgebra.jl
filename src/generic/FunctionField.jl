@@ -941,7 +941,10 @@ end
 #
 ###############################################################################
 
-function Base.inv(a::AbsSimpleFunctionFieldElem)
+Base.inv(a::AbsSimpleFunctionFieldElem) = _inv_naive(a)
+
+# Generic fallback for downstream specializations of inv.
+function _inv_naive(a::AbsSimpleFunctionFieldElem)
    R = parent(a)
    anum = numerator(a, false)
    aden = denominator(a, false)
