@@ -49,19 +49,36 @@ GLOBAL_VARIABLE_ListOfDodgyFuncs::Vector{Symbol} = Symbol[]   # see add_dodgy_fu
 GLOBAL_VARIABLE_ActiveDodgyFuncs::Vector{Symbol} = Symbol[]
 
 
-# This is for "registering" a dodgy function:
-# it would normally be called in the initialization of the package.
+@doc raw"""
+    add_dodgy_func(func::Symbol)
+
+This is registers the name `func` as a name for a function fam,ily having dodgy variants.
+It would normally be called in the initialization of the package.
+"""
 function add_dodgy_func(func::Symbol)
   !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && push!(GLOBAL_VARIABLE_ListOfDodgyFuncs, func)
   return nothing
 end
 
 
+@doc raw"""
+    get_dodgy_funcs()
+
+Returns a list of symbols for dodgy function families.
+"""
 function get_active_dodgy_funcs()
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
   return GLOBAL_VARIABLE_ActiveDodgyFuncs
 end
 
+
+@doc raw"""
+    set_dodgy_mode(b::Bool = true)
+    set_dodgy_mode(func:Symbol, b::Bool = true)
+
+Enable dodgy mode: globally (1st version), for the given family (2nd version).
+"""
+function set_dodgy_mode;
 
 # Activate (or deactivate) **all** dodgy functions
 function set_dodgy_mode(b::Bool = true)
@@ -87,6 +104,11 @@ function set_dodgy_mode(func::Symbol, b::Bool = true)
   return GLOBAL_VARIABLE_ActiveDodgyFuncs  ## or just nothing?
 end
 
+@doc raw"""
+    get_dodgy_mode(func:Symbol)
+
+Return `true` iff dodgy mode is enable for family `func`.
+"""
 function get_dodgy_mode(func::Symbol)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
