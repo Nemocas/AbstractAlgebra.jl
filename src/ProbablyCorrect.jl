@@ -52,7 +52,7 @@ GLOBAL_VARIABLE_ActiveDodgyFuncs::Vector{Symbol} = Symbol[]
 @doc raw"""
     add_dodgy_func(FuncFamily::Symbol)
 
-This is registers the name `FuncFamily` as a name for a function family having dodgy variants.
+This registers the name `FuncFamily` as a name for a function family having dodgy variants.
 It would normally be called in the initialization of the package.
 """
 function add_dodgy_func(func::Symbol)
@@ -112,7 +112,7 @@ Return `true` iff dodgy mode is enable for family `func`.
 function get_dodgy_mode(FuncFamily::Symbol)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
-  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function ID")
+  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
   return (func in GLOBAL_VARIABLE_ActiveDodgyFuncs)
 end
 
