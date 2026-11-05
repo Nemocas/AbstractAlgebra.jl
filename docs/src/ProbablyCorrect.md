@@ -146,14 +146,14 @@ AbstractAlgebra.dodgy_steps_get()
 
 We shall need the following function and macro:
 ```
-   AbstractAlgebra.get_dodgy_mode(family_symbol)
-   AbstractAlgebra.@RegisterDodgyStep(fn_name, argv)
+   AbstractAlgebra.get_dodgy_mode(func_family_symbol)
+   AbstractAlgebra.@RecordDodgyStep(fn_name, argv, result)
 ```
 The first returns `true` iff dodgy mode for the specified family is enabled.
 The second records a dodgy step, where
 *   `fn_name::Symbol`   indicates the name of function which was called
 *   `argv::Vector{Any}` are the argument values supplied
-
+*   `result::Any`       is the esult produced
 
 It is worthwhile looking at a concrete example: a simple example can be found in
 the implementation of `is_prime(::ZZRingElem)` in the file  `Nemo/src/flint/fmpz.jl`.
@@ -169,7 +169,7 @@ Here is a copy of the `is_prime` function as illustrative example:
      !is_probable_prime(x) && return false
      (x <= (Int128(1) << 80)) && return true  # guaranteed correct by FLINT doc
      if AbstractAlgebra.get_dodgy_mode(:is_prime)
-       AbstractAlgebra.@RegisterDodgyStep(:is_prime, (x,));
+       AbstractAlgebra.@RecordDodgyStep(:is_prime, (x,));
        return true
      end
      return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElem})::Cint)
@@ -189,7 +189,7 @@ to provide a guaranteed result.
 Here is a simplistic but _less desirable_ dodgy variant of `is_prime`:
 ```
    function is_prime(x::ZZRingElem)
-     AbstractAlgebra.@RegisterDodgyStep(:is_prime, (x,));
+     AbstractAlgebra.@RecordDodgyStep(:is_prime, (x,));
      !is_probable_prime(x) && return false
      return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElem})::Cint)
    end

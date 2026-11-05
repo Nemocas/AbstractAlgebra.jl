@@ -34,10 +34,10 @@
 #     enable/disable dodgy mode for all families.
 
 # setter/getter for GLOBAL_VARIABLE_DodgySteps
-#  -  dodgy_steps_clear()    [[clears the vector/register]]
+#  -  dodgy_steps_clear()    [[clears the vector/log]]
 #  -  dodgy_steps_get()      [[value of GLOBAL_VARIABLE_DodgySteps]
-#  -  @RegisterDodgyStep(fn_name, argv)
-#     append a new dodgy step to the register
+#  -  @RecordDodgyStep(fn_name, argv, result)
+#     append a new dodgy step to the log
 #     [[does nothing if the length limit has been reached]]
 
 
@@ -50,9 +50,9 @@ GLOBAL_VARIABLE_ActiveDodgyFuncs::Vector{Symbol} = Symbol[]
 
 
 @doc raw"""
-    add_dodgy_func(func::Symbol)
+    add_dodgy_func(FuncFamily::Symbol)
 
-This is registers the name `func` as a name for a function fam,ily having dodgy variants.
+This is registers the name `FuncFamily` as a name for a function family having dodgy variants.
 It would normally be called in the initialization of the package.
 """
 function add_dodgy_func(func::Symbol)
@@ -78,7 +78,7 @@ end
 
 Enable dodgy mode: globally (1st version), for the given family (2nd version).
 """
-function set_dodgy_mode;
+function set_dodgy_mode end
 
 # Activate (or deactivate) **all** dodgy functions
 function set_dodgy_mode(b::Bool = true)
@@ -92,10 +92,10 @@ function set_dodgy_mode(b::Bool = true)
   return GLOBAL_VARIABLE_ActiveDodgyFuncs
 end
 
-function set_dodgy_mode(func::Symbol, b::Bool = true)
+function set_dodgy_mode(FuncFamily::Symbol, b::Bool = true)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
-  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function ID")
+  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
   if b
     !(func in GLOBAL_VARIABLE_ActiveDodgyFuncs) && push!(GLOBAL_VARIABLE_ActiveDodgyFuncs, func)
   else
@@ -109,7 +109,7 @@ end
 
 Return `true` iff dodgy mode is enable for family `func`.
 """
-function get_dodgy_mode(func::Symbol)
+function get_dodgy_mode(FuncFamily::Symbol)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
   !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function ID")
@@ -127,16 +127,16 @@ struct DodgyStepInfo
   #  methodID::Union{Nothing,Method}
   SourceLocation::Tuple{String,Int}
   argv::Tuple
-  resv::Any  # either simple value or a tuple
+  result::Any  # either simple value or a tuple
   stack::Vector{Union{Ptr{Nothing}, Base.InterpreterIP}}
 
-  #  CALLED ONLY BY macro RegisterDodgyStep (see below)
+  #  CALLED ONLY BY macro RecordDodgyStep (see below)
   function DodgyStepInfo(fn_name::Symbol,
                          SourceLocation::Tuple{String,Int},
                          argv::Tuple,
-                         resv::Any,
+                         result::Any,
                          stack)
-    return new(fn_name, SourceLocation, argv, resv, stack)
+    return new(fn_name, SourceLocation, argv, result, stack)
   end
 end
 
@@ -147,7 +147,7 @@ end
 
 
 GLOBAL_VARIABLE_DodgySteps::Vector{DodgyStepInfo} = DodgyStepInfo[]
-GLOBAL_VARIABLE_DodgySteps_MaxSize::Int = 10  #set this to 1 if you just want to know whether any (potentially) dodgy result was generated [[BUG: not currently user-settable]]
+GLOBAL_VARIABLE_DodgySteps_MaxSize::Int = 20  #set this to 1 if you just want to know whether any (potentially) dodgy result was generated [[BUG: not currently user-settable]]
 const GLOBAL_VARIABLE_EmptyStackTrace = Union{Ptr{Nothing}, Base.InterpreterIP}[]
 
 
@@ -164,12 +164,12 @@ function dodgy_steps_get()
 end
 
 
-# Use macro RegisterDodgyStep in code which wants to register a potentially dodgy step
+# Use macro RecordDodgyStep in code which wants to record a potentially dodgy step
 # The macro uses the following global variables:
 #   AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps
 #   AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps_MaxSize
 
-macro RegisterDodgyStep(fn_name, argv)  # fn_name::Symbol;  argv::Vector{Any}
+macro RecordDodgyStep(fn_name, argv, result)  # fn_name::Symbol;  argv::Vector{Any};  result::Any
   SourceLine = __source__.line
   SourceFile = String(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(
@@ -179,7 +179,7 @@ macro RegisterDodgyStep(fn_name, argv)  # fn_name::Symbol;  argv::Vector{Any}
             AbstractAlgebra.DodgyStepInfo($(esc(fn_name)),
                                           ($(esc(SourceFile)), $(esc(SourceLine))),
                                           $(esc(argv)),
-                                          nothing,
+                                          $(esc(result)),
                                           AbstractAlgebra.GLOBAL_VARIABLE_EmptyStackTrace))
     end
   )  # end of quoted part
