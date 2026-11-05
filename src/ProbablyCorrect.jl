@@ -1,56 +1,6 @@
 # [[prototype]]
 # Curt doc for "dodgy mode" in Oscar
 
-# **USER DOC**
-# _How to tell Oscar to use dodgy mode_
-
-# Dodgy mode permits some computations to be faster at the cost of
-# potentially produing an incorrect result (with low probability).
-# By default "dodgy mode" is inactive -- it must be explicitly enabled:
-# this can be done either globally or individually for each applicable
-# function.  Here is a typical workflow:
-
-#    AbstractAlgebra.set_dodgy_mode(true);
-#    AbstractAlgebra.dodgy_steps_clear()
-#    ...RUN YOUR COMPUTATION...
-#    AbstractAlgebra.dodgy_steps_get()     -- list of possibly dodgy steps
-#    AbstractAlgebra.set_dodgy_mode(false);
-
-# If `dodgy_steps_get()` returns an empty vector then there were no dodgy
-# steps, so all results computed are reliable.
-# If the vector is not empty then there were some dodgy steps, so the results
-# produced by those steps are potentially incorrect (though this is typically
-# extremely unlikely).
-
-# Dodgy mode for a particular function may be enabled/disabled individually.
-# For instance, we can set dodgy mode for the ":is_prime" family by running:
-
-#    AbstractAlgebra.set_dodgy_mode(:is_prime, true);   # ENABLE
-#    AbstractAlgebra.set_dodgy_mode(:is_prime, false);  # DISABLE
-
-
-# **USER/DEVELOPER DOC**
-# _How to write/modify a function to exploit dodgy mode_
-
-# A simple example can be found in the implementation of is_prime(::ZZRingElem)
-# in the file  Nemo/src/flint/fmpz.jl  near line 1960.
-
-# Check whether dodgy mode is active for the corresponding family, by calling
-#    AbstractAlgebra.get_dodgy_mode(family_symbol)
-# This returns `true` if dodgy mode is active for that family; otherwise `false`.
-
-# If dodgy mode is active then a possibly dodgy step must be registered by calling
-#    AbstractAlgebra.@RegisterDodgyStep(fn_name, argv)
-# where
-#    fn_name::Symbol   indicates the name of function which was called
-#    argv::Vector{Any} are the argument values supplied.
-# If the argument values are "simple", and it is known that for these values
-# the result will surely be correct, then @RegisterDodgyStep should not be called.
-# For instance, is_prime is always correct for values below 1000000, so even if
-# dodgy_mode is enabled, no dodgy step should be registered when the given value
-# is below 1000000 -- actually, the true safe limit for is_prime is rather higher.
-
-
 # DESIGN/MAINTAINER DOC
 
 # We use the following global variables:
