@@ -172,11 +172,17 @@ AbstractAlgebra.base_ring(K::InjProjMat{T}) where T = K.R::parent_type(T)
 
 function AbstractAlgebra.matrix(K::InjProjMat)
   R = base_ring(K)
+  M = zero_matrix(R, nrows(K), ncols(K))
   if nrows(K) >= ncols(K)
-    return [zero_matrix(R, K.s-1, ncols(K)) ; identity_matrix(R, ncols(K)) ; zero_matrix(R, nrows(K) - K.s - ncols(K) + 1, ncols(K))]
+    for l in 1:ncols(K)
+      M[K.s - 1 + l, l] = one(R)
+    end
   else
-    return [zero_matrix(R, nrows(K), K.s-1) identity_matrix(R, nrows(K)) zero_matrix(R, nrows(K), ncols(K)-K.s-nrows(K) + 1)]
+    for l in 1:nrows(K)
+      M[l, K.s - 1 + l] = one(R)
+    end
   end
+  return M
 end
 
 function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
