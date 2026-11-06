@@ -8,20 +8,24 @@
     internal_power(a, n, mul = *)
 
 Return `a^n` for `n > 1` by right-to-left square-and-multiply, using `mul`
-for all products.
+for all products. `n` needs `trailing_zeros`, `>>` and `iszero`.
 """
 function internal_power(a, n, mul::F = *) where F
    @assert n > 1
-   while iseven(n)
+   # one shift per set bit, as shifting a `BigInt` allocates
+   t = trailing_zeros(n)
+   n >>= t + 1
+   for _ in 1:t
       a = mul(a, a)
-      n >>= 1
    end
    z = a
-   while !iszero(n >>= 1)
-      a = mul(a, a)
-      if isodd(n)
-         z = mul(z, a)
+   while !iszero(n)
+      t = trailing_zeros(n) + 1
+      n >>= t
+      for _ in 1:t
+         a = mul(a, a)
       end
+      z = mul(z, a)
    end
    return z
 end
