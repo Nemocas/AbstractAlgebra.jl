@@ -66,6 +66,7 @@ end
 
 characteristic(r::ResidueField{T}) where T <: Integer = modulus(r)
 is_known(::typeof(characteristic), R::ResidueField{T}) where T <: Integer = true
+is_known(::typeof(characteristic), R::ResidueField) = false
 
 data(a::ResFieldElem) = a.data
 
