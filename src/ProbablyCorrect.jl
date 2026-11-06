@@ -151,6 +151,11 @@ GLOBAL_VARIABLE_DodgySteps_MaxSize::Int = 20  #set this to 1 if you just want to
 const GLOBAL_VARIABLE_EmptyStackTrace = Union{Ptr{Nothing}, Base.InterpreterIP}[]
 
 
+@doc raw"""
+    dodgy_steps_clear()
+
+Clear the log of dodgy steps.
+"""
 function dodgy_steps_clear()
   global GLOBAL_VARIABLE_DodgySteps
   empty!(GLOBAL_VARIABLE_DodgySteps)
@@ -158,6 +163,11 @@ function dodgy_steps_clear()
 end
 
 
+@doc raw"""
+    dodgy_steps_get()
+
+Return the log of dodgy steps.
+"""
 function dodgy_steps_get()
   global GLOBAL_VARIABLE_DodgySteps
   return GLOBAL_VARIABLE_DodgySteps
