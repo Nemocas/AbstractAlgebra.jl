@@ -555,6 +555,12 @@ end
 end
 
 @testset "Generic.AbsSimpleFunctionField.inverse" begin
+   for (x, z) in ((x1, z1), (x2, z2))
+      S, y = function_field(z^2 - x, "y")
+      @test Generic._inv_naive(y) == (1//x)*y
+      @test Generic._inv_naive(S((x + 1)//x)) == S(x//(x + 1))
+   end
+
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
