@@ -11,7 +11,7 @@ function is_power(a::PolyRingElem, n::Int)
     degree(a) % n == 0 || return false, a
     f = factor(a)
     all(i % n == 0 for (_, i) in f) || return false, a
-    fl, x = is_power(constant_coefficient(f.unit), n)
+    fl, x = is_power(constant_coefficient(unit(f)), n)
     fl || return false, a
     return true, x*prod(p^div(k, n) for (p, k) = f)
 end

@@ -476,7 +476,7 @@ function is_irreducible(a::RingElement)
    is_zero(a) && return false
    is_unit(a) && return false
    af = factor(a)
-   return length(af) == 1 && all(isone, values(af.fac))
+   return length(af) == 1 && isone(only(af)[2])
 end
 
 @doc raw"""
@@ -490,6 +490,6 @@ function is_squarefree(a::RingElement)
    iszero(a) && return false
    is_unit(a) && return true
    af = factor_squarefree(a)
-   return all(isone, values(af.fac))
+   return all(isone(e) for (_, e) in af)
 end
 

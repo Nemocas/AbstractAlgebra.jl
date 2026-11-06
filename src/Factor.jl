@@ -149,6 +149,40 @@ end
 
 ################################################################################
 #
+#   Mutation
+#
+################################################################################
+
+# a *= b^e
+function mulpow!(a::Fac{T}, b::T, e::Int) where T
+  @assert e >= 0
+  if e == 0
+    return
+  end
+  if is_unit(b)
+    a.unit *= b^e
+  elseif haskey(a.fac, b)
+    a.fac[b] += e
+  else
+    a.fac[b] = e
+  end
+end
+
+# a *= b^e
+function mulpow!(a::Fac{T}, b::Fac{T}, e::Int) where T
+  @assert !(a === b)
+  @assert e >= 0
+  if e == 0
+    return
+  end
+  a.unit *= b.unit^e
+  for (p, k) in b
+    mulpow!(a, p, k*e)
+  end
+end
+
+################################################################################
+#
 #   String I/O
 #
 ################################################################################
