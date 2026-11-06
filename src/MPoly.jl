@@ -68,7 +68,7 @@ The type of the polynomials themselves can be found via [`mpoly_type`](@ref).
 
 For univariate polynomials see [`poly_ring_type`](@ref).
 
-# Implementation 
+# Implementation
 
 This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
 so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
@@ -1371,6 +1371,506 @@ function derivative(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingEle
    return derivative(f, var_index(x))
 end
 
+###############################################################################
+#
+#   Pseudo division
+#
+###############################################################################
+
+@doc raw"""
+    pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement} -> MPolyRingElem{T}
+    pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement} -> MPolyRingElem{T}
+
+Return the pseudoremainder of $p$ divided by $q$. If $q = 0$ we throw a `DivideError()`.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> p = x*y^2 + (x + 1)*y + 3
+x*y^2 + x*y + y + 3
+
+julia> q = (x + 1)*y + (x^3 + 2x + 2)
+x^3 + x*y + 2*x + y + 2
+
+julia> pseudorem(p, q, 1)
+x*y^2 + x*y + y + 3
+
+julia> pseudorem(p, q, 2)
+x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
+```
+"""
+function pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  check_parent(p, q)
+  iszero(q) && throw(DivideError())
+
+  deg_q = degree(q, i)
+  deg_q == 0 && return zero(p)
+
+  deg_p = degree(p, i)
+  deg_p < deg_q && return deepcopy(p)
+
+  lc_q = coeff(q, [i], [deg_q])
+  v = gen(parent(p), i)
+
+  delta = deg_p - deg_q + 1
+  actual_muls = 0
+  rem = deepcopy(p)
+
+  # Pre-allocate a temporary polynomial to minimize allocations during the subtraction phase
+  temp = zero(parent(p))
+
+  while !iszero(rem)
+    deg_rem = degree(rem, i)
+    deg_rem < deg_q && break
+
+    lc_rem = coeff(rem, [i], [deg_rem])
+    d = deg_rem - deg_q
+
+    rem = mul!(rem, lc_q)
+    actual_muls += 1
+
+    term = iszero(d) ? lc_rem : (d == 1 ? lc_rem * v : lc_rem * v^d)
+    temp = mul!(temp, term, q)
+    rem = sub!(rem, temp)
+  end
+
+  if !iszero(rem) && actual_muls < delta
+    rem = mul!(rem, lc_q^(delta - actual_muls))
+  end
+
+  return rem
+end
+
+function pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+  check_parent(p, v)
+  return pseudorem(p, q, var_index(v))
+end
+
+@doc raw"""
+    pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement} -> Tuple{MPolyRingElem{T}, MPolyRingElem{T}}
+    pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement} -> Tuple{MPolyRingElem{T}, MPolyRingElem{T}}
+
+Return a tuple `(s, r)` consisting of the pseudoquotient $s$ and pseudoremainder $r$
+of $p$ divided by $q$ with respect to the $i$-th variable. If $q = 0$, a `DivideError()` is thrown.
+
+# Examples
+
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> p = x*y^2 + (x + 1)*y + 3
+x*y^2 + x*y + y + 3
+
+julia> q = (x + 1)*y + (x^3 + 2x + 2)
+x^3 + x*y + 2*x + y + 2
+
+julia> pseudodivrem(p, q, 1)
+(0, x*y^2 + x*y + y + 3)
+
+julia> pseudodivrem(p, q, 2)
+(-x^4 + x^2*y - x^2 + x*y + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
+"""
+function pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  check_parent(p, q)
+  iszero(q) && throw(DivideError())
+  deg_q = degree(q, i)
+  deg_p = degree(p, i)
+
+  deg_p < deg_q && return (zero(p), deepcopy(p))
+
+  deg_q == 0 && return (p * q^deg_p, zero(p))
+
+  lc_q = coeff(q, [i], [deg_q])
+  v = gen(parent(p), i)
+
+  delta = deg_p - deg_q + 1
+  actual_muls = 0
+
+  quo = zero(parent(p))
+  rem = deepcopy(p)
+
+  temp = zero(parent(p))
+
+  while !iszero(rem)
+    deg_rem = degree(rem, i)
+    deg_rem < deg_q && break
+
+    lc_rem = coeff(rem, [i], [deg_rem])
+    d = deg_rem - deg_q
+    term = iszero(d) ? lc_rem : (d == 1 ? lc_rem * v : lc_rem * v^d)
+
+    rem = mul!(rem, lc_q)
+    quo = mul!(quo, lc_q)
+    actual_muls += 1
+
+    quo = add!(quo, term)
+    temp = mul!(temp, term, q)
+    rem = sub!(rem, temp)
+  end
+
+  if actual_muls < delta
+    pad_factor = lc_q^(delta - actual_muls)
+    quo = mul!(quo, pad_factor)
+    if !iszero(rem)
+      rem = mul!(rem, pad_factor)
+    end
+  end
+
+  return quo, rem
+end
+
+function pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+  check_parent(p, v)
+  return pseudodivrem(p, q, var_index(v))
+end
+
+###############################################################################
+#
+#   Subresultants
+#
+###############################################################################
+
+function subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+  check_parent(f, v)
+  return subresultant_prs_ducos(f, g, var_index(v))
+end
+
+@doc raw"""
+    subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+    subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, $v$::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the subresultant polynomial remainder sequence of $f$ and $g$ in the $i$-th variable
+of their base ring, using an algorithmic variant due to Ducos. The returned vector starts with
+$f$ and $g$, followed by the regular subresultants in decreasing degree.
+"""
+function subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  check_parent(f, g)
+  @req degree(f, i) >= degree(g, i) "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
+
+  S = [f, g]
+  degree(g, i) <= 0 && return S
+
+  s = coeff(g, [i], [degree(g, i)])^(degree(f, i) - degree(g, i))
+  A_poly = g
+  B_poly = pseudorem(f, -g, i)
+
+  while true
+    d = degree(A_poly, i)
+    e = degree(B_poly, i)
+
+    is_zero(B_poly) && return S
+
+    if d - e > 1 # defective subresultant
+      C = __lazard_se(A_poly, B_poly, s, i)
+      push!(S, C)
+    else # regular subresultant
+      C = B_poly
+      push!(S, C)
+    end
+
+    e == 0 && return S
+
+    B_poly = __ducos_s_e_minus_1(A_poly, B_poly, C, s, i)
+    A_poly = C
+    s = coeff(A_poly, [i], [degree(A_poly, i)])
+  end
+end
+
+function __lazard_se(Sd::P, Sd_1::P, s::P, i::Int) where {P <: MPolyRingElem}
+  d = degree(Sd, i)
+  e = degree(Sd_1, i)
+  n = d - e - 1
+
+  # Find the highest power of 2 <= n for the dichotomous powering
+  a = 1 << (8 * sizeof(n) - 1 - leading_zeros(n))
+  n_rem = n - a
+
+  x = coeff(Sd_1, [i], [e])
+  c = x
+
+  temp = zero(parent(Sd))
+
+  while a > 1
+    a >>= 1
+    temp = mul!(temp, c, c)
+    c = divexact(temp, s)
+    if n_rem >= a
+      temp = mul!(temp, c, x)
+      c = divexact(temp, s)
+      n_rem -= a
+    end
+  end
+
+  temp = mul!(temp, c, Sd_1)
+  return divexact(temp, s)
+end
+
+function __ducos_s_e_minus_1(A::P, B::P, C::P, s::P, i::Int) where {P <: MPolyRingElem}
+  d = degree(A, i)
+  e = degree(B, i)
+  v = gen(parent(A), i)
+
+  d <= 0 && return zero(parent(A))
+
+  v_powers = Vector{P}(undef, d)
+  v_powers[1] = one(parent(A))
+  for j in 1:(d-1)
+    v_powers[j+1] = v_powers[j] * v
+  end
+
+  c_d_1 = coeff(B, [i], [e])
+  s_e = coeff(C, [i], [degree(C, i)])
+
+  D = zero(parent(A))
+  temp = zero(parent(A))
+
+  for j in 0:(e-1)
+    c_Aj = coeff(A, [i], [j])
+    if !is_zero(c_Aj)
+      temp = mul!(temp, s_e * c_Aj, v_powers[j+1])
+      D = add!(D, D, temp)
+    end
+  end
+
+  H_curr = (s_e * v_powers[e+1]) - C
+
+  c_Ae = coeff(A, [i], [e])
+  if !is_zero(c_Ae)
+    temp = mul!(temp, c_Ae, H_curr)
+    D = add!(D, D, temp)
+  end
+
+  for j in (e+1):(d-1)
+    H_curr = mul!(H_curr, H_curr, v)
+    cf = coeff(H_curr, [i], [e])
+
+    if !is_zero(cf)
+      H_curr = sub!(H_curr, H_curr, divexact(cf * B, c_d_1))
+    end
+
+    c_Aj = coeff(A, [i], [j])
+    if !is_zero(c_Aj)
+      temp = mul!(temp, c_Aj, H_curr)
+      D = add!(D, D, temp)
+    end
+  end
+
+  D = divexact(D, coeff(A, [i], [d]))
+
+  H_d = mul!(H_curr, H_curr, v)
+  cf_d = coeff(H_d, [i], [e])
+
+  val = divexact(c_d_1 * (H_d + D) - cf_d * B, s)
+
+  return isodd(d - e + 1) ? -val : val
+end
+
+### Kerber SPRS ###
+# For details; see the paper 'Division-Free Computation of Subresultants Using Bezout Matrices' by Kerber, 2009.
+# DOI: 10.1080/00207160802460595
+
+# Reference: M. Kerber (2009), Algorithm 4.1 (SubresViaBezout) - the main algorithm
+function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+  check_parent(f, v)
+  return subresultant_prs_kerber(f, g, var_index(v))
+end
+
+@doc raw"""
+    subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+    subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the subresultant polynomial remainder sequence of $f$ and $g$ in the $i$-th variable (or
+the variable $v$) of their base ring, using an algorithm due to Kerber. This algorithm does not
+perform any divisions in the base ring and is hence preferable for such base rings where divisions
+are costly, e.g., multivariate polynomial rings in many variables. The returned vector starts with
+$f$ and $g$, followed by the complete subresultant chain $S_{m-1}, \dots, S_0$ ordered by decreasing
+subresultant index (which may include defective and identically zero polynomials).
+"""
+function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  check_parent(f, g)
+  R = parent(f)
+  n = degree(f, i)
+  m = degree(g, i)
+
+  @req n >= m "The degree in the specified variable of the second polynomial
+  cannot be strictly larger than the same degree of the first polynomial"
+  m <= 0 && return [f, g]
+
+  H = __kerber_H_matrix(f, g, i)
+  minors_map = Vector{Vector{elem_type(R)}}(undef, m)
+
+  for j in 1:m
+    S_j = __kerber_S_matrix(H, j, m)
+    minors_map[j] = leading_principal_minors(S_j)
+  end
+
+  res = Vector{elem_type(R)}(undef, m + 2)
+  res[1] = f
+  res[2] = g
+
+  x = gen(R, i)
+  for k in (n - m + 1):n
+    poly = zero(R)
+    max_t = min(m - 1, n - k)
+
+    for t in 0:max_t
+      j_rep = mod1(k + t, m)
+      minor_val = minors_map[j_rep][k]
+      if !is_zero(minor_val)
+        poly += minor_val * (x^(n - k - t))
+      end
+    end
+
+    if k % 4 in (2, 3) # signs are determined mod 4 (cf. discriminants)
+      poly = -poly
+    end
+    res[k - n + m + 2] = poly
+  end
+
+  return res
+end
+
+# Reference: M. Kerber (2009), Definition 2.5
+# This method returns the polynomial H_{idx} associated to f and g (of degrees m and n
+# in the i-th variable of the base ring) from Definition 2.5
+function __kerber_H_poly(f::P, g::P, i::Int, n::Int, m::Int, idx::Int) where {P <: MPolyRingElem}
+  R = parent(f)
+  x = gen(R, i)
+
+  x_powers = Vector{P}(undef, n + 1)
+  x_powers[1] = one(R)
+  for j in 1:n
+    x_powers[j + 1] = x_powers[j] * x
+  end
+
+  temp = zero(R)
+
+  # Following the definition, we compute the result as P1*P2 - P3*P4
+
+  # P1 = f_n * x^(idx-1) + ... + f_{n-idx+1}
+  P1 = zero(R)
+  for k in 0:(idx - 1)
+    c = coeff(f, [i], [n - k])
+    if !is_zero(c)
+      temp = mul!(temp, c, x_powers[idx - k])
+      P1 = add!(P1, temp)
+    end
+  end
+
+  # P2 = g_{m-idx} * x^(n-idx) + ... + g_0 * x^(n-m)
+  P2 = zero(R)
+  for k in 0:(m - idx)
+    c = coeff(g, [i], [k])
+    if !is_zero(c)
+      temp = mul!(temp, c, x_powers[k + n - m + 1])
+      P2 = add!(P2, temp)
+    end
+  end
+
+  # P3 = f_{n-idx} * x^(n-idx) + ... + f_0
+  P3 = zero(R)
+  for k in 0:(n - idx)
+    c = coeff(f, [i], [k])
+    if !is_zero(c)
+      temp = mul!(temp, c, x_powers[k + 1])
+      P3 = add!(P3, temp)
+    end
+  end
+
+  # P4 = g_m * x^(idx-1) + ... + g_{m-idx+1}
+  P4 = zero(R)
+  for k in 0:(idx - 1)
+    c = coeff(g, [i], [m - k])
+    if !is_zero(c)
+      temp = mul!(temp, c, x_powers[idx - k])
+      P4 = add!(P4, temp)
+    end
+  end
+
+  res = P1*P2
+  res = sub!(res, P3*P4)
+  return res
+end
+
+# Reference: M. Kerber (2009), Definition 2.5
+# This method returns the matrix H from Theorem 2.6 (or line 3 in Algorithm 4.1)
+function __kerber_H_matrix(f::P, g::P, i::Int) where {P <: MPolyRingElem}
+  R = parent(f)
+  n = degree(f, i)
+  m = degree(g, i)
+
+  @req n >= m "The degree of the first input in the specified variable must be greater or than or equal to the degree of the first input"
+  @req m > 0 "The second polynomial must have positive degree in the specified variable"
+
+  H = zero_matrix(R, n, n)
+
+  # Bottom rows of H
+  for r in (m + 1):n
+    row_H = n - r + 1
+    shift = n - r
+    for j in 0:m
+      c = coeff(g, [i], [j])
+      if !is_zero(c)
+        col_H = n - (j + shift)
+        H[row_H, col_H] = c
+      end
+    end
+  end
+
+  # Top rows of H (requires H_poly by definition)
+  for r in 1:m
+    row_H = n - r + 1
+    H_poly = __kerber_H_poly(f, g, i, n, m, m - r + 1)
+
+    for p in 0:(n - 1)
+      c = coeff(H_poly, [i], [p])
+      if !is_zero(c)
+        col_H = n - p
+        H[row_H, col_H] = c
+      end
+    end
+  end
+
+  return H
+end
+
+# Reference: M. Kerber (2009), Definitions 4.1 & 4.2
+# This method returns the matrix S_{j,s}(A) from Definition 4.2 (2) (which is also used
+# in the 4-th line of Algorithm 4.1)
+function __kerber_S_matrix(A::MatElem{T}, j::Int, s::Int) where {T <: RingElement}
+  n = nrows(A)
+  N_js = div(n - j, s)
+
+  dim_S = j + s * N_js
+  R = base_ring(A)
+  S_mat = zero_matrix(R, dim_S, dim_S)
+
+  col_idx = 1
+
+  for i in 0:N_js
+    p = j + s * i
+
+    # 1. Pivot column of the block (positive)
+    for row in 1:dim_S
+      S_mat[row, col_idx] = A[row, p]
+    end
+    col_idx += 1
+
+    # 2. Trailing columns of the block (negated, in increasing order)
+    start_val = max(1, p - s + 1)
+    for val in start_val:(p - 1)
+      for row in 1:dim_S
+        S_mat[row, col_idx] = -A[row, val]
+      end
+      col_idx += 1
+    end
+  end
+
+  return S_mat
+end
 
 ###############################################################################
 #
