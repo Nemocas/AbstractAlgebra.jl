@@ -232,22 +232,7 @@ function Base.:(^)(g::GroupElem, n::Integer)
     n == 0 && return one(g)
     # `copy` would do, but is not part of the group interface (yet)
     n == 1 && return deepcopy(g)
-    t = trailing_zeros(n)
-    n >>= t + 1
-    x = g
-    for _ in 1:t
-        x = x * x
-    end
-    y = x
-    while n > 0
-        t = trailing_zeros(n) + 1
-        n >>= t
-        for _ in 1:t
-            x = x * x
-        end
-        y = y * x
-    end
-    return y
+    return internal_power(g, n)
 end
 
 ################################################################################

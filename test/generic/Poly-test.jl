@@ -1332,6 +1332,9 @@ if false
             p = mulmod(p, f, g)
          end
       end
+
+      R, x = polynomial_ring(GF(2), :x)
+      @test powermod(x, typemin(Int), x^2 + x + 1) == x
    end
 end
 

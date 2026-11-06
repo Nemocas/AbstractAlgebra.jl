@@ -450,20 +450,7 @@ function ^(a::AbsMSeries, b::Int)
     elseif b == 1
         return deepcopy(a)
     end
-    bit = ~((~UInt(0)) >> 1)
-    while (UInt(bit) & b) == 0
-        bit >>= 1
-    end
-    z = a
-    bit >>= 1
-    while bit !=0
-        z = z*z
-        if (UInt(bit) & b) != 0
-            z *= a
-        end
-        bit >>= 1
-    end
-    return z
+    return AbstractAlgebra.internal_power_left_to_right(a, b)
 end
 
 ###############################################################################

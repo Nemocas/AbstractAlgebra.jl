@@ -4,17 +4,45 @@
 #
 ###############################################################################
 
-function internal_power(a, n)
+@doc raw"""
+    internal_power(a, n, mul = *)
+
+Return `a^n` for `n > 1` by right-to-left square-and-multiply, using `mul`
+for all products. `n` needs `trailing_zeros`, `>>` and `iszero`.
+"""
+function internal_power(a, n, mul::F = *) where F
    @assert n > 1
-   while iseven(n)
-      a = a*a
-      n >>= 1
+   # one shift per set bit, as shifting a `BigInt` allocates
+   t = trailing_zeros(n)
+   n >>= t + 1
+   for _ in 1:t
+      a = mul(a, a)
    end
    z = a
-   while !iszero(n >>= 1)
-      a = a*a
-      if isodd(n)
-         z = z*a
+   while !iszero(n)
+      t = trailing_zeros(n) + 1
+      n >>= t
+      for _ in 1:t
+         a = mul(a, a)
+      end
+      z = mul(z, a)
+   end
+   return z
+end
+
+@doc raw"""
+    internal_power_left_to_right(a, n, mul = *)
+
+Return `a^n` for `n > 1` by left-to-right square-and-multiply, using `mul`
+for all products. `n` needs `ndigits(n, base = 2)`, `>>` and `isodd`.
+"""
+function internal_power_left_to_right(a, n, mul::F = *) where F
+   @assert n > 1
+   z = a
+   for i in ndigits(n, base = 2) - 2:-1:0
+      z = mul(z, z)
+      if isodd(n >> i)
+         z = mul(z, a)
       end
    end
    return z
@@ -91,21 +119,7 @@ function mulmod(a::T, b::T, m::T) where T <: Integer
    return mod(widen(a)*b, m) % T
 end
 
-function internal_powermod(a, n, m)
-   @assert n > 1
-   while iseven(n)
-      a = mulmod(a, a, m)
-      n >>= 1
-   end
-   z = a
-   while !iszero(n >>= 1)
-      a = mulmod(a, a, m)
-      if isodd(n)
-         z = mulmod(z, a, m)
-      end
-   end
-   return z
-end
+internal_powermod(a, n, m) = internal_power(a, n, (x, y) -> mulmod(x, y, m))
 
 @doc raw"""
     powermod(f::T, e::Int, m::T) where T <: RingElem
