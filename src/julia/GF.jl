@@ -195,7 +195,7 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
    end
    if y < 0
       x = inv(x)
-      y = -y
+      y = -widen(y)
    end
    if y >= p - 1
       y1 = y%(p - 1)

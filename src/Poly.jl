@@ -1554,7 +1554,7 @@ function powermod(a::PolyRingElem{T}, b::Int, d::PolyRingElem{T}) where T <: Rin
    else
       if b < 0
          a = invmod(a, d)
-         b = -b
+         b = -widen(b)
       end
       z = isone(b) ? a : internal_power_left_to_right(a, b, (x, y) -> mulmod(x, y, d))
    end
