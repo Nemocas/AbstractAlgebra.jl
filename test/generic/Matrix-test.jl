@@ -1759,6 +1759,12 @@ end
    N = QQ[1 1; 0 2]
    @test trace_of_product(M, N) == tr(M * N)
 
+   # noncommutative entries: the order of the products matters
+   S = matrix_ring(ZZ, 2)
+   a = S(ZZ[0 1; 0 0])
+   b = S(ZZ[0 0; 1 0])
+   @test trace_of_product(matrix(S, 1, 2, [a, 0]), matrix(S, 2, 1, [b, a])) == a * b
+
    @test trace_of_product(zero_matrix(ZZ, 0, 3), zero_matrix(ZZ, 3, 0)) == 0
    @test trace_of_product(zero_matrix(ZZ, 2, 0), zero_matrix(ZZ, 0, 2)) == 0
 

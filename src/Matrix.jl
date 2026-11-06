@@ -1965,8 +1965,10 @@ function trace_of_product(M::MatElem{T}, N::MatElem{T}) where T <: NCRingElement
    @req ncols(M) == nrows(N) && nrows(M) == ncols(N) "Incompatible matrix dimensions"
    check_base_ring(M, N)
    d = zero(base_ring(M))
+   z = similar(M, 1, 1)
    for i in 1:nrows(M)
-      d = add!(d, (view(M, i:i, :) * view(N, :, i:i))[1, 1])
+      z = mul!(z, view(M, i:i, :), view(N, :, i:i))
+      d = add!(d, z[1, 1])
    end
    return d
 end
