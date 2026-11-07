@@ -1547,6 +1547,8 @@ of their base ring, using an algorithmic variant due to Ducos. The returned vect
 $f$ and $g$, followed by the regular subresultants in decreasing degree.
 """
 function subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  @req is_domain_type(T) "The polynomials must be elements of an integral domain"
+  @req is_exact_type(T) "The polynomials must be elements of an exact domain"
   check_parent(f, g)
   @req degree(f, i) >= degree(g, i) "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
 
@@ -1690,6 +1692,7 @@ $f$ and $g$, followed by the complete subresultant chain $S_{m-1}, \dots, S_0$ o
 subresultant index (which may include defective and identically zero polynomials).
 """
 function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  @req is_exact_type(T) "The polynomials must be elements of an exact domain"
   check_parent(f, g)
   R = parent(f)
   n = degree(f, i)
