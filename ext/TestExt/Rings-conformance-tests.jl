@@ -353,6 +353,40 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
           end
       end
 
+      elems = T[generate_element(R)::T for _ in 1:reps]
+      # `AbstractAlgebra.sqrt` agrees with `Base.sqrt` on ring elements, but
+      # only the former is exact on `BigInt` and `Rational{BigInt}`
+      has_sqrt = supports([zero(R); one(R); elems]) do a
+         is_square(a)
+         is_square_with_sqrt(a)
+         is_square(a^2)
+         is_square_with_sqrt(a^2)
+         AbstractAlgebra.sqrt(a^2)
+         AbstractAlgebra.sqrt(a^2; check = false)
+      end
+      if has_sqrt
+         @testset "Square roots" begin
+            for a in [zero(R); one(R); elems]
+               a2 = a^2
+               @test is_square(a2)
+               @test equality(AbstractAlgebra.sqrt(a2)^2, a2)
+               @test equality(AbstractAlgebra.sqrt(a2; check = false)^2, a2)
+               f, s = is_square_with_sqrt(a2)
+               @test f && equality(s^2, a2)
+            end
+            for a in elems
+               f, s = is_square_with_sqrt(a)
+               @test f == is_square(a)
+               if f
+                  @test equality(s^2, a)
+                  @test equality(AbstractAlgebra.sqrt(a)^2, a)
+               else
+                  @test_throws Exception AbstractAlgebra.sqrt(a)
+               end
+            end
+         end
+      end
+
    end
 
    return nothing
