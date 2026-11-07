@@ -1497,6 +1497,20 @@ end
 
 ################################################################################
 #
+#  Homomorphisms from univariate rational function fields
+#
+################################################################################
+
+struct RationalFunctionFieldHom{
+    D <: RationalFunctionField,
+    C <: Field,
+    P <: PolyRingAnyMap} <: Map{D, C, AbstractAlgebra.SetMap, RationalFunctionFieldHom}
+  domain::D
+  polynomial_map::P
+end
+
+################################################################################
+#
 #  Multivariate Puiseux polynomials
 #  
 ################################################################################
