@@ -109,8 +109,11 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                @test is_unit(R(0))
             else
                @test !is_unit(R(0))
-               for (a, a2) in zip(elems, squares)
-                  @test is_unit(a) == is_unit(a2)
+               # the square of an inexact unit need not be provably a unit
+               if is_exact_type(T)
+                  for (a, a2) in zip(elems, squares)
+                     @test is_unit(a) == is_unit(a2)
+                  end
                end
             end
          end
@@ -174,9 +177,9 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             @test equality((a + b)*c, a*c + b*c)
             @test iszero(a*zero(R))
             @test iszero(zero(R)*a)
-            @test A == a
-            @test B == b
-            @test C == c
+            @test isequal(A, a)
+            @test isequal(B, b)
+            @test isequal(C, c)
          end
       end
 
@@ -253,8 +256,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
                      e isa StackOverflowError && rethrow()
                   end
                end
-               @test A == a
-               @test B == b
+               @test isequal(A, a)
+               @test isequal(B, b)
             end
          end
       end
@@ -305,7 +308,7 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
             b = generate_element(R)::T
             A = deepcopy(a)
             B = deepcopy(b)
-            @test a*b == b*a
+            @test equality(a*b, b*a)
             # documentation is not clear on divexact
             if is_domain_type(T)
                @test iszero(b) || equality(divexact(b*a, b), a)
@@ -341,8 +344,8 @@ function test_Ring_interface(R::AbstractAlgebra.Ring; reps = 15)
                end
             catch
             end
-            @test A == a
-            @test B == b
+            @test isequal(A, a)
+            @test isequal(B, b)
          end
       end
 
@@ -373,13 +376,18 @@ function test_Field_interface(R::AbstractAlgebra.Field; reps = 15)
       for i in 1:reps
          a = generate_element(R)::T
          A = deepcopy(a)
-         @test is_unit(a) == !iszero(a)
+         if is_exact_type(T)
+            @test is_unit(a) == !iszero(a)
+         else
+            # an inexact element may be neither provably zero nor provably a unit
+            @test !(is_unit(a) && iszero(a))
+         end
          if !is_zero(a)
-            @test is_one(a * inv(a))
-            @test is_one(inv(a) * a)
+            @test equality(a * inv(a), one(R))
+            @test equality(inv(a) * a, one(R))
             test_mutating_op_like_neg(inv, inv!, a)
          end
-         @test A == a
+         @test isequal(A, a)
       end
    end
 

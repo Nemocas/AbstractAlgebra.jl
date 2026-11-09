@@ -1,6 +1,6 @@
 @testset "Julia.Floats.conformance_tests" begin
-   ConformanceTests.test_Ring_interface(RDF)
-   ConformanceTests.test_Ring_interface(RealField)
+   ConformanceTests.test_Field_interface(RDF)
+   ConformanceTests.test_Field_interface(RealField)
 end
 
 @testset "Julia.Floats.printing" begin
