@@ -898,7 +898,7 @@ function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::AbstractUn
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
     startc = first(c)
-    for i in r
+    @inbounds for i in r
         for j in c
             a[i, j] = b[i - startr + 1, j - startc + 1]
         end
@@ -912,7 +912,7 @@ function setindex!(a::MatrixElem{T}, b::Vector, r::AbstractUnitRange{Int}, c::Ab
     end
     startr = first(r)
     startc = first(c)
-    for i in r
+    @inbounds for i in r
         for j in c
             a[i, j] = b[i - startr + 1 + j - startc]
         end
