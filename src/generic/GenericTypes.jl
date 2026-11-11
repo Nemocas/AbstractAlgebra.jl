@@ -1415,11 +1415,17 @@ end
 @attributes mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::Vector{<:AbstractAlgebra.FPModule{T}}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
+   zero_R::T #zero of the base ring - encodes the base ring itself
+             #needed for products of length 0
    inj::Vector{<:ModuleHomomorphism{T}}
    pro::Vector{<:ModuleHomomorphism{T}}
 
    function DirectSumModule{T}(m::Vector{<:AbstractAlgebra.FPModule{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
-      return new{T}(m, rels)
+      @assert length(m) > 0
+      return new{T}(m, rels, zero(base_ring(m[1])))
+   end
+   function DirectSumModule{T}(zero_R::T, m::Vector{<:AbstractAlgebra.FPModule{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
+      return new{T}(m, rels, zero_R)
    end
 end
 

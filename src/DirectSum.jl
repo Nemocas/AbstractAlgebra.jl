@@ -56,5 +56,5 @@ julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: S1 -> D, Hom: S2 -> D, Hom: S3 -> D], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: D -> S1, Hom: D -> S2, Hom: D -> S3])
 ```
 """
-direct_sum(m::Vector{<:FPModule{<:RingElement}}) = Generic.direct_sum(m)
-direct_sum(m::FPModule{<:RingElement}...) = Generic.direct_sum([m...])
+direct_sum(m::Vector{<:FPModule{<:RingElement}}; init::Union{Nothing, Ring} = nothing) = Generic.direct_sum(m; init)
+direct_sum(m::FPModule{<:RingElement}...; init::Union{Nothing, Ring} = nothing) = Generic.direct_sum([m...]; init)
