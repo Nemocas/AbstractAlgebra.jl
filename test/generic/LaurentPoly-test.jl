@@ -375,6 +375,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test_throws DomainError (2y)^-1
       @test_throws DomainError (3y^-1)^-2
       @test_throws DomainError (y + y^2)^-1
+      @test_throws DomainError (2y)^typemin(Int)
+      @test_throws DomainError (y + y^2)^typemin(Int)
       @test_throws DomainError (y-y)^-1
 
       LQ, z = laurent_polynomial_ring(QQ, "z")

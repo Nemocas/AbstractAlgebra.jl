@@ -226,6 +226,9 @@ end
    R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
 
    @test R(-1)^typemin(Int) == 1
+   @test_throws DomainError R(2)^typemin(Int)
+   @test_throws NotInvertibleError x^typemin(Int)
+   @test_throws NotInvertibleError (x + y)^typemin(Int)
 end
 
 @testset "Generic.FreeAssociativeAlgebra.iterators" begin

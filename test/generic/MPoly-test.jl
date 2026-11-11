@@ -771,6 +771,7 @@ end
 
       @test_throws DomainError rand(varlist)^-1
       @test_throws DomainError rand(varlist)^-rand(2:100)
+      @test_throws DomainError rand(varlist)^typemin(Int)
    end
 
    # Over field of nonzero characteristic
