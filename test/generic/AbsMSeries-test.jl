@@ -499,6 +499,26 @@ end
          @test isequal(f, deepcopy(f))
       end
    end
+
+   # the polynomial of a series may hold terms beyond its precision
+   R, (x, y) = power_series_ring(QQ, [3, 3], [:x, :y])
+   P = Generic.underlying_poly_ring(R)
+   X, Y = gens(P)
+   f = R(1 + X^2*Y, [2, 2])
+   g = R(one(P), [2, 2])
+
+   @test isequal(f, g)
+   @test hash(f) == hash(g)
+
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   S, t = power_series_ring(QQ, 10, :t)
+   R, (x, y) = power_series_ring(S, [3, 3], [:x, :y])
+   f = (1 + O(t^2))*x
+   g = (1 + O(t^3))*x
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end
 
 @testset "Generic.AbsMSeries.adhoc_comparison" begin
