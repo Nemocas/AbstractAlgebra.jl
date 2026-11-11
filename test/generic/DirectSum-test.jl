@@ -52,6 +52,34 @@
    @test vector_space_dim(D) == 6
 end
 
+@testset "Generic.DirectSum.init" begin
+   for R in (ZZ, GF(5))
+      F = free_module(R, 1)
+      modules = typeof(F)[]
+      D, inj, pro = direct_sum(modules; init = R)
+
+      @test base_ring(D) === R
+      @test isempty(summands(D))
+      @test isempty(relations(D))
+      @test isempty(inj)
+      @test isempty(pro)
+      @test ngens(D) == 0
+      @test rank(D) == 0
+      @test isempty(gens(D))
+      @test eltype(gens(D)) === elem_type(D)
+      @test iszero(zero(D))
+      @test_throws ErrorException direct_sum(modules)
+   end
+
+   R = GF(5)
+   F = free_module(R, 1)
+   D, inj, pro = direct_sum(F; init = R)
+   @test base_ring(D) === R
+   @test summands(D) == [F]
+   @test pro[1](inj[1](gen(F, 1))) == gen(F, 1)
+   @test_throws ErrorException("Incompatible modules") direct_sum(F; init = GF(7))
+end
+
 @testset "Generic.DirectSum.basic_manipulation" begin
 
    for R in [ZZ, QQ]
