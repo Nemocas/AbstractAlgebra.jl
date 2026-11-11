@@ -520,6 +520,8 @@ end
 # this power tries to invert for negative exponents (and not just throw)
 function _pow(a::T, e::Int) where T <: RingElement
     if e < 0
+        # -typemin(Int) overflows, but typemin(Int) is even
+        e == typemin(Int) && return _pow(a*a, div(e, 2))
         return divexact(one(parent(a)), a)^Base.checked_neg(e)
     else
         return a^e

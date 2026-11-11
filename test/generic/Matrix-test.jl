@@ -1596,6 +1596,10 @@ end
    @test M^1 == M
    @test M^2 == M*M
    @test M^3 == M*M*M
+
+   # M has order 3, and typemin(Int) ≡ 1 mod 3
+   M = matrix(QQ, [0 -1; 1 -1])
+   @test M^typemin(Int) == M
 end
 
 @testset "Generic.Mat.adhoc_exact_division" begin

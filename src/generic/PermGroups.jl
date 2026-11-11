@@ -465,7 +465,7 @@ julia> g^5
 """
 function ^(g::Perm{T}, n::Integer) where T
    if n < 0
-      return inv(g)^-n
+      return inv(g)^-widen(n)
    elseif n == 0
       return Perm(T(length(g.d)))
    elseif n == 1
@@ -492,7 +492,7 @@ end
 
 function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    if n < 0
-      return inv(g)^-n
+      return inv(g)^-widen(n)
    elseif n == 0
       return Perm(I(length(g.d)))
    elseif n == 1

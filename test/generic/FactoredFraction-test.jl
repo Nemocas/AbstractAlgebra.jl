@@ -197,6 +197,8 @@ end
     x = F(x)
     a = divexact(x + 1, (x + 2)^2) + x
     @test (a - x)*(x + 1)^-1 == (x + 2)^-2
+    @test F(-1)^typemin(Int) == 1
+    @test x^typemin(Int) * x == x^(typemin(Int) + 1)
     @test F(2//3) == F(2, 3)
     @test F(2//gen(Zx)) == F(2, gen(Zx))
 end

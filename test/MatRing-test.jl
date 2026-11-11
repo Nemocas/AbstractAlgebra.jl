@@ -522,6 +522,11 @@ end
    @test M^1 == M
    @test M^2 == M*M
    @test M^3 == M*M*M
+
+   # M has order 3, and typemin(Int) ≡ 1 mod 3
+   S = matrix_ring(QQ, 2)
+   M = S(matrix(QQ, [0 -1; 1 -1]))
+   @test M^typemin(Int) == M
 end
 
 @testset "MatRing.exact_division" begin

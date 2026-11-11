@@ -597,6 +597,11 @@ end
          r2 *= f
       end
    end
+
+   R, x = puiseux_series_ring(ZZ, 10, "x")
+   f = 1 + x
+   @test isequal(f^typemin(Int), (f^2)^div(typemin(Int), 2))
+   @test isequal((-one(R))^typemin(Int), one(R))
 end
 
 @testset "Generic.PuiseuxSeries.inversion" begin

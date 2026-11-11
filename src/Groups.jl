@@ -228,7 +228,7 @@ end
 Base.literal_pow(::typeof(^), g::GroupElem, ::Val{-1}) = inv(g)
 
 function Base.:(^)(g::GroupElem, n::Integer)
-    n < 0 && return inv(g)^-n
+    n < 0 && return inv(g)^-widen(n)
     n == 0 && return one(g)
     # `copy` would do, but is not part of the group interface (yet)
     n == 1 && return deepcopy(g)

@@ -236,6 +236,8 @@ end
 
 function ^(a::ResElem, b::Int)
    if b < 0
+      # -typemin(Int) overflows, but typemin(Int) is even
+      b == typemin(Int) && return (a*a)^div(b, 2)
       # powermod throws a DivideError when it should throw an NotInvertibleError
       parent(a)(powermod(data(inv(a)), -b, modulus(a)))
    else

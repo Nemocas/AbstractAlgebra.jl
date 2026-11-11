@@ -107,6 +107,9 @@ import AbstractAlgebra: Generic.normalize!
         g = v^(1//3)+u^(1//2)
         h = v^(1//3) + w^(1//3)
 
+        @test (-one(K))^typemin(Int) == 1
+        @test u^typemin(Int) * u == u^(typemin(Int) + 1)
+
         @test monomials(g) == [u^(1//2),v^(1//3)]
         @test monomials(h) == [v^(1//3),w^(1//3)]
         @test collect(coefficients(g)) == [1,1]

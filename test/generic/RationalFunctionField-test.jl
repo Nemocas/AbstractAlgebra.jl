@@ -375,6 +375,10 @@ end
       @test 1//b == a^-iter
       b *= a
    end
+
+   # 2 has order 3 mod 7, and typemin(Int) ≡ 1 mod 3
+   R, = rational_function_field(GF(7), "x")
+   @test R(2)^typemin(Int) == R(2)
 end
 
 @testset "Generic.RationalFunctionField.inversion" begin
