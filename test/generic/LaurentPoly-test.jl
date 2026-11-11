@@ -370,6 +370,7 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
 
       @test isone(f(rand(-9:9))^0)
+      @test L(-1)^typemin(Int) == 1
 
       @test_throws DomainError (2y)^-1
       @test_throws DomainError (3y^-1)^-2

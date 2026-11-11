@@ -222,6 +222,12 @@ end
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.powering" begin
+   R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+
+   @test R(-1)^typemin(Int) == 1
+end
+
 @testset "Generic.FreeAssociativeAlgebra.iterators" begin
    R, (x, y) = free_associative_algebra(QQ, [:x, :y])
    f = x * y * x + 2 * x + 3

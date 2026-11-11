@@ -385,6 +385,9 @@ end
 
    @test a^5 == 5
 
+   # generic `RingElem` fallback; R(2) has order 3, typemin(Int) ≡ 1 mod 3
+   @test invoke(^, Tuple{RingElem, Integer}, R(2), typemin(Int)) == R(2)
+
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
 

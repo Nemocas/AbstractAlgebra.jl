@@ -741,6 +741,11 @@ end
 
    @test isequal(f*f, f^2)
    @test isequal(f^0, one(R))
+
+   R, x = laurent_series_ring(ZZ, 10, "x")
+   f = 1 + x
+   @test isequal(f^typemin(Int), (f^2)^div(typemin(Int), 2))
+   @test isequal((-one(R))^typemin(Int), one(R))
 end
 
 @testset "Generic.LaurentSeries.shift" begin
