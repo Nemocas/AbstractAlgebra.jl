@@ -813,6 +813,7 @@ end
          @test is_divisible_by(p, f)
          @test q * f == p
 
+         iszero(f) && continue
          q1 = divexact(p, f)
 
          @test q1 * f == p
@@ -821,6 +822,18 @@ end
            @test q1 == g
          end
       end
+   end
+
+   S, = polynomial_ring(ZZ, 2)
+   for check in (true, false)
+      @test_throws DivideError divexact(one(S), zero(S); check)
+      @test_throws DivideError divexact(zero(S), zero(S); check)
+   end
+
+   # in the zero ring, 0 is a unit
+   S, = polynomial_ring(residue_ring(ZZ, 1)[1], 2)
+   for check in (true, false)
+      @test is_zero(divexact(S(0), S(0); check))
    end
 end
 

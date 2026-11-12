@@ -223,6 +223,17 @@ end
    @test inv(b)*b == 1
    @test is_one(inv(b)*b)
    @test is_one(b/b)
+
+   for check in (true, false)
+      @test_throws DivideError divexact(S(1), S(0); check)
+      @test_throws DivideError divexact(S(0), S(0); check)
+   end
+
+   # in the zero ring, 0 is a unit
+   S = total_ring_of_fractions(residue_ring(ZZ, 1)[1])
+   for check in (true, false)
+      @test is_zero(divexact(S(0), S(0); check))
+   end
 end
 
 @testset "Generic.TotFrac.promotion" begin

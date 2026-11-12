@@ -610,6 +610,12 @@ end
          @test divexact(f*g, f) == g
       end
    end
+
+   S, = function_field(P1[1], "y")
+   for check in (true, false)
+      @test_throws DivideError divexact(one(S), zero(S); check)
+      @test_throws DivideError divexact(zero(S), zero(S); check)
+   end
 end
 
 @testset "Generic.AbsSimpleFunctionField.adhoc_exact_division" begin

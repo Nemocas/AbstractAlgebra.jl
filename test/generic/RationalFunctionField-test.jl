@@ -439,6 +439,11 @@ end
       @test divexact(a*b, b) == a
       @test divexact((a + b)*c, c) == divexact(a*c, c) + divexact(b*c, c)
    end
+
+   for F in (rational_function_field(QQ, "x")[1], K), check in (true, false)
+      @test_throws DivideError divexact(one(F), zero(F); check)
+      @test_throws DivideError divexact(zero(F), zero(F); check)
+   end
 end
 
 @testset "Generic.RationalFunctionField.adhoc_exact_division" begin
