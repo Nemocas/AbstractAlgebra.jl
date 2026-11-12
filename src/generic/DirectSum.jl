@@ -18,7 +18,7 @@ parent(v::DirectSumModuleElem) = v.parent
 
 base_ring_type(::Type{DirectSumModule{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(N::DirectSumModule{T}) where T <: RingElement = parent(N.zero_R)::base_ring_type(N)
+base_ring(N::DirectSumModule{T}) where T <: RingElement = N.base_ring::base_ring_type(N)
 
 @attr Int number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m; init = 0)
 
@@ -278,7 +278,7 @@ function direct_sum(R::Ring, m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <
      end
    end
    # Construct DirectSumModule object
-   M = DirectSumModule{T}(zero(R), m, new_rels)
+   M = DirectSumModule{T}(R, m, new_rels)
    set_attribute!(M, :degs => degs)
    # construct injections and projections
    inj = Vector{ModuleHomomorphism{T}}(undef, length(m))
