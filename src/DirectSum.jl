@@ -11,13 +11,16 @@
 ###############################################################################
 
 @doc raw"""
-    direct_sum(m::Vector{<:FPModule{T}}) where T <: RingElement
-    direct_sum(vals::FPModule{T}...) where T <: RingElement
+    direct_sum([R::Ring,] m::Vector{<:FPModule{T}}) where T <: RingElement
+    direct_sum([R::Ring,] m::FPModule{T}...) where T <: RingElement
 
 Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
-(supplied as a vector of modules), a vector $f$ of the injections
+(supplied as a vector or as separate arguments), a vector $f$ of the injections
 of the $m[i]$ into $M$ and a vector $g$ of the projections from
 $M$ onto the $m[i]$.
+
+The modules must have the same base ring. If `R` is omitted, use the base ring
+of the first module. To construct an empty direct sum, supply `R`.
 
 # Examples
 
@@ -56,5 +59,14 @@ julia> D, f = direct_sum(S1, S2, S3)
 (DirectSumModule over integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: S1 -> D, Hom: S2 -> D, Hom: S3 -> D], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Hom: D -> S1, Hom: D -> S2, Hom: D -> S3])
 ```
 """
-direct_sum(m::Vector{<:FPModule{<:RingElement}}) = Generic.direct_sum(m)
-direct_sum(m::FPModule{<:RingElement}...) = Generic.direct_sum([m...])
+function direct_sum(m::Vector{<:FPModule{<:RingElement}})
+   isempty(m) && error("Cannot take a direct sum of an empty vector of modules")
+   return direct_sum(base_ring(first(m)), m)
+end
+
+function direct_sum(R::Ring, m::Vector{<:FPModule{<:RingElement}})
+   return Generic.direct_sum(R, isempty(m) ? FPModule{elem_type(R)}[] : m)
+end
+
+direct_sum(m::FPModule{<:RingElement}...) = direct_sum(collect(m))
+direct_sum(R::Ring, m::FPModule{<:RingElement}...) = direct_sum(R, collect(m))
