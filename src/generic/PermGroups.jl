@@ -465,7 +465,9 @@ julia> g^5
 """
 function ^(g::Perm{T}, n::Integer) where T
    if n < 0
-      return inv(g)^-widen(n)
+      # only typemin is its own negative; `BigInt` has none (cf. `Base.powermod`)
+      n == -n && return inv(g*g)^-div(n, 2)
+      return inv(g)^-n
    elseif n == 0
       return Perm(T(length(g.d)))
    elseif n == 1
@@ -492,7 +494,9 @@ end
 
 function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    if n < 0
-      return inv(g)^-widen(n)
+      # only typemin is its own negative; `BigInt` has none (cf. `Base.powermod`)
+      n == -n && return inv(g*g)^-div(n, 2)
+      return inv(g)^-n
    elseif n == 0
       return Perm(I(length(g.d)))
    elseif n == 1
