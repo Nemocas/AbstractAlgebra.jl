@@ -617,6 +617,12 @@ end
          end
       end
    end
+
+   R, = power_series_ring(QQ, [3, 3], ["x", "y"])
+   for check in (true, false)
+      @test_throws DivideError divexact(one(R), zero(R); check)
+      @test_throws DivideError divexact(zero(R), zero(R); check)
+   end
 end
 
 @testset "Generic.AbsMSeries.evaluation" begin

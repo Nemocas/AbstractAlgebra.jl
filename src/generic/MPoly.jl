@@ -2591,6 +2591,8 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 function divexact(a::MPoly{T}, b::MPoly{T}; check::Bool=true) where {T <: RingElement}
+   # in the zero ring, 0 is a unit
+   iszero(b) && !is_trivial(parent(b)) && throw(DivideError())
    d, q = divides(a, b)
    check && d == false && error("Not an exact division in divexact")
    return q

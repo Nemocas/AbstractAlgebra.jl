@@ -63,3 +63,17 @@ end
    @test !isequal(f, g)
    @test isequal(f, deepcopy(f))
 end
+
+@testset "Generic.SparsePoly.exact_division" begin
+   R, = SparsePolynomialRing(ZZ, "x")
+   for check in (true, false)
+      @test_throws DivideError divexact(one(R), zero(R); check)
+      @test_throws DivideError divexact(zero(R), zero(R); check)
+   end
+
+   # in the zero ring, 0 is a unit
+   R, = SparsePolynomialRing(residue_ring(ZZ, 1)[1], "x")
+   for check in (true, false)
+      @test is_zero(divexact(R(0), R(0); check))
+   end
+end

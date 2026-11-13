@@ -377,6 +377,8 @@ end
 # that are also non-zero divisors
 
 function divexact(a::TotFrac{T}, b::TotFrac{T}; check::Bool=true)  where {T <: RingElem}
+  # in the zero ring, 0 is a unit
+  iszero(b) && !is_trivial(parent(b)) && throw(DivideError())
   return a*inv(b)  # inv(b) will throw if b is a zero divisor
 end
 

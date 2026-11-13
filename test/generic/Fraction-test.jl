@@ -246,6 +246,11 @@ end
       @test divexact(a*b, b) == a
       @test divexact((a + b)*c, c) == divexact(a*c, c) + divexact(b*c, c)
    end
+
+   for F in (K, fraction_field(polynomial_ring(ZZ, 2)[1])), check in (true, false)
+      @test_throws DivideError divexact(one(F), zero(F); check)
+      @test_throws DivideError divexact(zero(F), zero(F); check)
+   end
 end
 
 @testset "Generic.FracFieldElem.adhoc_exact_division" begin

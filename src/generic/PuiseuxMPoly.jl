@@ -503,7 +503,7 @@ end
 # e.g., divexact(a*b, a) should return b
 function divexact(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem; check::Bool = true)
     check_parent(f, g)
-    @req !iszero(g) "division by zero"
+    iszero(g) && throw(DivideError())
 
     if iszero(f)
         return zero(parent(f))
