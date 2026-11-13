@@ -1025,27 +1025,15 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
 
    if b < 0
       a = inv(a)
-      b = -b
+      b = -widen(b)
    end
 
-   bit = ~((~UInt(0)) >> 1)
-   while (UInt(bit) & b) == 0
-      bit >>= 1
-   end
    val = valuation(a)
    a = shift_right(a, val)
    prec = precision(a)
-   z = a
-   bit >>= 1
-   while bit !=0
-      z = mullow(z, z, prec)
-      if (UInt(bit) & b) != 0
-         z = mullow(z, a, prec)
-      end
-      bit >>= 1
-   end
-   z = set_valuation!(z, b*val)
-   z = set_precision!(z, b*val + prec)
+   z = AbstractAlgebra.internal_power_left_to_right(a, b, (x, y) -> mullow(x, y, prec))
+   z = set_valuation!(z, Int(b*val))
+   z = set_precision!(z, Int(b*val + prec))
    if pol_length(z) <= 1
       z = set_scale!(z, 1)
    end

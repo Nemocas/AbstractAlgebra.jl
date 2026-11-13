@@ -741,6 +741,9 @@ end
 
    @test isequal(f*f, f^2)
    @test isequal(f^0, one(R))
+
+   L, t = laurent_series_field(GF(2), 8, :t)
+   @test (1 + t)^typemin(Int) == one(L)
 end
 
 @testset "Generic.LaurentSeries.shift" begin
