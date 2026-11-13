@@ -228,6 +228,10 @@ function characteristic(R::NCRing)
    error("Characteristic not known")
 end
 
+# Defaulting to `true` makes the conformance tests reject a ring that neither
+# implements `characteristic` nor overrides this method.
+is_known(::typeof(characteristic), ::NCRing) = true
+
 ###############################################################################
 #
 #   One and zero
