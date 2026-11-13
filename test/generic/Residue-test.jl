@@ -287,6 +287,53 @@ end
    @test gcd(T(x + 1), T(x + 1)) == T(1)
 end
 
+@testset "EuclideanRingResidueRingElem.divrem" begin
+   # the Euclidean function is x -> nu(gcd(data(x), modulus)), with nu the
+   # Euclidean function of the base ring
+   function test_divrem(a, b, nu)
+      phi(x) = nu(gcd(data(x), modulus(x)))
+      q, r = divrem(a, b)
+      @test a == q*b + r
+      @test iszero(r) || phi(r) < phi(b)
+      @test iszero(r) == divides(a, b)[1]
+
+      d, s, t = gcdx(a, b)
+      @test d == gcd(a, b)
+      @test d == s*a + t*b
+   end
+
+   R, = residue_ring(ZZ, 36)
+   for A in 0:35, B in 1:35
+      test_divrem(R(A), R(B), abs)
+   end
+   @test_throws DivideError divrem(R(1), R(0))
+
+   S, x = polynomial_ring(QQ, "x")
+   T, = residue_ring(S, x^3*(x + 1)^2)
+   for i in 1:100
+      a = rand(T, 0:4, -5:5)
+      b = rand(T, 0:4, -5:5)
+      iszero(b) && continue
+      test_divrem(a, b, degree)
+   end
+
+   # oscar-system/Oscar.jl#4340
+   T, = residue_ring(S, x^2)
+   test_divrem(T(x), T(-x), degree)
+
+   S, x = polynomial_ring(GF(5), "x")
+   T, = residue_ring(S, x^3*(x + 1)^2)
+   f = T(x^2*(x + 1))
+   g = T(x*(x + 1)^2)
+   test_divrem(f, g, degree)
+   @test gcd(f, g) == T(x^2 + x)
+
+   f *= T(x + 2)
+   g *= T(x^2 + x + 2)
+   test_divrem(f, g, degree)
+   @test gcd(f, g) == T(x^2 + x)
+end
+
 @testset "EuclideanRingResidueRingElem.adhoc_binary" begin
    R, = Generic.residue_ring(ZZ, 7)
 
@@ -499,30 +546,3 @@ end
    @test gen(S) == S(x)
    @test gens(S) == elem_type(S)[one(S), gen(S), gen(S)^2]
 end
-
-@testset "EuclideanRingResidueRingElem.divrem" begin
-   R, x = polynomial_ring(GF(5), "x")
-   S, _ = residue_ring(R, (x^3)*(x+1)^2)
-
-   f = S(x^2*(x+1))
-   g = S(x*(x+1)^2)
-   q, r = divrem(f, g)
-   @test f == q*g+r
-   @test degree(data(r)) < degree(data(g))
-
-   h, r, s = gcdx(f, g)
-   @test h == S(x^2+x)
-   @test h == r*f+s*g
-
-   f *= (x+2)
-   g *= (x^2+x+2)
-   q, r = divrem(f, g)
-   @test f == q*g+r
-
-   h, r, s = gcdx(f, g)
-   @test h == S(x^2+x)
-   @test h == r*f+s*g
-end
-
-
-
