@@ -1,5 +1,6 @@
 include("error-test.jl")
 include("AliasMacro-test.jl")
+include("Caches-test.jl")
 include("Attributes-test.jl")
 include("WeakKeyIdDict-test.jl")
 include("WeakValueDict-test.jl")
