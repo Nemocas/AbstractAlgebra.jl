@@ -24,3 +24,15 @@ so that one can have towers of generic constructions. This means that
 new interfaces should generally only be added if they cooperate with all
 the existing interfaces, at least so far as the theory exists to do so.
 
+## Parents with variable names
+
+Constructors of parents with variables should accept the variable names in the
+forms described in [Parent objects with variable names](@ref). Given a method
+`f(args..., varnames::Vector{Symbol})`, the macro `@varnames_interface`
+generates the methods for all other forms, and the macro `@f`. This applies to
+any such parent, not only to rings.
+
+```@docs
+AbstractAlgebra.@varnames_interface
+AbstractAlgebra.reshape_to_varnames
+```
