@@ -321,6 +321,7 @@ end
    @test_throws DomainError f^-3
    @test_throws DomainError f^identity(-1)
    @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError f^typemin(Int)
 end
 
 @testset "Generic.NCPoly.exact_division" begin

@@ -2298,7 +2298,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
       for i = 1:N
-         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8
+         if !iszero(a.exps[i, 1]) && ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8
             error("Exponent overflow in powering")
          end
       end

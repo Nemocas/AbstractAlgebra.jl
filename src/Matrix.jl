@@ -1559,6 +1559,8 @@ Return $a^b$. We require that the matrix $a$ is square.
 function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    check_square(a)
    if b < 0
+      # -typemin(Int) overflows, but typemin(Int) is even
+      b == typemin(Int) && return (a*a)^div(b, 2)
       return inv(a)^(-b)
    end
    # special case powers of x for constructing polynomials efficiently

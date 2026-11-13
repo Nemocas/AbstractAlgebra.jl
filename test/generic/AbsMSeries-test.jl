@@ -244,6 +244,7 @@ end
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
+      @test_throws DomainError one(R)^typemin(Int)
 
       for iters = 1:100
          f = rand(R, 0:10, -10:10)

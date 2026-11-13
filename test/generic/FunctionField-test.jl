@@ -187,6 +187,7 @@ end
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
+      @test_throws ErrorException y^typemin(Int)
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)

@@ -570,6 +570,7 @@ end
    # Special case: length 1
    f = R(2)
    @test isequal(f^3, R(8))
+   @test_throws DomainError f^typemin(Int)
 
    for iter = 1:100
       f = rand(R, 0:12, -10:10)

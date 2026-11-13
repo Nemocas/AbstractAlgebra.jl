@@ -1102,6 +1102,7 @@ end
    f = rand(R, -1:10, -10:10)
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError f^typemin(Int)
    @test_throws DomainError pow_multinomial(f, -1)
    @test_throws DomainError pow_multinomial(f, -rand(2:100))
 

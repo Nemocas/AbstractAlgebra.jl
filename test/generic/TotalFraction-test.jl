@@ -192,6 +192,7 @@ end
    a = S(5, 7)
 
    @test a^-12 == 1
+   @test a^typemin(Int) == 1
 end
 
 @testset "Generic.TotFrac.inversion" begin

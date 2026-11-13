@@ -30,7 +30,9 @@ function ^(a::T, n::Integer) where T <: RingElem
    elseif n == -1
       return inv(a)
    else
-      return internal_power(inv(a), -widen(n))
+      # only typemin is its own negative; `BigInt` has none (cf. `Base.powermod`)
+      n == -n && return internal_power(inv(a*a), -div(n, 2))
+      return internal_power(inv(a), -n)
    end
 end
 

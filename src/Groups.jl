@@ -228,6 +228,8 @@ end
 Base.literal_pow(::typeof(^), g::GroupElem, ::Val{-1}) = inv(g)
 
 function Base.:(^)(g::GroupElem, n::Integer)
+    # only typemin is its own negative; `BigInt` has none (cf. `Base.powermod`)
+    n < 0 && n == -n && return inv(g*g)^-div(n, 2)
     n < 0 && return inv(g)^-n
     n == 0 && return one(g)
     # `copy` would do, but is not part of the group interface (yet)
