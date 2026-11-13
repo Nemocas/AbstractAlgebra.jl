@@ -137,3 +137,8 @@ export unit
 export upscale
 export weights
 export zero
+
+export ore_extension
+export trivial_derivation
+export derivation
+export sigma_endomorphism
