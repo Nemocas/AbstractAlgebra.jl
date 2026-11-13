@@ -370,7 +370,10 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       end
 
       @test isone(f(rand(-9:9))^0)
-      @test L(-1)^typemin(Int) == 1
+
+      # 2 has order 3 mod 7, and typemin(Int) ≡ 1 mod 3
+      L7, = laurent_polynomial_ring(residue_ring(ZZ, 7)[1], "y")
+      @test L7(2)^typemin(Int) == L7(2)
 
       @test_throws DomainError (2y)^-1
       @test_throws DomainError (3y^-1)^-2
