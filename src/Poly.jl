@@ -94,6 +94,15 @@ than the length, even for constant polynomials.
 """
 degree(a::PolynomialElem) = length(a) - 1
 
+# Length of the first `n` coefficients of `a` once leading zeros are dropped.
+# Generic code builds polynomials with `setcoeff!`, which need not normalise,
+# and then calls `set_length!(a, _normalised_length(a, n))`.
+function _normalised_length(a::PolynomialElem, n::Int)
+   while n > 0 && iszero(coeff(a, n - 1))
+      n -= 1
+   end
+   return n
+end
 
 @doc raw"""
     is_constant(a::PolynomialElem)
@@ -584,7 +593,7 @@ function +(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   z = set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, _normalised_length(z, i - 1))
    return z
 end
 
@@ -608,7 +617,7 @@ function -(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingElement
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   z = set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, _normalised_length(z, i - 1))
    return z
 end
 
@@ -664,7 +673,7 @@ function mul_karatsuba(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
       setcoeff!(r, i + m - 1, u)
    end
    # necessary for finite characteristic
-   r = set_length!(r, normalise(r, length(r)))
+   r = set_length!(r, _normalised_length(r, length(r)))
    return r
 end
 
@@ -736,7 +745,7 @@ function mul_ks(a::PolyRingElem{T}, b::PolyRingElem{T}) where {T <: PolyRingElem
       end
       setcoeff!(r, i - 1, u)
    end
-   r = set_length!(r, normalise(r, lenr))
+   r = set_length!(r, _normalised_length(r, lenr))
    return r
 end
 
@@ -766,7 +775,7 @@ function mul_classical(a::PolyRingElem{T}, b::PolyRingElem{T}) where T <: RingEl
       d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
-   z = set_length!(z, normalise(z, lenz))
+   z = set_length!(z, _normalised_length(z, lenz))
    return z
 end
 
@@ -797,7 +806,7 @@ function *(a::T, b::PolyRingElem{T}) where {T <: RingElem}
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   z = set_length!(z, normalise(z, len))
+   z = set_length!(z, _normalised_length(z, len))
    return z
 end
 
@@ -808,7 +817,7 @@ function *(a::JuliaRingElement, b::PolynomialElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   z = set_length!(z, normalise(z, len))
+   z = set_length!(z, _normalised_length(z, len))
    return z
 end
 
@@ -1064,7 +1073,7 @@ function truncate(a::PolynomialElem, n::Int)
    for i = 1:lenz
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
-   z = set_length!(z, normalise(z, lenz))
+   z = set_length!(z, _normalised_length(z, lenz))
    return z
 end
 
@@ -1206,7 +1215,7 @@ function divhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n0::Int) where T <: Rin
     if iszero(r)
         return r
     end
-    r = set_length!(r, normalise(r, length(r)))
+    r = set_length!(r, _normalised_length(r, length(r)))
     # negate r to compensate for negation above
     return -r
 end
@@ -1224,7 +1233,7 @@ function reverse!(z::PolynomialElem, x::PolynomialElem, len::Int)
     z = setcoeff!(z, i-1, coeff(x, len-i))
     z = setcoeff!(z, len-i, c)
   end
-  set_length!(z, normalise(z, len))
+  set_length!(z, _normalised_length(z, len))
   return z
 end
 
@@ -1623,7 +1632,7 @@ function divexact(f::PolyRingElem{T}, g::PolyRingElem{T}; check::Bool=true) wher
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
-         f = set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, _normalised_length(f, lenf - 1))
       end
    end
    if check
@@ -1688,7 +1697,7 @@ function mod(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
             u = add!(u, c)
             f = setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
-         f = set_length!(f, normalise(f, length(f) - 1))
+         f = set_length!(f, _normalised_length(f, length(f) - 1))
       end
    end
    return f
@@ -1723,7 +1732,7 @@ function Base.divrem(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElem
          u = add!(u, c)
          f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
-      f = set_length!(f, normalise(f, length(f) - 1))
+      f = set_length!(f, _normalised_length(f, length(f) - 1))
    end
    return q, f
 end
@@ -1916,7 +1925,7 @@ function divides(f::PolyRingElem{T}, g::PolyRingElem{T}) where T <: RingElement
         u = add!(u, c)
         f = setcoeff!(f, i + length(f) - length(g) - 1, u)
      end
-     f = set_length!(f, normalise(f, length(f)))
+     f = set_length!(f, _normalised_length(f, length(f)))
   end
   return iszero(f), q
 end
@@ -2619,7 +2628,7 @@ function derivative(a::PolynomialElem)
    for i = 1:len - 1
       z = setcoeff!(z, i - 1, i*coeff(a, i))
    end
-   z = set_length!(z, normalise(z, len - 1))
+   z = set_length!(z, _normalised_length(z, len - 1))
    return z
 end
 
@@ -2657,11 +2666,7 @@ function integral(x::PolyRingElem{T}) where {T <: Union{ResElem, FieldElement}}
    for i = 1:len
       p = setcoeff!(p, i, divexact(coeff(x, i - 1), base_ring(x)(i)))
    end
-   len += 1
-   while len > 0 && iszero(coeff(p, len - 1)) # FIXME: cannot use normalise here
-      len -= 1
-   end
-   p = set_length!(p, len)
+   p = set_length!(p, _normalised_length(p, len + 1))
    return p
 end
 
@@ -2707,7 +2712,7 @@ function subresultant_ducos(A::PolyRingElem{T}, Sd1::PolyRingElem{T}, Se0::PolyR
    for j = 0:e1 - 2
       setcoeff!(D, j, se*coeff(A, j))
    end
-   D = set_length!(D, normalise(D, e1 - 1))
+   D = set_length!(D, _normalised_length(D, e1 - 1))
    Hj = parent(A)()
    fit!(Hj, e1)
    setcoeff!(Hj, e1 - 1, se)

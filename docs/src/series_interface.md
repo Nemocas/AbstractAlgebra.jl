@@ -258,14 +258,9 @@ case.
     necessarily useful to the user, but is used extensively by the generic functionality in
     AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
-```julia
-normalise(f::MySeries{T}, n::Int)
+```@docs
+normalise(::SeriesElem, ::Int)
 ```
-
-Given a series $f$ represented by a polynomial of at least the given length, return the
-normalised length of the underlying polynomial assuming it has length at most $n$. This
-function does not actually normalise the polynomial and is not particularly useful to
-the user. It is used internally.
 
 ```julia
 renormalize!(f::MySeries{T}) where T <: RingElem
