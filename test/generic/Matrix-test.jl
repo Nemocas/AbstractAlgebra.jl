@@ -219,11 +219,7 @@ end
       @test_throws MethodError T[;;;]
       @test_throws MethodError T[1;;;]
 
-      if VERSION < v"1.11.2"
-         @test_throws ArgumentError T[1; 2 3]
-      else
-         @test_throws DimensionMismatch T[1; 2 3]
-      end
+      @test_throws Union{ArgumentError, DimensionMismatch} T[1; 2 3]
    end
 
    arr = [1 2; 3 4]
