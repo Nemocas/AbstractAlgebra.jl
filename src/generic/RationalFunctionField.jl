@@ -726,7 +726,7 @@ function evaluation_points(K::RationalFunctionField, n::Int)
    return v
 end
 
-function rank_interpolation(A::MatrixElem{<: RationalFunctionFieldElem})
+function rank_interpolation(A::MatElem{<: RationalFunctionFieldElem})
    n = nrows(A)
    m = ncols(A)
    if is_zero(n) || is_zero(m)
@@ -750,7 +750,7 @@ function rank_interpolation(A::MatrixElem{<: RationalFunctionFieldElem})
    return rank_interpolation(matrix(Kx, n, m, [numerator(B[i, j]) for i in 1:n, j in 1:m]))
 end
 
-function rank_interpolation_mc(A::MatrixElem{<: RationalFunctionFieldElem}, err::Float64)
+function rank_interpolation_mc(A::MatElem{<: RationalFunctionFieldElem}, err::Float64)
    n = nrows(A)
    m = ncols(A)
    if is_zero(n) || is_zero(m)
