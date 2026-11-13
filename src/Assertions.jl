@@ -2,12 +2,6 @@
 #
 #     Assertions.jl : Verbose printing and custom assertions
 #
-# This file was part of Hecke until Sep 2024 and was licensed under the
-# BSD 2-Clause "Simplified" License.
-#
-# (C) 2015-2019 Claus Fieker, Tommy Hofmann
-# All rights reserved.
-#
 ################################################################################
 
 ################################################################################
