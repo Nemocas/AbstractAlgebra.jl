@@ -96,6 +96,15 @@ Note that numerator and denominator are returned as elements of a polynomial
 ring whose variable is printed the same way as that of the generator of the
 rational function field.
 
+## Homomorphisms from univariate rational function fields
+
+Use `hom` to construct homomorphisms from univariate rational function fields
+into arbitrary fields.
+
+```@docs
+hom(::Generic.RationalFunctionField{T, U}, ::Field, ::Any, ::Any) where {T, U <: PolyRingElem{T}}
+```
+
 ## Rational function field functionality provided by AbstractAlgebra.jl
 
 The following functionality is provided for rational function fields.
