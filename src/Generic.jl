@@ -32,11 +32,12 @@ include("generic/NCPoly.jl")
 
 include("generic/MPoly.jl")
 
-include("generic/UnivPoly.jl")
+include("generic/PuiseuxMPoly.jl")
+
+include("generic/UniversalRing.jl")
 
 include("generic/SparsePoly.jl")
 
-include("generic/LaurentPoly.jl")
 
 include("generic/LaurentMPoly.jl")
 
@@ -51,8 +52,6 @@ include("generic/LaurentSeries.jl")
 include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
-
-include("generic/MatRing.jl")
 
 include("generic/FreeAssociativeAlgebra.jl")
 
@@ -120,5 +119,9 @@ Base.@deprecate_binding ResidueRingElem EuclideanRingResidueRingElem
 
 # Deprecated for 0.44
 #Base.@deprecate_binding MatSpace AbstractAlgebra.MatSpace false
+
+# renamed in 0.49.1
+const FunctionField = AbsSimpleFunctionField
+const FunctionFieldElem = AbsSimpleFunctionFieldElem
 
 end # generic

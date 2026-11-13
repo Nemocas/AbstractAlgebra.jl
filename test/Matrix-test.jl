@@ -112,6 +112,14 @@ end
     @test T == matrix(QQ, [42 0 0; 0 42 0; 0 0 42])
 end
 
+@testset "Matrix.vector_space_dim" begin
+  F, = residue_field(ZZ, 2)
+  S1 = matrix_space(F, 3, 4)
+  S2 = matrix_ring(QQ, 2)
+  @test vector_space_dim(S1) == 12
+  @test vector_space_dim(S2) == 4
+end
+
 @testset "Matrix.conversion" begin
   U, t = polynomial_ring(QQ, "t")
 
@@ -125,7 +133,7 @@ end
   @test Sa == S(Sa)
   @test Sa == S(Ra)
   @test matrix(Ra) == Sa
-  @test matrix(U, Ra) == Ra
+  @test matrix(U, Ra) == Sa
   @test matrix(Sa) == Sa
   @test matrix(U, Sa) == Sa
   @test Matrix(Ra) == a
@@ -160,4 +168,122 @@ end
    r2 = Strassen.lu!(P, S; cutoff = 50)
    @test r1 == r2
    @test S1 == S
+
+   a = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   b = matrix(randmat_triu(matrix_ring(ZZ, 10), -100:100))
+   c = identity_matrix(ZZ, 10)
+
+   Strassen.mul_tt!(c, a, b; cutoff = 5)
+   @test c == a*b
+   Strassen.mul_tt!(c, a, b; cutoff = 2)
+   @test c == a*b
+end
+
+@testset "Promotion" begin
+  M = matrix(ZZ, 1, 1, [1])
+  N = matrix(QQ, 1, 1, [2])
+
+  L = @inferred M + N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) + N
+  L = @inferred M - N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) - N
+  L = @inferred M * N
+  @test base_ring(L) === QQ
+  @test L == change_base_ring(QQ, M) * N
+  L = @inferred N + M
+  @test base_ring(L) === QQ
+  @test L == N + change_base_ring(QQ, M)
+  L = @inferred N - M
+  @test base_ring(L) === QQ
+  @test L == N - change_base_ring(QQ, M)
+  L = @inferred N * M
+  @test base_ring(L) === QQ
+  @test L == N * change_base_ring(QQ, M)
+
+  @test M * QQ[1;] == QQ[1;]
+  @test M * ZZ[1;] == ZZ[1;]
+  @test N * QQ[1;] == QQ[2;]
+  @test N * ZZ[1;] == QQ[2;]
+  @test QQ[1;] * M == QQ[1;]
+  @test ZZ[1;] * M == ZZ[1;]
+  @test QQ[1;] * N == QQ[2;]
+  @test ZZ[1;] * N == QQ[2;]
+
+  @test M * QQ(1) == QQ(1) * M == QQ.(M)
+  @test N * ZZ(1) == ZZ(1) * N == QQ.(N)
+end
+
+@testset "Rank Interpolation" begin
+  Fx, x = polynomial_ring(GF(257), :x)
+  Qy, y = polynomial_ring(QQ, 3, :y)
+  Qz, z = rational_function_field(QQ, :z)
+  
+  A = rand(matrix_space(Fx, 2, 2), 0:5)
+  B = rand(matrix_space(Qy, 2, 2), 1:3, 1:4, 1:2)
+  C = rand(matrix_space(Qz, 2, 2), 0:5, 1:5)
+
+  @test rank(A) == AbstractAlgebra.rank_interpolation(A)
+  @test rank(A) >= AbstractAlgebra.rank_interpolation_mc(A, 0.01)
+  @test rank(B) == AbstractAlgebra.rank_interpolation(B)
+  @test rank(B) >= AbstractAlgebra.rank_interpolation_mc(B, 0.01)
+  @test rank(C) == AbstractAlgebra.rank_interpolation(C)
+  @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C, 0.01)
+
+  multiply_row!(A, 0, 1)
+  multiply_row!(B, 0, 1)
+  multiply_row!(C, 0, 1)
+
+  @test rank(A) == AbstractAlgebra.rank_interpolation(A)
+  @test rank(A) >= AbstractAlgebra.rank_interpolation_mc(A, 0.01)
+  @test rank(B) == AbstractAlgebra.rank_interpolation(B)
+  @test rank(B) >= AbstractAlgebra.rank_interpolation_mc(B, 0.01)
+  @test rank(C) == AbstractAlgebra.rank_interpolation(C)
+  @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C, 0.01)
+
+  A = rand(matrix_space(Fx, 0, 2), 0:5)
+  B = rand(matrix_space(Qy, 0, 2), 1:3, 1:4, 1:2)
+  C = rand(matrix_space(Qz, 2, 0), 0:5, 1:5)
+
+  @test rank(A) == AbstractAlgebra.rank_interpolation(A)
+  @test rank(A) >= AbstractAlgebra.rank_interpolation_mc(A, 0.01)
+  @test rank(B) == AbstractAlgebra.rank_interpolation(B)
+  @test rank(B) >= AbstractAlgebra.rank_interpolation_mc(B, 0.01)
+  @test rank(C) == AbstractAlgebra.rank_interpolation(C)
+  @test rank(C) >= AbstractAlgebra.rank_interpolation_mc(C, 0.01)
+
+  # zero rows and columns; every evaluation has rank r, so mc is exact
+  for (M, r) in [(zero_matrix(Fx, 2, 2), 0),
+                 (matrix(Fx, [0 0; 1 2]), 1),
+                 (matrix(Fx, [0 0; x 1]), 1),
+                 (matrix(Fx, [1 x; 0 1; 0 0]), 2),
+                 (zero_matrix(Qy, 2, 2), 0),
+                 (matrix(Qy, [0 0; 1 2]), 1),
+                 (matrix(Qy, [0 0; y[1] 1]), 1),
+                 (matrix(Qy, [0 1; 0 2; 0 0]), 1),
+                 (zero_matrix(Qz, 2, 2), 0),
+                 (matrix(Qz, [0 0; 1 2]), 1)]
+    @test AbstractAlgebra.rank_interpolation(M) == r
+    @test AbstractAlgebra.rank_interpolation_mc(M, 0.01) == r
+  end
+
+  # x vanishes at the first evaluation point
+  @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 0; x 0])) == 1
+  @test AbstractAlgebra.rank_interpolation(matrix(Fx, [0 x; 0 0; 0 0])) == 1
+
+  # clearing denominators gives [1 z; 1 z], which has rank 1 at every point,
+  # so the Monte Carlo result is exact
+  C = matrix(Qz, [1//z 1; 1 z])
+  @test AbstractAlgebra.rank_interpolation_mc(C, 0.01) == 1
+
+  # Schwartz-Zippel needs the total degree of the minors, not the degree in
+  # each variable. 2000 runs with err = 0.01 expect 19 wrong ranks, 147 with
+  # the per-variable bound; P(>= 60 wrong) < 1e-13.
+  M = matrix(Qy, 1, 1, [y[1]*y[2]*y[3]])
+  @test count(_ -> AbstractAlgebra.rank_interpolation_mc(M, 0.01) != 1, 1:2000) < 60
+
+  # A = rand(matrix_space(Fx, 10, 10), 0:5)
+  # @test_throws AbstractAlgebra.rank_interpolation(A)
+  # @test_throws AbstractAlgebra.rank_interpolation_mc(A, 0.01)
 end

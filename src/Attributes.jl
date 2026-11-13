@@ -1,14 +1,6 @@
 import MacroTools
 
-if VERSION >= v"1.7"
-   import Base: ismutabletype
-else
-   function ismutabletype(@nospecialize(t::Type))
-       t = Base.unwrap_unionall(t)
-       return isa(t, DataType) && t.mutable
-   end
-end
-
+using Base: ismutabletype
 
 """
     @attributes typedef
@@ -99,13 +91,13 @@ macro attributes(expr)
       #    @attributes [Module[.Submodule].]Type{T}
       return esc(quote
          # do nothing if the type already has storage for attributes
-         if !AbstractAlgebra._is_attribute_storing_type($expr)
-           isstructtype($expr) && AbstractAlgebra.ismutabletype($expr) || error("attributes can only be attached to mutable structs")
+         if !$(@__MODULE__).is_attribute_storing_type($expr)
+           Base.isstructtype($expr) && $(@__MODULE__).ismutabletype($expr) || error("attributes can only be attached to mutable structs")
            let attr = Base.WeakKeyDict{$expr, Dict{Symbol, Any}}()
-             AbstractAlgebra._get_attributes(G::$expr) = Base.get(attr, G, nothing)
-             AbstractAlgebra._get_attributes!(G::$expr) = Base.get!(() -> Dict{Symbol, Any}(), attr, G)
-             AbstractAlgebra._get_attributes(::Type{$expr}) = attr
-             AbstractAlgebra._is_attribute_storing_type(::Type{$expr}) = true
+             $(@__MODULE__)._get_attributes(G::$expr) = Base.get(attr, G, nothing)
+             $(@__MODULE__)._get_attributes!(G::$expr) = Base.get!(() -> Dict{Symbol, Any}(), attr, G)
+             $(@__MODULE__)._get_attributes(::Type{$expr}) = attr
+             $(@__MODULE__).is_attribute_storing_type(::Type{$expr}) = true
            end
          end
       end)
@@ -113,7 +105,7 @@ macro attributes(expr)
    error("attributes can only be attached to mutable structs")
 end
 
-_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || isstructtype(T) && ismutabletype(T) && hasfield(T, :__attrs)
+_is_attribute_storing_type(::Type{T}) where T = Base.issingletontype(T) || (isstructtype(T) && ismutabletype(T) && hasfield(T, :__attrs))
 
 # storage for attributes of singletons
 const _singleton_attr_storage = Dict{Type, Dict{Symbol, Any}}()
@@ -133,7 +125,7 @@ function _get_attributes(G::T) where T
    if Base.issingletontype(T)
       return Base.get(_singleton_attr_storage, T, nothing)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   is_attribute_storing_type(T) || error("attributes storage not supported for type $T")
    return isdefined(G, :__attrs) ? G.__attrs : nothing
 end
 
@@ -152,12 +144,27 @@ function _get_attributes!(G::T) where T
    if Base.issingletontype(T)
       return Base.get!(() -> Dict{Symbol, Any}(), _singleton_attr_storage, T)
    end
-   isstructtype(T) && ismutable(T) && hasfield(T, :__attrs) || error("attributes storage not supported for type $T")
+   is_attribute_storing_type(T) || error("attributes storage not supported for type $T")
    if !isdefined(G, :__attrs)
       G.__attrs = Dict{Symbol, Any}()
    end
    return G.__attrs
 end
+
+"""
+    is_attribute_storing(G::Any)
+
+Return a boolean indicating whether `G` has the ability to store attributes.
+"""
+is_attribute_storing(G::T) where T = is_attribute_storing_type(T)
+
+"""
+    is_attribute_storing_type(T::Type)
+
+Return a boolean indicating whether instances of type `T` have
+the ability to store attributes.
+"""
+is_attribute_storing_type(::Type{T}) where T = _is_attribute_storing_type(T)
 
 """
     has_attribute(G::Any, attr::Symbol)
@@ -168,6 +175,15 @@ function has_attribute(G::Any, attr::Symbol)
    D = _get_attributes(G)
    return D isa Dict && haskey(D, attr)
 end
+
+# The do-block methods of `get_attribute` and `get_attribute!` look the key up
+# inline instead of calling `get(f, D, attr)` or `get!(f, D, attr)`. Nested
+# attribute computations would otherwise share that higher-order frame, so
+# inference widens the inner call and marks every frame in between as
+# limited; these uncached results keep their backedges, which piles up and
+# overflows the stack during method invalidation. See
+# https://github.com/JuliaLang/julia/issues/63933
+struct _AttrNotSet end
 
 """
     get_attribute(f::Function, G::Any, attr::Symbol)
@@ -186,7 +202,9 @@ end
 """
 function get_attribute(f, G::Any, attr::Symbol)
    D = _get_attributes(G)
-   D isa Dict && return get(f, D, attr)
+   D isa Dict || return f()
+   v = get(D, attr, _AttrNotSet())
+   v isa _AttrNotSet || return v
    return f()
 end
 
@@ -227,7 +245,11 @@ end
 """
 function get_attribute!(f, G::Any, attr::Symbol)
    D = _get_attributes!(G)
-   return Base.get!(f, D, attr)
+   v = get(D, attr, _AttrNotSet())
+   v isa _AttrNotSet || return v
+   v = f()
+   D[attr] = v
+   return v
 end
 
 """
@@ -283,6 +305,12 @@ via [`get_attribute!`](@ref).
 
 The name of the function is used as name for the underlying attribute.
 
+The macro works the same for unary functions with keyword arguments,
+but ignores the keyword arguments when caching the result, i.e.
+different calls with different keyword arguments will return
+the identical (cached) result. In case that there is no result cached yet,
+the function is called with the given keyword arguments.
+
 Effectively, this turns code like this:
 ```julia
 @attr RetType function myattr(obj::Foo)
@@ -326,7 +354,6 @@ julia> myattr(obj) # second time uses the cached result
 macro attr(rettype, expr::Expr)
    d = MacroTools.splitdef(expr)
    length(d[:args]) == 1 || throw(ArgumentError("Only unary functions are supported"))
-   length(d[:kwargs]) == 0 || throw(ArgumentError("Keyword arguments are not supported"))
 
    # store the original function name
    name = d[:name]
@@ -343,7 +370,7 @@ macro attr(rettype, expr::Expr)
    wrapper_def = copy(d)
    wrapper_def[:name] = name
    wrapper_def[:body] = quote
-      return get_attribute!(() -> $(compute_name)($argname), $(argname), Symbol($(string(name))))::$(rettype)
+      return get_attribute!(() -> $(compute_name)($argname; $(first.(MacroTools.splitarg.(d[:kwargs]))...)), $(argname), Symbol($(string(name))))::$(rettype)
    end
    # insert the correct line number, so that `functionloc(name)` works correctly
    wrapper_def[:body].args[1] = __source__

@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 DocTestFilters = r"[0-9\.]+ seconds \(.*\)"
 ```

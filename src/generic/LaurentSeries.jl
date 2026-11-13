@@ -41,6 +41,14 @@ base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_
 
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
+coefficient_ring_type(T::Type{<:LaurentSeriesRing}) = base_ring_type(T)
+
+coefficient_ring_type(T::Type{<:LaurentSeriesField}) = base_ring_type(T)
+
+coefficient_ring(R::LaurentSeriesRing) = base_ring(R)
+
+coefficient_ring(R::LaurentSeriesField) = base_ring(R)
+
 function is_domain_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesElem{S}}
    return is_domain_type(S)
 end
@@ -365,9 +373,8 @@ function renormalize!(z::LaurentSeriesElem)
    return nothing
 end
 
-function characteristic(a::LaurentSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::Union{LaurentSeriesRing, LaurentSeriesField}) = characteristic(coefficient_ring(R))
+is_known(::typeof(characteristic), R::Union{LaurentSeriesRing, LaurentSeriesField}) = is_known(characteristic, coefficient_ring(R))
 
 ###############################################################################
 #
@@ -379,15 +386,15 @@ function similar(x::LaurentSeriesElem, R::Ring, max_prec::Int,
       s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
-   p = Generic.LaurentSeriesRingElem{TT}(V, 0, max_prec, max_prec, 1)
+   p = LaurentSeriesRingElem{TT}(V, 0, max_prec, max_prec, 1)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && s == var(parent(x)) &&
-         x isa Generic.LaurentSeriesRingElem{TT} &&
+         x isa LaurentSeriesRingElem{TT} &&
       max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.LaurentSeriesRing{TT}(R, max_prec, s, cached)
+      p.parent = LaurentSeriesRing{TT}(R, max_prec, s, cached)
    end
    return p
 end
@@ -396,15 +403,15 @@ function similar(x::LaurentSeriesElem, R::Field, max_prec::Int,
       s::Symbol; cached::Bool=true)
    TT = elem_type(R)
    V = Vector{TT}(undef, 0)
-   p = Generic.LaurentSeriesFieldElem{TT}(V, 0, max_prec, max_prec, 1)
+   p = LaurentSeriesFieldElem{TT}(V, 0, max_prec, max_prec, 1)
    # Default similar is supposed to return a Generic series
    if base_ring(x) === R && s == var(parent(x)) &&
-         x isa Generic.LaurentSeriesFieldElem{TT} &&
+         x isa LaurentSeriesFieldElem{TT} &&
       max_precision(parent(x)) == max_prec
       # steal parent in case it is not cached
       p.parent = parent(x)
    else
-      p.parent = Generic.LaurentSeriesField{TT}(R, max_prec, s, cached)
+      p.parent = LaurentSeriesField{TT}(R, max_prec, s, cached)
    end
    return p
 end
@@ -445,14 +452,38 @@ zero(a::LaurentSeriesElem,    var::VarName=var(parent(a)); cached::Bool=true) =
 #
 ###############################################################################
 
+@doc raw"""
+    laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+    laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the Laurent series over `R` in the variable `var` of valuation `val`
+whose first `len` coefficients are given by the first `len` entries of `arr`.
+The entry `arr[i]` is the coefficient of `var^(val + (i - 1)*scale)`, so
+consecutive coefficients are `scale` exponents apart. The input must satisfy
+`0 <= len <= length(arr)`, `scale > 0`, and
+`prec >= val + (len - 1)*scale + 1`, where `prec` is the absolute precision.
+The Laurent series parent is created on the fly with maximum relative precision
+`max_precision`. It is a field when `R` is a field and a ring otherwise. Setting
+`cached` to `false` prevents the parent from being cached.
+
+# Examples
+
+```jldoctest
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+
+julia> laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
+1 + 2*x^2 + 3*x^4 + O(x^5)
+```
+"""
 function laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
-   p = Generic.LaurentSeriesRingElem{TT}(coeffs, len, prec, val, scale)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   p = LaurentSeriesRingElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
-   p.parent = Generic.LaurentSeriesRing{TT}(R, max_precision, Symbol(var), cached)
+   p.parent = LaurentSeriesRing{TT}(R, max_precision, Symbol(var), cached)
    return p
 end
 
@@ -460,10 +491,10 @@ function laurent_series(R::Field, arr::Vector{T}, len::Int, prec::Int, val::Int,
    scale <= 0 && error("Scale must be positive")
    prec < (len - 1)*scale + val + 1 && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
-   p = Generic.LaurentSeriesFieldElem{TT}(coeffs, len, prec, val, scale)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   p = LaurentSeriesFieldElem{TT}(coeffs, len, prec, val, scale)
    # Default is supposed to return a Generic Laurent series
-   p.parent = Generic.LaurentSeriesField{TT}(R, max_precision, Symbol(var), cached)
+   p.parent = LaurentSeriesField{TT}(R, max_precision, Symbol(var), cached)
    return p
 end
 
@@ -802,7 +833,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
+function *(a::JuliaRingElement, b::LaurentSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -820,7 +851,7 @@ end
 
 *(a::LaurentSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::LaurentSeriesElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -831,8 +862,8 @@ end
 @doc raw"""
     shift_left(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+Return the Laurent series $x$ shifted left by $n$ terms, i.e. multiplied by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
@@ -844,8 +875,8 @@ end
 @doc raw"""
     shift_right(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 
-Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+Return the Laurent series $x$ shifted right by $n$ terms, i.e. divided by
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
@@ -1115,37 +1146,17 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem{T}, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::Generic.LaurentSeriesElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::LaurentSeriesElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::Generic.LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::LaurentSeriesElem, y::JuliaRingElement) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Generic.LaurentSeriesElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::LaurentSeriesElem) = y == x
+==(x::JuliaRingElement, y::LaurentSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -1215,7 +1226,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::LaurentSeriesElem, y::JuliaRingElement; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1342,28 +1353,25 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    end
    aval2 = div(aval, 2)
    prec = precision(a) - aval
-   if prec == 0
-      asqrt = parent(a)()
+   asqrt = parent(a)()
+   if prec <= 0
       asqrt = set_precision!(asqrt, aval2)
       asqrt = set_valuation!(asqrt, aval2)
       asqrt = set_scale!(asqrt, 1)
       return true, asqrt
    end
-   asqrt = parent(a)()
    s = scale(a)
    zlen = div(prec + s - 1, s)
    fit!(asqrt, zlen)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
-   if prec > 0
-      c = polcoeff(a, 0)
-      if check && !is_square(c)
-         return false, zero(S)
-      end
-      g = sqrt(c; check=check)
-      asqrt = setcoeff!(asqrt, 0, g)
-      g2 = g + g
+   c = polcoeff(a, 0)
+   if check && !is_square(c)
+      return false, zero(S)
    end
+   g = sqrt(c; check=check)
+   asqrt = setcoeff!(asqrt, 0, g)
+   g2 = g + g
    p = R()
    for n = 1:zlen - 1
       c = R()
@@ -1395,13 +1403,6 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
     return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::Generic.LaurentSeriesElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::LaurentSeriesElem; check::Bool=true)
    flag, s = sqrt_classical(a, check=check)
    check && !flag && error("Not a square in sqrt")
@@ -1779,9 +1780,18 @@ end
 rand(rng::AbstractRNG, S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::LaurentSeriesRingOrField, val_range, v...) =
+rand(S::LaurentSeriesRingOrField, val_range::AbstractUnitRange{Int}, v...) =
    rand(Random.default_rng(), S, val_range, v...)
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::LaurentSeriesRing{BigInt})
+  rand(R, 0:12, -10:10)
+end
 
 ###############################################################################
 #
@@ -1827,7 +1837,7 @@ function (R::LaurentSeriesField{T})() where {T <: FieldElement}
    return z
 end
 
-function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::JuliaRingElement) where {T <: RingElement}
    if b == 0
       z = LaurentSeriesRingElem{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else

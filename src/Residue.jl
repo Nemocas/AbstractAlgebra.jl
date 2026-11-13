@@ -85,6 +85,19 @@ function is_unit(a::ResElem)
    return isone(g)
 end
 
+function is_nilpotent(res::ResElem)
+  m = modulus(res)
+  r = data(res)
+  while true
+    g = gcd(r, m)
+    (g == m) && return true
+    is_one(g) && return false
+    m = divexact(m, g)
+    g = mod(g, m);   r = g^2  # if computation domain is limited precision integer then g = mod(g,m) guarantees that g^2 will not overflow!
+  end
+end
+
+
 # currently residue rings are only allowed over domains
 # otherwise this function would be more complicated
 is_zero_divisor(a::ResElem) = !is_unit(a)
@@ -100,9 +113,8 @@ annihilator(a::ResElem) = is_zero_divisor_with_annihilator(a)[2]
 deepcopy_internal(a::ResElem, dict::IdDict) =
    parent(a)(deepcopy_internal(data(a), dict))
 
-function characteristic(a::ResidueRing{T}) where T <: Integer
-   return modulus(a)
-end
+characteristic(R::ResidueRing{T}) where T <: Integer = modulus(R)
+is_known(::typeof(characteristic), R::ResidueRing{T}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -192,27 +204,27 @@ end
 #
 ###############################################################################
 
-*(a::ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::ResElem, b::JuliaRingElement) = parent(a)(data(a) * b)
 
 *(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::ResElem) = parent(b)(a * data(b))
+*(a::JuliaRingElement, b::ResElem) = parent(b)(a * data(b))
 
 *(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
-+(a::ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::ResElem, b::JuliaRingElement) = parent(a)(data(a) + b)
 
 +(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::ResElem) = parent(b)(a + data(b))
++(a::JuliaRingElement, b::ResElem) = parent(b)(a + data(b))
 
 +(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
--(a::ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::ResElem, b::JuliaRingElement) = parent(a)(data(a) - b)
 
 -(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
--(a::Union{Integer, Rational, AbstractFloat}, b::ResElem) = parent(b)(a - data(b))
+-(a::JuliaRingElement, b::ResElem) = parent(b)(a - data(b))
 
 -(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
@@ -270,41 +282,21 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(a::ResElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::ResElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::ResElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::Union{Integer, Rational, AbstractFloat}, b::ResElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResElem)
+function ==(a::JuliaRingElement, b::ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc raw"""
-    ==(a::ResElem{T}, b::T) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::T, b::ResElem{T}) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::T, b::ResElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
@@ -321,6 +313,21 @@ end
 
 Return the inverse of the element $a$ in the residue ring. If an impossible
 inverse is encountered, an exception is raised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = inv(f)
+1//3*x^2 - 1//3*x + 4//3
+```
 """
 function Base.inv(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
@@ -336,6 +343,8 @@ end
 
 function divexact(a::ResElem{T}, b::ResElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
+   # in the zero ring, 0 is a unit
+   iszero(b) && !is_trivial(parent(b)) && throw(DivideError())
    fl, q = divides(a, b)
    check && !fl && error("Impossible inverse in divexact")
    return q
@@ -374,6 +383,24 @@ end
 Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 by taking the greatest common divisor of the data associated with the
 supplied residues and taking its greatest common divisor with the modulus.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> S, = residue_ring(R, x^3 + 3x + 1);
+
+julia> f = S(x + 1)
+x + 1
+
+julia> g = S(x^2 + 2x + 1)
+x^2 + 2*x + 1
+
+julia> h = gcd(f, g)
+1
+```
 """
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -423,18 +450,32 @@ function rand(rng::AbstractRNG,
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResidueRing, vs...)
+function RandomExtensions.make(S::ResidueRing, v, vs...)
    R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
+   if isempty(vs) && elem_type(R) == Random.gentype(v)
+      Make(S, v)
    else
-      Make(S, make(base_ring(S), vs...))
+      Make(S, make(R, v, vs...))
    end
 end
 
-rand(rng::AbstractRNG, S::ResidueRing, v...) = rand(rng, make(S, v...))
+# `v, vs...` describe how to sample from the base ring. With no such
+# specification at all, `rand(S)` and `rand(S, dims...)` keep their `Base`
+# meaning -- one resp. an array of uniformly random elements -- which is served
+# by whatever `Random.Sampler` the concrete residue ring provides.
+rand(rng::AbstractRNG, S::ResidueRing, v, vs...) = rand(rng, make(S, v, vs...))
 
-rand(S::ResidueRing, v...) = rand(Random.default_rng(), S, v...)
+rand(S::ResidueRing, v, vs...) = rand(Random.default_rng(), S, v, vs...)
+
+# An integer (or tuple of integers) is an array size, never a sampling
+# specification; saying so resolves the ambiguity with `Base.rand(X, dims...)`.
+rand(rng::AbstractRNG, S::ResidueRing, dims::Dims) = rand(rng, make(S), dims)
+
+rand(S::ResidueRing, dims::Dims) = rand(Random.default_rng(), S, dims)
+
+rand(rng::AbstractRNG, S::ResidueRing, d::Integer, dims::Integer...) = rand(rng, S, Dims((d, dims...)))
+
+rand(S::ResidueRing, d::Integer, dims::Integer...) = rand(Random.default_rng(), S, Dims((d, dims...)))
 
 ###############################################################################
 #
@@ -452,8 +493,7 @@ to the constructor with the same base ring $R$ and element $a$. A modulus
 of zero is not supported and throws an exception.
 """
 function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
-   # Modulus of zero cannot be supported. E.g. A C library could not be expected to
-   # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    T = elem_type(R)
    S = EuclideanRingResidueRing{T}(R(a), cached)
@@ -461,6 +501,7 @@ function residue_ring(R::Ring, a::RingElement; cached::Bool = true)
 end
 
 function residue_ring(R::PolyRing, a::RingElement; cached::Bool = true)
+   @req !is_trivial(R) "Zero rings are currently not supported as base ring."
    iszero(a) && throw(DomainError(a, "Modulus must be nonzero"))
    !is_unit(leading_coefficient(a)) && throw(DomainError(a, "Non-invertible leading coefficient"))
    T = elem_type(R)
@@ -471,7 +512,7 @@ end
 @doc raw"""
     quo(R::Ring, a::RingElement; cached::Bool = true)
 
-Returns `S, f` where `S = residue_ring(R, a)` and `f` is the 
+Returns `S, f` where `S = residue_ring(R, a)` and `f` is the
 projection map from `R` to `S`. This map is supplied as a map with section
 where the section is the lift of an element of the residue field back
 to the ring `R`.

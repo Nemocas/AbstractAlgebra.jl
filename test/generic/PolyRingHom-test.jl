@@ -23,18 +23,18 @@
   @test (ff * f)(x) == 0
   ff = hom(Qx, Qx, c -> one(GF2), x)
   @test_throws ErrorException f * ff
-  ff = hom(Qx, Qx, map_from_func(x -> Qx(x), QQ, Qx), x)
+  ff = hom(Qx, Qx, map_from_func(QQ, Qx, x -> Qx(x)), x)
   @test (f * ff)(x + 1) == 0
   @test (ff * f)(x + 1) == 0
-  ff = hom(Qx, Qx, map_from_func(x -> x, QQ, QQ), x)
+  ff = hom(Qx, Qx, map_from_func(QQ, QQ, x -> x), x)
   @test (f * ff)(x + 1) == 0
   @test (ff * f)(x + 1) == 0
 
   f = identity_map(Qx)
-  ff = hom(Qx, Qx, map_from_func(x -> Qx(x), QQ, Qx), x)
+  ff = hom(Qx, Qx, map_from_func(QQ, Qx, x -> Qx(x)), x)
   @test (f * ff)(x + 1) == x + 1
   @test (ff * f)(x + 1) == x + 1
-  ff = hom(Qx, Qx, map_from_func(x -> x, QQ, QQ), x)
+  ff = hom(Qx, Qx, map_from_func(QQ, QQ, x -> x), x)
   @test (f * ff)(x + 1) == x + 1
   @test (ff * f)(x + 1) == x + 1
 

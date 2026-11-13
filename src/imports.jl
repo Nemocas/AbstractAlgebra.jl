@@ -1,7 +1,7 @@
+using Compat: allequal, allunique
+
 using Random: Random, AbstractRNG, SamplerTrivial
 using RandomExtensions: RandomExtensions, make, Make, Make2, Make3, Make4
-
-using Test: @test # for "interface-conformance" functions
 
 import LinearAlgebra
 
@@ -19,6 +19,7 @@ import LinearAlgebra: norm
 import LinearAlgebra: nullspace
 import LinearAlgebra: rank
 import LinearAlgebra: tr
+import LinearAlgebra: transpose!
 
 
 # Do not import elements of `Base_import_exclude` as we have our own
@@ -37,6 +38,7 @@ import Base: >
 import Base: >=
 import Base: >>
 import Base: Array
+import Base: Matrix
 import Base: Rational
 import Base: ^
 import Base: abs
@@ -80,6 +82,7 @@ import Base: precision
 import Base: rand
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: setindex!
 import Base: show
 import Base: similar

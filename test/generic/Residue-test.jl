@@ -1,20 +1,20 @@
 @testset "EuclideanRingResidueRingElem.conformance_tests" begin
-   test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
-   test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
+   ConformanceTests.test_Ring_interface(residue_ring(ZZ, 1)[1])   # is_gen fails on polys
+   ConformanceTests.test_Ring_interface_recursive(residue_ring(ZZ, -4)[1])
 
    #
    R, = residue_ring(ZZ, 16453889)
-   test_Ring_interface_recursive(R)
+   ConformanceTests.test_Ring_interface_recursive(R)
 
    #
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
-   test_Ring_interface_recursive(T)
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    #
-   S, x = polynomial_ring(ZZ, "x")
+   S, x = polynomial_ring(QQ, "x")
    T, = residue_ring(S, x^2 + 1)
-   #test_Ring_interface_recursive(T)   # TODO: currently fails because `inv(one(T))` fails
+   ConformanceTests.test_Ring_interface_recursive(T)
 
    @test !occursin("\n", sprint(show, T))
 end
@@ -67,6 +67,8 @@ end
 
    @test isa(d, EuclideanRingResidueRingElem)
 
+   @test R(2//3) * R(3) == R(2)
+
    S, x = polynomial_ring(R, "x")
    T, = residue_ring(S, x^3 + 3x + 1)
 
@@ -80,7 +82,9 @@ end
 
    @test isa(g, EuclideanRingResidueRingElem)
 
-   # Poly modulus, invertible lc 
+   @test T(1//(x+1)) == inv(T(x+1))
+
+   # Poly modulus, invertible lc
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 1)
 
@@ -101,16 +105,6 @@ end
    k = T(1)
 
    @test isa(k, EuclideanRingResidueRingElem)
-
-   S, = Generic.residue_ring(B, 164538890)
-   x = R(1)
-   y = S(1)
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
 end
 
 @testset "EuclideanRingResidueRingElem.is_trivial" begin
@@ -124,12 +118,33 @@ end
    @test is_trivial(R)
 end
 
+@testset "EuclideanRingResidueRingElem.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+
+   @test order(R) == 4
+   @test length(R) == 4
+   @test collect(R) == [R(i) for i in 0:3]
+
+   R, = residue_ring(ZZ, 1)
+
+   @test order(R) == 1
+   @test collect(R) == [zero(R)]
+end
+
 @testset "EuclideanRingResidueRingElem.rand" begin
    R, = Generic.residue_ring(ZZ, 49)
 
    test_rand(R, 1:9) do f
       @test 1 <= f.data <= 9
    end
+
+   # Carrying no sampling specification, `rand(R)` and `rand(R, dims...)` keep
+   # their `Base` meaning and must not be forwarded to the base ring: they ask
+   # `R` itself for a `Random.Sampler` (which AbstractAlgebra does not provide).
+   @test make(R) isa RandomExtensions.MakeWrap
+   @test which(rand, Tuple{typeof(R), Int}) isa Method       # i.e. unambiguous
+   @test which(rand, Tuple{typeof(R), Int, Int}) isa Method
+   @test which(rand, Tuple{typeof(R), Tuple{Int, Int}}) isa Method
 
    # make with 3 arguments
    P, x = polynomial_ring(RealField, "x")
@@ -264,7 +279,7 @@ end
    # Poly modulus, invertible lc
    S, x = polynomial_ring(ZZ, "x")
    T, = residue_ring(S, x^2 + 2x + 1)
-   
+
    @test gcd(T(x + 1), T(x + 1)) == T(x + 1)
 
    T, = residue_ring(S, x^2 + 1)
@@ -464,6 +479,17 @@ end
          @test q*a2 == p
       end
    end
+
+   R, = residue_ring(ZZ, 6)
+   for check in (true, false)
+      @test_throws DivideError divexact(R(1), R(0); check)
+      @test_throws DivideError divexact(R(0), R(0); check)
+   end
+   @test_throws DivideError R(1) / R(0)
+
+   # in the zero ring, 0 is a unit
+   R, = residue_ring(ZZ, 1)
+   @test is_zero(divexact(R(0), R(0)))
 end
 
 @testset "EuclideanRingResidueRingElem.polynomials" begin

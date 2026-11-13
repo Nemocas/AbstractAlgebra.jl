@@ -12,7 +12,7 @@ function is_power(a::RingElem, n::Int)
         return true, a
     end
     R = parent(a)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.poly_ring(R)
     x = gen(Rt)
     r = roots(x^n - a)
     if length(r) == 0
@@ -21,12 +21,35 @@ function is_power(a::RingElem, n::Int)
         return true, r[1]
     end
 end
-  
+
 function root(a::RingElem, n::Int)
     fl, b = is_power(a, n)
     fl || error("element does not have a $n-th root")
     return b
 end
+
+@doc raw"""
+    falling_factorial(x::RingElement, n::Integer)
+
+Return the falling factorial of $x$, i.e. $x(x - 1)(x - 2)\cdots (x - n + 1)$.
+If $n < 0$ we throw a `DomainError()`.
+
+# Examples
+
+```jldoctest
+julia> R, x = ZZ[:x];
+
+julia> falling_factorial(x, 1)
+x
+
+julia> falling_factorial(x, 2)
+x^2 - x
+
+julia> falling_factorial(4, 2)
+12
+```
+"""
+falling_factorial(x::RingElement, n::Integer) = (-1)^n*rising_factorial(-x, n)
 
 @doc raw"""
     rising_factorial(x::RingElement, n::Integer)

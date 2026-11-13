@@ -28,7 +28,7 @@ Base.BroadcastStyle(::Type{<:MatElem}) = Broadcast.ArrayStyle{BroadcastDummy}()
 #
 ################################################################################
 
-# I use a non-recursive version at the leaft to not confusing inference too much
+# I use a non-recursive version at the leaf to not confuse inference too much
 function _compute_target_size(a::Tuple)
   if length(a) == 1
     return _compute_target_size_nonrec(a[1])
@@ -107,6 +107,22 @@ function _promote_dest_func_elem(f::T, a::Tuple) where {T}
   return zero(K)
 end
 
+Base.maybeview(A::MatElem, x...) = view(A, x...)
+
+function set!(dest::MatElem, src)
+  for I in eachindex(dest)
+    dest[I] = src[I]
+  end
+  return dest
+end
+
+set!(dest::MatElem, src::MatElem) = map_entries!(identity, dest, src)
+
+function Base.copyto!(dest::MatElem, src)
+  set!(dest, src)
+  return dest
+end
+
 ################################################################################
 #
 #  Similar functionality
@@ -116,7 +132,7 @@ end
 # The most tricky part:
 #
 # Any expression of the form fun.(args...) is transformed into a
-# Broadcasted object bc with bc.fun == and bc.args == x (a Tuple)
+# Broadcasted object bc with bc.f == fun and bc.args == x (a Tuple)
 # Note that the x can themselves be again objects of type Broadcasted.
 # So we end up with a nice expression tree and our aim is to find
 # the shape and coefficient ring of the final output matrix
@@ -130,7 +146,8 @@ Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted) = Base.copyto!(dest, conv
 function Base.copyto!(dest::MatElem, bc::Broadcast.Broadcasted{Nothing})
   axes(dest) == axes(bc) || Broadcast.throwdm(axes(dest), axes(bc))
   # Performance optimization: broadcast!(identity, dest, A) is equivalent to copyto!(dest, A) if indices match
-  if bc.f === identity && bc.args isa Tuple{AbstractArray} # only a single input argument to broadcast!
+  if bc.f === identity && bc.args isa Tuple{Union{AbstractArray, MatElem}} # only a single input argument to broadcast!
+    # this takes care of assignments of the form A .= B (in this case bc.args = (B, ))
     A = bc.args[1]
     if axes(dest) == axes(A)
       return copyto!(dest, A)

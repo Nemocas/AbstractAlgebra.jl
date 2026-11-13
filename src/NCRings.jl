@@ -19,8 +19,6 @@
 # The AbstractAlgebra promotion system is used to define catch all functions for
 # arithmetic between arbitrary ring elements.
 #
-# TODO: move this to NCRing.jl
-#
 ################################################################################
 
 promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElement = T
@@ -36,6 +34,9 @@ function promote_rule_sym(::Type{T}, ::Type{S}) where {T, S}
 end
 
 @inline function try_promote(x::S, y::T) where {S <: NCRingElem, T <: NCRingElem}
+   if S === T
+      return true, x, y
+   end
    U = promote_rule_sym(S, T)
    if S === U
       return true, x, parent(x)(y)
@@ -61,7 +62,7 @@ end
 #
 ###############################################################################
 
-+(x::NCRingElem) = x
++(x::NCRingElem) = deepcopy(x)
 
 +(x::NCRingElem, y::NCRingElem) = +(promote(x, y)...)
 
@@ -75,7 +76,7 @@ end
 
 -(x::NCRingElement, y::NCRingElem) = parent(y)(x) - y
 
-*(x::NCRingElem) = x
+*(x::NCRingElem) = deepcopy(x)
 
 *(x::NCRingElem, y::NCRingElem) = *(promote(x, y)...)
 
@@ -83,30 +84,46 @@ end
 
 *(x::NCRingElement, y::NCRingElem) = parent(y)(x)*y
 
+# general fallback for comparison of elements via promotion.
+# This is different from Julia's existing promotion logic because
+# it takes parents into account
 function ==(x::NCRingElem, y::NCRingElem)
-   fl, u, v = try_promote(x, y)
-   if fl
-     return u == v
-   else
-     return false
-   end
+  # avoid infinite recursion: we only get here if a ring type "forgot" to
+  # implement ==, so only do something if x and y have different type
+  if typeof(x) !== typeof(y)
+    fl, u, v = try_promote(x, y)
+    fl && return u == v
+  end
+  throw(NotImplementedError(:(==), x, y))
  end
- 
+
 ==(x::NCRingElem, y::NCRingElement) = x == parent(x)(y)
 
 ==(x::NCRingElement, y::NCRingElem) = parent(y)(x) == y
 
 function divexact_left(x::NCRingElem, y::NCRingElem; check::Bool = true)
-   return divexact_left(promote(x, y)...)
+   xx, yy = promote(x, y)
+   # if divexact_left is not implemented, we need to break the recursion;
+   # compare types rather than operands, as dispatch only depends on the
+   # types and `promote` may return copies
+   if typeof(xx) === typeof(x) && typeof(y) === typeof(yy)
+     throw(NotImplementedError(:divexact_left, x, y))
+   end
+   return divexact_left(xx, yy; check=check)
 end
 
 function divexact_right(x::NCRingElem, y::NCRingElem; check::Bool = true)
-   return divexact_right(promote(x, y)...)
+   xx, yy = promote(x, y)
+   # see divexact_left
+   if typeof(xx) === typeof(x) && typeof(y) === typeof(yy)
+     throw(NotImplementedError(:divexact_right, x, y))
+   end
+   return divexact_right(xx, yy; check=check)
 end
 
 function divexact_left(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_left(x, parent(x)(y); check = check)
@@ -114,7 +131,7 @@ end
 
 function divexact_right(
    x::NCRingElem,
-   y::Union{Integer, Rational, AbstractFloat};
+   y::JuliaRingElement;
    check::Bool = true)
 
    return divexact_right(x, parent(x)(y); check = check)
@@ -122,11 +139,11 @@ end
 
 #Base.:/(x::ModuleElem, y::RingElement) = divexact_right(x, y; check=true)
 Base.:/(x::NCRingElem, y::NCRingElement) = divexact_right(x, y; check=true)
-Base.:/(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = divexact_right(x, y; check=true)
+Base.:/(x::NCRingElem, y::JuliaRingElement) = divexact_right(x, y; check=true)
 
 #Base.:\(y::RingElement, x::ModuleElem) = divexact_left(x, y; check=true)
 Base.:\(y::NCRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
-Base.:\(y::Union{Integer, Rational, AbstractFloat}, x::NCRingElem) = divexact_left(x, y; check=true)
+Base.:\(y::JuliaRingElement, x::NCRingElem) = divexact_left(x, y; check=true)
 
 Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 
@@ -137,7 +154,7 @@ Base.literal_pow(::typeof(^), x::NCRingElem, ::Val{p}) where {p} = x^p
 ###############################################################################
 
 @doc raw"""
-    is_unit(a::T) where {T <: NCRingElem}
+    is_unit(a::T) where {T <: NCRingElement}
 
 Return true if $a$ is invertible, else return false.
 
@@ -155,12 +172,58 @@ julia> is_unit(ZZ(-1)), is_unit(ZZ(4))
 """
 function is_unit end
 
+@doc raw"""
+    is_nilpotent(a::T) where {T <: NCRingElement}
+
+Return true iff $a$ is nilpotent, i.e. a^k == 0 for some k.
+
+# Examples
+```jldoctest
+julia> R, _ = residue_ring(ZZ,720);
+
+julia> S, x = polynomial_ring(R, :x);
+
+julia> is_nilpotent(30*x), is_nilpotent(30+90*x), is_nilpotent(S(15))
+(true, true, false)
+```
+"""
+function is_nilpotent(a::T) where {T <: NCRingElement}
+  is_domain_type(T) && return is_zero(a)
+  throw(NotImplementedError(:is_nilpotent, a))
+end
+
+
+@doc raw"""
+    is_square(a::NCRingElement)
+
+Return `true` iff `a` is the square of a value in its own ring.
+See also `is_square(A::MatElem)` which tests whether a matrix has square shape.
+"""
+is_square(::NCRingElement)
+
+@doc raw"""
+    sqrt(a::NCRingElem; check::Bool=true)
+
+Return a square root of `a`, if it exists. By default (`check=true`),
+implementations should raise an exception if `a` is not a square in its ring.
+If `check=false`, implementations may skip this verification.
+
+See also `is_square` and `is_square_with_sqrt`.
+"""
+sqrt(::NCRingElem)
+
 ###############################################################################
 #
 #   Characteristic
 #
 ###############################################################################
 
+@doc raw"""
+    characteristic(R::NCRing)
+
+Return the characteristic of the ring `R`. If the characteristic
+is not known, an exception is raised.
+"""
 function characteristic(R::NCRing)
    error("Characteristic not known")
 end
@@ -217,6 +280,7 @@ end
 Return an array $M$ of "powers" of `a` where $M[i + 1] = a^i$ for $i = 0..d$.
 
 # Examples
+
 ```jldoctest
 julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 [1   2   3]
@@ -230,7 +294,6 @@ julia> A = powers(M, 4)
  [17 23 26; 24 33 38; 34 48 57]
  [167 233 273; 242 337 394; 358 497 579]
  [1725 2398 2798; 2492 3465 4044; 3668 5102 5957]
-
 ```
 """
 function powers(a::T, d::Int) where {T <: Union{NCRingElement, MatElem}}
@@ -279,6 +342,6 @@ Base.broadcastable(x::NCRingElem) = Ref(x)
 
 dot(x::NCRingElem, y::NCRingElem) = x * y
 
-dot(x::NCRingElem, y::Union{Integer, Rational, AbstractFloat}) = x * y
+dot(x::NCRingElem, y::JuliaRingElement) = x * y
 
-dot(x::Union{Integer, Rational, AbstractFloat}, y::NCRingElem) = x * y
+dot(x::JuliaRingElement, y::NCRingElem) = x * y

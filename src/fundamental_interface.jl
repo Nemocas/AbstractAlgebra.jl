@@ -4,6 +4,15 @@
 #
 ###############################################################################
 
+function Base.:(==)(x::SetElem, y::SetElem)
+  x === y && return true
+  throw(NotImplementedError(:(==), x, y))
+end
+
+function Base.hash(a::SetElem, h::UInt)
+  throw(NotImplementedError(:hash, a, h))
+end
+
 ###############################################################################
 #
 #   Parents, elements and data type methods
@@ -49,6 +58,7 @@ true
 """
 elem_type(x) = elem_type(typeof(x))
 elem_type(T::DataType) = throw(MethodError(elem_type, (T,)))
+elem_type(T::Type{Union{}}) = throw(MethodError(elem_type, (T,)))
 
 @doc raw"""
     parent_type(element)
@@ -73,11 +83,12 @@ true
 """
 parent_type(x) = parent_type(typeof(x))
 parent_type(T::DataType) = throw(MethodError(parent_type, (T,)))
+parent_type(T::Type{Union{}}) = throw(MethodError(parent_type, (T,)))
 
 @doc raw"""
     base_ring(a)
 
-Return base ring $R$ of given element or parent $a$.
+Return the internal base ring of the given element or parent $a$.
 
 # Examples
 ```jldoctest
@@ -91,7 +102,7 @@ julia> R = GF(7)
 Finite field F_7
 
 julia> base_ring(R)
-Union{}
+ERROR: MethodError: no method matching base_ring(::AbstractAlgebra.GFField{Int64})
 ```
 """
 function base_ring end
@@ -101,7 +112,7 @@ base_ring(x::NCRingElement) = base_ring(parent(x))
 @doc raw"""
     base_ring_type(a)
 
-Return the type of the base ring of the given element, element type, parent or parent type $a$.
+Return the type of the internal base ring of the given element, element type, parent or parent type $a$.
 
 # Examples
 ```jldoctest
@@ -119,6 +130,12 @@ true
 
 julia> base_ring_type(typeof(zero(R))) == typeof(base_ring(zero(R)))
 true
+
+julia> R = GF(7)
+Finite field F_7
+
+julia> base_ring_type(R)
+Union{}
 ```
 """
 base_ring_type(x) = base_ring_type(typeof(x))
@@ -126,9 +143,85 @@ base_ring_type(x::Type{<:NCRingElement}) = base_ring_type(parent_type(x))
 base_ring_type(x::Type{<:ModuleElem}) = base_ring_type(parent_type(x))
 base_ring_type(x::Type{<:Ideal}) = base_ring_type(parent_type(x))
 base_ring_type(T::DataType) = throw(MethodError(base_ring_type, (T,)))
+base_ring_type(T::Type{Union{}}) = throw(MethodError(base_ring_type, (T,)))
 
-# generic coefficient_ring method
+@doc raw"""
+    coefficient_ring(a)
+
+Return the coefficient ring of the given element or parent $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> coefficient_ring(x^2+1) == QQ
+true
+
+julia> S, (z,w) = universal_polynomial_ring(QQ, [:z,:w])
+(Universal polynomial ring over Rationals, UniversalRingElem{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}, Rational{BigInt}}[z, w])
+
+julia> coefficient_ring(S) == QQ
+true
+```
+"""
+function coefficient_ring end
 coefficient_ring(x::NCRingElement) = coefficient_ring(parent(x))
+
+@doc raw"""
+    coefficient_ring_type(a)
+
+Return the type of the coefficient ring of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> coefficient_ring_type(R) == typeof(coefficient_ring(R))
+true
+
+julia> coefficient_ring_type(zero(R)) == typeof(coefficient_ring(zero(R)))
+true
+
+julia> coefficient_ring_type(typeof(R)) == typeof(coefficient_ring(R))
+true
+
+julia> coefficient_ring_type(typeof(zero(R))) == typeof(coefficient_ring(zero(R)))
+true
+```
+"""
+coefficient_ring_type(x) = coefficient_ring_type(typeof(x))
+coefficient_ring_type(x::Type{<:NCRingElement}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(x::Type{<:ModuleElem}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(x::Type{<:Ideal}) = coefficient_ring_type(parent_type(x))
+coefficient_ring_type(T::DataType) = throw(MethodError(coefficient_ring_type, (T,)))
+coefficient_ring_type(T::Type{Union{}}) = throw(MethodError(coefficient_ring_type, (T,)))
+
+@doc raw"""
+    coefficient_type(a)
+
+Return the type of the coefficients of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> coefficient_type(R) == elem_type(coefficient_ring(R))
+true
+
+julia> coefficient_type(zero(R)) == elem_type(coefficient_ring(zero(R)))
+true
+
+julia> coefficient_type(typeof(R)) == elem_type(coefficient_ring(R))
+true
+
+julia> coefficient_type(typeof(zero(R))) == elem_type(coefficient_ring(zero(R)))
+true
+```
+"""
+coefficient_type(x) = elem_type(coefficient_ring_type(x))
 
 ###############################################################################
 #
@@ -228,7 +321,7 @@ function isone end
 @doc raw"""
     iszero(a)
 
-Return true if $a$ is the additative identity, else return false.
+Return true if $a$ is the additive identity, else return false.
 
 # Examples
 ```jldoctest
@@ -337,7 +430,7 @@ The unary version is a shorthand for `inv!(a, a)`.
 inv!(z, a) = AbstractAlgebra.inv(a)
 inv!(a) = inv!(a, a)
 
-for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*))
+for (name, op) in ((:add!, :+), (:sub!, :-), (:mul!, :*), (:pow!, :^))
   @eval begin
     @doc """
         $($name)(z, a, b)
@@ -412,6 +505,13 @@ The two argument version is a shorthand for `div(a, a, b)`.
 div!(z, a, b) = AbstractAlgebra.div(a, b)
 div!(a, b) = div!(a, a, b)
 
+@doc """
+    divides!(z, a, b)
+
+Return `divides(a, b)`, possibly modifying the object `z` in the process.
+"""
+divides!(z, a, b) = divides(a, b)
+
 @doc raw"""
     canonical_injection(D, i)
 
@@ -439,3 +539,5 @@ function _number_of_direct_product_factors end
 Return the homomorphism from the domain `D` into the codomain `C` defined by the data.
 """
 function hom end
+
+function can_solve_with_solution end

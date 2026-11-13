@@ -47,8 +47,10 @@ struct F2Elem <: AbstractAlgebra.FieldElem
 end
 
 (::F2)(x::F2Elem) = x
+(::F2)(x::Integer) = F2Elem(x % Bool)
 Base.:-(x::F2Elem) = x
 Base.:+(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
+Base.:-(x::F2Elem, y::F2Elem) = F2Elem(x.x ⊻ y.x)
 Base.inv(x::F2Elem) = x.x ? x : throw(DivideError())
 Base.:*(x::F2Elem, y::F2Elem) = F2Elem(x.x * y.x)
 
@@ -60,6 +62,7 @@ AbstractAlgebra.elem_type(::Type{F2}) = F2Elem
 AbstractAlgebra.parent(x::F2Elem) = F2()
 AbstractAlgebra.mul!(x::F2Elem, y::F2Elem, z::F2Elem) = y * z
 AbstractAlgebra.add!(x::F2Elem, y::F2Elem) = x + y
+AbstractAlgebra.sub!(x::F2Elem, y::F2Elem) = x + y
 AbstractAlgebra.divexact(x::F2Elem, y::F2Elem) = y.x ? x : throw(DivideError())
 
 Random.rand(rng::AbstractRNG, sp::Random.SamplerTrivial{F2}) = F2Elem(rand(rng, Bool))
@@ -73,11 +76,13 @@ struct F2Matrix <: AbstractAlgebra.MatElem{F2Elem}
    m::Generic.MatSpaceElem{F2Elem}
 end
 
+F2Matrix(::F2, ::UndefInitializer, r::Int, c::Int) = F2Matrix(Generic.MatSpaceElem{F2Elem}(F2(), undef, r, c))
+
 AbstractAlgebra.elem_type(::Type{F2MatSpace}) = F2Matrix
 AbstractAlgebra.parent_type(::Type{F2Matrix}) = F2MatSpace
 
 AbstractAlgebra.base_ring(::F2MatSpace) = F2()
-AbstractAlgebra.dense_matrix_type(::Type{F2}) = F2Matrix
+AbstractAlgebra.dense_matrix_type(::Type{F2Elem}) = F2Matrix
 AbstractAlgebra.matrix_space(::F2, r::Int, c::Int) = F2MatSpace(F2(), r, c)
 
 AbstractAlgebra.number_of_rows(a::F2Matrix) = nrows(a.m)
@@ -128,7 +133,7 @@ end
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test typeof(S) <: MatSpace
+   @test S isa MatSpace
 
    f = S(t^2 + 1)
 
@@ -204,16 +209,15 @@ end
       @test T[[];] == matrix(T, 0, 0, [])
       @test T[[] ()...] == matrix(T, 0, 1, [])
       @test T[[] []] == matrix(T, 0, 2, [])
-      if VERSION >= v"1.7"
-         # @test T[;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         # @test T[;;] == matrix(T, 0, 0, []) # stalls Julia 1.6 parser
-         @test T[1;;] == matrix(T, 1, 1, [1])
-         @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
-         @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
-         @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
-         # @test_throws MethodError T[;;;] # stalls Julia 1.6 parser
-         @test_throws MethodError T[1;;;]
-      end
+      @test T[;] == matrix(T, 0, 0, [])
+      @test T[;;] == matrix(T, 0, 0, [])
+      @test T[1;;] == matrix(T, 1, 1, [1])
+      @test T[[1 2; 3 4];;] == matrix(T, [1 2; 3 4])
+      @test T[[1; 3];; 2; 4] == matrix(T, [1 2; 3 4])
+      @test T[1:4;; 5:8] == matrix(T, [1 5; 2 6; 3 7; 4 8])
+      @test T[1 2; 3 4] == matrix(T, [1:2, 3:4])
+      @test_throws MethodError T[;;;]
+      @test_throws MethodError T[1;;;]
 
       if VERSION < v"1.11.2"
          @test_throws ArgumentError T[1; 2 3]
@@ -298,9 +302,29 @@ end
       end
    end
 
+   D4 = diagonal_matrix(R, 1:5)
+   @test size(D4) == (5, 5)
+   @test D4[1, 1] == R(1)
+   @test D4[5, 5] == R(5)
+   @test D4 isa Generic.MatSpaceElem{elem_type(R)}
+
+   # test comparison of matrices over different ring, and of different sizes
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 
+   @test x != y
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
+   # test comparison of matrices over same ring, but of different sizes
+   x = zero_matrix(ZZ, 2, 2)
+   y = zero_matrix(ZZ, 2, 3)
+
+   @test x != y
    @test x in [x, y]
    @test x in [y, x]
    @test !(x in [y])
@@ -348,7 +372,7 @@ end
 
    # Test constructors over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    @test isa(S, MatSpace)
@@ -477,7 +501,7 @@ end
 
    # test over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -583,7 +607,7 @@ end
       @test elem_type(base_ring(m3)) == ET
       @test !isempty(m3)
       @test !iszero(m3)
-      @test m3 isa Generic.MatRingElem
+      @test m3 isa MatRingElem
       @test parent(m3) == M3
    end
 
@@ -616,7 +640,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -631,7 +655,7 @@ end
    @test iszero(zero(M, 3, 3))
    @test iszero(zero(M, QQ, 3, 3))
    @test iszero(zero(M, QQ))
-   
+
    M = zero!(M)
    @test iszero(M)
 
@@ -696,7 +720,7 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -1180,16 +1204,21 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = rand(S, -10:10)
    P = rand(S, -10:10)
-   
+
    @test M + N == N + M
    @test M - N == M + (-N)
    @test M*(N + P) == M*N + M*P
+
+   # Issue Nemocas/Nemo.jl#2143
+   R, _ = residue_ring(ZZ, 2)
+   S, _ = residue_ring(ZZ, 3)
+   @test_throws ErrorException identity_matrix(R, 2) * identity_matrix(S, 2)
 end
 
 # add x to all the elements of the main diagonal of a copy of M
@@ -1344,12 +1373,12 @@ add_diag(M::Matrix, x) = [i != j ? M[i, j] : M[i, j] + x for (i, j) in Tuple.(Ca
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = rand(S, -10:10)
-   
+
    t1 = rand(ZZ, -10:10)
    t2 = rand(R, -10:10)
 
@@ -1387,7 +1416,7 @@ end
    @test typeof(B * A) == typeof(A)
    @test A * B == A^2
    @test B * A == A^2
-   
+
    @test typeof(A + B) == typeof(A)
    @test typeof(B + A) == typeof(A)
    @test A + B == A + A
@@ -1493,12 +1522,12 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
    N = deepcopy(M)
-   
+
    @test M == M
    @test M == N
    @test M == copy(M)
@@ -1526,9 +1555,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    @test S(5) == 5
    @test 5 == S(5)
    @test S(BigInt(5)) == 5
@@ -1558,9 +1587,9 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    @test M^0 == one(S)
@@ -1631,12 +1660,29 @@ end
 
    # Tests over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    @test is_symmetric(M + transpose(M))
+end
+
+@testset "Generic.Mat.is_alternating" begin
+
+  @testset "Test is_alternating for $R" for R in [GF(2), GF(3), ZZ, QQ]
+     @test is_alternating(matrix(R, [0 1 ; -1 0]))
+     @test !is_alternating(matrix(R, [1 1 ; -1 1]))
+     @test !is_alternating(matrix(R, [1 0 ; 1 1]))
+     @test !is_alternating(matrix(R, [0 1 0 ; -1 0 0]))
+  end
+
+  # Tests over noncommutative ring
+  R = matrix_ring(ZZ, 2)
+  S = matrix_space(R, 2, 2)
+  M = rand(S, -10:10)
+
+  @test is_alternating(M - transpose(M))
 end
 
 @testset "Generic.Mat.is_skew_symmetric" begin
@@ -1660,21 +1706,24 @@ end
    R, t = polynomial_ring(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
    arr = [t + 1 t; t^2 t]
    A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   B = matrix(R, permutedims(arr))
    @test transpose(A) == B
 
-   # transpose input/output types are the same
    a = matrix(F2(), F2Elem[1 1 0; 0 0 1])
-   # not method (yet) for transpose(a)
-   at = transpose(a.m)
-   @test typeof(at) == typeof(a.m)
-   @test at[1, 1] == at[2, 1] == at[3, 2] == F2Elem(true)
-   @test at[3, 1] == at[1, 2] == at[2, 2] == F2Elem(false)
+   b = matrix(F2(), F2Elem[1 0; 1 0; 0 1])
+
+   # MatElem fallback; F2Matrix has no own transpose
+   @test transpose(a) isa F2Matrix
+   @test transpose(a) == b
+
+   # must not switch to dense_matrix_type(F2) == F2Matrix
+   @test transpose(a.m) isa Generic.MatSpaceElem{F2Elem}
+   @test transpose(a.m) == b.m
 end
 
 @testset "Generic.Mat.gram" begin
@@ -1693,6 +1742,45 @@ end
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test tr(A) == t^2 + 3t + 2
+end
+
+@testset "Generic.Mat.trace_of_product" begin
+   R, t = polynomial_ring(QQ, :t)
+   A = R[t + 1 t 1; t^2 t t; -2 t + 2 t^2 + t + 1]
+   B = R[1 t 0; 0 1 t; t 0 1]
+   @test trace_of_product(A, B) == tr(A * B)
+
+   M = ZZ[1 2 3; 4 5 6]
+   N = ZZ[1 0; 0 1; 1 1]
+   @test trace_of_product(M, N) == 15
+   @test trace_of_product(N, M) == 15
+
+   M = QQ[1//2 2; 3 -1//3]
+   N = QQ[1 1; 0 2]
+   @test trace_of_product(M, N) == tr(M * N)
+
+   # noncommutative entries: the order of the products matters
+   S = matrix_ring(ZZ, 2)
+   a = S(ZZ[0 1; 0 0])
+   b = S(ZZ[0 0; 1 0])
+   @test trace_of_product(matrix(S, 1, 2, [a, 0]), matrix(S, 2, 1, [b, a])) == a * b
+
+   @test trace_of_product(zero_matrix(ZZ, 0, 3), zero_matrix(ZZ, 3, 0)) == 0
+   @test trace_of_product(zero_matrix(ZZ, 2, 0), zero_matrix(ZZ, 0, 2)) == 0
+
+   @test_throws ArgumentError trace_of_product(ZZ[1 2; 3 4], ZZ[1 2 3; 4 5 6])
+   @test_throws ArgumentError trace_of_product(ZZ[1 2 3; 4 5 6], ZZ[1 2 3; 4 5 6])
+   S, _ = polynomial_ring(QQ, :s)
+   @test_throws ErrorException trace_of_product(identity_matrix(R, 2), identity_matrix(S, 2))
+
+   for (R, args) in ((ZZ, (-10:10,)), (QQ, (-10:10,)), (GF(7), ()),
+                     (polynomial_ring(ZZ, :x)[1], (0:3, -10:10)))
+      for (m, n) in ((0, 0), (3, 3), (2, 5), (5, 2))
+         M = rand(matrix_space(R, m, n), args...)
+         N = rand(matrix_space(R, n, m), args...)
+         @test trace_of_product(M, N) == tr(M * N)
+      end
+   end
 end
 
 @testset "Generic.Mat.content" begin
@@ -1922,6 +2010,7 @@ end
       end
       @test [det(M)] == minors(M, n)
       @test [] == minors(M, n + 1)
+      @test [(det(M),[i for i in 1:n],[j for j in 1:n])] == minors_with_position(M,n)
    end
 end
 
@@ -1957,7 +2046,7 @@ end
    M = rand(R, -5:5)
    M = transpose(M) - M
    @test det(M) == pfaffian(M)^2
-   
+
    S, z = polynomial_ring(ZZ, "z")
    n = 5
    for dim = 0:n
@@ -2335,7 +2424,7 @@ end
    U = matrix_space(S, 3, 1)
 
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
-   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
+   b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4]))
 
    x, d = AbstractAlgebra._solve_rational(M, b)
 
@@ -2656,7 +2745,7 @@ end
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
 
-      x = AbstractAlgebra._solve_triu(M, b, false)
+      x = AbstractAlgebra._solve_triu(M, b; unipotent = false, side = :right)
 
       @test M*x == b
    end
@@ -3566,7 +3655,7 @@ end
 
    # Test constructors over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 2, 2)
 
    M = rand(S, -10:10)
@@ -4047,11 +4136,33 @@ end
    M3[1] = 10
    @test M2 == ZZ[1 2 10; 2 3 4; 3 4 5]
 
+   M2 = deepcopy(M)
+   M3 = @view M2[[1, 2], [1, 3]]
+   @test size(M3) == (2, 2)
+   @test M3 == ZZ[1 3; 2 4]
+   M3[[1, 2], 1] = [8, 9]
+   @test M2 == ZZ[8 2 3; 9 3 4; 3 4 5]
+
+   M2 = deepcopy(M)
+   M3 = @view M2[1, 2]
+   @test size(M3) == ()
+   @test length(M3) == 1
+   # NOTE: The following cases are to cover all types of [gs]etindex functions.
+   M3[] = ZZ(9)
+   @test M3[] == 9
+   M3[1] = ZZ(10)
+   @test M3[1] == 10
+   M3[] = 11
+   @test M3[] == 11
+   M3[1] = 12
+   @test M3[1] == 12
+   @test M2 == ZZ[1 12 3; 2 3 4; 3 4 5]
+
    # Test views over noncommutative ring
    R = matrix_ring(ZZ, 2)
-   
+
    S = matrix_space(R, 4, 4)
-   
+
    M = rand(S, -10:10)
 
    for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
@@ -4102,7 +4213,7 @@ end
    R = matrix_ring(ZZ, 2)
    U, x = polynomial_ring(R, "x")
    S = matrix_space(R, 2, 2)
-   
+
    M = rand(S, -10:10)
 
    N = change_base_ring(U, M)
@@ -4118,7 +4229,7 @@ end
          M = algebra ? matrix_ring(R, u) : matrix_space(R, u, v)
          m0 = M(mat)
          for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
-            for f = (f0, map_from_func(f0, R, R))
+            for f = (f0, map_from_func(R, R, f0))
                m = deepcopy(m0)
                n0 = similar(m)
                n = map_entries!(f, n0, m)
@@ -4126,7 +4237,7 @@ end
                if !isempty(mat)
                   # when empty, it may happen that the result of map below has Any
                   # as eltype, and calling M on it fails, cf. issue #423
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
             end
          end
@@ -4135,13 +4246,13 @@ end
       m = deepcopy(m0)
       for S = [QQ, ZZ, GF(2), GF(7), polynomial_ring(GF(5), 'x')[1]]
          for f0 = (x -> S(x), x -> S(x + 1))
-            for f = (f0, map_from_func(f0, ZZ, S))
+            for f = (f0, map_from_func(ZZ, S, f0))
                n = map_entries(f, m)
                @test n !== m
                @test m == m0 # map's input must not be mutated
                M = algebra ? matrix_ring(S, u) : matrix_space(S, u, v)
                if !isempty(mat)
-                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+                  @test n == M(map(f isa Function ? f : image_fn(f), mat))
                end
                @test n isa (algebra ? MatRingElem : MatElem)
             end
@@ -4298,30 +4409,6 @@ end
    @test collect(M) == [ M() ]
 end
 
-@testset "Generic.Mat.promotion" begin
-  M = matrix(ZZ, 1, 1, [1])
-  N = matrix(QQ, 1, 1, [2])
-
-  L = @inferred M + N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) + N
-  L = @inferred M - N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) - N
-  L = @inferred M * N
-  @test base_ring(L) === QQ
-  @test L == change_base_ring(QQ, M) * N
-  L = @inferred N + M
-  @test base_ring(L) === QQ
-  @test L == N + change_base_ring(QQ, M)
-  L = @inferred N - M
-  @test base_ring(L) === QQ
-  @test L == N - change_base_ring(QQ, M)
-  L = @inferred N * M
-  @test base_ring(L) === QQ
-  @test L == N * change_base_ring(QQ, M)
-end
-
 @testset "Generic.Mat.InjProjMat" begin
    # Construction
    @test matrix(Generic.inj_proj_mat(QQ, 3, 2, 1)) == QQ[1 0; 0 1; 0 0]
@@ -4352,7 +4439,13 @@ end
       end
    end
 
+   @test_throws ErrorException("InjProjMat is read-only") (M[1, 1] = 1)
+   @test_throws ErrorException("InjProjMat is read-only") (M[:, :] = zero_matrix(QQ, 4, 2))
+
    # Multiplication
+   @test !Base.isambiguous(
+      which(*, Tuple{typeof(M), MatElem{eltype(M)}}),
+      which(*, Tuple{MatElem{eltype(M)}, typeof(M)}))
    @test_throws AssertionError M*identity_matrix(QQ, 1)
    @test_throws AssertionError identity_matrix(QQ, 1)*M
    for iter in 1:10
@@ -4403,6 +4496,13 @@ end
       X = Generic.inj_proj_mat(QQ, 4, 2, s)
       @test M + X == N + matrix(X)
    end
+
+   # Noncommutative base ring
+   S = matrix_ring(QQ, 2)
+   M = Generic.inj_proj_mat(S, 3, 2, 2)
+   N = matrix(M)
+   @test N == matrix(S, [0 0; 1 0; 0 1])
+   @test all(M[i, j] == N[i, j] for i in 1:3, j in 1:2)
 end
 
 @testset "Generic.Mat.unsafe" begin
@@ -4423,6 +4523,25 @@ end
   c = mul!(c, a, QQ(2))
   @test c == a * QQ(2)
 
+  # test 2-arg transpose! with destination != source
   b = transpose(a)
-  @test AbstractAlgebra.transpose!(a) == b
+  c = zero_matrix(QQ, 3, 2)
+  @test AbstractAlgebra.transpose!(c, a) == b
+
+  # test 2-arg transpose! with destination == source
+  x = QQ[1 2; 3 4]
+  @test AbstractAlgebra.transpose!(x, x) == QQ[1 3; 2 4]
+
+  # in-place transpose of non-square matrix does not work
+  @test_throws DomainError AbstractAlgebra.transpose!(a)
+end
+
+@testset "Generic.Mat.MatSpace_iteration" begin
+  a = matrix(QQ, [1 2; 3 4])
+  b = 2*a
+  c = zero_matrix(QQ, 2, 2)
+
+  @test canonical_unit(a) == 1
+  @test canonical_unit(b) == 2
+  @test canonical_unit(c) == 1
 end

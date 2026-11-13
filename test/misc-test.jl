@@ -63,8 +63,13 @@ module VarNamesTest
 
       @test ! @isdefined var"@no_macros"
       @test_throws MethodError no_n_variant("A", 3)
-      @test_throws (VERSION < v"1.7" ? LoadError : ArgumentError) @macroexpand @no_n_variant("A", 3, :q)
+      @test_throws ArgumentError @macroexpand @no_n_variant("A", 3, :q)
       @test ! @isdefined q1
     end
   end
+end
+
+@testset "is_pairwise" begin
+  @test is_pairwise(!is_associated, [2, -3, 5])
+  @test !is_pairwise(!is_associated, [2, -3, -2])
 end

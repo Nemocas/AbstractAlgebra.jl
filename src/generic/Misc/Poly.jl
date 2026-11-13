@@ -9,11 +9,11 @@ function is_power(a::PolyRingElem, n::Int)
     # probably a equal-degree-factorisation would be good + some more gcd's
     # implement some Newton-type algo?
     degree(a) % n == 0 || return false, a
-    fl, x = is_power(leading_coefficient(a), n)
-    fl || return false, a
     f = factor(a)
-    all(i -> i % n == 0, values(f.fac)) || return false, a
-    return true, x*prod(p^div(k, n) for (p, k) = f.fac)
+    all(i % n == 0 for (_, i) in f) || return false, a
+    fl, x = is_power(constant_coefficient(unit(f)), n)
+    fl || return false, a
+    return true, x*prod(p^div(k, n) for (p, k) = f)
 end
 
 ################################################################################
@@ -23,7 +23,7 @@ end
 ################################################################################
 
 function factor(R::Field, f::PolyRingElem)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.poly_ring(R)
     f1 = change_base_ring(R, f; parent = Rt)
     return factor(f1)
 end
@@ -31,15 +31,16 @@ end
 function factor(R::Ring, f::Union{FracElem, Rational})
     fn = factor(R(numerator(f)))
     fd = factor(R(denominator(f)))
-    fn.unit = divexact(fn.unit, fd.unit)
-    for (k,v) = fd.fac
-        if Base.haskey(fn.fac, k)
-            fn.fac[k] -= v
+    un = divexact(unit(fn), unit(fd))
+    fndc = Dict{elem_type(R), Int}(p => e for (p, e) in fn)
+    for (k, v) = fd
+        if Base.haskey(fndc, k)
+            fndc[k] -= v
         else
-            fn.fac[k] = -v
+            fndc[k] = -v
         end
     end
-    return fn
+    return Fac(un, sort!(collect(fndc); by = x -> pretty_sort(x[1])))
 end
 
 ################################################################################
@@ -58,7 +59,8 @@ function roots(f::PolyRingElem)
     rts = Vector{elem_type(base_ring(f))}()
     for (p, e) in lf
         if degree(p) == 1
-            push!(rts, -divexact(constant_coefficient(p), leading_coefficient(p)))
+            fl, q = divides(constant_coefficient(p), leading_coefficient(p))
+            fl && push!(rts, -q)
         end
     end
     return rts
@@ -70,9 +72,24 @@ end
 Returns the roots of the polynomial `f` in the field `R` as an array.
 """
 function roots(R::Field, f::PolyRingElem)
-    Rt = AbstractAlgebra.PolyRing(R)
+    Rt = AbstractAlgebra.poly_ring(R)
     f1 = change_base_ring(R, f, parent = Rt)
     return roots(f1)
+end
+
+@doc raw"""
+    roots_with_multiplicities(f::PolyRingElem) -> Vector{Tuple{T, Int}}
+
+Return the roots of `f` in its base ring, whose element type is `T`, each with
+its multiplicity: the largest $e$ such that $(x - r)^e$ divides `f`. The order
+of the roots is not specified. The base ring must be exact, and `f` non-zero.
+"""
+function roots_with_multiplicities(f::PolyRingElem)
+    @req !iszero(f) "Argument must be non-zero"
+    @req is_exact_type(elem_type(base_ring(f))) "Multiplicities can only be computed over exact rings"
+    x = gen(parent(f))
+    # `roots` does not promise to list each root once
+    return [(r, valuation(f, x - r)) for r in unique(roots(f))]
 end
 
 function roots(a::FinFieldElem, i::Int)
@@ -89,10 +106,10 @@ function sturm_sequence(f::PolyRingElem{<:FieldElem})
         if r != 0
             push!(seq, -r)
             g, h = h, -r
-        else 
+        else
             break
         end
     end
     return seq
 end
- 
+

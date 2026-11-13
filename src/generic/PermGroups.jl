@@ -672,6 +672,7 @@ gen(G::SymmetricGroup, i::Int) = gens(G)[i]
 number_of_generators(G::SymmetricGroup) = G.n == 1 ? 0 : G.n == 2 ? 1 : 2
 
 is_finite(G::SymmetricGroup) = true
+is_known(::typeof(is_finite), ::SymmetricGroup) = true
 
 order(::Type{T}, G::SymmetricGroup) where {T} = convert(T, factorial(T(G.n)))
 
@@ -681,10 +682,16 @@ order(::Type{T}, g::Perm) where {T} =
 is_abelian(G::SymmetricGroup) = G.n <= 2
 
 @doc raw"""
-    matrix_repr(a::Perm)
+    matrix_repr(a::Perm{T}) -> Matrix{T}
+    matrix_repr(M::Type{<:Matrix}, a::Perm)
+    matrix_repr(M::Type{<:SparseMatrixCSC}, a::Perm)
 
-Return the permutation matrix as a sparse matrix representing `a` via natural
-embedding of the permutation group into the general linear group over $\mathbb{Z}$.
+Return the permutation matrix representing `a` via the natural embedding of
+the permutation group into the general linear group over $\mathbb{Z}$.
+
+The result type can be chosen via `M`; if `M` has no element type, the
+integer type of `a` is used. The sparse variant requires `SparseArrays`
+to be loaded.
 
 # Examples
 ```jldoctest
@@ -692,19 +699,30 @@ julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
-3×3 SparseArrays.SparseMatrixCSC{Int64, Int64} with 3 stored entries:
- ⋅  1  ⋅
- ⋅  ⋅  1
- 1  ⋅  ⋅
-
-julia> Array(ans)
 3×3 Matrix{Int64}:
  0  1  0
  0  0  1
  1  0  0
+
+julia> using SparseArrays
+
+julia> matrix_repr(SparseMatrixCSC, p)
+3×3 SparseMatrixCSC{Int64, Int64} with 3 stored entries:
+ ⋅  1  ⋅
+ ⋅  ⋅  1
+ 1  ⋅  ⋅
 ```
 """
-matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+matrix_repr(a::Perm{T}) where T = matrix_repr(Matrix{T}, a)
+
+function matrix_repr(::Type{M}, a::Perm{T}) where {M<:Matrix, T}
+   n = length(a.d)
+   P = zeros(T, n, n)
+   for (i, j) in enumerate(a.d)
+      P[i, j] = 1
+   end
+   return convert(M, P)
+end
 
 @doc raw"""
     emb!(result::Perm, p::Perm, V)
@@ -751,7 +769,7 @@ function emb(G::SymmetricGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Generic.emb!(one(G), p, V)
+   return p -> emb!(one(G), p, V)
 end
 
 @doc raw"""
@@ -817,6 +835,10 @@ end
 ###############################################################################
 
 function parse_cycles(str::AbstractString)
+  return parse_cycles(string(str))
+end
+
+function parse_cycles(str::Union{String, SubString})
    ccycles = Int[]
    cptrs = Int[1]
    if startswith(str, "Cycle Decomposition: ")

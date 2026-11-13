@@ -26,17 +26,16 @@ base_ring(a::TotFracRing{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 parent(a::TotFrac) = a.parent
 
-function is_domain_type(::Type{T}) where {S <: RingElement, T <: TotFrac{S}}
+function is_domain_type(::Type{T}) where {S <: RingElem, T <: TotFrac{S}}
    return is_domain_type(S)
 end
 
-function is_exact_type(a::Type{T}) where {S <: RingElement, T <: TotFrac{S}}
+function is_exact_type(a::Type{T}) where {S <: RingElem, T <: TotFrac{S}}
    return is_exact_type(S)
 end
 
-function characteristic(R::TotFracRing{T}) where T <: RingElem
-   return characteristic(base_ring(R))
-end
+characteristic(R::TotFracRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::TotFracRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -315,6 +314,12 @@ function ==(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
            denominator(x, false)*numerator(y, false))
 end
 
+function isequal(x::TotFrac{T}, y::TotFrac{T}) where {T <: RingElem}
+   check_parent(x, y, false) || return false
+   return isequal(numerator(x, false)*denominator(y, false),
+                  denominator(x, false)*numerator(y, false))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -370,6 +375,52 @@ end
 
 # Division is not possible generically due to the possibility of non-units
 # that are also non-zero divisors
+
+function divexact(a::TotFrac{T}, b::TotFrac{T}; check::Bool=true)  where {T <: RingElem}
+  return a*inv(b)  # inv(b) will throw if b is a zero divisor
+end
+
+##############################################################################
+#
+#  Evaluation
+#
+##############################################################################
+
+function evaluate(f::TotFrac, V::Vector{<:RingElement})
+    return evaluate(numerator(f), V)//evaluate(denominator(f), V)
+end
+
+function evaluate(f::TotFrac, v::RingElement)
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+function evaluate(f::TotFrac{<:PolyRingElem}, v::Integer)
+    return evaluate(numerator(f), v)//evaluate(denominator(f), v)
+end
+
+# function evaluate(f::TotFrac, vals::Vector{<:RingElement})
+#     @req length(vals) == ngens(base_ring(parent(a)))  "Evaluation point needs 1 coordinate per variable"
+#     vars = collect(1:ngens(base_ring(parent(a))))
+#     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+# end
+
+function evaluate(f::TotFrac, vars::Vector{Int}, vals::Vector{<:RingElement})
+    return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
+function (a::TotFrac)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::TotFrac)(vals::RingElement...)
+   vars = collect(1:ngens(base_ring(parent(a))))
+   return evaluate(a, vars, [vals...])
+end
+
+function (a::TotFrac)(vals::Vector{<:RingElement})
+   vars = collect(1:ngens(base_ring(parent(a))))
+   return evaluate(a, vars, vals)
+end
 
 ###############################################################################
 #
@@ -530,7 +581,6 @@ rand(S::TotFracRing, v...) = rand(Random.default_rng(), S, v...)
 #
 ###############################################################################
 
-promote_rule(::Type{TotFrac{T}}, ::Type{TotFrac{T}}) where T <: RingElement = TotFrac{T}
 promote_rule(::Type{TotFrac{T}}, ::Type{TotFrac{T}}) where T <: RingElem = TotFrac{T}
 
 function promote_rule(::Type{TotFrac{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
@@ -539,22 +589,22 @@ end
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
-function (a::TotFracRing{T})(b::RingElement) where {T <: RingElement}
+function (a::TotFracRing{T})(b::RingElement) where {T <: RingElem}
    return a(base_ring(a)(b))
 end
 
-function (a::TotFracRing{T})() where {T <: RingElement}
+function (a::TotFracRing{T})() where {T <: RingElem}
    R = base_ring(a)
    z = TotFrac{T}(zero(R), one(R))
    z.parent = a
    return z
 end
 
-function (a::TotFracRing{T})(b::T) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T) where {T <: RingElem}
    R = base_ring(a)
    parent(b) != R && error("Could not coerce to fraction")
    z = TotFrac{T}(b, one(R))
@@ -562,7 +612,7 @@ function (a::TotFracRing{T})(b::T) where {T <: RingElement}
    return z
 end
 
-function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingElem}
    R = base_ring(a)
    parent(b) != R && error("Could not coerce to fraction")
    parent(c) != R && error("Could not coerce to fraction")
@@ -575,23 +625,23 @@ function (a::TotFracRing{T})(b::T, c::T, check::Bool=true) where {T <: RingEleme
    return z
 end
 
-function (a::TotFracRing{T})(b::T, c::Union{Integer, Rational}, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::T, c::Union{Integer, Rational}, check::Bool=true) where {T <: RingElem}
    a(b, base_ring(a)(c), check)
 end
 
-function (a::TotFracRing{T})(b::Union{Integer, Rational}, c::T, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Union{Integer, Rational}, c::T, check::Bool=true) where {T <: RingElem}
    a(base_ring(a)(b), c, check)
 end
 
-function (a::TotFracRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Union{Integer, Rational}) where {T <: RingElem}
    a(base_ring(a)(b))
 end
 
-function (a::TotFracRing{T})(b::Integer, c::Integer, check::Bool=true) where {T <: RingElement}
+function (a::TotFracRing{T})(b::Integer, c::Integer, check::Bool=true) where {T <: RingElem}
    a(base_ring(a)(b), base_ring(a)(c), check)
 end
 
-function (a::TotFracRing{T})(b::TotFrac{T}) where {T <: RingElement}
+function (a::TotFracRing{T})(b::TotFrac{T}) where {T <: RingElem}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end

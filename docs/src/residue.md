@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -122,13 +123,6 @@ parent(a::ResElem)
 
 Return the parent of the given residue.
 
-```julia
-characteristic(R::ResidueRing)
-```
-
-Return the characteristic of the given residue ring. If the characteristic is
-not known, an exception is raised.
-
 ## Residue ring functions
 
 ### Basic functionality
@@ -220,56 +214,15 @@ julia> R, x = polynomial_ring(QQ, :x)
 Base.inv(::ResElem)
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> S, = residue_ring(R, x^3 + 3x + 1);
-
-julia> f = S(x + 1)
-x + 1
-
-julia> g = inv(f)
-1//3*x^2 - 1//3*x + 4//3
-
-```
-
 ### Greatest common divisor
 
 ```@docs
-gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> S, = residue_ring(R, x^3 + 3x + 1);
-
-julia> f = S(x + 1)
-x + 1
-
-julia> g = S(x^2 + 2x + 1)
-x^2 + 2*x + 1
-
-julia> h = gcd(f, g)
-1
-
+gcd(::ResElem{T}, ::ResElem{T}) where T <: RingElem
 ```
 
 ### Square Root
 
-```@docs
-is_square{T <: Integer}(::ResFieldElem{T})
-```
-
-```@docs
-Base.sqrt{T <: Integer}(::ResFieldElem{T})
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `ResFieldElem`.
 
 **Examples**
 

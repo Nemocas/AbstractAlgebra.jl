@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Ring functionality
 
 AbstractAlgebra has both commutative and noncommutative rings. Together we
@@ -51,19 +56,15 @@ parent(a::NCRingElement)
 
 Return the parent of the given ring element.
 
-```julia
-is_domain_type(::Type{T}) where T <: NCRingElement
-is_exact_type(::Type{T}) where T <: NCRingElement
+```@docs
+is_domain_type
+is_exact_type
 ```
-
-Return true if the given ring element type can only belong to elements of an
-integral domain or exact ring respectively. (An exact ring is one whose
-elements are represented exactly in the system without approximation.)
 
 The following function is implemented where mathematically and algorithmically
 possible.
 
-```julia
+```@docs
 characteristic(R::NCRing)
 ```
 
@@ -246,5 +247,26 @@ unit(a::Fac)
 evaluate(a::Fac)
 getindex(a::Fac, b)
 setindex!(a::Fac{Int}, c::Int, b::Int)
+```
+## Square root
+
+Rings may implement functionality for detecting and computing square roots.
+
+The exact behaviour depends on the ring. Some rings provide both operations,
+while others only implement `is_square`.
+
+```@docs
+is_square
+sqrt(::NCRingElem)
+```
+
+## Miscellaneous
+
+There are some miscellaneous functions for rings to ease up certain computations.
+
+```@docs
+falling_factorial
+rising_factorial
+rising_factorial2
 ```
 

@@ -1,0 +1,131 @@
+###############################################################################
+#
+#   UniversalLaurentPoly.jl : Universal laurent polynomial ring (variables can be added)
+#
+###############################################################################
+
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+universal_ring_name(R::UniversalRing{<:LaurentMPolyRingElem}) = "Laurent polynomial ring"
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+# Methods shared with universal polynomial rings live in UnivPoly.jl. Those
+# here differ because Laurent polynomials lack indexed access to their terms.
+
+coefficients(a::UniversalRingElem{<:LaurentMPolyRingElem}) = coefficients(data(a))
+
+exponent_vectors(a::UniversalRingElem{<:LaurentMPolyRingElem}) = exponent_vectors(data(a))
+
+function monomials(a::UniversalRingElem{<:LaurentMPolyRingElem})
+   return (UniversalRingElem(m, parent(a)) for m in monomials(data(a)))
+end
+
+function terms(a::UniversalRingElem{<:LaurentMPolyRingElem})
+   return (UniversalRingElem(t, parent(a)) for t in terms(data(a)))
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(a::UniversalRingElem{<:LaurentMPolyRingElem}, A::Vector{<:RingElement})
+   isempty(A) && error("Evaluating at an empty list of values is not allowed")
+   a2 = data(a)
+   n = nvars(parent(a2))
+   k = length(A)
+   if k < n
+      # variables without a value must not occur; evaluate them at one
+      for e in exponent_vectors(a2)
+         iszero(view(e, k+1:n)) || error("Number of variables does not match number of values")
+      end
+      R = parent(A[1])
+      A = vcat(A, [one(R) for _ in k+1:n])
+   end
+   return evaluate(a2, A[1:n])
+end
+
+###############################################################################
+#
+#   Change base ring
+#
+###############################################################################
+
+function _change_univ_poly_ring(R, Rx::UniversalRing{<:LaurentMPolyRingElem}, cached::Bool)
+   return universal_laurent_polynomial_ring(R, symbols(Rx); cached)[1]
+end
+
+###############################################################################
+#
+#   constructors
+#
+###############################################################################
+
+@doc raw"""
+    universal_laurent_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bool=true)
+    universal_laurent_polynomial_ring(R::Ring; cached::Bool=true)
+
+Given a coefficient ring `R` and variable names, say `varnames = [:x1, :x2, ...]`, return
+a tuple `S, [x1, x2, ...]` of the universal Laurent polynomial ring `S = R[x1, x2, \dots]` and its generators `x1, x2, \dots`.
+
+If `varnames` is omitted, return an object representing
+the universal Laurent polynomial ring `S = R[\ldots]` with no variables in it initially.
+
+By default (`cached=true`), the output `S` will be cached, i.e. if `universal_laurent_polynomial_ring`
+is invoked again with the same coefficient ring `R`, the same (*identical*) ring is returned. Keep in mind that
+this ring might already have more variables than supplied in `varnames`. Setting `cached` to `false`
+ensures a distinct new ring is returned, and will also prevent it from being cached.
+
+# Examples
+
+```jldoctest
+julia> S, (x,y) = universal_laurent_polynomial_ring(ZZ, [:x,:y])
+(Universal Laurent polynomial ring over Integers, UniversalRingElem{LaurentMPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, LaurentMPolyRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}[x, y])
+
+julia> z = gen(S, :z)
+z
+
+julia> x*y - z
+x*y - z
+
+julia> S = universal_laurent_polynomial_ring(ZZ)
+Universal Laurent polynomial ring over Integers
+
+julia> x = gen(S, :x)
+x
+
+julia> y, z = gens(S, [:y, :z])
+2-element Vector{UniversalRingElem{LaurentMPolyRingElem{BigInt, AbstractAlgebra.Generic.MPoly{BigInt}, LaurentMPolyRing{BigInt, AbstractAlgebra.Generic.MPolyRing{BigInt}}}, BigInt}}:
+ y
+ z
+
+julia> x^(-1)*y - z
+-z + x^-1*y
+```
+"""
+function universal_laurent_polynomial_ring(R::Ring, varnames::Vector{Symbol}; cached::Bool=true)
+   @req !is_trivial(R) "Zero rings are currently not supported as coefficient ring."
+   S = get_cached!(UniversalLaurentPolyRingID, R, cached) do
+      P, _ = laurent_polynomial_ring(R, varnames; cached = false)
+      UniversalRing(P)
+   end
+   return (S, gens(S, varnames))
+end
+
+const UniversalLaurentPolyRingID = CacheDictType{Ring, Ring}()
+
+function universal_laurent_polynomial_ring(R::Ring; cached::Bool=true)
+   return universal_laurent_polynomial_ring(R, Symbol[]; cached)[1]
+end
+
+@varnames_interface universal_laurent_polynomial_ring(R::Ring, s)

@@ -11,6 +11,9 @@
    @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.FreeModuleElem{elem_type(R)}
    @test parent_type(Generic.FreeModuleElem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
 
+   @test coefficient_ring(M) == R
+   @test coefficient_ring_type(M) == typeof(coefficient_ring(M))
+
    @test isa(M, Generic.FreeModule)
 
    @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
@@ -25,6 +28,22 @@ end
    M = free_module(R, 5)
 
    @test rank(M) == 5
+end
+
+@testset "Generic.FreeModule.order_and_iteration" begin
+   R, = residue_ring(ZZ, 4)
+   M = free_module(R, 2)
+
+   @test order(M) == 16
+   @test length(M) == 16
+   @test eltype(M) == elem_type(M)
+   @test collect(M) == [M([i, j]) for j in 0:3 for i in 0:3]
+
+   N = free_module(R, 0)
+
+   @test order(N) == 1
+   @test length(N) == 1
+   @test collect(N) == [zero(N)]
 end
 
 @testset "Generic.FreeModule.unary_ops" begin

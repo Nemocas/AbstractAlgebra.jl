@@ -38,6 +38,8 @@ function gen(R::AbsPowerSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
+number_of_variables(R::AbsPowerSeriesRing) = 1
+
 @doc raw"""
     max_precision(R::AbsPowerSeriesRing)
 
@@ -68,9 +70,8 @@ function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs, length(a), precision(a))
 end
 
-function characteristic(a::AbsPowerSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::AbsPowerSeriesRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::AbsPowerSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -307,7 +308,7 @@ end
 #
 ###############################################################################
 
-function (a::AbsPowerSeriesRing{T} where T <: RingElement)(b::RingElement)
+function (a::AbsPowerSeriesRing)(b::RingElement)
    return a(base_ring(a)(b))
 end
 
@@ -317,7 +318,7 @@ function (a::AbsPowerSeriesRing{T})() where T <: RingElement
    return z
 end
 
-function (a::AbsPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (a::AbsPowerSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    bb = base_ring(a)(b)
    if is_zero(bb)
       z = AbsSeries{T}(Vector{T}(undef, 0), 0, a.prec_max)

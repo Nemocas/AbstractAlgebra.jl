@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -85,7 +86,7 @@ x + 1
 The corresponding factored field uses the following constructor.
 
 ```julia
-FactoredFractionField(R::Ring; cached::Bool = true)
+factored_fraction_field(R::Ring; cached::Bool = true)
 ```
 
 **Examples**
@@ -94,7 +95,7 @@ FactoredFractionField(R::Ring; cached::Bool = true)
 julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
-julia> S = FactoredFractionField(R)
+julia> S = factored_fraction_field(R)
 Factored fraction field of Multivariate polynomial ring in 2 variables over integers
 
 julia> (X, Y) = (S(x), S(y))
@@ -171,13 +172,6 @@ parent(a::FracElem)
 ```
 
 Return the fraction field of the given fraction.
-
-```julia
-characteristic(R::FracField)
-```
-
-Return the characteristic of the base ring of the fraction field. If the
-characteristic is not known an exception is raised.
 
 
 **Examples**
@@ -278,35 +272,12 @@ x^3 + 3*x + 1
 ### Greatest common divisor
 
 ```@docs
-gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(QQ, :x)
-(Univariate polynomial ring in x over rationals, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
-(x^2 + 2*x + 1)//(x^2 + x + 1)
-
-julia> h = gcd(f, g)
-(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
-
+gcd(::FracElem{T}, ::FracElem{T}) where T <: RingElem
 ```
 
 ### Square root
 
-```@docs
-is_square{T <: RingElem}(::FracElem{T})
-```
-
-```@docs
-Base.sqrt(::FracElem{T}) where {T <: RingElem}
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `FracElem`.
 
 **Examples**
 
@@ -334,31 +305,11 @@ When working over a Euclidean domain, it is convenient to extend valuations to t
 fraction field. To facilitate this, we define the following functions.
 
 ```@docs
-remove{T <: RingElem}(::FracElem{T}, ::T)
+remove(::FracElem{T}, ::T) where T <: RingElement
 ```
 
 ```@docs
-valuation{T <: RingElem}(::FracElem{T}, ::T)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> f = (x + 1)//(x^3 + 3x + 1)
-(x + 1)//(x^3 + 3*x + 1)
-
-julia> g = (x^2 + 1)//(x^2 + x + 1)
-(x^2 + 1)//(x^2 + x + 1)
-
-julia> v, q = remove(f^3*g, x + 1)
-(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
-
-julia> v = valuation(f^3*g, x + 1)
-3
-
+valuation(::FracElem{T}, ::T) where T <: RingElement
 ```
 
 ### Random generation
@@ -400,7 +351,7 @@ and the function `normalise` returns relatively prime terms.
 **Examples**
 
 ```jldoctest
-julia> F = FactoredFractionField(ZZ)
+julia> F = factored_fraction_field(ZZ)
 Factored fraction field of Integers
 
 julia> f = F(-1)
@@ -423,4 +374,3 @@ julia> collect(f)
  (10, 10)
  (42, -8)
 ```
-

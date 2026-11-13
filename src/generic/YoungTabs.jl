@@ -72,11 +72,11 @@ function _numpart(n::Integer)
    elseif n < 395
       return _numpart(Int(n), _numPartsTable)
    else
-      return _numpart(BigInt(n), _numPartsTableBig)
+      return _numpart(Int(n), _numPartsTableBig)
    end
 end
 
-function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
+function _numpart(n::Int, lookuptable::Dict{Int, T}) where T<:Integer
    s = zero(T)
    if !haskey(lookuptable, n)
       for j in 1:floor(T, (1 + Base.sqrt(1 + 24n))/6)
@@ -411,7 +411,7 @@ const _border = Dict{Symbol,String}(
 
 :cross => "┼")
 
-function boxed_str(Y::YoungTableau, fill=Y.fill)
+function boxed_str(Y::YoungTableau, fill::Vector{<:Integer}=Y.fill)
    r,c = size(Y)
    w = max(length(string(maximum(fill))), 3)
    horizontal = repeat(_border[:horizontal], w)
@@ -525,31 +525,25 @@ end
 ##############################################################################
 
 @doc raw"""
-    matrix_repr(Y::YoungTableau)
+    matrix_repr(Y::YoungTableau{T}) -> Matrix{T}
+    matrix_repr(M::Type{<:AbstractMatrix}, Y::YoungTableau) -> M
 
-Construct sparse integer matrix representing the tableau.
+Construct an integer matrix representing the tableau; equivalent to `M(Y)`.
 
 # Examples
 ```jldoctest
 julia> y = YoungTableau([4,3,1]);
 
-
 julia> matrix_repr(y)
-3×4 SparseArrays.SparseMatrixCSC{Int64, Int64} with 8 stored entries:
+3×4 Matrix{Int64}:
  1  2  3  4
- 5  6  7  ⋅
- 8  ⋅  ⋅  ⋅
+ 5  6  7  0
+ 8  0  0  0
 ```
 """
-function matrix_repr(Y::YoungTableau{T}) where T
-   tab = spzeros(T, length(Y.part), Y.part[1])
-   k=1
-   for (idx, p) in enumerate(Y.part)
-      tab[idx, 1:p] = Y.fill[k:k+p-1]
-      k += p
-   end
-   return tab
-end
+matrix_repr(Y::YoungTableau{T}) where T = matrix_repr(Matrix{T}, Y)
+
+matrix_repr(::Type{M}, Y::YoungTableau) where {M<:AbstractMatrix} = M(Y)
 
 @doc raw"""
     fill!(Y::YoungTableaux, V::Vector{<:Integer})
@@ -671,7 +665,7 @@ julia> Generic.collength(y, 2,4)
 0
 ```
 """
-collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
+collength(Y::YoungTableau, i::Integer, j::Integer) = count(x -> x>=j, view(Y.part, Int(i)+1:lastindex(Y.part)))
 
 @doc raw"""
     hooklength(Y::YoungTableau, i, j)
@@ -745,6 +739,13 @@ end
 ##############################################################################
 
 SkewDiagram(lambda::AbstractVector{<:Integer}, mu::AbstractVector{<:Integer}) = SkewDiagram(Partition(lambda), Partition(mu))
+
+# mixed eltypes: promote so the inner constructor matches
+function SkewDiagram(lambda::Partition{S}, mu::Partition{T}) where {S, T}
+   R = promote_type(S, T)
+   return SkewDiagram(Partition(lambda.n, convert(Vector{R}, lambda.part), false),
+                      Partition(mu.n, convert(Vector{R}, mu.part), false))
+end
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
 @doc raw"""
@@ -813,21 +814,15 @@ end
 ##############################################################################
 
 @doc raw"""
-    matrix_repr(xi::SkewDiagram)
+    matrix_repr(xi::SkewDiagram{T}) -> Matrix{T}
+    matrix_repr(M::Type{<:AbstractMatrix}, xi::SkewDiagram) -> M
 
-Return a sparse representation of the diagram `xi`, i.e. a sparse array `A`
-where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
+Return a matrix `A` representing the diagram `xi`, i.e. `A[i,j] == 1` if and
+only if `(i,j)` is in `xi.lam` but not in `xi.mu`; equivalent to `M(xi)`.
 """
-function matrix_repr(xi::SkewDiagram)
-   skdiag = spzeros(eltype(xi), size(xi)...)
-   for i in 1:length(xi.mu)
-      skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
-   end
-   for i in length(xi.mu)+1:length(xi.lam)
-      skdiag[i,1:xi.lam[i]] .= 1
-   end
-   return skdiag
-end
+matrix_repr(xi::SkewDiagram{T}) where T = matrix_repr(Matrix{T}, xi)
+
+matrix_repr(::Type{M}, xi::SkewDiagram) where {M<:AbstractMatrix} = M(xi)
 
 @doc raw"""
     has_left_neighbor(xi::SkewDiagram, i::Integer, j::Integer)

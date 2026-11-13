@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-function pow!(z::T, a, b)::T where T
-  return a^b
-end
-
 # a *= x^p, using ta and tx as temps. Must return the modified a, ta, tx
 function mulpow!(a::T, x::S, p, ta::T, tx::S) where {T, S}
   tx = pow!(tx, x, p)
@@ -112,8 +108,8 @@ function evaluate_horner_lex(B::MPolyRingElem, C::Vector{<:RingElement})
   end
   p = sortperm(Bexps, rev=true)
   if p != 1:n
-    Bcoeffs = [Bcoeffs[p[i]] for i in 1:n]
-    Bexps   = [Bexps[p[i]] for i in 1:n]
+    Bcoeffs = Bcoeffs[p]
+    Bexps   = Bexps[p]
   end
   res = elem_type(ctxA)[ctxA() for i in 1:nvars(parent(B))+2]
   _horner_lex_rec(res, ctxA, Bcoeffs, Bexps, 1, n, 1, C, ctxC, ctxA(), ctxC())

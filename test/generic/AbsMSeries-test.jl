@@ -1,10 +1,6 @@
-function test_elem(R::AbstractAlgebra.Generic.AbsMSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.AbsMSeries.conformance" begin
    R, (x, y) = power_series_ring(ZZ, [5, 3], ["x", "y"])
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.AbsMSeries.constructors" begin
@@ -13,7 +9,7 @@ end
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(QQ, prec, ["x$(i)" for i in 1:nvars])
-   
+
       f = rand(R, 0:10, -10:10)
 
       @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt},
@@ -43,7 +39,7 @@ end
       @test R(p, prec) isa Generic.AbsMSeries
 
       R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
-     
+
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
       @test R(x) isa Generic.AbsMSeries
@@ -60,7 +56,7 @@ end
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:40)
       R, gens = power_series_ring(QQ, weights, prec, ["x$(i)" for i in 1:nvars])
-   
+
       f = rand(R, 0:10, -10:10)
 
       @test parent_type(f) == Generic.AbsMSeriesRing{Rational{BigInt},
@@ -85,7 +81,7 @@ end
       @test R(p, [0 for i in 1:nvars]) isa Generic.AbsMSeries
 
       R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
-     
+
       @test R(ZZ(2)) isa Generic.AbsMSeries
 
       @test R(x) isa Generic.AbsMSeries
@@ -101,7 +97,7 @@ end
    @test string(y) == "y + O(y^3) + O(x^5)"
    @test string(x^2 - y) == "-y + x^2 + O(y^3) + O(x^5)"
 
-   # weighted 
+   # weighted
 
    R, (x, y) = power_series_ring(ZZ, [2, 3], 10, ["x", "y"])
 
@@ -303,7 +299,7 @@ end
          f = rand(R, 0:12, -10:10)
          g = rand(R, 0:12, -10:10)
          h = rand(R, 0:12, -10:10)
-      
+
          @test isequal(f + g, g + f)
          @test isequal(f + (g + h), (f + g) + h)
          @test isequal(f*g, g*f)
@@ -326,7 +322,7 @@ end
          f = rand(R, 0:12, -10:10)
          g = rand(R, 0:12, -10:10)
          h = rand(R, 0:12, -10:10)
-      
+
          @test isequal(f + g, g + f)
          @test isequal(f + (g + h), (f + g) + h)
          @test isequal(f*g, g*f)
@@ -363,7 +359,7 @@ end
          @test isequal(f*d1 - f*d2, f*(d1 - d2))
          @test isequal(f*d1 + f*d2, f*(d1 + d2))
       end
-   
+
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(S, prec, ["x$(i)" for i in 1:nvars])
 
@@ -407,7 +403,7 @@ end
          @test isequal(f*d1 - f*d2, f*(d1 - d2))
          @test isequal(f*d1 + f*d2, f*(d1 + d2))
       end
-   
+
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
       R, gens = power_series_ring(S, weights, prec, ["x$(i)" for i in 1:nvars])
@@ -433,7 +429,7 @@ end
    for nvars in 1:5
       prec = [rand(0:10) for i in 1:nvars]
       R, gens = power_series_ring(ZZ, prec, ["x$(i)" for i in 1:nvars])
-      
+
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
          r2 = R(1)
@@ -454,7 +450,7 @@ end
       weights = [rand(1:4) for i in 1:nvars]
       prec = rand(0:20)
       R, gens = power_series_ring(ZZ, weights, prec, ["x$(i)" for i in 1:nvars])
-      
+
       for iter = 1:100
          f = rand(R, 0:12, -10:10)
          r2 = R(1)
@@ -503,6 +499,26 @@ end
          @test isequal(f, deepcopy(f))
       end
    end
+
+   # the polynomial of a series may hold terms beyond its precision
+   R, (x, y) = power_series_ring(QQ, [3, 3], [:x, :y])
+   P = Generic.underlying_poly_ring(R)
+   X, Y = gens(P)
+   f = R(1 + X^2*Y, [2, 2])
+   g = R(one(P), [2, 2])
+
+   @test isequal(f, g)
+   @test hash(f) == hash(g)
+
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   S, t = power_series_ring(QQ, 10, :t)
+   R, (x, y) = power_series_ring(S, [3, 3], [:x, :y])
+   f = (1 + O(t^2))*x
+   g = (1 + O(t^3))*x
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end
 
 @testset "Generic.AbsMSeries.adhoc_comparison" begin
@@ -645,4 +661,11 @@ end
       @test evaluate(f, [x], [g]) == evaluate(f, [g, y])
       @test evaluate(f, [y], [h]) == evaluate(f, [x, h])
    end
+end
+
+@testset "Generic.AbsMSeries.#2060" begin
+   R, a = polynomial_ring(QQ, :a)
+   F, x = polynomial_ring(R, :x)
+   S, (eps,) = power_series_ring(F, 4, [:ϵ])
+   @test coefficients(eps + a) == [a, 1]
 end

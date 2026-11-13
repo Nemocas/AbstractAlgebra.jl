@@ -17,7 +17,7 @@ function test_weak_cache(T, kreps, ireps)
             @test d[x] == y
             @test ddef[x] == y
          end
-         x = BigInt(rand(1:999))      
+         x = BigInt(rand(1:999))
          delete!(ddef, x)
          delete!(d, x)
          @test !haskey(d, x)
@@ -59,7 +59,7 @@ function test_weak_cache(T, kreps, ireps)
             @test d[x] == y
             @test ddef[x] == y
          end
-         x = BigInt(rand(1:999))      
+         x = BigInt(rand(1:999))
          delete!(ddef, x)
          delete!(d, x)
          @test !haskey(d, x)
@@ -188,13 +188,13 @@ end
     @test length(wkd) == 2
     res = pop!(wkd, 3, C)
     @test res == C
-    @test 3 ∉ keys(wkd)
-    @test B ∉ values(wkd)
+    @test !(3 in keys(wkd))
+    @test !(B in values(wkd))
     @test length(wkd) == 2
     @test !isempty(wkd)
     wkd = filter!( p -> p.first != 2, wkd)
-    @test 3 ∉ keys(wkd)
-    @test B ∉ values(wkd)
+    @test !(3 in keys(wkd))
+    @test !(B in values(wkd))
     @test length(wkd) == 1
     @test WeakValueDict(Pair(4, C)) == wkd
     @test !isempty(wkd)

@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Introduction
 
 Maps in AbstractAlgebra model maps on sets $f : D \to C$ for some domain $D$

@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -94,8 +95,13 @@ the usual ways of constructing an element of a ring.
 (R::PolyRing)(c::elem_type(R))
 (R::PolyRing{T})(a::T) where T <: RingElement
 ```
+The third constructor above cannot be used to coerce a polynomial from one ring
+to another; instead use a call like `map_coefficients(identity, f; parent=dest_ring))`,
+or alternatively, for _small polynomials_ one can simply use evaluation:
+namely, `f(y)` where `y` is the generator of the destination polynomial ring.
+The fourth constructor creates a constant polynomial from an element of the coefficient ring.
 
-For polynommials there is also the following more general constructor accepting
+For polynomials there is also the following more general constructor accepting
 an array of coefficients.
 
 ```julia
@@ -110,12 +116,9 @@ i.e. where `A[1]` is the constant coefficient.
 A third way of constructing polynomials is to construct them directly without
 creating the polynomial ring.
 
-```julia
-polynomial(R::Ring, arr::Vector{T}, var::VarName=:x; cached::Bool=true)
+```@docs
+polynomial
 ```
-
-Given an array of coefficients construct the polynomial with those coefficients
-over the given ring and with the given variable.
 
 **Examples**
 
@@ -166,7 +169,7 @@ julia> f = polynomial(ZZ, [1, 2, 3], :y)
 ## Similar and zero
 
 Another way of constructing polynomials is to construct one similar to an
-existing polynomial using either similar or zero. 
+existing polynomial using either similar or zero.
 
 ```julia
 similar(x::MyPoly{T}, R::Ring=base_ring(x)) where T <: RingElem
@@ -220,14 +223,7 @@ Return the coefficient ring of the given polynomial ring or polynomial.
 parent(a::NCRingElement)
 ```
 
-Return the polynomial ring of the given polynomial..
-
-```julia
-characteristic(R::NCRing)
-```
-
-Return the characteristic of the given polynomial ring. If the characteristic
-is not known, an exception is raised.
+Return the polynomial ring of the given polynomial.
 
 **Examples**
 
@@ -375,7 +371,7 @@ printing polynomials in that ring.
 In addition, the following basic functions are provided.
 
 ```@docs
-modulus{T <: ResElem}(::PolyRingElem{T})
+modulus(::PolyRingElem{T}) where T <: ResElem
 ```
 
 ```@docs
@@ -405,10 +401,6 @@ is_monic(::PolyRingElem)
 ```
 
 ```@docs
-is_square(::PolyRingElem)
-```
-
-```@docs
 length(::PolynomialElem)
 ```
 
@@ -434,6 +426,14 @@ is_term_recursive(::PolyRingElem)
 
 ```@docs
 is_constant(::PolynomialElem)
+```
+
+```@docs
+is_separable(::PolyRingElem)
+```
+
+```@docs
+is_unit(::PolyRingElem)
 ```
 
 **Examples**
@@ -567,30 +567,7 @@ truncate(::PolyRingElem, ::Int)
 ```
 
 ```@docs
-mullow{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x + 1)*y + x^3 + 2*x + 2
-
-julia> h = truncate(f, 1)
-3
-
-julia> k = mullow(f, g, 4)
-(x^2 + x)*y^3 + (x^4 + 3*x^2 + 4*x + 1)*y^2 + (x^4 + x^3 + 2*x^2 + 7*x + 5)*y + 3*x^3 + 6*x + 6
-
+mullow(::PolyRingElem{T}, ::PolyRingElem{T}, ::Int) where T <: RingElem
 ```
 
 ### Reversal
@@ -598,26 +575,6 @@ julia> k = mullow(f, g, 4)
 ```@docs
 reverse(::PolyRingElem, ::Int)
 reverse(::PolyRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = reverse(f, 7)
-3*y^6 + (x + 1)*y^5 + x*y^4
-
-julia> h = reverse(f)
-3*y^2 + (x + 1)*y + x
-
 ```
 
 ### Shifting
@@ -628,26 +585,6 @@ shift_left(::PolyRingElem, ::Int)
 
 ```@docs
 shift_right(::PolyRingElem, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = shift_left(f, 7)
-x*y^9 + (x + 1)*y^8 + 3*y^7
-
-julia> h = shift_right(f, 2)
-x
-
 ```
 
 ### Inflation and deflation
@@ -669,9 +606,7 @@ deflate(::PolyRingElem)
 
 ### Square root
 
-```@docs
-Base.sqrt(::PolyRingElem{T}; check::Bool) where T <: RingElement
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `PolyRingElem`.
 
 **Examples**
 
@@ -689,15 +624,6 @@ change_coefficient_ring(::Ring, ::PolyRingElem{T}) where T <: RingElement
 map_coefficients(::Any, ::PolyRingElem{<:RingElement})
 ```
 
-**Examples**
-
-```julia
-R, x = polynomial_ring(ZZ, :x)
-g = x^3+6*x + 1
-change_base_ring(GF(2), g)
-change_coefficient_ring(GF(2), g)
-```
-
 ### Pseudodivision
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
@@ -709,34 +635,11 @@ of $b$.
 We call $q$ the pseudoquotient and $r$ the pseudoremainder.
 
 ```@docs
-pseudorem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+pseudorem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-pseudodivrem{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (x + 1)*y + (x^3 + 2x + 2)
-(x + 1)*y + x^3 + 2*x + 2
-
-julia> h = pseudorem(f, g)
-x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
-
-julia> q, r = pseudodivrem(f, g)
-((x^2 + x)*y - x^4 - x^2 + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
-
+pseudodivrem(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ### Content and primitive part
@@ -764,7 +667,7 @@ p = primpart(k*(x^2 + 1))
 ### Evaluation, composition and substitution
 
 ```@docs
-evaluate(::PolyRingElem, b::T) where T <: RingElement
+evaluate(::PolyRingElem, b)
 ```
 
 ```@docs
@@ -772,7 +675,7 @@ compose(::PolyRingElem, ::PolyRingElem)
 ```
 
 ```@docs
-subst{T <: RingElem}(::PolyRingElem{T}, ::Any)
+subst(::PolyRingElem{T}, ::Any) where T <: RingElem
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
@@ -829,49 +732,18 @@ derivative(::PolyRingElem)
 integral{T <: Union{ResElem, FieldElem}}(::PolyRingElem{T})
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> T, z = polynomial_ring(QQ, :z)
-(Univariate polynomial ring in z over rationals, z)
-
-julia> U, = residue_ring(T, z^3 + 3z + 1);
-
-julia> V, w = polynomial_ring(U, :w)
-(Univariate polynomial ring in w over U, w)
-
-julia> f = x*y^2 + (x + 1)*y + 3
-x*y^2 + (x + 1)*y + 3
-
-julia> g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4
-(z^2 + 2*z + 1)*w^2 + (z + 1)*w - 2*z + 4
-
-julia> h = derivative(f)
-2*x*y + x + 1
-
-julia> k = integral(g)
-(1//3*z^2 + 2//3*z + 1//3)*w^3 + (1//2*z + 1//2)*w^2 + (-2*z + 4)*w
-
-```
-
 ### Resultant and discriminant
 
 ```@docs
-sylvester_matrix{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+sylvester_matrix(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-resultant{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+resultant(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
-resx{T <: RingElem}(::PolyRingElem{T}, ::PolyRingElem{T})
+resx(::PolyRingElem{T}, ::PolyRingElem{T}) where T <: RingElem
 ```
 
 ```@docs
@@ -909,37 +781,11 @@ x^2 - 34*x + 1
 ### Newton representation
 
 ```@docs
-monomial_to_newton!{T <: RingElem}(::Vector{T}, ::Vector{T})
+monomial_to_newton!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 ```@docs
-newton_to_monomial!{T <: RingElem}(::Vector{T}, ::Vector{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = 3x*y^2 + (x + 1)*y + 3
-3*x*y^2 + (x + 1)*y + 3
-
-julia> g = deepcopy(f)
-3*x*y^2 + (x + 1)*y + 3
-
-julia> roots = [R(1), R(2), R(3)]
-3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 2
- 3
-
-julia> monomial_to_newton!(g.coeffs, roots)
-
-julia> newton_to_monomial!(g.coeffs, roots)
+newton_to_monomial!(::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 ### Roots
@@ -947,40 +793,13 @@ julia> newton_to_monomial!(g.coeffs, roots)
 ```@docs
 roots(f::PolyRingElem)
 roots(R::Field, f::PolyRingElem)
+roots_with_multiplicities(f::PolyRingElem)
 ```
 
 ### Interpolation
 
 ```@docs
-interpolate{T <: RingElem}(::PolyRing, ::Vector{T}, ::Vector{T})
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> xs = [R(1), R(2), R(3), R(4)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 2
- 3
- 4
-
-julia> ys = [R(1), R(4), R(9), R(16)]
-4-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 1
- 4
- 9
- 16
-
-julia> f = interpolate(S, xs, ys)
-y^2
-
+interpolate(::PolyRing, ::Vector{T}, ::Vector{T}) where T <: RingElem
 ```
 
 ### Power sums
@@ -991,26 +810,6 @@ polynomial_to_power_sums(::PolyRingElem{T}) where T <: RingElem
 
 ```@docs
 power_sums_to_polynomial(::Vector{T}) where T <: RingElem
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> f = x^4 - 2*x^3 + 10*x^2 + 7*x - 5
-x^4 - 2*x^3 + 10*x^2 + 7*x - 5
-
-julia> V = polynomial_to_power_sums(f)
-4-element Vector{BigInt}:
-   2
- -16
- -73
-  20
-
-julia> power_sums_to_polynomial(V)
-x^4 - 2*x^3 + 10*x^2 + 7*x - 5
 ```
 
 ### Special functions
@@ -1025,23 +824,6 @@ chebyshev_t(::Int, ::PolyRingElem)
 
 ```@docs
 chebyshev_u(::Int, ::PolyRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> S, y = polynomial_ring(R, :y)
-(Univariate polynomial ring in y over R, y)
-
-julia> f = chebyshev_t(20, y)
-524288*y^20 - 2621440*y^18 + 5570560*y^16 - 6553600*y^14 + 4659200*y^12 - 2050048*y^10 + 549120*y^8 - 84480*y^6 + 6600*y^4 - 200*y^2 + 1
-
-julia> g = chebyshev_u(15, y)
-32768*y^15 - 114688*y^13 + 159744*y^11 - 112640*y^9 + 42240*y^7 - 8064*y^5 + 672*y^3 - 16*y
-
 ```
 
 ### Random generation
@@ -1067,6 +849,14 @@ g = rand(S, 2:2)
 U, z = polynomial_ring(R, :z)
 h = rand(U, 3:3, -1:2, -10:10)
 ```
+
+### Graeffe transform
+
+
+```@docs
+graeffe_transform(f::PolyRingElem)
+```
+
 
 ### Ring homomorphisms
 

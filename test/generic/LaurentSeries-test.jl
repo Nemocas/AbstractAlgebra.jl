@@ -16,13 +16,9 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.LaurentSeriesRing{BigInt})
-   rand(R, 0:12, -10:10)
-end
-
 @testset "Generic.LaurentSeries.conformance" begin
    R, x = laurent_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.LaurentSeries.constructors" begin
@@ -44,9 +40,15 @@ end
    @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.LaurentSeriesRing)
    @test isa(T, Generic.LaurentSeriesRing)
@@ -103,13 +105,6 @@ end
 
    @test isa(l, Generic.LaurentSeriesElem)
 
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
-   
    R, x = laurent_series_ring(ZZ, 30, "x")
    RR, x = laurent_series_ring(ZZ, 30, "x")
    @test R === RR
@@ -177,6 +172,11 @@ end
    U, y = laurent_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
+
+   K, z = laurent_series_field(GF(7), 10, "z")
+
+   @test characteristic(K) == 7
+   @test AbstractAlgebra.is_known(characteristic, K)
 end
 
 @testset "Generic.LaurentSeries.similar" begin
@@ -309,7 +309,7 @@ end
    @test isa(r, Generic.LaurentSeriesFieldElem)
 
    s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 1; max_precision=10)
-   
+
    @test max_precision(parent(s)) == 10
 end
 

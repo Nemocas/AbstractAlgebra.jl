@@ -2,15 +2,21 @@ using Documenter, AbstractAlgebra
 
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
+const render_pdf = "--pdf" in ARGS
+const run_doctests = !("--nodoctests" in ARGS)
+
 makedocs(
-         format = Documenter.HTML(;
-            size_threshold_warn = 204800,
-            size_threshold = 409600,
-         ),
+        format = [
+            Documenter.HTML(;
+                size_threshold_warn = 204800,
+                size_threshold = 409600,
+            ),
+            (render_pdf ? (Documenter.LaTeX(),) : ())...,
+         ],
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
-         doctest = true,
+         doctest = run_doctests,
          checkdocs = :none,
          pages    = [
              "index.md",
@@ -28,9 +34,10 @@ makedocs(
                  "polynomial.md",
                  "ncpolynomial.md",
                  "mpolynomial.md",
-                 "univpolynomial.md",
+                 "universal_ring.md",
                  "laurent_polynomial.md",
                  "laurent_mpolynomial.md",
+                 "puiseux_mpolynomial.md",
                  "series.md",
                  "puiseux.md",
                  "mseries.md",
@@ -64,8 +71,19 @@ makedocs(
              ],
              "Matrices" => [
                  "matrix_introduction.md",
-                 "matrix.md",
+                 "Working with matrices" => [
+                    "matrix_construction.md",
+                    "matrix_manipulation.md",
+                    "matrix_predicates.md",
+                    "matrix_properties.md",
+                    "matrix_normal_forms.md",
+                    "how_to_linear_solve.md", 
+                 ],
+                 "matrix_spaces.md",
                  "matrix_algebras.md",
+                 "Developer documentation" => [
+                    "matrix_implementation.md"
+                 ],
              ],
              "Maps" => [
                  "map_introduction.md",
@@ -88,6 +106,7 @@ makedocs(
                  "field_interface.md",
                  "fraction_interface.md",
                  "module_interface.md",
+                 "ideal_interface.md",
                  "matrix_interface.md",
                  "map_interface.md",
                  "rand.md",

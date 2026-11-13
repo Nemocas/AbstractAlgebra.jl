@@ -1,15 +1,16 @@
 ```@meta
-CurrentModule = AbstractAlgebra.Generic
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
-# Free algebras
+# Free associative algebras
 
 AbstractAlgebra.jl provides a module, implemented in `src/FreeAssociativeAlgebra.jl` for
 free associative algebras over any commutative ring belonging to the
 AbstractAlgebra abstract type hierarchy.
 
-## Generic free algebra types
+## Generic free associative algebra types
 
 AbstractAlgebra provides a generic type `Generic.FreeAssociativeAlgebraElem{T}`
 where `T` is the type of elements of the coefficient ring. The elements are
@@ -25,45 +26,19 @@ The following basic functions are implemented.
 base_ring(R::FreeAssociativeAlgebra)
 base_ring(a::FreeAssociativeAlgebraElem)
 parent(a::FreeAssociativeAlgebraElem)
-characteristic(R::FreeAssociativeAlgebra)
 ```
 
-## Free algebra constructors
+## Free associative algebra constructors
 
-```julia
-free_associative_algebra(R::Ring, s::AbstractVector{<:VarName}; cached::Bool = true)
-free_associative_algebra(R::Ring, n::Int, s::VarName; cached::Bool = false)
+```@docs
+free_associative_algebra(::Ring, ::Vector{Symbol})
+free_associative_algebra(::Ring, ::Int)
+@free_associative_algebra
 ```
 
-The first constructor, given a base ring `R` and an array `s` of variables,
-will return a tuple `S, (x, ...)` representing the new algebra
-$S = R \left<x, \ldots \right>$ and a tuple of generators $(x, ...)$.
+## Free associative algebra element constructors
 
-The second constructor given a string `s` and a number of variables `n` will
-do the same as the first constructor except that the variables will be
-automatically numbered as, `s1`, `s2`, ..., `sn`.
-
-By default the parent object `S` will depend only on `R` and  `(x, ...)` and
-will be cached. Setting the optional argument `cached` to `false` will prevent
-the parent object `S` from being cached.
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
-(Free associative algebra on 2 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y])
-
-julia> (x + y + 1)^2
-x^2 + x*y + y*x + y^2 + 2*x + 2*y + 1
-
-
-julia> (x*y*x*x)^4
-x*y*x^3*y*x^3*y*x^3*y*x^2
-```
-
-## Free algebra element constructors
-
-Elements of a free algebra can be constructed from the generators in the
+Elements of a free associative algebra can be constructed from the generators in the
 usual way using arithmetic operations. Also, all of the standard ring element
 constructors may be used. Finally, the `MPolyBuildCtx` is overloaded to work
 with coefficients and monomial words and not exponent vectors.
@@ -116,7 +91,10 @@ provide the first such term.
 leading_coefficient(a::FreeAssociativeAlgebraElem)
 leading_monomial(a::FreeAssociativeAlgebraElem)
 leading_term(a::FreeAssociativeAlgebraElem)
-leading_exponent_word(a::FreeAssociativeAlgebraElem)
+```
+
+```@docs
+leading_exponent_word
 ```
 
 For types that allow constant time access to coefficients, the following are
@@ -134,35 +112,6 @@ In contrast with the interface for multivariable polynomials, the function
 
 ```@docs
 exponent_word(a::Generic.FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y, z) = free_associative_algebra(ZZ, [:x, :y, :z])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
-
-julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
-(-1, 0, 7)
-
-julia> leading_term(-x^2*y^2*z^2*x + z*y)
--x^2*y^2*z^2*x
-
-julia> leading_monomial(-x^2*y^2*z^2*x + z*y)
-x^2*y^2*z^2*x
-
-julia> leading_coefficient(-x^2*y^2*z^2*x + z*y)
--1
-
-julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
-7-element Vector{Int64}:
- 1
- 1
- 2
- 2
- 3
- 3
- 1
 ```
 
 ```@docs
@@ -185,54 +134,19 @@ monomials(p::FreeAssociativeAlgebraElem)
 exponent_words(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, (a, b, c) = free_associative_algebra(ZZ, [:a, :b, :c])
-(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[a, b, c])
-
-julia> collect(terms(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
- 3*b*a*c
- -b
- c
- 2
-
-julia> collect(coefficients(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
-  3
- -1
-  1
-  2
-
-julia> collect(monomials(3*b*a*c - b + c + 2))
-4-element Vector{Any}:
- b*a*c
- b
- c
- 1
-
-julia> collect(exponent_words(3*b*a*c - b + c + 2))
-4-element Vector{Vector{Int64}}:
- [2, 1, 3]
- [2]
- [3]
- []
-```
-
 ### Groebner bases
 
-The function `groebner_basis` provides the computation of a Groebner basis of an ideal, given a set of 
+The function `groebner_basis` provides the computation of a Groebner basis of an ideal, given a set of
 generators of that ideal.
 Since such a Groebner basis is not necessarily finite, one can additionally pass a `reduction_bound`
 to the function, to only compute a partial Groebner basis.
 
 ```@docs
-groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
+AbstractAlgebra.groebner_basis(g::Vector{Generic.FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false) where T <: FieldElement
 
-normal_form(f::FreeAssociativeAlgebraElem{T}, g::Vector{FreeAssociativeAlgebraElem{T}}, aut::AhoCorasickAutomaton) where T
+AbstractAlgebra.normal_form(f::Generic.FreeAssociativeAlgebraElem{T}, g::Vector{Generic.FreeAssociativeAlgebraElem{T}}, aut::Generic.AhoCorasickAutomaton) where T
 
-interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
+AbstractAlgebra.interreduce!(g::Vector{Generic.FreeAssociativeAlgebraElem{T}}) where T
 ```
 
 The implementation uses a non-commutative version of the Buchberger algorithm as described in
@@ -244,7 +158,7 @@ The implementation uses a non-commutative version of the Buchberger algorithm as
 
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = @free_associative_algebra(GF(2), [:x, :y, :u, :v, :t, :s])
-Free associative algebra on 6 indeterminates x, y, u, v, ..., s
+Free associative algebra on 6 indeterminates x, y, u, v, t, s
   over finite field F_2
 
 julia> g = Generic.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y*x)^2*t + t + s])
@@ -256,7 +170,7 @@ julia> g = Generic.groebner_basis([u*(x*y)^3 + u*(x*y)^2 + u + v, (y*x)^3*t + (y
  u*x*y*x*y*x*s + v*x*y*x*y*x*t
 ```
 
-In order to check whether a given element of the algebra is in the ideal generated by a Groebner 
+In order to check whether a given element of the algebra is in the ideal generated by a Groebner
 basis `g`, one can compute its normal form.
 ```jldoctest; setup = :(using AbstractAlgebra)
 julia> R = @free_associative_algebra(GF(2), [:x, :y, :u, :v, :t, :s]);

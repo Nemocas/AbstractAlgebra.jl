@@ -33,8 +33,38 @@ parent_type(::Type{Ideal{S}}) where S <: RingElement = IdealSet{S}
     gens(I::Ideal{T}) where T <: RingElement
 
 Return a list of generators of the ideal `I` in reduced form and canonicalised.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
+3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3*x^3 + 2*x^2 + 1
+ 5*x^4 + 1
+ 2*x - 1
+
+julia> I = Generic.Ideal(R, V)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1])
+
+julia> gens(I)
+2-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
+ 3
+ x + 1
+```
 """
-gens(I::Ideal{T}) where T <: RingElement = I.gens
+gens(I::Ideal) = I.gens
+
+number_of_generators(I::Ideal) = length(I.gens)
+
+gen(I::Ideal, i::Int) = I.gens[i]
+
+function deepcopy_internal(I::Ideal, dict::IdDict)
+   elms = [deepcopy_internal(x, dict) for x in I.gens]
+   return Ideal(base_ring(I), elms)
+end
 
 ###############################################################################
 #
@@ -352,7 +382,7 @@ function heapinsert!(heap::Vector{lmnode{U, V, N}}, node::lmnode{U, V, N}) where
    heap[i] = node
    return nothing
 end
-   
+
 function heappop!(heap::Vector{lmnode{U, V, N}}) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElement}, V, N}
    s = length(heap)
    x = heap[1]
@@ -410,7 +440,7 @@ function reduce_coefficients(p::U, V::Vector{U}, start::Int) where U <: Abstract
                   n -= 1
                   break
                end
-            end        
+            end
          end
       end
       n += 1
@@ -522,7 +552,7 @@ function reducer_size(f::T) where {U <: AbstractAlgebra.MPolyRingElem{<:RingElem
       c = coeff(f.poly, i)
       # larger coefficients are also somewhat punished
       s += Base.log(ndigits(c; base=2))*j*j
-      j -= 1      
+      j -= 1
    end
    return s
 end
@@ -1121,7 +1151,7 @@ function compute_spolys(S::Vector{T}, b::T, d::T) where {U <: AbstractAlgebra.MP
             s = compute_spoly(n, d)
             push!(S, s)
             break
-         end 
+         end
       end
       n = n.equal
       nend = b
@@ -1183,7 +1213,7 @@ function insert_links(d::T, b::T) where {U <: AbstractAlgebra.MPolyRingElem{<:Ri
             b2 = b2.next
             if lm_divides_lcm(b2.up, d) && !b2.up.path
                insert_links(d, b2.up)
-            end   
+            end
          end
       end
    end
@@ -1428,7 +1458,7 @@ end
    B = [divexact(d, canonical_unit(d)) for d in B]
    # do tail reduction if requested
    if complete_reduction
-      B = [tail_reduce(d, B) for d in B]
+      B = tail_reduce.(B, Ref(B))
    end
    # sort by leading monomial then leading coefficient
    B = sort!(B, lt = isless_monomial_lc)
@@ -1609,7 +1639,7 @@ function normal_form(p::T, V::Vector{T}) where {U <: RingElement, T <: AbstractA
             h = leading_coefficient(V[i]) # should be non-negative
             q, r = AbstractAlgebra.divrem(c, h)
             u = shift_left(V[i], n - length(V[i]))
-            p -= q*u       
+            p -= q*u
          end
          n = min(n - 1, length(p))
       end
@@ -1824,14 +1854,18 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          return [parent(p)(gcd(constant_coefficient(p), constant_coefficient(V[n])))]
       end
       # check if p can replace V[n]
-      swap = false
-      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q) = divides(lc, leading_coefficient(p)))[1]
+      q = nothing
+      if length(p) == length(V[n]) && !is_unit(lc) && ((_, q1) = divides(lc, leading_coefficient(p)))[1]
          p, V[n] = V[n], reduce_tail(p, view(V, 1:n - 1), res)
          insert_spoly(V, H, n, res)
-         swap = true
+         q = q1
       end
       # check if leading coefficients divide leading_coefficient of p
-      while n >= 1 && (swap || ((_, q) = divides(leading_coefficient(p), leading_coefficient(V[n])))[1])
+      while n >= 1
+         if q === nothing
+            fl, q = divides(leading_coefficient(p), leading_coefficient(V[n]))
+            fl || break
+         end
          best_v = V[n]
          best_size = mysize(V[n])
          best_q = q
@@ -1850,7 +1884,7 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          while n >= 1 && length(V[n]) > length(p)
             n -= 1
          end
-         swap = false
+         q = nothing
       end
       if iszero(p) # p was absorbed, yay!
          return V
@@ -1891,18 +1925,18 @@ function extend_ideal_basis(D::Vector{T}, p::T, V::Vector{T}, H::Vector{T}, res:
          if !iszero(p)
             if length(p) >= length(v)
               push!(D, r)
-            else 
+            else
                push!(H, p)
                p = r
             end
          else
-            p = r 
+            p = r
          end
          # p still needs reduction
       end
    end
 end
-      
+
 function remove_constant_multiples(V::Vector{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
    len = length(V)
    for i = 1:len
@@ -2040,7 +2074,7 @@ function reduce_gens(I::Ideal{T}; complete_reduction::Bool=true) where {U <: Rin
       else
          res = divexact(res, canonical_unit(res))
          V = [S(res)]
-         B0 = [reduce_by_resultant(p, res) for p in D]
+         B0 = map(Base.Fix2(reduce_by_resultant, res), D)
          B0 = filter(!iszero, B0)
          B = sort(B0, by=mysize2, rev=true)
          H = T[]
@@ -2071,55 +2105,54 @@ end
 ###############################################################################
 
 @doc raw"""
-    normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
+    normal_form(p::U, I::Ideal{U}) where {U}
 
 Return the normal form of the polynomial `p` with respect to the ideal `I`.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:degrevlex)
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
+2-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
+ 3*x^2*y - 3*y^2
+ 9*x^2*y + 7*x*y
+
+julia> I = Generic.Ideal(R, V)
+AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2])
+
+
+julia> normal_form(30x^5*y + 2x + 1, I)
+135*y^4 + 138*y^3 - 147*y^2 + 2*x + 1
+```
 """
-function normal_form(p::U, I::Ideal{U}) where {T <: RingElement, U <: Union{AbstractAlgebra.PolyRingElem{T}, AbstractAlgebra.MPolyRingElem{T}}}
+function normal_form(p::U, I::Ideal{U}) where {U}
+   is_zero(p) && return deepcopy(p)
+   is_zero(I) && return deepcopy(p)
    return normal_form(p, gens(I))
 end
 
-###############################################################################
-#
-#   Comparison
-#
-###############################################################################
+function normal_form(p::U, I::Ideal{U}) where {U <: FieldElem}
+   iszero(I) && return deepcopy(p)
+   return zero(p)
+end
 
-function ==(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   return gens(I) == gens(J)
+function normal_form(p::U, I::Ideal{U}) where {U <: Integer}
+   iszero(I) && return deepcopy(p)
+   m = only(gens(I))
+   return rem(p, m, RoundDown)
 end
 
 ###############################################################################
 #
-#   Containment
+#   Membership
 #
 ###############################################################################
 
-@doc raw"""
-    Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-
-Return `true` if the ideal `J` is contained in the ideal `I`.
-"""
-function Base.contains(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
-   G1 = gens(J)
-   G2 = gens(I)
-   if isempty(G1)
-      return true
-   end
-   if isempty(G2)
-      return false
-   end
-   return divides(G1[1], G2[1])[1]
-end
-
-function Base.contains(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Union{AbstractAlgebra.PolyRingElem{U}, AbstractAlgebra.MPolyRingElem{U}}}
-   G = gens(J)
-   for v in G
-      if !iszero(normal_form(v, I))
-         return false
-      end
-   end
-   return true
+function Base.in(v::T, I::Ideal{T}) where T <: RingElement
+  return is_zero(normal_form(v, I))
 end
 
 ###############################################################################
@@ -2134,35 +2167,30 @@ end
 Return the intersection of the ideals `I` and `J`.
 """
 function intersect(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
-   if isempty(G1)
-      return deepcopy(I)
-   end
-   if isempty(G2)
-      return deepcopy(J)
-   end
-   return Ideal(R, lcm(G1[1], G2[1]))
+   isempty(G1) && return deepcopy(I)
+   isempty(G2) && return deepcopy(J)
+   return Ideal(R, lcm(only(G1), only(G2)))
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: FieldElement, T <: AbstractAlgebra.PolyRingElem{U}}
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
-   if isempty(G1)
-      return deepcopy(I)
-   end
-   if isempty(G2)
-      return deepcopy(J)
-   end
-   return Ideal(R, lcm(G1[1], G2[1]))
+   isempty(G1) && return deepcopy(I)
+   isempty(G2) && return deepcopy(J)
+   return Ideal(R, lcm(only(G1), only(G2)))
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.PolyRingElem{U}}
-   if contains(I, J)
+   check_base_ring(I, J)
+   if is_subset(J, I)
       return J
-   elseif contains(J, I)
+   elseif is_subset(I, J)
       return I
    end
    S = base_ring(I) # poly ring
@@ -2183,9 +2211,10 @@ function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: Abstr
 end
 
 function intersect(I::Ideal{T}, J::Ideal{T}) where {U <: RingElement, T <: AbstractAlgebra.MPolyRingElem{U}}
-   if contains(I, J)
+   check_base_ring(I, J)
+   if is_subset(J, I)
       return J
-   elseif contains(J, I)
+   elseif is_subset(I, J)
       return I
    end
    S = base_ring(I) # poly ring
@@ -2212,6 +2241,7 @@ end
 ###############################################################################
 
 function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)
@@ -2219,6 +2249,7 @@ function +(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
 end
 
 function *(I::Ideal{T}, J::Ideal{T}) where T <: RingElement
+   check_base_ring(I, J)
    R = base_ring(I)
    G1 = gens(I)
    G2 = gens(J)

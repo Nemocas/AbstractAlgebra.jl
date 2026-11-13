@@ -10,17 +10,21 @@
 #
 ###############################################################################
 
-parent_type(::Type{FreeModuleElem{T}}) where T <: Union{RingElement, NCRingElem} = FreeModule{T}
+parent_type(::Type{FreeModuleElem{T}}) where T <: NCRingElement = FreeModule{T}
 
-base_ring_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} = parent_type(T)
+base_ring_type(::Type{FreeModule{T}}) where T <: NCRingElement = parent_type(T)
 
-base_ring(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.base_ring::parent_type(T)
+base_ring(M::FreeModule{T}) where T <: NCRingElement = M.base_ring::parent_type(T)
 
-elem_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} = FreeModuleElem{T}
+coefficient_ring_type(T::Type{<:FreeModule}) = base_ring_type(T)
 
-parent(m::FreeModuleElem{T}) where T <: Union{RingElement, NCRingElem} = m.parent
+coefficient_ring(M::FreeModule) = base_ring(M)
 
-function rels(M::FreeModule{T}) where T <: RingElement
+elem_type(::Type{FreeModule{T}}) where T <: NCRingElement = FreeModuleElem{T}
+
+parent(m::FreeModuleElem{T}) where T <: NCRingElement = m.parent
+
+function rels(M::FreeModule{T}) where T <: NCRingElement
    # there are no relations in a free module
    return Vector{dense_matrix_type(T)}(undef, 0)
 end
@@ -28,36 +32,81 @@ end
 is_free(M::FreeModule) = true
 
 @doc raw"""
-    rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
+    rank(M::FreeModule{T}) where T <: NCRingElement
 
 Return the rank of the given free module.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> rank(M)
+3
+```
 """
-rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
+rank(M::FreeModule{T}) where T <: NCRingElement = M.rank
 
 @doc raw"""
+    vector_space_dim(M::FreeModule{T}) where T <: FieldElement
     dim(M::FreeModule{T}) where T <: FieldElement
 
 Return the dimension of the given vector space.
+
+# Examples
+
+```jldoctest
+julia> V = vector_space(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> dim(V)
+2
+```
 """
-dim(M::FreeModule{T}) where T <: FieldElement = M.rank
+vector_space_dim(M::FreeModule{T}) where T <: FieldElement = rank(M)
 
-number_of_generators(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
+order(M::FreeModule) = order(base_ring(M))^rank(M)
 
-function gens(N::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
+number_of_generators(M::FreeModule{T}) where T <: NCRingElement = M.rank
+
+function gens(N::FreeModule{T}) where T <: NCRingElement
    return [gen(N, i) for i = 1:ngens(N)]
 end
 
-function gen(N::FreeModule{T}, i::Int) where T <: Union{RingElement, NCRingElem}
+function gen(N::FreeModule{T}, i::Int) where T <: NCRingElement
    @boundscheck 1 <= i <= ngens(N) || throw(ArgumentError("generator index out of range"))
    R = base_ring(N)
-   m = zero_matrix(R, 1, ngens(N))
-   add_one!(m, 1, i)
+   if N.is_row
+     m = zero_matrix(R, 1, ngens(N))
+     add_one!(m, 1, i)
+   else
+     m = zero_matrix(R, ngens(N), 1)
+     add_one!(m, i, 1)
+   end
    return N(m)
 end
 
+@doc raw"""
+    basis(M::FreeModule)
+
+Return the standard basis of the given free module, i.e. its generators.
+
+# Examples
+
+```jldoctest
+julia> V = vector_space(QQ, 2)
+Vector space of dimension 2 over rationals
+
+julia> basis(V)
+2-element Vector{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}}}:
+ (1//1, 0//1)
+ (0//1, 1//1)
+```
+"""
 basis(N::FreeModule) = gens(N)
 
-Base.hash(a::FreeModuleElem, h::UInt) = hash(a.v, h)
+Base.hash(a::FreeModuleElem, h::UInt) = hash(_matrix(a), h)
 
 ###############################################################################
 #
@@ -65,10 +114,14 @@ Base.hash(a::FreeModuleElem, h::UInt) = hash(a.v, h)
 #
 ###############################################################################
 
-function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
+function show(io::IO, M::FreeModule{T}) where T <: NCRingElement
    @show_name(io, M)
    @show_special(io, M)
-   print(io, "Free module of rank ")
+   if M.is_row
+     print(io, "Free module of rank ")
+   else
+     print(io, "Free column-module of rank ")
+   end
    print(io, rank(M))
    print(io, " over ")
    print(terse(pretty(io)), Lowercase(), base_ring(M))
@@ -86,13 +139,24 @@ end
 function show(io::IO, a::FreeModuleElem)
    print(io, "(")
    M = parent(a)
-   for i = 1:rank(M) - 1
-      print(IOContext(io, :compact => true), _matrix(a)[1, i])
-      print(io, ", ")
+   if M.is_row
+     for i = 1:rank(M) - 1
+        print(IOContext(io, :compact => true), _matrix(a)[1, i])
+        print(io, ", ")
+     end
+     if rank(M) > 0
+        print(IOContext(io, :compact => true), _matrix(a)[1, rank(M)])
+     end
+   else
+     for i = 1:rank(M) - 1
+        print(IOContext(io, :compact => true), _matrix(a)[i, 1])
+        print(io, ", ")
+     end
+     if rank(M) > 0
+        print(IOContext(io, :compact => true), _matrix(a)[rank(M), 1])
+     end
    end
-   if rank(M) > 0
-      print(IOContext(io, :compact => true), _matrix(a)[1, rank(M)])
-   end
+
    print(io, ")")
 end
 
@@ -102,15 +166,19 @@ end
 #
 ###############################################################################
 
-function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingElem}
+function (M::FreeModule{T})(a::Vector{T}) where T <: NCRingElement
    length(a) != rank(M) && error("Number of elements does not equal rank")
    R = base_ring(M)
-   v = matrix(R, 1, length(a), a)
+   if M.is_row
+     v = matrix(R, 1, length(a), a)
+   else
+     v = matrix(R, length(a), 1, a)
+   end
    z = FreeModuleElem{T}(M, v)
    return z
 end
 
-#function (M::FreeModule{T})(a::Vector{<: Integer}) where T <: Union{RingElement, NCRingElem}
+#function (M::FreeModule{T})(a::Vector{<: Integer}) where T <: NCRingElement
 #   length(a) != rank(M) && error("Number of elements does not equal rank")
 #   R = base_ring(M)
 #   v = matrix(R, 1, length(a), a)
@@ -118,22 +186,31 @@ end
 #   return z
 #end
 
-function (M::FreeModule{T})(a::Vector{S}) where {T <: Union{RingElement, NCRingElem}, S <: RingElement}
+function (M::FreeModule{T})(a::Vector{S}) where {T <: NCRingElement, S <: RingElement}
    length(a) != rank(M) && error("Number of elements does not equal rank")
    R = base_ring(M)
-   v = matrix(R, 1, length(a), a)
+   if M.is_row
+     v = matrix(R, 1, length(a), a)
+   else
+     v = matrix(R, length(a), 1, a)
+   end
    z = FreeModuleElem{T}(M, v)
    return z
 end
 
-function (M::FreeModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
+function (M::FreeModule{T})(a::Vector{Any}) where T <: NCRingElement
    length(a) != 0 && error("Incompatible element")
    return M(T[])
 end
 
-function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-   ncols(a) != rank(M) && error("Number of elements does not equal rank")
-   nrows(a) != 1 && error("Matrix should have single row")
+function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: NCRingElement
+  if M.is_row
+     ncols(a) != rank(M) && error("Number of elements does not equal rank")
+     nrows(a) != 1 && error("Matrix should have single row")
+   else
+     nrows(a) != rank(M) && error("Number of elements does not equal rank")
+     ncols(a) != 1 && error("Matrix should have single column")
+   end
    z = FreeModuleElem{T}(M, a)
    return z
 end
@@ -161,8 +238,8 @@ end
 #
 ###############################################################################
 
-function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
+function FreeModule(R::NCRing, rank::Int; cached::Bool = true, is_row::Bool = true)
    T = elem_type(R)
-   return FreeModule{T}(R, rank, cached)
+   return FreeModule{T}(R, rank, cached; is_row)
 end
 

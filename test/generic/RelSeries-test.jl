@@ -18,7 +18,7 @@
 
 @testset "Generic.RelSeries.conformance" begin
    R, x = power_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.RelSeries.types" begin
@@ -45,9 +45,15 @@ end
    @test elem_type(Generic.RelPowerSeriesRing{BigInt}) == Generic.RelSeries{BigInt}
    @test parent_type(Generic.RelSeries{BigInt}) == Generic.RelPowerSeriesRing{BigInt}
 
+   @test coefficient_ring(R) === ZZ
+   @test coefficient_ring_type(R) == typeof(coefficient_ring(R))
+
    @test elem_type(T) == Generic.RelSeries{elem_type(S)}
    @test elem_type(Generic.RelPowerSeriesRing{elem_type(S)}) == Generic.RelSeries{elem_type(S)}
    @test parent_type(Generic.RelSeries{elem_type(S)}) == Generic.RelPowerSeriesRing{elem_type(S)}
+
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
 
    @test isa(R, Generic.RelPowerSeriesRing)
 
@@ -92,13 +98,6 @@ end
    l = T(t)
 
    @test isa(l, Generic.RelSeries)
-
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
 
    @test_throws DomainError O(0+O(x^0))
 
@@ -252,7 +251,7 @@ end
    @test isa(r, RelPowerSeriesRingElem)
 
    s = rel_series(ZZ, [1, 2, 3], 3, 5, 0; max_precision=10)
-   
+
    @test max_precision(parent(s)) == 10
 end
 
@@ -818,7 +817,7 @@ end
     for iter = 1:300
         f1 = rand(R, 0:10, -10:10)
         f2 = rand(R, 0:10, -10:10)
-     
+
         g = rand(R, 1:10, -10:10)
 
         @test compose(f1 + f2, g; inner = :second) == compose(f1, g; inner = :second) + compose(f2, g; inner = :second)
@@ -1252,7 +1251,7 @@ end
 @testset "Generic.RelSeries.unsafe_operators" begin
    # Exact ring
    R, x = power_series_ring(ZZ, 10, "x")
-   
+
    for iter = 1:300
       f = rand(R, 0:9, -10:10)
       g = rand(R, 0:9, -10:10)
@@ -1286,8 +1285,8 @@ end
       h = mul!(h, f, g)
       @test isequal(h, k)
       @test isequal(f, f0)
-      @test isequal(g, g0)      
-     
+      @test isequal(g, g0)
+
       f1 = deepcopy(f)
       f1 = mul!(f1, f1, g)
       @test isequal(f1, k)

@@ -24,6 +24,14 @@
   @test is_rref(R)
   @test U*M == S
   @test is_invertible(U)
+
+  # An aliasing bug fixed in #2154
+  K, t = rational_function_field(QQ, :t)
+  M = K[-t - 1 -t - 1; t + 1 2t - 2]
+  echelon_form_with_transformation(M)
+  @test M == K[-t - 1 -t - 1; t + 1 2t - 2]
+  echelon_form_with_transformation(M, shape = :lower)
+  @test M == K[-t - 1 -t - 1; t + 1 2t - 2]
 end
 
 @testset "Hermite form" begin

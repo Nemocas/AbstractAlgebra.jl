@@ -1,8 +1,8 @@
 @testset "Julia.GFElem.conformance_tests" begin
-   test_Field_interface_recursive(GF(3))
-   test_Field_interface_recursive(GF(13))
-   test_Field_interface_recursive(GF(big(13)))
-   test_Field_interface_recursive(GF(big(10)^20 + 39))
+   ConformanceTests.test_Field_interface_recursive(GF(3))
+   ConformanceTests.test_Field_interface_recursive(GF(13))
+   ConformanceTests.test_Field_interface_recursive(GF(big(13)))
+   ConformanceTests.test_Field_interface_recursive(GF(big(10)^20 + 39))
 end
 
 @testset "Julia.GFElem.constructors" begin
@@ -299,19 +299,19 @@ end
       for i = 1:1000
           a = rand(R)
 
-          f1, s = is_square_with_sqrt(a^2)
+          f1, s = @inferred is_square_with_sqrt(a^2)
 
           @test f1 && s^2 == a^2
 
           @test is_square(a^2)
 
-          @test sqrt(a^2)^2 == a^2
+          @test (@inferred sqrt(a^2))^2 == a^2
 
           if p != 2 && !iszero(a)
              @test !is_square(z*a^2)
 
              @test_throws ErrorException sqrt(z*a^2)
-          end 
+          end
        end
    end
 end
@@ -319,7 +319,7 @@ end
 @testset "Julia.GFElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R = GF(n)
-      elts = AbstractAlgebra.test_iterate(R)
+      elts = ConformanceTests.test_iterate(R)
       @test elts == R.(0:n-1)
    end
 end

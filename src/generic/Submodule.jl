@@ -31,11 +31,14 @@ function gen(N::Submodule{T}, i::Int) where T <: RingElement
 end
 
 @doc raw"""
+    vector_space_dim(N::Submodule{T}) where T <: FieldElement
     dim(N::Submodule{T}) where T <: FieldElement
+    rank(N::Submodule{T}) where T <: FieldElement
 
 Return the dimension of the given vector subspace.
 """
-dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
+vector_space_dim(N::Submodule{T}) where T <: FieldElement = length(N.gen_cols)
+rank(N::Submodule{T}) where T <: FieldElement = vector_space_dim(N)
 
 # Generators as elements of supermodule. Used internally.
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}
@@ -73,11 +76,11 @@ function show(io::IO, v::SubmoduleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(IOContext(io, :compact => true), _matrix(v)[1, i])
+      print(IOContext(io, :compact => true), v[i])
       print(io, ", ")
    end
    if len > 0
-      print(IOContext(io, :compact => true), _matrix(v)[1, len])
+      print(IOContext(io, :compact => true), v[len])
    end
    print(io, ")")
 end
@@ -138,7 +141,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       gens = Vector{S}(undef, 0) # original may have generators that are zero
       M = Submodule{T}(m, gens, Vector{dense_matrix_type(T)}(undef, 0),
                        Vector{Int}(undef, 0), Vector{Int}(undef, 0))
-      f = ModuleHomomorphism(M, m, matrix(R, 0, ngens(m), []))
+      f = ModuleHomomorphism(M, m, matrix(R, 0, ngens(m),elem_type(R)[]))
       M.map = f
       return M, f
    end
@@ -169,7 +172,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
          for j = 1:ncols(Mi)
             Mi[1, j] = g[1, j]
          end
-      end 
+      end
    end
    # Remove zero rows
    num = r

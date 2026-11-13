@@ -64,24 +64,8 @@ function modulus(r::ResFieldElem)
    return modulus(parent(r))
 end
 
-@doc raw"""
-    characteristic(R::ResidueField)
-
-Return the characteristic of the residue field.
-"""
-function characteristic(R::ResidueField)
-   return characteristic(base_ring(R))
-end
-
-@doc raw"""
-    characteristic(r::ResidueField{T}) where T <: Integer
-
-Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
-residue $r$ belongs to.
-"""
-function characteristic(r::ResidueField{T}) where T <: Integer
-   return modulus(r)
-end
+characteristic(r::ResidueField{T}) where T <: Integer = modulus(r)
+is_known(::typeof(characteristic), R::ResidueField{T}) where T <: Integer = true
 
 data(a::ResFieldElem) = a.data
 
@@ -103,19 +87,6 @@ function is_unit(a::ResFieldElem)
 end
 
 deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-function canonical_unit(x::ResFieldElem{<:Union{Integer, RingElem}})
-  if iszero(x)
-    return one(parent(x))
-  end
-  return x
-end
 
 ###############################################################################
 #
@@ -179,27 +150,27 @@ end
 #
 ###############################################################################
 
-*(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) * b)
 
 *(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
-*(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a * data(b))
+*(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a * data(b))
 
 *(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
-+(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) + b)
 
 +(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a + data(b))
++(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a + data(b))
 
 +(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
--(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::ResFieldElem, b::JuliaRingElement) = parent(a)(data(a) - b)
 
 -(a::ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
--(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem) = parent(b)(a - data(b))
+-(a::JuliaRingElement, b::ResFieldElem) = parent(b)(a - data(b))
 
 -(a::T, b::ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
@@ -251,41 +222,21 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::ResFieldElem, b::JuliaRingElement)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::ResFieldElem)
+function ==(a::JuliaRingElement, b::ResFieldElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
-@doc raw"""
-    ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResFieldElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc raw"""
-    ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::T, b::ResFieldElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
@@ -319,6 +270,7 @@ end
 
 function divexact(a::ResFieldElem{T}, b::ResFieldElem{T}; check::Bool=true) where {T <: RingElement}
    check_parent(a, b)
+   iszero(b) && throw(DivideError())
    fl, q = divides(a, b)
    return q
 end
@@ -353,11 +305,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::ResFieldElem{T}) where T <: Integer
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::ResFieldElem{T}) where T <: Integer
    if iszero(a)
       return true
@@ -367,12 +314,6 @@ function is_square(a::ResFieldElem{T}) where T <: Integer
    return isone(a^pm1div2)
 end
 
-@doc raw"""
-    sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
-
-Return the square root of $a$. By default the function will throw an exception
-if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::ResFieldElem{T}; check::Bool=true) where T <: Integer
    U = parent(a)
    p = modulus(a)
@@ -462,18 +403,32 @@ function rand(rng::AbstractRNG,
    S(rand(rng, v))
 end
 
-function RandomExtensions.make(S::ResidueField, vs...)
+function RandomExtensions.make(S::ResidueField, v, vs...)
    R = base_ring(S)
-   if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
-      Make(S, vs[1])
+   if isempty(vs) && elem_type(R) == Random.gentype(v)
+      Make(S, v)
    else
-      Make(S, make(base_ring(S), vs...))
+      Make(S, make(R, v, vs...))
    end
 end
 
-rand(rng::AbstractRNG, S::ResidueField, v...) = rand(rng, make(S, v...))
+# `v, vs...` describe how to sample from the base ring. With no such
+# specification at all, `rand(S)` and `rand(S, dims...)` keep their `Base`
+# meaning -- one resp. an array of uniformly random elements -- which is served
+# by whatever `Random.Sampler` the concrete residue ring provides.
+rand(rng::AbstractRNG, S::ResidueField, v, vs...) = rand(rng, make(S, v, vs...))
 
-rand(S::ResidueField, v...) = rand(Random.default_rng(), S, v...)
+rand(S::ResidueField, v, vs...) = rand(Random.default_rng(), S, v, vs...)
+
+# An integer (or tuple of integers) is an array size, never a sampling
+# specification; saying so resolves the ambiguity with `Base.rand(X, dims...)`.
+rand(rng::AbstractRNG, S::ResidueField, dims::Dims) = rand(rng, make(S), dims)
+
+rand(S::ResidueField, dims::Dims) = rand(Random.default_rng(), S, dims)
+
+rand(rng::AbstractRNG, S::ResidueField, d::Integer, dims::Integer...) = rand(rng, S, Dims((d, dims...)))
+
+rand(S::ResidueField, d::Integer, dims::Integer...) = rand(Random.default_rng(), S, Dims((d, dims...)))
 
 ###############################################################################
 #
@@ -490,7 +445,9 @@ residue ring parent object is cached and returned for any subsequent calls
 to the constructor with the same base ring $R$ and element $a$.
 """
 function residue_field(R::Ring, a::RingElement; cached::Bool = true)
+   @req !is_trivial(R) "Base ring must not be the zero ring."
    iszero(a) && throw(DivideError())
+   @req !is_unit(a) "Cannot create a field with one element"
    T = elem_type(R)
    S = EuclideanRingResidueField{T}(R(a), cached)
    return S, Generic.EuclideanRingResidueMap(R, S)
@@ -499,7 +456,7 @@ end
 @doc raw"""
     quo(::Type{Field}, R::Ring, a::RingElement; cached::Bool = true)
 
-Returns `S, f` where `S = residue_field(R, a)` and `f` is the 
+Returns `S, f` where `S = residue_field(R, a)` and `f` is the
 projection map from `R` to `S`. This map is supplied as a map with section
 where the section is the lift of an element of the residue field back
 to the ring `R`.

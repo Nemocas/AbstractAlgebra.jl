@@ -7,7 +7,7 @@
 function Partition(part::AbstractVector{T}, check::Bool=true) where T
    Generic.Partition(part, check)
 end
- 
+
 function AllParts(n::T) where T
    Generic.AllParts(n)
 end
@@ -29,7 +29,7 @@ end
 #   YoungTableau constructor
 #
 ##############################################################################
- 
+
 function YoungTableau(p::Vector{Int})
    Generic.YoungTableau(p)
 end

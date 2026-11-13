@@ -17,48 +17,49 @@
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
 @testset "Generic.Poly.types" begin
-   @test dense_poly_type(BigInt) == Generic.Poly{BigInt}
-   @test dense_poly_type(Rational{BigInt}) == Generic.Poly{Rational{BigInt}}
+   @test poly_type(BigInt) == Generic.Poly{BigInt}
+   @test poly_type(Rational{BigInt}) == Generic.Poly{Rational{BigInt}}
 end
 
 @testset "Generic.Poly.constructors" begin
-   S1 = PolyRing(ZZ)
-   S2 = PolyRing(ZZ)
+   S1 = AbstractAlgebra.poly_ring(ZZ)
+   S2 = AbstractAlgebra.poly_ring(ZZ)
 
    @test S1 !== S2
    @test isa(S1, Generic.PolyRing)
 
    R, x = ZZ["x"]
-   S1 = R["y"]
-   S2 = ZZ["x"]["y"]
+   S1, y = R["y"]
+   @test isa(y, PolyRingElem)
+   S2, (x,y) = ZZ["x"]["y"]
+   @test isa(y, PolyRingElem)
 
    @test polynomial_ring(R, "y", cached = true)[1] === polynomial_ring(R, "y", cached = true)[1]
    @test polynomial_ring(R, "y", cached = true)[1] !== polynomial_ring(R, "y", cached = false)[1]
 
-   for (S, y) in (S1, S2)
+   for S in (S1, S2)
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
 
       @test elem_type(S) == Generic.Poly{elem_type(R)}
       @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
       @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
-      @test typeof(R) <: AbstractAlgebra.Ring
-      @test typeof(S) <: Generic.PolyRing
-
-      @test isa(y, PolyRingElem)
+      @test R isa AbstractAlgebra.Ring
+      @test S isa Generic.PolyRing
    end
 
    R, x = polynomial_ring(ZZ, "x")
    S, y = polynomial_ring(R, "y")
 
-   @test typeof(S) <: Generic.PolyRing
+   @test S isa Generic.PolyRing
 
    @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
-   @test typeof(T) <: Generic.PolyRing
+   @test T isa Generic.PolyRing
 
    @testset "Generic.Poly.constructors.elements" begin
       @test isa(z, PolyRingElem)
@@ -94,13 +95,6 @@ end
       n = S([ZZ(1), ZZ(2), ZZ(3)])
 
       @test isa(n, PolyRingElem)
-
-      @test x in [x, y]
-      @test x in [y, x]
-      @test !(x in [y])
-
-      @test x in keys(Dict(x => 1))
-      @test !(y in keys(Dict(x => 1)))
    end
 
    @testset "Generic.Poly.constructors.varname" begin
@@ -119,6 +113,24 @@ end
       @test Rx1 == Rx5
       @test Rx1 == Rx6
       @test Rx1 == (Rx7, x)
+   end
+
+   @testset "Generic.Poly.constructors.getindex" begin
+      S, vs = ZZ[:x][:y]
+      @test S isa Generic.PolyRing{Generic.Poly{BigInt}}
+      @test length(vs) == 2
+      for v in vs
+         @test v isa Generic.Poly{Generic.Poly{BigInt}}
+         @test parent(v) == S
+      end
+
+      S, vs = ZZ[:x][:y][:z]
+      @test S isa Generic.PolyRing{Generic.Poly{Generic.Poly{BigInt}}}
+      @test length(vs) == 3
+      for v in vs
+         @test v isa Generic.Poly{Generic.Poly{Generic.Poly{BigInt}}}
+         @test parent(v) == S
+      end
    end
 end
 
@@ -142,11 +154,11 @@ end
 
 @testset "Generic.Poly.conformance" begin
    R, x = polynomial_ring(ZZ, "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
    R, x = polynomial_ring(QQ, "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
    R, x = polynomial_ring(GF(5), "x")
-   test_Poly_interface(R)
+   ConformanceTests.test_Poly_interface(R)
 end
 
 @testset "Generic.Poly.printing" begin
@@ -2441,6 +2453,14 @@ end
    end
 end
 
+@testset "Generic.Poly.roots_with_multiplicities" begin
+   # the argument checks: the roots themselves need a univariate `factor`
+   R, x = polynomial_ring(QQ, "x")
+   @test_throws ArgumentError roots_with_multiplicities(R(0))
+   S, y = polynomial_ring(RealField, "y")
+   @test_throws ArgumentError roots_with_multiplicities(y^2 + 1)
+end
+
 @testset "Generic.Poly.interpolation" begin
    # Exact ring
    R, x = polynomial_ring(ZZ, "x")
@@ -2991,6 +3011,15 @@ end
    F = GF(11)
    P, y = polynomial_ring(F, 'x')
    @test map_coefficients(t -> F(t) + 2, f) == 3y^2 + 5y^3 + 4y^6
+
+   let
+      Q = matrix_ring(QQ, 2)
+      Qz, z = Q[:z]
+      Qx, x = QQ[:x]
+      f = map_coefficients(c -> c * (2*one(Q)), x; parent = Qz)
+      @test f == 2*z
+      @test parent(f) === Qz
+   end
 end
 
 @testset "Generic.Poly.polynomial_to_power_sums" begin
@@ -3033,11 +3062,23 @@ end
       d = min(num, degree(f))
       @test collect(Base.Iterators.take(V, d)) == collect(Base.Iterators.take(W, d))
    end
-end 
+end
 
 @testset "Generic.Poly.zero_rings" begin
   R, = residue_ring(ZZ, 1)
   Rx, = R[:x]
   @test is_zero(gen(Rx)) && is_one(gen(Rx))
-  test_Ring_interface_recursive(Rx)
+  ConformanceTests.test_Ring_interface_recursive(Rx)
+end
+
+@testset "Generic.Poly.separability" begin
+  QQx, x = QQ[:x]
+  @test is_separable(x)
+  @test is_separable((x + 1)*x)
+  @test !is_separable(x^2)
+
+  F = GF(2)
+  Fx, x = F[:x]
+  @test is_separable(x)
+  @test !is_separable(x^2)
 end

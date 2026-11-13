@@ -60,41 +60,42 @@ function test_rand(@nospecialize(test::Union{Nothing,Function}),
    @test size(mM) == (2, 3)
    foreach(_test, mM)
 
-   Random.seed!(rng, rng.seed)
-   x = rand(rng, R, args...)
+   rng1 = copy(rng)
+   x = rand(rng1, R, args...)
    @test x isa type
    _test(x)
-   y = rand(rng, M)
+   y = rand(rng1, M)
    @test y isa type
    _test(y)
 
    if isempty(args)
-      v = rand(rng, R, 2)
+      v = rand(rng1, R, 2)
       @test v isa Vector{type}
       @test size(v) == (2,)
       foreach(_test, v)
-      m = rand(rng, R, 2, 3)
+      m = rand(rng1, R, 2, 3)
       @test m isa Matrix{type}
       @test size(m) == (2, 3)
       foreach(_test, m)
    end
-   vM = rand(rng, M, 2)
+   vM = rand(rng1, M, 2)
    @test vM isa Vector{type}
    @test size(vM) == (2,)
    foreach(_test, vM)
 
-   mM = rand(rng, M, 2, 3)
+   mM = rand(rng1, M, 2, 3)
    @test mM isa Matrix{type}
    @test size(mM) == (2, 3)
    foreach(_test, mM)
 
-   Random.seed!(rng, rng.seed)
-   @test x == rand(rng, R, args...)
-   @test y == rand(rng, M)
+   # rng2 should reproduce the same random values as rng1
+   rng2 = copy(rng)
+   @test x == rand(rng2, R, args...)
+   @test y == rand(rng2, M)
    if isempty(args)
-      @test v == rand(rng, R, 2)
-      @test m == rand(rng, R, 2, 3)
+      @test v == rand(rng2, R, 2)
+      @test m == rand(rng2, R, 2, 3)
    end
-   @test vM == rand(rng, M, 2)
-   @test mM == rand(rng, M, 2, 3)
+   @test vM == rand(rng2, M, 2)
+   @test mM == rand(rng2, M, 2, 3)
 end

@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:NCPolyRing{T}}) where T<:NCRingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:NCPolyRing}) = base_ring_type(T)
 coefficient_ring(R::NCPolyRing) = base_ring(R)
 
 function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S}}
@@ -19,63 +20,73 @@ function is_exact_type(a::Type{T}) where {S <: NCRingElem, T <: NCPolyRingElem{S
 end
 
 @doc raw"""
-    dense_poly_type(::Type{T}) where T<:NCRingElement
-    dense_poly_type(::T) where T<:NCRingElement
-    dense_poly_type(::Type{S}) where S<:NCRing
-    dense_poly_type(::S) where S<:NCRing
+    poly_type(::Type{T}) where T<:NCRingElement
+    poly_type(::T) where T<:NCRingElement
+    poly_type(::Type{S}) where S<:NCRing
+    poly_type(::S) where S<:NCRing
 
-The type of univariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.NCPoly{T}` respectively `Generic.Poly{T}`.
+Return the type of a (univariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`poly_ring_type`](@ref).
 
-See also [`dense_poly_ring_type`](@ref), [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
+For multivariate polynomials see [`mpoly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic univariate polynomials (namely `Generic.NCPoly{T}` or `Generic.Poly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest
-julia> dense_poly_type(AbstractAlgebra.ZZ(1))
+julia> poly_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(elem_type(AbstractAlgebra.ZZ))
+julia> poly_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(AbstractAlgebra.ZZ)
+julia> poly_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.Poly{BigInt}
 
-julia> dense_poly_type(typeof(AbstractAlgebra.ZZ))
+julia> poly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.Poly{BigInt}
 ```
 """
-dense_poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
-dense_poly_type(::Type{S}) where S<:NCRing = dense_poly_type(elem_type(S))
-dense_poly_type(x) = dense_poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
-dense_poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
+poly_type
+
+poly_type(::Type{T}) where T<:NCRingElement = Generic.NCPoly{T}
+poly_type(::Type{S}) where S<:NCRing = poly_type(elem_type(S))
+poly_type(x) = poly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
+poly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `NCRingElement`."))
+poly_type(T::Type{Union{}}) = throw(MethodError(poly_type, (T,)))
 
 @doc raw"""
-    dense_poly_ring_type(::Type{T}) where T<:NCRingElement
-    dense_poly_ring_type(::T) where T<:NCRingElement
-    dense_poly_ring_type(::Type{S}) where S<:NCRing
-    dense_poly_ring_type(::S) where S<:NCRing
+    poly_ring_type(::Type{T}) where T<:NCRingElement
+    poly_ring_type(::T) where T<:NCRingElement
+    poly_ring_type(::Type{S}) where S<:NCRing
+    poly_ring_type(::S) where S<:NCRing
 
 The type of univariate polynomial rings with coefficients of type `T` respectively
-`elem_type(S)`. Implemented via [`dense_poly_type`](@ref).
+`elem_type(S)`. Implemented via [`poly_type`](@ref).
 
 See also [`mpoly_type`](@ref) and [`mpoly_ring_type`](@ref).
 
 # Examples
 ```jldoctest
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ(1))
+julia> poly_ring_type(AbstractAlgebra.ZZ(1))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(elem_type(AbstractAlgebra.ZZ))
+julia> poly_ring_type(elem_type(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(AbstractAlgebra.ZZ)
+julia> poly_ring_type(AbstractAlgebra.ZZ)
 AbstractAlgebra.Generic.PolyRing{BigInt}
 
-julia> dense_poly_ring_type(typeof(AbstractAlgebra.ZZ))
+julia> poly_ring_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.PolyRing{BigInt}
 ```
 """
-dense_poly_ring_type(x) = parent_type(dense_poly_type(x))
+poly_ring_type(x) = parent_type(poly_type(x))
 
 @doc raw"""
     var(a::NCPolyRing)
@@ -100,9 +111,11 @@ Return the number of variables of the polynomial ring, which is 1.
 """
 number_of_variables(a::NCPolyRing) = 1
 
-characteristic(a::NCPolyRing) = characteristic(base_ring(a))
+characteristic(R::NCPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::NCPolyRing) = is_known(characteristic, base_ring(R))
 
-is_finite(a::NCPolyRing) = is_trivial(a)
+is_finite(R::NCPolyRing) = is_trivial(R)
+is_known(::typeof(is_finite), R::NCPolyRing) = is_known(is_trivial, R)
 
 ###############################################################################
 #
@@ -400,12 +413,7 @@ Return `true` if $x = y$.
 """
 ==(x::T, y::NCPolyRingElem{T}) where T <: NCRingElem = y == x
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::NCPolyRingElem) = y == x
+==(x::JuliaRingElement, y::NCPolyRingElem) = y == x
 
 ###############################################################################
 #
@@ -417,6 +425,29 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
     mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
 
 Return $a\times b$ truncated to $n$ terms.
+
+# Examples
+
+```jldoctest
+julia> R = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> S, x = polynomial_ring(R, :x)
+(Univariate polynomial ring in x over matrix ring, x)
+
+julia> T, y = polynomial_ring(S, :y)
+(Univariate polynomial ring in y over S, y)
+
+julia> f = x*y^2 + (x + 1)*y + 3
+x*y^2 + (x + 1)*y + [3 0; 0 3]
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x + 1)*y + x^3 + [2 0; 0 2]*x + [2 0; 0 2]
+
+julia> mullow(f, g, 4)
+(x^2 + x)*y^3 + (x^4 + [3 0; 0 3]*x^2 + [4 0; 0 4]*x + 1)*y^2 + (x^4 + x^3 + [2 0; 0 2]*x^2 + [7 0; 0 7]*x + [5 0; 0 5])*y + [3 0; 0 3]*x^3 + [6 0; 0 6]*x + [6 0; 0 6]
+```
 """
 function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: NCRingElem
    check_parent(a, b)
@@ -531,7 +562,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_right(a::NCPolyRingElem{<:NCRingElem}, b::NCRingElement; check::Bool=true)
 
 Assuming $a = qb$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
@@ -548,7 +579,7 @@ function divexact_right(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <:
 end
 
 @doc raw"""
-    divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: NCRingElem
+    divexact_left(a::NCPolyRingElem{<:NCRingElem}, b::NCRingElement; check::Bool=true)
 
 Assuming $a = bq$, return $q$. By default if the division is not exact an
 exception is raised. If `check=false` this test is omitted.
@@ -564,13 +595,7 @@ function divexact_left(a::NCPolyRingElem{T}, b::T; check::Bool=true) where T <: 
    return z
 end
 
-@doc raw"""
-    divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-
-Assuming $a = qb$, return $q$. By default if the division is not exact an
-exception is raised. If `check=false` this test is omitted.
-"""
-function divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact_right(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -581,13 +606,7 @@ function divexact_right(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractF
    return z
 end
 
-@doc raw"""
-    divexact_left(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
-
-Assuming $a = bq$, return $q$. By default if the division is not exact an
-exception is raised. If `check=false` this test is omitted.
-"""
-function divexact_left(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact_left(a::NCPolyRingElem, b::JuliaRingElement; check::Bool=true)
    return divexact_right(a, b; check=check)
 end
 
@@ -598,7 +617,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
+    evaluate(a::NCPolyRingElem, b::NCRingElement)
 
 Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
@@ -617,12 +636,7 @@ function evaluate(a::NCPolyRingElem, b::T) where T <: NCRingElem
    return z
 end
 
-@doc raw"""
-    evaluate(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat})
-
-Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
-function evaluate(a::NCPolyRingElem, b::Union{Integer, Rational, AbstractFloat})
+function evaluate(a::NCPolyRingElem, b::JuliaRingElement)
    i = length(a)
    R = base_ring(a)
    if i == 0
@@ -666,7 +680,7 @@ _make_parent(g::T, p::NCPolyRingElem, cached::Bool) where {T} =
 
 function map_coefficients(g::T, p::NCPolyRingElem{<:NCRingElement};
                     cached::Bool = true,
-		    parent::NCPolyRing = _make_parent(g, p, cached)) where {T}
+		    parent = _make_parent(g, p, cached)) where {T}
    return _map(g, p, parent)
 end
 
@@ -676,18 +690,6 @@ function _map(g::T, p::NCPolyRingElem, Rx) where {T}
                                      iszero(c) ? zero(R) : R(g(c))
                                    end for i in 0:degree(p)]
    return Rx(new_coefficients)
-end
-
-###############################################################################
-#
-#   Unsafe functions
-#
-###############################################################################
-
-function addmul!(z::NCPolyRingElem{T}, x::NCPolyRingElem{T}, y::NCPolyRingElem{T}, c::NCPolyRingElem{T}) where T <: NCRingElem
-   c = mul!(c, x, y)
-   z = add!(z, c)
-   return z
 end
 
 ###############################################################################
@@ -724,7 +726,21 @@ end
 rand(rng::AbstractRNG, S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
    rand(rng, make(S, deg_range, v...))
 
-rand(S::NCPolyRing, deg_range, v...) = rand(Random.default_rng(), S, deg_range, v...)
+rand(S::NCPolyRing, deg_range::AbstractUnitRange{Int}, v...) =
+   rand(Random.default_rng(), S, deg_range, v...)
+
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+(f::NCPolyRingElem)(a::Integer) = evaluate(f, a)
+
+function (f::NCPolyRingElem)(a::NCRingElem)
+    return evaluate(f, a)
+end
 
 
 ###############################################################################
@@ -734,7 +750,7 @@ rand(S::NCPolyRing, deg_range, v...) = rand(Random.default_rng(), S, deg_range, 
 ###############################################################################
 
 @doc raw"""
-    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool = true)
+    polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true)
 
 Given a base ring `R` and symbol/string `s` specifying how the generator
 (variable) should be printed, return a tuple `S, x` representing the new
@@ -753,20 +769,16 @@ julia> S, y = polynomial_ring(R, :y)
 (Univariate polynomial ring in y over R, y)
 ```
 """
-function polynomial_ring(R::NCRing, s::VarName =:x; kw...)
-   S = polynomial_ring_only(R, Symbol(s); kw...)
+function polynomial_ring(R::NCRing, s::VarName = :x; cached::Bool=true, kw...)
+   S = poly_ring(R, Symbol(s); cached, kw...)
    (S, gen(S))
 end
 
 @doc raw"""
-    polynomial_ring_only(R::NCRing, s::Symbol; cached::Bool=true)
+    poly_ring(R::NCRing, s::Symbol; cached::Bool=false)
 
 Like [`polynomial_ring(R::NCRing, s::Symbol)`](@ref) but return only the
 polynomial ring.
 """
-polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing =
-   dense_poly_ring_type(T)(R, s, cached)
-
-# Simplified constructor
-
-PolyRing(R::NCRing) = polynomial_ring_only(R, :x; cached=false)
+poly_ring(R::T, s::Symbol = :x; cached::Bool=false) where T<:NCRing =
+   poly_ring_type(T)(R, s, cached)

@@ -22,12 +22,34 @@
    F = free_module(QQ,2)
    D, inj, pro = direct_sum(F, F)
    f = D([gen(F, 1), gen(F,2)])
+   @test rank(D) == 4
+   @test dim(D) == 4
+   @test vector_space_dim(D) == 4
    @test gen(D, 1) == D[1]
    @test isa(f, Generic.DirectSumModuleElem)
    @test f == inj[1](gen(F,1)) + inj[2](gen(F, 2))
 
    @test_throws ArgumentError gen(D, 0)
    @test_throws ArgumentError gen(D, ngens(D) + 1)
+
+   F = free_module(ZZ, 1)
+   S, _ = sub(F, [2*gen(F, 1)])
+   Q, _ = quo(F, S)
+   D, _, _ = direct_sum(Q, Q)
+
+   @test relations(D) == [matrix(ZZ, 1, 2, [2, 0]), matrix(ZZ, 1, 2, [0, 2])]
+   @test invariant_factors(D) == BigInt[2, 2]
+   @test_throws MethodError rank(D)
+   @test_throws MethodError dim(D)
+
+   # direct sum of non-free module types over a field
+   F = free_module(QQ, 3)
+   S, _ = sub(F, [gen(F, 1)])
+   Q, _ = quo(F, S)
+   D, _, _ = direct_sum(F, S, Q)
+   @test rank(D) == 6
+   @test dim(D) == 6
+   @test vector_space_dim(D) == 6
 end
 
 @testset "Generic.DirectSum.basic_manipulation" begin
@@ -88,4 +110,3 @@ end
       end
    end
 end
-

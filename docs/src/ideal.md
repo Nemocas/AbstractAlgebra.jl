@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -84,28 +85,7 @@ AbstractAlgebra.Generic.Ideal{BigInt}(Integers, BigInt[1])
 ### Basic functionality
 
 ```@docs
-gens(::Generic.Ideal{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
-3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 3*x^3 + 2*x^2 + 1
- 5*x^4 + 1
- 2*x - 1
-
-julia> I = Generic.Ideal(R, V)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1])
-
-julia> gens(I)
-2-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 3
- x + 1
+gens(::Generic.Ideal)
 ```
 
 ### Arithmetic of Ideals
@@ -116,44 +96,11 @@ ideals.
 ### Containment
 
 ```@docs
-contains(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
+is_subset(I::T, J::T) where {T <: Generic.Ideal}
 ```
 
 ```@docs
 intersect(::Generic.Ideal{T}, ::Generic.Ideal{T}) where T <: RingElement
-```
-
-**Examples**
-
-```jldoctest
-julia> R, x = polynomial_ring(ZZ, :x)
-(Univariate polynomial ring in x over integers, x)
-
-julia> V = [1 + 2x^2 + 3x^3, 5x^4 + 1, 2x - 1]
-3-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 3*x^3 + 2*x^2 + 1
- 5*x^4 + 1
- 2*x - 1
-
-julia> W = [1 + 2x^2 + 3x^3, 5x^4 + 1]
-2-element Vector{AbstractAlgebra.Generic.Poly{BigInt}}:
- 3*x^3 + 2*x^2 + 1
- 5*x^4 + 1
-
-julia> I = Generic.Ideal(R, V)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[3, x + 1])
-
-julia> J = Generic.Ideal(R, W)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.Poly{BigInt}}(Univariate polynomial ring in x over integers, AbstractAlgebra.Generic.Poly{BigInt}[282, 3*x + 255, x^2 + 107])
-
-julia> contains(J, I)
-false
-
-julia> contains(I, J)
-true
-
-julia> intersect(I, J) == J
-true
 ```
 
 ### Normal form
@@ -163,23 +110,4 @@ a polynomial with respect to an ideal.
 
 ```@docs
 normal_form(::U, ::Generic.Ideal{U}) where {T <: RingElement, U <: Union{PolyRingElem{T}, MPolyRingElem{T}}}
-```
-
-**Examples**
-
-```jldoctest
-julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:degrevlex)
-(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
-
-julia> V = [3*x^2*y - 3*y^2, 9*x^2*y + 7*x*y]
-2-element Vector{AbstractAlgebra.Generic.MPoly{BigInt}}:
- 3*x^2*y - 3*y^2
- 9*x^2*y + 7*x*y
-
-julia> I = Generic.Ideal(R, V)
-AbstractAlgebra.Generic.Ideal{AbstractAlgebra.Generic.MPoly{BigInt}}(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[7*x*y + 9*y^2, 243*y^3 - 147*y^2, x*y^2 + 36*y^3 - 21*y^2, x^2*y + 162*y^3 - 99*y^2])
-
-
-julia> normal_form(30x^5*y + 2x + 1, I)
-135*y^4 + 138*y^3 - 147*y^2 + 2*x + 1
 ```

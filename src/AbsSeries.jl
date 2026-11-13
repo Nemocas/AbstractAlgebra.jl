@@ -155,10 +155,37 @@ zero(a::AbsPowerSeriesRingElem, var::VarName=var(parent(a)); cached::Bool=true) 
 #
 ###############################################################################
 
+@doc raw"""
+    abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
+
+Return the absolute power series over `R` in the variable `var` whose first
+`len` coefficients are given by the first `len` entries of `arr`: `arr[i]` is
+the coefficient of `var^(i - 1)`. The input must satisfy
+`0 <= len <= length(arr)` and `prec >= len`, where `prec` is the absolute
+precision. The series ring is created on the fly with maximum absolute
+precision `max_precision`; setting `cached` to `false` prevents it from being
+cached.
+
+# Examples
+
+```jldoctest
+julia> abs_series(ZZ, [1, 2, 3], 3, 5, :y)
+1 + 2*y + 3*y^2 + O(y^5)
+
+julia> abs_series(ZZ, [1, 2, 3], 1, 6; cached=false)
+1 + O(x^6)
+
+julia> abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
+1 + 2*x + 3*x^2 + O(x^5)
+
+julia> abs_series(ZZ, [], 0, 6)
+O(x^6)
+```
+"""
 function abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
    TT = elem_type(R)
-   coeffs = T == Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
+   coeffs = T === Any && length(arr) == 0 ? elem_type(R)[] : map(R, arr)
    p = Generic.AbsSeries{TT}(coeffs, len, prec)
    # Default is supposed to return a Generic polynomial
    p.parent = Generic.AbsPowerSeriesRing{TT}(R, max_precision, Symbol(var), cached)
@@ -337,7 +364,7 @@ function *(a::T, b::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
    return z
 end
 
-function *(a::Union{Integer, Rational, AbstractFloat}, b::AbsPowerSeriesRingElem)
+function *(a::JuliaRingElement, b::AbsPowerSeriesRingElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -351,7 +378,7 @@ end
 
 *(a::AbsPowerSeriesRingElem{T}, b::T) where {T <: RingElem} = b*a
 
-*(a::AbsPowerSeriesRingElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::AbsPowerSeriesRingElem, b::JuliaRingElement) = b*a
 
 ###############################################################################
 #
@@ -363,7 +390,7 @@ end
     shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_left(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -393,7 +420,7 @@ end
     shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
 
 Return the power series $x$ shifted right by $n$ terms, i.e. divided by
-$x^n$.
+$t^n$, where $t$ is the variable of the ring.
 """
 function shift_right(x::AbsPowerSeriesRingElem{T}, n::Int) where T <: RingElement
    n < 0 && throw(DomainError(n, "n must be >= 0"))
@@ -563,35 +590,21 @@ end
 ###############################################################################
 
 @doc raw"""
-    ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem}
+    ==(x::AbsPowerSeriesRingElem{<:RingElem}, y::RingElement)
+    ==(x::RingElement, y::AbsPowerSeriesRingElem{<:RingElem})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::AbsPowerSeriesRingElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::AbsPowerSeriesRingElem{T}) where {T <: RingElem} = y == x
 
-@doc raw"""
-    ==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::AbsPowerSeriesRingElem, y::JuliaRingElement) = precision(x) == 0 ||
                      ((length(x) == 0 && iszero(base_ring(x)(y))) ||
                       (length(x) == 1 && coeff(x, 0) == y))
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::AbsPowerSeriesRingElem) = y == x
+==(x::JuliaRingElement, y::AbsPowerSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -654,7 +667,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::AbsPowerSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(x::AbsPowerSeriesRingElem, y::JuliaRingElement; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -725,7 +738,7 @@ function Base.inv(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
     la = [prec]
     while la[end] > 1
         push!(la, div(la[end] + 1, 2))
-    end 
+    end
     two = R(2)
     two = _set_precision_raw!(two, prec)
     n = length(la) - 1
@@ -738,7 +751,7 @@ function Base.inv(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
         y = mul!(y, minus_a, x)
         y = add!(y, two)
         x = mul!(x, x, y)
-        n -= 1 
+        n -= 1
     end
     return x
 end
@@ -783,7 +796,7 @@ function compose(f::AbsPowerSeriesRingElem, g::AbsPowerSeriesRingElem; inner = n
              Alternatively, use directly f(g) or g(f)
              """)
   end
-            
+
   if inner == :second
     return _compose_right(f, g)
   else
@@ -864,18 +877,20 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    asqrt = parent(a)()
    fit!(asqrt, prec)
    asqrt = _set_precision_raw!(asqrt, prec)
+   if prec <= aval2
+      asqrt = set_length!(asqrt, normalise(asqrt, prec))
+      return true, asqrt
+   end
    for n = 1:aval2
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
-   if prec > aval2
-      c = coeff(a, aval)
-      if check && !is_square(c)
-         return false, zero(S)
-      end
-      g = sqrt(c; check=check)
-      asqrt = setcoeff!(asqrt, aval2, g)
-      g2 = g + g
+   c = coeff(a, aval)
+   if check && !is_square(c)
+      return false, zero(S)
    end
+   g = sqrt(c; check=check)
+   asqrt = setcoeff!(asqrt, aval2, g)
+   g2 = g + g
    p = R()
    for n = 1:prec - aval2 - 1
       c = R()
@@ -905,13 +920,6 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    return true, asqrt
 end
 
-@doc raw"""
-    sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
-
-Return the square root of the power series $a$. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::AbsPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
@@ -1038,7 +1046,7 @@ function Base.exp(a::AbsPowerSeriesRingElem{T}) where T <: FieldElement
       t = add!(t, one1)
       t = add!(t, a)
       x = mul!(x, x, t)
-      n -= 1 
+      n -= 1
    end
    if !isone(c)
       x *= c
@@ -1068,6 +1076,19 @@ Transform the series `p` by applying `f` on each non-zero coefficient.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+
+julia> map_coefficients(AbstractAlgebra.sqrt, f)
+2*x^6 + x^7 + 3*x^8 + 4*x^9 + 5*x^10 + O(x^11)
+```
 """
 function map_coefficients(g::T, p::AbsPowerSeriesRingElem{<:RingElement};
                     cached::Bool = true,
@@ -1105,6 +1126,19 @@ into `R`.
 If the optional `parent` keyword is provided, the series will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, x = power_series_ring(ZZ, 10, :x)
+(Univariate power series ring over integers, x + O(x^11))
+
+julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+
+julia> change_base_ring(QQ, f)
+4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
+```
 """
 function change_base_ring(R::Ring, p::AbsPowerSeriesRingElem{T};
                     cached::Bool = true, parent::Ring =

@@ -12,6 +12,7 @@
 
 base_ring_type(::Type{<:MPolyRing{T}}) where T<:RingElement = parent_type(T)
 
+coefficient_ring_type(T::Type{<:MPolyRing}) = base_ring_type(T)
 coefficient_ring(R::MPolyRing) = base_ring(R)
 
 @doc raw"""
@@ -20,10 +21,17 @@ coefficient_ring(R::MPolyRing) = base_ring(R)
     mpoly_type(::Type{S}) where S<:Ring
     mpoly_type(::S) where S<:Ring
 
-The type of multivariate polynomials with coefficients of type `T` respectively `elem_type(S)`.
-Falls back to `Generic.MPoly{T}`.
+Return the type of a (multivariate) polynomial whose coefficients have type `T` or
+type `elem_type(S)`.
+The type of the corresponding polynomial ring can be found via [`mpoly_ring_type`](@ref).
 
-See also [`mpoly_ring_type`](@ref), [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+For univariate polynomials see [`poly_type`](@ref).
+
+# Implementation
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
 
 # Examples
 ```jldoctest
@@ -40,10 +48,13 @@ julia> mpoly_type(typeof(AbstractAlgebra.ZZ))
 AbstractAlgebra.Generic.MPoly{BigInt}
 ```
 """
+mpoly_type
+
 mpoly_type(::Type{T}) where T<:RingElement = Generic.MPoly{T}
 mpoly_type(::Type{S}) where S<:Ring = mpoly_type(elem_type(S))
 mpoly_type(x) = mpoly_type(typeof(x)) # to stop this method from eternally recursing on itself, we better add ...
 mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype of `RingElement`."))
+mpoly_type(T::Type{Union{}}) = throw(MethodError(mpoly_type, (T,)))
 
 @doc raw"""
     mpoly_ring_type(::Type{T}) where T<:RingElement
@@ -51,10 +62,18 @@ mpoly_type(::Type{T}) where T = throw(ArgumentError("Type `$T` must be subtype o
     mpoly_ring_type(::Type{S}) where S<:Ring
     mpoly_ring_type(::S) where S<:Ring
 
-The type of multivariate polynomial rings with coefficients of type `T`
-respectively `elem_type(S)`. Implemented via [`mpoly_type`](@ref).
+Return the type of the parent of a (multivariate) polynomial whose coefficients
+have type `T` or type `elem_type(S)`.
+The type of the polynomials themselves can be found via [`mpoly_type`](@ref).
 
-See also [`dense_poly_type`](@ref) and [`dense_poly_ring_type`](@ref).
+For univariate polynomials see [`poly_ring_type`](@ref).
+
+# Implementation 
+
+This function is already defined for generic multivariate polynomials (namely `Generic.MPoly{T}`),
+so _needs to be defined only for_ special polynomial rings, _e.g._ those defined by
+a C implementation.
+
 
 # Examples
 ```jldoctest
@@ -89,58 +108,65 @@ Return the number of variables in `R`.
 number_of_generators(R::MPolyRing) = number_of_variables(R)
 
 @doc raw"""
+    var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the indices of the variables actually occurring in $p$.
+"""
+function var_indices(p::MPolyRingElem{T}) where {T <: RingElement}
+   isused = zeros(Int, nvars(parent(p)))
+   for v in exponent_vectors(p)
+      isused .|= v  # accumulate by OR-ing the exponent vectors
+   end
+   return findall(!iszero, isused)
+end
+
+@doc raw"""
     vars(p::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the variables actually occurring in $p$.
 """
 function vars(p::MPolyRingElem{T}) where {T <: RingElement}
-   U = typeof(p)
-   vars_in_p = Vector{U}(undef, 0)
-   n = nvars(parent(p))
-   gen_list = gens(parent(p))
-   biggest = [0 for i in 1:n]
-   for v in exponent_vectors(p)
-      for j = 1:n
-         if v[j] > biggest[j]
-            biggest[j] = v[j]
-         end
-      end
-   end
-   for i = 1:n
-      if biggest[i] != 0
-         push!(vars_in_p, gen_list[i])
-      end
-   end
-   return(vars_in_p)
+   R = parent(p)
+   return [gen(R, i) for i in var_indices(p)]
 end
 
 @doc raw"""
-    var_index(p::MPolyRingElem{T}) where {T <: RingElement}
+    var_index(x::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the index of the given variable $x$. If $x$ is not a variable
 in a multivariate polynomial ring, an exception is raised.
 """
 function var_index(x::MPolyRingElem{T}) where {T <: RingElement}
-   !is_monomial(x) && error("Not a variable in var_index")
-   exps = first(exponent_vectors(x))
-   count = 0
-   index = 0
-   for i = 1:length(exps)
-      if exps[i] > 1
-         error("Not a variable in var_index")
-      end
-      if exps[i] == 1
-         count += 1
-         index = i
-      end
-   end
-   count != 1 && error("Not a variable in var_index")
-   return index
+  fl, i = _is_gen_with_index(x)
+  if fl
+    return i
+  else
+    error("Not a variable in var_index")
+  end
+end
+
+# fallback method, MPolyRingElem subtypes can provide an optimized one
+function _is_gen_with_index(x::MPolyRingElem)
+  for i in 1:nvars(parent(x))
+    is_gen(x, i) && return true, i
+  end
+  return false, 0
+end
+
+# fallback method for is_gen(x, i) -- most MPolyRingElem subtypes will provide
+# a more efficient one, though for now this is needed for Nemo.FqMPolyRing
+# (see < https://github.com/Nemocas/Nemo.jl/pull/2047>)
+function is_gen(x::MPolyRingElem, i::Int)
+  return is_monomial(x) == 1 && total_degree(x) == 1 && exponent(x, 1, i) == 1
 end
 
 characteristic(R::MPolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::MPolyRing) = is_known(characteristic, base_ring(R))
 
 is_finite(R::MPolyRing) = is_trivial(base_ring(R)) || (nvars(R) == 0 && is_finite(base_ring(R)))
+is_known(::typeof(is_finite), R::MPolyRing) =
+  is_known(is_trivial, base_ring(R)) &&
+    (is_trivial(base_ring(R)) || nvars(R) > 0 || is_known(is_finite, base_ring(R)))
 
 
 ###############################################################################
@@ -158,18 +184,26 @@ indices raised to the given exponents (note that not all variables need to
 appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
 the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 $x, y, z$ in that order).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+
+julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+x^4*y^2*z^2 - 2*x^4*y*z^2 + 4*x^4*z^2 + 2*x^2*y^2 + x + 1
+
+julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+true
+```
 """
 function coeff(a::MPolyRingElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(exps) &&
-       error("Number of variables does not match number of exponents")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(exps) "Number of variables does not match number of exponents"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
-      if exps[i] < 0
-         error("Exponent cannot be negative")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
+      @req exps[i] >= 0 "Exponent must not be negative"
    end
    S = parent(a)
    M = Generic.MPolyBuildCtx(S)
@@ -260,22 +294,32 @@ end
     leading_coefficient(p::MPolyRingElem)
 
 Return the leading coefficient of the polynomial $p$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y]; internal_ordering=:deglex);
+
+julia> p = 2*x*y + 3*y^3 + 1
+3*y^3 + 2*x*y + 1
+
+julia> leading_coefficient(p)
+3
+```
 """
 function leading_coefficient(p::MPolyRingElem{T}) where T <: RingElement
-   if iszero(p)
-      return zero(base_ring(p))
-   else
-      return first(coefficients(p))
-   end
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
+   return first(coefficients(p))
 end
 
 @doc raw"""
     trailing_coefficient(p::MPolyRingElem)
 
 Return the trailing coefficient of the polynomial $p$, i.e. the coefficient of
-the last nonzero term, or zero if the polynomial is zero.
+the last nonzero term.
 """
 function trailing_coefficient(p::MPolyRingElem{T}) where T <: RingElement
+   @req !iszero(p) "Zero polynomial does not have a leading monomial"
    coeff = zero(base_ring(p))
    for c in coefficients(p)
       coeff = c
@@ -315,14 +359,6 @@ function constant_coefficient(p::MPolyRingElem{T}) where T <: RingElement
             return c
          end
       end
-   end
-   return zero(base_ring(p))
-end
-
-function constant_coefficient(p::MPolyRingElem)
-   len = length(p)
-   if !iszero(p) && iszero(exponent_vector(p, len))
-      return coeff(p, len)
    end
    return zero(base_ring(p))
 end
@@ -425,28 +461,46 @@ end
 
 iszero(x::MPolyRingElem{T}) where T <: RingElement = length(x) == 0
 
-function is_unit(a::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(a)
-      return is_unit(leading_coefficient(a))
-   elseif is_domain_type(elem_type(coefficient_ring(a)))
-      return false
-   elseif length(a) == 1
-      return false
-   else
-      throw(NotImplementedError(:is_unit, a))
-   end
+function is_unit(f::T) where {T <: MPolyRingElem}
+  # A polynomial over a commutative ring is a unit iff its
+  # constant term is a unit and all other coefficients are nilpotent:
+  # see e.g. <https://kconrad.math.uconn.edu/blurbs/ringtheory/polynomial-properties.pdf> for a proof.
+  # For constant polynomials we delegate to the coefficient ring:
+  is_constant(f) && return is_unit(constant_coefficient(f))
+  # Here deg(f) > 0.
+  # Over an integral domain, non-constant polynomials are never units:
+  is_domain_type(base_ring_type(T)) && return false
+  constant_term_is_unit = false
+  for (c, expv) in zip(coefficients(f), exponent_vectors(f))
+    if is_zero(expv)
+      is_unit(c) || return false
+      constant_term_is_unit = true
+    else
+      is_nilpotent(c) || return false
+    end
+  end
+  return constant_term_is_unit  # handles the case that there is no constant term
 end
 
 function content(a::MPolyRingElem{T}) where T <: RingElement
    z = zero(coefficient_ring(a))
    for c in coefficients(a)
-      z = gcd(z, c)
+      z = gcd!(z, c)
    end
    return z
 end
 
+
+function is_nilpotent(f::T) where {T <: MPolyRingElem}
+  # Over a commutative ring a poly is nilpotent iff all coeffs are nilpotent.
+  is_domain_type(T) && return is_zero(f)
+  return all(is_nilpotent, coefficients(f))
+end
+
+
 function is_zero_divisor(x::MPolyRingElem{T}) where T <: RingElement
-   return is_zero_divisor(content(x))
+  is_domain_type(T) && return is_zero(x)
+  return is_zero_divisor(content(x))
 end
 
 function is_zero_divisor_with_annihilator(a::MPolyRingElem{T}) where T <: RingElement
@@ -481,6 +535,43 @@ function is_monomial(x::MPolyRingElem{T}) where T <: RingElement
    return length(x) == 1 && isone(first(coefficients(x)))
 end
 
+function exponent_vector!(e::Vector{S}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return [S(x) for x in exponent_vector(a, i)]
+end
+
+function exponent_vector(::Type{Vector{S}}, a::MPolyRingElem{T}, i::Int) where {T <: RingElement, S}
+   return [S(x) for x in exponent_vector(a, i)]
+end
+
+function coeff!(c::T, a::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+   return coeff(a, i)
+end
+
+function term!(t::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return term(a, i)
+end
+
+function monomial!(m::T, a::T, i::Int) where {T <: MPolyRingElem}
+   return monomial(a, i)
+end
+
+@doc raw"""
+    term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+
+Return the term in `R` corresponding to the given exponent vector with coefficient `c`.
+"""
+function term(R::MPolyRing, c::RingElement, exps::Vector{Int})
+   @req length(exps) == nvars(R) "length of exponent vector should match the number of variables"
+   return setcoeff!(zero(R), exps, coefficient_ring(R)(c))
+end
+
+@doc raw"""
+    monomial(R::MPolyRing, exps::Vector{Int})
+
+Return the monomial in `R` corresponding to the given exponent vector.
+"""
+monomial(R::MPolyRing, exps::Vector{Int}) = term(R, one(coefficient_ring(R)), exps)
+
 ###############################################################################
 #
 #   Iterators
@@ -488,44 +579,76 @@ end
 ###############################################################################
 
 @doc raw"""
-    coefficients(a::MPolyRingElem{T}) where T <: RingElement
+    coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the coefficients of the given polynomial. To retrieve
 an array of the coefficients, use `collect(coefficients(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function coefficients(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyCoeffs(a)
+function coefficients(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyCoeffs(a, inplace=inplace)
 end
 
 @doc raw"""
-    exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
+    exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the exponent vectors of the given polynomial. To
 retrieve an array of the exponent vectors, use
 `collect(exponent_vectors(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function exponent_vectors(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyExponentVectors(a)
+function exponent_vectors(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyExponentVectors(a, inplace=inplace)
+end
+
+function exponent_vectors(::Type{Vector{S}}, a::MPolyRingElem{T}; inplace::Bool = false) where {T <: RingElement, S}
+   return Generic.MPolyExponentVectors(Vector{S}, a, inplace=inplace)
 end
 
 @doc raw"""
-    monomials(a::MPolyRingElem{T}) where T <: RingElement
+    monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the monomials of the given polynomial. To retrieve
 an array of the monomials, use `collect(monomials(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function monomials(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyMonomials(a)
+function monomials(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyMonomials(a, inplace=inplace)
 end
 
 @doc raw"""
-    terms(a::MPolyRingElem{T}) where T <: RingElement
+    terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
 
 Return an iterator for the terms of the given polynomial. To retrieve
 an array of the terms, use `collect(terms(a))`.
+
+If `inplace` is `true`, the elements of the iterator may share their memory. This
+means that an element returned by the iterator may be overwritten 'in place' in
+the next iteration step. This may result in significantly fewer memory allocations.
+However, using the in-place version is only meaningful, if just one element of
+the iterator is needed at any time. For example, calling `collect` on this
+iterator will not give useful results.
 """
-function terms(a::MPolyRingElem{T}) where T <: RingElement
-   return Generic.MPolyTerms(a)
+function terms(a::MPolyRingElem{T}; inplace::Bool = false) where T <: RingElement
+   return Generic.MPolyTerms(a, inplace=inplace)
 end
 
 ###############################################################################
@@ -560,17 +683,10 @@ function show(io::IO, mime::MIME"text/plain", p::MPolyRing)
   @show_name(io, p)
   @show_special(io, mime, p)
 
-  max_vars = 5 # largest number of variables to print
-  n = nvars(p)
   print(io, "Multivariate polynomial ring")
   print(io, " in ", ItemQuantity(nvars(p), "variable"), " ")
-  if n > max_vars
-    join(io, symbols(p)[1:max_vars - 1], ", ")
-    println(io, ", ..., ", symbols(p)[n])
-  else
-    join(io, symbols(p), ", ")
-    println(io)
-  end
+  print_abbreviated_list(io, symbols(p))
+  println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), base_ring(p))
   print(io, Dedent())
@@ -611,6 +727,19 @@ the minimum exponent for each variable of the polynomial, and the second of
 which (the deflation) gives the gcds of all the exponents after subtracting
 the shift, again per variable. This functionality is used by gcd (and can be
 used by factorisation algorithms).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
+
+julia> shift, defl = deflation(f)
+([1, 2], [3, 3])
+```
 """
 function deflation(f::MPolyRingElem{T}) where T <: RingElement
    N = nvars(parent(f))
@@ -642,6 +771,16 @@ one for each variable), then deflated (divided) by the given exponents
 (again supplied as an array of deflation factors, one for each variable).
 The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
 division by $0$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> deflate(x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2, [1, 2], [3, 3])
+x^2*y^2 + 3*x*y^2 - x + 5*y - 1
+```
 """
 function deflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -690,12 +829,12 @@ function deflate(f::MPolyRingElem{T}) where T <: RingElement
 end
 
 function inflate_deflate_vectors(R::MPolyRing, vars::Vector{Int}, shift::Vector{Int}, defl::Vector{Int})::Tuple{Vector{Int},Vector{Int}}
-   unique(vars) != vars && error("Variables not unique")
+   @req allunique(vars) "Variables not unique"
    !(length(vars) == length(shift) == length(defl)) && error("Number of variables does not match lengths of shift and deflation vectors")
    shift1 = zeros(Int, nvars(R))
    defl1 = ones(Int, nvars(R))
    for i in 1:(length(vars))
-      !(1 <= vars[i] <= nvars(R)) && error("Variable index not in range")
+      @req 1 <= vars[i] <= nvars(R) "Variable index not in range"
       shift1[vars[i]] = shift[i]
       defl1[vars[i]] = defl[i]
    end
@@ -725,6 +864,22 @@ the given variables have been reduced by the given shifts (supplied as an array
 of shifts), then deflated (divided) by the given exponents (again supplied as an
 array of deflation factors). The algorithm automatically replaces a deflation of
 $0$ by $1$, to avoid division by $0$.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> g = (x + y + 1)^2
+x^2 + 2*x*y + 2*x + y^2 + 2*y + 1
+
+julia> g0 = coeff(g, [y], [0])
+x^2 + 2*x + 1
+
+julia> deflate(g - g0, [y], [1], [1])
+2*x + y + 2
+```
 """
 function deflate(f::T, vars::Vector{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: MPolyRingElem
    varidx = [var_index(x) for x in vars]
@@ -740,6 +895,16 @@ have been inflated (multiplied) by the given deflation exponents (supplied
 as an array of inflation factors, one for each variable) and then increased
 by the given shifts (again supplied as an array of shifts, one for each
 variable).
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> inflate(x^2*y^2 + 3*x*y^2 - x + 5*y - 1, [1, 2], [3, 3])
+x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5*x*y^5 - x*y^2
+```
 """
 function inflate(f::MPolyRingElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -811,7 +976,8 @@ See also `valuation`, which only returns the valuation.
 """
 function remove(z::MPolyRingElem{T}, p::MPolyRingElem{T}) where {T <: RingElement}
    check_parent(z, p)
-   iszero(z) && error("Not yet implemented")
+   @req !iszero(z) "Element must be non-zero"
+   @req !is_unit(p) "Element must be a non-unit"
    fl, q = divides(z, p)
    if !fl
       return 0, z
@@ -845,34 +1011,90 @@ end
 #
 ###############################################################################
 
-function evaluate(a::MPolyRingElem{T}, vals::Vector) where {T <: RingElement}
-   return evaluate(a, parent(a).(vals))
-end
-
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
 
 Evaluate the polynomial expression by substituting in the array of values for
 each of the variables. The evaluation will succeed if multiplication is
 defined between elements of the coefficient ring of $a$ and elements of the
 supplied vector.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = 2x^2*y^2 + 3x + y + 1
+2*x^2*y^2 + 3*x + y + 1
+
+julia> evaluate(f, BigInt[1, 2])
+14
+
+julia> evaluate(f, [QQ(1), QQ(2)])
+14//1
+
+julia> evaluate(f, [1, 2])
+14
+
+julia> f(1, 2) == 14
+true
+
+julia> evaluate(f, [x + y, 2y - x])
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+
+julia> f(x + y, 2y - x)
+2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+
+julia> R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
+(Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
+
+julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
+x^2*y^2 + 2*x*z + 3*y*z + z + 1
+
+julia> evaluate(f, [1, 3], [3, 4])
+9*y^2 + 12*y + 29
+
+julia> evaluate(f, [x, z], [3, 4])
+9*y^2 + 12*y + 29
+
+julia> evaluate(f, [1, 2], [x + z, x - z])
+x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
+
+julia> S = matrix_ring(ZZ, 2)
+Matrix ring of degree 2
+  over integers
+
+julia> M1 = S([1 2; 3 4])
+[1   2]
+[3   4]
+
+julia> M2 = S([2 3; 1 -1])
+[2    3]
+[1   -1]
+
+julia> M3 = S([-1 1; 1 1])
+[-1   1]
+[ 1   1]
+
+julia> evaluate(f, [M1, M2, M3])
+[ 64    83]
+[124   149]
+```
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
+function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U}
+   @req length(vals) == nvars(parent(a)) "Number of variables does not match number of values"
    R = base_ring(a)
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
+   if (U <: Integer && U !== BigInt) ||
+      (U <: Rational && U !== Rational{BigInt})
       c = zero(R)*zero(U)
       V = typeof(c)
-      if U != V
-         vals = [parent(c)(v) for v in vals]
-         powers = [Dict{Int, V}() for i in 1:length(vals)]
-      else
-         powers = [Dict{Int, U}() for i in 1:length(vals)]
+      if U !== V
+         return evaluate(a, [parent(c)(v) for v in vals])
       end
-   else
-      powers = [Dict{Int, U}() for i in 1:length(vals)]
    end
+   @req !isempty(vals) "No values supplied"
+   powers = [Dict{Int, U}() for i in 1:length(vals)]
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
@@ -881,34 +1103,23 @@ function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement,
    # must be done in a certain order.
    # But addition is associative.
    S = parent(one(R)*one(parent(vals[1])))
-   r = elem_type(S)[zero(S)]
-   i = UInt(1)
+   r = zero(S)
    cvzip = zip(coefficients(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(S)
       for j = 1:length(vals)
          exp = v[j]
-         if iszero(exp)
-           continue
+         pe = get!(powers[j], exp) do
+            if iszero(exp)
+               return one(vals[j])
+            end
+            return vals[j]^exp
          end
-         if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
-         end
-         t = t*powers[j][exp]
+         t = mul!(t, pe)
       end
-      push!(r, c*t)
-      j = i = i + 1
-      while iseven(j) && length(r) > 1
-          top = pop!(r)
-          r[end] = add!(r[end], top)
-          j >>= 1
-      end
+      r = add!(r, c*t)
    end
-   while length(r) > 1
-      top = pop!(r)
-      r[end] = add!(r[end], top)
-   end
-   return r[1]
+   return r
 end
 
 @doc raw"""
@@ -920,13 +1131,10 @@ array `vars`. The evaluation will succeed if multiplication is defined between
 elements of the coefficient ring of $a$ and elements of `vals`.
 """
 function evaluate(a::MPolyRingElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(vals) &&
-      error("Number of variables does not match number of values")
+   @req allunique(vars) "Variables not unique"
+   @req length(vars) == length(vals) "Number of variables does not match number of values"
    for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
+      @req 1 <= vars[i] <= nvars(parent(a)) "Variable index not in range"
    end
 
    if length(vars) == 0
@@ -1000,10 +1208,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
@@ -1024,10 +1232,10 @@ function __evaluate(a, vars, vals, powers)
              v[varnum] = 0
              continue
            end
-           if !haskey(powers[j], exp)
-              powers[j][exp] = vals[j]^exp
+           pe = get!(powers[j], exp) do
+              return vals[j]^exp
            end
-           t *= powers[j][exp]
+           t = mul!(t, pe)
            v[varnum] = 0
         end
         M = Generic.MPolyBuildCtx(S)
@@ -1052,17 +1260,58 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: MPolyRingE
 end
 
 @doc raw"""
-    evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+    evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
 
-Evaluate the polynomial expression at the supplied values, which may be any
-ring elements, commutative or non-commutative, but in the same ring. Evaluation
-always proceeds in the order of the variables as supplied when creating the
-polynomial ring to which $a$ belongs. The evaluation will succeed if a product
-of a coefficient of the polynomial by one of the values is defined.
+Evaluate the polynomial `a` at the supplied variable-value pairs; the values must be in a commutative ring. The result will be an element of the parent of `a`. The values
+can alternatively be supplied as a dictionary or through keyword arguments as shown in the example below.
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x,:y]);
+
+julia> f = x + y;
+
+julia> evaluate(f, :x => 2)
+y + 2
+
+julia> evaluate(f, :x => 2, :y => 3)
+5
+
+julia> evaluate(f, Dict(:x => 2, :y => 3))
+5
+
+julia> f(x=2,y=3)
+5
+```
 """
-function evaluate(a::MPolyRingElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
-   return a(vals...)
+function evaluate(a::MPolyRingElem, val_pairs::Pair{Symbol, <:RingElement}...)
+   isempty(val_pairs) && return a
+   ss = symbols(parent(a))
+   vars = Array{Int}(undef, length(val_pairs))
+   vals = Array{RingElement}(undef, length(val_pairs))
+   for (i, (var, val)) in enumerate(val_pairs)
+     vari = findfirst(isequal(var), ss)
+     vari === nothing && error("Polynomial ring has no variable $var")
+     findnext(isequal(var), ss, vari+1) === nothing || error("$var is ambiguous")
+     vars[i] = vari
+     vals[i] = val
+   end
+   return evaluate(a, vars, vals)
 end
+
+evaluate(a::MPolyRingElem, val_dict::Dict{Symbol, <:RingElement}) = evaluate(a, val_dict...)
+
+(a::MPolyRingElem)(;kwargs...) = evaluate(a, kwargs...)
+
+@doc raw"""
+    (a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...)
+
+Evaluate the polynomial `a` at the supplied values; the $k$-th supplied value
+specifies the image of the $k$-th variable in the polynomial ring of `a`.  The
+supplied values may be in commutative or non-commutative rings -- the
+supplied values should anyway commute amongst themselves. The
+evaluation will succeed if each product from a term in `a`  is defined.
+"""
+(a::MPolyRingElem)(val::NCRingElement, vals::NCRingElement...) = evaluate(a, [val, vals...])
 
 ################################################################################
 #
@@ -1095,6 +1344,28 @@ end
 
 Return the partial derivative of `f` with respect to `x`. The value `x` must
 be a generator of the polynomial ring of `f`.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = AbstractAlgebra.polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> f = x*y + x + y + 1
+x*y + x + y + 1
+
+julia> derivative(f, x)
+y + 1
+
+julia> derivative(f, y)
+x + 1
+
+julia> derivative(f, 1)
+y + 1
+
+julia> derivative(f, 2)
+x + 1
+```
 """
 function derivative(f::MPolyRingElem{T}, x::MPolyRingElem{T}) where T <: RingElement
    return derivative(f, var_index(x))
@@ -1114,15 +1385,82 @@ Assuming the polynomial $p$ is actually a univariate polynomial, convert the
 polynomial to a univariate polynomial in the given univariate polynomial ring
 $R$. An exception is raised if the polynomial $p$ involves more than one
 variable.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> S, z = polynomial_ring(ZZ, :z)
+(Univariate polynomial ring in z over integers, z)
+
+julia> f = 2x^5 + 3x^4 - 2x^2 - 1
+2*x^5 + 3*x^4 - 2*x^2 - 1
+
+julia> g = to_univariate(S, f)
+2*z^5 + 3*z^4 - 2*z^2 - 1
+```
 """
 function to_univariate(R::PolyRing{T}, p::MPolyRingElem{T}) where T <: RingElement
-   if !is_univariate(p)
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
-   if is_constant(p)
+   if is_zero(p)
+      zero(R)
+   elseif is_constant(p)
       return R(leading_coefficient(p))
    end
    return R(coefficients_of_univariate(p))
+end
+
+@doc raw"""
+    to_univariate(p::MPolyRingElem)
+
+Assuming the polynomial $p$ is actually a univariate polynomial in the
+variable $x$, convert the polynomial to a univariate polynomial in a
+univariate polynomial ring over the same base ring in the variable $x$.
+If $p$ is constant, it is considered to be a polynomial in the first
+variable of its parent. An exception is raised if the polynomial $p$
+involves more than one variable or if its parent has no variables.
+"""
+function to_univariate(p::MPolyRingElem)
+   S = parent(p)
+   iszero(ngens(S)) && error("Parent has no variables.")
+   is_uni, var = is_univariate_with_data(p)
+   is_uni || error("Polynomial is not univariate.")
+   if iszero(var)
+      var = 1
+   end
+   x = symbols(S)[var]
+   R, _ = base_ring(S)[x]
+   return to_univariate(R, p)
+end
+
+@doc raw"""
+    is_univariate_with_data(p::MPolyRingElem)
+
+Returns `(true, i)` if $p$ is a univariate polynomial in the `i`-th variable
+of its parent i.e. involves exactly one variable. If $p$ is constant,
+`(true, 0)` is returned. Otherwise `(false, 0)` is returned. The result
+depends on the terms of the polynomial, not simply on the number of
+variables in the polynomial ring.
+"""
+function is_univariate_with_data(p::MPolyRingElem{T}) where T <: RingElement
+   if is_constant(p)
+      return true, 0
+   end
+   var = -1
+   for v in exponent_vectors(p)
+      n = count(x -> x != 0, v)
+      if n > 1
+         return false, 0
+      elseif n == 1
+         if var == -1
+            var = findfirst(x -> x != 0, v)::Int  # can't be nothing
+         elseif v[var] == 0
+            return false, 0
+         end
+      end
+   end
+   return true, var
 end
 
 @doc raw"""
@@ -1134,23 +1472,7 @@ otherwise. The result depends on the terms of the polynomial, not simply on
 the number of variables in the polynomial ring.
 """
 function is_univariate(p::MPolyRingElem{T}) where T <: RingElement
-   if is_constant(p)
-      return true
-   end
-   var = -1
-   for v in exponent_vectors(p)
-      n = count(x -> x != 0, v)
-      if n > 1
-         return false
-      elseif n == 1
-         if var == -1
-            var = findfirst(x -> x != 0, v)
-         elseif v[var] == 0
-            return false
-         end
-      end
-   end
-   return true
+   return is_univariate_with_data(p)[1]
 end
 
 @doc raw"""
@@ -1169,10 +1491,10 @@ end
 Return the coefficients of p, which is assumed to be univariate,
 as an array in ascending order.
 """
-function coefficients_of_univariate(p::MPolyRingElem,
-                                    check_univariate::Bool=true)
-
-   coeffs = Vector{elem_type(coefficient_ring(p))}(undef, 0)
+function coefficients_of_univariate(p::MPolyRingElem{T},
+                                    check_univariate::Bool=true) where T
+   R = coefficient_ring(p)
+   coeffs = Vector{T}(undef, 0)
    var_index = -1
    for (c, v) in zip(coefficients(p), exponent_vectors(p))
       e = 0
@@ -1189,7 +1511,7 @@ function coefficients_of_univariate(p::MPolyRingElem,
       end
 
       while length(coeffs) <= e
-         push!(coeffs, zero(coefficient_ring(p)))
+         push!(coeffs, zero(R))
       end
       coeffs[1 + e] = c
 
@@ -1231,6 +1553,12 @@ end
 #the block is also not used here I think
 #functionality to view mpoly as upoly in variable `i`, so the
 #coefficients are mpoly's without variable `i`.
+@doc raw"""
+    leading_coefficient(f::MPolyRingElem, i::Int)
+
+Return the leading coefficient of `f` when viewed as a univariate polynomial in the `i`-th
+variable.
+"""
 function leading_coefficient(f::MPolyRingElem, i::Int)
    g = MPolyBuildCtx(parent(f))
    d = degree(f, i)
@@ -1250,7 +1578,11 @@ Return the content of `f` as a polynomial in the variable `i`, i.e. the gcd of
 all the coefficients when viewed as univariate polynomial in `i`.
 """
 function content(f::MPolyRingElem, i::Int)
-   return reduce(gcd, coefficients(f, i))
+   z = zero(parent(f))
+   for c in coefficients(f, i)
+      z = gcd!(z, c)
+   end
+   return z
 end
 
 ################################################################################
@@ -1273,6 +1605,19 @@ into `R`.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> fz = x^2*y^2 + x + 1
+x^2*y^2 + x + 1
+
+julia> fq = change_base_ring(QQ, fz)
+x^2*y^2 + x + 1
+```
 """
 function change_base_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
    base_ring(parent) != R && error("Base rings do not match.")
@@ -1288,6 +1633,16 @@ into `R`.
 If the optional `parent` keyword is provided, the polynomial will be an
 element of `parent`. The caching of the parent object can be controlled
 via the `cached` keyword argument.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
+(Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> change_coefficient_ring(QQ, x^2*y^2 + x + 1)
+x^2*y^2 + x + 1
+```
 """
 function change_coefficient_ring(R::Ring, p::MPolyRingElem{T}; cached::Bool=true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
   return change_base_ring(R, p, cached = cached, parent = parent)
@@ -1320,6 +1675,62 @@ function _map(g::T, p::MPolyRingElem, Rx) where {T}
    end
 
    return finish(M)
+end
+
+###############################################################################
+#
+#  Universal polynomial ring methods
+#
+###############################################################################
+
+@doc raw"""
+    _upgrade(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+
+Return an element of `R` which is obtained from `p` by mapping the $i$-th variable
+of `parent(p)` to the $i$-th variable of `R`.
+For this to work, `R` needs to have at least as many variables as `parent(p)`.
+"""
+function _upgrade(p::MPolyRingElem{T}, R::MPolyRing{T}) where {T}
+   n = nvars(R) - nvars(parent(p))
+   n < 0 && error("Too few variables")
+   ctx = MPolyBuildCtx(R)
+   v0 = zeros(Int, n)
+   for (c, v) in zip(coefficients(p), exponent_vectors(p))
+      push_term!(ctx, c, vcat(v, v0))
+   end
+   return finish(ctx)
+end
+
+@doc raw"""
+    _add_gens(R::MPolyRing, varnames::Vector{Symbol})
+
+Return a new uncached multivariate polynomial ring which has the same properties
+as `R` but `varnames` as additional generators.
+"""
+function _add_gens(R::MPolyRing, varnames::Vector{Symbol})
+   return poly_ring(base_ring(R), vcat(symbols(R), varnames); internal_ordering=internal_ordering(R))
+end
+
+###############################################################################
+#
+#  Factorization
+#
+###############################################################################
+
+function factor_squarefree(f::MPolyRingElem{<: FieldElement})
+  if characteristic(coefficient_ring(f)) == 0
+    return MPolyFactor.mfactor_squarefree_char_zero(f)
+  else
+    throw(NotImplementedError(:factor_squarefree, f))
+  end
+end
+
+function factor(f::MPolyRingElem{<: FieldElement})
+  if characteristic(coefficient_ring(f)) == 0
+    return MPolyFactor.mfactor_char_zero(f)
+  else
+    throw(NotImplementedError(:factor, f))
+  end
 end
 
 ###############################################################################
@@ -1384,8 +1795,26 @@ function rand(rng::AbstractRNG, S::MPolyRing,
    rand(rng, make(S, term_range, exp_bound, v...))
 end
 
-function rand(S::MPolyRing, term_range, exp_bound, v...)
+function rand(S::MPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    rand(Random.default_rng(), S, term_range, exp_bound, v...)
+end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(Rx::MPolyRing)
+  R = base_ring(Rx)
+  num_gens = ngens(Rx)
+  iszero(num_gens) && return Rx(ConformanceTests.generate_element(R))
+  len_bound = 8
+  exp_bound = rand(1:5)
+  len = rand(0:len_bound)
+  coeffs = elem_type(R)[ConformanceTests.generate_element(R) for _ in 1:len]
+  exps = [[rand(0:exp_bound) for _ in 1:num_gens] for _ in 1:len]
+  return Rx(coeffs, exps)
 end
 
 ###############################################################################
@@ -1411,17 +1840,19 @@ set with `internal_ordering` and must be one of `:lex`, `:deglex` or `:degrevlex
 
 See also: [`polynomial_ring(::Ring, ::Vararg)`](@ref), [`@polynomial_ring`](@ref).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, generators = polynomial_ring(ZZ, [:x, :y, :z])
 (Multivariate polynomial ring in 3 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 ```
 """
-function polynomial_ring(R::Ring, s::Vector{Symbol}; kw...)
-   S = polynomial_ring_only(R, s; kw...)
+function polynomial_ring(R::Ring, s::Vector{Symbol}; cached::Bool=true, kw...)
+   S = poly_ring(R, s; cached, kw...)
    (S, gens(S))
 end
+
+@varnames_interface polynomial_ring(R::Ring, s)
 
 """
     polynomial_ring(R::Ring, varnames...; cached=true, internal_ordering=:lex)
@@ -1468,7 +1899,7 @@ polynomial_ring(R::Ring, varnames...)
 
 Same as [`polynomial_ring(::Ring, ["s$i" for i in 1:n])`](@ref polynomial_ring(::Ring, ::Vector{Symbol})).
 
-# Example
+# Examples
 
 ```jldoctest
 julia> S, x = polynomial_ring(ZZ, 3)
@@ -1503,10 +1934,14 @@ true
 :(@polynomial_ring)
 
 """
-    polynomial_ring_only(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true)
+    poly_ring(R::Ring, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false)
 
 Like [`polynomial_ring(R::Ring, s::Vector{Symbol})`](@ref) but return only the
-multivariate polynomial ring.
+multivariate polynomial ring. Moreover, the default value for `cached` is `false`,
+not `true`.
+
+This function is part of the internal interface for polynomial rings.
+User code should normally not need to invoke it.
 """
-polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring =
+poly_ring(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=false) where T<:Ring =
    mpoly_ring_type(T)(R, s, internal_ordering, cached)

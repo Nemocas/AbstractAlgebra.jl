@@ -1,10 +1,12 @@
 using REPL # needed due to https://github.com/JuliaLang/julia/issues/53349
 
 module Tmp
-    using AbstractAlgebra
+    # Import under a different module name to verify the macro does
+    # not try to access AbstractAlgebra "by name"
+    import AbstractAlgebra as AA
 
     # test @attributes applied to a struct definition, using internal storage
-    @attributes mutable struct Foo
+    AA.@attributes mutable struct Foo
         x::Int
         Foo() = new(0)
     end
@@ -14,7 +16,7 @@ module Tmp
         x::Int
         Bar() = new(0)
     end
-    @attributes Bar
+    AA.@attributes Bar
 
     mutable struct Quux
         x::Int
@@ -25,7 +27,7 @@ module Tmp
     end
 
     # applying @attributes to a singleton type definition is supported but does nothing
-    @attributes struct AnotherSingleton
+    AA.@attributes struct AnotherSingleton
     end
 
     struct NotSupported
@@ -38,10 +40,10 @@ module Tmp
         x::Int
         FooBar{T}() where T = new(0)
     end
-    @attributes Tmp.FooBar{Bar}
+    AA.@attributes Tmp.FooBar{Bar}
 
 
-    @attributes mutable struct Container{T}
+    AA.@attributes mutable struct Container{T}
         x::T
         Container(x::T) where T = new{T}(x)
     end
@@ -51,19 +53,19 @@ end
 @attributes Tmp.Quux
 @attributes Tmp.FooBar{Tmp.Quux}
 
-@testset "_is_attribute_storing_type" begin
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Foo)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Bar)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Quux)
+@testset "is_attribute_storing_type" begin
+  @test is_attribute_storing_type(Tmp.Foo)
+  @test is_attribute_storing_type(Tmp.Bar)
+  @test is_attribute_storing_type(Tmp.Quux)
 
-  @test !AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar)
-  @test !AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Foo})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Bar})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.FooBar{Tmp.Quux})
+  @test !is_attribute_storing_type(Tmp.FooBar)
+  @test !is_attribute_storing_type(Tmp.FooBar{Tmp.Foo})
+  @test is_attribute_storing_type(Tmp.FooBar{Tmp.Bar})
+  @test is_attribute_storing_type(Tmp.FooBar{Tmp.Quux})
 
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container)
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container{Tmp.Bar})
-  @test AbstractAlgebra._is_attribute_storing_type(Tmp.Container{Tmp.Quux})
+  @test is_attribute_storing_type(Tmp.Container)
+  @test is_attribute_storing_type(Tmp.Container{Tmp.Bar})
+  @test is_attribute_storing_type(Tmp.Container{Tmp.Quux})
 end
 
 # applying @attributes to a singleton typename is supported but does nothing
@@ -165,6 +167,27 @@ end
     @test get_attribute(x, :bar12) == :somesymbol
     @test get_attribute!(x, :bar13, :defaultsymbol) == :defaultsymbol
     @test get_attribute(x, :bar13) == :defaultsymbol
+
+    # test callbacks that set other attributes of the same object; 20 new
+    # entries force the attribute storage to rehash during the callback
+    v = get_attribute!(x, :nested1) do
+      for i in 1:20
+        set_attribute!(x, Symbol(:inner, i) => i)
+      end
+      return get_attribute!(() -> 41, x, :nested2) + 1
+    end
+    @test v == 42
+    @test get_attribute(x, :nested1) == 42
+    @test get_attribute(x, :nested2) == 41
+    @test all(i -> get_attribute(x, Symbol(:inner, i)) == i, 1:20)
+
+    v = get_attribute(x, :nested3) do
+      set_attribute!(x, :inner21 => 21)
+      return 43
+    end
+    @test v == 43
+    @test get_attribute(x, :nested3) === nothing
+    @test get_attribute(x, :inner21) == 21
 end
 
 
@@ -186,6 +209,9 @@ A cached attribute.
 # cached attribute with return type specification depending on the input type
 my_derived_type(::Type{Tmp.Container{T}}) where T = T
 @attr my_derived_type(T) cached_attr3(obj::T) where T <: Tmp.Container = obj.x
+
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg1(obj::T; some_kwarg::Bool) where T = (obj,T,some_kwarg)
+@attr Tuple{T,DataType,Bool} cached_attr_with_kwarg2(obj::T; some_kwarg::Bool=true) where T = (obj,T,some_kwarg)
 
 @testset "attribute caching for $T" for T in (Tmp.Foo, Tmp.Bar, Tmp.Quux, Tmp.FooBar{Tmp.Bar}, Tmp.FooBar{Tmp.Quux})
 
@@ -210,6 +236,40 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     z = Tmp.Container(x)
     y = @inferred cached_attr3(z)
     @test y === x
+
+    # check case of ignored keyword arguments
+    x = T()
+    y = @inferred cached_attr_with_kwarg1(x; some_kwarg=true)
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg1(x; some_kwarg=false)
+    @test y == (x,T,false)
+    @test cached_attr_with_kwarg1(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg1(x; some_kwarg=false) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg2(x; some_kwarg=true)
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
+    @test cached_attr_with_kwarg2(x) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg2(x; some_kwarg=false)
+    @test y == (x,T,false)
+    @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
+    @test cached_attr_with_kwarg2(x) === y
+
+    x = T()
+    y = @inferred cached_attr_with_kwarg2(x)
+    @test y == (x,T,true)
+    @test cached_attr_with_kwarg2(x; some_kwarg=true) === y
+    @test cached_attr_with_kwarg2(x; some_kwarg=false) === y
+    @test cached_attr_with_kwarg2(x) === y
 
     # verify docstring is correctly attached
     if VERSION >= v"1.12.0-DEV.1223"
@@ -238,19 +298,20 @@ my_derived_type(::Type{Tmp.Container{T}}) where T = T
     @test functionloc(uncached_attr)[2] < functionloc(cached_attr)[2]
 end
 
-@static if VERSION >= v"1.7"
-    # the following tests need the improved `@macroexpand` from Julia 1.7
-    @testset "@attr error handling" begin
-        # wrong number of arguments
-        @test_throws ArgumentError @macroexpand @attr Any foo() = 1
-        @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
-        @test_throws ArgumentError @macroexpand @attr Int foo() = 1
-        @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
-        @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
-        @test_throws MethodError @macroexpand @attr Int Int Int
+@testset "@attr error handling" begin
+    # wrong number of arguments
+    @test_throws ArgumentError @macroexpand @attr Any foo() = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int) = 1
+    @test_throws ArgumentError @macroexpand @attr Int foo() = 1
+    @test_throws ArgumentError @macroexpand @attr Int foo(x::Int, y::Int) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(; some_kwarg::Bool=true) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool) = 1
+    @test_throws ArgumentError @macroexpand @attr Any foo(x::Int, y::Int; some_kwarg::Bool=true) = 1
+    @test_throws MethodError @macroexpand @attr Int foo(x::Int) = 1 Any
+    @test_throws MethodError @macroexpand @attr Int Int Int
 
-        # wrong kind of arguments
-        #@test_throws ArgumentError @macroexpand @attr Int Int
-        #@test_throws ArgumentError @macroexpand @attr foo(x::Int) = 1 Int
-    end
+    # wrong kind of arguments
+    #@test_throws ArgumentError @macroexpand @attr Int Int
+    #@test_throws ArgumentError @macroexpand @attr foo(x::Int) = 1 Int
 end

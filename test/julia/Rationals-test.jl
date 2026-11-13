@@ -1,5 +1,5 @@
 @testset "Julia.Rationals.conformance_tests" begin
-   test_Field_interface_recursive(QQ)
+   ConformanceTests.test_Field_interface_recursive(QQ)
 end
 
 @testset "Julia.Rationals.constructors" begin
@@ -70,6 +70,13 @@ end
       @test a1 == 0 || divexact(c1, a1)*a1 == c1
       @test b1 == 0 || divexact(c2, b1)*b1 == c2
    end
+
+   for F in (qq, QQ), check in (true, false)
+      @test_throws DivideError divexact(F(1), F(0); check)
+      @test_throws DivideError divexact(F(0), F(0); check)
+      @test_throws DivideError divexact(F(1), 0; check)
+      @test_throws DivideError divexact(1, F(0); check)
+   end
 end
 
 @testset "Julia.Rationals.gcd" begin
@@ -104,7 +111,7 @@ end
       @test AbstractAlgebra.sqrt(g)^2 == g
       @test is_square(f)
       @test is_square(g)
-   
+
       @test is_square_with_sqrt(f) == (true, abs(r))
       @test is_square_with_sqrt(g) == (true, abs(s))
    end

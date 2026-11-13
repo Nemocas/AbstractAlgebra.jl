@@ -20,15 +20,17 @@ elem_type(::Type{Integers{T}}) where T <: Integer = T
 
 parent_type(::Type{T}) where T <: Integer = Integers{T}
 
-base_ring_type(::Type{<:Integers}) = typeof(Union{})
-
-base_ring(a::Integers{T}) where T <: Integer = Union{}
+base_ring_type(::Type{<:Integers}) = Union{}   # no base ring
 
 is_exact_type(::Type{T}) where T <: Integer = true
 
 is_domain_type(::Type{T}) where T <: Integer = true
 
 base_ring(::Vector{T}) where T <: Integer = T
+
+# ideal interface
+ideal_type(::Type{Integers{T}}) where T <: Integer = Generic.Ideal{T}
+ideal(R::Integers, V::Vector) = Generic.Ideal(R, V)
 
 ###############################################################################
 #
@@ -46,7 +48,8 @@ is_zero_divisor(a::Integer) = is_zero(a)
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
-characteristic(::Integers{T}) where T <: Integer = 0
+characteristic(::Integers) = 0
+is_known(::typeof(characteristic), ::Integers) = true
 
 ###############################################################################
 #
@@ -121,6 +124,19 @@ end
 
 Return `true` if $a$ is divisible by $b$, i.e. if there exists $c$ such that
 $a = bc$.
+
+# Examples
+
+```jldoctest
+julia> r = ZZ(6)
+6
+
+julia> s = ZZ(3)
+3
+
+julia> is_divisible_by(r, s)
+true
+```
 """
 function is_divisible_by(a::Integer, b::Integer)
    if iszero(b)
@@ -134,7 +150,7 @@ function is_divisible_by(a::BigInt, b::BigInt)
    if iszero(b)
       return iszero(a)
    end
-   return Bool(ccall((:__gmpz_divisible_p, :libgmp), Cint,
+   return Bool(ccall((:__gmpz_divisible_p, Base.GMP.libgmp), Cint,
                                              (Ref{BigInt}, Ref{BigInt}), a, b))
 end
 
@@ -142,7 +158,7 @@ function is_divisible_by(a::BigInt, b::Int)
    if iszero(b)
       return iszero(a)
    end
-   return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
+   return Bool(ccall((:__gmpz_divisible_ui_p, Base.GMP.libgmp), Cint,
                                         (Ref{BigInt}, Int), a, b < 0 ? -b : b))
 end
 
@@ -150,7 +166,7 @@ function is_divisible_by(a::BigInt, b::UInt)
    if iszero(b)
       return iszero(a)
    end
-   return Bool(ccall((:__gmpz_divisible_ui_p, :libgmp), Cint,
+   return Bool(ccall((:__gmpz_divisible_ui_p, Base.GMP.libgmp), Cint,
                                                     (Ref{BigInt}, UInt), a, b))
 end
 
@@ -185,11 +201,11 @@ function divexact(a::BigInt, b::BigInt; check::Bool=true)
    q = BigInt()
    if check
       r = BigInt()
-      ccall((:__gmpz_tdiv_qr, :libgmp), Nothing,
+      ccall((:__gmpz_tdiv_qr, Base.GMP.libgmp), Nothing,
               (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, r, a, b)
       @req is_zero(r) "Not an exact division"
    else
-      ccall((:__gmpz_divexact, :libgmp), Nothing,
+      ccall((:__gmpz_divexact, Base.GMP.libgmp), Nothing,
                               (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), q, a, b)
    end
    return q
@@ -201,11 +217,11 @@ function divexact(a::BigInt, b::Int; check::Bool=true)
    sgn = b < 0
    if check
       r = BigInt()
-      ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
+      ccall((:__gmpz_tdiv_qr_ui, Base.GMP.libgmp), Nothing,
            (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, sgn ? -b : b)
       @req is_zero(r) "Not an exact division"
    else
-      ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
+      ccall((:__gmpz_divexact_ui, Base.GMP.libgmp), Nothing,
                            (Ref{BigInt}, Ref{BigInt}, Int), q, a, sgn ? -b : b)
    end
    return sgn ? -q : q
@@ -216,11 +232,11 @@ function divexact(a::BigInt, b::UInt; check::Bool=true)
    q = BigInt()
    if check
       r = BigInt()
-      ccall((:__gmpz_tdiv_qr_ui, :libgmp), Nothing,
+      ccall((:__gmpz_tdiv_qr_ui, Base.GMP.libgmp), Nothing,
                      (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, UInt), q, r, a, b)
       @req is_zero(r) "Not an exact division"
    else
-      ccall((:__gmpz_divexact_ui, :libgmp), Nothing,
+      ccall((:__gmpz_divexact_ui, Base.GMP.libgmp), Nothing,
                                      (Ref{BigInt}, Ref{BigInt}, UInt), q, a, b)
    end
    return q
@@ -274,12 +290,6 @@ function sqrt(a::T; check::Bool=true) where T <: Integer
    return s
 end
 
-@doc raw"""
-    is_square_with_sqrt(a::T) where T <: Integer
-
-Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
-return `(false, 0)`.
-"""
 function is_square_with_sqrt(a::T) where T <: Integer
    if a < 0
       return false, zero(T)
@@ -304,7 +314,7 @@ function is_square_with_sqrt(a::BigInt)
    end
    z = BigInt()
    r = BigInt()
-   ccall((:__gmpz_sqrtrem, :libgmp), Cint,
+   ccall((:__gmpz_sqrtrem, Base.GMP.libgmp), Cint,
          (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), z, r, a)
    if iszero(r)
       return true, z
@@ -313,11 +323,6 @@ function is_square_with_sqrt(a::BigInt)
    end
 end
 
-@doc raw"""
-    is_square(a::T) where T <: Integer
-
-Return true if $a$ is a square.
-"""
 function is_square(a::T) where T <: Integer
    if a < 0
       return false
@@ -330,7 +335,7 @@ function is_square(a::BigInt)
    if a < 0
       return false
    end
-   return Bool(ccall((:__gmpz_perfect_square_p, :libgmp), Cint,
+   return Bool(ccall((:__gmpz_perfect_square_p, Base.GMP.libgmp), Cint,
                      (Ref{BigInt},), a))
 end
 
@@ -345,7 +350,7 @@ function root(a::BigInt, n::Int; check::Bool=true)
                       "Argument `a` must be positive if exponent `n` is even"))
     n <= 0 && throw(DomainError(n, "Exponent must be positive"))
     z = BigInt()
-    exact = Bool(ccall((:__gmpz_root, :libgmp), Cint,
+    exact = Bool(ccall((:__gmpz_root, Base.GMP.libgmp), Cint,
                   (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n))
     check && !exact && error("Not a perfect n-th power (n = $n)")
     return z
@@ -435,10 +440,10 @@ function is_power(a::T, n::Int) where T <: Integer
    elseif !ispower_moduli(a, n)
       return (false, zero(T))
    end
-      
+
    q = BigInt()
    r = BigInt()
-   ccall((:__gmpz_rootrem, :libgmp), Nothing,
+   ccall((:__gmpz_rootrem, Base.GMP.libgmp), Nothing,
                      (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}, Int), q, r, a, n)
    return iszero(r) ? (true, T(q)) : (false, zero(T))
 end
@@ -448,7 +453,7 @@ function iroot(a::BigInt, n::Int)
                       "Argument `a` must be positive if exponent `n` is even"))
     n <= 0 && throw(DomainError(n, "Exponent must be positive"))
     z = BigInt()
-    ccall((:__gmpz_root, :libgmp), Cint,
+    ccall((:__gmpz_root, Base.GMP.libgmp), Cint,
                   (Ref{BigInt}, Ref{BigInt}, Cint), z, a, n)
     return z
 end
@@ -512,6 +517,13 @@ end
 
 Return a pair $(c,d)$ such that $a=c*d$ and $c = gcd(a, b^\infty)$ if $a\neq 0$,
 and $c=b$, $d=0$ if $a=0$.
+
+# Examples
+
+```jldoctest
+julia> c, n = ppio(ZZ(12), ZZ(26))
+(4, 3)
+```
 """
 function ppio(a::T, b::T) where T <: Integer
    iszero(a) && return (b,T(0))
@@ -533,7 +545,7 @@ end
 ###############################################################################
 
 function is_probable_prime(x::Integer, reps::Integer=25)
-   return ccall((:__gmpz_probab_prime_p, :libgmp), Cint,
+   return ccall((:__gmpz_probab_prime_p, Base.GMP.libgmp), Cint,
                 (Ref{BigInt}, Cint), x, reps) != 0
 end
 
@@ -569,9 +581,25 @@ rand(rng::AbstractRNG,
         sp[][1](rand(rng, sp[][2]))
 
 
-rand(rng::AbstractRNG, R::Integers, n) = R(rand(rng, n))
+rand(rng::AbstractRNG, R::Integers, n::AbstractArray) = R(rand(rng, n))
 
-rand(R::Integers, n) = rand(Random.default_rng(), R, n)
+rand(R::Integers, n::AbstractArray) = rand(Random.default_rng(), R, n)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Signed}
+  n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+  return rand(R, -n:n)
+end
+
+function ConformanceTests.generate_element(R::Integers{T}) where {T <: Unsigned}
+  n = T(2)^rand((1,1,1,2,3,10,31,32,33,63,64,65,100))
+  return rand(R, 0:n)
+end
 
 ###############################################################################
 #
@@ -586,4 +614,3 @@ end
 function (a::Integers{T})(b::Union{Integer, Rational}) where T <: Integer
    return T(b)
 end
-

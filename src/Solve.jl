@@ -6,6 +6,7 @@ using AbstractAlgebra.PrettyPrinting: @show_name
 using AbstractAlgebra.PrettyPrinting: Dedent
 using AbstractAlgebra.PrettyPrinting: Indent
 using AbstractAlgebra.PrettyPrinting: pretty
+import AbstractAlgebra: can_solve_with_solution
 using AbstractAlgebra: _can_solve_with_solution_fflu
 using AbstractAlgebra: _can_solve_with_solution_interpolation
 using AbstractAlgebra: _solve_fflu_precomp
@@ -20,7 +21,6 @@ export solve
 export solve_init
 export solve_context_type
 export can_solve
-export can_solve_with_solution
 export can_solve_with_solution_and_kernel
 
 ################################################################################
@@ -29,7 +29,7 @@ export can_solve_with_solution_and_kernel
 #
 ################################################################################
 
-mutable struct LazyTransposeMatElem{T, MatT} <: MatElem{T} where {MatT <: MatElem{T}}
+mutable struct LazyTransposeMatElem{T, MatT <: MatElem{T}} <: MatElem{T}
   M::MatT
 end
 
@@ -38,12 +38,13 @@ data(M::LazyTransposeMatElem) = M.M
 # The entries of M and the result are SHARED, so e.g. a setindex! will modify
 # 'both' matrices. But this is the point: we don't want to actually transpose
 # the matrix.
-lazy_transpose(M::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(M)}(M)
+lazy_transpose(A::MatElem{T}) where T = LazyTransposeMatElem{T, typeof(A)}(A)
 lazy_transpose(M::LazyTransposeMatElem) = data(M)
 
 # Change the order of rows and columns in nrows, ncols, getindex and setindex!
-AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))
-AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))
+# `::Int` breaks the inference cycle with `nrows(::MatElem)`
+AbstractAlgebra.nrows(M::LazyTransposeMatElem) = ncols(data(M))::Int
+AbstractAlgebra.ncols(M::LazyTransposeMatElem) = nrows(data(M))::Int
 
 Base.getindex(M::LazyTransposeMatElem, r::Int, c::Int) = data(M)[c, r]
 function Base.setindex!(M::LazyTransposeMatElem{T}, d::T, r::Int, c::Int) where T
@@ -88,22 +89,25 @@ struct LUTrait <: MatrixNormalFormTrait end # LU factoring for fields
 struct FFLUTrait <: MatrixNormalFormTrait end # "fraction free" LU factoring for fraction fields
 struct MatrixInterpolateTrait <: MatrixNormalFormTrait end # interpolate in fraction fields of polynomial rings
 
-function matrix_normal_form_type(R::Ring)
-  if is_domain_type(elem_type(R))
+function matrix_normal_form_type(T::Type{<:Ring})
+  if is_domain_type(T)
     return HermiteFormTrait()
   else
     return HowellFormTrait()
   end
 end
 
-matrix_normal_form_type(::Field) = RREFTrait()
+matrix_normal_form_type(::Type{<:Field}) = RREFTrait()
 
 # The fflu approach is the fastest over a fraction field (see benchmarks on PR 661)
-matrix_normal_form_type(::FracField) = FFLUTrait()
-matrix_normal_form_type(::AbstractAlgebra.Rationals{BigInt}) = FFLUTrait()
-matrix_normal_form_type(::FracField{T}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
+matrix_normal_form_type(::Type{<:FracField}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:AbstractAlgebra.Rationals{BigInt}}) = FFLUTrait()
+matrix_normal_form_type(::Type{<:FracField{T}}) where {T <: PolyRingElem} = MatrixInterpolateTrait()
 
-matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
+matrix_normal_form_type(T::Type{<:MatElem}) = matrix_normal_form_type(base_ring_type(T))
+
+matrix_normal_form_type(x) = matrix_normal_form_type(typeof(x))
+matrix_normal_form_type(T::DataType) = throw(MethodError(matrix_normal_form_type, (T,)))
 
 ################################################################################
 #
@@ -175,7 +179,7 @@ end
 Return a context object `C` that allows to efficiently solve linear systems
 $Ax = b$ or $xA = b$ for different $b$.
 
-# Example
+# Examples
 
 ```jldoctest
 julia> A = QQ[1 2 3; 0 3 0; 5 0 0];
@@ -186,13 +190,13 @@ Linear solving context of matrix
   [0//1   3//1   0//1]
   [5//1   0//1   0//1]
 
-julia> solve(C, [QQ(1), QQ(1), QQ(1)], side = :left)
+julia> solve(C, [QQ(1), QQ(1), QQ(1)]; side = :left)
 3-element Vector{Rational{BigInt}}:
  1//3
  1//9
  2//15
 
-julia> solve(C, [QQ(1), QQ(1), QQ(1)], side = :right)
+julia> solve(C, [QQ(1), QQ(1), QQ(1)]; side = :right)
 3-element Vector{Rational{BigInt}}:
  1//5
  1//3
@@ -207,34 +211,38 @@ function solve_init(NF::MatrixNormalFormTrait, A::MatElem)
   return solve_context_type(NF, base_ring(A))(A)
 end
 
-# For a ring R, the following signatures of `solve_context_type` need to be
+# For a ring R of type T, the following signatures of `solve_context_type` need to be
 # implemented:
-# 1) solve_context_type(R)
-# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(R))
+# 1) solve_context_type(::Type{<:T})
+# 2) solve_context_type(::MatrixNormalFormTrait, elem_type(T))
 # Version 1 should pick a matrix_normal_form_type and call 2
 
-function solve_context_type(R::NCRing)
-  return solve_context_type(matrix_normal_form_type(R), elem_type(R))
+function solve_context_type(T::Type{<:NCRing})
+  return solve_context_type(matrix_normal_form_type(T), elem_type(T))
 end
 
-function solve_context_type(K::Field)
-  # matrix_normal_form_type(K) would be RREFTrait, but we want to use
+function solve_context_type(T::Type{<:Field})
+  # matrix_normal_form_type(T) would be RREFTrait, but we want to use
   # LU in solve contexts
-  return solve_context_type(LUTrait(), elem_type(K))
+  return solve_context_type(LUTrait(), elem_type(T))
 end
 
-function solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField})
+function solve_context_type(T::Type{<:Union{AbstractAlgebra.Rationals{BigInt}, FracField}})
   # In this case, we use FFLU
-  return solve_context_type(FFLUTrait(), elem_type(K))
+  return solve_context_type(FFLUTrait(), elem_type(T))
 end
 
-function solve_context_type(A::MatElem)
-  return solve_context_type(base_ring(A))
+function solve_context_type(T::Type{<:MatElem})
+  return solve_context_type(base_ring_type(T))
 end
 
 function solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRingElement}
   MatType = dense_matrix_type(T)
   return SolveCtx{T, typeof(NF), MatType, MatType, LazyTransposeMatElem{T, MatType}}
+end
+
+function solve_context_type(NF::MatrixNormalFormTrait, T::Type{<:MatElem})
+  return solve_context_type(NF, base_ring_type(T))
 end
 
 function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
@@ -246,13 +254,23 @@ function solve_context_type(::FFLUTrait, ::Type{T}) where {T <: NCRingElement}
   return SolveCtx{T, FFLUTrait, dense_matrix_type(T), IntMatT, IntMatT}
 end
 
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRingElement} = solve_context_type(NF, T)
 solve_context_type(NF::MatrixNormalFormTrait, ::Type{T}) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::T) where {T <: NCRing} = solve_context_type(NF, elem_type(T))
-solve_context_type(NF::MatrixNormalFormTrait, ::Type{<: MatElem{T}}) where T = solve_context_type(NF, T)
-solve_context_type(NF::MatrixNormalFormTrait, ::MatElem{T}) where T = solve_context_type(NF, T)
 
-matrix_normal_form_type(C::SolveCtx{T, NF}) where {T, NF} = NF()
+solve_context_type(x) = solve_context_type(typeof(x))
+solve_context_type(NF::MatrixNormalFormTrait, x) = solve_context_type(NF, typeof(x))
+solve_context_type(T::DataType) = throw(MethodError(solve_context_type, (T,)))
+solve_context_type(NF::MatrixNormalFormTrait, T::DataType) = throw(MethodError(solve_context_type, (NF, T)))
+
+# Deprecated: instance-based dispatch, kept so downstream methods on ring
+# instances (e.g. `matrix_normal_form_type(::NumFieldOrder)`) are still reached.
+# Remove in the next breaking release.
+matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
+solve_context_type(A::MatElem) = solve_context_type(base_ring(A))
+solve_context_type(R::NCRing) = solve_context_type(matrix_normal_form_type(R), elem_type(R))
+solve_context_type(K::Field) = solve_context_type(typeof(K))
+solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField}) = solve_context_type(typeof(K))
+
+matrix_normal_form_type(::Type{<:SolveCtx{T, NF}}) where {T, NF} = NF()
 
 matrix(C::SolveCtx) = C.A
 
@@ -557,14 +575,28 @@ If no solution exists, an error is raised.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`can_solve_with_solution`](@ref).
+See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
+
+# Examples
+
+```jldoctest
+julia> A = QQ[2 0 0;0 3 0;0 0 5]
+[2//1   0//1   0//1]
+[0//1   3//1   0//1]
+[0//1   0//1   5//1]
+
+julia> solve(A, one(A))
+[1//2   0//1   0//1]
+[0//1   1//3   0//1]
+[0//1   0//1   1//5]
+```
 """
 function solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return solve(matrix_normal_form_type(A), A, b; side)
 end
 
 function solve(NF::MatrixNormalFormTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
-  fl, x = can_solve_with_solution(NF, A, b, side = side)
+  fl, x = can_solve_with_solution(NF, A, b; side = side)
   @req fl "Unable to solve linear system"
   return x
 end
@@ -580,7 +612,27 @@ Return `true` if the linear system $xA = b$ or $Ax = b$ with `side == :left`
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`can_solve_with_solution`](@ref).
+See also [`can_solve_with_solution`](@ref can_solve_with_solution(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
+
+# Examples
+
+```jldoctest
+julia> A = QQ[2 0 0;0 3 0;0 0 5]
+[2//1   0//1   0//1]
+[0//1   3//1   0//1]
+[0//1   0//1   5//1]
+
+julia> can_solve(A,one(A))
+true
+
+julia> A = ZZ[2 0 0;0 3 0;0 0 5]
+[2   0   0]
+[0   3   0]
+[0   0   5]
+
+julia> can_solve(A,one(A))
+false
+```
 """
 function can_solve(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve(matrix_normal_form_type(A), A, b; side)
@@ -604,7 +656,7 @@ If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`solve`](@ref).
+See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T).
 """
 function can_solve_with_solution(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve_with_solution(matrix_normal_form_type(A), A, b; side)
@@ -629,7 +681,7 @@ If `side == :right`, the system $Ax = b$ is solved.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
 
-See also [`solve`](@ref) and [`kernel`](@ref).
+See also [`solve`](@ref solve(::Union{MatElem{T}, SolveCtx{T}}, ::Union{Vector{T}, MatElem{T}}) where T) and [`kernel`](@ref kernel(::Union{MatElem, SolveCtx})).
 """
 function can_solve_with_solution_and_kernel(A::Union{MatElem{T}, SolveCtx{T}}, b::Union{Vector{T}, MatElem{T}}; side::Symbol = :left) where T
   return can_solve_with_solution_and_kernel(matrix_normal_form_type(A), A, b; side)
@@ -653,6 +705,21 @@ If the base ring is a principal ideal domain, the rows or columns respectively o
 are a basis of the respective kernel.
 
 If a context object `C` is supplied, then the above applies for `A = matrix(C)`.
+
+#Example
+
+```jldoctest
+julia> A = QQ[2 6 0 0;1 3 0 0;0 0 5 0];
+
+julia> kernel(A, side=:right)
+[-3//1   0//1]
+[ 1//1   0//1]
+[ 0//1   0//1]
+[ 0//1   1//1]
+
+julia> kernel(A)
+[-1//2   1//1   0//1]
+```
 """
 function kernel(A::Union{MatElem, SolveCtx}; side::Symbol = :left)
   return kernel(matrix_normal_form_type(A), A; side)
@@ -750,7 +817,7 @@ function kernel(::RREFTrait, A::MatElem; side::Symbol = :left)
   check_option(side, [:right, :left], "side")
 
   if side === :left
-    KK = kernel(RREFTrait(), lazy_transpose(A), side = :right)
+    KK = kernel(RREFTrait(), lazy_transpose(A); side = :right)
     return lazy_transpose(KK)::typeof(A)
   end
 
@@ -769,12 +836,12 @@ function kernel(::RREFTrait, C::SolveCtx{T, <: MatrixNormalFormTrait}; side::Sym
 
   if side === :right
     if !isdefined(C, :kernel_right)
-      C.kernel_right = kernel(RREFTrait(), matrix(C), side = :right)
+      C.kernel_right = kernel(RREFTrait(), matrix(C); side = :right)
     end
     return C.kernel_right
   else
     if !isdefined(C, :kernel_left)
-      C.kernel_left = kernel(RREFTrait(), matrix(C), side = :left)
+      C.kernel_left = kernel(RREFTrait(), matrix(C); side = :left)
     end
     return C.kernel_left
   end
@@ -836,7 +903,7 @@ function _can_solve_internal(::NFTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Ve
     check_linear_system_dim_left(A, b)
     B = matrix(base_ring(A), 1, ncols(A), b)
   end
-  fl, sol, K = _can_solve_internal_no_check(NFTrait(), A, B, task, side = side)
+  fl, sol, K = _can_solve_internal_no_check(NFTrait(), A, B, task; side = side)
   if isright
     x = eltype(b)[ sol[i, 1] for i in 1:nrows(sol) ]
   else # side == :left
@@ -856,7 +923,7 @@ function _can_solve_internal(::NFTrait, A::Union{MatElem{T}, SolveCtx{T}}, b::Ma
   else
     check_linear_system_dim_left(A, b)
   end
-  return _can_solve_internal_no_check(NFTrait(), A, b, task, side = side)
+  return _can_solve_internal_no_check(NFTrait(), A, b, task; side = side)
 end
 
 # Catch non-matching normal forms in solve context
@@ -870,7 +937,7 @@ function _can_solve_internal_no_check(::HowellFormTrait, A::MatElem{T}, b::MatEl
 
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(HowellFormTrait(), lazy_transpose(A), lazy_transpose(b), task; side = :right)
     return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
@@ -908,7 +975,7 @@ function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T, HowellFo
       return fl, sol, zero(b, 0, 0)
     end
 
-    return fl, sol, kernel(C, side = :right)
+    return fl, sol, kernel(C; side = :right)
   else# side === :left
     A = matrix(C)
     B = reduced_matrix(C)
@@ -922,7 +989,7 @@ function _can_solve_internal_no_check(::HowellFormTrait, C::SolveCtx{T, HowellFo
       return fl, sol, zero(b, 0, 0)
     end
 
-    return fl, sol, kernel(C, side = :left)
+    return fl, sol, kernel(C; side = :left)
   end
 end
 
@@ -931,7 +998,7 @@ end
 function _can_solve_internal_no_check(::HermiteFormTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(HermiteFormTrait(), lazy_transpose(A), lazy_transpose(b), task; side = :right)
     return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
@@ -956,7 +1023,7 @@ function _can_solve_internal_no_check(::HermiteFormTrait, C::SolveCtx{T, Hermite
     return fl, sol, zero(b, 0, 0)
   end
 
-  return true, sol, kernel(C, side = side)
+  return true, sol, kernel(C; side = side)
 end
 
 ### RREFTrait
@@ -964,7 +1031,7 @@ end
 function _can_solve_internal_no_check(::RREFTrait, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :left
     # For side == :left, we pretend that A and b are transposed
-    fl, _sol, _K = _can_solve_internal_no_check(RREFTrait(), lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(RREFTrait(), lazy_transpose(A), lazy_transpose(b), task; side = :right)
     return fl, lazy_transpose(_sol), lazy_transpose(_K)
   end
 
@@ -1062,7 +1129,7 @@ function _can_solve_internal_no_check(::LUTrait, C::SolveCtx{T, LUTrait}, b::Mat
     return fl, sol, zero(b, 0, 0)
   end
 
-  return true, sol, kernel(C, side = side)
+  return true, sol, kernel(C; side = side)
 end
 
 ### FFLUTrait / MatrixInterpolateTrait
@@ -1080,7 +1147,7 @@ end
 function _can_solve_internal_no_check(NF::Union{FFLUTrait, MatrixInterpolateTrait}, A::MatElem{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
 
   if side === :left
-    fl, _sol, _K = _can_solve_internal_no_check(NF, lazy_transpose(A), lazy_transpose(b), task, side = :right)
+    fl, _sol, _K = _can_solve_internal_no_check(NF, lazy_transpose(A), lazy_transpose(b), task; side = :right)
     # This does not return LazyTransposedMat for sol because the matrices are made integral
     return fl, transpose(_sol), lazy_transpose(_K)
   end
@@ -1112,7 +1179,7 @@ function _can_solve_internal_no_check(NF::Union{FFLUTrait, MatrixInterpolateTrai
 
   if task === :with_kernel
     # I don't know how to compute the kernel using an (ff)lu factoring
-    return flag, sol, kernel(A, side = :right)
+    return flag, sol, kernel(A; side = :right)
   else
     return flag, sol, zero(A, 0, 0)
   end
@@ -1148,7 +1215,7 @@ function _can_solve_internal_no_check_right(::FFLUTrait, C::SolveCtx{T, FFLUTrai
   end
   if task === :with_kernel
     # I don't know how to compute the kernel using an (ff)lu factoring
-    return fl, y, kernel(RREFTrait(), C, side = :right)
+    return fl, y, kernel(RREFTrait(), C; side = :right)
   else
     return fl, y, zero(b, 0, 0)
   end
@@ -1177,7 +1244,7 @@ function _can_solve_internal_no_check_left(::FFLUTrait, C::SolveCtx{T, FFLUTrait
   end
   if task === :with_kernel
     # I don't know how to compute the kernel using an (ff)lu factoring
-    return fl, y, kernel(RREFTrait(), C, side = :left)
+    return fl, y, kernel(RREFTrait(), C; side = :left)
   else
     return fl, y, zero(b, 0, 0)
   end

@@ -43,7 +43,7 @@ end
 function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: RingElement
    c = setcoeff!(c, n, a)
    c = set_length!(c, normalise(c, length(c)))
-   return c  
+   return c
 end
 
 function set_coefficient!(c::Poly{T}, n::Int, a::U) where {T <: RingElement, U <: Integer}
@@ -58,6 +58,17 @@ function set_coefficient!(c::Poly{T}, n::Int, a::T) where T <: Integer
    return c
 end
 
+@doc raw"""
+    normalise(f::PolynomialElem, n::Int)
+    normalise(f::SeriesElem, n::Int)
+
+Given `f` whose underlying polynomial has length at most `n`, including any
+leading zero coefficients, return the length that polynomial has once those
+are discarded. The polynomial itself is not modified.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function normalise(a::Poly, n::Int)
    while n > 0 && iszero(a.coeffs[n])
       n -= 1
@@ -75,7 +86,7 @@ function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs)
 end
 
-Base.copy(f::Generic.Poly) = deepcopy(f)
+Base.copy(f::Poly) = deepcopy(f)
 
 ###############################################################################
 #
@@ -185,6 +196,17 @@ function set_length!(c::Poly{T}, n::Int) where T <: RingElement
    return c
 end
 
+@doc raw"""
+    fit!(f::PolynomialElem, n::Int)
+    fit!(f::SeriesElem, n::Int)
+
+Ensure that the polynomial underlying `f` internally has space for `n`
+coefficients, mutating `f` in place. Nothing is returned. Types that manage
+their own allocation may implement this as a no-op.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function fit!(c::Poly{T}, n::Int) where T <: RingElement
    if length(c.coeffs) < n
       resize!(c.coeffs, n)
@@ -305,7 +327,7 @@ end
 #
 ###############################################################################
 
-function Base.iterate(a::Generic.MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyRingElem
+function Base.iterate(a::MPolyExponentVectors{T}, st::Int = -1) where T <: AbstractAlgebra.PolyRingElem
    st += 1
    if st > degree(a.poly)
        return nothing
@@ -327,8 +349,7 @@ mutable struct PolyBuildCtx{T, S}
 end
 
 # TODO the MPolyBuildCtx function should be renamed BuildCtx
-function MPolyBuildCtx(R::AbstractAlgebra.PolyRing)
-   T = elem_type(coefficient_ring(R))
+function MPolyBuildCtx(R::AbstractAlgebra.PolyRing{T}) where T
    S = typeof(R)
    return PolyBuildCtx{T, S}(T[], R)
 end
@@ -382,7 +403,7 @@ function (a::PolyRing{T})() where T <: RingElement
    return z
 end
 
-function (a::PolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (a::PolyRing{T})(b::JuliaRingElement) where T <: RingElement
    z = Poly{T}(base_ring(a)(b))
    z.parent = a
    return z

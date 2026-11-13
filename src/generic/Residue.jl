@@ -28,7 +28,7 @@ end
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
@@ -46,6 +46,10 @@ function (a::EuclideanRingResidueRing{T})(b::Integer) where {T <: RingElement}
    z = EuclideanRingResidueRingElem{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
+end
+
+function (a::EuclideanRingResidueRing)(b::T) where {T <: Union{Rational, FracElem, TotFrac}}
+   return inv(a(denominator(b))) * a(numerator(b))
 end
 
 function (a::EuclideanRingResidueRing{T})(b::T) where {T <: RingElem}
@@ -110,8 +114,9 @@ function gens(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}
 end
 
 function characteristic(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
-   return characteristic(base_ring(base_ring(R)))
+   return characteristic(base_ring(R))
 end
+is_known(::typeof(characteristic), R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem} = is_known(characteristic, base_ring(R))
 
 function size(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}}) where {T<:PolyRingElem}
    return size(base_ring(base_ring(R)))^degree(modulus(R))
@@ -124,6 +129,39 @@ function rand(R::Union{EuclideanRingResidueRing{T}, EuclideanRingResidueField{T}
       r = r * g + rand(base_ring(base_ring(R)))
    end
    return r
+end
+
+###############################################################################
+#
+#   Some functions for residue rings of integers
+#
+###############################################################################
+
+function order(R::EuclideanRingResidueRing{BigInt})
+  return abs(modulus(R))
+end
+
+function length(R::EuclideanRingResidueRing{BigInt})
+  return order(R)
+end
+
+function Base.iterate(R::EuclideanRingResidueRing{BigInt})
+  I = big(0):(modulus(R) - 1)
+  _st = Base.iterate(I)
+  if _st === nothing
+    return nothing
+  end
+  x, st = _st
+  return R(x), (I, st)
+end
+
+function Base.iterate(R::EuclideanRingResidueRing{BigInt}, (I, st))
+  _st = Base.iterate(I, st)
+  if _st === nothing
+    return nothing
+  end
+  x, st = _st
+  return R(x), (I, st)
 end
 
 ###############################################################################
@@ -208,3 +246,12 @@ function gcdx(a::T, b::T) where {T <: EuclideanRingResidueRingElem}
   return R(G), R(U)*R(u), R(U)*R(v)
 end
 
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::EuclideanRingResidueRing)
+  return R(ConformanceTests.generate_element(base_ring(R)))
+end

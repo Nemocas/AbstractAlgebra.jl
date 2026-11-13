@@ -10,28 +10,9 @@
 #
 ###############################################################################
 
-@doc raw"""
-    parent(a::AbstractAlgebra.MatElem)
+base_ring(a::MatSpaceElem{T}) where T = a.base_ring::parent_type(T)
 
-Return the parent object of the given matrix.
-"""
-parent(a::MatElem) = matrix_space(base_ring(a), nrows(a), ncols(a))
-
-@doc raw"""
-    dense_matrix_type(::Type{T}) where T<:NCRingElement
-    dense_matrix_type(::T) where T<:NCRingElement
-    dense_matrix_type(::Type{S}) where S<:NCRing
-    dense_matrix_type(::S) where S<:NCRing
-
-Return the type of matrices with coefficients of type `T` respectively
-`elem_type(S)`.
-"""
-dense_matrix_type(::T) where T <: NCRing = dense_matrix_type(elem_type(T))
-dense_matrix_type(::T) where T <: NCRingElement = dense_matrix_type(T)
-dense_matrix_type(::Type{T}) where T <: NCRing = dense_matrix_type(elem_type(T))
-
-# default: MatSpaceElem
-dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
+base_ring(a::MatSpaceView{T}) where T = a.base_ring::parent_type(T)
 
 ###############################################################################
 #
@@ -39,18 +20,22 @@ dense_matrix_type(::Type{T}) where T <: NCRingElement = MatSpaceElem{T}
 #
 ###############################################################################
 
-number_of_rows(a::Union{Mat, MatRingElem}) = size(a.entries, 1)
+number_of_rows(a::MatSpaceElem) = size(a.entries, 1)
+number_of_columns(a::MatSpaceElem) = size(a.entries, 2)
 
-number_of_columns(a::Union{Mat,MatRingElem}) = size(a.entries, 2)
+# `::Int`: `size` of a `SubArray` with abstract index types does not infer
+number_of_rows(a::MatSpaceView) = size(a.entries, 1)::Int
+number_of_columns(a::MatSpaceView) = size(a.entries, 2)::Int
 
-Base.@propagate_inbounds getindex(a::Union{Mat, MatRingElem}, r::Int, c::Int) = a.entries[r, c]
 
-Base.@propagate_inbounds function setindex!(a::Union{Mat, MatRingElem}, d::NCRingElement,
+Base.@propagate_inbounds getindex(a::Mat, r::Int, c::Int) = a.entries[r, c]
+
+Base.@propagate_inbounds function setindex!(a::Mat, d::NCRingElement,
                                             r::Int, c::Int)
     a.entries[r, c] = base_ring(a)(d)
 end
 
-Base.isassigned(a::Union{Mat,MatRingElem}, i, j) = isassigned(a.entries, i, j)
+Base.isassigned(a::Mat, i, j) = isassigned(a.entries, i, j)
 
 ################################################################################
 #
@@ -75,16 +60,20 @@ function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: NCRingEl
    return MatSpaceView(deepcopy_internal(d.entries, dict), d.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
+   return MatSpaceView(view(A.entries, rows, cols), A.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Int, cols::Union{Colon, AbstractVector{Int}}) where T <: NCRingElement
+   return MatSpaceVecView(view(A.entries, rows, cols), A.base_ring)
 end
 
-function Base.view(M::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
-   return MatSpaceVecView(view(M.entries, rows, cols), M.base_ring)
+function Base.view(A::Mat{T}, rows::Union{Colon, AbstractVector{Int}}, cols::Int) where T <: NCRingElement
+   return MatSpaceVecView(view(A.entries, rows, cols), A.base_ring)
+end
+
+function Base.view(A::Mat{T}, rows::Int, cols::Int) where T <: NCRingElement
+   return MatSpacePointView(view(A.entries, rows, cols), A.base_ring)
 end
 
 ################################################################################
@@ -93,7 +82,13 @@ end
 #
 ################################################################################
 
-is_square(a::MatElem) = (nrows(a) == ncols(a))
+@doc raw"""
+    is_square(A::MatElem)
+
+Return `true` iff the matrix `A` has square shape.
+See also `is_square(a::T)  where {T <: NCRingElement}` which tests whether the given value `a` is a square in its own ring.
+"""
+is_square(A::MatElem) = (nrows(A) == ncols(A))
 
 ###############################################################################
 #
@@ -138,9 +133,20 @@ Base.getindex(V::MatSpaceVecView, i::Int) = V.entries[i]
 
 Base.setindex!(V::MatSpaceVecView{T}, z::T, i::Int) where {T} = (V.entries[i] = z)
 
-Base.setindex!(V::MatSpaceVecView, z::RingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
+Base.setindex!(V::MatSpaceVecView, z::NCRingElement, i::Int) = setindex!(V.entries, V.base_ring(z), i)
 
 Base.size(V::MatSpaceVecView) = (length(V.entries), )
+
+
+Base.length(V::MatSpacePointView) = 1
+
+Base.getindex(V::MatSpacePointView) = V.entries[]
+
+Base.setindex!(V::MatSpacePointView{T}, z::T) where {T <: NCRingElement} = (V.entries[] = z)
+
+Base.setindex!(V::MatSpacePointView, z::NCRingElement) = setindex!(V.entries, V.base_ring(z))
+
+Base.size(V::MatSpacePointView) = ()
 
 ###############################################################################
 #
@@ -166,11 +172,17 @@ AbstractAlgebra.base_ring(K::InjProjMat{T}) where T = K.R::parent_type(T)
 
 function AbstractAlgebra.matrix(K::InjProjMat)
   R = base_ring(K)
+  M = zero_matrix(R, nrows(K), ncols(K))
   if nrows(K) >= ncols(K)
-    return [zero_matrix(R, K.s-1, ncols(K)) ; identity_matrix(R, ncols(K)) ; zero_matrix(R, nrows(K) - K.s - ncols(K) + 1, ncols(K))]
+    for l in 1:ncols(K)
+      M[K.s - 1 + l, l] = one(R)
+    end
   else
-    return [zero_matrix(R, nrows(K), K.s-1) identity_matrix(R, nrows(K)) zero_matrix(R, nrows(K), ncols(K)-K.s-nrows(K) + 1)]
+    for l in 1:nrows(K)
+      M[l, K.s - 1 + l] = one(R)
+    end
   end
+  return M
 end
 
 function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
@@ -178,6 +190,10 @@ function Base.getindex(K::InjProjMat{T}, i::Int, j::Int) where T
   nrows(K) >= ncols(K) && i - K.s + 1 == j && return one(base_ring(K))::T
   nrows(K) <= ncols(K) && i == j - K.s + 1 && return one(base_ring(K))::T
   return zero(base_ring(K))::T
+end
+
+function Base.setindex!(K::InjProjMat, ::NCRingElement, ::Int, ::Int)
+  error("InjProjMat is read-only")
 end
 
 function *(b::InjProjMat{T}, c::MatElem{T}) where {T <: NCRingElement}
@@ -207,7 +223,7 @@ function *(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   end
 end
 
-function *(a::InjProjMat, b::InjProjMat)
+function *(a::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement}
    @assert base_ring(a) === base_ring(b)
    R = base_ring(a)
    @assert ncols(a) == nrows(b)
@@ -259,6 +275,7 @@ function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
 end
 +(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = b+c
 +(c::InjProjMat{T}, b::InjProjMat{T}) where {T <: NCRingElement} = matrix(b) + c
+-(c::InjProjMat{T}, b::MatElem{T}) where {T <: NCRingElement} = matrix(c) - b
 
 function add_one!(a::MatElem, i::Int, j::Int)
   a[i, j] += 1

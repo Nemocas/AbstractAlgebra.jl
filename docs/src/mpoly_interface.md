@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -47,14 +48,31 @@ Note that both abstract types are parameterised. The type `T` should usually be 
 of elements of the coefficient ring of the polynomial ring. For example, in the case of
 $\mathbb{Z}[x, y]$ the type `T` would be the type of an integer, e.g. `BigInt`.
 
+Given a type for the coefficients, we can obtain the corresponding type of a
+multivariate polynomial having that type of coefficient:
+
+```@docs
+mpoly_type
+```
+
+Analogously, given a type for the coefficients, we can obtain the corresponding
+type of the ring of multivariate polynomials having that type of coefficient:
+
+```@docs
+mpoly_ring_type
+```
+
+### Identical polynomial rings
+
 Multivariate polynomial rings should be made unique on the system by caching parent
 objects (unless an optional `cache` parameter is set to `false`). Multivariate
 polynomial rings should at least be distinguished based on their base (coefficient)
 ring and number of variables. But if they have the same base ring, symbols (for their
 variables/generators) and ordering, they should certainly have the same parent object.
 
-See `src/generic/GenericTypes.jl` for an example of how to implement such a cache (which
-usually makes use of a dictionary).
+Implementaors of a new type of polynomial ring should see `src/generic/GenericTypes.jl`
+for an example of how to implement such a cache (which usually makes use of a dictionary).
+In particular look at `MPolyID`.
 
 ## Required functionality for multivariate polynomials
 
@@ -232,7 +250,7 @@ divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
 ```
 
 Return a tuple `(flag, q)` where `flag` is `true` if $g$ divides $f$, in which case
-$q$ will be the exact quotient, or `flag` is false and $q$ is set to zero.
+$q$ will be the exact quotient, or `flag` is false and $q$ is undefined.
 
 ```julia
 remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: RingElem
@@ -504,7 +522,7 @@ evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: RingElem, U <: Integer}
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
 
 ```julia
-(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+(a::MyMPoly{T})(vals::NCRingElement...) where T <: RingElement
 ```
 
 Evaluate the polynomial at the given arguments. This provides functional

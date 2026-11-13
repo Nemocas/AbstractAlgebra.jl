@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Extending the interface of AbstractAlgebra.jl
 
 In this section we will discuss on how to extend the interface of
@@ -22,6 +27,14 @@ $\mathbb{Z}[x]$, then one should implement
 ```@docs
 base_ring
 base_ring_type
+```
+
+If there is a well-defined notion of a coefficient ring (e.g. in the case of
+polynomial rings or modules), then one should implement
+
+```@docs
+coefficient_ring
+coefficient_ring_type
 ```
 
 ## Special elements

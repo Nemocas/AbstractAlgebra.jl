@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -36,7 +37,7 @@ over a noncommutative ring:
 
 We have that `PolyRing{T} <: Ring` and
 `PolyRingElem{T} <: RingElem`. Similarly we have that
-`NCPolyRing{T} <: NCRing` and 
+`NCPolyRing{T} <: NCRing` and
 `NCPolyRingElem{T} <: NCRingElem`.
 
 Note that the abstract types are parameterised. The type `T` should usually be the type
@@ -134,30 +135,34 @@ Return the array `[s]` where `s` is a `Symbol` representing the variable of the 
 polynomial ring. This is provided for uniformity with the multivariate interface, where
 there is more than one variable and hence an array of symbols.
 
-```julia
-dense_poly_type(::Type{T}) where T <: RingElement
-```
-
-Return the type of a polynomial whose coefficients have the given type. In our
-example `MyPoly{T}`.
-
-This function is defined for generic polynomials and only needs to be defined for
-custom polynomial rings, e.g. ones defined by a C implementation.
+Given a type for the coefficients, we can obtain the corresponding type of a
+univariate polynomial having that type of coefficient:
 
 ```@docs
-polynomial_ring_only(R::Ring, s::Symbol; cached::Bool=true)
+poly_type
+```
+
+Analogously, given a type for the coefficients, we can obtain the corresponding
+type of the ring of univariate polynomials having that type of coefficient:
+
+```@docs
+poly_ring_type
+```
+
+```@docs
+poly_ring(R::Ring, s::Symbol; cached::Bool=false)
 ```
 
 The default implementation figures out the appropriate polynomial ring type via
-`dense_poly_type` and calls its constructor with `R, s, cached` as arguments.
+`poly_type` and calls its constructor with `R, s, cached` as arguments.
 In our example, this would be
 
 ```julia
 MyPolyRing{T}(R, s, cached)
 ```
 
-Accordingly, `polynomial_ring_only` only needs to be defined, if such a
-constructor does not exist or other behaviour is wanted.
+Accordingly, a `poly_ring` method only needs to be defined if such a
+constructor does not exist for `poly_type(T)` or if other behaviour is wanted.
 
 ### Basic manipulation of rings and elements
 
@@ -185,7 +190,7 @@ coeff(f::MyPoly{T}, n::Int) where T <: RingElem
 ```
 
 Return the coefficient of the polynomial `f` of degree `n`. If `n` is larger than the
-degree of the polynomial, it should return zero in the coefficient ring. 
+degree of the polynomial, it should return zero in the coefficient ring.
 
 ```julia
 setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: RingElem
@@ -228,7 +233,7 @@ can also be defined to do nothing.
 Sometimes parts of the Euclidean Ring interface can and should be implemented for
 polynomials over a ring that is not necessarily a field.
 
-When divisibility testing can be implemented for a polynomial ring over a field, it 
+When divisibility testing can be implemented for a polynomial ring over a field, it
 should be possible to implement the following functions from the Euclidean Ring
 interface:
 
@@ -243,7 +248,7 @@ may be possible to implement the following functions:
   * lcm
 
 Polynomial rings can optionally implement any part of the generic univariate polynomial
-functionality provided by AbstractAlgebra.jl, using the same interface. 
+functionality provided by AbstractAlgebra.jl, using the same interface.
 
 Obviously additional functionality can also be added to that provided by
 AbstractAlgebra.jl on an ad hoc basis.

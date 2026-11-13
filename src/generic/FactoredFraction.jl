@@ -20,7 +20,8 @@ base_ring_type(::Type{FactoredFracField{T}}) where T <: NCRingElement = parent_t
 
 base_ring(F::FactoredFracField{T}) where T <: RingElement = F.base_ring::parent_type(T)
 
-characteristic(F::FactoredFracField{T}) where T <: RingElement = characteristic(base_ring(F))
+characteristic(F::FactoredFracField) = characteristic(base_ring(F))
+is_known(::typeof(characteristic), R::FactoredFracField) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -53,7 +54,7 @@ function (F::FactoredFracField{T})(a::Rational) where T <: RingElem
     return F(numerator(a), denominator(a))
 end
 
-function (F::FactoredFracField{T})(a::Generic.FracFieldElem{T}) where T <: RingElement
+function (F::FactoredFracField{T})(a::FracFieldElem{T}) where T <: RingElement
     base_ring(F) == base_ring(a) || error("Could not coerce into $F")
     return _append_pow!(_make_base_elem(F, numerator(a)), denominator(a), -1)
 end
@@ -76,7 +77,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
    return FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
                           deepcopy_internal(a.terms, dict),
                           a.parent)
@@ -403,20 +404,40 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FactoredFracFieldElem{T}, v::Vector{U}) where {T <: RingElement, U <: RingElement}
-    z = evaluate(unit(f), v)
+# Split the factors by the sign of their exponent, as `numerator` and
+# `denominator` do, and divide only at the end: the values need not be
+# invertible, so `b^e` with `e < 0` would throw. Thus x//(x+y)^2 at (2, 3)
+# evaluates as 2//5^2, not as 2*5^-2.
+function _evaluate(f::FactoredFracFieldElem, v)
+    n = evaluate(unit(f), v)
+    d = one(n)
     for (b, e) in f
-        z *= evaluate(b, v)^e
+        if e < 0
+            d *= evaluate(b, v)^Base.checked_neg(e)
+        else
+            n *= evaluate(b, v)^e
+        end
     end
-    return z
+    return n//d
 end
 
-function evaluate(f::FactoredFracFieldElem{T}, v::U) where {T <: RingElement, U <: RingElement}
-    z = evaluate(unit(f), v)
-    for (b, e) in f
-        z *= evaluate(b, v)^e
-    end
-    return z
+evaluate(f::FactoredFracFieldElem, v::Vector{<:RingElement}) = _evaluate(f, v)
+
+evaluate(f::FactoredFracFieldElem, v::RingElement) = _evaluate(f, v)
+
+# Neither the method above nor `evaluate(::FracElem{<:PolyRingElem}, ::Integer)`
+# in Fraction.jl is more specific than the other, so their intersection needs
+# its own method. Route it through `_evaluate` too: going via
+# `numerator(f)//denominator(f)` instead would multiply the factorisation out,
+# which is precisely what this type exists to avoid.
+evaluate(f::FactoredFracFieldElem{<:PolyRingElem}, v::Integer) = _evaluate(f, v)
+
+function (a::FactoredFracFieldElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FactoredFracFieldElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ##############################################################################
@@ -690,11 +711,28 @@ end
 
 ###############################################################################
 #
-#   FactoredFractionField constructor
+#   Conformance test element generation
 #
 ###############################################################################
 
-function FactoredFractionField(R::AbstractAlgebra.Ring; cached::Bool=true)
+function ConformanceTests.generate_element(FF::FactoredFracField{BigInt})
+  limit = 10
+  t = one(FF)
+  for i in 1:abs(rand(Int)%limit)
+      s = FF(rand(Int)%(20*limit))
+      e = rand(Int)%limit
+      t *= iszero(s) ? s^abs(e) : s^e
+  end
+  return t
+end
+
+###############################################################################
+#
+#   factored_fraction_field constructor
+#
+###############################################################################
+
+function factored_fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    return FactoredFracField{AbstractAlgebra.elem_type(R)}(R, cached)
-end 
+end
 

@@ -27,6 +27,7 @@ base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::base_ring_type(a)
 function Base.numerator(a::FracFieldElem, canonicalise::Bool=true)
    if canonicalise
       u = canonical_unit(a.den)
+      isone(u) && return a.num
       return divexact(a.num, u)
    else
       return a.num
@@ -36,6 +37,7 @@ end
 function Base.denominator(a::FracFieldElem, canonicalise::Bool=true)
    if canonicalise
       u = canonical_unit(a.den)
+      isone(u) && return a.den
       return divexact(a.den, u)
    else
       return a.den
@@ -64,7 +66,6 @@ gens(F::FracField) = F.(gens(base_ring(F)))
 #
 ###############################################################################
 
-promote_rule(::Type{FracFieldElem{T}}, ::Type{FracFieldElem{T}}) where T <: RingElement = FracFieldElem{T}
 promote_rule(::Type{FracFieldElem{T}}, ::Type{FracFieldElem{T}}) where T <: RingElem = FracFieldElem{T}
 
 function promote_rule(::Type{FracFieldElem{T}}, ::Type{U}) where {T <: RingElem, U <: RingElem}
@@ -73,49 +74,63 @@ end
 
 ###############################################################################
 #
-#   Parent object call overloading
+#   Parent object call overload
 #
 ###############################################################################
 
-function (a::FracField{T})(b::RingElement) where {T <: RingElement}
+function (a::FracField{T})(b::RingElement) where {T <: RingElem}
    return a(base_ring(a)(b))
 end
 
-function (a::FracField{T})() where {T <: RingElement}
+function (a::FracField{T})() where {T <: RingElem}
    z = FracFieldElem{T}(zero(base_ring(a)), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::T) where {T <: RingElement}
+function (a::FracField{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(b, one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::T, c::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Could not coerce to fraction")
-   parent(c) != base_ring(a) && error("Could not coerce to fraction")
-   z = FracFieldElem{T}(b, c)
-   z.parent = a
-   return z
+function _reduce_fraction(x, y)
+   iszero(y) && throw(DivideError())
+   g = gcd(x, y)
+   return divexact(x, g), divexact(y, g)
 end
 
-function (a::FracField{T})(b::T, c::T) where {U <: FieldElem, T <: PolyRingElem{U}}
+function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
-   u = canonical_unit(c)
-   if !isone(u)
-      b = divexact(b, u)
-      c = divexact(c, u)
+   if reduce
+     b, c = _reduce_fraction(b, c)
    end
    z = FracFieldElem{T}(b, c)
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::T, c::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::T, c::T; reduce::Bool = false) where {U <: FieldElem, T <: PolyRingElem{U}}
+   parent(b) != base_ring(a) && error("Could not coerce to fraction")
+   parent(c) != base_ring(a) && error("Could not coerce to fraction")
+
+   if reduce
+      b, c = _reduce_fraction(b, c)
+   else
+      u = canonical_unit(c)
+      if !isone(u)
+         b = divexact(b, u)
+         c = divexact(c, u)
+      end
+   end
+   z = FracFieldElem{T}(b, c)
+   z.parent = a
+   return z
+end
+
+function (a::FracField{T})(b::T, c::JuliaRingElement) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(b, base_ring(a)(c))
    z.parent = a
@@ -130,7 +145,7 @@ function (a::FracField{T})(b::T, c::Rational) where {U <: FieldElem, T <: PolyRi
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, Rational, AbstractFloat}, c::T) where {T <: RingElement}
+function (a::FracField{T})(b::JuliaRingElement, c::T) where {T <: RingElem}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    z = FracFieldElem{T}(base_ring(a)(b), c)
    z.parent = a
@@ -150,26 +165,26 @@ function (a::FracField{T})(b::Union{Integer, Rational}, c::T) where {U <: FieldE
    return z
 end
 
-function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElement}
+function (a::FracField{T})(b::Union{Integer, AbstractFloat}) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::Rational) where {T <: RingElement}
+function (a::FracField{T})(b::Rational) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(numerator(b, false)),
                base_ring(a)(denominator(b, false)))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::Integer, c::Integer) where {T <: RingElement}
+function (a::FracField{T})(b::Integer, c::Integer) where {T <: RingElem}
    z = FracFieldElem{T}(base_ring(a)(b), base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function (a::FracField{T})(b::FracFieldElem{T}) where {T <: RingElement}
+function (a::FracField{T})(b::FracFieldElem{T}) where {T <: RingElem}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end
@@ -287,4 +302,13 @@ function fraction_field(R::AbstractAlgebra.Ring; cached::Bool=true)
    T = elem_type(R)
 
    return FracField{T}(R, cached)
+end
+
+function ConformanceTests.generate_element(R::FracField{T}) where {T <: RingElem}
+  num = ConformanceTests.generate_element(base_ring(R))
+  den = ConformanceTests.generate_element(base_ring(R))
+  if iszero(den)
+    den = one!(den)
+  end
+  return R(num, den)
 end

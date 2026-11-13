@@ -13,29 +13,74 @@
 Map(::Type{T}) where T <: Map = supertype(T)
 Map(::Type{S}) where S <: SetMap = Map{D, C, <:S, T} where {D, C, T}
 
+@doc raw"""
+    domain(f::Map)
+
+Return the parent object `f` maps from.
+"""
 function domain end
+
+@doc raw"""
+    codomain(f::Map)
+
+Return the parent object `f` maps to.
+"""
 function codomain end
+
+@doc raw"""
+    image_fn(f::Map)
+
+Return the Julia function or closure that evaluates `f`. Only maps of class
+`FunctionalMap` are guaranteed to provide it.
+"""
 function image_fn end
+
+# Generic fallbacks: any map can be applied via `image`/`preimage`, so wrapping
+# those is always a valid way to obtain the underlying functions. Map types that
+# store the functions directly (e.g. `MapWithHeader`) specialize these to hand
+# back the stored function instead. Needed by `InverseMap`, which is built from
+# arbitrary maps.
+image_fn(f::Map) = x -> image(f, x)
+inverse_fn(f::Map) = x -> preimage(f, x)
 
 function coimage(h::Map)
   return quo(domain(h), kernel(h)[1])
 end
 
+@doc raw"""
+    check_composable(f::Map, g::Map)
+
+Raise an exception unless the codomain of `f` equals the domain of `g`, i.e.
+unless the composition `f*g` is defined.
+"""
 function check_composable(a::Map, b::Map)
    codomain(a) !== domain(b) && error("Incompatible maps")
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", M::Map)
-   # the "header" printed for most map types is identical: the terse output
-   # followed by "from DOMAIN" and "to CODOMAIN" lines.. We implement this
-   # generically here. If desired, map types can provide a custom
-   # show_map_data method to add additional data after this initial "header".
-   println(terse(io), M)
+   # the "header" printed for most map types is identical: a descriptive name
+   # for the map followed by "from DOMAIN" and "to CODOMAIN" lines. We
+   # implement this generically here. If desired, map types can provide a
+   # custom show_map_data method to add additional data after this initial
+   # "header".
+   #
+   # The output will be
+   #
+   # show_map_head(io, M)
+   #   from DOMAIN
+   #   to CODOMAIN
+   # show_map_data(io, M)
+   #
+   show_map_head(io, M)
+   println(io)
    io = pretty(io)
    println(io, Indent(), "from ", Lowercase(), domain(M))
    print(io, "to ", Lowercase(), codomain(M), Dedent())
    show_map_data(io, M)
 end
+
+# for backwards compatibility, but all maps using `@show_name` should overload it
+show_map_head(io::IO, M::Map) = print(terse(io), M)
 
 function show_map_data(io::IO, M::Map)
    # no extra data by default; Map subtypes may overload this
@@ -70,12 +115,12 @@ Compose the two maps $f$ and $g$, i.e. return the map $h$ such that $h(x) = g(f(
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ);
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1);
 
-julia> g = map_from_func(x -> QQ(x), ZZ, QQ);
+julia> g = map_from_func(ZZ, QQ, x -> QQ(x));
 
 julia> h = compose(f, g)
-Functional composite map
+Composite map
   from integers
   to rationals
 which is the composite of
@@ -123,34 +168,208 @@ identity_map(R::D) where D <: Set = Generic.IdentityMap{D}(R)
 ################################################################################
 
 @doc raw"""
-    map_from_func(image_fn::Function, domain, codomain)
+    map_from_func(D, C, image_fn, [inverse_fn])
 
-Construct the generic functional map with domain and codomain given by the parent objects
-$R$ and $S$ corresponding to the Julia function $f$.
+Creates the map `D -> C, x -> image_fn(x)` of type `MapFromFunc` given the callable
+object `image_fn`. If `inverse_fn` is provided, it is assumed to satisfy
+`image_fn(inverse_fn(x)) = x` and will be used as the preimage function.
 
 # Examples
 ```jldoctest
-julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
 Map defined by a Julia function
   from integers
   to integers
 
 julia> f(ZZ(2))
 3
+
+julia> F = GF(2);
+
+julia> g = map_from_func(QQ, F, x -> F(numerator(x)) * inv(F(denominator(x))), y -> QQ(lift(y)))
+Map defined by a Julia function with inverse
+  from rationals
+  to finite field F_2
+
+julia> preimage(g, F(1))
+1//1
 ```
 """
-function map_from_func(image_fn::Function, domain, codomain)
-   return Generic.FunctionalMap(domain, codomain, image_fn)
-end
+map_from_func(D, C, image_fn) = MapFromFunc(D, C, image_fn)
+map_from_func(D, C, image_fn, inverse_fn) = MapFromFunc(D, C, image_fn, inverse_fn)
+
 
 ################################################################################
 #
-#  FunctionalCompositeMap
+#  MapWithHeader
 #
 ################################################################################
 
-function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
-   check_composable(f, g)
-   return Generic.FunctionalCompositeMap(f, g)
+
+# MapWithHeader objects store attributes in the header object
+_get_attributes(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes(G.header)
+_get_attributes!(G::Map{<:Any, <:Any, MapWithHeader, <:Any}) = _get_attributes!(G.header)
+_is_attribute_storing_type(::Type{<:Map(MapWithHeader)}) = true
+
+(f::Map(MapWithHeader))(x) = image(f, x)
+
+function domain(M::Map(MapWithHeader))
+  return M.header.domain
 end
 
+function codomain(M::Map(MapWithHeader))
+  return M.header.codomain
+end
+
+function image_fn(f::Map(MapWithHeader))
+  if isdefined(f.header, :image)
+    return f.header.image
+  else
+    return x -> image(f, x)
+  end
+end
+
+function inverse_fn(f::Map(MapWithHeader))
+  if isdefined(f.header, :preimage)
+    return f.header.preimage
+  else
+    return x -> preimage(f, x)
+  end
+end
+#
+# image_fn(f::Map(MapWithHeader)) = image_function(f)
+# inverse_fn(f::Map(MapWithHeader)) = preimage_function(f)
+
+
+################################################################################
+#
+#  Caching methods for MapWithHeader
+#
+################################################################################
+
+function change(D::Dict{K, V}, k::K, def::V, new::Function) where {K, V}
+  i = Base.ht_keyindex2!(D, k)
+  if i>0
+    D.vals[i] = new(D.vals[i])
+  else
+    pos = -i
+    D.keys[pos] = k
+    D.vals[pos] = def
+    D.count += 1
+    if pos < D.idxfloor
+      D.idxfloor = pos
+    end
+    D.slots[pos] = 0x1
+  end
+  return nothing
+end
+
+function inc(D::Dict{K, Int}, k::K, def::Int = 0) where K
+  i = Base.ht_keyindex2!(D, k)
+  if i>0
+    D.vals[i] += 1
+  else
+    pos = -i
+    D.keys[pos] = k
+    D.vals[pos] = def
+    D.count += 1
+    if pos < D.idxfloor
+      D.idxfloor = pos
+    end
+    D.slots[pos] = 0x1
+  end
+  return nothing
+end
+
+
+function _allow_cache!(M::Map, lim::Int, ::Type{D}, ::Type{C}, ::Type{De}, ::Type{Ce}) where {D, C, De, Ce}
+  if isdefined(M.header, :cache)
+#    println("Cache already installed")
+  else
+    M.header.cache = MapCache(domain(M), codomain(M), De, Ce, lim)
+    M.header.cache.old_pr = M.header.preimage
+    M.header.cache.old_im = M.header.image
+  end
+
+  function im(a::De)
+    if haskey(M.header.cache.im, a)
+      inc(M.header.cache.imStat, a)
+      return M.header.cache.im[a]::Ce
+    else
+      b = M.header.cache.old_im(a)::Ce
+      M.header.cache.im[a] = b
+      M.header.cache.imStat[a] = 0
+      return b
+    end
+  end
+  im(a) = M.header.cache.old_im(a)::Ce
+  M.header.image = im
+
+  function pr(a::Ce)
+    i = Base.ht_keyindex(M.header.cache.pr, a)
+    if i >= 0
+      inc(M.header.cache.prStat, a)
+      return M.header.cache.pr.vals[i]::De
+    else
+      b = M.header.cache.old_pr(a)::De
+      M.header.cache.pr[a] = b
+      M.header.cache.prStat[a] = 0
+      return b
+    end
+  end
+  pr(a) = M.header.cache.old_pr(a)::De
+  M.header.preimage = pr
+
+  nothing
+end
+
+function allow_cache!(M::T, lim::Int = 100) where T <: Map
+  return _allow_cache!(M, lim, typeof(domain(M)), typeof(codomain(M)), elem_type(domain(M)), elem_type(codomain(M)))
+end
+
+function stop_cache!(M::T) where T <: Map
+  if isdefined(M.header, :cache)
+    M.header.image = M.header.cache.old_im
+    M.header.preimage = M.header.cache.old_pr
+  end
+  nothing
+end
+
+# For InverseMap:
+function pseudo_inv(a::Map)
+  return InverseMap(a)
+end
+
+
+################################################################################
+#
+#  Comparison of objects as maps
+#
+#  Rationale: Often objects are implicitly used as maps. For instance, a `Ring`
+#  `R` can be used to type-cast objects `x` into `R`. When objects are
+#  implicitly used as maps, one may wish to compare them as such. The function
+#  `==` can not be overloaded for this since it would be expected to compare
+#  two objects as what they are originally (i.e. as `Ring`s in the above
+#  example). Therefore, we introduce another function here for which methods
+#  can be added successively to allow for reasonable comparisons.
+#
+#  This is, for example, used in recursive setups like the following.
+#  Suppose `R = ℤ[x₁, x₂]` and `P = ℚ[y₁, y₂]`, together with maps
+#
+#    φ, ψ : R → P, xᵢ ↦ yᵢ
+#
+#  Both maps will need to implicitly cast the coefficients in `R` to
+#  coefficients in `P`. Let us now assume that `φ` is doing this implicitly,
+#  while `ψ` has `QQ` stored internally as a `coefficient_map`.
+#    Comparing those two maps (i.e. implementing `==`) will now compare the
+#  images of the variables (which agree in this case) and then move on to
+#  comparing the `coefficient_map`s. In this case, this would compare
+#  `nothing` to `QQ`. Clearly, `nothing == QQ` should return `false` by any
+#  means. With the function `is_equal_as_morphism` introduced below, we
+#  could implement a reasonable method for this case.
+################################################################################
+
+function is_equal_as_morphism(a::Any, b::Any)
+  a === b && return true
+  error("no method implemented to compare $a and $b as morphisms beyond `===`")
+end

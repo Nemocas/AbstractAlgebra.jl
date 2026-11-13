@@ -28,13 +28,15 @@ include("generic/AbsMSeries-test.jl")
 include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 include("generic/LaurentMPoly-test.jl")
-include("generic/UnivPoly-test.jl")
+include("UniversalRing-test.jl")
+include("generic/Localization-test.jl")
 include("algorithms/MPolyEvaluate-test.jl")
 include("algorithms/MPolyFactor-test.jl")
 include("algorithms/MPolyNested-test.jl")
 include("algorithms/DensePoly-test.jl")
 include("algorithms/coprime_base-test.jl")
 include("generic/PolyRingHom-test.jl")
+include("PuiseuxPolynomials-test.jl")
 
 @testset "Generic.Rings.broadcast" begin
    F = GF(3)
@@ -67,6 +69,12 @@ end
   @test is_perfect(GF(2))
   @test is_finite(GF(2))
   @test !is_finite(QQ)
+  R1, = laurent_polynomial_ring(QQ[:x][1], :y)
+  @test krull_dim(R1) == 2
+  R2, = power_series_ring(ZZ, 3, :x)
+  @test krull_dim(R2) == 2
+  S, = universal_polynomial_ring(ZZ, [:x,:y])
+  @test_throws NotImplementedError is_noetherian(S)
 end
 
 @testset "is_associated" begin
@@ -83,4 +91,14 @@ end
    @test !is_associated(f, 0*f)
    @test !is_associated(0*f, f)
    @test !is_associated(f, 2x^2-x+2)
+end
+
+# `promote` returns copies although the operands already have a common type
+mutable struct CopyPromoteRingElem <: RingElem end
+
+Base.promote(x::CopyPromoteRingElem, y::CopyPromoteRingElem) =
+   CopyPromoteRingElem(), CopyPromoteRingElem()
+
+@testset "divexact fallback" begin
+   @test_throws NotImplementedError divexact(CopyPromoteRingElem(), CopyPromoteRingElem())
 end

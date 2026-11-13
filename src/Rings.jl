@@ -35,7 +35,16 @@ behaviour of the function undefined if the division is not exact.
 """
 function divexact end
 
-divexact(x::RingElem, y::RingElem; check::Bool=true) = divexact(promote(x, y)...; check=check)
+function divexact(x::RingElem, y::RingElem; check::Bool=true)
+  xx, yy = promote(x, y)
+  # if divexact is not implemented, we need to break the recursion;
+  # compare types rather than operands, as dispatch only depends on the
+  # types and `promote` may return copies
+  if typeof(xx) === typeof(x) && typeof(y) === typeof(yy)
+    throw(NotImplementedError(:divexact, x, y))
+  end
+  return divexact(xx, yy; check=check)
+end
 
 divexact(x::RingElem, y::RingElement; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
@@ -47,8 +56,8 @@ divexact_right(x::T, y::T; check::Bool=true) where T <: RingElement = divexact(x
 
 Base.:/(x::ModuleElem, y::RingElement) = divexact(x, y; check=true)
 Base.:/(x::RingElem, y::RingElem) = divexact(x, y; check=true)
-Base.:/(x::RingElem, y::Union{Integer, Rational, AbstractFloat}) = divexact(x, y; check=true)
-Base.:/(x::Union{Integer, Rational, AbstractFloat}, y::RingElem) = divexact(x, y; check=true)
+Base.:/(x::RingElem, y::JuliaRingElement) = divexact(x, y; check=true)
+Base.:/(x::JuliaRingElement, y::RingElem) = divexact(x, y; check=true)
 
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
 
@@ -83,23 +92,85 @@ function evaluate(x::PolyRingElem{T}, y::Integer) where T <: RingElem
    return evaluate(x, base_ring(x)(y))
 end
 
-function evaluate(x::MPolyRingElem{T}, y::Integer) where T <: RingElem
-   return evaluate(x, base_ring(x)(y))
-end
-
 ###############################################################################
 #
 #   Type traits
 #
 ###############################################################################
 
-# Type can only represent elements of an exact ring
-# true unless explicitly specified
+@doc raw"""
+    is_exact_type(T::Type) -> Bool
+    is_exact_type(x) -> Bool
+
+Return `true` if all elements of the given type are represented exactly, i.e.
+without approximation, and `false` otherwise. Integers, rationals, finite
+fields and polynomials and matrices over them are exact; floating point
+numbers, $p$-adic numbers and power series are not. As the type may be
+abstract or parameterised, `true` is only returned if every type it covers is
+exact.
+
+Here `T` may be a ring element type or a ring type, and `x` may be a ring
+element or a ring.
+
+# Examples
+
+```jldoctest
+julia> is_exact_type(BigInt)
+true
+
+julia> is_exact_type(ZZ)
+true
+
+julia> S, x = power_series_ring(QQ, 5, :x);
+
+julia> is_exact_type(S), is_exact_type(x)
+(false, false)
+```
+
+!!! note
+    Implementors only need to define this for their ring element types; the
+    variants taking a ring type or an instance delegate to those.
+"""
 is_exact_type(R::Type{T}) where T <: RingElem = true
 
-# Type can only represent elements of domains
-# false unless explicitly specified
-is_domain_type(R::Type{T}) where T <: RingElem = false
+is_exact_type(x) = is_exact_type(typeof(x))
+is_exact_type(x::Type{<:Ring}) = is_exact_type(elem_type(x))
+is_exact_type(T::DataType) = throw(MethodError(is_exact_type, (T,)))
+
+@doc raw"""
+    is_domain_type(T::Type) -> Bool
+    is_domain_type(x) -> Bool
+
+Return `true` if every element of the given type is guaranteed to have an
+integral domain as its parent, and `false` if this cannot be guaranteed. For
+example elements of generic residue rings do not qualify, as the answer
+depends on the modulus, which is not part of the type.
+
+Here `T` may be a ring element type or a ring type, and `x` may be a ring
+element or a ring.
+
+# Examples
+
+```jldoctest
+julia> is_domain_type(BigInt)
+true
+
+julia> is_domain_type(ZZ)
+true
+
+julia> is_domain_type(residue_ring(ZZ, 6)[1])
+false
+```
+
+!!! note
+    Implementors only need to define this for their ring element types; the
+    variants taking a ring type or an instance delegate to those.
+"""
+is_domain_type(R::Type{T}) where T <: NCRingElem = false
+
+is_domain_type(x) = is_domain_type(typeof(x))
+is_domain_type(x::Type{<:NCRing}) = is_domain_type(elem_type(x))
+is_domain_type(T::DataType) = throw(MethodError(is_domain_type, (T,)))
 
 ###############################################################################
 #
@@ -144,13 +215,6 @@ end
 #
 ################################################################################
 
-@doc raw"""
-    sqrt(a::FieldElem)
-
-Return the square root of the element `a`. By default the function will
-throw an exception if the input is not square. If `check=false` this test is
-omitted.
-"""
 function Base.sqrt(a::FieldElem; check::Bool=true)
   R = parent(a)
   R, t = polynomial_ring(R, :t; cached = false)
@@ -163,21 +227,20 @@ function Base.sqrt(a::FieldElem; check::Bool=true)
   error("Element $a does not have a square root")
 end
 
-# assumes the existence of sqrt without check argument for input
-function Base.sqrt(a::RingElem; check::Bool=true)
-  s = sqrt(a)
-  if check
-    s != a^2 && error("Element $a does not have a square root")
-  end
-  return s
-end  
+@doc raw"""
+    is_square_with_sqrt(a::T) where T <: RingElement
 
-# assumes the existence of is_square and sqrt for input  
+Return `(true, s)` if $a$ is a perfect square, where $s^2 = a$. Otherwise
+return `(false, ...)` where `...` is some element of `parent(a)`.
+"""
+is_square_with_sqrt(::RingElement)
+
 function is_square_with_sqrt(a::RingElem)
+  # assumes the existence of is_square and sqrt for input
   if is_square(a)
      return true, sqrt(a)
   else
-     return false, parent(a)()
+     return false, a
   end
 end
 
@@ -195,16 +258,43 @@ of a single element, or equivalently if its characteristic is 1. Such
 rings are also called zero rings.
 """
 is_trivial(R::NCRing) = !is_domain_type(elem_type(R)) && iszero(one(R))
+is_known(::typeof(is_trivial), R::NCRing) = is_domain_type(elem_type(R))
+
+@doc raw"""
+    is_zero(R::NCRing)
+
+Test whether the ring $R$ is trivial. However, the recommended method
+for doing this is [`is_trivial`](@ref).
+
+```jldoctest
+julia> R, (x,) = polynomial_ring(QQ, [:x]);
+
+julia> S=quo(R,1)[1]
+Residue ring of R modulo 1
+
+julia> is_trivial(S)
+true
+
+julia> is_zero(S)
+true
+```
+"""
+is_zero(R::NCRing) = is_trivial(R)
 
 @doc raw"""
     is_perfect(F::Field)
 
-Test whether the field $F$ is perfect.
+Test whether the field $F$ is perfect, that is, whether the characteristic is zero or
+else whether every element of $F$ admits a $p$-th root, where $p > 0$ is the characteristic of $F$.
 """
-is_perfect(F::Field) = characteristic(F) == 0 || F isa FinField ||
-                                                 throw(NotImplementedError(:is_perfect, F))
+is_perfect(F::Field) = characteristic(F) == 0 || throw(NotImplementedError(:is_perfect, F))
+is_known(::typeof(is_perfect), F::Field) = is_known(characteristic, F) && characteristic(F) == 0
+
+is_perfect(F::FinField) = true
+is_known(::typeof(is_perfect), F::FinField) = true
 
 is_finite(F::FinField) = true
+is_known(::typeof(is_finite), F::FinField) = true
 
 function is_finite(R::NCRing)
   c = characteristic(R)
@@ -212,3 +302,74 @@ function is_finite(R::NCRing)
   c == 1 && return true
   throw(NotImplementedError(:is_finite, R))
 end
+is_known(::typeof(is_finite), R::NCRing) = is_known(characteristic, R) && characteristic(R) <= 1
+
+@doc raw"""
+    is_noetherian(R::Ring)
+
+Check if the ring $R$ is Noetherian.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> is_noetherian(R)
+true
+```
+"""
+function is_noetherian(R::Ring)
+  throw(NotImplementedError(:is_noetherian, R))
+end
+
+is_noetherian(::Field) = true
+is_noetherian(::Integers) = true
+
+is_noetherian(R::Union{PolyRing, MPolyRing, LaurentPolyRing, LaurentMPolyRing}) = is_noetherian(coefficient_ring(R))
+is_noetherian(R::Union{MSeriesRing, SeriesRing}) = is_noetherian(base_ring(R))
+is_noetherian(R::ResidueRing) = is_noetherian(base_ring(R)) || throw(NotImplementedError(:is_noetherian, R))
+
+@doc raw"""
+    krull_dim(R::Ring)
+
+Return the Krull dimension of the ring $R$. The method is currently only supported for certain commutative Noetherian Rings.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, [:x]);
+
+julia> krull_dim(R)
+2
+```
+"""
+function krull_dim(R::Ring)
+  @req is_noetherian(R) "Krull dimension is only supported for Noetherian rings."
+  throw(NotImplementedError(:krull_dim, R))
+end
+
+krull_dim(::Field) = 0
+krull_dim(::Integers) = 1
+
+krull_dim(R::Union{MPolyRing, PolyRing, LaurentMPolyRing, LaurentPolyRing}) = krull_dim(coefficient_ring(R)) + nvars(R)
+krull_dim(R::Union{SeriesRing, MSeriesRing}) = krull_dim(base_ring(R)) + nvars(R)
+
+
+########################################################################
+# locality checks
+########################################################################
+@doc raw"""
+    is_local(R::Ring)
+
+Return whether a given ring `R` is a local ring.
+"""
+function is_local(R::Ring)
+  throw(NotImplementedError(:is_local, R))
+end
+
+# In general we can not assume it to be known whether a given ring is local
+is_known(::typeof(is_local), R::Ring) = false
+
+is_local(::Field) = true
+
+is_local(R::MPolyRing{<:FieldElem}) = is_zero(ngens(R))
+is_known(::typeof(is_local), R::MPolyRing{<:FieldElem}) = true
+

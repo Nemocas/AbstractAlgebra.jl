@@ -44,7 +44,7 @@ end
 #
 ###############################################################################
 
-function Base.deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
+function deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
     return FreeAssociativeAlgebraElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),
@@ -92,7 +92,7 @@ end
 
 function is_gen(a::FreeAssociativeAlgebraElem{T}) where T
     if length(a) < 1
-        return iszero(one(base_ring(a)))
+        return is_trivial(base_ring(a))
     else
         return a.length == 1 && isone(a.coeffs[1]) && length(a.exps[1]) == 1
     end
@@ -133,12 +133,12 @@ function (a::FreeAssociativeAlgebra{T})(b::T) where T
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::Union{Integer, Rational, AbstractFloat}) where T
+function (a::FreeAssociativeAlgebra{T})(b::JuliaRingElement) where T
     R = base_ring(a)
     return a(R(b))
 end
 
-function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+function (a::FreeAssociativeAlgebra{T})(b::T) where {T <: JuliaRingElement}
     iszero(b) && return zero(a)
     return FreeAssociativeAlgebraElem{T}(a, T[b], [Int[]], 1)
 end
@@ -171,10 +171,27 @@ function coeff(a::FreeAssociativeAlgebraElem, i::Int)
     return a.coeffs[i]
 end
 
+# Only for compatibility, we can't do anything in place here
+function coeff!(c::T, a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
+    return coeff(a, i)
+end
+
 function term(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
     R = parent(a)
     return FreeAssociativeAlgebraElem{T}(R, [a.coeffs[i]], [a.exps[i]], 1)
+end
+
+function term!(
+    t::FreeAssociativeAlgebraElem{T},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    fit!(t, 1)
+    t.coeffs[1] = deepcopy(a.coeffs[i])
+    t.exps[1] = copy(a.exps[i])
+    t.length = 1
+    return t
 end
 
 function monomial(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
@@ -183,26 +200,84 @@ function monomial(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingEleme
     return FreeAssociativeAlgebraElem{T}(R, T[one(base_ring(R))], [a.exps[i]], 1)
 end
 
+function monomial!(
+    m::FreeAssociativeAlgebraElem{T},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    fit!(m, 1)
+    if !isassigned(m.coeffs, 1) || !is_one(m.coeffs[1])
+        m.coeffs[1] = one(base_ring(a))
+    end
+    m.exps[1] = copy(a.exps[i])
+    m.length = 1
+    return m
+end
+
 @doc raw"""
     exponent_word(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
 
 Return a vector of variable indices corresponding to the monomial of the
 $i$-th term of $a$. Term numbering begins at $1$, and the variable
 indices are given in the order of the variables for the ring.
+
+# Examples
+
+```jldoctest
+julia> R, (x, y, z) = free_associative_algebra(ZZ, [:x, :y, :z])
+(Free associative algebra on 3 indeterminates over integers, AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{BigInt}[x, y, z])
+
+julia> map(total_degree, (R(0), R(1), -x^2*y^2*z^2*x + z*y))
+(-1, 0, 7)
+
+julia> leading_term(-x^2*y^2*z^2*x + z*y)
+-x^2*y^2*z^2*x
+
+julia> leading_monomial(-x^2*y^2*z^2*x + z*y)
+x^2*y^2*z^2*x
+
+julia> leading_coefficient(-x^2*y^2*z^2*x + z*y)
+-1
+
+julia> exponent_word(-x^2*y^2*z^2*x + z*y, 1)
+7-element Vector{Int64}:
+ 1
+ 1
+ 2
+ 2
+ 3
+ 3
+ 1
+```
 """
 function exponent_word(a::FreeAssociativeAlgebraElem{T}, i::Int) where T <: RingElement
     @boundscheck 1 <= i <= length(a) || throw(ArgumentError("index out of range"))
     return a.exps[i]
 end
 
-function Base.iterate(a::FreeAssAlgExponentWords, state = 0)
-    state += 1
-    state <= length(a.poly) || return nothing
-    return exponent_word(a.poly, state), state
+function exponent_word!(
+    w::Vector{Int},
+    a::FreeAssociativeAlgebraElem{T},
+    i::Int,
+) where T <: RingElement
+    resize!(w, length(a.exps[i]))
+    copyto!(w, a.exps[i])
+    return w
+end
+
+function Base.iterate(a::FreeAssAlgExponentWords, state::Union{Nothing, Int} = nothing)
+    s = isnothing(state) ? 1 : state + 1
+    if length(a.poly) >= s
+      w = a.inplace ? exponent_word!(a.temp, a.poly, s) : exponent_word(a.poly, s)
+      return w, s
+    else
+      return nothing
+    end
 end
 
 function leading_coefficient(a::FreeAssociativeAlgebraElem{T}) where T
-    return a.length > 0 ? coeff(a, 1) : zero(base_ring(a))
+    @req !is_zero(a) "Zero polynomial does not have a leading monomial"
+    return coeff(a, 1)
 end
 
 function leading_monomial(a::FreeAssociativeAlgebraElem{T}) where T
@@ -215,6 +290,13 @@ function leading_term(a::FreeAssociativeAlgebraElem{T}) where T
     return term(a, 1)
 end
 
+@doc raw"""
+    leading_exponent_word(a::FreeAssociativeAlgebraElem)
+
+Return the exponent word of the leading term of `a`, i.e. the vector of
+variable indices spelling out its leading monomial. Throw an error if `a` is
+zero.
+"""
 function leading_exponent_word(a::FreeAssociativeAlgebraElem{T}) where T
     @req !is_zero(a) "Zero polynomial does not have a leading exponent word"
     return exponent_word(a, 1)
@@ -225,9 +307,7 @@ function total_degree(a::FreeAssociativeAlgebraElem{T}) where T
     return length(a) > 0 ? length(a.exps[1]) : -1
 end
 
-function Base.length(
-    x::FreeAssAlgExponentWords{T},
-) where {S <: RingElement, T <: FreeAssociativeAlgebraElem{S}}
+function Base.length(x::FreeAssAlgExponentWords)
     return length(x.poly)
 end
 
@@ -244,6 +324,7 @@ end
 ###############################################################################
 
 function canonical_unit(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    iszero(a) && return one(base_ring(a))
     return canonical_unit(leading_coefficient(a))
 end
 
@@ -306,6 +387,14 @@ function ==(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) 
            view(a.coeffs, 1:a.length) == view(b.coeffs, 1:b.length)
 end
 
+function isequal(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T
+    check_parent(a, b, false) || return false
+    length(a) == length(b) || return false
+    n = length(a)
+    view(a.exps, 1:n) == view(b.exps, 1:n) || return false
+    return isequal(view(a.coeffs, 1:n), view(b.coeffs, 1:n))
+end
+
 function word_cmp(a::Vector{Int}, b::Vector{Int})
     if length(a) > length(b)
         return +1
@@ -332,8 +421,8 @@ function sort_terms!(z::FreeAssociativeAlgebraElem{T}) where T
     n = length(z)
     if n > 1
         p = sortperm(view(z.exps, 1:n), lt = word_gt)
-        z.coeffs = [z.coeffs[p[i]] for i in 1:n]
-        z.exps = [z.exps[p[i]] for i in 1:n]
+        permute!(view(z.coeffs, 1:n), p)
+        permute!(view(z.exps, 1:n), p)
     end
     return z
 end
@@ -363,10 +452,10 @@ end
 Implements the degree lexicographic ordering on terms, i.e.
 first, the degrees of the largest monomials are compared, and if they
 are the same, they are compared lexicographically and if they are still the same,
-the coefficients are compared. 
+the coefficients are compared.
 If everything is still the same, the next largest monomial is compared
 and lastly the number of monomials is compared.
-Since the coefficients are also compared, this only works when the 
+Since the coefficients are also compared, this only works when the
 coefficient Ring implements isless.
 
 The order of letters is the reverse of the order given when initialising the algebra.
@@ -428,6 +517,8 @@ end
 function *(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     zcoeffs = T[]
     zexps = Vector{Int}[]
+    sizehint!(zcoeffs, a.length * b.length)
+    sizehint!(zexps, a.length * b.length)
     for i in 1:a.length, j in 1:b.length
         push!(zcoeffs, a.coeffs[i] * b.coeffs[j])
         push!(zexps, vcat(a.exps[i], b.exps[j]))
@@ -637,7 +728,7 @@ end
 #
 ###############################################################################
 
-function *(a::FreeAssociativeAlgebraElem, n::Union{Integer, Rational, AbstractFloat})
+function *(a::FreeAssociativeAlgebraElem, n::JuliaRingElement)
     z = zero(a)
     return mul!(z, a, n)
 end
@@ -647,7 +738,7 @@ function *(a::FreeAssociativeAlgebraElem{T}, n::T) where {T <: RingElem}
     return mul!(z, a, n)
 end
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::FreeAssociativeAlgebraElem) = a*n
+*(n::JuliaRingElement, a::FreeAssociativeAlgebraElem) = a*n
 
 *(n::T, a::FreeAssociativeAlgebraElem{T}) where {T <: RingElem} = a*n
 
@@ -683,34 +774,91 @@ function one!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     return a
 end
 
-function neg!(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    for i in 1:length(a)
-        a.coeffs[i] = neg!(a.coeffs[i])
-    end
-    return a
-end
-
 function neg!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    if z === a
-        return neg!(a)
-    end
-    z.length = length(a)
     fit!(z, length(a))
     for i in 1:length(a)
-        if isassigned(z.coeffs, i)
-            z.coeffs[i] = neg!(z.coeffs[i], a.coeffs[i])
-        else
-            z.coeffs[i] = -a.coeffs[i]
-        end
-        # mutating z.exps[i] is not allowed since it could be aliased
+        # coefficient objects and words may be shared with other elements, so neither is mutated
+        z.coeffs[i] = -a.coeffs[i]
         z.exps[i] = a.exps[i]
     end
+    z.length = length(a)
     return z
 end
 
+# z = a op b, where a is given by its coefficients ac[i:n] and words ae[i:n]
+# instead of as an element.
+# ac/ae may be z.coeffs/z.exps themselves (in-place case). Then the caller
+# must first move the a-terms to the tail, i.e. choose i > length(b): the
+# write index k advances at most once per consumed term, so k <= i holds
+# throughout and no unread term is overwritten.
+function _merge!(z::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-)}, ac::Vector{T}, ae::Vector{Vector{Int}}, i::Int, n::Int, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    j = k = 1
+    while i <= n && j <= b.length
+        c = word_cmp(ae[i], b.exps[j])
+        if c < 0
+            z.coeffs[k] = op === (+) ? b.coeffs[j] : -b.coeffs[j]
+            z.exps[k] = b.exps[j]
+            j += 1
+            k += 1
+        elseif c > 0
+            z.coeffs[k] = ac[i]
+            z.exps[k] = ae[i]
+            i += 1
+            k += 1
+        else
+            s = op(ac[i], b.coeffs[j])
+            if !iszero(s)
+                z.coeffs[k] = s
+                z.exps[k] = ae[i]
+                k += 1
+            end
+            i += 1
+            j += 1
+        end
+    end
+    while i <= n
+        z.coeffs[k] = ac[i]
+        z.exps[k] = ae[i]
+        i += 1
+        k += 1
+    end
+    while j <= b.length
+        z.coeffs[k] = op === (+) ? b.coeffs[j] : -b.coeffs[j]
+        z.exps[k] = b.exps[j]
+        j += 1
+        k += 1
+    end
+    z.length = k - 1
+    return z
+end
+
+# a = a op b in place
+function _merge!(a::FreeAssociativeAlgebraElem{T}, op::Union{typeof(+), typeof(-)}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    lb == 0 && return a
+    fit!(a, la + lb)
+    for i in la:-1:1
+        a.coeffs[lb + i] = a.coeffs[i]
+        a.exps[lb + i] = a.exps[i]
+    end
+    return _merge!(a, op, a.coeffs, a.exps, lb + 1, la + lb, b)
+end
+
 function add!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return add!(zero(a), a, b)
+    if a === b
+        k = 1
+        for i in 1:a.length
+            s = a.coeffs[i] + a.coeffs[i]
+            iszero(s) && continue
+            a.coeffs[k] = s
+            a.exps[k] = a.exps[i]
+            k += 1
+        end
+        a.length = k - 1
+        return a
+    end
+    return _merge!(a, +, b)
 end
 
 function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
@@ -719,114 +867,77 @@ function add!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}
     elseif z === b
         return add!(z, a)
     end
-    z.coeffs = empty!(z.coeffs)
-    z.exps = empty!(z.exps)
-    i = j = 1
-    while i <= a.length && j <= b.length
-        c = word_cmp(a.exps[i], b.exps[j])
-        if c < 0
-            push!(z.coeffs, b.coeffs[j])
-            push!(z.exps, b.exps[j])
-            j += 1
-        elseif c > 0
-            push!(z.coeffs, a.coeffs[i])
-            push!(z.exps, a.exps[i])
-            i += 1
-        else
-            s = a.coeffs[i] + b.coeffs[j]
-            if !iszero(s)
-                push!(z.coeffs, s)
-                push!(z.exps, a.exps[i])
-            end
-            i += 1
-            j += 1
-        end
-    end
-    while i <= a.length
-        push!(z.coeffs, a.coeffs[i])
-        push!(z.exps, a.exps[i])
-        i += 1
-    end
-    while j <= b.length
-        push!(z.coeffs, b.coeffs[j])
-        push!(z.exps, b.exps[j])
-        j += 1
-    end
-    z.length = length(z.coeffs)
-    return z
+    fit!(z, a.length + b.length)
+    return _merge!(z, +, a.coeffs, a.exps, 1, a.length, b)
 end
 
 function sub!(a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
-    iszero(b) && return a
-    return sub!(zero(a), a, b)
+    if a === b
+        return zero!(a)
+    end
+    return _merge!(a, -, b)
 end
 
 function sub!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
     if z === a
         return sub!(z, b)
     elseif z === b
-        return sub!(zero(a), a, b)
+        z = neg!(z)
+        return add!(z, a)
     end
-    z.coeffs = empty!(z.coeffs)
-    z.exps = empty!(z.exps)
-    i = j = 1
-    while i <= a.length && j <= b.length
-        c = word_cmp(a.exps[i], b.exps[j])
-        if c < 0
-            push!(z.coeffs, -b.coeffs[j])
-            push!(z.exps, b.exps[j])
-            j += 1
-        elseif c > 0
-            push!(z.coeffs, a.coeffs[i])
-            push!(z.exps, a.exps[i])
-            i += 1
-        else
-            s = a.coeffs[i] - b.coeffs[j]
-            if !iszero(s)
-                push!(z.coeffs, s)
-                push!(z.exps, a.exps[i])
-            end
-            i += 1
-            j += 1
-        end
-    end
-    while i <= a.length
-        push!(z.coeffs, a.coeffs[i])
-        push!(z.exps, a.exps[i])
-        i += 1
-    end
-    while j <= b.length
-        push!(z.coeffs, -b.coeffs[j])
-        push!(z.exps, b.exps[j])
-        j += 1
-    end
-    z.length = length(z.coeffs)
-    return z
+    fit!(z, a.length + b.length)
+    return _merge!(z, -, a.coeffs, a.exps, 1, a.length, b)
 end
 
-function mul!(a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
-    for i in 1:length(a)
-        a.coeffs[i] = mul!(a.coeffs[i], n)
+function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, b::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    la = a.length
+    lb = b.length
+    if la == 0 || lb == 0
+        return zero!(z)
     end
-    return a
+    n = la * lb
+    fit!(z, n)
+    # An input aliased with z is moved to the tail of z's storage. Product
+    # (i, j) is written to slot (i-1)*lb + j, which reaches the slot of a_i
+    # (or b_j) only at that term's last use.
+    ia = ib = 0
+    if z === a
+        ia = n - la
+        for i in la:-1:1
+            z.coeffs[ia + i] = z.coeffs[i]
+            z.exps[ia + i] = z.exps[i]
+        end
+    end
+    if z === b
+        ib = n - lb
+        if a !== b
+            for j in lb:-1:1
+                z.coeffs[ib + j] = z.coeffs[j]
+                z.exps[ib + j] = z.exps[j]
+            end
+        end
+    end
+    k = 1
+    for i in 1:la, j in 1:lb
+        c = a.coeffs[ia + i] * b.coeffs[ib + j]
+        w = vcat(a.exps[ia + i], b.exps[ib + j])
+        z.coeffs[k] = c
+        z.exps[k] = w
+        k += 1
+    end
+    z.length = n
+    return combine_like_terms!(sort_terms!(z))
 end
 
 function mul!(z::FreeAssociativeAlgebraElem{T}, a::FreeAssociativeAlgebraElem{T}, n::Union{Integer, Rational, AbstractFloat, T}) where T <: RingElement
-    if z === a
-        return mul!(a, n)
-    end
     fit!(z, length(a))
     j = 1
-    for i = 1:length(a)
-        if isassigned(z.coeffs, j)
-            z.coeffs[j] = mul!(z.coeffs[j], a.coeffs[i], n)
-        else
-            z.coeffs[j] = a.coeffs[i] * n
-        end
-        if !iszero(z.coeffs[j])
-            z.exps[j] = a.exps[i]
-            j += 1
-        end
+    for i in 1:length(a)
+        c = a.coeffs[i] * n
+        iszero(c) && continue
+        z.coeffs[j] = c
+        z.exps[j] = a.exps[i]
+        j += 1
     end
     z.length = j - 1
     return z

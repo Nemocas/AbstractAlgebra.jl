@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -50,13 +51,15 @@ has_attribute
 get_attribute
 get_attribute!
 set_attribute!
+is_attribute_storing
+is_attribute_storing_type
 ```
 
 ## Advanced printing
 
 ### Self-given names
 
-We provide macros `@show_name`, `@show_special` and `@show_special_elem` to 
+We provide macros `@show_name`, `@show_special` and `@show_special_elem` to
 change the way certain objects are printed.
 
 In compact and terse printing mode, `@show_name` tries to determine
@@ -202,7 +205,7 @@ The available algorithms/normal forms are
 
 To select a normal form type for rings of type `NewRing`, implement the function
 ```julia
-Solve.matrix_normal_form_type(::NewRing) = Bla()
+Solve.matrix_normal_form_type(::Type{<:NewRing}) = Bla()
 ```
 where `Bla <: MatrixNormalFormTrait`.
 A new type trait can be added via
@@ -257,13 +260,13 @@ These can be extended for a ring of type `NewRing` as follows.
 
 #### Solve context type
 
-For a new ring type, one may have to define the type parameters of a `SolveCtx`
+For a new ring type, one may have to define the type parameters of a `Solve.SolveCtx`
 object.
 First of all, one needs to implement the function
 
 ```julia
-function Solve.solve_context_type(::NewRing)
-  return Solve.solve_context_type(::NormalFormTrait, elem_type(NewRing))
+function Solve.solve_context_type(T::Type{<:NewRing})
+  return Solve.solve_context_type(::NormalFormTrait, elem_type(T))
 end
 ```
 
@@ -289,8 +292,8 @@ To initialize the solve context functionality for a new normal form `NewTrait`,
 one needs to implement the functions
 
 ```julia
-Solve._init_reduce(C::SolveCtx{T, NewTrait}) where T
-Solve._init_reduce_transpose(C::SolveCtx{T, NewTrait}) where T
+Solve._init_reduce(C::Solve.SolveCtx{T, NewTrait}) where T
+Solve._init_reduce_transpose(C::Solve.SolveCtx{T, NewTrait}) where T
 ```
 
 These should fill the corresponding fields of the solve context `C` with a
@@ -305,7 +308,7 @@ As above, one finally needs to implement the functions
 
 ```julia
 Solve._can_solve_internal_no_check(
-  ::NewTrait, C::SolveCtx{T, NewTrait}, b::MatElem{T}, task::Symbol;
+  ::NewTrait, C::Solve.SolveCtx{T, NewTrait}, b::MatElem{T}, task::Symbol;
   side::Symbol = :left
   ) where T
 ```
@@ -313,5 +316,11 @@ Solve._can_solve_internal_no_check(
 and
 
 ```julia
-kernel(::NewTrait, C::SolveCtx{T, NewTrait}; side::Symbol = :left)
+kernel(::NewTrait, C::Solve.SolveCtx{T, NewTrait}; side::Symbol = :left)
+```
+
+## Miscellaneous
+
+```@docs
+is_pairwise
 ```

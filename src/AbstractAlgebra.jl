@@ -1,7 +1,9 @@
 @doc raw"""
- AbstractAlgebra is a pure Julia package for computational abstract algebra.
+AbstractAlgebra is a pure Julia package for computational abstract algebra.
 
- For more information see https://github.com/Nemocas/AbstractAlgebra.jl
+Repository: <https://github.com/Nemocas/AbstractAlgebra.jl>
+
+Documentation: <https://nemocas.github.io/AbstractAlgebra.jl>
 """
 module AbstractAlgebra
 
@@ -15,6 +17,8 @@ const import_exclude = [:import_exclude, :QQ, :ZZ,
                   :numerator, :denominator,
                   :promote_rule,
                   :Set, :Module, :Group,
+                  :InfiniteDimensionError, # remove in next breaking release, see #2135
+                  :identity_map, # see #5188 in Oscar.jl
                  ]
 
 
@@ -81,6 +85,16 @@ function denominator(a::T, canonicalise::Bool=true) where T
   return Base.denominator(a, canonicalise)
 end
 
+# hook for optional IJulia integration via package extension
+const _ijulia_inited_hook = Ref{Function}(() -> false)
+
+is_ijulia_inited() = _ijulia_inited_hook[]()
+
+function _set_ijulia_inited_hook!(f::Function)
+  _ijulia_inited_hook[] = f
+  return nothing
+end
+
 
 include("exports.jl")
 include("AliasMacro.jl")
@@ -89,6 +103,7 @@ include("Assertions.jl")
 
 include("Attributes.jl")
 include("PrintHelper.jl")
+include("PrettyOrdering.jl")
 
 ###############################################################################
 # generic fall back if no immediate coercion is possible
@@ -168,17 +183,15 @@ end
 include("AbstractTypes.jl")
 
 const PolynomialElem{T} = Union{PolyRingElem{T}, NCPolyRingElem{T}}
-const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
+
+pretty_lt(x::Number, y::Number) = isless(x, y)
+pretty_eq(x::Number, y::Number) = (x == y)
 
 include("julia/JuliaTypes.jl")
 
-# Unions of AbstactAlgebra abstract types and Julia types
-const RingElement   = Union{RingElem,   Integer, Rational, AbstractFloat}
-const NCRingElement = Union{NCRingElem, Integer, Rational, AbstractFloat}
-
-const FieldElement = Union{FieldElem, Rational, AbstractFloat}
-
 include("ConcreteTypes.jl")
+
+const MatrixElem{T} = Union{MatElem{T}, MatRingElem{T}}
 
 ###############################################################################
 #
@@ -186,7 +199,19 @@ include("ConcreteTypes.jl")
 #
 ###############################################################################
 
+# prevent the default Julia methods for iszero and isone from being invoked on
+# one of our parent objects: the default implementations are
+#   iszero(x) = x == zero(x)    and    isone(x) = x == one(x)
+# which for a parent object will always return false, which usually is not
+# what the user hoped for. So let's rather throw an error and leave it to
+# subtypes to implement better methods (e.g. `iszero(::Ring)` or potentially
+# isone(::Group) come to mind).
+iszero(S::Set) = throw(NotImplementedError(:iszero, S))
+isone(S::Set) = throw(NotImplementedError(:isone, S))
+
 include("fundamental_interface.jl")
+include("misc/VarNames.jl")
+include("Infinity.jl")
 
 ################################################################################
 #
@@ -200,6 +225,15 @@ using .PrettyPrinting
 
 import .PrettyPrinting: expressify
 
+
+################################################################################
+#
+#   Conformance tests (function stubs for TestExt)
+#
+################################################################################
+
+include("ConformanceTests.jl")
+
 ###############################################################################
 #
 #   Generic algorithms defined on abstract types
@@ -212,9 +246,20 @@ function check_parent(a, b, throw::Bool = true)
    return flag
 end
 
-include("algorithms/LaurentPoly.jl")
+function check_base_ring(a, b, throw::Bool = true)
+   flag = base_ring(a) === base_ring(b)
+   flag || !throw || error("base rings do not match")
+   return flag
+end
+
 include("algorithms/FinField.jl")
 include("algorithms/GenericFunctions.jl")
+
+include("Groups.jl")
+include("Rings.jl")
+include("NCRings.jl")
+include("Fields.jl")
+include("Factor.jl")
 
 include("CommonTypes.jl") # types needed by AbstractAlgebra and Generic
 include("Poly.jl")
@@ -231,6 +276,7 @@ include("QuotientModule.jl")
 include("Module.jl")
 include("InvariantFactorDecomposition.jl")
 include("DirectSum.jl")
+include("MapTypes.jl")
 include("Map.jl")
 include("MapCache.jl")
 include("MapWithInverse.jl")
@@ -240,6 +286,7 @@ include("YoungTabs.jl")
 include("PermGroups.jl")
 include("LaurentSeries.jl")
 include("PuiseuxSeries.jl")
+include("PuiseuxMPoly.jl")
 include("SparsePoly.jl")
 include("AbsMSeries.jl")
 include("RationalFunctionField.jl")
@@ -248,17 +295,12 @@ include("ResidueField.jl")
 include("Fraction.jl")
 include("TotalFraction.jl")
 include("MPoly.jl")
+include("UniversalLaurentPoly.jl")
+include("UniversalRing.jl")
 include("UnivPoly.jl")
 include("FreeAssociativeAlgebra.jl")
 include("LaurentMPoly.jl")
 include("MatrixNormalForms.jl")
-
-
-include("Groups.jl")
-include("Rings.jl")
-include("NCRings.jl")
-include("Fields.jl")
-include("Factor.jl")
 
 # More functionality for Julia types
 include("julia/Integer.jl")
@@ -346,7 +388,42 @@ end
 
 include("misc/ProductIterator.jl")
 include("misc/Evaluate.jl")
-include("misc/VarNames.jl")
+
+@doc raw"""
+    is_pairwise(f, a::AbstractVector)
+
+Return whether `f(a[i], a[j])` is true for all `i != j`. It is assumed that `f`
+is symmetric.
+
+# Examples
+
+```jldoctest
+julia> is_pairwise(!is_associated, [2, -3, 5])
+true
+
+julia> is_pairwise(!is_associated, [2, -3, -2])
+false
+```
+"""
+function is_pairwise(fun, arr::AbstractVector)
+  for i in 1:length(arr)
+    for j in 1:(i - 1)
+      if !fun(arr[i], arr[j])
+        return false
+      end
+    end
+  end
+  return true
+end
+
+
+###############################################################################
+#
+#   methods to inquire about known properties of objects
+#
+###############################################################################
+
+include("KnownProperties.jl")
 
 ###############################################################################
 #
@@ -364,16 +441,8 @@ getindex(S::Set, i::Int) = gen(S, i)
 
 include("error.jl")
 
-###############################################################################
-#
-#   Load Groups/Rings/Fields etc.
-#
-###############################################################################
-
 
 # Generic functions to be defined after all rings
-include("polysubst.jl")
-
 include("broadcasting.jl")
 
 ################################################################################
@@ -424,30 +493,14 @@ function test_module(x, y)
    julia_exe = Base.julia_cmd()
    pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
-   test_file = test_file * "$y-test.jl";
-   test_function_name = "test_"
-
-   x == "generic"
-   if y == "RelSeries"
-      test_function_name *= "gen_rel_series"
-   elseif y == "AbsSeries"
-      test_function_name *= "gen_abs_series"
-   elseif y == "Matrix"
-      test_function_name *= "gen_mat"
-   elseif y == "Fraction"
-      test_function_name *= "gen_frac"
-   elseif y == "Residue"
-      test_function_name *= "gen_res"
-   else
-      test_function_name *= "gen_$(lowercase(y))"
-   end
+   test_file = test_file * "$y-test.jl"
+   rand_file = joinpath(pkgdir, "test/rand.jl")
 
    cmd = """
          using Test
          using AbstractAlgebra
-         include("test/rand.jl")
+         include("$rand_file")
          include("$test_file")
-         $test_function_name()
          """
    @info("spawning ", `$julia_exe --project=$(Base.active_project()) -e $cmd`)
    run(`$julia_exe -e $cmd`)
@@ -463,5 +516,44 @@ end
 #
 ###############################################################################
 include("utils.jl")
+
+using PrecompileTools: @setup_workload, @compile_workload    # this is a small dependency
+
+@setup_workload begin
+  # Putting some things in `@setup_workload` instead of `@compile_workload` can reduce the size of the
+  # precompile file and potentially make loading faster.
+  @compile_workload begin
+    # Julia.Integers.conformance_tests
+    ConformanceTests.exercise_Ring_interface_recursive(ZZ)
+    ConformanceTests.exercise_EuclideanRing_interface(ZZ)
+
+    # Generic.Poly.conformance
+    R, x = polynomial_ring(ZZ, "x")
+    ConformanceTests.exercise_Poly_interface(R)
+    R, x = polynomial_ring(QQ, "x")
+    ConformanceTests.exercise_Poly_interface(R)
+    R, x = polynomial_ring(GF(5), "x")
+    ConformanceTests.exercise_Poly_interface(R)
+
+    # EuclideanRingResidueRingElem.conformance_tests
+    R, = residue_ring(ZZ, 1)
+    ConformanceTests.exercise_Ring_interface(R)   # is_gen fails on polys
+
+    R, = residue_ring(ZZ, -4)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    R, = residue_ring(ZZ, 16453889)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    S, x = polynomial_ring(R, "x")
+    R, = residue_ring(S, x^3 + 3x + 1)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+
+    S, x = polynomial_ring(QQ, "x")
+    R, = residue_ring(S, x^2 + 1)
+    ConformanceTests.exercise_Ring_interface_recursive(R)
+  end
+end
+
 
 end # module

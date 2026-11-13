@@ -16,16 +16,19 @@
 #
 ################################################################################
 
-global const VERBOSE_SCOPE = Symbol[]
+const VERBOSE_SCOPE = Symbol[]
 
-global const VERBOSE_LOOKUP = Dict{Symbol, Int}()
+const VERBOSE_LOOKUP = Dict{Symbol, Int}()
 
-global const VERBOSE_PRINT_INDENT = Int[ 0 ]
+const VERBOSE_PRINT_INDENT = Int[ 0 ]
 
 @doc raw"""
     AbstractAlgebra.add_verbosity_scope(s::Symbol) -> Nothing
 
 Add the symbol `s` to the list of (global) verbosity scopes.
+For use inside a module this function must be called in the
+ `__init__` function of that module; the verbosity scope is
+then available to all functions in the module.
 
 # Examples
 
@@ -375,9 +378,9 @@ end
 #
 ################################################################################
 
-global const ASSERT_SCOPE = Symbol[]
+const ASSERT_SCOPE = Symbol[]
 
-global const ASSERT_LOOKUP = Dict{Symbol, Int}()
+const ASSERT_LOOKUP = Dict{Symbol, Int}()
 
 @doc raw"""
     AbstractAlgebra.add_assertion_scope(s::Symbol) -> Nothing

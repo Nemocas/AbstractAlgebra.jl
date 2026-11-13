@@ -9,7 +9,21 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently nothing here =#
+# renamed in 0.45.1
+@alias FactoredFractionField factored_fraction_field
+
+#renamed in 0.47.4
+@alias dense_poly_type poly_type
+@alias dense_poly_ring_type poly_ring_type
+
+const UniversalPolyRing{T} = UniversalRing{<:MPolyRingElem, T}
+const UniversalPolyRingElem{T} = UniversalRingElem{<:MPolyRingElem, T}
+const UnivPoly{T} = UniversalPolyRingElem{T}
+
+# renamed in 0.49.1:
+# Generic.FunctionField -> Generic.AbsSimpleFunctionField,
+# Generic.FunctionFieldElem -> Generic.AbsSimpleFunctionFieldElem
+# NOTE: aliases live at the end of src/Generic.jl, inside module Generic
 
 ###############################################################################
 #
@@ -52,14 +66,45 @@ end
 @deprecate _extended_weak_popov(A::MatElem{T}, V::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _extended_weak_popov(A, V, Val(S))
 @deprecate _popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _popov(A, Val(S))
 @deprecate _hnf_via_popov(A::MatElem{T}, trafo::Type{Val{S}}) where {T <: PolyRingElem, S} _hnf_via_popov(A, Val(S))
-@deprecate gen(a::MPolyRing{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} gen(a, i, Val(ord))
-import .Generic: exponent_vector; @deprecate exponent_vector(a::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} exponent_vector(a, i, Val(ord))
-import .Generic: exponent; @deprecate exponent(a::Generic.MPoly{T}, i::Int, j::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} exponent(a, i, j, Val(ord))
-import .Generic: set_exponent_vector!; @deprecate set_exponent_vector!(a::Generic.MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{ord}}) where {T <: RingElement, ord} set_exponent_vector!(a, i, exps, Val(ord))
-import .Generic: is_gen; @deprecate is_gen(x::Generic.MPoly{T}, ::Type{Val{ord}}) where {T <: RingElement, ord} is_gen(x, Val(ord))
-import .Generic: degree; @deprecate degree(f::Generic.MPoly{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} degree(f, i, Val(ord))
+@deprecate gen(a::MPolyRing{T}, i::Int, ::Type{Val{ord}}) where {T <: RingElement, ord} gen(a, i)
 
 # deprecated in 0.43.0
 @deprecate change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement} map_coefficients(g, p, parent = new_polynomial_ring)
 @deprecate mulmod(a::S, b::S, mod::Vector{S}) where {S <: MPolyRingElem} Base.divrem(a * b, mod)[2]
 @deprecate var"@attr"(__source__::LineNumberNode, __module__::Base.Module, expr::Expr) var"@attr"(__source__, __module__, :Any, expr) # delegate `@attr functionexpression` to `@attr Any functionexpression` (macros are just functions with this weird extra syntax)
+
+# deprecated in 0.45.0
+@deprecate test_iterate ConformanceTests.test_iterate
+
+# deprecated in 0.45.2
+import Base: contains
+@deprecate contains(I::Ideal{T}, J::Ideal{T}) where {T <: RingElement} issubset(J, I)
+
+# deprecated in 0.48.0
+@deprecate zero_matrix(::Type{Int}, r, c) zeros(Int, r, c)
+@deprecate Array(R::NCRing, r::Int...) Array{elem_type(R)}(undef, r)
+function zeros(R::NCRing, r::Int...)
+    Base.depwarn("`zeros(R::NCRing, r::Int...)` is deprecated, use `zero_matrix(R, r...)` instead.", :zeros)
+    T = elem_type(R)
+    A = Array{T}(undef, r)
+    for i in eachindex(A)
+        A[i] = R()
+    end
+    return A
+end
+
+@deprecate PolyRing(R::NCRing) poly_ring(R, :x)
+
+@deprecate polynomial_ring_only(R::T, s::Symbol; cached::Bool=true) where T<:NCRing poly_ring(R, s; cached)
+@deprecate polynomial_ring_only(R::T, s::Vector{Symbol}; internal_ordering::Symbol=:lex, cached::Bool=true) where T<:Ring poly_ring(R, s; internal_ordering, cached)
+
+# deprecated in 0.51.0
+@deprecate map_from_func(image_fn::Function, D, C) map_from_func(D, C, image_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_preimage_from_func(image_fn::Function, D, C) map_with_preimage_from_func(D, C, image_fn)
+@deprecate map_with_section_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_section_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_section_from_func(image_fn::Function, D, C) map_with_section_from_func(D, C, image_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn, inverse_fn)
+@deprecate map_with_retraction_from_func(image_fn::Function, D, C) map_with_retraction_from_func(D, C, image_fn)
+
+# to be deprecated in a future release

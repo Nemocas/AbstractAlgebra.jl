@@ -35,8 +35,8 @@ function ObstructionTriple{T}(first_poly::FreeAssociativeAlgebraElem{T},
                               first_index::Int,
                               second_index::Int
                             ) where T
-    return ObstructionTriple{T}(first_poly, second_poly, pre_and_suffixes[1], 
-                                pre_and_suffixes[2], pre_and_suffixes[3], 
+    return ObstructionTriple{T}(first_poly, second_poly, pre_and_suffixes[1],
+                                pre_and_suffixes[2], pre_and_suffixes[3],
                                 pre_and_suffixes[4], first_index, second_index)
 end
 
@@ -79,7 +79,7 @@ end
 If an element of the Groebner basis that is stored in `aut` divides `a`,
 return (true, a1, a2, keyword_index), where `keyword_index` is the index of the
 keyword that divides `a` such that `a = a1 aut[keyword_index] a2`.
-""" 
+"""
 function gb_divides_leftmost(a::Word, aut::AhoCorasickAutomaton)
     match = search(aut, a)
     if isnothing(match)
@@ -99,7 +99,7 @@ end
 
 Assuming `g` is a Groebner basis and `aut` an Aho-Corasick automaton for the elements of `g`,
 compute the normal form of `f` with respect to `g`
-""" 
+"""
 function normal_form(
     f::FreeAssociativeAlgebraElem{T},
     g::Vector{FreeAssociativeAlgebraElem{T}},
@@ -183,7 +183,7 @@ end
 Interreduce a given Groebner basis with itself, i.e. compute the normal form of each
 element of `g` with respect to the rest of the elements and discard elements with
 normal form $0$ and duplicates.
-""" 
+"""
 function interreduce!(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
     i = 1
     while length(g) > 1 && length(g) >= i
@@ -345,12 +345,12 @@ end
 
 
 ###
-# check if obs2 is a subobstructon of obs1, i.e. if 
+# check if obs2 is a subobstructon of obs1, i.e. if
 # the second pre-and suffix of obs2 are right- respectively left subwords of the second pre-and suffix of obs1.
 # In other words, check if for obs1 = (w_i, w_i^'; u_j, u_j^') and obs2 = (w_k, w_k^'; v_l, v_l^')
 # it holds that u_j == w v_l and u_j^' = v_l^' w^' for some w, w^'
 # both w and w^' might be empty
-function is_subobstruction(obs1_second_prefix::Monomial, obs1_second_suffix::Monomial, 
+function is_subobstruction(obs1_second_prefix::Monomial, obs1_second_suffix::Monomial,
         obs2_second_prefix::Monomial, obs2_second_suffix)
     return is_subword_right(obs2_second_prefix, obs1_second_prefix) && is_subword_left(obs2_second_suffix, obs1_second_suffix)
 end
@@ -543,29 +543,20 @@ function remove_redundancies!(
 end
 
 function get_obstructions(g::Vector{FreeAssociativeAlgebraElem{T}}) where T
-    s = length(g)
-    result = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
-    for i in 1:s, j in 1:i
-        if i == j
-            obs = obstructions(_leading_word(g[i]))
-        else
-            obs = obstructions(_leading_word(g[i]), _leading_word(g[j]))
-        end
-        for o in obs
-            triple = ObstructionTriple{T}(g[i], g[j], o, i, j)
-            push!(result, triple => common_multiple_leading_term(triple))
-        end
+    obstruction_queue = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    for s in 1:length(g)
+      add_obstructions!(obstruction_queue, g, s)
     end
     # TODO maybe here some redundancies can be removed too, check Kreuzer Xiu
-    return result
+    return obstruction_queue
 end
 
 
 function add_obstructions!(
     obstruction_queue::PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}},
     g::Vector{FreeAssociativeAlgebraElem{T}},
+    s::Int = length(g)
 ) where T
-    s = length(g)
     for i in 1:s
         if i == s
             obs = obstructions(_leading_word(g[i]))
@@ -584,16 +575,24 @@ end
 function groebner_basis_buchberger(
     g::Vector{FreeAssociativeAlgebraElem{T}},
     reduction_bound::Int = typemax(Int),
-    remove_redundancies::Bool = false
+    remove_redundancies::Bool = false;
+    obstruction_free_set::Vector{FreeAssociativeAlgebraElem{T}}=FreeAssociativeAlgebraElem{T}[]
 ) where T<:FieldElement
-    g = copy(g)
+
+    g = vcat(obstruction_free_set, g)
+
+    obstruction_queue = PriorityQueue{Obstruction{T},FreeAssociativeAlgebraElem{T}}()
+    for s in length(obstruction_free_set)+1:length(g)
+      add_obstructions!(obstruction_queue, g, s)
+    end
+
     #   interreduce!(g) # on some small examples, this increases running time, so it might not be optimal to use this here
     nonzero_reductions = 0
     # compute the aho corasick automaton
     # to make normal form computation more efficient
     aut = AhoCorasickAutomaton([g_i.exps[1] for g_i in g])
     # step 1 from Thm. 5.2.12 Noncommutative Groebner Bases and Applications, Xingqiang Xiu
-    obstruction_queue = get_obstructions(g)
+
     while !isempty(obstruction_queue) # step 2
         obstruction = popfirst!(obstruction_queue)[1]
         # step3
@@ -607,6 +606,7 @@ function groebner_basis_buchberger(
         push!(g, Sp)
         insert_keyword!(aut, Sp.exps[1], length(g))
         if nonzero_reductions >= reduction_bound
+            @warn "The computation terminated because it exceeded the limit of $reduction_bound reduction steps."
             return g
         end
         add_obstructions!(obstruction_queue, g)
@@ -618,20 +618,51 @@ function groebner_basis_buchberger(
 end
 
 @doc """
-    groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false)
+    groebner_basis(g::Vector{FreeAssociativeAlgebraElem{T}}, reduction_bound::Int = typemax(Int), remove_redundancies::Bool = false; obstruction_free_set::Vector{FreeAssociativeAlgebraElem{T}})
 
 Compute a Groebner basis for the ideal generated by `g`. Stop when `reduction_bound` many
-non-zero entries have been added to the Groebner basis. If the computation stops due to the bound being exceeded, 
+non-zero entries have been added to the Groebner basis. If the computation stops due to the bound being exceeded,
 the result is in general not an actual Groebner basis, just a subset of one. However, whenever the normal form with
 respect to this incomplete Groebner basis is `0`, it will also be `0` with respect to the full Groebner basis.
 
 If `remove_redundancies` is set to true, some redundant obstructions will be removed during the computation, which might save
 time, however in practice it seems to inflate the running time regularly.
-""" 
+
+One can provide the keyword argument `obstruction_free_set` with a precomputed partial Groebner basis.
+It is assumed (but not checked) that all entries of `obstruction_free_set` are indeed contained in the ideal generated by `g`.
+
+# Examples
+
+```jldoctest
+julia> R, (a, b) = free_associative_algebra(QQ, ["a", "b"]);
+
+julia> f1 = a^2 -1;
+
+julia> f2 = b^3 -1;
+
+julia> f3 = a*b*a*b^2*a*b*a - b;
+
+julia> g = AbstractAlgebra.groebner_basis([(a*b*a*b^2)^2 - 1]; obstruction_free_set = [f1,f2,f3])
+12-element Vector{AbstractAlgebra.Generic.FreeAssociativeAlgebraElem{Rational{BigInt}}}:
+ a^2 - 1
+ b^3 - 1
+ a*b*a*b^2*a*b*a - b
+ a*b*a*b^2*a*b*a*b^2 - 1
+ -b*a*b^2*a*b*a*b^2 + a
+ -b*a*b^2*a*b*a + a*b
+ -b*a*b^2*a*b + a*b*a
+ -a*b^2*a*b + b^2*a*b*a
+ b^2*a*b*a*b^2 - a*b^2*a
+ -a*b*a*b^2 + b*a*b^2*a
+ b^2*a*b*a*b*a*b - a*b*a*b*a
+ -a*b*a*b*a*b + b*a*b*a*b*a
+```
+"""
 function groebner_basis(
     g::Vector{FreeAssociativeAlgebraElem{T}},
     reduction_bound::Int = typemax(Int),
-    remove_redundancies::Bool = false
+    remove_redundancies::Bool = false;
+    obstruction_free_set::Vector{FreeAssociativeAlgebraElem{T}}=FreeAssociativeAlgebraElem{T}[]
 ) where T<:FieldElement
-    return groebner_basis_buchberger(g, reduction_bound, remove_redundancies)
+    return groebner_basis_buchberger(g, reduction_bound, remove_redundancies; obstruction_free_set=obstruction_free_set)
 end

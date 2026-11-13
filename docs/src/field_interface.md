@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Field Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it
@@ -11,8 +16,8 @@ Most fields must supply two types:
   - a type for the parent object (representing the field itself)
   - a type for elements of that field
 
-For example, the generic fraction field type in AbstractAlgebra.jl provides two 
-types in `generic/GenericTypes.jl`: 
+For example, the generic fraction field type in AbstractAlgebra.jl provides two
+types in `generic/GenericTypes.jl`:
 
   - `Generic.FracField{T}` for the parent objects
   - `Generic.FracFieldElem{T}` for the actual fractions
@@ -21,8 +26,8 @@ The parent type must belong to `Field` and the element type must belong
 to `FieldElem`. Of course, the types may belong to these abstract types
 transitively.
 
-For parameterised fields, we advise that the types of both the parent objects and
-element objects to be parameterised by the types of the elements of the base ring.
+For parameterised fields, we advise parameterising both the type of parent objects and 
+the type of the element objects by the type of the elements of the base ring.
 
 There can be variations on this theme: e.g. in some areas of mathematics there is a
 notion of a coefficient domain, in which case it may make sense to parameterise all
@@ -39,13 +44,12 @@ union type `FieldElement` in `src/julia/JuliaTypes`.
 So far, in addition to `FieldElem` the  union type
 `FieldElement` includes the Julia types `Rational`
 and `AbstractFloat`.
-                                                                                                   
+
 Most of the generic code in AbstractAlgebra makes use of the union type
 `FieldElement` instead of `FieldElem` so that the
 generic functions also accept the Julia Base field types.
-                                                                
+
 !!! note
-    
     One must be careful when defining ad hoc binary operations for field element
     types. It is often necessary to define separate versions of the functions for
     `FieldElem` then for each of the Julia types separately in
@@ -106,8 +110,8 @@ functionality.
 characteristic(R::MyParent)
 ```
 
-Return the characteristic of the field. If the characteristic is not known, an
-exception is raised.
+Return the characteristic of the field. This is optional for rings but required
+for fields.
 
 ### Basic manipulation of rings and elements
 

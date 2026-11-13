@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -78,7 +79,7 @@ julia> h = ZZ(BigInt(1234))
 
 ## Basic ring functionality
 
-The integer ring in AbstractAlgebra.jl implements the full Ring interface and the 
+The integer ring in AbstractAlgebra.jl implements the full Ring interface and the
 Euclidean Ring interface.
 
 We give some examples of such functionality.
@@ -145,19 +146,6 @@ is_divisible_by(a::BigInt, b::BigInt)
 is_associated(a::BigInt, b::BigInt)
 ```
 
-**Examples**
-
-```jldoctest
-julia> r = ZZ(6)
-6
-
-julia> s = ZZ(3)
-3
-
-julia> is_divisible_by(r, s)
-true
-```
-
 ### Square root
 
 ```@docs
@@ -165,7 +153,6 @@ AbstractAlgebra.sqrt(a::BigInt)
 ```
 
 ```@docs
-is_square(a::BigInt)
 is_square_with_sqrt(a::BigInt)
 ```
 
@@ -199,13 +186,3 @@ julia> m = AbstractAlgebra.exp(ZZ(0))
 ```@docs
 ppio(a::BigInt, b::BigInt)
 ```
-
-**Examples**
-
-```jldoctest
-julia> c, n = ppio(ZZ(12), ZZ(26))
-(4, 3)
-
-```
-
-

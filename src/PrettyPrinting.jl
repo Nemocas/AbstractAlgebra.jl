@@ -2,7 +2,7 @@ module PrettyPrinting
 
 using ..AbstractAlgebra
 
-import ..AbstractAlgebra: MatrixElem
+import ..AbstractAlgebra: MatElem
 import ..AbstractAlgebra: NCRingElem
 import ..AbstractAlgebra: RingElem
 
@@ -115,18 +115,19 @@ function obj_to_latex_string(@nospecialize(obj); context = nothing)
    return sprint(show_via_expressify, MIME("text/latex"), obj, context = context)
 end
 
-function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited
-      error("Dummy error for jupyter")
-   end
+function Base.showable(mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
+    return !AbstractAlgebra.is_ijulia_inited()
+end
+
+function Base.show(io::IO, mi::MIME"text/latex", x::Union{RingElem, NCRingElem, MatElem})
    show_via_expressify(io, mi, x)
 end
 
-function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatrixElem})
-   if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-         !AbstractAlgebra.get_html_as_latex()
-      error("Dummy error for jupyter")
-   end
+function Base.showable(mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
+   return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
+end
+
+function Base.show(io::IO, mi::MIME"text/html", x::Union{RingElem, NCRingElem, MatElem})
    if AbstractAlgebra.get_html_as_latex()
       io = IOContext(io, :size_limit => 1000)
    end
@@ -148,7 +149,7 @@ function show_obj(io::IO, mi::MIME, obj)
    finish(S)
 end
 
-global _html_as_latex = Ref{Bool}(false)
+const _html_as_latex = Ref{Bool}(false)
 
 @doc raw"""
     get_html_as_latex()
@@ -218,6 +219,17 @@ end
 #        Expr(:hcat, a, b)       => a b
 
 
+@doc raw"""
+    expressify(a; context = nothing)
+
+Return an `Expr`, `Symbol`, `Integer` or `String` describing `a`, from which
+plain text, LaTeX and html output are derived. The fallback simply prints `a`.
+
+Implementing this for a new element type, and then applying
+[`@enable_all_show_via_expressify`](@ref) to that type, gives correctly
+bracketed output when values of the type appear inside composed types such as
+polynomials.
+"""
 function expressify(@nospecialize(a); context = nothing)
    return sprint(print, a; context = context)::String
 end
@@ -243,15 +255,25 @@ end
 #
 # The challenge for us is that we always want to define text/latex and
 # text/html methods for sprint and friends. This has the disadvantage that if
-# get_html_as_latex()== false, then our objects will print their ordinary
+# get_html_as_latex() == false, then our objects will print their ordinary
 # string presentation, but since it is coming from text/html, it will be
 # rendered using the "normal" font.
 #
-# Thus, inside IJulia we will throw an error for text/latex (always) and
-# text/html (unless get_html_as_latex()).
+# Thus, when IJulia is initialized we make `showable` return false for
+# text/latex (always) and text/html (unless get_html_as_latex()), so IJulia
+# falls back to text/plain.
+#
+# The IJulia state is queried via AbstractAlgebra.is_ijulia_inited(); by
+# default this is false, and the IJulia extension installs the real check.
 #
 # Super easy!
 
+@doc raw"""
+    @enable_all_show_via_expressify(T)
+
+Define `Base.show` for the type `T` for plain text, LaTeX and html output, all
+derived from [`expressify`](@ref), which must already be implemented for `T`.
+"""
 macro enable_all_show_via_expressify(T)
   return quote
     function Base.show(io::IO, x::$(esc(T)))
@@ -262,18 +284,19 @@ macro enable_all_show_via_expressify(T)
        AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
+    function Base.showable(mi::MIME"text/latex", x::$(esc(T)))
+       return !AbstractAlgebra.is_ijulia_inited()
+     end
+
     function Base.show(io::IO, mi::MIME"text/latex", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited
-          error("Dummy error for jupyter")
-       end
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
 
+    function Base.showable(mi::MIME"text/html", x::$(esc(T)))
+       return !AbstractAlgebra.is_ijulia_inited() || AbstractAlgebra.get_html_as_latex()
+    end
+
     function Base.show(io::IO, mi::MIME"text/html", x::$(esc(T)))
-       if isdefined(Main, :IJulia) && Main.IJulia.inited &&
-             !AbstractAlgebra.get_html_as_latex()
-          error("Dummy error for jupyter")
-       end
        return AbstractAlgebra.show_via_expressify(io, mi, x)
     end
   end
@@ -291,10 +314,10 @@ end
 #   a*-b*c  => -a*b*c   unary minus can move freely through products
 #   (-a)/b  => -(a/b)   unary minus can move through the numerator of a quotient
 #   a-b     => a + -b   subtraction is turned into addition with unary minus
-#   --a     => a        
+#   --a     => a
 #   0*a     => 0
 #   0+a     => a
-#   1*a     => a 
+#   1*a     => a
 
 # since unary minus has a higher precedence than * and /, we maintain
 # -a*b*c as (-a)*b*c and not as -(a*b*c) because the former prints without ()
@@ -560,12 +583,12 @@ mutable struct printer{IOT <: IO}
    terse_level::Int
    size_limit_stack::Vector{Int}  # >= 0 for loosely-defined limit before ...
                                   # < 0 for unrestricted output
-end
 
-function printer(io::IO)
-   terse_level = get(io, :terse_level, 0)
-   size_limit = get(io, :size_limit, -1)
-   return printer{typeof(io)}(io, String[], terse_level, Int[size_limit])
+   function printer(io::IO)
+      terse_level = get(io, :terse_level, 0)
+      size_limit = get(io, :size_limit, -1)
+      return new{typeof(io)}(io, String[], terse_level, Int[size_limit])
+   end
 end
 
 # TODO since the subexpressions are not changing much, cache the leaf_count
@@ -852,7 +875,7 @@ function printPlusArg(S::printer, mi::MIME, obj::Expr, i::Int,
    end
 end
 
-# special override for plus which seeks the sign of its arguments 
+# special override for plus which seeks the sign of its arguments
 function printPlus(S::printer, mi::MIME, obj::Expr,
                    left::Int, right::Int)
    n = length(obj.args)
@@ -1249,7 +1272,7 @@ const _latex_to_string = Dict{String, String}(
   "ι" => "\\iota", "Κ" => "\\Kappa", "κ" => "\\kappa", "Λ" => "\\Lambda", "λ"
   => "\\lambda", "Μ" => "\\Mu", "μ" => "\\mu", "Ν" => "\\Nu", "ν" => "\\nu",
   "Ξ" => "\\Xi", "ξ" => "\\xi", "Ο" => "\\Omicron", "ο" => "\\omicron", "Π" =>
-  "\\Pie", "π" => "\\pie", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
+  "\\Pi", "π" => "\\pi", "Ρ" => "\\Rho", "ρ" => "\\rho", "Σ" => "\\Sigma",
   "σ" => "\\sigma", "Τ" => "\\Tau", "τ" => "\\tau", "Υ" => "\\Upsilon", "υ" =>
   "\\upsilon", "Φ" => "\\Phi", "φ" => "\\phi", "Χ" => "\\Chi", "χ" => "\\chi",
   "Ψ" => "\\Psi", "ψ" => "\\psi", "Ω" => "\\Omega", "omega" => "\\omega")
@@ -1277,7 +1300,7 @@ function underscorify(x::String)
       n -= 1
    end
    if n == 1 && length(y[1]) == 1
-      z = y[1]
+      z = string(y[1])
    else
       # at this point we need operatorname and escaped underscores
       z = "\\mathop{\\mathrm{" * join(y[1:n], "\\_") * "}}"
@@ -1427,7 +1450,7 @@ end
 
 ###############################################################################
 #
-#  Macros for fancy printing. 
+#  Macros for fancy printing.
 #
 ###############################################################################
 
@@ -1492,14 +1515,14 @@ If `all` is `true`, private and non-exported variables are also searched.
     but a name returned once is kept until the variable no longer contains this object.
 
 For this to work in doctests, one should call
-`AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of 
+`AbstractAlgebra.set_current_module(@__MODULE__)` in the `value` argument of
 `Documenter.DocMeta.setdocmeta!` and keep the default value of `M = Main` here.
 
 !!! warning
     This function should not be used directly, but rather through [`AbstractAlgebra.get_name`](@ref).
 """
 function find_name(obj, M=Main; all::Bool=false)
-  AbstractAlgebra._is_attribute_storing_type(typeof(obj)) || return find_new_name(obj, M; all)
+  is_attribute_storing(obj) || return find_new_name(obj, M; all)
 
   cached_name = get_attribute(obj, :_cached_name)
   if !isnothing(cached_name)
@@ -1549,7 +1572,7 @@ This function tries to find a name in the following order:
 3. The name returned by [`AbstractAlgebra.extra_name`](@ref).
 """
 function get_name(obj)
-  if AbstractAlgebra._is_attribute_storing_type(typeof(obj))
+  if is_attribute_storing(obj)
     name = get_attribute(obj, :_name)
     isnothing(name) || return name
   end
@@ -1624,7 +1647,7 @@ macro show_special(io, obj)
     begin
       local i = $(esc(io))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           s(i, o)
@@ -1672,7 +1695,7 @@ macro show_special(io, mime, obj)
       local i = $(esc(io))
       local m = $(esc(mime))
       local o = $(esc(obj))
-      if AbstractAlgebra._is_attribute_storing_type(typeof(o))
+      if is_attribute_storing(o)
         s = get_attribute(o, :show)
         if s !== nothing
           if applicable(s, i, m, o)
@@ -1720,7 +1743,7 @@ macro show_special_elem(io, obj)
       local i = $(esc(io))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           s(i, o)
@@ -1765,7 +1788,7 @@ macro show_special_elem(io, mime, obj)
       local m = $(esc(mime))
       local o = $(esc(obj))
       local p = parent(o)
-      if AbstractAlgebra._is_attribute_storing_type(typeof(p))
+      if is_attribute_storing(p)
         s = get_attribute(p, :show_elem)
         if s !== nothing
           if applicable(s, i, m, o)
@@ -1800,6 +1823,8 @@ A permanent change will always override a temporary change.
 
 This function may behave arbitrarily if called from within the scope of a
 `with_unicode` do-block.
+
+See also [`is_unicode_allowed`](@ref) and [`with_unicode`](@ref).
 """
 function allow_unicode(allowed::Bool; temporary::Bool=false)
    if temporary
@@ -1818,6 +1843,8 @@ end
     is_unicode_allowed() -> Bool
 
 Return whether unicode characters are allowed in pretty printing.
+
+See also [`allow_unicode`](@ref) and [`with_unicode`](@ref).
 """
 function is_unicode_allowed()
    override = ALLOW_UNICODE_OVERRIDE_VALUE[]
@@ -1838,6 +1865,8 @@ with_unicode([allowed]) do
    # code that should be executed with unicode allowed/disallowed
 end
 ```
+
+See also [`allow_unicode`](@ref) and [`is_unicode_allowed`](@ref).
 """
 function with_unicode(f::Function, allowed::Bool=true)
    previous = ALLOW_UNICODE_OVERRIDE_VALUE[]
@@ -1958,7 +1987,7 @@ IOCustom(io::IO, force_newlines = false) = IOCustom{typeof(io)}(io, 0, false, " 
 
 IOCustom(io::IOCustom, force_newlines = false) = begin io.force_newlines = force_newlines; io; end
 
-in(key_value::Pair, io::IOCustom) = in(key_value, io.io, ===)
+in(key_value::Pair, io::IOCustom) = in(key_value, io.io)
 haskey(io::IOCustom, key) = haskey(io.io, key)
 getindex(io::IOCustom, key) = getindex(io.io, key)
 get(io::IOCustom, key, default) = get(io.io, key, default)
@@ -1998,8 +2027,8 @@ _isbuffer(io::IO) = false
 _isbuffer(io::IOContext) = _isbuffer(io.io)
 _isbuffer(io::IOCustom) = _isbuffer(io.io)
 
-function _write_line(io::IOCustom, str::AbstractString)
-  written = 0
+function _write_line(io::IOCustom, str::Union{String,SubString{String}})
+  written::Int = 0
 
   # We handle io.indent_level == 0 differently for the following reason
   # $(s) will call print(io, s)
@@ -2112,7 +2141,7 @@ function _write_line(io::IOCustom, str::AbstractString)
 end
 
 function write(io::IOCustom, str::String)
-  written = 0
+  written::Int = 0
   if str == "\n"
     written = write(io.io, str)
     io.indented_line = false

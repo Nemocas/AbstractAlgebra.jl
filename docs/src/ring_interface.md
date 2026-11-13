@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
+DocTestSetup = AbstractAlgebra.doctestsetup()
+```
 # Ring Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it
@@ -127,6 +132,8 @@ base_ring_type(::Type{MyParent})
 Return the type of the of base rings for parent objects with the given parent type.
 For example, `base_ring_type(Generic.PolyRing{T})` will return `parent_type(T)`.
 
+If the rings of this type are not parameterised by another ring, this function must return `Union{}`.
+
 ```julia
 base_ring(R::MyParent)
 ```
@@ -135,7 +142,7 @@ Given a parent object `R`, representing a ring, this function returns the parent
 of any base ring that parameterises this ring. For example, the base ring of the ring
 of polynomials over the integers would be the integer ring.
 
-If the ring is not parameterised by another ring, this function must return `Union{}`.
+If the ring is not parameterised by another ring, calling this function should rais an error.
 
 !!! note
 
@@ -144,6 +151,9 @@ If the ring is not parameterised by another ring, this function must return `Uni
     only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
     been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
     ideal.
+
+    There is no general mathematical definition for base ring, so to know what `base_ring`
+    does for any given type of ring, you need to consult its documentation.
 
 ```julia
 parent(f::MyElem)
@@ -305,9 +315,11 @@ In AbstractAlgebra.jl, the denominator would be made positive by dividing both t
 numerator and denominator by the canonical unit of the denominator. For a negative
 denominator, this would be $-1$.
 
-For elements of a field, `canonical_unit` simply returns the element itself. In general,
-`canonical_unit` of an invertible element should be that element. Finally, if $a = ub$
-we should have the identity `canonical_unit(a) = canonical_unit(u)*canonical_unit(b)`.
+For non-zero elements of a field, `canonical_unit` simply returns the element itself.
+In general, `canonical_unit` of an invertible element should be that element.
+Finally, if $a = bc$, then `canonical_unit(a)*a = canonical_unit(b)*canonical_unit(c)*a`
+holds. Thus if $a$ is not a zero-divisor, then we even have
+`canonical_unit(a) = canonical_unit(b)*canonical_unit(c)`.
 
 For some rings, it is completely impractical to implement this function, in which case
 it may return $1$ in the given ring. The function must however always exist, and always
@@ -336,20 +348,13 @@ components.
 To obtain best results when printing composed types derived from other types, e.g., polynomials,
 the following method should be implemented.
 
-```julia
-expressify(f::MyElem; context = nothing)
+```@docs
+expressify
+@enable_all_show_via_expressify
 ```
 
-which must return either `Expr`, `Symbol`, `Integer` or `String`.
-
-For a type which implements  `expressify`, one can automatically derive `show` methods
-supporting output as plain text, LaTeX and `html` by using the following:
-
-```julia
-@enable_all_show_via_expressify MyElem
-```
-
-This defines the following show methods for the specified type `MyElem`:
+`@enable_all_show_via_expressify MyElem` defines the following show methods for
+the specified type `MyElem`:
 
 ```julia
 function Base.show(io::IO, a::MyElem)
@@ -553,6 +558,9 @@ to types. It is the coercions themselves that must deal with the mathematical
 situation at the level of rings, including checking that the object can even
 be coerced into the given ring.
 
+Note that `AbstractAlgebra.promote_rule` is a separate function from
+`Base.promote_rule` and is the one that must be extended.
+
 We now describe the required AbstractAlgebra type promotion rules.
 
 For every ring, one wants to be able to coerce integers into the ring. And for
@@ -567,7 +575,7 @@ For ring element types `MyElem` that are neither parameterised nor built over a
 base ring, the promotion rules can be defined as follows:
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
 ```
 
 For ring element types `MyElem` that aren't parameterised, but which have a
@@ -575,23 +583,23 @@ base ring with concrete element type `T` the promotion rules can be defined as
 follows:
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
 ```
 
 ```julia
-promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
+AbstractAlgebra.promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
 ```
 
 For ring element types `MyElem{T}` that are parameterised by the type of
 elements of the base ring, the promotion rules can be defined as follows:
 
 ```julia
-promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
+AbstractAlgebra.promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
 ```
 
 ```julia
-function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? MyElem{T} : Union{}
+function AbstractAlgebra.promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   AbstractAlgebra.promote_rule(T, U) == T ? MyElem{T} : Union{}
 end
 ```
 
@@ -773,7 +781,8 @@ using AbstractAlgebra.RandomExtensions: RandomExtensions, Make2, AbstractRNG
 import AbstractAlgebra: parent_type, elem_type, base_ring, base_ring_type, parent, is_domain_type,
        is_exact_type, canonical_unit, isequal, divexact, zero!, mul!, add!,
        get_cached!, is_unit, characteristic, Ring, RingElem, expressify,
-       @show_name, @show_special, is_terse, pretty, terse, Lowercase
+       @show_name, @show_special, is_terse, pretty, terse, Lowercase,
+       promote_rule
 
 import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
              deepcopy_internal, hash
@@ -789,7 +798,7 @@ import Base: show, +, -, *, ^, ==, inv, isone, iszero, one, zero, rand,
 end
 
 const ConstPolyID = AbstractAlgebra.CacheDictType{Ring, ConstPolyRing}()
-   
+
 mutable struct ConstPoly{T <: RingElement} <: RingElem
    c::T
    parent::ConstPolyRing{T}
@@ -962,10 +971,10 @@ rand(R::ConstPolyRing, n::AbstractUnitRange{Int}) = rand(Random.default_rng(), R
 
 # Promotion rules
 
-promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
+AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{ConstPoly{T}}) where T <: RingElement = ConstPoly{T}
 
-function promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? ConstPoly{T} : Union{}
+function AbstractAlgebra.promote_rule(::Type{ConstPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   AbstractAlgebra.promote_rule(T, U) == T ? ConstPoly{T} : Union{}
 end
 
 # Constructors
@@ -1017,9 +1026,8 @@ The above implementation of `constant_polynomial_ring` may be tested as follows.
 
 ```jldoctest ConstPoly; filter = r".*"s
 using Test
-include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 
-function test_elem(R::ConstPolyRing{elem_type(ZZ)})
+function ConformanceTests.generate_element(R::ConstPolyRing{elem_type(ZZ)})
    n = rand(1:999)
    return R(rand(-n:n))
 end

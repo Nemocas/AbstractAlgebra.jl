@@ -16,13 +16,11 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_elem(R::AbstractAlgebra.Generic.PuiseuxSeriesRing{BigInt})
-   rand(R, -12:12, 1:6, -10:10)
-end
+
 
 @testset "Generic.PuiseuxSeries.conformance" begin
    R, x = puiseux_series_ring(ZZ, 10, "x")
-   test_Ring_interface(R)
+   ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "Generic.PuiseuxSeries.constructors" begin
@@ -44,9 +42,15 @@ end
    @test elem_type(Generic.PuiseuxSeriesRing{elem_type(S)}) == Generic.PuiseuxSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.PuiseuxSeriesRingElem{elem_type(S)}) == Generic.PuiseuxSeriesRing{elem_type(S)}
 
+   @test coefficient_ring(T) == S
+   @test coefficient_ring_type(T) == typeof(coefficient_ring(T))
+
    @test elem_type(U) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test elem_type(Generic.PuiseuxSeriesField{Rational{BigInt}}) == Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}
    @test parent_type(Generic.PuiseuxSeriesFieldElem{Rational{BigInt}}) == Generic.PuiseuxSeriesField{Rational{BigInt}}
+
+   @test coefficient_ring(U) === QQ
+   @test coefficient_ring_type(U) == typeof(coefficient_ring(U))
 
    @test isa(R, Generic.PuiseuxSeriesRing)
    @test isa(T, Generic.PuiseuxSeriesRing)
@@ -94,13 +98,6 @@ end
    l = T(t)
 
    @test isa(l, Generic.PuiseuxSeriesElem)
-
-   @test x in [x, y]
-   @test x in [y, x]
-   @test !(x in [y])
-
-   @test x in keys(Dict(x => 1))
-   @test !(y in keys(Dict(x => 1)))
 end
 
 @testset "Generic.PuiseuxSeries.printing" begin
@@ -158,6 +155,11 @@ end
    U, y = puiseux_series_ring(T, 10, "y")
 
    @test modulus(T) == 7
+
+   K, z = puiseux_series_field(GF(7), 10, "z")
+
+   @test characteristic(K) == 7
+   @test AbstractAlgebra.is_known(characteristic, K)
 
    R, x = puiseux_series_ring(QQ, 10, "x")
 
@@ -806,7 +808,7 @@ end
 
       @test isequal(integral(derivative(f)) + const_coeff, f)
    end
- 
+
    # Inexact field
    S, x = puiseux_series_field(RealField, 10, "x")
 

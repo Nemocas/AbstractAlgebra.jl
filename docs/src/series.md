@@ -1,5 +1,6 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+CollapsedDocStrings = true
 DocTestSetup = AbstractAlgebra.doctestsetup()
 ```
 
@@ -65,42 +66,22 @@ respectively.
 In order to construct series in AbstractAlgebra.jl, one must first construct the ring
 itself. This is accomplished with any of the following constructors.
 
-```julia
-power_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true, model::Symbol=:capped_relative)
+```@docs
+power_series_ring(::Ring, ::Int, ::VarName)
+@power_series_ring
+laurent_series_ring
+laurent_series_field
 ```
-
-```julia
-laurent_series_ring(R::Ring, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-```julia
-laurent_series_ring(R::Field, prec_max::Int, s::VarName; cached::Bool = true)
-```
-
-Given a base ring `R`, a maximum precision (relative or absolute, depending on the
-model) and a string `s` specifying how the generator (variable) should be
-printed, return a tuple `S, x` representing the series ring and its generator.
-
-By default, `S` will depend only on `S`, `x` and the maximum precision and will be
-cached. Setting the optional argument `cached` to `false` will prevent this.
-
-In the case of power series, the optional argument `model` can be set to either
-`:capped_absolute` or `:capped_relative`, depending on which power series model is
-required.
 
 It is also possible to construct absolute and relative power series with a
 default variable. These are lightweight constructors and should be used in
 generic algorithms wherever possible when creating series rings where the
 symbol does not matter.
 
-```julia
-AbsPowerSeriesRing(R::Ring, prec::Int)
-RelPowerSeriesRing(R::Ring, prec::Int)
+```@docs
+AbsPowerSeriesRing
+RelPowerSeriesRing
 ```
-
-Return the absolute or relative power series ring over the given base ring $R$
-and with precision cap given by `prec`. Note that a tuple is not returned, only
-the power series ring itself, not a generator.
 
 Here are some examples of constructing various kinds of series rings and coercing
 various elements into those rings.
@@ -170,44 +151,23 @@ And for absolute series:
 (S::SeriesRing{T})(A::Vector{T}, len::Int, prec::Int) where T <: RingElem
 ```
 
-It is also possible to create series directly without having to create the
-corresponding series ring.
-
-```julia
-abs_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
-rel_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
-laurent_series(R::Ring, arr::Vector{T}, len::Int, prec::Int, val::Int, scale::Int, var::VarName=:x; max_precision::Int=prec, cached::Bool=true) where T
-```
-
 **Examples**
 
 ```jldoctest
 julia> S, x = power_series_ring(QQ, 10, :x; model=:capped_absolute)
 (Univariate power series ring over rationals, x + O(x^10))
 
-julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+julia> S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
 2*x + 3*x^2 + x^3 + O(x^6)
+```
 
-julia> f = abs_series(ZZ, [1, 2, 3], 3, 5, :y)
-1 + 2*y + 3*y^2 + O(y^5)
+It is also possible to create series directly without having to create the
+corresponding series ring.
 
-julia> g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
-x^4 + 2*x^5 + 3*x^6 + O(x^7)
-
-julia> k = abs_series(ZZ, [1, 2, 3], 1, 6, cached=false)
-1 + O(x^6)
-
-julia> p = rel_series(ZZ, BigInt[], 0, 3, 1)
-O(x^3)
-
-julia> q = abs_series(ZZ, [], 0, 6)
-O(x^6)
-
-julia> s = abs_series(ZZ, [1, 2, 3], 3, 5; max_precision=10)
-1 + 2*x + 3*x^2 + O(x^5)
-
-julia> s = laurent_series(ZZ, [1, 2, 3], 3, 5, 0, 2; max_precision=10)
-1 + 2*x^2 + 3*x^4 + O(x^5)
+```@docs
+abs_series
+rel_series
+laurent_series
 ```
 
 ## Big-oh notation
@@ -344,12 +304,6 @@ parent(a::SeriesElem)
 
 Return the parent of the given series.
 
-```julia
-characteristic(R::SeriesRing)
-```
-
-Return the characteristic of the given series ring. If the characteristic is
-not known, an exception is raised.
 
 ## Series functions
 
@@ -371,7 +325,7 @@ isone(a::SeriesElem)
 
 ```julia
 divexact(a::T, b::T) where T <: SeriesElem
-inv(a::SeriesElem) 
+inv(a::SeriesElem)
 ```
 
 Series also implement the Series Interface, the most important basic
@@ -413,7 +367,7 @@ For power series types, $n$ must be non-negative. Laurent series do not have thi
 restriction.
 
 ```@docs
-modulus{T <: ResElem}(::SeriesElem{T})
+modulus(::SeriesElem{T}) where T <: ResElem
 ```
 
 ```@docs
@@ -526,135 +480,26 @@ map_coefficients(::Any, ::AbsPowerSeriesRingElem{<:RingElem})
 change_base_ring(::Ring, ::AbsPowerSeriesRingElem{<:RingElem})
 ```
 
-**Examples**
-
-```jldoctest
-julia> R, x = power_series_ring(ZZ, 10, :x)
-(Univariate power series ring over integers, x + O(x^11))
-
-julia> f = 4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
-4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
-
-julia> map_coefficients(AbstractAlgebra.sqrt, f)
-2*x^6 + x^7 + 3*x^8 + 4*x^9 + 5*x^10 + O(x^11)
-
-julia> change_base_ring(QQ, f)
-4*x^6 + x^7 + 9*x^8 + 16*x^9 + 25*x^10 + O(x^11)
-```
-
 ### Shifting
 
 ```@docs
-shift_left{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
+shift_left(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 ```@docs
-shift_right{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
-
-julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over R, x + O(x^31))
-
-julia> a = 2x + x^3
-2*x + x^3 + O(x^31)
-
-julia> b = O(x^4)
-O(x^4)
-
-julia> c = 1 + x + 2x^2 + O(x^5)
-1 + x + 2*x^2 + O(x^5)
-
-julia> d = 2x + x^3 + O(x^4)
-2*x + x^3 + O(x^4)
-
-julia> f = shift_left(a, 2)
-2*x^3 + x^5 + O(x^33)
-
-julia> g = shift_left(b, 2)
-O(x^6)
-
-julia> h = shift_right(c, 1)
-1 + 2*x + O(x^4)
-
-julia> k = shift_right(d, 3)
-1 + O(x^1)
-
+shift_right(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 ### Truncation
 
 ```@docs
-truncate{T <: RingElem}(::RelPowerSeriesRingElem{T}, ::Int)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
-
-julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over R, x + O(x^31))
-
-julia> a = 2x + x^3
-2*x + x^3 + O(x^31)
-
-julia> b = O(x^4)
-O(x^4)
-
-julia> c = 1 + x + 2x^2 + O(x^5)
-1 + x + 2*x^2 + O(x^5)
-
-julia> d = 2x + x^3 + O(x^4)
-2*x + x^3 + O(x^4)
-
-julia> f = truncate(a, 3)
-2*x + O(x^3)
-
-julia> g = truncate(b, 2)
-O(x^2)
-
-julia> h = truncate(c, 7)
-1 + x + 2*x^2 + O(x^5)
-
-julia> k = truncate(d, 5)
-2*x + x^3 + O(x^4)
-
+truncate(::RelPowerSeriesRingElem{T}, ::Int) where T <: RingElem
 ```
 
 ### Division
 
 ```@docs
 Base.inv(::RelPowerSeriesRingElem)
-```
-
-**Examples**
-
-```jldoctest
-julia> R, t = polynomial_ring(QQ, :t)
-(Univariate polynomial ring in t over rationals, t)
-
-julia> S, x = power_series_ring(R, 30, :x)
-(Univariate power series ring over R, x + O(x^31))
-
-julia> a = 1 + x + 2x^2 + O(x^5)
-1 + x + 2*x^2 + O(x^5)
-
-julia> b = S(-1)
--1 + O(x^30)
-
-julia> c = inv(a)
-1 - x - x^2 + 3*x^3 - x^4 + O(x^5)
-
-julia> d = inv(b)
--1 + O(x^30)
-
 ```
 
 ### Composition
@@ -685,10 +530,7 @@ Base.log(a::SeriesElem{T}) where T <: FieldElem
 ```@docs
 Base.exp(a::RelPowerSeriesRingElem)
 ```
-
-```@docs
-Base.sqrt(a::RelPowerSeriesRingElem)
-```
+Methods for `is_square` and `sqrt` are provided for inputs of type `RelPowerSeriesRingElem`.
 
 
 **Examples**

@@ -73,7 +73,7 @@ variable_names(as::VarNames...) = variable_names(as)
 variable_names(as::Tuple{Vararg{VarNames}}, brackets::Val = Val(true)) =
     Symbol[x for a in as for x in _variable_names(a, brackets)]
 
-_variable_names(a::AbstractArray{<:VarName}, ::Any) = Symbol.(a)
+_variable_names(a::AbstractArray{<:VarName}, ::Any) = [Symbol(x) for x in a]
 
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{true}) = Symbol.(s, '[', axe, ']')
 _variable_names((s, axe)::Pair{<:Union{Char, Symbol}}, ::Val{false}) = check_names(Symbol.(s, axe))
@@ -175,7 +175,7 @@ Mimic usual keyword arguments for usage in macros.
 
 Return a copy of `default` with the key value pairs from `kvs` applied.
 
-# Example
+# Examples
 ```jldoctest
 julia> AbstractAlgebra.keyword_arguments((:(a=1), :(b=:yes)),
        Dict(:a=>0, :b=>:no, :c=>0),
@@ -229,7 +229,7 @@ function normalise_keyword_arguments(args)
         kv = Expr(:parameters)
     end
     # Keyword arguments without previous `;`
-    append!(kv.args, (Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))))
+    append!(kv.args, [Expr(:kw, e.args...) for e in args if Meta.isexpr(e, :(=))])
     # normal arguments
     args = (e for e in args if !Meta.isexpr(e, :(=)))
     return [kv, args...]
@@ -313,7 +313,7 @@ function n_vars_method(d::Dict{Symbol}, n, range)
         "an alternative name like `m`, not `$n`")
     quote
         $f($(args...), $n::Int, s::VarName=:x; kv...) where {$(wheres...)} =
-            $f($(argnames...), Symbol.(s, $range); kv...)
+            $f($(argnames...), (Symbol.(s, $range))::Vector{Symbol}; kv...)
     end
 end
 
@@ -474,13 +474,3 @@ macro varnames_interface(e::Expr, options::Expr...)
         $(varnames_macro(d[:f], length(d[:argnames]), opts[:macros], opts[:n], opts[:range]))
     end
 end
-
-@varnames_interface free_associative_algebra(R::Ring, s)
-@varnames_interface Generic.laurent_polynomial_ring(R::Ring, s)
-@varnames_interface Generic.rational_function_field(K::Field, s)
-
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Int, s)
-@varnames_interface Generic.power_series_ring(R::Ring, weights::Vector{Int}, prec::Int, s) macros=:no # use keyword `weights=...` instead
-@varnames_interface Generic.power_series_ring(R::Ring, prec::Vector{Int}, s) n=:no macros=:no # `n` variant would clash with line above; macro would be the same as for `prec::Int`
-
-@varnames_interface polynomial_ring(R::Ring, s)

@@ -38,11 +38,11 @@ zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
 one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
-is_unit(a::Rational) = a != 0
+is_unit(a::Rational) = !is_zero(a)
 
 is_zero_divisor(a::Rational) = is_zero(a)
 
-canonical_unit(a::Rational)  = a
+canonical_unit(a::Rational) = iszero(a) ? one(a) : a
 
 function numerator(a::Rational, canonicalise::Bool=true)
    return Base.numerator(a) # all other types ignore canonicalise
@@ -52,7 +52,8 @@ function denominator(a::Rational, canonicalise::Bool=true)
    return Base.denominator(a) # all other types ignore canonicalise
 end
 
-characteristic(a::Rationals{T}) where T <: Integer = 0
+characteristic(::Rationals) = 0
+is_known(::typeof(characteristic), ::Rationals) = true
 
 ###############################################################################
 #
@@ -108,11 +109,22 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational, b::Integer; check::Bool=true) = a//b
+# `a//0` is `±1//0` for nonzero `a`, not an error
 
-divexact(a::Integer, b::Rational; check::Bool=true) = a//b
+function divexact(a::Rational, b::Integer; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
-divexact(a::Rational, b::Rational; check::Bool=true) = a//b
+function divexact(a::Integer, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
+
+function divexact(a::Rational, b::Rational; check::Bool=true)
+   iszero(b) && throw(DivideError())
+   return a//b
+end
 
 function divides(a::T, b::T) where T <: Rational
    if iszero(b)
@@ -139,11 +151,11 @@ end
 function is_square_with_sqrt(a::Rational{T}) where T <: Integer
    f1, s1 = is_square_with_sqrt(numerator(a))
    if !f1
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    f2, s2 = is_square_with_sqrt(denominator(a))
    if !f2
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    return true, s1//s2
 end
@@ -156,18 +168,18 @@ end
 
 function root(a::Rational{T}, n::Int; check::Bool=true) where T <: Integer
    num = root(numerator(a, false), n; check=check)
-   den = root(denominator(a, false), n; check=check)   
+   den = root(denominator(a, false), n; check=check)
    return num//den
 end
 
 function is_power(a::Rational{T}, n::Int) where T <: Integer
    f1, r1 = is_power(numerator(a), n)
    if !f1
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    f2, r2 = is_power(denominator(a), n)
    if !f2
-      return false, zero(T)
+      return false, zero(Rational{T})
    end
    return true, r1//r2
 end
@@ -218,9 +230,22 @@ function rand(rng::AbstractRNG,
 end
 
 
-rand(rng::AbstractRNG, R::Rationals, n) = rand(rng, make(R, n))
+rand(rng::AbstractRNG, R::Rationals, n::AbstractArray) = rand(rng, make(R, n))
 
-rand(R::Rationals, n) = rand(Random.default_rng(), R, n)
+rand(R::Rationals, n::AbstractArray) = rand(Random.default_rng(), R, n)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Rationals)
+  B = base_ring(R)
+  n = ConformanceTests.generate_element(B)
+  d = ConformanceTests.generate_element(B)
+  return is_zero(d) ? R(n) : R(n, d)
+end
 
 ###############################################################################
 #

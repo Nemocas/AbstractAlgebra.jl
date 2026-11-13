@@ -1,15 +1,12 @@
-function test_elem(R::AbstractAlgebra.Generic.RationalFunctionField{Rational{BigInt}})
-   rand(R, 0:3, -3:3)
-end
-
-@testset "Generic.FunctionField.conformance" begin
+@testset "Generic.RationalFunctionField.conformance" begin
    S, x = rational_function_field(QQ, "x")
-   test_Ring_interface(S)
+   ConformanceTests.test_Ring_interface(S)
 end
 
 @testset "Generic.RationalFunctionField.constructors" begin
    # Univariate
 
+   T, x = rational_function_field(QQ)  # verify default variable name is provided
    T, x = rational_function_field(QQ, "x")
 
    @test rational_function_field(QQ, "x", cached = true)[1] === rational_function_field(QQ, "x", cached = true)[1]
@@ -24,6 +21,12 @@ end
    @test isa(T(3), Generic.RationalFunctionFieldElem)
 
    @test isa(T(BigInt(7)), Generic.RationalFunctionFieldElem)
+
+   @test isa(T(3//2), Generic.RationalFunctionFieldElem)
+
+   @test isa(T(QQ(3//2)), Generic.RationalFunctionFieldElem)
+
+   @test T(1.5) == T(3//2)
 
    @test isa(T(x + 2), Generic.RationalFunctionFieldElem)
 
@@ -42,12 +45,6 @@ end
    TT, x = rational_function_field(QQ, "x")
    a = TT(1)
    b = T(2)
-
-   @test a in [a, b]
-   @test a in [b, a]
-   @test !(a in [b])
-   @test a in keys(Dict(a => 1))
-   @test !(b in keys(Dict(a => 1)))
 
    # Multivariate
 
@@ -79,6 +76,26 @@ end
    @test isa(12//(y + 2), Generic.RationalFunctionFieldElem)
 
    @test isa(((x + 1)//(y + 2))//((y + 3)//(x + 4)), Generic.RationalFunctionFieldElem)
+
+   T, = rational_function_field(QQ)
+   @test characteristic(T) == 0
+   @test !is_finite(T)
+   @test is_perfect(T)
+
+   T, = rational_function_field(GF(3))
+   @test characteristic(T) == 3
+   @test !is_finite(T)
+   @test !is_perfect(T)
+
+   T, = rational_function_field(GF(3), Symbol[])
+   @test characteristic(T) == 3
+   @test is_finite(T)
+   @test is_perfect(T)
+
+   T, = rational_function_field(GF(3), Symbol[:x, :y])
+   @test characteristic(T) == 3
+   @test !is_finite(T)
+   @test !is_perfect(T)
 end
 
 @testset "Generic.RationalFunctionField.printing" begin
@@ -128,6 +145,11 @@ end
    K, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    test_rand(K, 0:3, 0:3, -3:3)
+
+   # test that results are reduced
+   K, x = rational_function_field(GF(2), "x")
+   f = rand(K, 1:1)
+   @test is_unit(gcd(numerator(f), denominator(f)))
 end
 
 @testset "Generic.RationalFunctionField.manipulation" begin
@@ -481,20 +503,28 @@ end
 
 @testset "Generic.RationalFunctionField.evaluate" begin
    # Univariate
-   R, x = polynomial_ring(QQ, "x")
+   R, x = rational_function_field(QQ, "x")
 
    f = (x^2 + 2)//(x + 1)
+   @test f isa Generic.RationalFunctionFieldElem
 
    @test evaluate(f, 1) == QQ(3, 2)
    @test evaluate(f, QQ(2)) == 2
 
+   @test f(1) == QQ(3, 2)
+   @test f(QQ(2)) == 2
+
    # Multivariate
-   R, (x, y) = polynomial_ring(QQ, ["x", "y"])
+   R, (x, y) = rational_function_field(QQ, ["x", "y"])
 
    f = (x^2 + 2)//(y + 1)
+   @test f isa Generic.RationalFunctionFieldElem
 
    @test evaluate(f, [1, 2]) == 1
    @test evaluate(f, [QQ(2), QQ(1)]) == 3
+
+   @test f(1, 2) == 1
+   @test f(QQ(2), QQ(1)) == 3
 end
 
 @testset "Generic.RationalFunctionField.derivative" begin
@@ -556,9 +586,9 @@ end
 @testset "Generic.RationalFunctionField.promotion" begin
    # Univariate
    K, x = rational_function_field(QQ, "x")
-   
+
    T = elem_type(K)
-   
+
    @test AbstractAlgebra.promote_rule(T, T) == T
 
    # Multivariate
@@ -568,3 +598,20 @@ end
 
    @test AbstractAlgebra.promote_rule(T, T) == T
 end
+
+@testset "Generic.RationalFunctionField.evaluation_points" begin
+  let
+    K, x = rational_function_field(QQ, "x")
+    S = AbstractAlgebra.evaluation_points(K, 10)
+    @test length(unique(S)) == 10
+  end
+
+  let
+    K, x = rational_function_field(GF(2), "x")
+    S = AbstractAlgebra.evaluation_points(K, 1)
+    @test length(unique(S)) == 1
+    S = AbstractAlgebra.evaluation_points(K, 10)
+    @test length(unique(S)) == 10
+  end
+end
+

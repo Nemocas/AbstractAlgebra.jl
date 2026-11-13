@@ -14,9 +14,7 @@ parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
-base_ring_type(::Type{<:GFField}) = typeof(Union{})
-
-base_ring(a::GFField) = Union{}
+base_ring_type(::Type{<:GFField}) = Union{}   # no base ring
 
 parent(a::GFElem) = a.parent
 
@@ -75,14 +73,8 @@ isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
 is_unit(a::GFElem) = a.d != 0
 
-@doc raw"""
-    characteristic(R::GFField)
-
-Return the characteristic of the given finite field.
-"""
-function characteristic(R::GFField)
-   return R.p
-end
+characteristic(R::GFField) = R.p
+is_known(::typeof(characteristic), ::GFField) = true
 
 @doc raw"""
     order(R::GFField)
@@ -109,14 +101,6 @@ end
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(x::GFElem) = x
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -134,6 +118,9 @@ function show(io::IO, R::GFField)
    @show_special(io, R)
    print(io, "Finite field F_", R.p)
 end
+
+pretty_lt(x::GFElem, y::GFElem) = pretty_lt(x.d, y.d)
+pretty_eq(x::GFElem, y::GFElem) = (x == y)
 
 ###############################################################################
 #
@@ -299,7 +286,7 @@ function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
    q = div(q, T(1) << s)
    if isone(s)
       r = powermod(n, div(p + 1, 4), p)
-      return true, r
+      return true, R(r)
    end
    # find a quadratic nonresidue mod p
    z = T(2)
@@ -330,7 +317,7 @@ function sqrt_tonelli_shanks(a::GFElem{T}; check::Bool=true) where T <: Integer
       t = mulmod(t, c, p)
       m = i
    end
-   return true, r
+   return true, R(r)
 end
 
 function Base.sqrt(a::GFElem{T}; check::Bool=true) where T <: Integer

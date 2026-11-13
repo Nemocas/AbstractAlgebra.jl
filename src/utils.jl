@@ -29,14 +29,14 @@ function is_loaded_directly()
       # inside of the _require_search_from_serialized function.
       # To make it a bit more robust, we check the difference between the line number of the beginning
       # of _require_search_from_serialized and the call to _include_from_serialized.
-      bt = Base.process_backtrace(Base.backtrace())
-      @debug "is_loaded_directly: full backtrace:\n$(sprint(show, "text/plain", bt))"
-      Base.filter!(sf -> contains(string(sf[1].func), "_require_search_from_serialized"), bt)
-      length_bt = length(bt)
-      @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_bt) times in backtrace; expected 1"
-      bt_entry = only(bt)[1]
-      line_call = bt_entry.line
-      line_funcbegin = bt_entry.linfo.def.line
+      st = Base.stacktrace(Base.backtrace())
+      @debug "is_loaded_directly: full backtrace:\n$(sprint(show, "text/plain", st))"
+      Base.filter!(sf -> contains(string(sf.func), "_require_search_from_serialized") && !startswith(string(sf), "kwcall(") && !contains(string(sf), "[inlined]"), st)
+      length_st = length(st)
+      @debug "is_loaded_directly: `_require_search_from_serialized` appears $(length_st) times in backtrace; expected 1"
+      sf = only(st)
+      line_call = sf.line
+      line_funcbegin = (sf.linfo::Core.MethodInstance).def.line
       line_difference = line_call - line_funcbegin
       @debug "is_loaded_directly: `_require_search_from_serialized` called at line $line_call, function begins at line $line_funcbegin, difference $(line_difference)"
       # difference for `using Package` / `using OtherPackage`
@@ -53,10 +53,23 @@ function is_loaded_directly()
       # 1.12.0-DEV.896:   78 /  61 # ignored
       # 1.12.0-DEV.1322:  88 /  72 # ignored
       # 1.12.0-DEV.1506: 106 /  93
+      # 1.12.7:          106 /  93
+      # 1.13.0-rc3:      106 /  93
+      # 1.13.2-DEV.58:   115 / 102
+      # 1.13.3-DEV.13:   109 /  96
+      # 1.14.0-DEV.3081: 105 /  92
+      # 1.14.0-DEV.3083: 114 / 101
+      # 1.14.0-DEV.3089: 117 / 104
+      # 1.14.0-DEV.3446: 121 / 108
+      # 1.14.0-DEV.3586: 115 / 102
+      # 1.15.0-DEV.80:   120 / 107
+      # 1.15.0-DEV.124:  123 / 110
       @static if v"1.11.0-" < VERSION < v"1.12.0-DEV.1506"
         return line_difference >= 73
-      else # v"1.12.0-DEV.1506" <= VERSION
-        return line_difference >= 100
+      elseif VERSION < v"1.14.0-DEV.3083"
+        return line_difference >= 104
+      else
+        return line_difference >= 112
       end
     end
   catch e

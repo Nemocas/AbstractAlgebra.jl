@@ -34,6 +34,16 @@ function normalise(a::RelSeries, len::Int)
    return len
 end
 
+@doc raw"""
+    polcoeff(f::SeriesElem, n::Int)
+
+Return the coefficient of degree `n` of the polynomial underlying the series
+`f`, or zero if `n` exceeds the degree of that polynomial. Note that this
+ignores the valuation of `f`, unlike `coeff`.
+
+This function is part of the internal interface for polynomials and series;
+user code should normally not need to invoke it.
+"""
 function polcoeff(a::RelSeries, n::Int)
    n < 0  && throw(DomainError(n, "n must be >= 0"))
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
@@ -50,6 +60,8 @@ function gen(R::RelPowerSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
+number_of_variables(R::RelPowerSeriesRing) = 1
+
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
    coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
@@ -58,9 +70,8 @@ function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
    return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
 end
 
-function characteristic(a::RelPowerSeriesRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::RelPowerSeriesRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::RelPowerSeriesRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -364,7 +375,7 @@ function (R::RelPowerSeriesRing{T})() where T <: RingElement
    return z
 end
 
-function (R::RelPowerSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
+function (R::RelPowerSeriesRing{T})(b::JuliaRingElement) where T <: RingElement
    bb = base_ring(R)(b)
    if is_zero(bb)
       z = RelSeries{T}(Vector{T}(undef, 0), 0, R.prec_max, R.prec_max)

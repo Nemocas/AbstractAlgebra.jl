@@ -20,14 +20,8 @@ function is_exact_type(a::Type{T}) where {S <: RingElement, T <: FracElem{S}}
    return is_exact_type(S)
 end
 
-@doc raw"""
-    characteristic(R::FracField{T}) where T <: RingElem
-
-Return the characteristic of the given field.
-"""
-function characteristic(R::FracField{T}) where T <: RingElem
-   return characteristic(base_ring(R))
-end
+characteristic(R::FracField) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::FracField) = is_known(characteristic, base_ring(R))
 
 @doc raw"""
     vars(a::FracElem{S}) where {S <: MPolyRingElem{<: RingElement}}
@@ -51,14 +45,21 @@ end
 ###############################################################################
 
 function //(x::T, y::T) where {T <: RingElem}
-   R = parent(x)
    iszero(y) && throw(DivideError())
+   R = parent(x)
    g = gcd(x, y)
-   z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
-   try
-      z.parent = Generic.FracDict[R]
-   catch
-      z.parent = Generic.fraction_field(R)
+   if is_domain_type(R)
+     z = Generic.FracFieldElem{T}(divexact(x, g), divexact(y, g))
+     z.parent = get(Generic.FracDict, R) do
+       return Generic.fraction_field(R)
+     end
+     return z
+   end
+   # R might not be integral, so construct total ring of fractions
+   is_zero_divisor(y)  &&  error("Division by a zero-divisor")
+   z = Generic.TotFrac{T}(divexact(x, g), divexact(y, g))
+   z.parent = get(Generic.TotFracDict, R) do
+       return Generic.total_ring_of_fractions(R)
    end
    return z
 end
@@ -101,14 +102,6 @@ is_unit(a::FracElem) = !iszero(numerator(a, false))
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::FracElem) = a
-
-###############################################################################
-#
 #   AbstractString I/O
 #
 ###############################################################################
@@ -145,6 +138,17 @@ function show(io::IO, a::FracField)
     print(io, "Fraction field of ")
     print(terse(io), Lowercase(), base_ring(a))
   end
+end
+
+pretty_eq(a::FracElem, b::FracElem) = (a == b)
+function pretty_lt(a::FracElem, b::FracElem)
+  if pretty_lt(denominator(b, false), denominator(a, false))
+    return true
+  end
+  if pretty_lt(denominator(a, false), denominator(b, false))
+    return false
+  end
+  return pretty_lt(numerator(a, false), numerator(b, false))
 end
 
 ###############################################################################
@@ -373,7 +377,7 @@ end
 
 -(a::FracElem, b::Rational) = return a - parent(a)(b)
 
-+(a::Union{Integer, Rational, AbstractFloat}, b::FracElem) = b + a
++(a::JuliaRingElement, b::FracElem) = b + a
 
 function -(a::Union{Integer, AbstractFloat}, b::FracElem)
    n = a*denominator(b, false) - numerator(b, false)
@@ -450,11 +454,6 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    ==(x::FracElem, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 function ==(x::FracElem, y::Union{Integer, AbstractFloat})
    return (isone(denominator(x, false)) && numerator(x, false) == y) ||
           (isone(denominator(x, true)) && numerator(x, true) == y) ||
@@ -468,15 +467,11 @@ function ==(x::FracElem, y::Rational)
             denominator(x, false)*numerator(y, false))
 end
 
-@doc raw"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Union{Integer, Rational, AbstractFloat}, y::FracElem) = y == x
+==(x::JuliaRingElement, y::FracElem) = y == x
 
 @doc raw"""
-    ==(x::FracElem{T}, y::T) where {T <: RingElem}
+    ==(x::FracElem{<:RingElem}, y::RingElement)
+    ==(x::RingElement, y::FracElem{<:RingElem})
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -486,11 +481,6 @@ function ==(x::FracElem{T}, y::T) where {T <: RingElem}
           (numerator(x, false) == denominator(x, false)*y)
 end
 
-@doc raw"""
-    ==(x::T, y::FracElem{T}) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::FracElem{T}) where {T <: RingElem} = y == x
 
 ###############################################################################
@@ -624,20 +614,28 @@ end
 #
 ##############################################################################
 
-function evaluate(f::FracElem{T}, V::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(f::FracElem, V::Vector{<:RingElement})
     return evaluate(numerator(f), V)//evaluate(denominator(f), V)
 end
-  
-function evaluate(f::FracElem{T}, v::U) where {T <: RingElement, U <: RingElement}
+
+function evaluate(f::FracElem, v::RingElement)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, v::U) where {T <: PolyRingElem, U <: Integer}
+function evaluate(f::FracElem{<:PolyRingElem}, v::Integer)
     return evaluate(numerator(f), v)//evaluate(denominator(f), v)
 end
 
-function evaluate(f::FracElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
-     return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+function evaluate(f::FracElem, vars::Vector{Int}, vals::Vector{<:RingElement})
+    return evaluate(numerator(f), vars, vals)//evaluate(denominator(f), vars, vals)
+end
+
+function (a::FracElem)(val::RingElement)
+   return evaluate(a, val)
+end
+
+function (a::FracElem)(vals::RingElement...)
+   return evaluate(a, [vals...])
 end
 
 ###############################################################################
@@ -664,7 +662,7 @@ end
 function derivative(f::FracElem{T}, x::T) where {T <: MPolyRingElem}
     return derivative(f, var_index(x))
 end
-  
+
 # Return the derivative with respect to the `i`-th variable.
 function derivative(f::FracElem{T}, i::Int) where {T <: MPolyRingElem}
     n = numerator(f)
@@ -684,21 +682,10 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    is_square(a::FracElem{T}) where T <: RingElem
-
-Return `true` if $a$ is a square.
-"""
 function is_square(a::FracElem{T}) where T <: RingElem
    return is_square(numerator(a)) && is_square(denominator(a))
 end
 
-@doc raw"""
-    Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
-
-Return the square root of $a$. By default the function will throw an
-exception if the input is not square. If `check=false` this test is omitted.
-"""
 function Base.sqrt(a::FracElem{T}; check::Bool=true) where T <: RingElem
    return parent(a)(sqrt(numerator(a); check=check), sqrt(denominator(a); check=check))
 end
@@ -729,6 +716,22 @@ Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
 the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
 This requires the existence of a greatest common divisor function for the
 base ring.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x)
+(Univariate polynomial ring in x over rationals, x)
+
+julia> f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
+(x^2 + 2*x + 1)//(x^2 + x + 1)
+
+julia> h = gcd(f, g)
+(x + 1)//(x^5 + x^4 + 4*x^3 + 4*x^2 + 4*x + 1)
+```
 """
 function gcd(a::FracElem{T}, b::FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
@@ -750,13 +753,34 @@ end
 ################################################################################
 
 @doc raw"""
-    remove(z::FracElem{T}, p::T) where {T <: RingElem}
+    remove(z::FracElem{T}, p::T) where {T <: RingElement}
 
 Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 $p$.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> f = (x + 1)//(x^3 + 3x + 1)
+(x + 1)//(x^3 + 3*x + 1)
+
+julia> g = (x^2 + 1)//(x^2 + x + 1)
+(x^2 + 1)//(x^2 + x + 1)
+
+julia> v, q = remove(f^3*g, x + 1)
+(3, (x^2 + 1)//(x^11 + x^10 + 10*x^9 + 12*x^8 + 39*x^7 + 48*x^6 + 75*x^5 + 75*x^4 + 66*x^3 + 37*x^2 + 10*x + 1))
+
+julia> v = valuation(f^3*g, x + 1)
+3
+
+julia> v = valuation(q, x + 1)
+0
+```
 """
-function remove(z::FracElem{T}, p) where {T}
-   p = convert(T, p)
+function remove(z::FracElem{T}, p::T) where {T <: RingElement}
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z, false), p)
    w, n = remove(numerator(z, false), p)
@@ -764,12 +788,11 @@ function remove(z::FracElem{T}, p) where {T}
 end
 
 @doc raw"""
-    valuation(z::FracElem{T}, p::T) where {T <: RingElem}
+    valuation(z::FracElem{T}, p::T) where {T <: RingElement}
 
 Return the valuation of $z$ at $p$.
 """
-function valuation(z::FracElem{T}, p) where {T}
-   p = convert(T, p)
+function valuation(z::FracElem{T}, p::T) where {T <: RingElement}
    v, _ = remove(z, p)
    return v
 end
@@ -823,16 +846,53 @@ that it will always be returned by a call to the constructor when the same
 base ring $R$ is supplied.
 """
 function fraction_field(R::Ring; cached::Bool=true)
+   @req !is_trivial(R) "Base ring must not be the zero ring."
    return Generic.fraction_field(R; cached=cached)
 end
 
+function fraction_field(F::Field; cached::Bool=true)
+   return F
+end
+
+
 @doc raw"""
-    FactoredFractionField(R::Ring; cached::Bool=true)
+    fraction_field_type(a)
+
+Return the type of the base ring of the given element, element type, parent or parent type $a$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x)
+(Univariate polynomial ring in x over integers, x)
+
+julia> fraction_field_type(R) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(zero(R)) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(typeof(R)) == typeof(fraction_field(R))
+true
+
+julia> fraction_field_type(typeof(zero(R))) == typeof(fraction_field(R))
+true
+```
+"""
+fraction_field_type(x) = fraction_field_type(typeof(x))
+fraction_field_type(x::Type{<:RingElement}) = fraction_field_type(parent_type(x))
+fraction_field_type(T::DataType) = throw(MethodError(fraction_field_type, (T,)))
+
+fraction_field_type(::Type{T}) where {T <: Field} = T
+fraction_field_type(::Type{T}) where {T <: Ring} = Generic.FracField{elem_type(T)}
+
+
+@doc raw"""
+    factored_fraction_field(R::Ring; cached::Bool=true)
 
 Return the parent object of the fraction field over the given base ring $R$,
 where the elements are maintained in factored form as much as possible.
 """
-function FactoredFractionField(R::Ring; cached::Bool=true)
-   return Generic.FactoredFractionField(R; cached=cached)
+function factored_fraction_field(R::Ring; cached::Bool=true)
+   return Generic.factored_fraction_field(R; cached=cached)
 end
 

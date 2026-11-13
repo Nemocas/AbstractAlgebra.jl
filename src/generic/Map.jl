@@ -12,14 +12,31 @@
 
 domain(f::CompositeMap{D, C}) where {D, C} = domain(f.map1)::D
 codomain(f::CompositeMap{D, C}) where {D, C} = codomain(f.map2)::C
+@doc raw"""
+    map1(f::Map)
+
+Return the first of the two maps a composite map was built from, i.e. the one
+applied first. See also [`map2`](@ref).
+"""
 map1(f::CompositeMap) = f.map1
+
+@doc raw"""
+    map2(f::Map)
+
+Return the second of the two maps a composite map was built from, i.e. the one
+applied last. See also [`map1`](@ref).
+"""
 map2(f::CompositeMap) = f.map2
 
 function (f::CompositeMap{D, C})(a) where {D, C}
-   return f.map2(f.map1(a))::elem_type(C)
+  return image(f, a)::elem_type(C)
 end
 
-function preimage(f::Generic.CompositeMap{D, C}, a) where {D, C}
+function image(f::CompositeMap{D, C}, a) where {D, C}
+  return f.map2(f.map1(a))::elem_type(C)
+end
+
+function preimage(f::CompositeMap{D, C}, a) where {D, C}
    return preimage(f.map1, preimage(f.map2, a))
 end
 
@@ -50,7 +67,10 @@ end
 #
 ################################################################################
 
-(f::IdentityMap)(a) = a
+(f::IdentityMap)(a) = image(f, a)
+
+image(f::IdentityMap, a) = a
+preimage(f::IdentityMap, a) = a
 
 domain(f::IdentityMap) = f.domain
 codomain(f::IdentityMap) = f.domain
@@ -93,7 +113,7 @@ end
 
 Base.inv(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap)) = f
 
-AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), dim(domain(phi)))
+AbstractAlgebra.matrix(phi::IdentityMap{<:AbstractAlgebra.FPModule}) = identity_matrix(base_ring(domain(phi)), ngens(domain(phi)))
 
 ################################################################################
 #
@@ -106,10 +126,13 @@ codomain(f::FunctionalMap) = f.codomain
 image_fn(f::FunctionalMap) = f.image_fn
 
 function (f::FunctionalMap{D, C})(a) where {D, C}
-   parent(a) != domain(f) && throw(DomainError(f))
-   return image_fn(f)(a)::elem_type(C)
+  return image(f, a)::elem_type(C)
 end
 
+function image(f::FunctionalMap{D, C}, a) where {D, C}
+  parent(a) != domain(f) && throw(DomainError(f))
+  return image_fn(f)(a)::elem_type(C)
+end
 
 function Base.show(io::IO, M::FunctionalMap)
    if is_terse(io)
@@ -122,6 +145,20 @@ function Base.show(io::IO, M::FunctionalMap)
       print(io, Lowercase(), codomain(M))
    end
 end
+
+function compose(f::Map(FunctionalMap){D, U}, g::Map(FunctionalMap){U, C}) where {D, U, C}
+   check_composable(f, g)
+   return FunctionalCompositeMap(f, g)
+end
+
+function is_equal_as_morphism(a::FunctionalMap, b::FunctionalMap)
+  a === b && return true
+  domain(a) === domain(b) || return false
+  codomain(a) === codomain(b) || return false
+  a.image_fn === b.image_fn && return true
+  error("all legal methods for comparison of $a and $b are exhausted; further comparison not implemented")
+end
+
 
 ################################################################################
 #
@@ -164,7 +201,11 @@ map1(f::FunctionalCompositeMap) = f.map1
 map2(f::FunctionalCompositeMap) = f.map2
 
 function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
-   return image_fn(f)(a)::elem_type(C)
+  return image(f, a)::elem_type(C)
+end
+
+function image(f::FunctionalCompositeMap{D, C}, a) where {D, C}
+  return image_fn(f)(a)::elem_type(C)
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
@@ -178,4 +219,3 @@ function show(io::IO, M::FunctionalCompositeMap)
       print(io, " -> ", Lowercase(), codomain(M))
    end
 end
-

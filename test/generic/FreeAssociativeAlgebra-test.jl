@@ -20,11 +20,12 @@
       @test parent_type(Generic.FreeAssociativeAlgebraElem{elem_type(R)}) == Generic.FreeAssociativeAlgebra{elem_type(R)}
       @test base_ring(S) === R
       @test coefficient_ring(S) === R
+      @test coefficient_ring_type(S) === typeof(R)
       @test ngens(S) == length(gens(S))
 
-      @test typeof(S) <: Generic.FreeAssociativeAlgebra
+      @test S isa Generic.FreeAssociativeAlgebra
 
-      isa(symbols(S), Vector{Symbol})
+      @test isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test coefficient_ring(varlist[j]) === R
@@ -96,13 +97,14 @@
       if !iszero(f1)
          @test leading_term(f1) == leading_coefficient(f1)*leading_monomial(f1)
          @test total_degree(f1) >= total_degree(f1 - leading_term(f1))
+         @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
       else
+         @test_throws ArgumentError leading_coefficient(f1)
          @test_throws ArgumentError leading_term(f1)
          @test_throws ArgumentError leading_monomial(f1)
          @test_throws ArgumentError leading_exponent_word(f1)
+         @test canonical_unit(f1) == one(R)
       end
-
-      @test canonical_unit(f1) == canonical_unit(leading_coefficient(f1))
 
       @test !is_gen(zero(S))
       @test !is_gen(one(S))
@@ -123,15 +125,19 @@
 
       @test collect(exponent_words(varlist[1] + 1)) == [Int[1], Int[]]
       @test isone(varlist[1]^0)
-
-      _, varlist = polynomial_ring(QQ, var_names)
-      y = varlist[1]
-      @test x in [x, y]
-      @test x in [y, x]
-      @test !(x in [y])
-      @test x in keys(Dict(x => 1))
-      @test !(y in keys(Dict(x => 1)))
    end
+end
+
+@testset "Generic.FreeAssociativeAlgebra.isequal" begin
+   # `==` compares series coefficients to the lower precision, `isequal` not
+   R, t = power_series_ring(QQ, 10, :t)
+   S, (x, y) = free_associative_algebra(R, [:x, :y])
+   f = (1 + O(t^2))*x*y
+   g = (1 + O(t^3))*x*y
+
+   @test f == g
+   @test !isequal(f, g)
+   @test isequal(f, deepcopy(f))
 end
 
 @testset "Generic.FreeAssociativeAlgebra.printing" begin
@@ -216,6 +222,21 @@ end
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.iterators" begin
+   R, (x, y) = free_associative_algebra(QQ, [:x, :y])
+   f = x * y * x + 2 * x + 3
+
+   @test (@inferred collect(coefficients(f))) == [QQ(1), QQ(2), QQ(3)]
+   @test (@inferred collect(terms(f))) == [x * y * x, 2 * x, 3]
+   @test (@inferred collect(monomials(f))) == [x * y * x, x, 1]
+   @test (@inferred collect(exponent_words(f))) == [Int[1, 2, 1], Int[1], Int[]]
+
+   @test (@inferred first(coefficients(f, inplace = true))) == QQ(1)
+   @test (@inferred first(terms(f, inplace = true))) == x * y * x
+   @test (@inferred first(monomials(f, inplace = true))) == x * y * x
+   @test (@inferred first(exponent_words(f, inplace = true))) == Int[1, 2, 1]
+end
+
 @testset "Generic.FreeAssociativeAlgebra.adhoc_binary" begin
    R, x = ZZ["y"]
 
@@ -257,7 +278,7 @@ end
 
    S, (x,y) = free_associative_algebra(QQ, [:x, :y])
    f = x^2 + x*y^2*x + QQ(5)*y - QQ(1//2)*y*x
-   
+
    @test 2 + f == QQ(2) + f
    @test f + 2 == f + QQ(2)
    @test 1//2 + f == QQ(1//2) + f
@@ -274,12 +295,37 @@ end
    @test f * 1//2 == f * QQ(1//2)
 end
 
+@testset "Generic.FreeAssociativeAlgebra.mutating_ops" begin
+   # coefficients with in-place arithmetic, see #2531
+   R, (s,) = polynomial_ring(QQ, [:s])
+   S, (x, y) = free_associative_algebra(R, [:x, :y])
+   a = x^2 + y
+   b = a + 1
+   b = neg!(b)
+   @test a == x^2 + y
+   b = a + 1
+   b = mul!(b, 3)
+   @test a == x^2 + y
+
+   # zero terms are dropped
+   R2, _ = residue_ring(ZZ, 2)
+   S2, (u, v) = free_associative_algebra(R2, [:u, :v])
+   h = u*v + u + 1
+   @test iszero(add!(h, h))
+   h = u*v + u + 1
+   @test add!(h, u + 1) == u*v
+   R6, _ = residue_ring(ZZ, 6)
+   S6, (u, v) = free_associative_algebra(R6, [:u, :v])
+   @test iszero(mul!(zero(S6), 2*u + 4*v, 3*v))
+   @test mul!(zero(S6), 2*u + v, 3*v) == 3*v*v
+end
+
 @testset "Generic.FreeAssociativeAlgebra.NCRing_interface" begin
    S, = free_associative_algebra(ZZ, 3)
-   test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface_recursive(S)
 
    R, = QQ[:x, :y]
    S, = free_associative_algebra(R, :z => 1:3)
-   test_NCRing_interface(S)
+   ConformanceTests.test_NCRing_interface_recursive(S)
 end
 

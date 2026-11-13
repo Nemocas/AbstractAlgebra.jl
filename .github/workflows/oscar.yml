@@ -28,9 +28,9 @@ jobs:
       PR_NUMBER: ${{github.event.number || '0' }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: "Set up Julia"
-      uses: julia-actions/setup-julia@v2
+      uses: julia-actions/setup-julia@v3
       with:
         version: '1.10'
     - name: OscarDevTools - CI
@@ -57,20 +57,22 @@ jobs:
 
   test-oscar:
     needs: generatematrix
-    name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
+    name: ${{ join(matrix.*.name) }} - ${{ join(matrix.os) }}, julia ${{ matrix.julia-version}}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
       PR_NUMBER: ${{github.event.number}}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUMPROCS: 6
     strategy:
       matrix: ${{fromJSON(needs.generatematrix.outputs.matrix)}}
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+        id: setup-julia
+        uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
       - name: re-using OscarDevTools checkout

@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-matrix(f::Map(FPModuleHomomorphism)) = f.matrix
+matrix(f::Map(FPModuleHomomorphism)) = throw(NotImplementedError(:matrix, f))
 
 ###############################################################################
 #
@@ -37,7 +37,7 @@ end
 
 function compose(f::Map(FPModuleHomomorphism), g::Map(FPModuleHomomorphism))
    check_composable(f, g)
-   return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix)
+   return ModuleHomomorphism(domain(f), codomain(g), matrix(f)*matrix(g))
 end
 
 ###############################################################################
@@ -52,6 +52,25 @@ end
 Return a pair `K, g` consisting of the kernel object $K$ of the given module
 homomorphism $f$ (as a submodule of its domain) and the canonical injection
 from the kernel into the domain of $f$.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 3)
+Free module of rank 3 over integers
+
+julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
+(1, 2, 3)
+
+julia> S, f = sub(M, [m])
+(Submodule over integers with 1 generator and no relations, Hom: S -> M)
+
+julia> Q, g = quo(M, S)
+(Quotient module over integers with 2 generators and no relations, Hom: M -> Q)
+
+julia> kernel(g)
+(Submodule over integers with 1 generator and no relations, Hom: submodule over integers with 1 generator and no relations -> M)
+```
 """
 function kernel(f::Map(FPModuleHomomorphism))
    D = domain(f)
@@ -110,41 +129,86 @@ the map $f$ as a map of sets, if one exists. The preimage is neither
 unique nor chosen in a canonical way in general. When no such element exists,
 an exception is raised.
 """
-function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where
-                                                               T <: RingElement
-   return preimage(f, [v])[1]
+function preimage(f::Map(FPModuleHomomorphism), v::FPModuleElem{T}) where {T<:RingElement}
+  return preimage(f, [v])[1]
 end
 
-function preimage(f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}) where
-                                                               T <: RingElement
-   D = domain(f)
-   C = codomain(f)
-   R = base_ring(C)
-   if length(v) == 0
-      return elem_type(domain(f))[]
-   end
-   parent(v[1]) !== C && error("Incompatible element")
-   M = matrix(f)
-   trels = rels(C)
-   # Put rows of M and target relations into a matrix
-   q = length(trels)
-   m = nrows(M)
-   n = ncols(M)
-   if m == 0 || n == 0
-      return elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
-   else
-      # Put matrix M and target relations in a matrix
-      matr = zero_matrix(R, m + q, n)
-      matr[1:m, 1:n] = M
-      for i = 1:q
-        matr[m + i, :] = trels[i]
-      end
-      # Find left inverse of mat
-      inmat = reduce(vcat, Generic._matrix.(v))
-      x = solve(matr, inmat)
-      return elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
-   end
+function preimage(
+  f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}
+) where {T<:RingElement}
+  fl, b = has_preimage_with_preimage(f, v)
+  !fl && error("Element has no preimage")
+  return b
 end
+
+@doc raw"""
+    has_preimage_with_preimage(f::Map(FPModuleHomomorphism),
+      v::FPModuleElem{T}) where T <: RingElement
+
+Check if $v$ has a preimage under the homomorphism $f$.
+If it does, return a tuple `(true, y)` for `y` in `domain(f)` such that $f(y) = x$ holds,
+otherwise, return `(false, z)` where `z` is any element of type `elem_type(domain(f))`.
+"""
+function has_preimage_with_preimage(
+  f::Map(FPModuleHomomorphism), v::FPModuleElem{T}
+) where {T<:RingElement}
+  fl, b = has_preimage_with_preimage(f, [v])
+  return fl, b[1]
+end
+
+function has_preimage_with_preimage(
+  f::Map(FPModuleHomomorphism), v::Vector{<:FPModuleElem{T}}
+) where {T<:RingElement}
+  D = domain(f)
+  C = codomain(f)
+  R = base_ring(C)
+  if length(v) == 0
+    return true, elem_type(domain(f))[]
+  end
+  parent(v[1]) !== C && error("Incompatible element")
+  M = matrix(f)
+  m = nrows(M)
+  n = ncols(M)
+  if n == 0 #target module is trivial, so v is all zero
+    return true, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+  elseif m == 0 #source module is trivial
+    return all(iszero, v), elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+  else
+    ctx = solve_ctx(f)
+    inmat = reduce(vcat, Generic._matrix.(v))
+    fl, x = can_solve_with_solution(ctx, inmat)
+    if fl
+      return true, elem_type(D)[D(x[i:i, 1:m]) for i in 1:length(v)]
+    else
+      return false, elem_type(D)[D(zero_matrix(R, 1, m)) for x in v]
+    end
+  end
+end
+
+function compute_solve_ctx(f::Map(FPModuleHomomorphism))
+  C = codomain(f)
+  R = base_ring(C)
+  M = matrix(f)
+  trels = rels(C)
+
+  # Put rows of M and target relations into a matrix
+  q = length(trels)
+  m = nrows(M)
+  n = ncols(M)
+  matr = zero_matrix(R, m + q, n)
+  matr[1:m, 1:n] = M
+  for i in 1:q
+    matr[m + i, :] = trels[i]
+  end
+
+  # Find left inverse of mat
+  return solve_init(matr)
+end
+
+function solve_ctx(f::Map(FPModuleHomomorphism))
+   return compute_solve_ctx(f)
+end
+
 
 ###############################################################################
 #
@@ -156,41 +220,63 @@ end
     ModuleHomomorphism(M1::FPModule{T},
                        M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
 Create the homomorphism $f : M_1 \to M_2$ represented by the matrix $m$.
+
+# Examples
+
+```jldoctest
+julia> M = free_module(ZZ, 2)
+Free module of rank 2 over integers
+
+julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+Module homomorphism
+  from free module of rank 2 over integers
+  to free module of rank 2 over integers
+
+julia> m = M([ZZ(1), ZZ(2)])
+(1, 2)
+
+julia> f(m)
+(7, 10)
+```
 """
 function ModuleHomomorphism(M1::FPModule{T},
-                         M2::FPModule{T}, m::MatElem{T}) where T <: RingElement
-   return Generic.ModuleHomomorphism{T}(M1, M2, m)
+                         M2::FPModule{T}, m::MatElem{T}; check::Bool = true) where T <: RingElement
+   return Generic.ModuleHomomorphism(M1, M2, m; check)::Generic.ModuleHomomorphism{T}
 end
 
 function ModuleHomomorphism(M1::FPModule{T},
-               M2::FPModule{T}, v::Vector{S}) where
+               M2::FPModule{T}, v::Vector{S}; check::Bool = true) where
                         {T <: RingElement, S<:FPModuleElem{T}}
-   return Generic.ModuleHomomorphism(M1, M2, v)
+   return Generic.ModuleHomomorphism(M1, M2, v; check)
 end
 
 function ModuleHomomorphism(M1::Module, M2::Module, A...)
    Generic.ModuleHomomorphism(M1, M2, A...)
 end
 
-function module_homomorphism(M1::Module, M2::Module, m::MatElem)
-   Generic.ModuleHomomorphism(M1, M2, m)
+function module_homomorphism(M1::Module, M2::Module, m::MatElem; check::Bool = true)
+   Generic.ModuleHomomorphism(M1, M2, m; check)
+end
+
+function zero_map(M::FPModule, N::FPModule)
+   return module_homomorphism(M, N, zero_matrix(base_ring(M), ngens(M), ngens(N)))
 end
 
 @doc raw"""
-    ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, M::MatElem{T},
+    ModuleIsomorphism(M1::FPModule{T}, M2::FPModule{T}, A::MatElem{T},
                       minv::MatElem{T}) where T <: RingElement
-Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
+Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $A$. The
 inverse morphism is automatically computed.
 """
 function ModuleIsomorphism(M1::FPModule{T},
-                          M2::FPModule{T}, M::MatElem{T}) where T <: RingElement
-   return Generic.ModuleIsomorphism(M1, M2, M)
+                          M2::FPModule{T}, A::MatElem{T}; check::Bool = true) where T <: RingElement
+   return Generic.ModuleIsomorphism(M1, M2, A; check)
 end
 
 function ModuleIsomorphism(M1::Module, M2::Module, m::MatElem)
    Generic.ModuleIsomorphism(M1, M2, m)
 end
 
-function module_isomorphism(M1::Module, M2::Module, m::MatElem)
-   Generic.ModuleIsomorphism(M1, M2, m)
+function module_isomorphism(M1::Module, M2::Module, m::MatElem; check::Bool = true)
+   Generic.ModuleIsomorphism(M1, M2, m; check)
 end

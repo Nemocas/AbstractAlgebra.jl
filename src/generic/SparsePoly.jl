@@ -74,7 +74,7 @@ base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_t
 
 parent(a::SparsePoly) = a.parent
 
-function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
+function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
    Re = Base.deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
@@ -83,9 +83,8 @@ function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: Ring
    return parent(a)(Rc, Re)
 end
 
-function characteristic(a::SparsePolyRing{T}) where T <: RingElement
-   return characteristic(base_ring(a))
-end
+characteristic(R::SparsePolyRing) = characteristic(base_ring(R))
+is_known(::typeof(characteristic), R::SparsePolyRing) = is_known(characteristic, base_ring(R))
 
 ###############################################################################
 #
@@ -257,7 +256,7 @@ end
 #
 ###############################################################################
 
-function *(a::SparsePoly, n::Union{Integer, Rational, AbstractFloat})
+function *(a::SparsePoly, n::JuliaRingElement)
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -291,7 +290,7 @@ end
 
 *(n::T, a::SparsePoly{T}) where {T <: RingElem} = a*n
 
-*(n::Union{Integer, Rational, AbstractFloat}, a::SparsePoly) = a*n
+*(n::JuliaRingElement, a::SparsePoly) = a*n
 
 ###############################################################################
 #
@@ -311,21 +310,31 @@ function ==(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    return true
 end
 
+function isequal(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
+   check_parent(a, b, false) || return false
+   length(a) == length(b) || return false
+   for i = 1:length(a)
+      a.exps[i] == b.exps[i] || return false
+      isequal(a.coeffs[i], b.coeffs[i]) || return false
+   end
+   return true
+end
+
 ###############################################################################
 #
 #   Ad hoc comparison
 #
 ###############################################################################
 
-function ==(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::SparsePoly, b::JuliaRingElement)
    return length(a) == 0 ? b == 0 : a.length == 1 &&
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::Union{Integer, Rational, AbstractFloat}, b::SparsePoly) = b == a
+==(a::JuliaRingElement, b::SparsePoly) = b == a
 
 function ==(a::SparsePoly{T}, b::T) where T <: RingElem
-   return length(a) == 0 ? iszero(b) : a.length == 1 &
+   return length(a) == 0 ? iszero(b) : a.length == 1 &&
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
@@ -435,7 +444,7 @@ function divexact(a::SparsePoly{T}, b::T; check::Bool=true) where {T <: RingElem
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
+function divexact(a::SparsePoly, b::JuliaRingElement; check::Bool=true)
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
@@ -544,6 +553,8 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       c = gcd(c1, c2)
       a = divexact(a, c1)
       b = divexact(b, c2)
+   else
+      c = nothing
    end
    # check if we are in the univariate case
    constant_coeffs = true
@@ -564,7 +575,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
-      R = AbstractAlgebra.PolyRing(base_ring(base_ring(a)))
+      R = AbstractAlgebra.poly_ring(base_ring(base_ring(a)))
       f = R()
       g = R()
       fit!(f, reinterpret(Int, a.exps[a.length] + 1))
@@ -589,7 +600,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          end
       end
       r = parent(a)(Ac, Ae)
-      if !ignore_content
+      if c !== nothing  # !ignore_content
          return c*r
       else
          return r
@@ -638,7 +649,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       end
    end
    # sometimes don't care about content, e.g. when computing likely gcd degree
-   if !ignore_content
+   if c !== nothing  # !ignore_content
       # remove content from b as cheaply as possible, as per Bernard Parisse
       if leading_coefficient(b).length != 1 &&
          trailing_coefficient(b).length != 1
@@ -682,22 +693,10 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    end
 end
 
-function content(a::SparsePoly{T}) where {T <: RingElem}
-   for i = 1:length(a)
-      if a.coeffs[i].length == 1
-         z = term_content(a.coeffs[1])
-         for j = 2:length(a)
-            if isone(z)
-               return z
-            end
-            z = gcd(z, term_content(a.coeffs[j]))
-         end
-         return z
-      end
-   end
+function content(a::SparsePoly{T}) where {T <: RingElement}
    z = base_ring(a)()
-   for i = 1:length(a)
-      z = gcd(coeff(a, i - 1), z)
+   for x in a.coeffs
+      z = gcd!(z, x)
    end
    return z
 end
@@ -785,7 +784,7 @@ function (a::SparsePolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::SparsePolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::JuliaRingElement) where {T <: RingElement}
    z = SparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z

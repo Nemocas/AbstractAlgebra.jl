@@ -71,7 +71,7 @@ end
 
 function temp_ring(f::PolyRingAnyMap{<:Any, <: Any, <: Map})
   if isdefined(f, :temp_ring)
-    return f.temp_ring::dense_poly_ring_type(codomain(_coefficient_map(f)))
+    return f.temp_ring::poly_ring_type(codomain(_coefficient_map(f)))
   end
 
   S, = polynomial_ring(codomain(_coefficient_map(f)), cached = false)
@@ -103,7 +103,7 @@ function compose(F::PolyRingAnyMap{D, C, S}, G::PolyRingAnyMap{C, E, U}) where {
     newcoeffmap = compose(f, g)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 
@@ -136,19 +136,20 @@ function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <
     newcoeffmap = compose(f, G)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 
 # Special case for composing with the identity
-function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where {D, C, S <: Generic.IdentityMap{C}}
+function compose(F::PolyRingAnyMap{D, C, <: Map, <: Any}, G::S) where
+                {D, C, S <: AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){C, C}}
   codomain(F) === domain(G) || error("Incompatible (co)domain in composition")
   f = _coefficient_map(F)
   if typeof(codomain(f)) === C
     newcoeffmap = compose(f, G)
     return hom(domain(F), codomain(G), newcoeffmap, G.(_image(F)))
   else
-    return Generic.CompositeMap(F, G)
+    return CompositeMap(F, G)
   end
 end
 
@@ -178,12 +179,12 @@ morphism_type(::D, ::C, ::F) where {D <: AbstractAlgebra.PolyRing, C <: NCRing, 
 
 @doc raw"""
     hom(R::AbstractAlgebra.PolyRing, S::NCRing, [coeff_map,] image)
-    
-Given a homomorphism `coeff_map` from `C` to `S`, where `C` is the 
+
+Given a homomorphism `coeff_map` from `C` to `S`, where `C` is the
 coefficient ring of `R`, and given an element `image` of `S`, return the
-homomorphism from `R` to `S` whose restriction 
+homomorphism from `R` to `S` whose restriction
 to `C` is `coeff_map`, and which sends the generator of `R` to `image`.
- 
+
 If no coefficient map is entered, invoke a canonical homomorphism of `C`
 to `S`, if such a homomorphism exists, and throw an error, otherwise.
 
@@ -241,7 +242,7 @@ end
 function (F::PolyRingAnyMap)(g)
   if g isa elem_type(domain(F))
     _evaluate_help(F, g)
-  else 
+  else
     gg = domain(F)(g)
     @assert parent(gg) === domain(F)
     return F(gg)
