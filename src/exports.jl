@@ -153,8 +153,6 @@ export change_coefficient_ring
 export character
 export characteristic
 export charpoly
-export charpoly_danilevsky!
-export charpoly_danilevsky_ff!
 export charpoly_hessenberg!
 export chebyshev_t
 export chebyshev_u
@@ -266,8 +264,6 @@ export hessenberg
 export hessenberg!
 export hgcd
 export hnf
-export hnf_cohen
-export hnf_cohen_with_transform
 export hnf_kb
 export hnf_kb!
 export hnf_kb_with_transform

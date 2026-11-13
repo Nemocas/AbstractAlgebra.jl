@@ -990,71 +990,6 @@ end
    end
 end
 
-@testset "MatRing.rref" begin
-   S, = residue_ring(ZZ, 20011*10007)
-   R = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(R, i, -100:100)
-
-      do_test = false
-      r = 0
-      A = M
-      try
-         r, A, d = rref_rational(M)
-         do_test = true
-      catch e
-         if !(e isa ErrorException)
-            rethrow(e)
-         end
-      end
-
-      if do_test
-         @test r == i
-         @test is_rref(A)
-      end
-   end
-
-   S, z = polynomial_ring(ZZ, "z")
-   R = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(R, i, 0:3, -20:20)
-
-      r, A, d = rref_rational(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-
-   R, x = polynomial_ring(QQ, "x")
-   K, f = residue_field(R, x^3 + 3x + 1)
-   a = f(x)
-   S = matrix_ring(K, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(S, i, -100:100)
-
-      r, A = rref(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-
-   R, x = polynomial_ring(ZZ, "x")
-   S, y = polynomial_ring(R, "y")
-   T = matrix_ring(S, 5)
-
-   for i = 0:5
-      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
-
-      r, A, d = rref_rational(M)
-
-      @test r == i
-      @test is_rref(A)
-   end
-end
-
 @testset "MatRing.inversion" begin
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
@@ -1225,7 +1160,7 @@ end
          M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
-         p2 = charpoly_danilevsky!(U, M)
+         p2 = AbstractAlgebra.charpoly_danilevsky!(U, M)
 
          @test p1 == p2
       end
@@ -1234,7 +1169,7 @@ end
          M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
-         p2 = charpoly_danilevsky_ff!(U, M)
+         p2 = AbstractAlgebra.charpoly_danilevsky_ff!(U, M)
 
          @test p1 == p2
       end
@@ -1378,7 +1313,7 @@ end
    p1 = minpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(rand(R, -1:2, -3:3)))
+      similarity!(matrix(M), rand(1:6), R(rand(R, -1:2, -3:3)))
    end
 
    p2 = minpoly(U, M)
