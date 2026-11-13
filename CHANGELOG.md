@@ -9,6 +9,17 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.51.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.4) - 2026-11-13
+
+### Performance improvements or improved testing
+
+- [#2640](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2640) Speed up `trace_of_product`
+- [#2652](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2652) Use `@inbounds` in block `setindex!` with unit ranges
+
+### Fixed bugs that returned incorrect results
+
+- [#2611](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2611) Make `hash` of `AbsMSeries` ignore terms beyond the precision
+
 ## [0.51.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.3) - 2026-10-26
 
 ### New or extended functionality
