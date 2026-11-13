@@ -1073,6 +1073,20 @@ end
       end
 
    end
+
+   a = zero_matrix(ZZ, 3, 4)
+   b = matrix(ZZ, 2, 2, [1, 2, 3, 4])
+   v = [ZZ(i) for i in 1:4]
+   @test_throws BoundsError (a[3:4, 1:2] = b)
+   @test_throws BoundsError (a[0:1, 1:2] = b)
+   @test_throws BoundsError (a[1:2, 4:5] = Matrix(b))
+   @test_throws BoundsError (a[4, :] = v)
+   @test_throws BoundsError (a[:, 5] = v[1:3])
+   @test_throws DimensionMismatch (a[1:2, 1:3] = b)
+   @test_throws DimensionMismatch (a[1:2, 1:2] = Matrix(b)[:, 1:1])
+   @test_throws DimensionMismatch (a[1, :] = v[1:3])
+   @test_throws DimensionMismatch (a[1:2, 1:2] = v)
+   @test iszero(a)
 end
 
 @testset "Generic.Mat.binary_ops" begin
