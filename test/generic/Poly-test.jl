@@ -2256,16 +2256,18 @@ end
    for iter in 1:100
       f = rand(R, 1:5, -10:10)
       g = rand(R, 1:5, -10:10)
-      r, u, v = gcdx(f, g)
+      h = rand(R, -1:5, -10:10)
 
+      r, u, v = gcdx(f, g)
       @test u*f + v*g == r
       @test r == gcd(f, g)
 
-      h = R()
-      h = rand(R, -1:5, -10:10)
       r, u, v = gcdx(f*h, g*h)
-
       @test (u*f + v*g)*h == r
+
+      r, u, v, w = gcdx(f, g, h)
+      @test u*f + v*g + w*h == r
+      @test r == gcd(f, g, h)
    end
 
    # Characteristic p ring
