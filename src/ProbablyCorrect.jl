@@ -36,7 +36,7 @@
 # setter/getter for GLOBAL_VARIABLE_DodgySteps
 #  -  dodgy_steps_clear()    [[clears the vector/log]]
 #  -  dodgy_steps_get()      [[value of GLOBAL_VARIABLE_DodgySteps]
-#  -  @RecordDodgyStep(fn_name, argv, result)
+#  -  @record_dodgy_step(fn_name, argv, result)
 #     append a new dodgy step to the log
 #     [[does nothing if the length limit has been reached]]
 
@@ -131,7 +131,7 @@ struct DodgyStepInfo
   result::Any  # either simple value or a tuple
   stack::Vector{Union{Ptr{Nothing}, Base.InterpreterIP}}
 
-  #  CALLED ONLY BY macro RecordDodgyStep (see below)
+  #  CALLED ONLY BY macro record_dodgy_step (see below)
   function DodgyStepInfo(fn_name::Symbol,
                          SourceLocation::Tuple{String,Int},
                          argv::Tuple,
@@ -175,12 +175,12 @@ function dodgy_steps_get()
 end
 
 
-# Use macro RecordDodgyStep in code which wants to record a potentially dodgy step
+# Use macro record_dodgy_step in code which wants to record a potentially dodgy step
 # The macro uses the following global variables:
 #   AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps
 #   AbstractAlgebra.GLOBAL_VARIABLE_DodgySteps_MaxSize
 
-macro RecordDodgyStep(fn_name, argv, result)  # fn_name::Symbol;  argv::Vector{Any};  result::Any
+macro record_dodgy_step(fn_name, argv, result)  # fn_name::Symbol;  argv::Vector{Any};  result::Any
   SourceLine = __source__.line
   SourceFile = String(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(
