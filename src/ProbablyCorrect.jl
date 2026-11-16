@@ -126,18 +126,18 @@ struct DodgyStepInfo
 # func_family::Symbol    the "marker" used to identify the function family
   fn_name::Symbol
   #  methodID::Union{Nothing,Method}
-  SourceLocation::Tuple{String,Int}
+  source_location::Tuple{String,Int}
   argv::Tuple
   result::Any  # either simple value or a tuple
   stack::Vector{Union{Ptr{Nothing}, Base.InterpreterIP}}
 
   #  CALLED ONLY BY macro record_dodgy_step (see below)
   function DodgyStepInfo(fn_name::Symbol,
-                         SourceLocation::Tuple{String,Int},
+                         source_location::Tuple{String,Int},
                          argv::Tuple,
                          result::Any,
                          stack)
-    return new(fn_name, SourceLocation, argv, result, stack)
+    return new(fn_name, source_location, argv, result, stack)
   end
 end
 
