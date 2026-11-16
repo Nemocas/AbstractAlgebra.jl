@@ -180,9 +180,9 @@ end
 #   AbstractAlgebra.GLOBAL_DodgySteps
 #   AbstractAlgebra.GLOBAL_DodgySteps_MaxSize
 
-macro record_dodgy_step(fn_name, argv, result)  # fn_name::Symbol;  argv::Vector{Any};  result::Any
+macro record_dodgy_step(fn_name::Symbol, argv::Vector{Any}, result::Any)
   SourceLine = __source__.line
-  SourceFile = String(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
+  SourceFile = string(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(
     if length(AbstractAlgebra.GLOBAL_DodgySteps) < GLOBAL_DodgySteps_MaxSize
 
