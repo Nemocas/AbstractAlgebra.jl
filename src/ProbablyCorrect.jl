@@ -100,7 +100,7 @@ function set_dodgy_mode(func_family::Symbol, b::Bool = true)
   if b
     (posn == 0) && push!(GLOBAL_VARIABLE_ActiveDodgyFuncs, func_family)
   else
-    (posn > 0) && GLOBAL_VARIABLE_ActiveDodgyFuncs = deleteat!(GLOBAL_VARIABLE_ActiveDodgyFuncs, posn)
+    (posn > 0) && deleteat!(GLOBAL_VARIABLE_ActiveDodgyFuncs, posn)
   end
   return GLOBAL_VARIABLE_ActiveDodgyFuncs  ## or just nothing?
 end
