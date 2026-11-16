@@ -171,7 +171,7 @@ Return the log of dodgy steps.
 """
 function dodgy_steps_get()
   global GLOBAL_DodgySteps
-  return GLOBAL_DodgySteps
+  return deepcopy(GLOBAL_DodgySteps)
 end
 
 
