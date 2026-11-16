@@ -24,10 +24,10 @@
 # changed only via the relevant setter/getter functions:
 
 #  setters/getters for GLOBAL_VARIABLE_ActiveDodgyFuncs
-#  -  get_dodgy_mode(func::Symbol)
-#     Returns `true` iff dodgy mode is enabled for family  `func`
-#  -  set_dodgy_mode(func::Symbol, b::Bool)
-#     Enable dodgy mode for family `func` if `b` is `true`,
+#  -  get_dodgy_mode(func_family::Symbol)
+#     Returns `true` iff dodgy mode is enabled for family  `func_family`
+#  -  set_dodgy_mode(func_family::Symbol, b::Bool)
+#     Enable dodgy mode for family `func_family` if `b` is `true`,
 #     otherwise disable dodgy mode for that family.
 #     Returns new value of GLOBAL_VARIABLE_ListOfDodgyFuncs.
 #  -  set_dodgy_mode(b::Bool)
@@ -50,13 +50,13 @@ GLOBAL_VARIABLE_ActiveDodgyFuncs::Vector{Symbol} = Symbol[]
 
 
 @doc raw"""
-    add_dodgy_func(FuncFamily::Symbol)
+    add_dodgy_func(func_family::Symbol)
 
-This registers the name `FuncFamily` as a name for a function family having dodgy variants.
+This registers the name `func_family` as a name for a function family having dodgy variants.
 It would normally be called in the initialization of the package.
 """
-function add_dodgy_func(func::Symbol)
-  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && push!(GLOBAL_VARIABLE_ListOfDodgyFuncs, func)
+function add_dodgy_func(func_family::Symbol)
+  !(func_family in GLOBAL_VARIABLE_ListOfDodgyFuncs) && push!(GLOBAL_VARIABLE_ListOfDodgyFuncs, func_family)
   return nothing
 end
 
@@ -74,7 +74,7 @@ end
 
 @doc raw"""
     set_dodgy_mode(b::Bool = true)
-    set_dodgy_mode(func:Symbol, b::Bool = true)
+    set_dodgy_mode(func_family:Symbol, b::Bool = true)
 
 Enable dodgy mode: globally (1st version), for the given family (2nd version).
 """
@@ -92,28 +92,29 @@ function set_dodgy_mode(b::Bool = true)
   return GLOBAL_VARIABLE_ActiveDodgyFuncs
 end
 
-function set_dodgy_mode(FuncFamily::Symbol, b::Bool = true)
+function set_dodgy_mode(func_family::Symbol, b::Bool = true)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
-  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
+  !(func_family in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
+  posn = findfirst(GLOBAL_VARIABLE_ActiveDodgyFuncs, func_family)
   if b
-    !(func in GLOBAL_VARIABLE_ActiveDodgyFuncs) && push!(GLOBAL_VARIABLE_ActiveDodgyFuncs, func)
+    (posn == 0) && push!(GLOBAL_VARIABLE_ActiveDodgyFuncs, func_family)
   else
-    GLOBAL_VARIABLE_ActiveDodgyFuncs = filter(!=(func), GLOBAL_VARIABLE_ActiveDodgyFuncs)
+    (posn > 0) && GLOBAL_VARIABLE_ActiveDodgyFuncs = deleteat!(GLOBAL_VARIABLE_ActiveDodgyFuncs, posn)
   end
   return GLOBAL_VARIABLE_ActiveDodgyFuncs  ## or just nothing?
 end
 
 @doc raw"""
-    get_dodgy_mode(func:Symbol)
+    get_dodgy_mode(func_family:Symbol)
 
-Return `true` iff dodgy mode is enable for family `func`.
+Return `true` iff dodgy mode is enabled for family `func_family`.
 """
-function get_dodgy_mode(FuncFamily::Symbol)
+function get_dodgy_mode(func_family::Symbol)
   global GLOBAL_VARIABLE_ListOfDodgyFuncs
   global GLOBAL_VARIABLE_ActiveDodgyFuncs
-  !(func in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
-  return (func in GLOBAL_VARIABLE_ActiveDodgyFuncs)
+  !(func_family in GLOBAL_VARIABLE_ListOfDodgyFuncs) && error("Unregistered function family ID")
+  return (func_family in GLOBAL_VARIABLE_ActiveDodgyFuncs)
 end
 
 
@@ -122,7 +123,7 @@ end
 # (KISS goodbye) The struct now contains several fields, but the protoype
 # currently uses only some of them.
 struct DodgyStepInfo
-# fn_family::Symbol    the "marker" used to identify the function family
+# func_family::Symbol    the "marker" used to identify the function family
   fn_name::Symbol
   #  methodID::Union{Nothing,Method}
   SourceLocation::Tuple{String,Int}
