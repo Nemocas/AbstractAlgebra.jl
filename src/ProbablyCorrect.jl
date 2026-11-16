@@ -123,9 +123,7 @@ end
 # (KISS goodbye) The struct now contains several fields, but the protoype
 # currently uses only some of them.
 struct DodgyStepInfo
-# func_family::Symbol    the "marker" used to identify the function family
   fn_name::Symbol
-  #  methodID::Union{Nothing,Method}
   source_location::Tuple{String,Int}
   argv::Tuple
   result::Any  # either simple value or a tuple
@@ -180,7 +178,7 @@ end
 #   AbstractAlgebra.GLOBAL_DodgySteps
 #   AbstractAlgebra.GLOBAL_DodgySteps_MaxSize
 
-macro record_dodgy_step(fn_name::Symbol, argv::Vector{Any}, result::Any)
+macro record_dodgy_step(fn_name::Symbol, argv::Tuple, result::Any)
   SourceLine = __source__.line
   SourceFile = string(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(

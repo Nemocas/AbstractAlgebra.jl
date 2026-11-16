@@ -28,8 +28,8 @@ Unless you say otherwise, all user-facing OSCAR functions will use guaranteed-co
 Some OSCAR functions offer a dodgy variant, which computes the same result with high probability
 and taking less time.  The documentation for the function states whether it has a dodgy variant.
 
-Reiteratng: dodgy mode permits some computations to be faster at the cost of
-potentially produing an incorrect result (with low probability).  And by default
+Reiterating: dodgy mode permits some computations to be faster at the cost of
+potentially producing an incorrect result (with low probability).  And by default
 "dodgy mode" is disabled -- it must be explicitly enabled.  Dodgy mode can be enabled
 either globally or individually for each applicable function family.  Here is a typical workflow:
 ```
@@ -153,7 +153,7 @@ The first returns `true` iff dodgy mode for the specified family is enabled.
 The second records a dodgy step, where
 *   `fn_name::Symbol`   indicates the name of function which was called
 *   `argv::Vector{Any}` are the argument values supplied
-*   `result::Any`       is the esult produced
+*   `result::Any`       is the result produced
 
 It is worthwhile looking at a concrete example: a simple example can be found in
 the implementation of `is_prime(::ZZRingElem)` in the file  `Nemo/src/flint/fmpz.jl`.
@@ -161,7 +161,7 @@ the implementation of `is_prime(::ZZRingElem)` in the file  `Nemo/src/flint/fmpz
 There are two steps to complete:
 0. decide a name for the dodgy function family
 1. declare a dodgy function family by calling `add_dodgy_func` in the initialization code for the package
-2. inside the function(s) you are modifying, insert a check whether dodgy mode is enabled for the function family, and if so, call the macro `RegsiterDodgyStep`
+2. inside the function(s) you are modifying, insert a check whether dodgy mode is enabled for the function family, and if so, call the macro `record_dodgy_step`
 
 Here is a copy of the `is_prime` function as illustrative example:
 ```
