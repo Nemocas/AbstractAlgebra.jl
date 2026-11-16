@@ -95,7 +95,7 @@ end
 function set_dodgy_mode(func_family::Symbol, b::Bool = true)
   global GLOBAL_ListOfDodgyFuncs
   global GLOBAL_ActiveDodgyFuncs
-  !(func_family in GLOBAL_ListOfDodgyFuncs) && error("Unregistered function family ID")
+  @req (func_family in GLOBAL_ListOfDodgyFuncs)  "Unregistered function family ID"
   posn = findfirst(GLOBAL_ActiveDodgyFuncs, func_family)
   if b
     (posn == 0) && push!(GLOBAL_ActiveDodgyFuncs, func_family)
@@ -113,7 +113,7 @@ Return `true` iff dodgy mode is enabled for family `func_family`.
 function get_dodgy_mode(func_family::Symbol)
   global GLOBAL_ListOfDodgyFuncs
   global GLOBAL_ActiveDodgyFuncs
-  !(func_family in GLOBAL_ListOfDodgyFuncs) && error("Unregistered function family ID")
+  @req (func_family in GLOBAL_ListOfDodgyFuncs)  "Unregistered function family ID"
   return (func_family in GLOBAL_ActiveDodgyFuncs)
 end
 
