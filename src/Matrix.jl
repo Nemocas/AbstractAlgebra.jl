@@ -898,7 +898,7 @@ function setindex!(a::MatrixElem{T}, b::Union{MatrixElem, Matrix}, r::AbstractUn
     size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
     startr = first(r)
     startc = first(c)
-    for i in r
+    @inbounds for i in r
         for j in c
             a[i, j] = b[i - startr + 1, j - startc + 1]
         end
@@ -912,7 +912,7 @@ function setindex!(a::MatrixElem{T}, b::Vector, r::AbstractUnitRange{Int}, c::Ab
     end
     startr = first(r)
     startc = first(c)
-    for i in r
+    @inbounds for i in r
         for j in c
             a[i, j] = b[i - startr + 1 + j - startc]
         end
@@ -1559,6 +1559,8 @@ Return $a^b$. We require that the matrix $a$ is square.
 function ^(a::MatElem{T}, b::Int) where T <: NCRingElement
    check_square(a)
    if b < 0
+      # -typemin(Int) overflows, but typemin(Int) is even
+      b == typemin(Int) && return (a*a)^div(b, 2)
       return inv(a)^(-b)
    end
    # special case powers of x for constructing polynomials efficiently
@@ -1965,8 +1967,10 @@ function trace_of_product(M::MatElem{T}, N::MatElem{T}) where T <: NCRingElement
    @req ncols(M) == nrows(N) && nrows(M) == ncols(N) "Incompatible matrix dimensions"
    check_base_ring(M, N)
    d = zero(base_ring(M))
+   z = similar(M, 1, 1)
    for i in 1:nrows(M)
-      d = add!(d, (view(M, i:i, :) * view(N, :, i:i))[1, 1])
+      z = mul!(z, view(M, i:i, :), view(N, :, i:i))
+      d = add!(d, z[1, 1])
    end
    return d
 end

@@ -76,6 +76,12 @@ P2 = [(x2 + 1)*z2 + (x2 + 2), z2 + (x2 + 1)//(x2 + 2), z2^2 + 3z2 + 1,
    @test !is_perfect(S2)
 
    @test var(S1) == :y1
+
+   R3, (x3, y3) = rational_function_field(QQ, [:x3, :y3])
+   U3, z3 = R3[:z3]
+
+   @test_throws NotImplementedError function_field(z3^2 - x3, :w)
+   @test_throws NotImplementedError function_field(z3^2 - x3, :w; cached=false)
 end
 
 @testset "Generic.AbsSimpleFunctionField.printing" begin
@@ -181,6 +187,7 @@ end
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")
+      @test_throws ErrorException y^typemin(Int)
 
       for iters = 1:10
          f = rand(S, 1:5, -10:10)
@@ -555,6 +562,12 @@ end
 end
 
 @testset "Generic.AbsSimpleFunctionField.inverse" begin
+   for (x, z) in ((x1, z1), (x2, z2))
+      S, y = function_field(z^2 - x, "y")
+      @test Generic._inv_naive(y) == (1//x)*y
+      @test Generic._inv_naive(S((x + 1)//x)) == S(x//(x + 1))
+   end
+
    for i = 1:length(P1)
       # characteristic 0
       S, y = function_field(P1[i], "y")

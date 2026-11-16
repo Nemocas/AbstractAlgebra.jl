@@ -202,6 +202,12 @@ end
    @test a*a == one(G)
    @test b*b*b == one(G)
 
+   # typemin(Int) ≡ typemin(Int128) ≡ 1 mod 3
+   @test b^typemin(Int) == b
+   @test b^typemin(Int128) == b
+   @test Generic.power_by_squaring(b, typemin(Int)) == b
+   @test invoke(^, Tuple{GroupElem, Integer}, b, typemin(Int)) == b
+
    # (1,2,3)*(2,3,4) == (1,3)(2,4)
    @test Perm(T[2,3,1,4])*Perm(T[1,3,4,2]) == Perm(T[3,4,1,2])
 

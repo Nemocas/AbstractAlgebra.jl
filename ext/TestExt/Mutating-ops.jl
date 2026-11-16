@@ -15,7 +15,7 @@ function test_mutating_op_like_neg(f::Function, f!::Function, A)
      a = deepcopy(A)
      z = f!(z, a)
      @test equality(z, f(A))
-     @test a == A
+     @test isequal(a, A)
   end
 
   a = deepcopy(A)
@@ -42,8 +42,8 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; onl
      b = deepcopy(B)
      z = f!(z, a, b)
      @test equality(z, f(A, B))
-     @test a == A
-     @test b == B
+     @test isequal(a, A)
+     @test isequal(b, B)
   end
 
   if A isa T
@@ -51,14 +51,14 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; onl
      b = deepcopy(B)
      a = f!(a, a, b)
      @test equality(a, f(A, B))
-     @test b == B
+     @test isequal(b, B)
 
      if !only3arg
        a = deepcopy(A)
        b = deepcopy(B)
        a = f!(a, b)
        @test equality(a, f(A, B))
-       @test b == B
+       @test isequal(b, B)
      end
   end
 
@@ -67,7 +67,7 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; onl
      b = deepcopy(B)
      b = f!(b, a, b)
      @test equality(b, f(A, B))
-     @test a == A
+     @test isequal(a, A)
   end
 
   if A isa T && B isa T
@@ -76,7 +76,7 @@ function test_mutating_op_like_add(f::Function, f!::Function, A, B, T = Any; onl
      b = deepcopy(B)
      a = f!(a, b, b)
      @test equality(a, f(B, B))
-     @test b == B
+     @test isequal(b, B)
 
      b = deepcopy(B)
      b = f!(b, b, b)
@@ -114,15 +114,15 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = A
      b = deepcopy(B)
      z = f!(z, a, b, t)
      @test equality(z, f(Z, A, B))
-     @test a == A
-     @test b == B
+     @test isequal(a, A)
+     @test isequal(b, B)
 
      if A isa T
         a = deepcopy(A)
         b = deepcopy(B)
         a = f!(a, a, b, t)
         @test equality(a, f(A, A, B))
-        @test b == B
+        @test isequal(b, B)
      end
 
      if B isa T
@@ -130,7 +130,7 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = A
         b = deepcopy(B)
         b = f!(b, a, b, t)
         @test equality(b, f(B, A, B))
-        @test a == A
+        @test isequal(a, A)
      end
 
      if A isa T && B isa T
@@ -139,7 +139,7 @@ function test_mutating_op_like_addmul(f::Function, f!_::Function, Z, A, B, T = A
         b = deepcopy(B)
         a = f!(a, b, b, t)
         @test equality(a, f(A, B, B))
-        @test b == B
+        @test isequal(b, B)
 
         b = deepcopy(B)
         b = f!(b, b, b, t)

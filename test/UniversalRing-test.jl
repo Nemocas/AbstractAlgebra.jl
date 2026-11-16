@@ -777,6 +777,9 @@ end
          end
       end
    end
+
+   S = universal_polynomial_ring(ZZ; cached=false)
+   @test_throws DomainError gen(S, "x")^typemin(Int)
 end
 
 @testset "UnivPoly.inflation_deflation" begin

@@ -259,12 +259,20 @@ end
 
    @test a^5 == 5
 
+   # R(2) has order 3, and typemin(Int) ≡ 1 mod 3
+   @test R(2)^typemin(Int) == R(2)
+
    S, x = polynomial_ring(R, "x")
    T, = residue_field(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
+
+   S, x = polynomial_ring(QQ, "x")
+   T, = residue_field(S, x^2 + x + 1)
+
+   @test T(x)^typemin(Int) == T(x)
 end
 
 @testset "EuclideanRingResidueFieldElem.inversion" begin

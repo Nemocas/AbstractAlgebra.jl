@@ -193,16 +193,7 @@ function ^(x::GFElem{T}, y::Integer) where T <: Integer
       y < 0 && throw(DivideError())
       return deepcopy(x)
    end
-   if y < 0
-      x = inv(x)
-      y = -y
-   end
-   if y >= p - 1
-      y1 = y%(p - 1)
-      y = convert(T, y1)::T
-   else
-      y = convert(T, y)::T
-   end
+   y = convert(T, mod(y, p - 1))::T
    if y == 0
       return one(R)
    elseif y == 1

@@ -6,8 +6,9 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 # Direct Sums
 
-AbstractAlgebra allows the construction of the external direct sum of any
-nonempty vector of finitely presented modules.
+AbstractAlgebra allows the construction of the external direct sum of finitely
+presented modules over a common base ring. An empty direct sum requires an
+explicit base ring.
 
 Note that external direct sums are considered equal iff they are the same
 object.

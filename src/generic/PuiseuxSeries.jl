@@ -558,6 +558,8 @@ function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    end
 
    if b < 0
+      # -typemin(Int) overflows, but typemin(Int) is even
+      b == typemin(Int) && return (a*a)^div(b, 2)
       a = inv(a)
       b = -b
    end

@@ -493,8 +493,7 @@ end
 ###############################################################################
 
 function _wrap_factorization(f::Fac{T}, S::UniversalRing{T, U}) where {T, U}
-   res = Fac{UniversalRingElem{T, U}}()
-   res.unit = UniversalRingElem{T, U}(f.unit, S)
+   res = Fac(UniversalRingElem{T, U}(unit(f), S), Dict{UniversalRingElem{T, U}, Int}())
    for (fact, expo) in f
       mulpow!(res, UniversalRingElem{T, U}(fact, S), expo)
    end

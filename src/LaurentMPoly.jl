@@ -318,6 +318,8 @@ function ^(a::LaurentMPolyRingElem, b::Integer)
     if b >= 0
         return LaurentMPolyRingElem(parent(a), a.mpoly^b, a.mindegs*b)
     else
+        # -typemin(Int) overflows, but typemin(Int) is even
+        b == typemin(Int) && return (a*a)^div(b, 2)
         ap, ad = _normalize(a)
         return LaurentMPolyRingElem(parent(a), inv(ap)^-b, ad*b)
     end

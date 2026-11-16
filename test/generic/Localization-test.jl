@@ -110,6 +110,7 @@
     L = localization(Qx, [x^6 + 3, x^3 + 5])
     @test_throws ErrorException inv(L(2x^6 + 6))
     @test inv(L(x^2 + 108)) == L(1 // (x^2 + 108))
+    @test L(-1)^typemin(Int) == 1
   end
 
   @testset "Binary operators" begin

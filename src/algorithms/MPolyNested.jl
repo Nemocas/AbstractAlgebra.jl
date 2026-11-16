@@ -108,15 +108,9 @@ function gcd(
 end
 
 function _convert_frac_fac(R, u, fac)
-  Rfac = Fac{elem_type(R)}()
-  Rfac.unit = R(u)*_restore_numerators(R, fac.unit)
+  Rfac = Fac(R(u)*_restore_numerators(R, unit(fac)), Dict{elem_type(R), Int}())
   for (f, e) in fac
-    t = _restore_numerators(R, f)
-    if is_constant(t)
-      Rfac.unit *= t^e
-    else
-      Rfac[t] = e
-    end
+    mulpow!(Rfac, _restore_numerators(R, f), e)
   end
   return Rfac
 end
@@ -298,8 +292,7 @@ function gcd(
 end
 
 function _convert_iter_fac(R, fac::Fac{T}) where {T <: RingElem}
-  Rfac = Fac{elem_type(R)}()
-  Rfac.unit = renest(R, fac.unit)
+  Rfac = Fac(renest(R, unit(fac)), Dict{elem_type(R), Int}())
   for (f, e) in fac
     Rfac[renest(R, f)] = e
   end

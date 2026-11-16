@@ -222,6 +222,18 @@ end
    end
 end
 
+@testset "Generic.FreeAssociativeAlgebra.powering" begin
+   R, (x, y) = free_associative_algebra(ZZ, [:x, :y])
+
+   @test_throws DomainError R(2)^typemin(Int)
+   @test_throws NotInvertibleError x^typemin(Int)
+   @test_throws NotInvertibleError (x + y)^typemin(Int)
+
+   # 2 has order 3 mod 7, and typemin(Int) ≡ 1 mod 3
+   R, = free_associative_algebra(residue_ring(ZZ, 7)[1], [:x, :y])
+   @test R(2)^typemin(Int) == R(2)
+end
+
 @testset "Generic.FreeAssociativeAlgebra.iterators" begin
    R, (x, y) = free_associative_algebra(QQ, [:x, :y])
    f = x * y * x + 2 * x + 3
