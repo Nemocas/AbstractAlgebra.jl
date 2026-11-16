@@ -744,6 +744,14 @@ end
 
    L, t = laurent_series_field(GF(2), 8, :t)
    @test (1 + t)^typemin(Int) == one(L)
+
+   R, x = laurent_series_ring(ZZ, 10, "x")
+   f = 1 + x
+   @test isequal(f^typemin(Int), (f^2)^div(typemin(Int), 2))
+
+   # 2 has order 3 mod 7, and typemin(Int) ≡ 1 mod 3
+   R, = laurent_series_ring(residue_ring(ZZ, 7)[1], 10, "x")
+   @test isequal(R(2)^typemin(Int), R(2))
 end
 
 @testset "Generic.LaurentSeries.shift" begin

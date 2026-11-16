@@ -216,6 +216,10 @@ end
    a = (x + 1)//(-x^2 + 1)
 
    @test a^-12 == x^12-12*x^11+66*x^10-220*x^9+495*x^8-792*x^7+924*x^6-792*x^5+495*x^4-220*x^3+66*x^2-12*x+1
+
+   # 2 has order 3 mod 7, and typemin(Int) ≡ 1 mod 3
+   K = fraction_field(polynomial_ring(GF(7), "y")[1])
+   @test K(2)^typemin(Int) == K(2)
 end
 
 @testset "Generic.FracFieldElem.inversion" begin

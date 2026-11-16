@@ -18,11 +18,11 @@ parent(v::DirectSumModuleElem) = v.parent
 
 base_ring_type(::Type{DirectSumModule{T}}) where T <: RingElement = parent_type(T)
 
-base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])::base_ring_type(N)
+base_ring(N::DirectSumModule{T}) where T <: RingElement = N.base_ring::base_ring_type(N)
 
-@attr Int number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
+@attr Int number_of_generators(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m; init = 0)
 
-gens(N::DirectSumModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
+gens(N::DirectSumModule{T}) where T <: RingElement = elem_type(N)[gen(N, i) for i = 1:ngens(N)]
 
 rank(M::DirectSumModule{T}) where T = sum(rank, summands(M); init=0)
 vector_space_dim(M::DirectSumModule{<:FieldElement}) = sum(vector_space_dim, summands(M); init=0)
@@ -251,18 +251,16 @@ function AbstractAlgebra.canonical_projection(A::DirectSumModule, i::Int)
   return ModuleHomomorphism(A, B, inj_proj_mat(base_ring(A), ngens(A), ngens(B), sum(ngens(x) for x = summands(A)[1:i-1]; init = 0)+1))
 end
 
-function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
-   length(m) == 0 && error("Cannot take a direct sum of an empty vector of modules")
+function direct_sum(R::Ring, m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
    # Check base rings are the same
-   R = base_ring(m[1])
-   for i = 2:length(m)
+   for i = 1:length(m)
       base_ring(m[i]) != R && error("Incompatible modules")
    end
    # make vector of rels (only used by external interface, not internally)
-   degs = map(ngens, m)
+   degs = Int[ngens(M) for M in m]
    n = sum(degs)
    new_rels = Vector{dense_matrix_type(T)}(undef,
-       sum(length(rels(m[i])) for i in 1:length(m)))
+       sum(length(rels(m[i])) for i in 1:length(m); init = 0))
    if length(new_rels) > 0
      rel = 1
      start = 0
@@ -280,7 +278,7 @@ function direct_sum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingEle
      end
    end
    # Construct DirectSumModule object
-   M = DirectSumModule{T}(m, new_rels)
+   M = DirectSumModule{T}(R, m, new_rels)
    set_attribute!(M, :degs => degs)
    # construct injections and projections
    inj = Vector{ModuleHomomorphism{T}}(undef, length(m))

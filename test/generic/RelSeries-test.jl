@@ -592,6 +592,7 @@ end
    f = rand(R, 0:12, -10:10)
    @test_throws DomainError f^-1
    @test_throws DomainError f^-rand(2:100)
+   @test_throws DomainError f^typemin(Int)
 
    # Inexact field
    R, x = power_series_ring(RealField, 10, "x")

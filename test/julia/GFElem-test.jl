@@ -192,6 +192,11 @@ end
    @test_throws DivideError R(0)^(-1)
    @test_throws DivideError S(0)^(-1)
 
+   # 3 has order 3 mod 13, and typemin(Int) ≡ 1 mod 3
+   @test R(3)^typemin(Int) == R(3)
+   @test S(3)^typemin(Int) == S(3)
+   @test_throws DivideError R(0)^typemin(Int)
+
    for iter = 1:100
 
       a = R(1)

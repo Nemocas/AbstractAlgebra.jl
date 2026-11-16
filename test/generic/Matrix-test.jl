@@ -219,11 +219,7 @@ end
       @test_throws MethodError T[;;;]
       @test_throws MethodError T[1;;;]
 
-      if VERSION < v"1.11.2"
-         @test_throws ArgumentError T[1; 2 3]
-      else
-         @test_throws DimensionMismatch T[1; 2 3]
-      end
+      @test_throws Union{ArgumentError, DimensionMismatch} T[1; 2 3]
    end
 
    arr = [1 2; 3 4]
@@ -1073,6 +1069,20 @@ end
       end
 
    end
+
+   a = zero_matrix(ZZ, 3, 4)
+   b = matrix(ZZ, 2, 2, [1, 2, 3, 4])
+   v = [ZZ(i) for i in 1:4]
+   @test_throws BoundsError (a[3:4, 1:2] = b)
+   @test_throws BoundsError (a[0:1, 1:2] = b)
+   @test_throws BoundsError (a[1:2, 4:5] = Matrix(b))
+   @test_throws BoundsError (a[4, :] = v)
+   @test_throws BoundsError (a[:, 5] = v[1:3])
+   @test_throws DimensionMismatch (a[1:2, 1:3] = b)
+   @test_throws DimensionMismatch (a[1:2, 1:2] = Matrix(b)[:, 1:1])
+   @test_throws DimensionMismatch (a[1, :] = v[1:3])
+   @test_throws DimensionMismatch (a[1:2, 1:2] = v)
+   @test iszero(a)
 end
 
 @testset "Generic.Mat.binary_ops" begin
@@ -1596,6 +1606,10 @@ end
    @test M^1 == M
    @test M^2 == M*M
    @test M^3 == M*M*M
+
+   # M has order 3, and typemin(Int) ≡ 1 mod 3
+   M = matrix(QQ, [0 -1; 1 -1])
+   @test M^typemin(Int) == M
 end
 
 @testset "Generic.Mat.adhoc_exact_division" begin
@@ -1758,6 +1772,12 @@ end
    M = QQ[1//2 2; 3 -1//3]
    N = QQ[1 1; 0 2]
    @test trace_of_product(M, N) == tr(M * N)
+
+   # noncommutative entries: the order of the products matters
+   S = matrix_ring(ZZ, 2)
+   a = S(ZZ[0 1; 0 0])
+   b = S(ZZ[0 0; 1 0])
+   @test trace_of_product(matrix(S, 1, 2, [a, 0]), matrix(S, 2, 1, [b, a])) == a * b
 
    @test trace_of_product(zero_matrix(ZZ, 0, 3), zero_matrix(ZZ, 3, 0)) == 0
    @test trace_of_product(zero_matrix(ZZ, 2, 0), zero_matrix(ZZ, 0, 2)) == 0
@@ -4490,6 +4510,13 @@ end
       X = Generic.inj_proj_mat(QQ, 4, 2, s)
       @test M + X == N + matrix(X)
    end
+
+   # Noncommutative base ring
+   S = matrix_ring(QQ, 2)
+   M = Generic.inj_proj_mat(S, 3, 2, 2)
+   N = matrix(M)
+   @test N == matrix(S, [0 0; 1 0; 0 1])
+   @test all(M[i, j] == N[i, j] for i in 1:3, j in 1:2)
 end
 
 @testset "Generic.Mat.unsafe" begin

@@ -1235,7 +1235,7 @@ struct FreeModuleElem{T <: NCRingElement} <: AbstractAlgebra.FPModuleElem{T}
 end
 
 @doc raw"""
-    InjProjMat{T<:RingElement}
+    InjProjMat{T<:NCRingElement}
 
 An `n` x `m` matrix over a ring `R`, all zero but:
 If `n > m`: `s` is a row starting from which an identity matrix is inserted.
@@ -1250,7 +1250,7 @@ julia> Generic.inj_proj_mat(ZZ, 2, 5, 3)
 [0   0   0   1   0]
 ```
 """
-struct InjProjMat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
+struct InjProjMat{T <: NCRingElement} <: AbstractAlgebra.MatElem{T}
    R::NCRing
    n::Int #Rows
    m::Int #Cols
@@ -1415,11 +1415,16 @@ end
 @attributes mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::Vector{<:AbstractAlgebra.FPModule{T}}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
+   base_ring::Ring
    inj::Vector{<:ModuleHomomorphism{T}}
    pro::Vector{<:ModuleHomomorphism{T}}
 
    function DirectSumModule{T}(m::Vector{<:AbstractAlgebra.FPModule{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
-      return new{T}(m, rels)
+      @assert length(m) > 0
+      return DirectSumModule{T}(base_ring(first(m)), m, rels)
+   end
+   function DirectSumModule{T}(R::Ring, m::Vector{<:AbstractAlgebra.FPModule{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
+      return new{T}(m, rels, R)
    end
 end
 
@@ -1493,6 +1498,20 @@ end
 
 function PolyRingAnyMap(d::D, c::C, cm::U, ig::V) where {D, C, U, V}
   return PolyRingAnyMap{D, C, U, V}(d, c, cm, ig)
+end
+
+################################################################################
+#
+#  Homomorphisms from univariate rational function fields
+#
+################################################################################
+
+struct RationalFunctionFieldHom{
+    D <: RationalFunctionField,
+    C <: Field,
+    P <: PolyRingAnyMap} <: Map{D, C, AbstractAlgebra.SetMap, RationalFunctionFieldHom}
+  domain::D
+  polynomial_map::P
 end
 
 ################################################################################

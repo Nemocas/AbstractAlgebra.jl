@@ -97,6 +97,9 @@ end
     @test !is_gen(inv(y))
     @test !is_gen(x*y)
 
+    @test L(-1)^typemin(Int) == 1
+    @test x^typemin(Int) * x == x^(typemin(Int) + 1)
+
     @test iszero(L(elem_type(coefficient_ring(L))[], Vector{Int}[]))
 
     a = x^-9 + y^9

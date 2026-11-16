@@ -732,4 +732,6 @@ end
         J *= I
       end
    end
+
+   @test_throws ErrorException Generic.Ideal(ZZ, ZZ(2))^typemin(Int)
 end
