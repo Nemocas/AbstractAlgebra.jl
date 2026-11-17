@@ -11,6 +11,10 @@ which we think might affect some users directly.
 
 ## [0.51.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.4) - 2026-11-13
 
+### New or extended functionality
+
+- [#2650](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2650) Support homomorphisms from univariate rational function fields
+
 ### Performance improvements or improved testing
 
 - [#2640](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2640) Speed up `trace_of_product`
@@ -19,6 +23,15 @@ which we think might affect some users directly.
 ### Fixed bugs that returned incorrect results
 
 - [#2611](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2611) Make `hash` of `AbsMSeries` ignore terms beyond the precision
+- [#2655](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2655) Fix wrong results of `x^typemin(Int)` for residue ring elements and Puiseux series
+
+### Fixed bugs that could lead to crashes
+
+- [#2655](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2655) Fix `x^typemin(Int)` crashing with a `StackOverflowError` for matrices, `matrix_ring` elements, permutations and generic `GroupElem`s, and hanging for `GF(p)` elements
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2655](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2655) Fix `x^typemin(Int)` throwing for fractions, rational functions, localizations, total rings of fractions, factored fractions, and multivariate Laurent and Puiseux polynomials
 
 ## [0.51.3](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.3) - 2026-10-26
 
