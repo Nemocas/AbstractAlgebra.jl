@@ -1024,16 +1024,18 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    end
 
    if b < 0
+      # -typemin(Int) overflows, but typemin(Int) is even
+      b == typemin(Int) && return (a*a)^div(b, 2)
       a = inv(a)
-      b = -widen(b)
+      b = -b
    end
 
    val = valuation(a)
    a = shift_right(a, val)
    prec = precision(a)
    z = AbstractAlgebra.internal_power_left_to_right(a, b, (x, y) -> mullow(x, y, prec))
-   z = set_valuation!(z, Int(b*val))
-   z = set_precision!(z, Int(b*val + prec))
+   z = set_valuation!(z, b*val)
+   z = set_precision!(z, b*val + prec)
    if pol_length(z) <= 1
       z = set_scale!(z, 1)
    end

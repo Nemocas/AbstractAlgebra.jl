@@ -1553,8 +1553,10 @@ function powermod(a::PolyRingElem{T}, b::Int, d::PolyRingElem{T}) where T <: Rin
       z = parent(a)(coeff(a, 0)^b)
    else
       if b < 0
+         # -typemin(Int) overflows, but typemin(Int) is even
+         b == typemin(Int) && return powermod(mulmod(a, a, d), div(b, 2), d)
          a = invmod(a, d)
-         b = -widen(b)
+         b = -b
       end
       z = isone(b) ? a : internal_power_left_to_right(a, b, (x, y) -> mulmod(x, y, d))
    end
