@@ -1,14 +1,15 @@
-# [[prototype]]
-# Curt doc for "dodgy mode" in Oscar
+# [[[PROTOTYPE]]]
+
+# For user doc see the file docs/src/ProbablyCorrect.md
 
 # DESIGN/MAINTAINER DOC
 
 # We use the following global variables:
-#   GLOBAL_ListOfDodgyFuncs::Vector{Symbol}
+#   GLOBAL_ListOfDodgyFamilies::Vector{Symbol}
 #   -  a list of symbols: each symbol corresponds to a
 #      family of functions which offer a dodgy mode
 
-#   GLOBAL_ActiveDodgyFuncs::Vector{Symbol}
+#   GLOBAL_ActiveDodgyFamilies::Vector{Symbol}
 #   -  a list of symbols: each symbol corresponds to a
 #      family of functions for which dodgy mode is enabled
 
@@ -23,13 +24,13 @@
 # The values of the global variables should be accessed or
 # changed only via the relevant setter/getter functions:
 
-#  setters/getters for GLOBAL_ActiveDodgyFuncs
-#  -  get_dodgy_mode(func_family::Symbol)
-#     Returns `true` iff dodgy mode is enabled for family  `func_family`
-#  -  set_dodgy_mode(func_family::Symbol, b::Bool)
-#     Enable dodgy mode for family `func_family` if `b` is `true`,
+#  setters/getters for GLOBAL_ActiveDodgyFamilies
+#  -  get_dodgy_mode(family::Symbol)
+#     Returns `true` iff dodgy mode is enabled for family  `family`
+#  -  set_dodgy_mode(family::Symbol, b::Bool)
+#     Enable dodgy mode for family `family` if `b` is `true`,
 #     otherwise disable dodgy mode for that family.
-#     Returns new value of GLOBAL_ListOfDodgyFuncs.
+#     Returns new value of GLOBAL_ListOfDodgyFamilies.
 #  -  set_dodgy_mode(b::Bool)
 #     enable/disable dodgy mode for all families.
 
@@ -45,18 +46,18 @@
 # Global stuff for the "probably correct" prototype.
 
 # Initialization (fairly KISS):
-GLOBAL_ListOfDodgyFuncs::Vector{Symbol} = Symbol[]   # see add_dodgy_func below
-GLOBAL_ActiveDodgyFuncs::Vector{Symbol} = Symbol[]
+GLOBAL_ListOfDodgyFamilies::Vector{Symbol} = Symbol[]   # see add_dodgy_func below
+GLOBAL_ActiveDodgyFamilies::Vector{Symbol} = Symbol[]
 
 
 @doc raw"""
-    add_dodgy_func(func_family::Symbol)
+    add_dodgy_func(family::Symbol)
 
-This registers the name `func_family` as a name for a function family having dodgy variants.
+This registers the name `family` as a name for a function family having dodgy variants.
 It would normally be called in the initialization of the package.
 """
-function add_dodgy_func(func_family::Symbol)
-  !(func_family in GLOBAL_ListOfDodgyFuncs) && push!(GLOBAL_ListOfDodgyFuncs, func_family)
+function add_dodgy_func(family::Symbol)
+  !(family in GLOBAL_ListOfDodgyFamilies) && push!(GLOBAL_ListOfDodgyFamilies, family)
   return nothing
 end
 
@@ -67,14 +68,14 @@ end
 Returns a list of symbols for dodgy function families.
 """
 function get_active_dodgy_funcs()
-  global GLOBAL_ActiveDodgyFuncs
-  return GLOBAL_ActiveDodgyFuncs
+  global GLOBAL_ActiveDodgyFamilies
+  return GLOBAL_ActiveDodgyFamilies
 end
 
 
 @doc raw"""
     set_dodgy_mode(b::Bool = true)
-    set_dodgy_mode(func_family:Symbol, b::Bool = true)
+    set_dodgy_mode(family:Symbol, b::Bool = true)
 
 Enable dodgy mode: globally (1st version), for the given family (2nd version).
 """
@@ -82,39 +83,39 @@ function set_dodgy_mode end
 
 # Activate (or deactivate) **all** dodgy functions
 function set_dodgy_mode(b::Bool = true)
-  global GLOBAL_ListOfDodgyFuncs
-  global GLOBAL_ActiveDodgyFuncs
+  global GLOBAL_ListOfDodgyFamilies
+  global GLOBAL_ActiveDodgyFamilies
   if !b
-    GLOBAL_ActiveDodgyFuncs = Symbol[]
+    GLOBAL_ActiveDodgyFamilies = Symbol[]
   else
-    GLOBAL_ActiveDodgyFuncs = GLOBAL_ListOfDodgyFuncs
+    GLOBAL_ActiveDodgyFamilies = GLOBAL_ListOfDodgyFamilies
   end
-  return GLOBAL_ActiveDodgyFuncs
+  return GLOBAL_ActiveDodgyFamilies
 end
 
-function set_dodgy_mode(func_family::Symbol, b::Bool = true)
-  global GLOBAL_ListOfDodgyFuncs
-  global GLOBAL_ActiveDodgyFuncs
-  @req (func_family in GLOBAL_ListOfDodgyFuncs)  "Unregistered function family ID"
-  posn = findfirst(GLOBAL_ActiveDodgyFuncs, func_family)
+function set_dodgy_mode(family::Symbol, b::Bool = true)
+  global GLOBAL_ListOfDodgyFamilies
+  global GLOBAL_ActiveDodgyFamilies
+  @req (family in GLOBAL_ListOfDodgyFamilies)  "Unregistered function family ID"
+  posn = findfirst(==(family), GLOBAL_ActiveDodgyFamilies)
   if b
-    (posn == 0) && push!(GLOBAL_ActiveDodgyFuncs, func_family)
+    isnothing(posn) && push!(GLOBAL_ActiveDodgyFamilies, family)
   else
-    (posn > 0) && deleteat!(GLOBAL_ActiveDodgyFuncs, posn)
+    !isnothing(posn) && deleteat!(GLOBAL_ActiveDodgyFamilies, posn)
   end
-  return GLOBAL_ActiveDodgyFuncs  ## or just nothing?
+  return GLOBAL_ActiveDodgyFamilies  ## or just nothing?
 end
 
 @doc raw"""
-    get_dodgy_mode(func_family:Symbol)
+    get_dodgy_mode(family:Symbol)
 
-Return `true` iff dodgy mode is enabled for family `func_family`.
+Return `true` iff dodgy mode is enabled for family `family`.
 """
-function get_dodgy_mode(func_family::Symbol)
-  global GLOBAL_ListOfDodgyFuncs
-  global GLOBAL_ActiveDodgyFuncs
-  @req (func_family in GLOBAL_ListOfDodgyFuncs)  "Unregistered function family ID"
-  return (func_family in GLOBAL_ActiveDodgyFuncs)
+function get_dodgy_mode(family::Symbol)
+  global GLOBAL_ListOfDodgyFamilies
+  global GLOBAL_ActiveDodgyFamilies
+  @req (family in GLOBAL_ListOfDodgyFamilies)  "Unregistered function family ID"
+  return (family in GLOBAL_ActiveDodgyFamilies)
 end
 
 
@@ -178,7 +179,7 @@ end
 #   AbstractAlgebra.GLOBAL_DodgySteps
 #   AbstractAlgebra.GLOBAL_DodgySteps_MaxSize
 
-macro record_dodgy_step(fn_name::Symbol, argv::Tuple, result::Any)
+macro record_dodgy_step(fn_name#=::Symbol=#, argv#=::Tuple=#, result#=::Any=#)
   SourceLine = __source__.line
   SourceFile = string(__source__.file)  # In Julia 1.13 there will be @__FUNCTION__ (I have julia 1.10)
   return :(

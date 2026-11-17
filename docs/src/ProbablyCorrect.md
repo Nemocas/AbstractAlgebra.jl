@@ -146,22 +146,25 @@ AbstractAlgebra.dodgy_steps_get()
 
 We shall need the following function and macro:
 ```
-   AbstractAlgebra.get_dodgy_mode(func_family_symbol)
+   AbstractAlgebra.get_dodgy_mode(family_symbol)
    AbstractAlgebra.@record_dodgy_step(fn_name, argv, result)
 ```
 The first returns `true` iff dodgy mode for the specified family is enabled.
 The second records a dodgy step, where
 *   `fn_name::Symbol`   indicates the name of function which was called
-*   `argv::Vector{Any}` are the argument values supplied
+*   `argv::Tuple`       contains the argument values supplied
 *   `result::Any`       is the result produced
 
 It is worthwhile looking at a concrete example: a simple example can be found in
 the implementation of `is_prime(::ZZRingElem)` in the file  `Nemo/src/flint/fmpz.jl`.
 
-There are two steps to complete:
-0. decide a name for the dodgy function family
-1. declare a dodgy function family by calling `add_dodgy_func` in the initialization code for the package
-2. inside the function(s) you are modifying, insert a check whether dodgy mode is enabled for the function family, and if so, call the macro `record_dodgy_step`
+There are three steps to complete:
+0. decide a `Symbol` name for the new dodgy function family
+1. register the family by calling `add_dodgy_func` in the initialization code for the package
+2. inside the function(s) you are modifying, insert a check whether dodgy mode is enabled for the family, and if so, call the macro `record_dodgy_step`
+
+
+### Example
 
 Here is a copy of the `is_prime` function as illustrative example:
 ```
@@ -169,7 +172,7 @@ Here is a copy of the `is_prime` function as illustrative example:
      !is_probable_prime(x) && return false
      (x <= (Int128(1) << 80)) && return true  # guaranteed correct by FLINT doc
      if AbstractAlgebra.get_dodgy_mode(:is_prime)
-       AbstractAlgebra.@record_dodgy_step(:is_prime, (x,));
+       AbstractAlgebra.@record_dodgy_step(:is_prime, (x,), true);
        return true
      end
      return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElem})::Cint)
