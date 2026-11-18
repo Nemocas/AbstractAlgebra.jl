@@ -88,7 +88,7 @@ function set_dodgy_mode(b::Bool = true)
   if !b
     GLOBAL_ActiveDodgyFamilies = Symbol[]
   else
-    GLOBAL_ActiveDodgyFamilies = GLOBAL_ListOfDodgyFamilies
+    GLOBAL_ActiveDodgyFamilies = deepcopy(GLOBAL_ListOfDodgyFamilies)
   end
   return GLOBAL_ActiveDodgyFamilies
 end
