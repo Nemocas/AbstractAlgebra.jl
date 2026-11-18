@@ -166,6 +166,32 @@ end
 
 ###############################################################################
 #
+#   Euclidean division
+#
+###############################################################################
+
+# The Euclidean function is x -> nu(gcd(data(x), modulus)), with nu the
+# Euclidean function of the base ring. Since b and g = gcd(data(b), modulus)
+# generate the same ideal, r = mod(data(a), g) has nu(r) < nu(g), and a - r is
+# divisible by b.
+function Base.divrem(a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+   check_parent(a, b)
+   iszero(b) && throw(DivideError())
+   R = parent(a)
+   r = R(mod(data(a), gcd(data(b), modulus(R))))
+   return divexact(a - r, b), r
+end
+
+function gcdx(a::T, b::T) where {T <: EuclideanRingResidueRingElem}
+   check_parent(a, b)
+   R = parent(a)
+   g, u, v = gcdx(data(a), data(b))
+   d, s, _ = gcdx(g, modulus(R))
+   return R(d), R(s*u), R(s*v)
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
