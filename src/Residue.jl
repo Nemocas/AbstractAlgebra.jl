@@ -115,6 +115,7 @@ deepcopy_internal(a::ResElem, dict::IdDict) =
 
 characteristic(R::ResidueRing{T}) where T <: Integer = modulus(R)
 is_known(::typeof(characteristic), R::ResidueRing{T}) where T <: Integer = true
+is_known(::typeof(characteristic), R::ResidueRing) = false
 
 ###############################################################################
 #
