@@ -96,6 +96,20 @@ series ring.
 """
 max_precision(R::SeriesRing) = R.prec_max
 
+function normalise end
+
+@doc raw"""
+    normalise(f::SeriesElem, n::Int)
+
+Given a series `f` represented by a polynomial of at least the given length,
+return the normalised length of the underlying polynomial assuming it has
+length at most `n`. This function does not actually normalise the polynomial.
+
+This function is part of the internal interface for series; user code should
+normally not need to invoke it.
+"""
+normalise(f::SeriesElem, n::Int)
+
 @doc raw"""
     set_length!(f::PolynomialElem, n::Int)
     set_length!(f::SeriesElem, n::Int)

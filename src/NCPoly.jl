@@ -191,7 +191,7 @@ function +(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
-   z = set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, _normalised_length(z, i - 1))
    return z
 end
 
@@ -215,7 +215,7 @@ function -(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
-   z = set_length!(z, normalise(z, i - 1))
+   z = set_length!(z, _normalised_length(z, i - 1))
    return z
 end
 
@@ -241,7 +241,7 @@ function *(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}) where T <: NCRingElem
       end
    end
    z = parent(a)(d)
-   z = set_length!(z, normalise(z, lenz))
+   z = set_length!(z, _normalised_length(z, lenz))
    return z
 end
 
@@ -258,7 +258,7 @@ function *(a::T, b::NCPolyRingElem{T}) where T <: NCRingElem
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   z = set_length!(z, normalise(z, len))
+   z = set_length!(z, _normalised_length(z, len))
    return z
 end
 
@@ -269,7 +269,7 @@ function *(a::NCPolyRingElem{T}, b::T) where T <: NCRingElem
    for i = 1:len
       z = setcoeff!(z, i - 1, coeff(a, i - 1)*b)
    end
-   z = set_length!(z, normalise(z, len))
+   z = set_length!(z, _normalised_length(z, len))
    return z
 end
 
@@ -277,7 +277,7 @@ function +(a::T, b::NCPolyRingElem{T}) where {T <: NCRingElem}
    z = deepcopy(b)
    len = length(z)
    z = setcoeff!(z, 0, a + coeff(b, 0))
-   z = set_length!(z, normalise(z, len))
+   z = set_length!(z, _normalised_length(z, len))
    return z
 end
 
@@ -479,7 +479,7 @@ function mullow(a::NCPolyRingElem{T}, b::NCPolyRingElem{T}, n::Int) where T <: N
       end
    end
    z = parent(a)(d)
-   z = set_length!(z, normalise(z, lenz))
+   z = set_length!(z, _normalised_length(z, lenz))
    return z
 end
 
@@ -513,7 +513,7 @@ function divexact_right(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=
       q1 = d[lenf - leng + 1] = divexact_right(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(q1*g, lenf - leng)
       if length(f) == lenf # inexact case
-         f = set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, _normalised_length(f, lenf - 1))
       end
    end
    check && length(f) != 0 && error("Not an exact division")
@@ -546,7 +546,7 @@ function divexact_left(f::NCPolyRingElem{T}, g::NCPolyRingElem{T}; check::Bool=t
       q1 = d[lenf - leng + 1] = divexact_left(coeff(f, lenf - 1), coeff(g, leng - 1); check=check)
       f = f - shift_left(g*q1, lenf - leng)
       if length(f) == lenf # inexact case
-         f = set_length!(f, normalise(f, lenf - 1))
+         f = set_length!(f, _normalised_length(f, lenf - 1))
       end
    end
    check && length(f) != 0 && error("Not an exact division")
