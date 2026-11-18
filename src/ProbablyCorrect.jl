@@ -63,25 +63,27 @@ end
 
 
 @doc raw"""
-    get_dodgy_funcs()
+    get_active_dodgy_funcs()
 
-Returns a list of symbols for dodgy function families.
+Returns a list of symbols for function families which are currently in dodgy mode.
 """
 function get_active_dodgy_funcs()
   global GLOBAL_ActiveDodgyFamilies
-  return GLOBAL_ActiveDodgyFamilies
+  return deepcopy(GLOBAL_ActiveDodgyFamilies)
 end
 
 
 @doc raw"""
     set_dodgy_mode(b::Bool = true)
-    set_dodgy_mode(family:Symbol, b::Bool = true)
+    set_dodgy_mode(family::Symbol, b::Bool = true)
 
-Enable dodgy mode: globally (1st version), for the given family (2nd version).
+Enable/Disable dodgy mode: globally (1st version), for the given family (2nd version).
+The mode is enabled when `b == true`, and disabled otherwise.  The value returned is
+a list of symbols of those families for which dodgy mode is enabled.
 """
 function set_dodgy_mode end
 
-# Activate (or deactivate) **all** dodgy functions
+# Activate (or deactivate) **all** dodgy function families
 function set_dodgy_mode(b::Bool = true)
   global GLOBAL_ListOfDodgyFamilies
   global GLOBAL_ActiveDodgyFamilies
@@ -90,7 +92,7 @@ function set_dodgy_mode(b::Bool = true)
   else
     GLOBAL_ActiveDodgyFamilies = deepcopy(GLOBAL_ListOfDodgyFamilies)
   end
-  return GLOBAL_ActiveDodgyFamilies
+  return deepcopy(GLOBAL_ActiveDodgyFamilies)
 end
 
 function set_dodgy_mode(family::Symbol, b::Bool = true)
@@ -103,11 +105,11 @@ function set_dodgy_mode(family::Symbol, b::Bool = true)
   else
     !isnothing(posn) && deleteat!(GLOBAL_ActiveDodgyFamilies, posn)
   end
-  return GLOBAL_ActiveDodgyFamilies  ## or just nothing?
+  return deepcopy(GLOBAL_ActiveDodgyFamilies)  ## or just nothing?
 end
 
 @doc raw"""
-    get_dodgy_mode(family:Symbol)
+    get_dodgy_mode(family::Symbol)
 
 Return `true` iff dodgy mode is enabled for family `family`.
 """
