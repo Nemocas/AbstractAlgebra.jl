@@ -216,6 +216,8 @@ end
          b *= sinv
       end
    end
+
+   @test GF(7)(3)^typemin(Int8) == GF(7)(4)
 end
 
 @testset "Julia.GFElem.comparison" begin

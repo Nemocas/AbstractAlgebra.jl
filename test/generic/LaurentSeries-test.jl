@@ -742,6 +742,9 @@ end
    @test isequal(f*f, f^2)
    @test isequal(f^0, one(R))
 
+   L, t = laurent_series_field(GF(2), 8, :t)
+   @test (1 + t)^typemin(Int) == one(L)
+
    R, x = laurent_series_ring(ZZ, 10, "x")
    f = 1 + x
    @test isequal(f^typemin(Int), (f^2)^div(typemin(Int), 2))
