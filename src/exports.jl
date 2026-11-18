@@ -256,6 +256,7 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export get_active_dodgy_funcs
 export get_dodgy_mode
 export graeffe_transform
 export gram
