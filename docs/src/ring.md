@@ -6,9 +6,10 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 # Ring functionality
 
 AbstractAlgebra has both commutative and noncommutative rings. Together we
-refer to them below as rings.
+refer to them below as rings. What differs for noncommutative rings is
+described in the [introduction to noncommutative rings](ncring_introduction.md).
 
-## Abstract types for rings
+## [Abstract types for rings](@id ring-abstract-types)
 
 All commutative ring types in AbstractAlgebra belong to the `Ring` abstract
 type and commutative ring elements belong to the `RingElem` abstract type.
@@ -33,28 +34,18 @@ RingElement <: NCRingElement
 
 ## Functions for types and parents of rings
 
-```julia
-parent_type(::Type{T}) where T <: NCRingElement
-elem_type(::Type{T}) where T <: NCRing
+These functions are not specific to rings: `parent`, `parent_type` and
+`elem_type` apply to groups as well, and `base_ring` to modules.
+
+```@docs
+parent
+parent_type
+elem_type
+base_ring
+base_ring_type
+coefficient_ring
+coefficient_ring_type
 ```
-
-Return the type of the parent (resp. element) type corresponding to the given
-ring element (resp. parent) type.
-
-```julia
-base_ring(R::NCRing)
-base_ring(a::NCRingElement)
-```
-
-For generic ring constructions over a base ring (e.g. polynomials over a
-coefficient ring), return the parent object of that base ring.
-
-
-```julia
-parent(a::NCRingElement)
-```
-
-Return the parent of the given ring element.
 
 ```@docs
 is_domain_type
@@ -68,16 +59,27 @@ possible.
 characteristic(R::NCRing)
 ```
 
-## Constructors
+## [Constructors](@id ring-constructors)
 
-If `R` is a parent object of a ring in AbstractAlgebra, it can always be used
-to construct certain objects in that ring.
+The parent object `R` of a ring constructs elements of that ring when called:
 
-```julia
-(R::NCRing)() # constructs zero
-(R::NCRing)(c::Integer)
-(R::NCRing)(c::elem_type(R))
-(R::NCRing{T})(a::T) where T <: RingElement
+- `R()` returns the zero of `R`.
+- `R(n::Integer)` returns `n` coerced into `R`.
+- `R(a)` for an element `a` of `R` returns `a` itself, not a copy; use
+  `deepcopy(a)` for a copy.
+- `R(c)` for an element `c` of the base ring of `R` returns `c` coerced into
+  `R`.
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> R(), R(3), R(QQ(1//2))
+(0, 3, 1//2)
+
+julia> f = x^2 + 1;
+
+julia> R(f) === f
+true
 ```
 
 ## Basic functions
@@ -89,20 +91,20 @@ powering.
 In addition, the following are implemented for parents/elements just as they
 would be in Julia for types/objects.
 
-```julia
-zero(R::NCRing)
-one(R::NCRing)
-iszero(a::NCRingElement)
-isone(a::NCRingElement)
+```@docs
+zero
+one
+iszero
+isone
 ```
 
 In addition, the following are implemented where it is
 mathematically/algorithmically viable to do so.
 
-```julia
-is_unit(a::NCRingElement)
-is_zero_divisor(a::NCRingElement)
-is_zero_divisor_with_annihilator(a::NCRingElement)
+```@docs
+is_unit
+is_zero_divisor
+is_zero_divisor_with_annihilator
 ```
 
 The following standard Julia functions are also implemented for all ring
@@ -147,24 +149,11 @@ the approximate equality test.
 
 ## Basic functionality for commutative rings only
 
-```julia
-divexact(a::T, b::T) where T <: RingElement
-inv(a::T)
+```@docs
+divexact
+Base.inv(::RingElem)
+canonical_unit
 ```
-
-Return `a/b` or `1/a` respectively, where the slash here refers to the
-mathematical notion of division in the ring, not Julia's floating point
-division operator.
-
-## Basic functionality for noncommutative rings only
-
-```julia
-divexact_left(a::T, b::T) where T <: NCRingElement
-divexact_right(a::T, b::T) where T <: NCRingElement
-```
-
-As per `divexact` above, except that division by `b` happens on the left or
-right, respectively, of `a`.
 
 ## Unsafe ring operators
 
