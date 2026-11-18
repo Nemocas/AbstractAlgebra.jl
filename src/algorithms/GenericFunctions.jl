@@ -313,6 +313,12 @@ function gcdx(a::T, b::T) where T <: RingElem
    return divexact(a, t), divexact(m11, t), divexact(m21, t)
 end
 
+function gcdx(a::T, b::T, cs::T...) where T <: RingElem
+   d, s, t = gcdx(a, b)
+   d, u, vs... = gcdx(d, cs...)
+   return d, u*s, u*t, vs...
+end
+
 @doc raw"""
     gcdinv(f::T, g::T) where T <: RingElem
 
