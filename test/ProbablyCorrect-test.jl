@@ -2,6 +2,9 @@ using Test
 
 @testset "ProbablyCorrect foundations" begin
   add_dodgy_func(:JustForTesting)
+  set_dodgy_mode(true)
+  set_dodgy_mode(:JustForTesting, false)
+  @test !get_dodgy_mode(:JustForTesting)
   function test_func(n::Int)
     (n >= 0) && return n
     get_dodgy_mode(:JustForTesting) && @record_dodgy_step(:test_func, (n,), -n)
