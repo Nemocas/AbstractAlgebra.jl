@@ -6,7 +6,7 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 # Prototype
 
-**This foundation is still prototypical: future UI/API changes are likely!**
+**This foundation is still PROTOTYPICAL: future UI/API changes are likely!**
 
 _**We shall use the interim name "Dodgy Mode"**_
 
