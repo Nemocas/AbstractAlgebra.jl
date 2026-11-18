@@ -251,6 +251,7 @@ If 'checked = true' the result is checked to ensure it is an element of the give
 localization.
 """
 function divexact(a::LocalizedEuclideanRingElem, b::LocalizedEuclideanRingElem,; checked::Bool=true, check::Bool=true)
+   iszero(b) && throw(DivideError())
    d = divides(a, b; checked=checked)
    d[1] ? d[2] : error("$a not divisible by $b in the given Localization")
 end

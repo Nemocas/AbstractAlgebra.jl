@@ -561,6 +561,7 @@ currently assumes $y$ is an invertible series.
 """
 function divexact(x::AbsMSeries{T}, y::AbsMSeries{T}; check::Bool=true) where T <: RingElement
     check_parent(x, y)
+    iszero(y) && throw(DivideError())
     return x*inv(y)
 end
 

@@ -508,6 +508,7 @@ end
 
 function divexact(a::FracElem{T}, b::FracElem{T}; check::Bool=true) where {T <: RingElem}
    check_parent(a, b)
+   iszero(b) && throw(DivideError())
    n1 = numerator(a, false)
    d2 = denominator(b, false)
    n2 = numerator(b, false)

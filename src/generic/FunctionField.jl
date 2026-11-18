@@ -963,6 +963,7 @@ end
 function divexact(a::AbsSimpleFunctionFieldElem{T, U},
                   b::AbsSimpleFunctionFieldElem{T, U}; check::Bool=true
                  ) where {T <: FieldElement, U <: PolyRingElem{T}}
+   iszero(b) && throw(DivideError())
    return a*inv(b)
 end
 
