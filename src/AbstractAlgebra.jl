@@ -102,6 +102,8 @@ include("Aliases.jl") # needs to be included after AliasMacro.jl
 include("Assertions.jl")
 
 include("Attributes.jl")
+include("Credits.jl")
+using .Credits
 include("PrintHelper.jl")
 include("PrettyOrdering.jl")
 
