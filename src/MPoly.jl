@@ -1674,11 +1674,79 @@ function __ducos_s_e_minus_1(A::P, B::P, C::P, s::P, i::Int) where {P <: MPolyRi
   return isodd(d - e + 1) ? -val : val
 end
 
-### Kerber SPRS ###
-# For details; see the paper 'Division-Free Computation of Subresultants Using Bezout Matrices' by Kerber, 2009.
+### Kerber Subresultants & SPRS ###
+# For details, see the paper 'Division-Free Computation of Subresultants Using Bezout Matrices' by Kerber, 2009.
 # DOI: 10.1080/00207160802460595
 
-# Reference: M. Kerber (2009), Algorithm 4.1 (SubresViaBezout) - the main algorithm
+# Reference: M. Kerber (2009), Algorithm 4.1 (SubresViaBezout)
+function subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}, s::Int) where {T <: RingElement}
+  check_parent(f, v)
+  return subresultants_top_coefficients(f, g, var_index(v), s)
+end
+
+@doc raw"""
+    subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int, s::Int) where {T <: RingElement}
+    subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}, s::Int) where {T <: RingElement}
+
+Return the sequence of subresultants $S_{m-1}, \dots, S_0$ of $f$ and $g$ in the $i$-th variable
+(or the variable $v$) of their base ring, truncated to their top $s$ terms (degrees $j$ down to
+$\max(0, j - s + 1)$ for each $S_j$), using Kerber's division-free Bézout matrix algorithm.
+
+Here $m$ denotes the degree of $g$ in the specified variable, with $\deg(f) \ge \deg(g)$ required
+and $1 \le s \le \max(1, m)$. Unlike `subresultant_prs_kerber`, $f$ and $g$ are not included at
+the start of the returned vector; defective and identically zero subresultants are included.
+"""
+function subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int, s::Int) where {T <: RingElement}
+  check_parent(f, g)
+  R = parent(f)
+  n = degree(f, i)
+  m = degree(g, i)
+
+  @req n >= m "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
+  @req s >= 1 "The number of top coefficients s must be at least 1"
+  m <= 0 && return elem_type(R)[]
+  @req s <= m "The number of top coefficients s cannot exceed the degree of the second polynomial in the specified variable"
+
+  H = __kerber_H_matrix(f, g, i)
+  minors_map = Vector{Vector{elem_type(R)}}(undef, s)
+
+  for j in 1:s
+    S_j = __kerber_S_matrix(H, j, s)
+    minors_map[j] = leading_principal_minors(S_j)
+  end
+
+  res = Vector{elem_type(R)}(undef, m)
+
+  x = gen(R, i)
+  x_powers = Vector{elem_type(R)}(undef, m)
+  x_powers[1] = one(R)
+  for d in 1:(m - 1)
+    x_powers[d + 1] = x_powers[d] * x
+  end
+
+  temp = zero(R)
+  for k in (n - m + 1):n
+    poly = zero(R)
+    max_t = min(s - 1, n - k)
+
+    for t in 0:max_t
+      j_rep = mod1(k + t, s)
+      minor_val = minors_map[j_rep][k]
+      if !is_zero(minor_val)
+        temp = mul!(temp, minor_val, x_powers[n - k - t + 1])
+        poly = add!(poly, temp)
+      end
+    end
+
+    if k % 4 in (2, 3) # signs are determined mod 4 (cf. discriminants)
+      poly = -poly
+    end
+    res[k - n + m] = poly
+  end
+
+  return res
+end
+
 function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
   check_parent(f, v)
   return subresultant_prs_kerber(f, g, var_index(v))
@@ -1693,132 +1761,87 @@ the variable $v$) of their base ring, using an algorithm due to Kerber. This alg
 perform any divisions in the base ring and is hence preferable for such base rings where divisions
 are costly, e.g., multivariate polynomial rings in many variables. The returned vector starts with
 $f$ and $g$, followed by the complete subresultant chain $S_{m-1}, \dots, S_0$ ordered by decreasing
-subresultant index (which may include defective and identically zero polynomials).
+subresultant index (which may include defective and identically zero subresultants).
 """
 function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  check_parent(f, g)
+  n = degree(f, i)
+  m = degree(g, i)
+
+  @req n >= m "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
+  m <= 0 && return [f, g]
+
+  subres = subresultants_top_coefficients(f, g, i, m)
+  res = Vector{elem_type(parent(f))}(undef, m + 2)
+  res[1] = f
+  res[2] = g
+  for j in 1:m
+    res[j + 2] = subres[j]
+  end
+
+  return res
+end
+
+function principal_subresultant_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+  check_parent(f, v)
+  return principal_subresultant_coefficients(f, g, var_index(v))
+end
+
+@doc raw"""
+    principal_subresultant_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+    principal_subresultant_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
+
+Return the principal subresultant coefficients $\operatorname{sres}_{m-1}(f, g), \dots, \operatorname{sres}_0(f, g)$
+of $f$ and $g$ in the $i$-th variable (or the variable $v$) of their base ring, where $m$ is the
+degree of $g$ in that variable ($\deg(f) \ge \deg(g)$ required). Each entry $\operatorname{sres}_j(f, g)$
+is the nominal leading coefficient (coefficient of $x_i^j$) of the $j$-th subresultant $S_j$,
+computed without divisions via the leading principal minors of the hybrid Bézout matrix.
+"""
+function principal_subresultant_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
   check_parent(f, g)
   R = parent(f)
   n = degree(f, i)
   m = degree(g, i)
 
-  @req n >= m "The degree in the specified variable of the second polynomial
-  cannot be strictly larger than the same degree of the first polynomial"
-  m <= 0 && return [f, g]
+  @req n >= m "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
+  m <= 0 && return elem_type(R)[]
 
-  H = __kerber_H_matrix(f, g, i)
-  minors_map = Vector{Vector{elem_type(R)}}(undef, m)
+  # For s = 1, Kerber's matrix S_{1,1}(H) is H itself
+  minors = leading_principal_minors(__kerber_H_matrix(f, g, i))
 
-  for j in 1:m
-    S_j = __kerber_S_matrix(H, j, m)
-    minors_map[j] = leading_principal_minors(S_j)
-  end
-
-  res = Vector{elem_type(R)}(undef, m + 2)
-  res[1] = f
-  res[2] = g
-
-  x = gen(R, i)
+  res = Vector{elem_type(R)}(undef, m)
   for k in (n - m + 1):n
-    poly = zero(R)
-    max_t = min(m - 1, n - k)
-
-    for t in 0:max_t
-      j_rep = mod1(k + t, m)
-      minor_val = minors_map[j_rep][k]
-      if !is_zero(minor_val)
-        poly += minor_val * (x^(n - k - t))
-      end
+    val = minors[k]
+    if !is_zero(val) && k % 4 in (2, 3)
+      val = -val
     end
-
-    if k % 4 in (2, 3) # signs are determined mod 4 (cf. discriminants)
-      poly = -poly
-    end
-    res[k - n + m + 2] = poly
+    res[k - n + m] = val
   end
 
   return res
 end
 
-# Reference: M. Kerber (2009), Definition 2.5
-# This method returns the polynomial H_{idx} associated to f and g (of degrees m and n
-# in the i-th variable of the base ring) from Definition 2.5
-function __kerber_H_poly(f::P, g::P, i::Int, n::Int, m::Int, idx::Int) where {P <: MPolyRingElem}
-  R = parent(f)
-  x = gen(R, i)
-
-  x_powers = Vector{P}(undef, n + 1)
-  x_powers[1] = one(R)
-  for j in 1:n
-    x_powers[j + 1] = x_powers[j] * x
-  end
-
-  temp = zero(R)
-
-  # Following the definition, we compute the result as P1*P2 - P3*P4
-
-  # P1 = f_n * x^(idx-1) + ... + f_{n-idx+1}
-  P1 = zero(R)
-  for k in 0:(idx - 1)
-    c = coeff(f, [i], [n - k])
-    if !is_zero(c)
-      temp = mul!(temp, c, x_powers[idx - k])
-      P1 = add!(P1, temp)
-    end
-  end
-
-  # P2 = g_{m-idx} * x^(n-idx) + ... + g_0 * x^(n-m)
-  P2 = zero(R)
-  for k in 0:(m - idx)
-    c = coeff(g, [i], [k])
-    if !is_zero(c)
-      temp = mul!(temp, c, x_powers[k + n - m + 1])
-      P2 = add!(P2, temp)
-    end
-  end
-
-  # P3 = f_{n-idx} * x^(n-idx) + ... + f_0
-  P3 = zero(R)
-  for k in 0:(n - idx)
-    c = coeff(f, [i], [k])
-    if !is_zero(c)
-      temp = mul!(temp, c, x_powers[k + 1])
-      P3 = add!(P3, temp)
-    end
-  end
-
-  # P4 = g_m * x^(idx-1) + ... + g_{m-idx+1}
-  P4 = zero(R)
-  for k in 0:(idx - 1)
-    c = coeff(g, [i], [m - k])
-    if !is_zero(c)
-      temp = mul!(temp, c, x_powers[idx - k])
-      P4 = add!(P4, temp)
-    end
-  end
-
-  res = P1*P2
-  res = sub!(res, P3*P4)
-  return res
-end
-
-# Reference: M. Kerber (2009), Definition 2.5
-# This method returns the matrix H from Theorem 2.6 (or line 3 in Algorithm 4.1)
+# Reference: M. Kerber (2009), Definition 2.5 & Theorem 2.6
+# Returns the matrix H = J_n * HBez(f, g) (line 3 in Algorithm 4.1)
 function __kerber_H_matrix(f::P, g::P, i::Int) where {P <: MPolyRingElem}
   R = parent(f)
   n = degree(f, i)
   m = degree(g, i)
 
-  @req n >= m "The degree of the first input in the specified variable must be greater or than or equal to the degree of the first input"
+  @req n >= m "The degree of the first input in the specified variable must be greater than or equal to the degree of the second input"
   @req m > 0 "The second polynomial must have positive degree in the specified variable"
+
+  f_coeffs = coefficients(f, i)
+  g_coeffs = coefficients(g, i)
 
   H = zero_matrix(R, n, n)
 
-  # Bottom rows of H
+  # Bottom rows of H (rows 1 to n - m of J_n * HBez(f, g))
   for r in (m + 1):n
     row_H = n - r + 1
     shift = n - r
     for j in 0:m
-      c = coeff(g, [i], [j])
+      c = g_coeffs[j + 1]
       if !is_zero(c)
         col_H = n - (j + shift)
         H[row_H, col_H] = c
@@ -1826,16 +1849,43 @@ function __kerber_H_matrix(f::P, g::P, i::Int) where {P <: MPolyRingElem}
     end
   end
 
-  # Top rows of H (requires H_poly by definition)
-  for r in 1:m
-    row_H = n - r + 1
-    H_poly = __kerber_H_poly(f, g, i, n, m, m - r + 1)
+  # Top rows of H (rows n - m + 1 to n of J_n * HBez(f, g)) requires the H_polys which are
+  # computed iteratively via H_{idx}(x) = x*H_{idx-1}(x) + f_{n-idx+1}*x^(n-m)*g(x) - g_{m-idx+1}*f(x)
+  h_coeffs = [zero(R) for _ in 1:n]
+  temp = zero(R)
+  shift_nm = n - m
 
+  for idx in 1:m
+    f_lead = f_coeffs[n - idx + 2] # f_{n - idx + 1}
+    g_lead = g_coeffs[m - idx + 2] # g_{m - idx + 1}
+
+    for p in (n - 1):-1:0
+      acc = zero(R)
+      if p > 0 && !is_zero(h_coeffs[p])
+        acc = add!(acc, h_coeffs[p])
+      end
+      if !is_zero(g_lead)
+        fp = f_coeffs[p + 1]
+        if !is_zero(fp)
+          temp = mul!(temp, g_lead, fp)
+          acc = sub!(acc, temp)
+        end
+      end
+      if p >= shift_nm && !is_zero(f_lead)
+        gp = g_coeffs[p - shift_nm + 1]
+        if !is_zero(gp)
+          temp = mul!(temp, f_lead, gp)
+          acc = add!(acc, temp)
+        end
+      end
+      h_coeffs[p + 1] = acc
+    end
+
+    row_H = n - m + idx
     for p in 0:(n - 1)
-      c = coeff(H_poly, [i], [p])
+      c = h_coeffs[p + 1]
       if !is_zero(c)
-        col_H = n - p
-        H[row_H, col_H] = c
+        H[row_H, n - p] = c
       end
     end
   end
@@ -1844,8 +1894,7 @@ function __kerber_H_matrix(f::P, g::P, i::Int) where {P <: MPolyRingElem}
 end
 
 # Reference: M. Kerber (2009), Definitions 4.1 & 4.2
-# This method returns the matrix S_{j,s}(A) from Definition 4.2 (2) (which is also used
-# in the 4-th line of Algorithm 4.1)
+# Returns the matrix S_{j,s}(A) from Definition 4.2 (2) (line 4 of Algorithm 4.1)
 function __kerber_S_matrix(A::MatElem{T}, j::Int, s::Int) where {T <: RingElement}
   n = nrows(A)
   N_js = div(n - j, s)
@@ -1861,7 +1910,10 @@ function __kerber_S_matrix(A::MatElem{T}, j::Int, s::Int) where {T <: RingElemen
 
     # 1. Pivot column of the block (positive)
     for row in 1:dim_S
-      S_mat[row, col_idx] = A[row, p]
+      entry = A[row, p]
+      if !is_zero(entry)
+        S_mat[row, col_idx] = entry
+      end
     end
     col_idx += 1
 
@@ -1869,7 +1921,10 @@ function __kerber_S_matrix(A::MatElem{T}, j::Int, s::Int) where {T <: RingElemen
     start_val = max(1, p - s + 1)
     for val in start_val:(p - 1)
       for row in 1:dim_S
-        S_mat[row, col_idx] = -A[row, val]
+        entry = A[row, val]
+        if !is_zero(entry)
+          S_mat[row, col_idx] = -entry
+        end
       end
       col_idx += 1
     end

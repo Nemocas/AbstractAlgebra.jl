@@ -500,6 +500,7 @@ export preimage
 export preimage_map
 export prime
 export primpart
+export principal_subresultant_coefficients
 export pseudo_inv
 export pseudodivrem
 export pseudorem
@@ -586,6 +587,7 @@ export sub!
 export submul!
 export subresultant_prs_ducos
 export subresultant_prs_kerber
+export subresultants_top_coefficients
 export subst
 export summands
 export supermodule
