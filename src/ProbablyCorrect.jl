@@ -53,6 +53,7 @@ GLOBAL_ActiveDodgyFamilies::Vector{Symbol} = Symbol[]
 @doc raw"""
     add_dodgy_func(family::Symbol)
 
+**EXPERIMENTAL FEATURE**
 This registers the name `family` as a name for a function family having dodgy variants.
 It would normally be called in the initialization of the package.
 """
@@ -65,6 +66,7 @@ end
 @doc raw"""
     get_active_dodgy_funcs()
 
+**EXPERIMENTAL FEATURE**
 Returns a list of symbols for function families which are currently in dodgy mode.
 """
 function get_active_dodgy_funcs()
@@ -77,6 +79,7 @@ end
     set_dodgy_mode(b::Bool = true)
     set_dodgy_mode(family::Symbol, b::Bool = true)
 
+**EXPERIMENTAL FEATURE**
 Enable/Disable dodgy mode: globally (1st version), for the given family (2nd version).
 The mode is enabled when `b == true`, and disabled otherwise.  The value returned is
 a list of symbols of those families for which dodgy mode is enabled.
@@ -111,6 +114,7 @@ end
 @doc raw"""
     get_dodgy_mode(family::Symbol)
 
+**EXPERIMENTAL FEATURE**
 Return `true` iff dodgy mode is enabled for family `family`.
 """
 function get_dodgy_mode(family::Symbol)
@@ -156,6 +160,7 @@ const GLOBAL_EmptyStackTrace = Union{Ptr{Nothing}, Base.InterpreterIP}[]
 @doc raw"""
     dodgy_steps_clear()
 
+**EXPERIMENTAL FEATURE**
 Clear the log of dodgy steps.
 """
 function dodgy_steps_clear()
@@ -168,6 +173,7 @@ end
 @doc raw"""
     dodgy_steps_get()
 
+**EXPERIMENTAL FEATURE**
 Return the log of dodgy steps.
 """
 function dodgy_steps_get()
