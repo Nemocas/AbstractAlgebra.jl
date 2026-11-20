@@ -1085,9 +1085,9 @@ end
     pscs = principal_subresultant_coefficients(p, q, x)
     @test length(pscs) == 3
 
-    expected_res = a^4*b - a^3*b^2 + a^2*b^3 - a*b^4 - 2*a^4 + 2*a^3*b +
-               2*a*b^3 - 2*b^4 - a^3 - 3*a^2*b + 3*a*b^2 + b^3 -
-               3*a^2 + 6*a*b - 3*b^2 - 5*a + 5*b + 3
+    expected_res = a^5 - a^4*b - a^3*b^2 + a^2*b^3 - a^4 - 2*a^3*b + 6*a^2*b^2 -
+               4*a*b^3 + b^4 - 10*a^3 + 24*a^2*b - 17*a*b^2 + 3*b^3 +
+               6*a^2 - 6*a*b + a + b + 3
     @test pscs[end] == expected_res
     @test pscs[end] == expected_res
     @test subresultants_top_coefficients(p, q, x, 3) == sprs[3:end]
@@ -1104,7 +1104,7 @@ end
     q_eq = (b + 1)*x^3 + a*x^2 + 2*x + 3
     sprs_eq_d = subresultant_prs_ducos(p_eq, q_eq, x)
     @test subresultant_prs_kerber(p_eq, q_eq, x) == sprs_eq_d
-    @test subresultants_top_coeffs(p_eq, q_eq, x, 3) == sprs_eq_d[3:end]
+    @test subresultants_top_coefficients(p_eq, q_eq, x, 3) == sprs_eq_d[3:end]
     @test principal_subresultant_coefficients(p_eq, q_eq, x) == [coeff(sprs_eq_d[j + 2], [x], [3 - j]) for j in 1:3]
   end
 end
