@@ -1403,6 +1403,7 @@ x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
 ```
 """
 function pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  @req is_exact_type(T) "The base ring type must be an exact type"
   check_parent(p, q)
   iszero(q) && throw(DivideError())
 
@@ -1458,6 +1459,7 @@ of $p$ divided by $q$ with respect to the $i$-th variable. If $q = 0$, a `Divide
 
 # Examples
 
+```jldoctest
 julia> R, (x, y) = polynomial_ring(ZZ, [:x, :y])
 (Multivariate polynomial ring in 2 variables over integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
@@ -1472,8 +1474,10 @@ julia> pseudodivrem(p, q, 1)
 
 julia> pseudodivrem(p, q, 2)
 (-x^4 + x^2*y - x^2 + x*y + 1, x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1)
+```
 """
 function pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
+  @req is_exact_type(T) "The base ring type must be an exact type"
   check_parent(p, q)
   iszero(q) && throw(DivideError())
   deg_q = degree(q, i)
@@ -1692,7 +1696,6 @@ $f$ and $g$, followed by the complete subresultant chain $S_{m-1}, \dots, S_0$ o
 subresultant index (which may include defective and identically zero polynomials).
 """
 function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
-  @req is_exact_type(T) "The polynomials must be elements of an exact domain"
   check_parent(f, g)
   R = parent(f)
   n = degree(f, i)
