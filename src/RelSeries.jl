@@ -819,22 +819,10 @@ function ^(a::RelPowerSeriesRingElem{T}, b::Int) where T <: RingElement
    elseif b == 1
       return deepcopy(a)
    else
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
-         bit >>= 1
-      end
       val = valuation(a)
       a = shift_right(a, val)
       prec = precision(a)
-      z = a
-      bit >>= 1
-      while bit !=0
-         z = mullow(z, z, prec)
-         if (UInt(bit) & b) != 0
-            z = mullow(z, a, prec)
-         end
-         bit >>= 1
-      end
+      z = internal_power_left_to_right(a, b, (x, y) -> mullow(x, y, prec))
       z = set_valuation!(z, b*val)
       z = _set_precision_raw!(z, b*val + prec)
       renormalize!(z)
