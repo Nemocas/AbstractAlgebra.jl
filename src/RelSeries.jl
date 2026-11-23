@@ -1221,7 +1221,7 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
    end
    aval2 = div(aval, 2)
    asqrt = parent(a)()
-   fit!(asqrt, prec)
+   fit!(asqrt, prec - aval2)
    asqrt = _set_precision_raw!(asqrt, prec)
    asqrt = set_valuation!(asqrt, aval2)
    if check
@@ -1238,7 +1238,7 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
    end
-   asqrt = set_length!(asqrt, normalise(asqrt, prec))
+   asqrt = set_length!(asqrt, normalise(asqrt, prec - aval2))
    return true, asqrt
 end
 
