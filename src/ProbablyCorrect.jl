@@ -4,6 +4,9 @@
 
 # DESIGN/MAINTAINER DOC
 
+# THIS CODE IS NOT THREADSAFE;
+#   the macro @record_dodgy_step should be made threadsafe.
+
 # We use the following global variables:
 #   GLOBAL_ListOfDodgyFamilies::Vector{Symbol}
 #   -  a list of symbols: each symbol corresponds to a

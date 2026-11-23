@@ -8,6 +8,8 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 **This foundation is still EXPERIMENTAL: future UI/API changes may occur!**
 
+This prototype is **not threadsafe.**
+
 We welcome constructive feedback about design improvements supported by
 genuine use cases.  For the moment we adopt a KISS design principle.
 
