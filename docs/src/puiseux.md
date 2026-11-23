@@ -11,7 +11,7 @@ ring $R$.
 
 Puiseux series are power series of the form
 $a_jx^{j/m} + a_{j+1}x^{(j+1)/m} + \cdots + a_{k-1}x^{(k-1)/m} + O(x^{k/m})$
-for some integer $m > 0$ where $i \geq 0$, $a_i \in R$ and the relative precision
+for some integer $m > 0$ where $j \in \mathbb{Z}$, $a_i \in R$ and the relative precision
 $k - j$ is at most equal to some specified precision $n$.
 
 The generic Puiseux series module is implemented in `src/generic/PuiseuxSeries.jl`.
