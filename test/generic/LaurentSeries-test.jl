@@ -932,6 +932,11 @@ end
               @test_throws ErrorException sqrt(s*x)
           end
       end
+
+      @test is_square(O(x^3))
+      @test isequal(sqrt(O(x^3)), O(x^2))
+      @test isequal(is_square_with_sqrt(O(x^3)), (true, O(x^2)))
+      @test isequal(sqrt(O(x^-3)), O(x^-1))
    end
 
     R, = residue_field(ZZ, 2)
