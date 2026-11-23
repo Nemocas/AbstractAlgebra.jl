@@ -700,6 +700,10 @@ end
 
           @test f1 && s1^2 == s
       end
+
+      @test is_square(O(x^3))
+      @test isequal(sqrt(O(x^3)), O(x^(3//2)))
+      @test isequal(is_square_with_sqrt(O(x^3)), (true, O(x^(3//2))))
    end
 
    R, = residue_field(ZZ, 2)
