@@ -19,8 +19,8 @@ $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{n-1}x^{n-1} + O(x^n)$
 where $j \geq 0$, $a_j \in R$ and the precision $n$ is fixed.
 
 There are two implementations of relative series: relative power series, implemented in
-`src/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
-series where $j$ can be negative, implemented in `src/Laurent.jl`.
+`src/RelSeries.jl` for which $j \geq 0$ in the above description, and Laurent
+series where $j$ can be negative, implemented in `src/generic/LaurentSeries.jl`.
 Note that there are two implementations for Laurent series, one over rings and one
 over fields, though in practice most of the implementation uses the same code in both
 cases.

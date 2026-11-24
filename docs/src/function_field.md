@@ -8,7 +8,7 @@ DocTestSetup = AbstractAlgebra.doctestsetup()
 
 AbstractAlgebra.jl provides a module, implemented in
 `src/generic/RationalFunctionField.jl` for rational function fields $k(x)$ or
-`k[x_1, x_2, \ldots, x_n]` over a field $k$.
+`k(x_1, x_2, \ldots, x_n)` over a field $k$.
 
 ## Generic rational function field type
 
