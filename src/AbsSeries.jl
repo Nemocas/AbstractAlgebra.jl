@@ -848,14 +848,15 @@ function sqrt_classical(a::AbsPowerSeriesRingElem; check::Bool=true)
    # coefficient of the square of g
    S = parent(a)
    R = base_ring(a)
+   if iszero(a)
+      # O(x^n) is the square of O(x^m) for all m >= n/2
+      return true, _set_precision_raw!(S(), precision(a) - div(precision(a), 2))
+   end
    aval = valuation(a)
    if check && !iseven(aval)
       return false, zero(S)
    end
    !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
-   if iszero(a)
-      return true, deepcopy(a)
-   end
    if characteristic(R) == 2
       return sqrt_classical_char2(a; check=check)
    end

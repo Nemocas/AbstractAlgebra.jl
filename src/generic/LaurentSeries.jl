@@ -1338,6 +1338,15 @@ end
 function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
+   if iszero(a)
+      # O(x^n) is the square of O(x^m) for all m >= n/2
+      prec = cld(precision(a), 2)
+      asqrt = S()
+      asqrt = set_precision!(asqrt, prec)
+      asqrt = set_valuation!(asqrt, prec)
+      asqrt = set_scale!(asqrt, 1)
+      return true, asqrt
+   end
    !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    if characteristic(R) == 2
       return sqrt_classical_char2(a, check=check)
@@ -1349,12 +1358,6 @@ function sqrt_classical(a::LaurentSeriesElem; check::Bool=true)
    aval2 = div(aval, 2)
    prec = precision(a) - aval
    asqrt = parent(a)()
-   if prec <= 0
-      asqrt = set_precision!(asqrt, aval2)
-      asqrt = set_valuation!(asqrt, aval2)
-      asqrt = set_scale!(asqrt, 1)
-      return true, asqrt
-   end
    s = scale(a)
    zlen = div(prec + s - 1, s)
    fit!(asqrt, zlen)

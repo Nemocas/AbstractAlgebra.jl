@@ -1209,7 +1209,7 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
    end
    aval2 = div(aval, 2)
    asqrt = parent(a)()
-   fit!(asqrt, prec)
+   fit!(asqrt, prec - aval2)
    asqrt = _set_precision_raw!(asqrt, prec)
    asqrt = set_valuation!(asqrt, aval2)
    if check
@@ -1226,13 +1226,21 @@ function sqrt_classical_char2(a::RelPowerSeriesRingElem; check::Bool=true)
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
    end
-   asqrt = set_length!(asqrt, normalise(asqrt, prec))
+   asqrt = set_length!(asqrt, normalise(asqrt, prec - aval2))
    return true, asqrt
 end
 
 function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    R = base_ring(a)
    S = parent(a)
+   if iszero(a)
+      # O(x^n) is the square of O(x^m) for all m >= n/2
+      prec = precision(a) - div(precision(a), 2)
+      asqrt = S()
+      asqrt = _set_precision_raw!(asqrt, prec)
+      asqrt = set_valuation!(asqrt, prec)
+      return true, asqrt
+   end
    aval = valuation(a)
    if check && !iseven(aval)
       return false, S()
@@ -1244,11 +1252,6 @@ function sqrt_classical(a::RelPowerSeriesRingElem; check::Bool=true)
    aval2 = div(aval, 2)
    prec = precision(a) - aval
    asqrt = parent(a)()
-   if prec <= 0
-      asqrt = _set_precision_raw!(asqrt, aval2)
-      asqrt = set_valuation!(asqrt, aval2)
-      return true, asqrt
-   end
    fit!(asqrt, prec)
    asqrt = _set_precision_raw!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
