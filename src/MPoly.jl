@@ -1405,6 +1405,7 @@ x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
 function pseudorem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
   @req is_exact_type(T) "The base ring type must be an exact type"
   check_parent(p, q)
+  @req i in 1:nvars(parent(p)) "Variable index out of range"
   iszero(q) && throw(DivideError())
 
   deg_q = degree(q, i)
@@ -1479,7 +1480,9 @@ julia> pseudodivrem(p, q, 2)
 function pseudodivrem(p::MPolyRingElem{T}, q::MPolyRingElem{T}, i::Int) where {T <: RingElement}
   @req is_exact_type(T) "The base ring type must be an exact type"
   check_parent(p, q)
+  @req i in 1:nvars(parent(p)) "Variable index out of range"
   iszero(q) && throw(DivideError())
+
   deg_q = degree(q, i)
   deg_p = degree(p, i)
 
@@ -1544,7 +1547,7 @@ end
 
 @doc raw"""
     subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
-    subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, $v$::MPolyRingElem{T}) where {T <: RingElement}
+    subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, v::MPolyRingElem{T}) where {T <: RingElement}
 
 Return the subresultant polynomial remainder sequence of $f$ and $g$ in the $i$-th variable
 of their base ring, using an algorithmic variant due to Ducos. The returned vector starts with
@@ -1554,9 +1557,10 @@ function subresultant_prs_ducos(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int
   @req is_domain_type(T) "The polynomials must be elements of an integral domain"
   @req is_exact_type(T) "The polynomials must be elements of an exact domain"
   check_parent(f, g)
+  @req i in 1:nvars(parent(f)) "Variable index out of range"
   @req degree(f, i) >= degree(g, i) "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
 
-  S = [f, g]
+  S = elem_type(parent(f))[f, g]
   degree(g, i) <= 0 && return S
 
   s = coeff(g, [i], [degree(g, i)])^(degree(f, i) - degree(g, i))
@@ -1615,7 +1619,8 @@ function __lazard_se(Sd::P, Sd_1::P, s::P, i::Int) where {P <: MPolyRingElem}
 end
 
 function __ducos_s_e_minus_1(A::P, B::P, C::P, s::P, i::Int) where {P <: MPolyRingElem}
-  d = degree(A, i)
+  A_coeffs = coefficients(A, i)
+  d = length(A_coeffs) - 1
   e = degree(B, i)
   v = gen(parent(A), i)
 
@@ -1623,33 +1628,34 @@ function __ducos_s_e_minus_1(A::P, B::P, C::P, s::P, i::Int) where {P <: MPolyRi
 
   v_powers = Vector{P}(undef, d)
   v_powers[1] = one(parent(A))
-  for j in 1:(d-1)
-    v_powers[j+1] = v_powers[j] * v
+  for j in 1:(d - 1)
+    v_powers[j + 1] = v_powers[j] * v
   end
 
   c_d_1 = coeff(B, [i], [e])
-  s_e = coeff(C, [i], [degree(C, i)])
+  s_e = C === B ? c_d_1 : coeff(C, [i], [e]) # C === B when d - e == 1 (regular subresultant), see subresultant_prs_ducos
 
   D = zero(parent(A))
   temp = zero(parent(A))
 
-  for j in 0:(e-1)
-    c_Aj = coeff(A, [i], [j])
+  for j in 0:(e - 1)
+    c_Aj = A_coeffs[j + 1]
     if !is_zero(c_Aj)
-      temp = mul!(temp, s_e * c_Aj, v_powers[j+1])
-      D = add!(D, D, temp)
+      temp = mul!(temp, c_Aj, v_powers[j + 1])
+      D = add!(D, temp)
     end
   end
+  D = mul!(D, s_e)
 
-  H_curr = (s_e * v_powers[e+1]) - C
+  H_curr = (s_e * v_powers[e + 1]) - C
 
-  c_Ae = coeff(A, [i], [e])
+  c_Ae = A_coeffs[e + 1]
   if !is_zero(c_Ae)
     temp = mul!(temp, c_Ae, H_curr)
-    D = add!(D, D, temp)
+    D = add!(D, temp)
   end
 
-  for j in (e+1):(d-1)
+  for j in (e + 1):(d - 1)
     H_curr = mul!(H_curr, H_curr, v)
     cf = coeff(H_curr, [i], [e])
 
@@ -1657,14 +1663,14 @@ function __ducos_s_e_minus_1(A::P, B::P, C::P, s::P, i::Int) where {P <: MPolyRi
       H_curr = sub!(H_curr, H_curr, divexact(cf * B, c_d_1))
     end
 
-    c_Aj = coeff(A, [i], [j])
+    c_Aj = A_coeffs[j + 1]
     if !is_zero(c_Aj)
       temp = mul!(temp, c_Aj, H_curr)
-      D = add!(D, D, temp)
+      D = add!(D, temp)
     end
   end
 
-  D = divexact(D, coeff(A, [i], [d]))
+  D = divexact(D, A_coeffs[d + 1])
 
   H_d = mul!(H_curr, H_curr, v)
   cf_d = coeff(H_d, [i], [e])
@@ -1699,19 +1705,19 @@ the start of the returned vector; defective and identically zero subresultants a
 function subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int, s::Int) where {T <: RingElement}
   check_parent(f, g)
   R = parent(f)
+  @req i in 1:nvars(R) "Variable index out of range"
   n = degree(f, i)
   m = degree(g, i)
 
   @req n >= m "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
-  @req s >= 1 "The number of top coefficients s must be at least 1"
+  @req s in 1:max(1, m) "The number of top coefficients s must be between 1 and max(1, deg_i(g))"
   m <= 0 && return elem_type(R)[]
-  @req s <= m "The number of top coefficients s cannot exceed the degree of the second polynomial in the specified variable"
 
   H = __kerber_H_matrix(f, g, i)
   minors_map = Vector{Vector{elem_type(R)}}(undef, s)
 
   for j in 1:s
-    S_j = __kerber_S_matrix(H, j, s)
+    S_j = (j == 1 && s == 1) ? H : __kerber_S_matrix(H, j, s) # S_{1,1}(H) = H, so avoid copying H whenever s = 1
     minors_map[j] = leading_principal_minors(S_j)
   end
 
@@ -1733,8 +1739,12 @@ function subresultants_top_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}
       j_rep = mod1(k + t, s)
       minor_val = minors_map[j_rep][k]
       if !is_zero(minor_val)
-        temp = mul!(temp, minor_val, x_powers[n - k - t + 1])
-        poly = add!(poly, temp)
+        if n == k + t # x_powers[1] = 1, so no multiplication needed
+          poly = add!(poly, minor_val)
+        else
+          temp = mul!(temp, minor_val, x_powers[n - k - t + 1])
+          poly = add!(poly, temp)
+        end
       end
     end
 
@@ -1765,11 +1775,12 @@ subresultant index (which may include defective and identically zero subresultan
 """
 function subresultant_prs_kerber(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
   check_parent(f, g)
+  @req i in 1:nvars(parent(f)) "Variable index out of range"
   n = degree(f, i)
   m = degree(g, i)
 
   @req n >= m "The degree in the specified variable of the second polynomial cannot be strictly larger than the same degree of the first polynomial"
-  m <= 0 && return [f, g]
+  m <= 0 && return elem_type(parent(f))[f, g]
 
   subres = subresultants_top_coefficients(f, g, i, m)
   res = Vector{elem_type(parent(f))}(undef, m + 2)
@@ -1800,6 +1811,7 @@ computed without divisions via the leading principal minors of the hybrid Bézou
 function principal_subresultant_coefficients(f::MPolyRingElem{T}, g::MPolyRingElem{T}, i::Int) where {T <: RingElement}
   check_parent(f, g)
   R = parent(f)
+  @req i in 1:nvars(R) "Variable index out of range"
   n = degree(f, i)
   m = degree(g, i)
 
@@ -1825,14 +1837,10 @@ end
 # Returns the matrix H = J_n * HBez(f, g) (line 3 in Algorithm 4.1)
 function __kerber_H_matrix(f::P, g::P, i::Int) where {P <: MPolyRingElem}
   R = parent(f)
-  n = degree(f, i)
-  m = degree(g, i)
-
-  @req n >= m "The degree of the first input in the specified variable must be greater than or equal to the degree of the second input"
-  @req m > 0 "The second polynomial must have positive degree in the specified variable"
-
   f_coeffs = coefficients(f, i)
   g_coeffs = coefficients(g, i)
+  n = length(f_coeffs) - 1
+  m = length(g_coeffs) - 1
 
   H = zero_matrix(R, n, n)
 
