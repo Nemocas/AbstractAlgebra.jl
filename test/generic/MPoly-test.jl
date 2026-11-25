@@ -793,63 +793,68 @@ end
 end
 
 @testset "Generic.MPoly.pseudodivrem" begin
-   R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
+  R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
 
-   p1 = x^2 + y
-   q1 = x - z
+  p1 = x^2 + y
+  q1 = x - z
 
-   quot1, rem1 = pseudodivrem(p1, q1, x)
-   @test quot1 == x + z
-   @test rem1 == z^2 + y
-   @test pseudorem(p1, q1, x) == rem1
-   @test quot1 * q1 + rem1 == p1
+  quot1, rem1 = pseudodivrem(p1, q1, x)
+  @test quot1 == x + z
+  @test rem1 == z^2 + y
+  @test pseudorem(p1, q1, x) == rem1
+  @test quot1 * q1 + rem1 == p1
 
-   p2 = x^2 + y
-   q2 = y * x - z
+  @test_throws ArgumentError pseudorem(p1, q1, 0)
+  @test_throws ArgumentError pseudorem(p1, q1, 4)
+  @test_throws ArgumentError pseudodivrem(p1, q1, 0)
+  @test_throws ArgumentError pseudodivrem(p1, q1, 4)
 
-   quot2, rem2 = pseudodivrem(p2, q2, 1)
-   @test quot2 == y * x + z
-   @test rem2 == z^2 + y^3
-   @test pseudorem(p2, q2, 1) == rem2
-   @test y^2 * p2 == quot2 * q2 + rem2
+  p2 = x^2 + y
+  q2 = y * x - z
 
-   p3 = x * y + x
-   q3 = y + 1
+  quot2, rem2 = pseudodivrem(p2, q2, 1)
+  @test quot2 == y * x + z
+  @test rem2 == z^2 + y^3
+  @test pseudorem(p2, q2, 1) == rem2
+  @test y^2 * p2 == quot2 * q2 + rem2
 
-   quot3, rem3 = pseudodivrem(p3, q3, 2)
-   @test quot3 == x
-   @test iszero(rem3)
-   @test iszero(pseudorem(p3, q3, 2))
-   @test quot3 * q3 == p3
+  p3 = x * y + x
+  q3 = y + 1
 
-   p4 = x^3 + 1
-   q4 = y * x^2 + 1
+  quot3, rem3 = pseudodivrem(p3, q3, 2)
+  @test quot3 == x
+  @test iszero(rem3)
+  @test iszero(pseudorem(p3, q3, 2))
+  @test quot3 * q3 == p3
 
-   quot4, rem4 = pseudodivrem(p4, q4, x)
-   @test quot4 == y * x
-   @test rem4 == y * (y - x)
-   @test pseudorem(p4, q4, x) == rem4
-   @test y^2 * p4 == quot4 * q4 + rem4
+  p4 = x^3 + 1
+  q4 = y * x^2 + 1
 
-   @test pseudodivrem(x, x^2 + y, x) == (zero(R), x)
-   @test pseudorem(x, x^2 + y, x) == x
+  quot4, rem4 = pseudodivrem(p4, q4, x)
+  @test quot4 == y * x
+  @test rem4 == y * (y - x)
+  @test pseudorem(p4, q4, x) == rem4
+  @test y^2 * p4 == quot4 * q4 + rem4
 
-   @test pseudodivrem(zero(R), x + y, x) == (zero(R), zero(R))
-   @test iszero(pseudorem(zero(R), x + y, x))
+  @test pseudodivrem(x, x^2 + y, x) == (zero(R), x)
+  @test pseudorem(x, x^2 + y, x) == x
 
-   @test_throws DivideError pseudorem(x + y, zero(R), x)
-   @test_throws DivideError pseudodivrem(x + y, zero(R), x)
+  @test pseudodivrem(zero(R), x + y, x) == (zero(R), zero(R))
+  @test iszero(pseudorem(zero(R), x + y, x))
 
-   @testset "nonzero constant divisors" begin
-      Rzz, (x_zz, y_zz) = polynomial_ring(ZZ, [:x, :y])
-      c = Rzz(2)
+  @test_throws DivideError pseudorem(x + y, zero(R), x)
+  @test_throws DivideError pseudodivrem(x + y, zero(R), x)
 
-      @test pseudodivrem(x_zz, c, 1) == (2 * x_zz, zero(Rzz))
-      @test iszero(pseudorem(x_zz, c, 1))
+  @testset "nonzero constant divisors" begin
+    Rzz, (x_zz, y_zz) = polynomial_ring(ZZ, [:x, :y])
+    c = Rzz(2)
 
-      @test pseudodivrem(Rzz(5), c, 1) == (Rzz(5), zero(Rzz))
-      @test iszero(pseudorem(Rzz(5), c, 1))
-    end
+    @test pseudodivrem(x_zz, c, 1) == (2 * x_zz, zero(Rzz))
+    @test iszero(pseudorem(x_zz, c, 1))
+
+    @test pseudodivrem(Rzz(5), c, 1) == (Rzz(5), zero(Rzz))
+    @test iszero(pseudorem(Rzz(5), c, 1))
+  end
 end
 
 @testset "Generic.subresultant_prs algorithms" begin
@@ -899,6 +904,16 @@ end
     A9 = matrix(QQ, [10*r + c for r in 1:9, c in 1:9])
     expected_cols = [3, -1, -2, 9, -4, -5, -6, -7, -8]
     @test __kerber_S_matrix(A9, 3, 6) == __make_kerber_S(A9, expected_cols)
+  end
+
+  @testset "domain, inexact safeguards" begin
+    R_nondom, (x_nd,) = polynomial_ring(residue_ring(ZZ, 6)[1], [:x])
+    @test_throws ArgumentError subresultant_prs_ducos(x_nd^2, x_nd, 1)
+
+    R_inexact, (x_in,) = polynomial_ring(RealField, [:x])
+    @test_throws ArgumentError pseudorem(x_in^2, x_in, 1)
+    @test_throws ArgumentError pseudodivrem(x_in^2, x_in, 1)
+    @test_throws ArgumentError subresultant_prs_ducos(x_in^2, x_in, 1)
   end
 
   @testset "big subresultant example" begin
@@ -1088,7 +1103,6 @@ end
     expected_res = a^5 - a^4*b - a^3*b^2 + a^2*b^3 - a^4 - 2*a^3*b + 6*a^2*b^2 -
                4*a*b^3 + b^4 - 10*a^3 + 24*a^2*b - 17*a*b^2 + 3*b^3 +
                6*a^2 - 6*a*b + a + b + 3
-    @test pscs[end] == expected_res
     @test pscs[end] == expected_res
     @test subresultants_top_coefficients(p, q, x, 3) == sprs[3:end]
     @test subresultants_top_coefficients(p, q, x, 1) == [pscs[j] * x^(3 - j) for j in 1:3]
