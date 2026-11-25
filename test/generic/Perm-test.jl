@@ -153,6 +153,9 @@ end
    @test a == b
    @test a !== b
 
+   @test mutable_copy(c) == c
+   @test mutable_copy(c) !== c
+
    @test isone(a) && isone(b)
    @test !isone(c)
 

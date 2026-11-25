@@ -53,6 +53,15 @@ function deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where
     )
 end
 
+function mutable_copy(a::FreeAssociativeAlgebraElem{T}) where T <: RingElement
+    return FreeAssociativeAlgebraElem{T}(
+        a.parent,
+        mutable_copy(a.coeffs),
+        mutable_copy(a.exps),
+        a.length,
+    )
+end
+
 function zero(a::FreeAssociativeAlgebra{T}) where T
     return FreeAssociativeAlgebraElem{T}(a, T[], Vector{Int}[], 0)
 end

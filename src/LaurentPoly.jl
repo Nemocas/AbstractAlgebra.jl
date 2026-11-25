@@ -108,6 +108,10 @@ function deepcopy_internal(p::LaurentPolyRingElem, dict::IdDict)
    return LaurentPolyRingElem(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
 end
 
+function mutable_copy(p::LaurentPolyRingElem)
+   return LaurentPolyRingElem(p.parent, mutable_copy(p.poly), p.mindeg)
+end
+
 const hashp_seed = UInt === UInt64 ? 0xcdaf0e0b5ade239b : 0x5ade239b
 
 function Base.hash(p::LaurentPolyRingElem, h::UInt)
