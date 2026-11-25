@@ -113,6 +113,10 @@ function deepcopy_internal(a::LaurentMPolyRingElem, dict::IdDict)
                                      deepcopy_internal(a.mindegs, dict))
 end
 
+function mutable_copy(a::LaurentMPolyRingElem)
+   return LaurentMPolyRingElem(a.parent, mutable_copy(a.mpoly), copy(a.mindegs))
+end
+
 function Base.hash(a::LaurentMPolyRingElem, h::UInt)
     (ap, ad) = _normalize(a)
     h = hash(ap, h)

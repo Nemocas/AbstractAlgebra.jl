@@ -213,6 +213,10 @@ function deepcopy_internal(a::AbsMSeries, dict::IdDict)
     return parent(a)(deepcopy_internal(poly(a), dict), a.prec)
 end
 
+function mutable_copy(a::AbsMSeries)
+    return parent(a)(mutable_copy(poly(a)), a.prec)
+end
+
 # In an unweighted ring the polynomial may hold terms beyond the precision
 function _truncated_poly(a::AbsMSeries)
     parent(a).weighted_prec == -1 || return poly(a)

@@ -720,6 +720,11 @@ function deepcopy_internal(a::AbsSimpleFunctionFieldElem, dict::IdDict)
             deepcopy_internal(denominator(a, false), dict))
 end
 
+function mutable_copy(a::AbsSimpleFunctionFieldElem)
+   return parent(a)(mutable_copy(numerator(a, false)),
+                    mutable_copy(denominator(a, false)))
+end
+
 function Base.hash(a::AbsSimpleFunctionFieldElem, h::UInt)
    b = 0x52fd76bf2694aa02%UInt
    # `==` compares canonical forms

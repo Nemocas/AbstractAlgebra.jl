@@ -97,6 +97,7 @@ end
    @test canonical_unit(-y + 1) == -1
 
    @test deepcopy(h) == h
+   @test mutable_copy(h) == h
 
    @test is_term(rand(R, -10:10)*y^2)
 

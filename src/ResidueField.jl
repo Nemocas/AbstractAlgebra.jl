@@ -88,6 +88,8 @@ end
 
 deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
 
+mutable_copy(a::ResFieldElem) = parent(a)(mutable_copy(data(a)))
+
 ###############################################################################
 #
 #   AbstractString I/O

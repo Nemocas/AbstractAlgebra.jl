@@ -350,6 +350,11 @@ function deepcopy_internal(a::LaurentSeriesElem{T}, dict::IdDict) where {T <: Ri
    return parent(a)(coeffs, pol_length(a), precision(a), valuation(a), scale(a))
 end
 
+function mutable_copy(a::LaurentSeriesElem{T}) where {T <: RingElement}
+   coeffs = T[mutable_copy(polcoeff(a, i - 1)) for i in 1:pol_length(a)]
+   return parent(a)(coeffs, pol_length(a), precision(a), valuation(a), scale(a))
+end
+
 function renormalize!(z::LaurentSeriesElem)
    i = 0
    zlen = pol_length(z)

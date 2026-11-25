@@ -449,6 +449,7 @@ export multiply_column
 export multiply_column!
 export multiply_row
 export multiply_row!
+export mutable_copy
 export neg!
 export newton_to_monomial!
 export norm
