@@ -3072,11 +3072,16 @@ function leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
   n = nrows(A)
   R = base_ring(A)
 
-  n == 0 && return elem_type(R)[]
+  n == 0 && return T[]
 
-  minors = Vector{elem_type(R)}(undef, n)
+  minors = Vector{T}(undef, n)
   minors[1] = deepcopy(A[1, 1])
   n == 1 && return minors
+
+  A_mat = Matrix{T}(undef, n, n)
+  for j in 1:n, i in 1:n
+    A_mat[i, j] = A[i, j]
+  end
 
   chi = [zero(R) for _ in 1:n+1]
   next_chi = [zero(R) for _ in 1:n+1]
@@ -3088,21 +3093,25 @@ function leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
   temp = zero(R)
 
   chi[1] = one(R)
-  chi[2] = -A[1, 1]
+  chi[2] = -A_mat[1, 1]
 
   for k in 2:n
     r = k - 1
-    a_corner = A[k, k]
+    a_corner = A_mat[k, k]
 
     for i in 1:r
-      v[i] = deepcopy(A[i, k])
+      v[i] = deepcopy(A_mat[i, k])
     end
 
     for p in 1:r
       dot_val = zero(R)
       for i in 1:r
-        temp = mul!(temp, A[k, i], v[i])
-        dot_val = add!(dot_val, temp)
+        aki = A_mat[k, i]
+        vi = v[i]
+        if !iszero(aki) && !iszero(vi)
+          temp = mul!(temp, aki, vi)
+          dot_val = add!(dot_val, temp)
+        end
       end
       q[p] = dot_val
 
@@ -3110,8 +3119,12 @@ function leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
         for i in 1:r
           row_dot = zero(R)
           for j in 1:r
-            temp = mul!(temp, A[i, j], v[j])
-            row_dot = add!(row_dot, temp)
+            aij = A_mat[i, j]
+            vj = v[j]
+            if !iszero(aij) && !iszero(vj)
+              temp = mul!(temp, aij, vj)
+              row_dot = add!(row_dot, temp)
+            end
           end
           next_v[i] = row_dot
         end
@@ -3126,12 +3139,17 @@ function leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
       c_vec[p + 2] = -q[p]
     end
 
-    for i in 1:(k + 1)
+    i_start = (k == n ? k + 1 : 1)
+    for i in i_start:(k + 1)
       acc = zero(R)
       max_j = min(i, k)
       for j in 1:max_j
-        temp = mul!(temp, c_vec[i - j + 1], chi[j])
-        acc = add!(acc, temp)
+        ci = c_vec[i - j + 1]
+        chij = chi[j]
+        if !iszero(ci) && !iszero(chij)
+          temp = mul!(temp, ci, chij)
+          acc = add!(acc, temp)
+        end
       end
       next_chi[i] = acc
     end
