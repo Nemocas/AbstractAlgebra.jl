@@ -179,6 +179,7 @@ function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)
    b = 0xcf418d4529109236%UInt
    q = data(p)
    v = Vector{Int}(undef, nvars(parent(q)))
+   c = zero(base_ring(q))
    for i in 1:length(q)
       v = exponent_vector!(v, q, i)
       l = length(v)
@@ -186,7 +187,8 @@ function Base.hash(p::UniversalRingElem{<:MPolyRingElem}, h::UInt)
          l -= 1
       end
       b = xor(b, xor(Base.hash(view(v, 1:l), h), h))
-      b = xor(b, xor(hash(coeff(q, i), h), h))
+      c = coeff!(c, q, i)
+      b = xor(b, xor(hash(c, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
