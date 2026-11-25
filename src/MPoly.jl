@@ -1398,7 +1398,7 @@ x^3 + x*y + 2*x + y + 2
 julia> pseudorem(p, q, 1)
 x*y^2 + x*y + y + 3
 
-julia> pseudorem(p, q, 2)
+julia> pseudorem(p, q, y)
 x^7 + 3*x^5 + 2*x^4 + x^3 + 5*x^2 + 4*x + 1
 ```
 """
