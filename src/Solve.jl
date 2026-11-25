@@ -261,14 +261,6 @@ solve_context_type(NF::MatrixNormalFormTrait, x) = solve_context_type(NF, typeof
 solve_context_type(T::DataType) = throw(MethodError(solve_context_type, (T,)))
 solve_context_type(NF::MatrixNormalFormTrait, T::DataType) = throw(MethodError(solve_context_type, (NF, T)))
 
-# Deprecated: instance-based dispatch, kept so downstream methods on ring
-# instances (e.g. `matrix_normal_form_type(::NumFieldOrder)`) are still reached.
-# Remove in the next breaking release.
-matrix_normal_form_type(A::MatElem) = matrix_normal_form_type(base_ring(A))
-solve_context_type(A::MatElem) = solve_context_type(base_ring(A))
-solve_context_type(R::NCRing) = solve_context_type(matrix_normal_form_type(R), elem_type(R))
-solve_context_type(K::Field) = solve_context_type(typeof(K))
-solve_context_type(K::Union{AbstractAlgebra.Rationals{BigInt}, FracField}) = solve_context_type(typeof(K))
 
 matrix_normal_form_type(::Type{<:SolveCtx{T, NF}}) where {T, NF} = NF()
 
