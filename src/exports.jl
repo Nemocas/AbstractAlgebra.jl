@@ -394,6 +394,7 @@ export leading_coefficient
 export leading_exponent_vector
 export leading_exponent_word
 export leading_monomial
+export leading_principal_minors
 export leading_term
 export leglength
 export length
@@ -500,6 +501,7 @@ export preimage
 export preimage_map
 export prime
 export primpart
+export principal_subresultant_coefficients
 export pseudo_inv
 export pseudodivrem
 export pseudorem
@@ -584,6 +586,9 @@ export sturm_sequence
 export sub
 export sub!
 export submul!
+export subresultant_prs_ducos
+export subresultant_prs_kerber
+export subresultants_top_coefficients
 export subst
 export summands
 export supermodule

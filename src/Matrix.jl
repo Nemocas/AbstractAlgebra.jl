@@ -3056,6 +3056,113 @@ function minors_iterator_with_position(A::MatElem, k::Int)
   return ((det(A[rows, cols]), rows, cols) for rows in row_indices for cols in col_indices)
 end
 
+# See the paper 'Division-Free Computation of Subresultants Using Bezout Matrices' by Kerber, 2009.
+# DOI: 10.1080/00207160802460595
+# The following algorithm combines Algorithms 3.1 and 3.2 from that paper
+@doc raw"""
+    leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
+
+Return a vector containing the $n$ leading principal minors of the square $n \times n$
+matrix $A$, i.e. the determinants of the top-left $k \times k$ submatrices
+$\det(A[1:k, 1:k])$ for $k = 1, \dots, n$. The computation is performed division-free
+using Berkowitz's algorithm.
+"""
+function leading_principal_minors(A::MatElem{T}) where {T <: RingElement}
+  check_square(A)
+  n = nrows(A)
+  R = base_ring(A)
+
+  n == 0 && return T[]
+
+  minors = Vector{T}(undef, n)
+  minors[1] = deepcopy(A[1, 1])
+  n == 1 && return minors
+
+  A_mat = Matrix{T}(undef, n, n)
+  for j in 1:n, i in 1:n
+    A_mat[i, j] = A[i, j]
+  end
+
+  chi = [zero(R) for _ in 1:n+1]
+  next_chi = [zero(R) for _ in 1:n+1]
+  v = [zero(R) for _ in 1:n-1]
+  next_v = [zero(R) for _ in 1:n-1]
+  q = [zero(R) for _ in 1:n-1]
+  c_vec = [zero(R) for _ in 1:n+1]
+
+  temp = zero(R)
+
+  chi[1] = one(R)
+  chi[2] = -A_mat[1, 1]
+
+  for k in 2:n
+    r = k - 1
+    a_corner = A_mat[k, k]
+
+    for i in 1:r
+      v[i] = deepcopy(A_mat[i, k])
+    end
+
+    for p in 1:r
+      dot_val = zero(R)
+      for i in 1:r
+        aki = A_mat[k, i]
+        vi = v[i]
+        if !iszero(aki) && !iszero(vi)
+          temp = mul!(temp, aki, vi)
+          dot_val = add!(dot_val, temp)
+        end
+      end
+      q[p] = dot_val
+
+      if p < r
+        for i in 1:r
+          row_dot = zero(R)
+          for j in 1:r
+            aij = A_mat[i, j]
+            vj = v[j]
+            if !iszero(aij) && !iszero(vj)
+              temp = mul!(temp, aij, vj)
+              row_dot = add!(row_dot, temp)
+            end
+          end
+          next_v[i] = row_dot
+        end
+
+        v, next_v = next_v, v
+      end
+    end
+
+    c_vec[1] = one(R)
+    c_vec[2] = -a_corner
+    for p in 1:r
+      c_vec[p + 2] = -q[p]
+    end
+
+    i_start = (k == n ? k + 1 : 1)
+    for i in i_start:(k + 1)
+      acc = zero(R)
+      max_j = min(i, k)
+      for j in 1:max_j
+        ci = c_vec[i - j + 1]
+        chij = chi[j]
+        if !iszero(ci) && !iszero(chij)
+          temp = mul!(temp, ci, chij)
+          acc = add!(acc, temp)
+        end
+      end
+      next_chi[i] = acc
+    end
+
+    chi, next_chi = next_chi, chi
+
+    c_0 = chi[k + 1]
+    minors[k] = isodd(k) ? -c_0 : deepcopy(c_0)
+  end
+
+  return minors
+end
+
 @doc raw"""
     exterior_power(A::MatElem, k::Int) -> MatElem
 
