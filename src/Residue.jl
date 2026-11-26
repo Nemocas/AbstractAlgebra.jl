@@ -117,6 +117,7 @@ mutable_copy(a::ResElem) = parent(a)(mutable_copy(data(a)))
 
 characteristic(R::ResidueRing{T}) where T <: Integer = modulus(R)
 is_known(::typeof(characteristic), R::ResidueRing{T}) where T <: Integer = true
+is_known(::typeof(characteristic), R::ResidueRing) = false
 
 ###############################################################################
 #
