@@ -78,9 +78,10 @@ end
 ###############################################################################
 
 function deepcopy_internal(a::FactoredFracFieldElem{T}, dict::IdDict) where T <: RingElement
-   return FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
-                          deepcopy_internal(a.terms, dict),
-                          a.parent)
+   haskey(dict, a) && return dict[a]
+   return dict[a] = FactoredFracFieldElem{T}(deepcopy_internal(a.unit, dict),
+                                             deepcopy_internal(a.terms, dict),
+                                             a.parent)
 end
 
 function mutable_copy(a::FactoredFracFieldElem{T}) where T <: RingElement

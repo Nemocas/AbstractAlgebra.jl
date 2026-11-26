@@ -834,12 +834,13 @@ isone(x::MPoly) = is_trivial(parent(x)) || (x.length == 1 && monomial_iszero(x.e
 is_constant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
 function deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
+   haskey(dict, a) && return dict[a]
    Re = deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
-      Rc[i] = deepcopy(a.coeffs[i])
+      Rc[i] = deepcopy_internal(a.coeffs[i], dict)
    end
-   return parent(a)(Rc, Re)
+   return dict[a] = parent(a)(Rc, Re)
 end
 
 function mutable_copy(a::MPoly{T}) where {T <: RingElement}

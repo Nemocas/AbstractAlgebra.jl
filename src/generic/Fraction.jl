@@ -51,10 +51,11 @@ function _canonical_num_den(a::FracFieldElem)
 end
 
 function deepcopy_internal(a::FracFieldElem{T}, dict::IdDict) where {T <: RingElem}
+   haskey(dict, a) && return dict[a]
    v = FracFieldElem{T}(deepcopy_internal(numerator(a, false), dict),
                deepcopy_internal(denominator(a, false), dict))
    v.parent = parent(a)
-   return v
+   return dict[a] = v
 end
 
 function mutable_copy(a::FracFieldElem{T}) where {T <: RingElem}

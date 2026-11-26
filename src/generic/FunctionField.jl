@@ -715,9 +715,10 @@ function num_coeff(a::AbsSimpleFunctionFieldElem, n::Int)
 end
 
 function deepcopy_internal(a::AbsSimpleFunctionFieldElem, dict::IdDict)
+   haskey(dict, a) && return dict[a]
    S = parent(a)
-   return S(deepcopy_internal(numerator(a, false), dict),
-            deepcopy_internal(denominator(a, false), dict))
+   return dict[a] = S(deepcopy_internal(numerator(a, false), dict),
+                      deepcopy_internal(denominator(a, false), dict))
 end
 
 function mutable_copy(a::AbsSimpleFunctionFieldElem)

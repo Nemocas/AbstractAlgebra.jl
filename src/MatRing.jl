@@ -232,13 +232,7 @@ function copy(d::MatRingElem{T}) where T <: NCRingElement
 end
 
 function deepcopy_internal(d::MatRingElem{T}, dict::IdDict) where T <: NCRingElement
-   z = similar(d)
-   for i = 1:nrows(d)
-      for j = 1:ncols(d)
-         z[i, j] = deepcopy_internal(d[i, j], dict)
-      end
-   end
-   return z
+   return MatRingElem{T}(deepcopy_internal(d.data, dict))
 end
 
 function mutable_copy(d::MatRingElem{T}) where T <: NCRingElement

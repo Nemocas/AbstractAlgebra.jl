@@ -74,10 +74,11 @@ function Base.denominator(a::TotFrac, canonicalise::Bool=true)
 end
 
 function deepcopy_internal(a::TotFrac{T}, dict::IdDict) where {T <: RingElem}
+   haskey(dict, a) && return dict[a]
    v = TotFrac{T}(deepcopy_internal(numerator(a, false), dict),
                   deepcopy_internal(denominator(a, false), dict))
    v.parent = parent(a)
-   return v
+   return dict[a] = v
 end
 
 function mutable_copy(a::TotFrac{T}) where {T <: RingElem}

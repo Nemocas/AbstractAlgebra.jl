@@ -232,11 +232,10 @@ Return a copy of the given element, recursively copying all components of the ob
 Obviously the parent, if it is stored in the element, should not be copied. The new
 element should have precisely the same parent as the old object.
 
-For types that cannot self-reference themselves anywhere internally, the `dict` argument
-may be ignored.
-
-In the case that internal self-references are possible, please consult the Julia
-documentation on how to implement `deepcopy_internal`.
+Objects shared in the original must be shared in the copy. A mutable element therefore
+returns `dict[f]` if `f` is a key of `dict`, and otherwise stores its copy as `dict[f]`.
+The components are copied with `deepcopy_internal(c, dict)`, passing the same `dict`. To
+obtain a copy whose components are distinct objects, use [`mutable_copy`](@ref).
 
 ```julia
 mutable_copy(f::MyElem)
@@ -838,9 +837,10 @@ function hash(f::ConstPoly, h::UInt)
 end
 
 function deepcopy_internal(f::ConstPoly{T}, dict::IdDict) where T <: RingElement
+   haskey(dict, f) && return dict[f]
    r = ConstPoly{T}(deepcopy_internal(f.c, dict))
    r.parent = f.parent # parent should not be deepcopied
-   return r
+   return dict[f] = r
 end
 
 function mutable_copy(f::ConstPoly{T}) where T <: RingElement

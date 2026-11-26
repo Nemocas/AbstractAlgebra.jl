@@ -75,12 +75,13 @@ base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_t
 parent(a::SparsePoly) = a.parent
 
 function deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
+   haskey(dict, a) && return dict[a]
    Re = Base.deepcopy_internal(a.exps, dict)
    Rc = Vector{T}(undef, a.length)
    for i = 1:a.length
       Rc[i] = Base.deepcopy_internal(a.coeffs[i], dict)
    end
-   return parent(a)(Rc, Re)
+   return dict[a] = parent(a)(Rc, Re)
 end
 
 function mutable_copy(a::SparsePoly{T}) where {T <: RingElement}

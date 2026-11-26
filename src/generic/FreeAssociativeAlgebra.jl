@@ -45,7 +45,8 @@ end
 ###############################################################################
 
 function deepcopy_internal(a::FreeAssociativeAlgebraElem{T}, dict::IdDict) where T <: RingElement
-    return FreeAssociativeAlgebraElem{T}(
+    haskey(dict, a) && return dict[a]
+    return dict[a] = FreeAssociativeAlgebraElem{T}(
         a.parent,
         deepcopy_internal(a.coeffs, dict),
         deepcopy_internal(a.exps, dict),

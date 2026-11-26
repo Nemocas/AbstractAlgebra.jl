@@ -62,8 +62,9 @@ number_of_generators(I::Ideal) = length(I.gens)
 gen(I::Ideal, i::Int) = I.gens[i]
 
 function deepcopy_internal(I::Ideal, dict::IdDict)
+   haskey(dict, I) && return dict[I]
    elms = [deepcopy_internal(x, dict) for x in I.gens]
-   return Ideal(base_ring(I), elms)
+   return dict[I] = Ideal(base_ring(I), elms)
 end
 
 mutable_copy(I::Ideal) = Ideal(base_ring(I), mutable_copy(I.gens))

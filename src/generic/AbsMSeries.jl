@@ -210,7 +210,8 @@ function is_gen(a::AbsMSeries)
 end
 
 function deepcopy_internal(a::AbsMSeries, dict::IdDict)
-    return parent(a)(deepcopy_internal(poly(a), dict), a.prec)
+    haskey(dict, a) && return dict[a]
+    return dict[a] = parent(a)(deepcopy_internal(poly(a), dict), a.prec)
 end
 
 function mutable_copy(a::AbsMSeries)

@@ -124,7 +124,8 @@ is_known(::typeof(characteristic), R::UniversalRing) = is_known(characteristic, 
 Base.hash(p::UniversalRingElem, h::UInt) = h
 
 function deepcopy_internal(p::UniversalRingElem, dict::IdDict)
-   return UniversalRingElem(deepcopy_internal(data(p), dict), parent(p))
+   haskey(dict, p) && return dict[p]
+   return dict[p] = UniversalRingElem(deepcopy_internal(data(p), dict), parent(p))
 end
 
 function mutable_copy(p::UniversalRingElem)

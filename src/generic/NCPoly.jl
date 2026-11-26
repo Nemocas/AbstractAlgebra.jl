@@ -48,11 +48,12 @@ end
 coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::NCPoly{T}, dict::IdDict) where T <: NCRingElem
+   haskey(dict, a) && return dict[a]
    coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy_internal(a.coeffs[i], dict)
    end
-   return parent(a)(coeffs)
+   return dict[a] = parent(a)(coeffs)
 end
 
 function mutable_copy(a::NCPoly{T}) where T <: NCRingElem

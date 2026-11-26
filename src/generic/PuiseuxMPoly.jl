@@ -285,7 +285,8 @@ function Base.:(==)(f::PuiseuxMPolyRingElem, g::PuiseuxMPolyRingElem)
 end
 
 function Base.deepcopy_internal(f::PuiseuxMPolyRingElem, dict::IdDict)
-    return puiseux_polynomial_ring_elem(parent(f), deepcopy_internal(poly(f), dict), deepcopy_internal(scale(f), dict); skip_normalization=true)
+    haskey(dict, f) && return dict[f]
+    return dict[f] = puiseux_polynomial_ring_elem(parent(f), deepcopy_internal(poly(f), dict), deepcopy_internal(scale(f), dict); skip_normalization=true)
 end
 
 function mutable_copy(f::PuiseuxMPolyRingElem)

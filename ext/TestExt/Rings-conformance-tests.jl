@@ -146,6 +146,8 @@ function test_NCRing_interface(R::AbstractAlgebra.NCRing; reps = 15)
             @test equality(a, A)
             @test hash(a) == hash(A)
             @test parent(a) === R
+            B, C = deepcopy((a, a))
+            @test B === C
             @test sprint(show, "text/plain", a) isa String
          end
          @test sprint(show, "text/plain", R) isa String

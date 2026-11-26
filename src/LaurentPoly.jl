@@ -105,7 +105,8 @@ gen(R::LaurentPolyRing) = LaurentPolyRingElem(R, one(base_ring(R)), 1)
 is_gen(p::LaurentPolyRingElem) = is_monomial(p, 1)
 
 function deepcopy_internal(p::LaurentPolyRingElem, dict::IdDict)
-   return LaurentPolyRingElem(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
+   haskey(dict, p) && return dict[p]
+   return dict[p] = LaurentPolyRingElem(p.parent, deepcopy_internal(p.poly, dict), p.mindeg)
 end
 
 function mutable_copy(p::LaurentPolyRingElem)
