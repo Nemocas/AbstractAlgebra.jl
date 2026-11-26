@@ -91,6 +91,10 @@
   @testset "Exact division" begin
     L = localization(Qx, x^6 + 108)
     @test_throws ErrorException divexact(L(9), L(2x^6 + 216))
+    for check in (true, false)
+      @test_throws DivideError divexact(one(L), zero(L); check)
+      @test_throws DivideError divexact(zero(L), zero(L); check)
+    end
     a = L(x^10 + 2 * x^8 + 14 * x^7 + 49 * x^5 + 42 * x^3 + 294 * x^2 + 588)
     b = L(x^11 + 14 * x^8 + 21 * x^6 + 294 * x^3 + 6)
     g = divides(a, b)
