@@ -59,7 +59,57 @@ Base.:/(x::RingElem, y::RingElem) = divexact(x, y; check=true)
 Base.:/(x::RingElem, y::JuliaRingElement) = divexact(x, y; check=true)
 Base.:/(x::JuliaRingElement, y::RingElem) = divexact(x, y; check=true)
 
+@doc raw"""
+    inv(a::RingElem)
+
+Return the multiplicative inverse of `a`. If `a` is not a unit, an exception
+is raised.
+
+!!! note
+    For Julia integers, including the elements of `ZZ`, `inv` is `Base.inv`
+    and returns a floating point number. `AbstractAlgebra.inv` instead returns
+    the inverse in the ring, and raises an exception if there is none.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> inv(R(2))
+1//2
+
+julia> inv(ZZ(-1)), AbstractAlgebra.inv(ZZ(-1))
+(-1.0, -1)
+```
+"""
 Base.inv(x::RingElem) = divexact(one(parent(x)), x)
+
+@doc raw"""
+    canonical_unit(a)
+
+Return a unit `u` such that `divexact(a, u)` is the preferred representative
+among the associates of `a`. For integers `u` is `-1` if `a < 0` and `1`
+otherwise; for polynomials it is the canonical unit of the leading
+coefficient, so over a field the result is monic. Fractions are normalised by
+dividing numerator and denominator by the canonical unit of the denominator.
+
+Some rings have no useful normalisation and always return `one(parent(a))`.
+Otherwise, if `a` is a unit then `canonical_unit(a) == a`, and if `a == b*c`
+then `canonical_unit(a)*a == canonical_unit(b)*canonical_unit(c)*a`.
+
+# Examples
+```jldoctest
+julia> canonical_unit(ZZ(-6))
+-1
+
+julia> R, x = polynomial_ring(QQ, :x);
+
+julia> f = 3x^2 + 1;
+
+julia> canonical_unit(f), divexact(f, canonical_unit(f))
+(3//1, x^2 + 1//3)
+```
+"""
+function canonical_unit end
 
 @doc raw"""
     is_divisible_by(x::T, y::T) where T <: RingElem

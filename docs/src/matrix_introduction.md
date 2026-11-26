@@ -12,8 +12,9 @@ restricted to numerical coefficient domains.
 
 Matrices in AbstractAlgebra belong to parent objects. Rectangular
 $m \times n$ matrices are elements of matrix spaces, while square
-$n \times n$ matrices may additionally be constructed as elements of matrix
-algebras, where matrix multiplication gives them the structure of a ring.
+$n \times n$ matrices may additionally be constructed as elements of
+[matrix algebras](matrix_algebras.md), where matrix multiplication gives them
+the structure of a ring.
 
 The matrix functionality includes standard arithmetic, linear solving,
 elementary row and column operations, determinants, inverses, kernels,
