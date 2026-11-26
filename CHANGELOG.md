@@ -9,6 +9,41 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.52.0](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.52.0) - 2026-11-26
+
+### Breaking changes
+
+> [!CAUTION]
+> These changes break compatibility from previous versions!
+
+#### Other fixed bugs
+
+- [#2657](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2657) Throw DivideError in more divexact methods
+
+#### Miscellaneous changes
+
+- [#2565](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2565) Restrict `rref`, `rref!`, `rref_rational`, `is_rref`, `lu!`, `fflu!`, `similarity!`, `is_popov`, `is_weak_popov`, `hnf_cohen`, `hnf_minors` (and `_with_transform` variants), `charpoly_danilevsky!`, `charpoly_danilevsky_ff!`, `add_row(!)`, `add_column(!)`, `multiply_row(!)` and `multiply_column(!)` to `MatElem`; for a `MatRingElem` `A`, apply them to `matrix(A)`
+- [#2565](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2565) Remove `is_square(::MatRingElem)`, which tested for a square matrix rather than for a square element
+- [#2588](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2588) `matrix_normal_form_type` and `solve_context_type` no longer reach methods defined on ring or matrix instances; define them on types instead
+
+### New or extended functionality
+
+- [#2594](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2594) Add `mutable_copy` for de-aliased copies
+- [#2660](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2660) Add `@register_cache`, `clear_cache` and `print_caches`
+- [#2661](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2661) Add `gcdx` for more than two inputs
+
+### Performance improvements or improved testing
+
+- [#2653](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2653) Speed up `hash`, `isequal` and `==` of fractions
+
+### Fixed bugs that returned incorrect results
+
+- [#2666](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2666) Treat inexact zero power series as squares
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2539](https://github.com/Nemocas/AbstractAlgebra.jl/pull/2539) Fix `MethodError` for `normalise` in generic polynomial code
+
 ## [0.51.4](https://github.com/Nemocas/AbstractAlgebra.jl/releases/tag/v0.51.4) - 2026-11-13
 
 ### New or extended functionality
