@@ -5,6 +5,8 @@
 export @alias
 export @attr
 export @attributes
+export @collect_credits
+export @credit
 export @enable_all_show_via_expressify
 export @free_associative_algebra
 export @hassert
@@ -27,6 +29,7 @@ export AdditiveGroupElem
 export AllParts
 export AllPerms
 export ConformanceTests
+export Credit
 export ErrorConstrDimMismatch
 export EuclideanRingResidueField
 export EuclideanRingResidueFieldElem
