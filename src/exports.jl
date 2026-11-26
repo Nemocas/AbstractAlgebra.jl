@@ -13,6 +13,7 @@ export @perm_str
 export @polynomial_ring
 export @power_series_ring
 export @rational_function_field
+export @record_dodgy_step
 export @req
 export @universal_polynomial_ring
 export @v_do
@@ -128,6 +129,7 @@ export abs_series_type
 export add!
 export add_column
 export add_column!
+export add_dodgy_func
 export add_row
 export add_row!
 export addmul!
@@ -211,6 +213,8 @@ export divexact_right
 export divhigh
 export divides
 export divides!
+export dodgy_steps_clear
+export dodgy_steps_get
 export domain
 export downscale
 export echelon_form
@@ -252,6 +256,8 @@ export gen
 export gens
 export get_attribute
 export get_attribute!
+export get_active_dodgy_funcs
+export get_dodgy_mode
 export graeffe_transform
 export gram
 export has_attribute
@@ -555,6 +561,7 @@ export scalar_matrix
 export section_map
 export set_attribute!
 export set_coefficient!
+export set_dodgy_mode
 export set_exponent_vector!
 export set_exponent_word!
 export set_length!
