@@ -251,14 +251,6 @@ function mutable_copy(d::MatRingElem{T}) where T <: NCRingElement
    return z
 end
 
-################################################################################
-#
-#   is_square
-#
-################################################################################
-
-is_square(::MatRingElem) = true   # FIXME: remove this once we untangled MatRingElem and MatrixElement etc.
-
 ###############################################################################
 #
 #   String I/O

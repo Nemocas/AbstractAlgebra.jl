@@ -23,14 +23,14 @@ Base.map!(f, dst::MatElem{T}, src::MatElem{U}) where {T <: NCRingElement, U <: N
 ## Elementary row and column operations
 
 ```@docs
-add_column(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
-add_column!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
-add_row(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
-add_row!(A::MatrixElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
-multiply_column(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
-multiply_column!(A::MatrixElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
-multiply_row(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
-multiply_row!(A::MatrixElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+add_column(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+add_column!(A::MatElem{T}, s::RingElement, i::Int, j::Int, rows = 1:nrows(A)) where T <: RingElement
+add_row(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+add_row!(A::MatElem{T}, s::RingElement, i::Int, j::Int, cols = 1:ncols(A)) where T <: RingElement
+multiply_column(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+multiply_column!(A::MatElem{T}, s::RingElement, i::Int, rows = 1:nrows(A)) where T <: RingElement
+multiply_row(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
+multiply_row!(A::MatElem{T}, s::RingElement, i::Int, cols = 1:ncols(A)) where T <: RingElement
 ```
 
 
