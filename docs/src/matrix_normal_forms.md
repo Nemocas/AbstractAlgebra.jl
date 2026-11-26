@@ -22,8 +22,8 @@ fflu(A::MatElem{T}, P = SymmetricGroup(nrows(A))) where {T <: RingElement}
 ## Reduced row-echelon form
 
 ```@docs
-rref_rational(A::MatrixElem{T}) where {T <: RingElement}
-rref(A::MatrixElem{T}) where {T <: FieldElement}
+rref_rational(A::MatElem{T}) where {T <: RingElement}
+rref(A::MatElem{T}) where {T <: FieldElement}
 ```
 
 
@@ -31,7 +31,7 @@ rref(A::MatrixElem{T}) where {T <: FieldElement}
 
 ```@docs
 hessenberg(A::MatElem{T}) where {T <: RingElement}
-similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+similarity!(A::MatElem{T}, r::Int, d::T) where {T <: RingElement}
 ```
 
 

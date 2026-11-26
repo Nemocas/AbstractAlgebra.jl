@@ -100,6 +100,7 @@ include("exports.jl")
 include("AliasMacro.jl")
 include("Aliases.jl") # needs to be included after AliasMacro.jl
 include("Assertions.jl")
+include("Caches.jl")
 
 include("Attributes.jl")
 include("PrintHelper.jl")
