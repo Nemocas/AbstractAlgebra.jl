@@ -66,7 +66,8 @@ end
 
 # A view into a copy of the whole underlying matrix, like `deepcopy`
 function mutable_copy(d::MatSpaceView{T}) where T <: NCRingElement
-   entries = view(mutable_copy(parent(d.entries)), parentindices(d.entries)...)
+   indices = map(mutable_copy, parentindices(d.entries))
+   entries = view(mutable_copy(parent(d.entries)), indices...)
    return MatSpaceView(entries, d.base_ring)
 end
 
@@ -271,7 +272,7 @@ function +(b::MatElem{T}, c::InjProjMat{T}) where {T <: NCRingElement}
   @assert size(b) == size(c)
   R = base_ring(b)
   @assert base_ring(c) === R
-  a = deepcopy(b)
+  a = mutable_copy(b)
   if nrows(c) >= ncols(c)
     for i in 1:ncols(c)
       add_one!(a, c.s+i-1, i)

@@ -233,7 +233,7 @@ function Base.:(^)(g::GroupElem, n::Integer)
     n < 0 && return inv(g)^-n
     n == 0 && return one(g)
     # `copy` would do, but is not part of the group interface (yet)
-    n == 1 && return deepcopy(g)
+    n == 1 && return mutable_copy(g)
     return internal_power(g, n)
 end
 

@@ -458,7 +458,7 @@ function ^(a::AbsMSeries, b::Int)
     elseif is_constant(poly(a))
         return R(poly(a)^b, a.prec)
     elseif b == 1
-        return deepcopy(a)
+        return mutable_copy(a)
     end
     return AbstractAlgebra.internal_power_left_to_right(a, b)
 end

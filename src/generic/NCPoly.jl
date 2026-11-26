@@ -98,10 +98,10 @@ function mul!(c::NCPoly{T}, a::NCPoly{T}, b::NCPoly{T}) where T <: NCRingElem
       c = set_length!(c, 0)
    else
       if a === c
-         a = deepcopy(a)
+         a = mutable_copy(a)
       end
       if b === c
-         b = deepcopy(b)
+         b = mutable_copy(b)
       end
 
       t = base_ring(a)()
@@ -153,12 +153,12 @@ function add!(c::NCPoly{T}, a::NCPoly{T}, b::NCPoly{T}) where T <: NCRingElem
    end
    while i <= lena
       # mutating operators must ensure they don't introduce new aliasing
-      c = setcoeff!(c, i - 1, deepcopy(coeff(a, i - 1)))
+      c = setcoeff!(c, i - 1, mutable_copy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
       # mutating operators must ensure they don't introduce new aliasing
-      c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
+      c = setcoeff!(c, i - 1, mutable_copy(coeff(b, i - 1)))
       i += 1
    end
    c = set_length!(c, normalise(c, len))

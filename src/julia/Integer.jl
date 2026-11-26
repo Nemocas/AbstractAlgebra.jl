@@ -558,6 +558,8 @@ end
 # No actual mutation is permitted for Julia types
 # See #1077
 
+mutable_copy(a::BigInt) = Base.GMP.MPZ.set(a)
+
 function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no temporary required
    return a + b*c
 end

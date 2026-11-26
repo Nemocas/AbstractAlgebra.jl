@@ -4137,6 +4137,12 @@ end
    V[1, 1] = 100
    @test M2 == M
 
+   # a copy of a view does not share the index vectors
+   rows = [1, 2]
+   V = mutable_copy(view(M, rows, :))
+   reverse!(rows)
+   @test V == M[1:2, :]
+
    for i in [ 1:1, 1:2, : ], j in [ 1:1, 1:2, : ]
      v = @view M[i,j]
      @test v isa Generic.MatSpaceView

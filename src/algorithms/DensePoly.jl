@@ -12,6 +12,7 @@ import AbstractAlgebra: elem_type
 import AbstractAlgebra: mul_red!
 import AbstractAlgebra: reduce!
 import AbstractAlgebra: add!
+import AbstractAlgebra: mutable_copy
 
 # usual polynomial mullow with the "fast" techniques depending on cutoffs
 # write the lower Alen coefficients of
@@ -242,9 +243,9 @@ function macc_toom22(
    if iszero(dr)
       for i in 0 : Alen - 1
          if i < rlen
-            A[Aoff + i] = deepcopy(r[1 + i])
+            A[Aoff + i] = mutable_copy(r[1 + i])
          elseif 0 <= i - 2*n < plen
-            A[Aoff + i] = deepcopy(p[1 + i - 2*n])
+            A[Aoff + i] = mutable_copy(p[1 + i - 2*n])
          else
             A[Aoff + i] = zero(R)
          end

@@ -155,6 +155,7 @@ end
 
    @test mutable_copy(c) == c
    @test mutable_copy(c) !== c
+   @test T != BigInt || mutable_copy(c)[1] !== c[1]
 
    @test isone(a) && isone(b)
    @test !isone(c)

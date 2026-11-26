@@ -96,7 +96,7 @@ end
 ###############################################################################
 
 function reduce_mod_invariants(v::AbstractAlgebra.MatElem{T}, invars::Vector{T}) where T <: RingElement
-   v = deepcopy(v) # don't modify input
+   v = mutable_copy(v) # don't modify input
    for i = 1:length(invars)
       if !iszero(invars[i])
          q, v[1, i] = divrem(v[1, i], invars[i])
