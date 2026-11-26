@@ -31,7 +31,7 @@ Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
 Base.deepcopy_internal(g::Perm, dict::IdDict) =
    Perm(Base.deepcopy_internal(g.d, dict), false)
 
-mutable_copy(g::Perm) = Perm(copy(g.d), false)
+mutable_copy(g::Perm) = Perm(mutable_copy(g.d), false)
 
 function getindex(g::Perm, n::Integer)
    return g.d[n]
