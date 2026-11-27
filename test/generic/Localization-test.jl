@@ -25,6 +25,12 @@
     @test elem_type(L) == LocalizedEuclideanRingElem{elem_type(Qx)}
     @test base_ring(L) == Qx
     @test base_ring(L()) == Qx
+
+    # the cache keeps no unreferenced localization alive
+    @test localization(Qx, x^3 + 5) === localization(Qx, x^3 + 5)
+    w = (() -> WeakRef(localization(Qx, x^3 + 7)))()
+    GC.gc(true)
+    @test w.value === nothing
   end
 
   @testset "Canonicalisation" begin
