@@ -86,7 +86,10 @@ function is_unit(a::ResFieldElem)
    return isone(g)
 end
 
-deepcopy_internal(a::ResFieldElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
+function deepcopy_internal(a::ResFieldElem, dict::IdDict)
+   haskey(dict, a) && return dict[a]
+   return dict[a] = parent(a)(deepcopy_internal(data(a), dict))
+end
 
 mutable_copy(a::ResFieldElem) = parent(a)(mutable_copy(data(a)))
 

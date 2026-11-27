@@ -63,11 +63,12 @@ end
 polcoeff(a::AbsSeries, n::Int) = coeff(a, n)
 
 function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where T <: RingElement
+   haskey(dict, a) && return dict[a]
    coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy_internal(coeff(a, i - 1), dict)
    end
-   return parent(a)(coeffs, length(a), precision(a))
+   return dict[a] = parent(a)(coeffs, length(a), precision(a))
 end
 
 function mutable_copy(a::AbsSeries{T}) where T <: RingElement

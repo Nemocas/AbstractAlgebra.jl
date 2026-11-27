@@ -143,7 +143,10 @@ function is_unit(a::LocalizedEuclideanRingElem{T})  where {T <: RingElem}
   return isin(inv(data(a)), parent(a))
 end
 
-deepcopy_internal(a::LocalizedEuclideanRingElem, dict::IdDict) = parent(a)(deepcopy_internal(data(a), dict))
+function deepcopy_internal(a::LocalizedEuclideanRingElem, dict::IdDict)
+   haskey(dict, a) && return dict[a]
+   return dict[a] = parent(a)(deepcopy_internal(data(a), dict))
+end
 
 mutable_copy(a::LocalizedEuclideanRingElem) = parent(a)(mutable_copy(data(a)))
 

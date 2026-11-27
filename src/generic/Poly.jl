@@ -80,11 +80,12 @@ end
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 function deepcopy_internal(a::Poly{T}, dict::IdDict) where T <: RingElement
+   haskey(dict, a) && return dict[a]
    coeffs = Vector{T}(undef, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy_internal(a.coeffs[i], dict)
    end
-   return parent(a)(coeffs)
+   return dict[a] = parent(a)(coeffs)
 end
 
 function mutable_copy(a::Poly{T}) where T <: RingElement

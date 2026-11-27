@@ -343,11 +343,12 @@ Return the modulus of the coefficients of the given power series.
 modulus(a::LaurentSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
 function deepcopy_internal(a::LaurentSeriesElem{T}, dict::IdDict) where {T <: RingElement}
+   haskey(dict, a) && return dict[a]
    coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy_internal(polcoeff(a, i - 1), dict)
    end
-   return parent(a)(coeffs, pol_length(a), precision(a), valuation(a), scale(a))
+   return dict[a] = parent(a)(coeffs, pol_length(a), precision(a), valuation(a), scale(a))
 end
 
 function mutable_copy(a::LaurentSeriesElem{T}) where {T <: RingElement}

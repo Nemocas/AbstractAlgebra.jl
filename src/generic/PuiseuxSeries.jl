@@ -264,7 +264,8 @@ function rescale!(a::PuiseuxSeriesElem)
 end
 
 function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::IdDict) where {T <: RingElement}
-    return parent(a)(deepcopy_internal(a.data, dict), a.scale)
+    haskey(dict, a) && return dict[a]
+    return dict[a] = parent(a)(deepcopy_internal(a.data, dict), a.scale)
 end
 
 function mutable_copy(a::PuiseuxSeriesElem{T}) where {T <: RingElement}

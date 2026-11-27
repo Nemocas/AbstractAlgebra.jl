@@ -134,6 +134,8 @@ function test_GroupElem_interface(g::GEl, h::GEl) where {GEl<:GroupElem}
           @test deepcopy(g) == g
           k = deepcopy(g)
           @test parent(k) === parent(g)
+          k1, k2 = deepcopy((g, g))
+          @test k1 === k2
           @test hash(g) isa UInt
           @test hash(g) == hash(k)
 

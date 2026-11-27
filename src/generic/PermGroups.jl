@@ -28,8 +28,10 @@ check_parent(g::Perm, h::Perm) = length(g.d) == length(h.d) ||
 Base.hash(g::Perm, h::UInt) = foldl((h, x) -> hash(x, h), g.d,
                                     init = hash(0x0d9939c64ab650ca, h))
 
-Base.deepcopy_internal(g::Perm, dict::IdDict) =
-   Perm(Base.deepcopy_internal(g.d, dict), false)
+function Base.deepcopy_internal(g::Perm, dict::IdDict)
+   haskey(dict, g) && return dict[g]
+   return dict[g] = Perm(Base.deepcopy_internal(g.d, dict), false)
+end
 
 mutable_copy(g::Perm) = Perm(mutable_copy(g.d), false)
 

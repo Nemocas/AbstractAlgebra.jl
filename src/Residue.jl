@@ -110,8 +110,10 @@ end
 
 annihilator(a::ResElem) = is_zero_divisor_with_annihilator(a)[2]
 
-deepcopy_internal(a::ResElem, dict::IdDict) =
-   parent(a)(deepcopy_internal(data(a), dict))
+function deepcopy_internal(a::ResElem, dict::IdDict)
+   haskey(dict, a) && return dict[a]
+   return dict[a] = parent(a)(deepcopy_internal(data(a), dict))
+end
 
 mutable_copy(a::ResElem) = parent(a)(mutable_copy(data(a)))
 

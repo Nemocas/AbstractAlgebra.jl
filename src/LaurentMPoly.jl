@@ -109,8 +109,9 @@ end
 ###############################################################################
 
 function deepcopy_internal(a::LaurentMPolyRingElem, dict::IdDict)
-   return LaurentMPolyRingElem(a.parent, deepcopy_internal(a.mpoly, dict),
-                                     deepcopy_internal(a.mindegs, dict))
+   haskey(dict, a) && return dict[a]
+   return dict[a] = LaurentMPolyRingElem(a.parent, deepcopy_internal(a.mpoly, dict),
+                                         deepcopy_internal(a.mindegs, dict))
 end
 
 function mutable_copy(a::LaurentMPolyRingElem)

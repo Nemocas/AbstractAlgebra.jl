@@ -63,11 +63,12 @@ end
 number_of_variables(R::RelPowerSeriesRing) = 1
 
 function deepcopy_internal(a::RelSeries{T}, dict::IdDict) where T <: RingElement
+   haskey(dict, a) && return dict[a]
    coeffs = Vector{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy_internal(polcoeff(a, i - 1), dict)
    end
-   return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
+   return dict[a] = parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
 end
 
 function mutable_copy(a::RelSeries{T}) where T <: RingElement

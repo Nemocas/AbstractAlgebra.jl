@@ -369,6 +369,12 @@ end
 
       @test hash(f) == hash(deepcopy(f))
 
+      # deepcopy keeps a coefficient shared with another object shared
+      if length(f) > 0
+         g, c = deepcopy((f, f.coeffs[1]))
+         @test g.coeffs[1] === c
+      end
+
       if length(f) > 0
          @test isa(coeff(f, rand(1:length(f))), elem_type(R))
       end
