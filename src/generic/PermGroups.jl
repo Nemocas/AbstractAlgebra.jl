@@ -928,8 +928,8 @@ end
 #
 ##############################################################################
 
-const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
-const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
+AbstractAlgebra.@register_cache const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
+AbstractAlgebra.@register_cache const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
 @doc raw"""
     character(lambda::Partition)
