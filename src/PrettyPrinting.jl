@@ -667,11 +667,11 @@ function push_right_curly(S::printer, ::MIME)
 end
 
 function push_left_curly(S::printer, ::MIME"text/latex")
-   push(S, "\\left{")
+   push(S, "\\left\\{")
 end
 
 function push_right_curly(S::printer, ::MIME"text/latex")
-   push(S, "\\right}")
+   push(S, "\\right\\}")
 end
 
 function push_elision(S, ::MIME)
