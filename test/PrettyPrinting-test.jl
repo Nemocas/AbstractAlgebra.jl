@@ -239,8 +239,8 @@ import AbstractAlgebra.PrettyPrinting
    @test limited_string(e) == "(x^1)[x^2, x^3, x^4, ..., x^198, x^199, x^200]"
 
    e = Expr(:list, [:(x^$i) for i in 1:200]...)
-   @test limited_latex_string(e) == "\\left{x^{1}, x^{2}, x^{3}, x^{4}, "*
-                                 "{\\ldots}, x^{198}, x^{199}, x^{200}\\right}"
+   @test limited_latex_string(e) == "\\left\\{x^{1}, x^{2}, x^{3}, x^{4}, "*
+                                 "{\\ldots}, x^{198}, x^{199}, x^{200}\\right\\}"
    @test limited_string(e) == "{x^1, x^2, x^3, x^4, ..., x^198, x^199, x^200}"
 
    e = Expr(:sequence, Expr(:text, "Polynomial ring in "),
