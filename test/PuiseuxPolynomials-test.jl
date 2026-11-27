@@ -88,6 +88,8 @@ import AbstractAlgebra: Generic.normalize!
         @test !is_constant(tp1^(1//2))
         @test !is_constant(tp1^(-1//3))
         @test !is_constant(1 + tp1)
+        @test is_constant_with_data(3 * tp1^(1//2) * tp1^(-1//2)) == (true, 3)
+        @test is_constant_with_data(tp1^(1//2)) == (false, 0)
 
         @test @inferred(constant_coefficient(zero(Kp))) == 0
         @test @inferred(constant_coefficient(tp1^(-1//2) + 5 + tp2^(1//3))) == 5

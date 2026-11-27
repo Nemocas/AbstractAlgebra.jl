@@ -317,6 +317,9 @@ monomial(::MPolyRing, ::Vector{Int})
 term(::MPolyRing, ::RingElement, ::Vector{Int})
 ```
 
+The constant of a constant polynomial is returned by
+[`is_constant_with_data`](@ref).
+
 **Examples**
 
 ```jldoctest

@@ -162,6 +162,7 @@ import ..AbstractAlgebra: inv
 import ..AbstractAlgebra: inv!
 import ..AbstractAlgebra: inverse_fn
 import ..AbstractAlgebra: is_constant
+import ..AbstractAlgebra: is_constant_with_data
 import ..AbstractAlgebra: is_divisible_by
 import ..AbstractAlgebra: is_domain_type
 import ..AbstractAlgebra: is_exact_type

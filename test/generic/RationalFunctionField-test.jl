@@ -200,6 +200,27 @@ end
    @test characteristic(R) == 0
 end
 
+@testset "Generic.RationalFunctionField.is_constant" begin
+   # constants of k(x) lie in k; those of k(x)(y) lie in k(x), without recursing
+   K, x = rational_function_field(QQ, :x)
+
+   fl, c = @inferred is_constant_with_data(K(3)//K(2))
+   @test fl && c == 3//2 && parent(c) === QQ
+   @test is_constant_with_data(zero(K)) == (true, 0)
+   @test is_constant_with_data(x//2) == (false, 0)
+   @test !is_constant(1//x)
+
+   L, y = rational_function_field(K, :y)
+   fl, c = @inferred is_constant_with_data(L(1//x))
+   @test fl && c == 1//x && parent(c) === K
+   @test is_constant(L(2))
+   @test !is_constant(x*y)
+
+   M, (u, v) = rational_function_field(QQ, [:u, :v])
+   @test is_constant_with_data((2u + 4v)//(3u + 6v)) == (true, 2//3)
+   @test !is_constant(u//v)
+end
+
 @testset "Generic.RationalFunctionField.unary_ops" begin
    # Univariate
    R, x = rational_function_field(QQ, "x")

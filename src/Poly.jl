@@ -115,6 +115,42 @@ function is_constant(a::PolynomialElem)
 end
 
 @doc raw"""
+    is_constant_with_data(a::RingElement) -> Bool, RingElement
+
+Return `(true, c)` if `a` is constant, where `c` is that constant, and
+`(false, z)` otherwise, where `z` is the zero of the ring `c` would lie in.
+
+- For a polynomial, Laurent polynomial or Puiseux polynomial over $R$, `c`
+  lies in $R$.
+- For a fraction over $R[x]$ or $R[x_1, \ldots, x_n]$, `c` lies in
+  `fraction_field(R)`, which is $R$ itself if $R$ is a field.
+- For an element of a rational function field $k(x)$, `c` lies in $k$.
+
+Only the outermost variables count: an element of $k(x)(y)$ is constant if it
+lies in $k(x)$.
+
+# Examples
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, :x);
+
+julia> is_constant_with_data(R(3))
+(true, 3)
+
+julia> F = fraction_field(R);
+
+julia> is_constant_with_data(F(6x, 4x))
+(true, 3//2)
+
+julia> is_constant_with_data(x//2)
+(false, 0//1)
+```
+"""
+function is_constant_with_data(a::Union{PolynomialElem, MPolyRingElem, LaurentPolyRingElem, LaurentMPolyRingElem})
+   is_constant(a) || return false, zero(base_ring(a))
+   return true, constant_coefficient(a)
+end
+
+@doc raw"""
     modulus(a::PolyRingElem{T}) where {T <: ResElem}
 
 Return the modulus of the coefficients of the given polynomial.

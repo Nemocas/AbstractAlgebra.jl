@@ -103,6 +103,38 @@ isone(a::FracElem) = numerator(a, false) == denominator(a, false)
 
 is_unit(a::FracElem) = !iszero(numerator(a, false))
 
+# `n//d` need not be reduced, so `n` and `d` may both be non-constant. Over a
+# domain, `n//d` lies in `Frac(R)` iff `n*lc(d) == d*lc(n)`, and then equals
+# `lc(n)//lc(d)`.
+function _is_constant_fraction(n, d)
+   iszero(n) && return true
+   is_constant(n) && is_constant(d) && return true
+   # nonzero proportional polynomials have the same support
+   length(n) == length(d) || return false
+   return n * leading_coefficient(d) == d * leading_coefficient(n)
+end
+
+@doc raw"""
+    is_constant(a::FracElem{<:Union{PolyRingElem, MPolyRingElem}})
+
+Return `true` if `a` lies in the image of `fraction_field(R)`, where `R` is
+the coefficient ring of the polynomial ring `base_ring(a)`.
+
+See also [`is_constant_with_data`](@ref).
+"""
+function is_constant(a::FracElem{<:Union{PolyRingElem, MPolyRingElem}})
+   return _is_constant_fraction(numerator(a, false), denominator(a, false))
+end
+
+function is_constant_with_data(a::FracElem{<:Union{PolyRingElem, MPolyRingElem}})
+   K = fraction_field(base_ring(base_ring(a)))
+   n = numerator(a, false)
+   d = denominator(a, false)
+   _is_constant_fraction(n, d) || return false, zero(K)
+   iszero(n) && return true, zero(K)
+   return true, divexact(K(leading_coefficient(n)), K(leading_coefficient(d)))
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

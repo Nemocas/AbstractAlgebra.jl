@@ -269,6 +269,13 @@ julia> d = denominator(g)
 x^3 + 3*x + 1
 ```
 
+### Constant elements
+
+```@docs
+is_constant(::FracElem{<:Union{PolyRingElem, MPolyRingElem}})
+is_constant_with_data
+```
+
 ### Greatest common divisor
 
 ```@docs

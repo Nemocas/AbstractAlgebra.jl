@@ -154,6 +154,8 @@ end
     @test !is_constant(inv(x))
     @test !is_constant(x * inv(y))
     @test !is_constant(1 + x)
+    @test is_constant_with_data(3 * x * inv(x)) == (true, 3)
+    @test is_constant_with_data(x * inv(y)) == (false, 0)
 
     @test is_monomial(x^2*y^-2)
     @test !is_monomial(2*x^2*y^-2)

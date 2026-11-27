@@ -82,6 +82,8 @@ is_monomial(p::UnivPolyOrLaurentElem) = is_monomial(data(p))
 
 is_constant(p::UnivPolyOrLaurentElem) = is_constant(data(p))
 
+is_constant_with_data(p::UnivPolyOrLaurentElem) = is_constant_with_data(data(p))
+
 is_term(p::UnivPolyOrLaurentElem) = is_term(data(p))
 
 coeff(p::UniversalRingElem{<:MPolyRingElem}, i::Int) = coeff(data(p), i)
