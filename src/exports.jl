@@ -303,6 +303,7 @@ export is_attribute_storing
 export is_attribute_storing_type
 export is_compatible
 export is_constant
+export is_constant_with_data
 export is_degree
 export is_diagonal
 export is_divisible_by

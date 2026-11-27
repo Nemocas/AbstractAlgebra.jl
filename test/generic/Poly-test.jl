@@ -339,6 +339,9 @@ end
    f = 2x*y + x^2 + 1
 
    @test !is_constant(f)
+   @test is_constant_with_data(S(x)) == (true, x)
+   @test is_constant_with_data(S()) == (true, 0)
+   @test is_constant_with_data(f) == (false, 0)
    @test leading_coefficient(f) == 2x
    @test trailing_coefficient(2x*y + x^2) == x^2
    @test constant_coefficient(y^2 + 2x) == 2x

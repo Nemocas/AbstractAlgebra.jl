@@ -203,6 +203,16 @@ end
     @test F(2//gen(Zx)) == F(2, gen(Zx))
 end
 
+@testset "Generic.FactoredFracFieldElem.is_constant" begin
+    # bases need not be coprime, so 2(x + 1)/(3(x + 1)) is constant
+    Zx, x = polynomial_ring(ZZ, :x)
+    F = factored_fraction_field(Zx)
+    @test is_constant_with_data(F(2x + 2, 3x + 3)) == (true, 2//3)
+    @test is_constant_with_data(F(x)//3) == (false, 0)
+    @test is_constant(zero(F))
+    @test !is_constant(F(x^2, x))
+end
+
 @testset "Generic.FactoredFracFieldElem.ZZxyz" begin
     Zxyz, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
     F = factored_fraction_field(Zxyz)

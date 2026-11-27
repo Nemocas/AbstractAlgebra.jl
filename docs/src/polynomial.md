@@ -428,6 +428,8 @@ is_term_recursive(::PolyRingElem)
 is_constant(::PolynomialElem)
 ```
 
+The constant itself is returned by [`is_constant_with_data`](@ref).
+
 ```@docs
 is_separable(::PolyRingElem)
 ```

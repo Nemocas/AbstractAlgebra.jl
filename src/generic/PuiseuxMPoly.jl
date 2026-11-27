@@ -325,6 +325,7 @@ is_univariate(R::PuiseuxMPolyRing) = is_univariate(base_ring(R))
 is_gen(f::PuiseuxMPolyRingElem) = is_gen(poly(f)) && scale(f) == 1
 is_term(f::PuiseuxMPolyRingElem) = is_term(poly(f))
 is_constant(f::PuiseuxMPolyRingElem) = is_constant(poly(f))
+is_constant_with_data(f::PuiseuxMPolyRingElem) = is_constant_with_data(poly(f))
 constant_coefficient(f::PuiseuxMPolyRingElem) = constant_coefficient(poly(f))
 is_monomial(f::PuiseuxMPolyRingElem) = is_monomial(poly(f).mpoly)
 is_unit(f::PuiseuxMPolyRingElem) = is_term(f) && is_unit(leading_coefficient(poly(f)))

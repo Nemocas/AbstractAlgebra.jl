@@ -115,6 +115,8 @@ using AbstractAlgebra.Generic: Integers, LaurentPolyWrapRing, LaurentPolyWrap,
       @test !is_constant(y)
       @test !is_constant(y^-1)
       @test !is_constant(y + 1)
+      @test is_constant_with_data(3 * y^-2 * y^2) == (true, 3)
+      @test is_constant_with_data(y^-1) == (false, 0)
 
       @test @inferred(constant_coefficient(zero(L))) == 0
       @test @inferred(constant_coefficient(y^-1 + 5 + 2y)) == 5

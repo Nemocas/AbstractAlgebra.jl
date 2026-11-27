@@ -194,6 +194,8 @@ end
    @test is_constant(S(3))
    @test is_constant(2*x*inv(x))
    @test !is_constant(f)
+   @test is_constant_with_data(2*x*inv(x)) == (true, 2)
+   @test is_constant_with_data(f) == (false, 0)
    @test is_monomial(x*y^-2)
    @test !is_monomial(2*x)
    @test is_term(2*x^-1)

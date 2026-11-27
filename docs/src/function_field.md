@@ -109,6 +109,14 @@ hom(::Generic.RationalFunctionField{T, U}, ::Field, ::Any, ::Any) where {T, U <:
 
 The following functionality is provided for rational function fields.
 
+### Constant elements
+
+```@docs
+is_constant(::Generic.RationalFunctionFieldElem)
+```
+
+The constant itself is returned by [`is_constant_with_data`](@ref).
+
 ### Greatest common divisor
 
 ```@docs

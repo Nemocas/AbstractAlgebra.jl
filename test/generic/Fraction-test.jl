@@ -129,6 +129,32 @@ end
    @test characteristic(R) == 0
 end
 
+@testset "Generic.FracFieldElem.is_constant" begin
+   # constants of Frac(R[x]) are the image of Frac(R), also for unreduced fractions
+   R, x = polynomial_ring(ZZ, :x)
+   F = fraction_field(R)
+
+   @test @inferred(is_constant_with_data(F(3)//F(2))) == (true, 3//2)
+   @test is_constant_with_data(zero(F)) == (true, 0)
+   @test is_constant_with_data(x//2) == (false, 0)
+   @test is_constant(F(3)//F(2))
+   @test !is_constant(1//x)
+   @test !is_constant(x//(x + 1))
+
+   @test is_constant_with_data(F(6x, 4x)) == (true, 3//2)
+   @test is_constant(F(zero(R), x))
+   @test !is_constant(F(x^2, x))
+   @test !is_constant(F(x, R(2)))
+
+   # over a field, the constant lies in the field itself
+   S, (y, z) = polynomial_ring(GF(5), [:y, :z])
+   G = fraction_field(S)
+   fl, c = @inferred is_constant_with_data(G(2y + 4z, 3y + 6z))
+   @test fl && c == 4 && parent(c) === base_ring(S)
+   @test !is_constant(G(y, z))
+   @test !is_constant(G(y + z, y - z))
+end
+
 @testset "Generic.FracFieldElem.unary_ops" begin
    S, x = polynomial_ring(ZZ, "x")
 

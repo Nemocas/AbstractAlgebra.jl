@@ -96,6 +96,18 @@ function Base.denominator(a::RationalFunctionFieldElem, canonicalise::Bool=true)
    return denominator(data(a), canonicalise)
 end
 
+@doc raw"""
+    is_constant(a::RationalFunctionFieldElem)
+
+Return `true` if `a` lies in the base field $k$ of the rational function
+field $k(x)$ or $k(x_1, \ldots, x_n)$ containing it.
+
+See also [`is_constant_with_data`](@ref).
+"""
+is_constant(a::RationalFunctionFieldElem) = is_constant(data(a))
+
+is_constant_with_data(a::RationalFunctionFieldElem) = is_constant_with_data(data(a))
+
 function (R::AbstractAlgebra.PolyRing{T})(x::RationalFunctionFieldElem{T, U}) where {T <: RingElement, U}
    @assert isone(denominator(x))
    y = numerator(x)

@@ -446,6 +446,9 @@ end
 
       @test is_constant(S(rand(-100:100)))
       @test is_constant(S(zero(S)))
+      @test is_constant_with_data(S(3)) == (true, 3)
+      @test is_constant_with_data(S()) == (true, 0)
+      @test is_constant_with_data(gen(S, 1) + 3) == (false, 0)
 
       g = rand(S, 1:1, 0:100, 0:0, 1:100)
       h = rand(S, 1:1, 0:100, 0:0, 1:1)
